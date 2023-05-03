@@ -46,7 +46,7 @@ const projects = [
     title: "PHPID Learning",
     description: "PHPID Learning website redesign",
     jobs: ["UI Design"],
-    url: "https://schemata.ruine.app",
+    url: "https://www.figma.com/file/qNIg0A9h7PnrFdOVSBbMEH/PHPID-Online-Learning-Redesign?t=G9iKlwb4iiNlrIeR-6",
     thumbnail: phpid,
   },
   {
