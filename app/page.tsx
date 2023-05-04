@@ -1,15 +1,22 @@
 import { SectionTitle } from "@/components/section-title";
 import {
   Icon,
+  adonisJsIcon,
+  figmaIcon,
   laravelIcon,
+  mysqlIcon,
+  nextjsIcon,
+  phpIcon,
   reactIcon,
   tailwindcssIcon,
+  typescriptIcon,
 } from "@/components/icons";
 import Image from "next/image";
 import fama from "@/assets/fama.png";
 import phpid from "@/assets/phpid.png";
 import ruinedev from "@/assets/ruinedev.png";
 import schemata from "@/assets/schemata.png";
+import indexkos from "@/assets/indexkos.png";
 
 const blogs = [
   {
@@ -31,6 +38,26 @@ const blogs = [
     title: "Mungkin Pemrograman Bukan Bidang yang Kamu Cari",
     date: "2 Oktober 2021",
     url: "https://github.com/itsfaqih/fundamental-pemrograman/blob/main/membentuk-pola-pikir/mungkin-pemrograman-bukan-bidang-yang-kamu-cari.md",
+  },
+  {
+    title: "Membuat Otentikasi JWT dengan PHP Native",
+    date: "16 November 2020",
+    url: "https://medium.com/@itsfaqih/membuat-otentikasi-jwt-dengan-php-native-a9d080953358",
+  },
+  {
+    title: "Apa itu JWT (JSON Web Token)?",
+    date: "14 November 2020",
+    url: "https://medium.com/@itsfaqih/apa-itu-jwt-json-web-token-63407936da10",
+  },
+  {
+    title: "Penerapan Sistem Grid Responsive dengan Flexbox",
+    date: "13 Juni 2020",
+    url: "https://medium.com/@itsfaqih/penerapan-sistem-grid-responsive-dengan-flexbox-c479c84be129",
+  },
+  {
+    title: "Memahami Satuan Persen (%) dalam CSS",
+    date: "11 Juni 2020",
+    url: "https://medium.com/@itsfaqih/memahami-satuan-persen-dalam-css-12479cba1c32",
   },
 ];
 
@@ -63,6 +90,13 @@ const projects = [
     url: "https://ruine.dev",
     thumbnail: ruinedev,
   },
+  {
+    title: "IndexKos App",
+    description: "Boarding house note app",
+    jobs: ["UI Design"],
+    url: "https://www.figma.com/file/ERVBkrAlNIMhZM075YA1uT/IndexKos?node-id=301%3A1073&t=zDSf0GIKzVZHO9ei-1",
+    thumbnail: indexkos,
+  },
 ];
 
 export default function Home() {
@@ -87,7 +121,7 @@ export default function Home() {
 
         <section className="mt-20">
           <SectionTitle title="Projects" />
-          <ul className="grid grid-cols-3 gap-8 mt-10">
+          <ul className="grid grid-cols-3 gap-8 mt-8">
             {projects.map((project) => (
               <li key={project.url}>
                 <a
@@ -115,8 +149,11 @@ export default function Home() {
         </section>
 
         <section className="mt-20">
-          <SectionTitle title="Tech Stack" />
+          <SectionTitle title="Skills" />
           <ul className="flex items-center gap-12 mt-8 grayscale">
+            <li>
+              <Icon className="text-5xl" icon={typescriptIcon} />
+            </li>
             <li>
               <Icon className="text-5xl" icon={reactIcon} />
             </li>
@@ -126,11 +163,27 @@ export default function Home() {
             <li>
               <Icon className="text-5xl" icon={laravelIcon} />
             </li>
+            <li>
+              <Icon className="text-4xl" icon={phpIcon} />
+            </li>
+            <li>
+              <Icon className="text-5xl" icon={mysqlIcon} />
+            </li>
+            <li>
+              <Icon className="text-5xl" icon={adonisJsIcon} />
+            </li>
+            <li>
+              <Icon className="text-5xl" icon={nextjsIcon} />
+            </li>
+            <li>
+              <Icon className="text-5xl" icon={figmaIcon} />
+            </li>
           </ul>
         </section>
-        <section className="mt-20">
+
+        <section className="mt-24">
           <SectionTitle title="Writing" />
-          <ul className="flex flex-col gap-6 mt-6 text-lg">
+          <ul className="grid grid-cols-2 gap-6 mt-6 text-lg">
             {blogs.map((blog) => (
               <li key={blog.title} className="flex flex-col gap-1">
                 <a
