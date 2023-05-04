@@ -1,22 +1,15 @@
 import { SectionTitle } from "@/components/section-title";
-import {
-  Icon,
-  adonisJsIcon,
-  figmaIcon,
-  laravelIcon,
-  mysqlIcon,
-  nextjsIcon,
-  phpIcon,
-  reactIcon,
-  tailwindcssIcon,
-  typescriptIcon,
-} from "@/components/icons";
 import Image from "next/image";
 import fama from "@/assets/fama.png";
 import phpid from "@/assets/phpid.png";
 import ruinedev from "@/assets/ruinedev.png";
 import schemata from "@/assets/schemata.png";
 import indexkos from "@/assets/indexkos.png";
+import dynamic from "next/dynamic";
+
+const SkillSection = dynamic(() => import("./skill-section"), {
+  ssr: false,
+});
 
 const blogs = [
   {
@@ -102,26 +95,24 @@ const projects = [
 export default function Home() {
   return (
     <main>
-      <div className="container py-20 mx-auto">
+      <div className="container py-10 mx-auto lg:py-20">
         <section>
           <h1 className="text-3xl font-medium tracking-tight text-gray-700">
             Faqih Muntashir
           </h1>
-          <div className="flex flex-col gap-3 mt-8 text-3xl text-gray-500">
-            <p>
-              Just your typical{" "}
-              <span className="text-gray-700">10X Engineer</span> wannabe
-            </p>
-            <p>
-              who cares about <span className="text-gray-700">developer</span>{" "}
-              and <span className="text-gray-700">user experience</span>.
-            </p>
-          </div>
+          <p className="mt-8 text-3xl leading-relaxed text-gray-500">
+            Just your typical{" "}
+            <span className="text-gray-700">10X Engineer</span> wannabe{" "}
+            <br className="hidden md:block" />
+            who cares about <span className="text-gray-700">
+              developer
+            </span> and <span className="text-gray-700">user experience</span>.
+          </p>
         </section>
 
         <section className="mt-20">
           <SectionTitle title="Projects" />
-          <ul className="grid grid-cols-3 gap-8 mt-8">
+          <ul className="grid gap-8 mt-8 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
               <li key={project.url}>
                 <a
@@ -148,42 +139,11 @@ export default function Home() {
           </ul>
         </section>
 
-        <section className="mt-20">
-          <SectionTitle title="Skills" />
-          <ul className="flex items-center gap-12 mt-8 grayscale">
-            <li>
-              <Icon className="text-5xl" icon={typescriptIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={reactIcon} />
-            </li>
-            <li>
-              <Icon className="text-4xl" icon={tailwindcssIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={laravelIcon} />
-            </li>
-            <li>
-              <Icon className="text-4xl" icon={phpIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={mysqlIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={adonisJsIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={nextjsIcon} />
-            </li>
-            <li>
-              <Icon className="text-5xl" icon={figmaIcon} />
-            </li>
-          </ul>
-        </section>
+        <SkillSection />
 
         <section className="mt-24">
           <SectionTitle title="Writing" />
-          <ul className="grid grid-cols-2 gap-6 mt-6 text-lg">
+          <ul className="grid gap-6 mt-6 text-lg lg:grid-cols-2">
             {blogs.map((blog) => (
               <li key={blog.title} className="flex flex-col gap-1">
                 <a
