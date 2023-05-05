@@ -25,7 +25,8 @@ export default function SkillSection() {
       <div className="mt-8 [&>swiper-container>swiper-slide]:w-auto">
         <swiper-container
           slides-per-view="auto"
-          free-mode={true}
+          grab-cursor
+          free-mode
           space-between={48}
         >
           <swiper-slide>

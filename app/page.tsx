@@ -139,7 +139,7 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <p className="mt-8 text-xl leading-relaxed text-gray-500 md:text-3xl">
+          <p className="mt-8 text-xl leading-relaxed text-gray-500 md:leading-relaxed md:text-3xl">
             Just your typical{" "}
             <span className="text-gray-700">10X Engineer</span> wannabe{" "}
             <br className="hidden md:block" />
