@@ -13,6 +13,16 @@ import {
   linkedinIcon,
   twitterIcon,
 } from "@/components/icons";
+import { slideInVariants } from "@/framer-motion/slide-in";
+import { scaleHoverVariants } from "@/framer-motion/scale-hover";
+import {
+  MotionA,
+  MotionDiv,
+  MotionH1,
+  MotionLi,
+  MotionP,
+  MotionUl,
+} from "@/components/motion";
 
 const SkillSection = dynamic(() => import("./skill-section"), {
   ssr: false,
@@ -112,48 +122,105 @@ export default function Home() {
       <div className="container py-10 mx-auto lg:py-20">
         <section>
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-medium tracking-tight text-gray-700 md:text-3xl">
+            <MotionH1
+              variants={slideInVariants()}
+              initial="hidden"
+              animate="visible"
+              className="text-xl font-medium tracking-tight text-gray-700 md:text-3xl"
+            >
               Faqih Muntashir
-            </h1>
-            <div className="flex items-center gap-6 md:gap-8">
-              <a
-                href="https://twitter.com/itsfaqih_"
-                target="_blank"
-                className="hover:grayscale-0 grayscale"
+            </MotionH1>
+            <ul className="flex items-center gap-6 md:gap-8">
+              <MotionLi
+                variants={{
+                  ...slideInVariants({ from: "right", delay: 0.1 }),
+                  ...scaleHoverVariants({ scale: 1.3 }),
+                }}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
               >
-                <Icon className="text-lg md:text-xl" icon={twitterIcon} />
-              </a>
-              <a
-                href="https://github.com/itsfaqih"
-                target="_blank"
-                className="hover:grayscale-0 grayscale"
+                <a
+                  href="https://twitter.com/itsfaqih_"
+                  target="_blank"
+                  className="transition hover:grayscale-0 grayscale"
+                >
+                  <Icon className="text-lg md:text-xl" icon={twitterIcon} />
+                </a>
+              </MotionLi>
+              <MotionLi
+                variants={{
+                  ...slideInVariants({ from: "right", delay: 0.15 }),
+                  ...scaleHoverVariants({ scale: 1.3 }),
+                }}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
               >
-                <Icon className="text-lg md:text-xl" icon={githubIcon} />
-              </a>
-              <a
-                href="https://linkedin.com/in/itsfaqih"
-                target="_blank"
-                className="hover:grayscale-0 grayscale"
+                <a
+                  href="https://github.com/itsfaqih"
+                  target="_blank"
+                  className="transition hover:grayscale-0 grayscale"
+                >
+                  <Icon className="text-lg md:text-xl" icon={githubIcon} />
+                </a>
+              </MotionLi>
+              <MotionLi
+                variants={{
+                  ...slideInVariants({ from: "right", delay: 0.2 }),
+                  ...scaleHoverVariants({ scale: 1.3 }),
+                }}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
               >
-                <Icon className="text-lg md:text-xl" icon={linkedinIcon} />
-              </a>
-            </div>
+                <a
+                  href="https://linkedin.com/in/itsfaqih"
+                  target="_blank"
+                  className="transition hover:grayscale-0 grayscale"
+                >
+                  <Icon className="text-lg md:text-xl" icon={linkedinIcon} />
+                </a>
+              </MotionLi>
+            </ul>
           </div>
-          <p className="mt-8 text-xl leading-relaxed text-gray-500 md:leading-relaxed md:text-3xl">
+          <MotionP
+            variants={slideInVariants({ delay: 0.1 })}
+            initial="hidden"
+            animate="visible"
+            className="mt-8 text-xl leading-relaxed text-gray-500 md:leading-relaxed md:text-3xl"
+          >
             Just your typical{" "}
             <span className="text-gray-700">10X Engineer</span> wannabe{" "}
             <br className="hidden md:block" />
             who cares about <span className="text-gray-700">
               developer
             </span> and <span className="text-gray-700">user experience</span>.
-          </p>
+          </MotionP>
         </section>
 
         <section className="mt-10 md:mt-20">
-          <SectionTitle title="Projects" />
+          <MotionDiv
+            variants={slideInVariants()}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "48px" }}
+          >
+            <SectionTitle title="Projects" />
+          </MotionDiv>
           <ul className="grid gap-8 mt-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <li key={project.url}>
+            {projects.map((project, i) => (
+              <MotionLi
+                variants={{
+                  ...slideInVariants({ from: "bottom", delay: i * 0.05 }),
+                  ...scaleHoverVariants(),
+                }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "48px" }}
+                whileHover="hover"
+                key={project.url}
+              >
                 <a
                   href={project.url}
                   target="_blank"
@@ -173,7 +240,7 @@ export default function Home() {
                     </p>
                   </div>
                 </a>
-              </li>
+              </MotionLi>
             ))}
           </ul>
         </section>
@@ -181,10 +248,24 @@ export default function Home() {
         <SkillSection />
 
         <section className="mt-24">
-          <SectionTitle title="Writing" />
+          <MotionDiv
+            variants={slideInVariants()}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "48px" }}
+          >
+            <SectionTitle title="Writing" />
+          </MotionDiv>
           <ul className="grid gap-6 mt-6 md:text-lg lg:grid-cols-2">
-            {blogs.map((blog) => (
-              <li key={blog.title} className="flex flex-col gap-1">
+            {blogs.map((blog, i) => (
+              <MotionLi
+                key={blog.title}
+                variants={slideInVariants({ delay: i * 0.05 })}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "48px" }}
+                className="flex flex-col gap-1"
+              >
                 <a
                   href={blog.url}
                   target="_blank"
@@ -193,7 +274,7 @@ export default function Home() {
                   {blog.title}
                 </a>
                 <p className="text-gray-400">{blog.date}</p>
-              </li>
+              </MotionLi>
             ))}
           </ul>
         </section>

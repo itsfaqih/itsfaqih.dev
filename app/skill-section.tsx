@@ -15,82 +15,117 @@ import {
   typescriptIcon,
 } from "@/components/icons";
 import { SectionTitle } from "@/components/section-title";
+import { MotionDiv } from "@/components/motion";
+import { scaleHoverVariants } from "@/framer-motion/scale-hover";
+import { slideInVariants } from "@/framer-motion/slide-in";
 
 register();
 
 export default function SkillSection() {
   return (
     <section className="mt-20">
-      <SectionTitle title="Skills" />
+      <MotionDiv
+        variants={slideInVariants()}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "48px" }}
+      >
+        <SectionTitle title="Skills" />
+      </MotionDiv>
       <div className="mt-8 [&>swiper-container>swiper-slide]:w-auto">
         <swiper-container
           slides-per-view="auto"
           grab-cursor
           free-mode
           space-between={48}
+          class="p-4 -m-4"
         >
-          <swiper-slide>
+          <SwiperSlide index={0}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={typescriptIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={1}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={reactIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={2}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={astroIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={3}>
             <Icon
               className="text-4xl transition grayscale hover:grayscale-0"
               icon={tailwindcssIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={4}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={laravelIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={5}>
             <Icon
               className="text-4xl transition grayscale hover:grayscale-0"
               icon={phpIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={6}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={mysqlIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={7}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={adonisJsIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={8}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={nextjsIcon}
             />
-          </swiper-slide>
-          <swiper-slide>
+          </SwiperSlide>
+          <SwiperSlide index={9}>
             <Icon
               className="text-5xl transition grayscale hover:grayscale-0"
               icon={figmaIcon}
             />
-          </swiper-slide>
+          </SwiperSlide>
         </swiper-container>
       </div>
     </section>
+  );
+}
+
+type SwiperSlideProps = {
+  index: number;
+  children: React.ReactNode;
+};
+
+function SwiperSlide({ index, children }: SwiperSlideProps) {
+  return (
+    <swiper-slide>
+      <MotionDiv
+        variants={{
+          ...slideInVariants({ from: "bottom", delay: index * 0.05 }),
+          ...scaleHoverVariants({ scale: 1.3 }),
+        }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "48px" }}
+        whileHover="hover"
+      >
+        {children}
+      </MotionDiv>
+    </swiper-slide>
   );
 }

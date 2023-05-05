@@ -6,11 +6,12 @@ declare global {
   declare namespace JSX {
     interface IntrinsicElements {
       "swiper-container": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & SwiperProps,
+        React.HTMLAttributes<HTMLElement> & SwiperProps & { class?: string },
         HTMLElement
       >;
       "swiper-slide": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & SwiperSlideProps,
+        React.HTMLAttributes<HTMLElement> &
+          SwiperSlideProps & { class?: string },
         HTMLElement
       >;
     }
