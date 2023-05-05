@@ -4,6 +4,7 @@ import { register } from "swiper/element";
 import {
   Icon,
   adonisJsIcon,
+  astroIcon,
   figmaIcon,
   laravelIcon,
   mysqlIcon,
@@ -21,38 +22,71 @@ export default function SkillSection() {
   return (
     <section className="mt-20">
       <SectionTitle title="Skills" />
-      <div className="mt-8 grayscale [&>swiper-container>swiper-slide]:w-auto">
+      <div className="mt-8 [&>swiper-container>swiper-slide]:w-auto">
         <swiper-container
           slides-per-view="auto"
           free-mode={true}
           space-between={48}
         >
           <swiper-slide>
-            <Icon className="text-5xl" icon={typescriptIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={typescriptIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={reactIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={reactIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-4xl" icon={tailwindcssIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={astroIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={laravelIcon} />
+            <Icon
+              className="text-4xl transition grayscale hover:grayscale-0"
+              icon={tailwindcssIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-4xl" icon={phpIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={laravelIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={mysqlIcon} />
+            <Icon
+              className="text-4xl transition grayscale hover:grayscale-0"
+              icon={phpIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={adonisJsIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={mysqlIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={nextjsIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={adonisJsIcon}
+            />
           </swiper-slide>
           <swiper-slide>
-            <Icon className="text-5xl" icon={figmaIcon} />
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={nextjsIcon}
+            />
+          </swiper-slide>
+          <swiper-slide>
+            <Icon
+              className="text-5xl transition grayscale hover:grayscale-0"
+              icon={figmaIcon}
+            />
           </swiper-slide>
         </swiper-container>
       </div>

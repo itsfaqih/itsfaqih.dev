@@ -10,6 +10,10 @@ import adonisJsIcon from "@iconify/icons-logos/adonisjs-icon";
 import nextjsIcon from "@iconify/icons-logos/nextjs-icon";
 import phpIcon from "@iconify/icons-logos/php";
 import figmaIcon from "@iconify/icons-logos/figma";
+import astroIcon from "@iconify/icons-logos/astro-icon";
+import twitterIcon from "@iconify/icons-logos/twitter";
+import githubIcon from "@iconify/icons-logos/github-icon";
+import linkedinIcon from "@iconify/icons-logos/linkedin-icon";
 
 export {
   Icon,
@@ -22,4 +26,8 @@ export {
   nextjsIcon,
   phpIcon,
   figmaIcon,
+  astroIcon,
+  twitterIcon,
+  githubIcon,
+  linkedinIcon,
 };

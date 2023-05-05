@@ -2,10 +2,17 @@ import { SectionTitle } from "@/components/section-title";
 import Image from "next/image";
 import fama from "@/assets/fama.png";
 import phpid from "@/assets/phpid.png";
+import ruineui from "@/assets/ruineui.png";
 import ruinedev from "@/assets/ruinedev.png";
 import schemata from "@/assets/schemata.png";
 import indexkos from "@/assets/indexkos.png";
 import dynamic from "next/dynamic";
+import {
+  Icon,
+  githubIcon,
+  linkedinIcon,
+  twitterIcon,
+} from "@/components/icons";
 
 const SkillSection = dynamic(() => import("./skill-section"), {
   ssr: false,
@@ -84,6 +91,13 @@ const projects = [
     thumbnail: ruinedev,
   },
   {
+    title: "ruine.UI Dashboard",
+    description: "Admin dashboard template",
+    jobs: ["UI Design", "Frontend"],
+    url: "https://ruine-dashboard.pages.dev/",
+    thumbnail: ruineui,
+  },
+  {
     title: "IndexKos App",
     description: "Boarding house note app",
     jobs: ["UI Design"],
@@ -97,9 +111,34 @@ export default function Home() {
     <main>
       <div className="container py-10 mx-auto lg:py-20">
         <section>
-          <h1 className="text-3xl font-medium tracking-tight text-gray-700">
-            Faqih Muntashir
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-medium tracking-tight text-gray-700">
+              Faqih Muntashir
+            </h1>
+            <div className="flex items-center gap-8">
+              <a
+                href="https://twitter.com/itsfaqih_"
+                target="_blank"
+                className="hover:grayscale-0 grayscale"
+              >
+                <Icon className="text-xl" icon={twitterIcon} />
+              </a>
+              <a
+                href="https://github.com/itsfaqih"
+                target="_blank"
+                className="hover:grayscale-0 grayscale"
+              >
+                <Icon className="text-xl" icon={githubIcon} />
+              </a>
+              <a
+                href="https://linkedin.com/in/itsfaqih"
+                target="_blank"
+                className="hover:grayscale-0 grayscale"
+              >
+                <Icon className="text-xl" icon={linkedinIcon} />
+              </a>
+            </div>
+          </div>
           <p className="mt-8 text-3xl leading-relaxed text-gray-500">
             Just your typical{" "}
             <span className="text-gray-700">10X Engineer</span> wannabe{" "}
