@@ -112,34 +112,34 @@ export default function Home() {
       <div className="container py-10 mx-auto lg:py-20">
         <section>
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-medium tracking-tight text-gray-700">
+            <h1 className="text-xl font-medium tracking-tight text-gray-700 md:text-3xl">
               Faqih Muntashir
             </h1>
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6 md:gap-8">
               <a
                 href="https://twitter.com/itsfaqih_"
                 target="_blank"
                 className="hover:grayscale-0 grayscale"
               >
-                <Icon className="text-xl" icon={twitterIcon} />
+                <Icon className="text-lg md:text-xl" icon={twitterIcon} />
               </a>
               <a
                 href="https://github.com/itsfaqih"
                 target="_blank"
                 className="hover:grayscale-0 grayscale"
               >
-                <Icon className="text-xl" icon={githubIcon} />
+                <Icon className="text-lg md:text-xl" icon={githubIcon} />
               </a>
               <a
                 href="https://linkedin.com/in/itsfaqih"
                 target="_blank"
                 className="hover:grayscale-0 grayscale"
               >
-                <Icon className="text-xl" icon={linkedinIcon} />
+                <Icon className="text-lg md:text-xl" icon={linkedinIcon} />
               </a>
             </div>
           </div>
-          <p className="mt-8 text-3xl leading-relaxed text-gray-500">
+          <p className="mt-8 text-xl leading-relaxed text-gray-500 md:text-3xl">
             Just your typical{" "}
             <span className="text-gray-700">10X Engineer</span> wannabe{" "}
             <br className="hidden md:block" />
@@ -149,9 +149,9 @@ export default function Home() {
           </p>
         </section>
 
-        <section className="mt-20">
+        <section className="mt-10 md:mt-20">
           <SectionTitle title="Projects" />
-          <ul className="grid gap-8 mt-8 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-8 mt-6 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
               <li key={project.url}>
                 <a
@@ -165,10 +165,10 @@ export default function Home() {
                     className="rounded-lg"
                   />
                   <div className="flex flex-col gap-1 mt-4">
-                    <p className="text-lg font-medium text-gray-700">
+                    <p className="font-medium text-gray-700 md:text-lg">
                       {project.title}
                     </p>
-                    <p className="text-lg text-gray-500">
+                    <p className="text-gray-500 md:text-lg">
                       {project.jobs.join(", ")}
                     </p>
                   </div>
@@ -182,7 +182,7 @@ export default function Home() {
 
         <section className="mt-24">
           <SectionTitle title="Writing" />
-          <ul className="grid gap-6 mt-6 text-lg lg:grid-cols-2">
+          <ul className="grid gap-6 mt-6 md:text-lg lg:grid-cols-2">
             {blogs.map((blog) => (
               <li key={blog.title} className="flex flex-col gap-1">
                 <a
