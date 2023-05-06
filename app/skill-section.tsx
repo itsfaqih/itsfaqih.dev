@@ -18,8 +18,52 @@ import { SectionTitle } from "@/components/section-title";
 import { MotionDiv } from "@/components/motion";
 import { scaleHoverVariants } from "@/framer-motion/scale-hover";
 import { slideInVariants } from "@/framer-motion/slide-in";
+import { cn } from "@/libs/cn.lib";
 
 register();
+
+const skills = [
+  {
+    title: "TypeScript",
+    icon: typescriptIcon,
+  },
+  {
+    title: "React",
+    icon: reactIcon,
+  },
+  {
+    title: "Astro",
+    icon: astroIcon,
+  },
+  {
+    title: "Tailwind CSS",
+    icon: tailwindcssIcon,
+  },
+  {
+    title: "Laravel",
+    icon: laravelIcon,
+  },
+  {
+    title: "MySQL",
+    icon: mysqlIcon,
+  },
+  {
+    title: "PHP",
+    icon: phpIcon,
+  },
+  {
+    title: "AdonisJS",
+    icon: adonisJsIcon,
+  },
+  {
+    title: "Figma",
+    icon: figmaIcon,
+  },
+  {
+    title: "Next.js",
+    icon: nextjsIcon,
+  },
+];
 
 export default function SkillSection() {
   return (
@@ -40,66 +84,14 @@ export default function SkillSection() {
           space-between={48}
           class="p-4 -m-4"
         >
-          <SwiperSlide index={0}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={typescriptIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={1}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={reactIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={2}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={astroIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={3}>
-            <Icon
-              className="text-4xl transition grayscale hover:grayscale-0"
-              icon={tailwindcssIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={4}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={laravelIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={5}>
-            <Icon
-              className="text-4xl transition grayscale hover:grayscale-0"
-              icon={phpIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={6}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={mysqlIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={7}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={adonisJsIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={8}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={nextjsIcon}
-            />
-          </SwiperSlide>
-          <SwiperSlide index={9}>
-            <Icon
-              className="text-5xl transition grayscale hover:grayscale-0"
-              icon={figmaIcon}
-            />
-          </SwiperSlide>
+          {skills.map((skill, index) => (
+            <SwiperSlide key={skill.title} title={skill.title} index={index}>
+              <Icon
+                icon={skill.icon}
+                className="text-5xl transition grayscale group-hover:grayscale-0"
+              />
+            </SwiperSlide>
+          ))}
         </swiper-container>
       </div>
     </section>
@@ -108,10 +100,11 @@ export default function SkillSection() {
 
 type SwiperSlideProps = {
   index: number;
+  title: string;
   children: React.ReactNode;
 };
 
-function SwiperSlide({ index, children }: SwiperSlideProps) {
+function SwiperSlide({ index, title, children }: SwiperSlideProps) {
   return (
     <swiper-slide>
       <MotionDiv
@@ -123,6 +116,8 @@ function SwiperSlide({ index, children }: SwiperSlideProps) {
         whileInView="visible"
         viewport={{ once: true, margin: "-64px" }}
         whileHover="hover"
+        title={title}
+        className="flex items-center justify-center w-14 h-14 group"
       >
         {children}
       </MotionDiv>

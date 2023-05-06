@@ -116,6 +116,24 @@ const projects = [
   },
 ];
 
+const socials = [
+  {
+    title: "Twitter",
+    url: "https://twitter.com/itsfaqih_",
+    icon: twitterIcon,
+  },
+  {
+    title: "Github",
+    url: "https://github.com/itsfaqih",
+    icon: githubIcon,
+  },
+  {
+    title: "Linkedin",
+    url: "https://www.linkedin.com/in/itsfaqih/",
+    icon: linkedinIcon,
+  },
+];
+
 export default function Home() {
   return (
     <main>
@@ -131,57 +149,27 @@ export default function Home() {
               Faqih Muntashir
             </MotionH1>
             <ul className="flex items-center gap-6 md:gap-8">
-              <MotionLi
-                variants={{
-                  ...slideInVariants({ from: "right", delay: 0.1 }),
-                  ...scaleHoverVariants({ scale: 1.3 }),
-                }}
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-              >
-                <a
-                  href="https://twitter.com/itsfaqih_"
-                  target="_blank"
-                  className="transition hover:grayscale-0 grayscale"
+              {socials.map((social, index) => (
+                <MotionLi
+                  key={social.title}
+                  variants={{
+                    ...slideInVariants({ from: "right", delay: index * 0.05 }),
+                    ...scaleHoverVariants({ scale: 1.3 }),
+                  }}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover="hover"
                 >
-                  <Icon className="text-lg md:text-xl" icon={twitterIcon} />
-                </a>
-              </MotionLi>
-              <MotionLi
-                variants={{
-                  ...slideInVariants({ from: "right", delay: 0.15 }),
-                  ...scaleHoverVariants({ scale: 1.3 }),
-                }}
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-              >
-                <a
-                  href="https://github.com/itsfaqih"
-                  target="_blank"
-                  className="transition hover:grayscale-0 grayscale"
-                >
-                  <Icon className="text-lg md:text-xl" icon={githubIcon} />
-                </a>
-              </MotionLi>
-              <MotionLi
-                variants={{
-                  ...slideInVariants({ from: "right", delay: 0.2 }),
-                  ...scaleHoverVariants({ scale: 1.3 }),
-                }}
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-              >
-                <a
-                  href="https://linkedin.com/in/itsfaqih"
-                  target="_blank"
-                  className="transition hover:grayscale-0 grayscale"
-                >
-                  <Icon className="text-lg md:text-xl" icon={linkedinIcon} />
-                </a>
-              </MotionLi>
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    title={social.title}
+                    className="transition hover:grayscale-0 grayscale"
+                  >
+                    <Icon className="text-lg md:text-xl" icon={social.icon} />
+                  </a>
+                </MotionLi>
+              ))}
             </ul>
           </div>
           <MotionP
