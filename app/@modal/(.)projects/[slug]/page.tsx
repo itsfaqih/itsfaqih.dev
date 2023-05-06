@@ -25,21 +25,23 @@ export default function ProjectModalPage({ params }: ProjectModalProps) {
       slug={project.slug}
       thumbnail={project.thumbnail}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col justify-between h-full">
         <div className="flex flex-col gap-6">
           <div>
-            <h2 className="text-lg text-gray-500">Description</h2>
-            <p className="mt-1 text-lg text-gray-700">{project.description}</p>
+            <h2 className="text-gray-500 md:text-lg">Description</h2>
+            <p className="mt-1 text-gray-700 md:text-lg">
+              {project.description}
+            </p>
           </div>
           <div>
-            <h2 className="text-lg text-gray-500">Work Type</h2>
-            <p className="mt-1 text-lg text-gray-700">
+            <h2 className="text-gray-500 md:text-lg">Work Type</h2>
+            <p className="mt-1 text-gray-700 md:text-lg">
               {project.jobs.join(", ")}
             </p>
           </div>
           <div>
-            <h2 className="text-lg text-gray-500">Tools Used</h2>
-            <ul className="flex items-center gap-4 mt-2 text-lg text-gray-700">
+            <h2 className="text-gray-500 md:text-lg">Tools Used</h2>
+            <ul className="flex items-center gap-4 mt-2 text-gray-700 md:text-lg">
               {project.tools.map((tool) => (
                 <MotionLi
                   key={tool}
@@ -50,20 +52,21 @@ export default function ProjectModalPage({ params }: ProjectModalProps) {
                 >
                   <Icon
                     icon={toolToIcon(tool)}
-                    className="text-2xl grayscale group-hover:grayscale-0"
+                    className="text-xl md:text-2xl grayscale group-hover:grayscale-0"
                   />
                 </MotionLi>
               ))}
             </ul>
           </div>
         </div>
-        <div className="mt-auto">
+        <div className="flex items-center gap-4 mt-16">
           <a
             href={project.url}
             target="_blank"
-            className="flex items-center gap-2 text-lg text-gray-700"
+            className="flex items-center gap-2 text-gray-700 md:text-lg"
           >
-            View Live <Icon icon="tabler:external-link" className="text-xl" />
+            View Live{" "}
+            <Icon icon="tabler:external-link" className="text-lg md:text-xl" />
           </a>
         </div>
       </div>

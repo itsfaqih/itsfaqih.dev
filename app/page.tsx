@@ -12,7 +12,7 @@ const SkillSection = dynamic(() => import("./skill-section"), {
   ssr: false,
 });
 
-export default function Home({ params }: { params: any }) {
+export default function Home() {
   return (
     <main>
       <div className="container py-10 mx-auto lg:py-20">
