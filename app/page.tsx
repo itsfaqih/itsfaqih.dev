@@ -204,7 +204,7 @@ export default function Home() {
             variants={slideInVariants()}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "48px" }}
+            viewport={{ once: true, margin: "-64px" }}
           >
             <SectionTitle title="Projects" />
           </MotionDiv>
@@ -217,7 +217,7 @@ export default function Home() {
                 }}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "48px" }}
+                viewport={{ once: true, margin: "-64px" }}
                 whileHover="hover"
                 key={project.url}
               >
@@ -252,7 +252,7 @@ export default function Home() {
             variants={slideInVariants()}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "48px" }}
+            viewport={{ once: true, margin: "-64px" }}
           >
             <SectionTitle title="Writing" />
           </MotionDiv>
@@ -263,7 +263,7 @@ export default function Home() {
                 variants={slideInVariants({ delay: i * 0.05 })}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "48px" }}
+                viewport={{ once: true, margin: "-64px" }}
                 className="flex flex-col gap-1"
               >
                 <a

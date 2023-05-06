@@ -28,7 +28,7 @@ export default function SkillSection() {
         variants={slideInVariants()}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "48px" }}
+        viewport={{ once: true, margin: "-64px" }}
       >
         <SectionTitle title="Skills" />
       </MotionDiv>
@@ -121,7 +121,7 @@ function SwiperSlide({ index, children }: SwiperSlideProps) {
         }}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "48px" }}
+        viewport={{ once: true, margin: "-64px" }}
         whileHover="hover"
       >
         {children}
