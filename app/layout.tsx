@@ -9,14 +9,18 @@ export const metadata = {
     "Just your typical 10X Engineer wannabe who cares about developer and user experience.",
 };
 
-export default function RootLayout({
-  children,
-}: {
+type RootLayoutProps = {
   children: React.ReactNode;
-}) {
+  modal: React.ReactNode;
+};
+
+export default function RootLayout({ children, modal }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        {modal}
+      </body>
     </html>
   );
 }

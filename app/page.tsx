@@ -1,140 +1,18 @@
 import { SectionTitle } from "@/components/section-title";
-import Image from "next/image";
-import fama from "@/assets/fama.png";
-import phpid from "@/assets/phpid.png";
-import ruineui from "@/assets/ruineui.png";
-import ruinedev from "@/assets/ruinedev.png";
-import schemata from "@/assets/schemata.png";
-import indexkos from "@/assets/indexkos.png";
 import dynamic from "next/dynamic";
-import {
-  Icon,
-  githubIcon,
-  linkedinIcon,
-  twitterIcon,
-} from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { slideInVariants } from "@/framer-motion/slide-in";
 import { scaleHoverVariants } from "@/framer-motion/scale-hover";
-import {
-  MotionA,
-  MotionDiv,
-  MotionH1,
-  MotionLi,
-  MotionP,
-  MotionUl,
-} from "@/components/motion";
+import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/motion";
+import { blogs } from "@/data/blogs";
+import { socials } from "@/data/socials";
+import { ProjectSection } from "./project-section";
 
 const SkillSection = dynamic(() => import("./skill-section"), {
   ssr: false,
 });
 
-const blogs = [
-  {
-    title: "Jangan Langsung Consume Data Eksternal pada Component React",
-    date: "27 Februari 2023",
-    url: "https://diskusi.tech/itsfaqih/jangan-langsung-consume-data-eksternal-pada-component-react-279j",
-  },
-  {
-    title: "Membentuk Mental Model Pemrograman Yang Sebenar-benarnya",
-    date: "16 Januari 2022",
-    url: "https://github.com/itsfaqih/fundamental-pemrograman/blob/main/membentuk-pola-pikir/membentuk-mental-model-pemrograman-yang-sebenar-benarnya.md",
-  },
-  {
-    title: "Miskonsepsi Kemandirian dalam Pemrograman",
-    date: "8 Oktober 2021",
-    url: "https://github.com/itsfaqih/fundamental-pemrograman/blob/main/membentuk-pola-pikir/miskonsepsi-kemandirian-dalam-pemrograman.md",
-  },
-  {
-    title: "Mungkin Pemrograman Bukan Bidang yang Kamu Cari",
-    date: "2 Oktober 2021",
-    url: "https://github.com/itsfaqih/fundamental-pemrograman/blob/main/membentuk-pola-pikir/mungkin-pemrograman-bukan-bidang-yang-kamu-cari.md",
-  },
-  {
-    title: "Membuat Otentikasi JWT dengan PHP Native",
-    date: "16 November 2020",
-    url: "https://medium.com/@itsfaqih/membuat-otentikasi-jwt-dengan-php-native-a9d080953358",
-  },
-  {
-    title: "Apa itu JWT (JSON Web Token)?",
-    date: "14 November 2020",
-    url: "https://medium.com/@itsfaqih/apa-itu-jwt-json-web-token-63407936da10",
-  },
-  {
-    title: "Penerapan Sistem Grid Responsive dengan Flexbox",
-    date: "13 Juni 2020",
-    url: "https://medium.com/@itsfaqih/penerapan-sistem-grid-responsive-dengan-flexbox-c479c84be129",
-  },
-  {
-    title: "Memahami Satuan Persen (%) dalam CSS",
-    date: "11 Juni 2020",
-    url: "https://medium.com/@itsfaqih/memahami-satuan-persen-dalam-css-12479cba1c32",
-  },
-];
-
-const projects = [
-  {
-    title: "Schemata",
-    description: "Developer-friendly Entity Relationship Diagram Builder",
-    jobs: ["Frontend"],
-    url: "https://schemata.ruine.app",
-    thumbnail: schemata,
-  },
-  {
-    title: "PHPID Learning",
-    description: "PHPID Learning website redesign",
-    jobs: ["UI Design"],
-    url: "https://www.figma.com/file/qNIg0A9h7PnrFdOVSBbMEH/PHPID-Online-Learning-Redesign?t=G9iKlwb4iiNlrIeR-6",
-    thumbnail: phpid,
-  },
-  {
-    title: "Fama",
-    description: "TailwindCSS based personal branding template",
-    jobs: ["UI Design", "Frontend"],
-    url: "https://github.com/itsfaqih/fama",
-    thumbnail: fama,
-  },
-  {
-    title: "ruine.dev Website",
-    description: "Website agency landing page",
-    jobs: ["UI Design", "Frontend"],
-    url: "https://ruine.dev",
-    thumbnail: ruinedev,
-  },
-  {
-    title: "ruine.UI Dashboard",
-    description: "Admin dashboard template",
-    jobs: ["UI Design", "Frontend"],
-    url: "https://ruine-dashboard.pages.dev/",
-    thumbnail: ruineui,
-  },
-  {
-    title: "IndexKos App",
-    description: "Boarding house note app",
-    jobs: ["UI Design"],
-    url: "https://www.figma.com/file/ERVBkrAlNIMhZM075YA1uT/IndexKos?node-id=301%3A1073&t=zDSf0GIKzVZHO9ei-1",
-    thumbnail: indexkos,
-  },
-];
-
-const socials = [
-  {
-    title: "Twitter",
-    url: "https://twitter.com/itsfaqih_",
-    icon: twitterIcon,
-  },
-  {
-    title: "Github",
-    url: "https://github.com/itsfaqih",
-    icon: githubIcon,
-  },
-  {
-    title: "Linkedin",
-    url: "https://www.linkedin.com/in/itsfaqih/",
-    icon: linkedinIcon,
-  },
-];
-
-export default function Home() {
+export default function Home({ params }: { params: any }) {
   return (
     <main>
       <div className="container py-10 mx-auto lg:py-20">
@@ -187,51 +65,7 @@ export default function Home() {
           </MotionP>
         </section>
 
-        <section className="mt-10 md:mt-20">
-          <MotionDiv
-            variants={slideInVariants()}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-64px" }}
-          >
-            <SectionTitle title="Projects" />
-          </MotionDiv>
-          <ul className="grid gap-8 mt-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project, i) => (
-              <MotionLi
-                variants={{
-                  ...slideInVariants({ from: "bottom", delay: i * 0.05 }),
-                  ...scaleHoverVariants(),
-                }}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-64px" }}
-                whileHover="hover"
-                key={project.url}
-              >
-                <a
-                  href={project.url}
-                  target="_blank"
-                  className="block p-4 transition bg-gray-50 rounded-xl hover:bg-gray-100"
-                >
-                  <Image
-                    src={project.thumbnail}
-                    alt=""
-                    className="rounded-lg"
-                  />
-                  <div className="flex flex-col gap-1 mt-4">
-                    <p className="font-medium text-gray-700 md:text-lg">
-                      {project.title}
-                    </p>
-                    <p className="text-gray-500 md:text-lg">
-                      {project.jobs.join(", ")}
-                    </p>
-                  </div>
-                </a>
-              </MotionLi>
-            ))}
-          </ul>
-        </section>
+        <ProjectSection className="mt-10 md:mt-20" />
 
         <SkillSection />
 

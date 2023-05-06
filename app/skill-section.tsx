@@ -1,67 +1,54 @@
 "use client";
 
 import { register } from "swiper/element";
-import {
-  Icon,
-  adonisJsIcon,
-  astroIcon,
-  figmaIcon,
-  laravelIcon,
-  mysqlIcon,
-  nextjsIcon,
-  phpIcon,
-  reactIcon,
-  tailwindcssIcon,
-  typescriptIcon,
-} from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { SectionTitle } from "@/components/section-title";
 import { MotionDiv } from "@/components/motion";
 import { scaleHoverVariants } from "@/framer-motion/scale-hover";
 import { slideInVariants } from "@/framer-motion/slide-in";
-import { cn } from "@/libs/cn.lib";
 
 register();
 
 const skills = [
   {
     title: "TypeScript",
-    icon: typescriptIcon,
+    icon: "logos:typescript-icon",
   },
   {
     title: "React",
-    icon: reactIcon,
+    icon: "logos:react",
   },
   {
     title: "Astro",
-    icon: astroIcon,
+    icon: "logos:astro-icon",
   },
   {
     title: "Tailwind CSS",
-    icon: tailwindcssIcon,
+    icon: "logos:tailwindcss-icon",
   },
   {
     title: "Laravel",
-    icon: laravelIcon,
+    icon: "logos:laravel",
   },
   {
     title: "MySQL",
-    icon: mysqlIcon,
+    icon: "logos:mysql",
   },
   {
     title: "PHP",
-    icon: phpIcon,
+    icon: "logos:php",
   },
   {
     title: "AdonisJS",
-    icon: adonisJsIcon,
+    icon: "logos:adonisjs-icon",
   },
   {
     title: "Figma",
-    icon: figmaIcon,
+    icon: "logos:figma",
   },
   {
     title: "Next.js",
-    icon: nextjsIcon,
+    icon: "logos:nextjs-icon",
   },
 ];
 
