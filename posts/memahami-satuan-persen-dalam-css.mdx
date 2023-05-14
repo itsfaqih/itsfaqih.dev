@@ -1,0 +1,92 @@
+---
+title: Memahami Satuan Persen (%) dalam CSS
+date: 2020-06-11
+---
+
+## Apa pentingnya mempelajari ini?
+
+### Dasar Pembuatan Website Responsive
+
+Website yang responsive adalah website yang layoutnya dapat beradaptasi dengan ukuran layar pengguna, oleh sebab itu komponen pada website diharuskan untuk memiliki ukuran yang elastis atau sifatnya tidak tetap.
+
+![Contoh Layout UI](https://miro.medium.com/v2/resize:fit:640/1*gVtwcBNnqeG2CRlNjl-E7w.gif)
+
+Untuk dapat memiliki sifat elastis ini, kita memerlukan satuan ukuran yang dapat berubah sesuai dengan ukuran layar. Satuan yang memiliki perilaku demikian hanyalah persen dan viewport.
+
+### Mempertajam Kemampuan Layouting
+
+Dalam desain UI terkadang kita melihat terdapat komponen yang memiliki ukuran relatif dari container-nya. Container adalah elemen yang membungkus komponen lain, atau biasa juga disebut sebagai elemen parent.
+Misal seperti gambar di bawah ini:
+
+![Contoh Layout UI](https://miro.medium.com/v2/resize:fit:640/format:webp/1*8Oatq0uQqctIVHJjmXesjg.png)
+
+Container atau parent dari komponen tersebut adalah kotak putih yang memiliki bayangan, sedangkan input nama, email, password, checkbox, dan tombol register adalah konten atau child dari komponen tersebut.
+
+Dalam komponen tersebut, terlihat bahwa input first name dan last name memiliki ukuran setengah dari container. Untuk bisa membuat persis seperti desain tersebut, tentu akan sangat sulit jika menggunakan satuan pixel sebagai ukuran lebar inputnya.
+
+Mengapa begitu? karena kita jadi perlu menghitung mempertimbangkan ukuran container, jarak antar child, dan sebagainya. Melakukan perhitungan semacam itu akan memakan waktu, apalagi jika suatu hari ukuran container-nya berubah, maka kita juga harus mengatur dan menghitung ulang ukurannya.
+
+Di sinilah satuan persen berperan besar untuk mempermudah kita dalam merealisasikan layout UI tersebut.
+
+## Cara Kerja Satuan Persen dalam CSS
+
+### Acuan Persentase adalah Elemen Container
+
+Misalnya kita memiliki kode seperti di bawah:
+
+```html
+<body>
+  <div style="width: 50%; height: 20px; background-color: red;"></div>
+</body>
+```
+
+Elemen `<div>` tersebut memiliki width atau lebar sebesar 50%. Container atau parent dari `<div>` tersebut adalah `<body>`. `<body>` memiliki ukuran default yaitu lebar sebesar layar perangkat pengguna.
+Dengan demikian, kita dapat menyimpulkan bahwa karena container-nya adalah `<body>`, maka `<div>` tersebut akan memiliki ukuran lebar yang memenuhi setengah `<body>` (50% dari lebar layar).
+
+Berikut adalah demo kodenya:
+
+<iframe
+  style={{ width: "100%" }}
+  height="300"
+  scrolling="no"
+  title="50% Width"
+  src="https://codepen.io/itsfaqih/embed/LYGGggP?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+Lalu misalkan di dalam `<div>` tersebut terdapat elemen yang ukuran lebarnya 50% juga, maka elemen tersebut akan memiliki lebar 50% dari `<div>` tersebut.
+
+Hal ini juga berlaku pada height.
+
+Sebagai contoh apabila elemen container memiliki height sebesar 20px dan terdapat child dengan height sebesar 100%, maka child tersebut akan memiliki height sebesar 20px juga (memenuhi height container).
+
+Contoh:
+
+```html
+<body>
+  <div style="width: 50%; height: 20px; background-color: red;">
+    <div style="width: 50%; height: 100%; background-color: blue;"></div>
+  </div>
+</body>
+```
+
+Demo:
+
+<iframe
+  style={{ width: "100%" }}
+  height="300"
+  scrolling="no"
+  title="50% width dan 100% height"
+  src="https://codepen.io/itsfaqih/embed/YzwwJoq?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+Dengan demikian kalian sudah memahami bagaimana cara kerja satuan persen pada CSS. Sangat mudah bukan?
+
+Terima kasih sudah membaca.

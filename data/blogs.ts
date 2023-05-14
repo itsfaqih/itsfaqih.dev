@@ -37,6 +37,6 @@ export const blogs = [
   {
     title: "Memahami Satuan Persen (%) dalam CSS",
     date: "11 Juni 2020",
-    url: "https://medium.com/@itsfaqih/memahami-satuan-persen-dalam-css-12479cba1c32",
+    url: "/blog/memahami-satuan-persen-dalam-css",
   },
 ];

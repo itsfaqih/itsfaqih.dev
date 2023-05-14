@@ -47,7 +47,7 @@ export function ProjectModal({
       backdropProps={{
         key: "backdrop",
         className:
-          "bg-transparent flex items-center justify-center !z-10 xl:px-48 2xl:px-80",
+          "flex items-center justify-center !z-10 xl:px-48 2xl:px-80",
         // @ts-ignore
         initial: { backgroundColor: "rgba(0, 0, 0, 0)" },
         animate: { backgroundColor: "rgba(0, 0, 0, 0.7)" },
