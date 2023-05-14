@@ -15,7 +15,7 @@ export async function generateStaticParams() {
   return allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
 }
 
-export function generateMetaData({ params }: BlogPageProps) {
+export async function generateMetaData({ params }: BlogPageProps) {
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
 
   if (!post) {
