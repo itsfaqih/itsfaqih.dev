@@ -4,6 +4,7 @@ import { allPosts } from "contentlayer/generated";
 import { useMDXComponent } from "next-contentlayer/hooks";
 import { cn } from "@/libs/cn.lib";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 type BlogPageProps = {
   params: {
@@ -15,14 +16,16 @@ export async function generateStaticParams() {
   return allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
 }
 
-export async function generateMetaData({ params }: BlogPageProps) {
+export async function generateMetaData({
+  params,
+}: BlogPageProps): Promise<Metadata> {
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
 
   if (!post) {
-    notFound();
+    throw new Error(`No post found for slug: ${params.slug}`);
   }
 
-  return { title: post.title };
+  return { title: `${post.title} | Faqih Muntashir` };
 }
 
 export default function BlogPage({ params }: BlogPageProps) {
