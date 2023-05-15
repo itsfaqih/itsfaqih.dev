@@ -22,7 +22,7 @@ export async function generateMetadata({
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
 
   if (!post) {
-    throw new Error(`No post found for slug: ${params.slug}`);
+    notFound();
   }
 
   return { title: `${post.title} | Faqih Muntashir` };
@@ -51,8 +51,9 @@ export default function BlogPage({ params }: BlogPageProps) {
         className={cn(
           "[&>*]:mt-4 mt-8 text-gray-700 text-lg leading-relaxed",
           "[&>h2]:mt-6 [&>h2]:text-2xl [&>h2]:font-medium [&>h2]:text-gray-700",
-          "[&>h3]:text-lg [&>h3]:font-semibold [&>h3]:text-gray-600",
-          "[&_pre]:-mx-6 [&_pre]:px-6 [&_pre]:py-4 [&_pre]:rounded-xl",
+          "[&>h3]:mt-6 [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:text-gray-600",
+          "[&>h4]:mt-6 [&>h4]:text-lg [&>h4]:font-semibold [&>h4]:text-gray-500",
+          "[&_pre]:-mx-6 [&_pre]:px-6 [&_pre]:py-4 [&_pre]:my-10 [&_pre]:rounded-xl [&_pre]:overflow-x-auto",
           "[&>iframe]:my-8",
           "[&_img]:my-10 [&_img]:rounded-xl [&_img]:mx-auto"
         )}

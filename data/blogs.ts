@@ -22,17 +22,17 @@ export const blogs = [
   {
     title: "Membuat Otentikasi JWT dengan PHP Native",
     date: "16 November 2020",
-    url: "https://medium.com/@itsfaqih/membuat-otentikasi-jwt-dengan-php-native-a9d080953358",
+    url: "/blog/membuat-otentikasi-jwt-dengan-php-native",
   },
   {
     title: "Apa itu JWT (JSON Web Token)?",
     date: "14 November 2020",
-    url: "https://medium.com/@itsfaqih/apa-itu-jwt-json-web-token-63407936da10",
+    url: "/blog/apa-itu-jwt",
   },
   {
     title: "Penerapan Sistem Grid Responsive dengan Flexbox",
     date: "13 Juni 2020",
-    url: "https://medium.com/@itsfaqih/penerapan-sistem-grid-responsive-dengan-flexbox-c479c84be129",
+    url: "/blog/penerapan-sistem-grid-responsive-dengan-flexbox",
   },
   {
     title: "Memahami Satuan Persen (%) dalam CSS",

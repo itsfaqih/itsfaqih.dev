@@ -1,0 +1,346 @@
+---
+title: Membuat Otentikasi JWT dengan PHP Native
+date: 2020-10-16
+---
+
+## Persiapan
+
+Sebelum mengikuti tutorial ini, pastikan kalian sudah meng-install requirements di bawah ini.
+
+### Requirements
+
+- Composer (https://getcomposer.org/download)
+- PHP (https://php.net/downloads, atau dari XAMPP dan sejenisnya)
+- Apache (https://httpd.apache.org/download.cgi) (XAMPP sudah include)
+- Postman (https://www.postman.com/downloads/) atau sejenisnya
+
+Catatan: Apache diperlukan karena penggunaan function getallheaders() untuk mendapatkan request header. Jika kalian ingin menggunakan web server lainnya, harap menyesuaikan.
+
+## Membuat Proyek
+
+### Install Library
+
+Pertama, kita buat direktori untuk proyek ini:
+
+```bash
+mkdir jwt-php-native
+cd jwt-php-native
+```
+
+Jika kalian menggunakan XAMPP, atau laragon, atau yang lainnya, bisa langsung dibuat di dalam direktorinya masing-masing (htdocs, www, dll).
+
+Di tutorial ini saya hanya akan menggunakan built-in web server dari php saja.
+
+Setelah membuat dan masuk ke direktori, kita install library dotenv dan jwt-nya:
+
+```bash
+composer require vlucas/phpdotenv firebase/php-jwt
+```
+
+Jika kalian penasaran mengapa kita juga butuh menginstall library dotenv, karena agar mempermudah kita menerapkan penggunaan environment variable, yang mana ini adalah cara terbaik untuk menyimpan data sensitif dari aplikasi. (Bisa baca detailnya di sini)
+
+Selesai meng-install kedua library tersebut, maka akan ada direktori vendor dan file composer di dalam proyek kita:
+
+![Isi direktori proyek setelah install library](https://cdn-images-1.medium.com/v2/resize:fit:800/1*oOmlNftzNPVrGklbaQuBPw.png)
+
+### Membuat Custom Environment Variable
+
+Ini adalah fitur utama dari library dotenv tadi. Kita dapat membuat custom environment variable dengan mudah melalui file ".env".
+
+Mari kita buat file tersebut, kemudian isi dengan ACCESS_TOKEN_SECRET dan REFRESH_TOKEN_SECRET:
+
+![Membuat file ".env"](https://cdn-images-1.medium.com/v2/resize:fit:800/1*sOc6lJfN3qscOb8TJkbXHw.png)
+
+Nilai dari kedua token tersebut sebenarnya bebas. Kalian bisa mengisinya dengan apapun yang kalian inginkan, dengan syarat keduanya tidak boleh sama.
+
+Namun karena secret key di sini bersifat rahasia layaknya password, akan lebih baik menggunakan random string panjang yang sulit ditebak. Terlebih lagi kedua secret itu cukup disimpan dan tidak perlu diingat.
+
+Dalam tutorial ini saya menggunakan password generator untuk membuat secret key-nya.
+
+![Memberikan nilai ke secret key](https://cdn-images-1.medium.com/v2/resize:fit:800/1*N0DeFaRQ_LouqtIH5Dhn4A.png)
+
+### Membuat Endpoint Otentikasi (Login)
+
+Kita buat file "login.php". File ini akan digunakan sebagai jalur user melakukan otentikasi JWT melalui request method POST.
+
+Di sini saya hanya menggunakan data mock/dummy, tapi jika kalian cukup bersemangat, bisa juga buat database, buat tabel, buat koneksi, dst.
+
+#### Import Library
+
+Sebelum menulis apapun, baiknya kita mengimport library yang nantinya akan digunakan:
+
+```php
+// Import script autoload agar bisa menggunakan library
+require_once('./vendor/autoload.php');
+// Import library
+use Firebase\JWT\JWT;
+use Dotenv\Dotenv;
+```
+
+Lalu kita load custom environment variable kita:
+
+```php
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+```
+
+#### Atur Content-Type
+
+Agar response yang dikirim ke user dibaca sebagai JSON, kita perlu mengatur response header bagian Content-Type seperti ini:
+
+```php
+header('Content-Type: application/json');
+```
+
+#### Validasi Method Request
+
+Karena proses login ini menggunakan method POST, yang perlu kita lakukan pertama kali adalah memeriksa apakah method yang digunakan oleh user sudah sesuai atau belum:
+
+```php
+// Cek method request apakah POST atau tidak
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+  http_response_code(405);
+  exit();
+}
+```
+
+Dengan kode di atas, apabila user tidak mengakses login.php menggunakan method POST, maka akan mendapatkan error kode 405, "method not allowed", yang berarti method yang digunakan tidak diizinkan.
+
+#### Validasi Format Data
+
+Umumnya JWT diterapkan pada sistem microservice (menggunakan API) sehingga data yang diterima oleh backend saat proses login ini bukan lah berupa form data (karena tidak melalui form), melainkan JSON.
+
+Nilai input form data diambil menggunakan variabel $\_POST, sedangkan untuk raw JSON diambil menggunakan cara di bawah:
+
+```php
+// Ambil JSON yang dikirim oleh user
+$json = file_get_contents('php://input');
+// Decode json tersebut agar mudah mengambil nilainya
+$input_user = json_decode($json);
+```
+
+Setelah men-decode JSON tersebut, barulah kita melakukan validasi data yang ada di dalamnya:
+
+```php
+// Jika tidak ada data email atau password
+if (!isset($input_user->email) || !isset($input_user->password)) {
+  http_response_code(400);
+  exit();
+}
+```
+
+Dengan kode di atas, apabila user tidak memasukkan email atau password, maka akan mendapatkan error kode 400, "bad request", yang berarti request yang dikirim oleh user tidak valid.
+
+#### Otentikasi User
+
+Seperti yang saya katakan sebelumnya, di sini saya menggunakan data mock, jadi untuk data user saya buat menjadi variabel seperti ini:
+
+```php
+// Cuma data mock/dummy, bisa diganti dengan data dari database
+$user = [
+  'email' => 'johndoe@example.com',
+  'password' => 'qwerty123'
+];
+```
+
+Kemudian kita cocokkan dengan data yang dikirim oleh user tadi:
+
+```php
+// Jika email atau password tidak sesuai
+if ($input_user->email !== $user['email'] || $input_user->password !== $user['password']) {
+  echo json_encode([
+    'message' => 'Email atau password tidak sesuai'
+  ]);
+  exit();
+}
+```
+
+Dengan demikian, jika data email atau password yang dikirim itu salah, maka user akan mendapatkan pesan "Email atau password tidak sesuai".
+
+Selanjutnya kita tinggal perlu membuat dan mengirim JWT ke user saat login berhasil.
+
+Buat variabel untuk menyimpan waktu kadaluarsa access token-nya:
+
+```php
+// 15 * 60 (detik) = 15 menit
+$waktu_kadaluarsa = time() + (15 * 60);
+```
+
+Waktu kadaluarsa access token tidak perlu dibuat terlalu lama karena alasan keamanan.
+
+Setelah itu kita buat variabel payload yang mana akan jadi payload token kita:
+
+```php
+$payload = [
+  'email' => $input_user->email,
+  'exp' => $waktu_kadaluarsa
+];
+```
+
+Sebenarnya di dalam payload ini kita hanya perlu email saja, namun karena cara kerja dari library JWT yang kita pakai, kita perlu key 'exp' untuk mengatur waktu kadaluarsa token-nya.
+
+Selanjutnya tinggal generate token menggunakan library-nya, dan kirim ke user:
+
+```php
+$access_token = JWT::encode($payload, $_ENV['ACCESS_TOKEN_SECRET']);
+echo json_encode([
+  'accessToken' => $access_token,
+  'expiry' => date(DATE_ISO8601, $waktu_kadaluarsa)
+]);
+```
+
+Sampai sini biasanya sudah cukup dan sudah bisa bekerja dengan baik.
+
+Tapi jika kalian tertarik untuk lanjut mempelajari tentang in memory token, yang mana akan saya buat tutorial selanjutnya, kalian bisa ikuti langkah penambahan refresh token di bawah (opsional).
+
+#### Menambahkan Refresh Token di Http-only Cookie
+
+```php
+// Ubah waktu kadaluarsa lebih lama (1 jam)
+$payload['exp'] = time() + (60 * 60);
+$refresh_token = JWT::encode($payload, $_ENV['REFRESH_TOKEN_SECRET']);
+// Simpan refresh token di http-only cookie
+setcookie('refreshToken', $refresh_token, $payload['exp'], '', '', false, true);
+```
+
+Cookie adalah data yang disimpan oleh browser user dan akan selalu diselipkan setiap user membuat request selanjutnya tepat setelah cookie tersebut ditambahkan.
+
+Menggunakan http-only berarti cookie tersebut tidak dapat diakses melalui javascript, sehingga bisa mencegah tercurinya refresh token.
+
+### Membuat Endpoint Protected Resource
+
+Protected Resource di sini maksudnya adalah data yang dilindungi. Sebagai contoh: konten yang hanya bisa dilihat oleh user yang sudah login.
+
+Dalam contoh ini, saya membuat file "games.php" yang isinya adalah daftar game. Daftar game ini nantinya hanya bisa diakses jika user mengirimkan access token yang valid.
+
+#### Import Library
+
+Sama seperti sebelumnya, kita import library-nya terlebih dahulu:
+
+```php
+// Import script autoload agar bisa menggunakan library
+require_once('./vendor/autoload.php');
+// Import library
+use Firebase\JWT\JWT;
+use Dotenv\Dotenv;
+```
+
+Jangan lupa custom environment variable kita:
+
+```php
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+```
+
+#### Atur Content-Type
+
+Seperti sebelumnya juga, kita atur response header Content-Type-nya:
+
+```php
+header('Content-Type: application/json');
+```
+
+#### Validasi Method Request
+
+Seperti sebelumnya, kita juga memvalidasi method yang digunakan oleh user saat request. Bedanya di sini harus menggunakan GET:
+
+```php
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+  http_response_code(405);
+  exit();
+}
+```
+
+#### Verifikasi Token dan Mengembalikan Data
+
+Jika saat login yang divalidasi adalah format data dan kebenaran email & passwordnya, di sini kita memverifikasi token yang dikirim oleh user.
+
+User akan mengirim token melalui header authorization, yang berarti kita perlu membaca header request-nya:
+
+```php
+$headers = getallheaders();
+if (!isset($headers['Authorization'])) {
+  http_response_code(401);
+  exit();
+}
+```
+
+Kode di atas akan memeriksa keberadaan header authorization. Jika tidak ada, maka user akan mendapatkan error 401, "Unauthorized", yang berarti tidak memiliki otoritas atau hak untuk mengaksesnya.
+
+Kemudian kita ambil token yang ada pada header. Karena dalam header authorization berisi "Bearer `<token>`", maka kita perlu menghapus string "Bearer":
+
+```php
+list(, $token) = explode(' ', $headers['Authorization']);
+```
+
+Lalu kita verifikasi token tersebut di dalam try catch statement, karena method verifikasi dan decode dari library yang kita gunakan akan melempar sebuah exception apabila tidak valid:
+
+```php
+try {
+  // Men-decode token. Dalam library ini juga sudah sekaligus memverfikasinya
+  JWT::decode($token, $_ENV['ACCESS_TOKEN_SECRET'], ['HS256']);
+// Data game yang akan dikirim jika token valid
+  $games = [
+    [
+      'title' => 'Dota 2',
+      'genre' => 'Strategy'
+    ],
+    [
+      'title' => 'Ragnarok',
+      'genre' => 'Role Playing Game']
+    ]
+  ];
+echo json_encode($games);
+} catch (Exception $e) {
+  // Bagian ini akan jalan jika terdapat error saat JWT diverifikasi atau di-decode
+  http_response_code(401);
+  exit();
+}
+```
+
+## Menguji Proyek
+
+Kita jalankan terlebih dahulu:
+
+```bash
+// Jalan di command prompt atau terminal
+php -S localhost:8000
+```
+
+Jika kalian menggunakan XAMPP atau sejenisnya, dan sudah menyimpan di direktorinya (seperti htdocs), maka bisa cukup jalankan web servernya (Apache atau lainnya).
+
+Kemudian buka Postman, dan langsung kita coba lakukan login melalui http://localhost:8000/login.php (jangan lupa sesuaikan port-nya), dengan method POST:
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*iX46ab2KpOH67yBVtyQWRA.png)
+
+Lalu isi body dengan raw JSON berupa data email dan password, kemudian klik "Send":
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*3SxDdopU4FCx7ltF3Izusg.png)
+
+Jika berhasil, maka kita akan mendapatkan response semacam ini:
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*76qXGKgG-zpEhmJ-o9Pzuw.png)
+
+Dari response itu, kita copy dan simpan accessToken. Kemudian kita coba buka endpoint "/games.php" tanpa mengatur apapun, maka kita akan mendapat status 401, yang berarti kita tidak memiliki akses ke resource tersebut:
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*pONd_kgo5NG_Ju0jwJPzXg.png)
+
+Sekarang kita isi bagian authorization dengan type bearer dan diisi token tadi:
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*MguBFIyl2HFvn8ec4VywwA.png)
+
+Hasilnya data game akan dikembalikan ke user:
+
+![-](https://cdn-images-1.medium.com/v2/resize:fit:800/1*dtAddQ8X-uUELYaKdg1-Ew.png)
+
+## Penutup
+
+Sekian pembahasan yang cukup panjang ini tentang pembuatan otentikasi JWT dengan PHP native.
+
+Jika kita perhatikan, belum ada peran refresh token di sini.
+
+Fungsi refresh token sendiri adalah untuk memperbarui access token user, karena access token memiliki umur yang pendek (15 menit dalam tutorial ini).
+
+Alasan mengapa belum ada penggunaan refresh tokennya, ini memang saya sengaja karena cara implementasi di sini (menggunakan http-only cookie) akan lebih masuk akal jika dibahas pada tutorial selanjutnya.
+
+Terima kasih sudah membaca, semoga bisa bermanfaat.

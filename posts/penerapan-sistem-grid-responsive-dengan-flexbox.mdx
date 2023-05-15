@@ -1,0 +1,92 @@
+---
+title: Penerapan Sistem Grid Responsive dengan Flexbox
+date: 2020-06-13
+---
+
+## Apa pentingnya mempelajari ini?
+
+### Menjadikan Website Lebih Maintainable
+
+Maksudnya "maintainable" berarti kode website tersebut bisa mudah "dipelihara" baik oleh pengembang aslinya, maupun orang lain.
+
+Kode yang bisa dipelihara harus lah mudah dipahami dan dimodifikasi atau dikembangkan tanpa berpotensi menyebabkan kerusakan atau masalah lainnya.
+
+Jika struktur frontend website kalian tidak ditulis dengan baik, tentu perubahan atau penambahan fitur akan jadi hal yang sulit untuk dicapai.
+
+Saya pribadi sebagai seorang freelancer, kapok (menyesal) menerima proyek modifikasi aplikasi, kecuali kode aplikasi tersebut memang ditulis secara rapi dan maintainable.
+
+Tentu kalian juga tidak mau kan, mengalami kesengsaraan ketika klien meminta revisi?
+
+### Sudah Menjadi Pengetahuan Umum
+
+Penerapan sistem grid sudah ada sejak lama, dan dipakai hampir seluruh website yang ada di dunia, bahkan sebelum flexbox ada.
+
+Sebelum para developer menggunakan flexbox, mereka menggunakan property float untuk bisa menerapkannya. Tapi float sekarang sudah ditinggalkan karena bukan solusi yang baik dan perlu diakali agar tidak merusak struktur website (melalui clearfix).
+
+Selain itu, sistem grid juga sudah banyak diterapkan para desainer UI. Oleh karena itu, mempelajari sistem grid sifatnya adalah wajib jika kalian ingin bisa mudah mengkonversi desain ke bentuk kode.
+
+## Sistem Grid Flexbox
+
+### Prasyarat
+
+Sebelum mempelajari penerapan sistem grid pada flexbox, kalian diasumsikan sudah memahami:
+
+1. Dasar Penggunaan Flexbox
+2. Penggunaan Satuan Persen (%) dalam CSS
+
+Jika kalian sudah memahami keduanya, maka kalian bisa lanjut membaca dengan tenang.
+
+### Bagaimana Sistem Grid Bekerja
+
+Sistem Grid adalah sistem layout dua dimensi yang berbasiskan row (baris) dan column (kolom).
+
+Tiap row memiliki width atau lebar sebesar 100% karena row merupakan sebuah baris, dan sebuah baris tidak diperuntukan bersejajar satu sama lainnya.
+
+Oleh sebab itu nantinya row bisa digunakan ketika kita ingin mengganti baris.
+
+Sedangkan column memiliki width yang bervariasi tergantung dengan kebutuhan, namun untuk satuan ukuran yang digunakan adalah persen (%). Alasan penggunaan satuan persen adalah agar ukuran elemen tersebut bersifat elastis menyesuaikan lebar layar, sehingga dapat tercipta layout yang responsive.
+
+Catatan: Khusus elemen yang membutuhkan width statis seperti sidebar dibolehkan menggunakan px.
+
+Lalu berbeda dengan row, peletakan column itu pasti sejajar. Kalau pun nantinya berbeda baris ketika di layar kecil, itu hanya merupakan efek wrapping-nya saja. Jadi di mata kita memang terlihat berbeda baris, tetapi bagi browser, column tersebut masih sejajar di dalam satu row.
+
+Di dalam satu row bisa terdapat satu atau banyak column. Di dalam satu column bisa terdapat komponen website atau pun sub-layout (isi row atau isi column, jadi bisa berperan sebagai row juga).
+
+Berikut adalah contoh gambarannya:
+
+![Layout dengan sistem grid](https://cdn-images-1.medium.com/v2/resize:fit:800/1*ii2loH4s8eYyrP2p4Q5wQA.png)
+
+### Cara Menganalisis Sistem Grid
+
+Agar bisa mendapat pemahaman yang lebih baik, kita bisa mengambil contoh layout website apapun, kemudian menganalisis bagaimana website tersebut menerapkan sistem grid.
+
+![Template Overflow Admin](https://cdn-images-1.medium.com/v2/resize:fit:1200/1*vr1UmqX4mQ2Gaz02VXCXqQ.png)
+
+Misalnya pada template di atas, bisa kita pisah bagian-bagiannya menjadi seperti ini:
+
+![Analisis sistem grid Template Overflow Admin (Analisis tidak 100% harus akurat)](https://cdn-images-1.medium.com/v2/resize:fit:800/1*Gdq1c3RPObRM5p9ecXtK1w.png)
+
+Karena terdapat elemen yang sejajar; sidebar dan konten, maka artinya kedua elemen tersebut berada di dalam satu row. Selanjutnya kita fokus ke layout bagian konten:
+
+![Analisis sistem grid konten Template Overflow Admin (Analisis tidak 100% harus akurat)](https://cdn-images-1.medium.com/v2/resize:fit:800/1*SKGkdbi4bolhHALwnYTSRQ.png)
+
+Dari analisis tersebut, kita sudah mendapat gambaran kasar sistem grid yang diterapkan. Dari gambaran itu, kita jadi bisa mengkonversi desain menjadi bentuk kode dengan mudah.
+Berikut demo layout sederhana mirip seperti template tersebut:
+
+<iframe
+  height="300"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="Sistem Grid Flexbox"
+  src="https://codepen.io/itsfaqih/embed/MWKeWpP?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+Catatan: Penggunaan sistem grid flexbox ini sebenarnya tidak perlu kaku menggunakan class row dan column. Kalian bisa menggunakan class sendiri, dan mengatur layout sesuai kebutuhan kalian.
+
+Sekian tutorial tentang sistem grid flexbox. Semoga bisa bermanfaat dan menambah pemahaman dalam mengembangkan frontend website.
+
+Terima kasih sudah membaca.

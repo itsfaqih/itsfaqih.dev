@@ -1,0 +1,173 @@
+---
+title: Apa itu JWT (JSON Web Token)?
+date: 2020-10-14
+---
+
+## Konsep Token JWT
+
+Seperti namanya, JSON Web Token, yang berarti token ini menggunakan JSON (Javascript Object Notation), lalu token ini memungkinkan kita untuk mengirimkan data yang dapat diverifikasi oleh dua pihak atau lebih.
+
+Agar lebih paham, mari kita bahas bagaimana JWT bekerja melalui contoh:
+
+```txt
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1hIjoiRmFxaWgifQ.jtYrULLMxWPWfy39r4Qm0gCxo-5–542VhsRDSO5cjQ
+```
+
+Jika kita perhatikan dalam teks acak di atas, terdapat titik yang memisahkan teks tersebut menjadi 3 bagian.
+
+### Header
+
+Bagian pertama disebut dengan header. Header berisi informasi tentang algoritma dan jenis token yang digunakan.
+
+```txt
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+```
+
+Bagian ini hanyalah string yang di-encode menggunakan base64. Jadi kita bisa mendapatkan nilai asli dari teks tersebut dengan men-decodenya. Kalian bisa cari web decode base64 online untuk membuktikannya sendiri.
+
+Nilai yang di dapat dari teks tersebut adalah sebuah json:
+
+```json
+{ "alg": "HS256", "typ": "JWT" }
+```
+
+### Payload
+
+Bagian kedua disebut dengan payload. Payload berisi data yang ingin dikirim melalui token.
+
+```txt
+eyJuYW1hIjoiRmFxaWgifQ
+```
+
+Bagian ini juga di-encode menggunakan base64, dan data yang didapat dari hasil decode-nya adalah:
+
+```json
+{ "nama": "Faqih" }
+```
+
+Dalam penerapannya di otentikasi atau pun otorisasi, biasanya data ini berupa data yang sifatnya unik bagi user, misalnya: email, id/uuid, dan juga data yang berkaitan dengan otorisasi seperti role, karena data tersebut akan digunakan sebagai tanda pengenal si pengirim token.
+
+Oh ya, jangan pernah menyelipkan data yang sifatnya konfidental atau sensitif ke dalam JWT (seperti password). Seperti yang kalian baru saja pelajari, kita bisa lihat isinya cukup dengan men-decodenya.
+
+### Signature
+
+Bagian ketiga adalah signature. Signature adalah hash gabungan dari header, payload dan sebuah secret key (berupa string random panjang biasanya):
+
+```txt
+jtYrULLMxWPWfy39r4Qm0gCxo-5-542VhsRDSO5cjQ
+```
+
+Algoritma hash yang digunakan mengikuti dari apa yang sudah ditentukan di dalam header. Jadi jika ditulis kode untuk membuat signature, maka kurang lebih akan seperti ini:
+
+```php
+// Contoh menggunakan bahasa PHP. Titik di PHP adalah cara menggabungkan string (concatenation)
+$signature = hash(base64_encode($header).base64_encode($payload).$secret)
+```
+
+Catatan: Kode di atas hanya ilustrasi dan bukan kode yang sebenarnya.
+
+Signature ini berguna untuk memverifikasi bahwa header maupun payload yang ada dalam token tidak berubah dari nilai aslinya (karena untuk membuat payload dan header palsu itu cukup mudah).
+
+Signature-nya sendiri tidak mungkin dapat diakali, karena sudah dalam berbentuk hash; yang mana adalah fungsi satu arah (tidak dapat dikembalikan ke nilai semula), dan meski kita tahu algoritma hashing-nya, kita juga memerlukan secret key yang mana hanya si pembuat aplikasi yang tahu.
+
+### Cara Kerja Verifikasi Signature
+
+Jika kalian pernah membuat otentikasi biasa menggunakan email/username dan password, maka kalian tidak asing lagi dengan proses hashing dan verifikasi password.
+
+Saat hashing, kalian melakukannya seperti ini:
+
+```php
+// function hash password dalam PHP
+$hash = password_hash('password_user', PASSWORD_BCRYPT);
+```
+
+Pada kode di atas, kita membuat hash password user menggunakan algoritma bcrypt. Hash ini lah yang kalian simpan ke dalam database.
+
+Lalu saat user login, kalian mencocokkan string password yang diinput user dengan hash yang ada di database seperti ini:
+
+```php
+// function verifikasi hash password dalam PHP
+$cocok = password_verify($input_user, $hash_dari_db);
+// $cocok akan bernilai true jika passwordnya benar
+
+```
+
+Hal ini juga mirip pada saat verifikasi JWT.
+
+Saat membuat signature kita hash:
+
+```php
+$signature = password_hash(base64_encode($header).base64_encode($payload).$secret, PASSWORD_BCRYPT)
+```
+
+Catatan: Sekali lagi, kode hanya sebagai ilustrasi, jangan ditiru!
+
+Lalu saat user mengirimkan token, bisa kita cek menggunakan function seperti ini:
+
+```php
+function verify($token, $secret) {
+  // Memisahkan header, payload, dan signature
+  list($header, $payload, $signature) = explode('.', $token);
+  // Mencocokkan apakah header dan payload saat ini masih sama seperti yang ada di signature (tidak berubah)
+  return password_verify($header.$payload.$secret, $signature);
+}
+// Menggunakan function
+$cocok = verify($jwt_dari_user, $secret_yang_dipakai_saat_hash);
+```
+
+Dengan demikian, apabila terdapat data header atau payload yang diubah, otomatis tidak akan lagi cocok dengan signaturenya. Membuat signature sendiri pun tidak mungkin dilakukan, karena dalam prosesnya diperlukan secret key dalam proses hashingnya.
+
+### Penerapan Oleh Dua Pihak atau Lebih
+
+Ini merupakan alasan mengapa JWT dibuat.
+
+Pada otentikasi/otorisasi umumnya kita menggunakan session, yang mana ketika user login ke sebuah web, maka server akan menyimpan data user tersebut.
+
+Data session yang tersimpan itu akan digunakan untuk melakukan verifikasi otentikasi; memastikan user sudah login atau belum, dan otorisasi; memastikan hak akses user yang login.
+
+Contoh kodenya:
+
+```php
+$sudah_login = $_SESSION['login'] === true;
+$adalah_admin = $_SESSION('role') === 'admin';
+if ($sudah_login) {
+  if ($adalah_admin) {
+    echo 'Selamat datang admin!';
+  } else {
+    echo 'Selamat datang user!';
+  }
+} else {
+  echo 'Silahkan login';
+}
+```
+
+![Gambaran alur menggunakan session](https://cdn-images-1.medium.com/v2/resize:fit:800/1*epOWpKjNYVXlT_8hC5W_1g.jpeg)
+
+Sejauh ini tidak ada masalah. Namun, jika kalian memiliki dua aplikasi atau lebih dan ingin bisa berbagi session, tentu menggunakan session biasa tidak memungkinkan, karena session user hanya disimpan oleh website yang digunakan user untuk login sebelumnya.
+
+![Dua server berbeda tidak dapat berbagi session](https://cdn-images-1.medium.com/v2/resize:fit:800/1*Bb3Kq_0z4SKhyrQib3Thvw.jpeg)
+
+Nah, di sinilah peran JWT.
+
+Karena valid tidaknya JWT bisa diverifikasi secara mandiri menggunakan signature, ini memungkinkan untuk aplikasi lain menggunakan token tersebut asalkan memiliki secret key yang sama.
+
+Lalu karena kasus ini adalah untuk otentikasi/otorisasi, maka aplikasi server B juga harus menyimpan data user yang sama di databasenya.
+
+Setelah verifikasi JWT di server B berhasil, kita bisa lanjut melakukan pengecekan hak akses menggunakan data dari payload; uuid, email, dan role, dengan dicocokkan yang ada di database, dan seterusnya.
+
+Jadi singkatnya, token hasil dari aplikasi server A, dapat digunakan juga oleh aplikasi server B.
+
+## Kesimpulan
+
+Dari pembahasan di atas, maka kita dapat mengambil kesimpulan bahwa:
+
+- JWT dapat memastikan integritas data yang dikirim (Data yang ada di dalam token tidak dapat dimanipulasi)
+- JWT dapat digunakan untuk otentikasi/otorisasi dua aplikasi yang berbeda
+
+## Penutup
+
+Begitulah penjelasan tentang konsep dari JWT, dan bagaimana JWT bisa menjaga integritas data yang dikirim oleh user. Semoga bisa bermanfaat bagi yang baru belajar.
+
+Jika ada yang masih dibingungkan atau ingin mengkritisi dan memberikan saran, jangan lupa untuk mengirimkannya di komentar.
+
+Pada tulisan selanjutnya saya akan membahas tentang bagaimana cara menyimpan token JWT yang baik di frontend (biasanya untuk aplikasi SPA).
