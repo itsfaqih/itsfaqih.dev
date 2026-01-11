@@ -1,0 +1,966 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
+  --animate-ripple: ripple 0.6s ease-out forwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ripple {
+    from {
+      transform: scale(0);
+      opacity: 0.3;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  @keyframes grid-box-fade {
+    0%, 100% {
+      opacity: 0;
+    }
+    /* Fade in during first 15% of cycle */
+    15% {
+      opacity: 1;
+    }
+    /* Stay visible briefly */
+    18% {
+      opacity: 1;
+    }
+    /* Fade out by 33% of cycle (so 2/3 remaining for other boxes) */
+    33% {
+      opacity: 0;
+    }
+  }
+
+
+}
+
+@layer base {
+  :root {
+    --bg-primary: #fafafa; /* slightly off-white/gray */
+    --bg-secondary: rgba(255, 255, 255, 0.5); /* translucent white */
+    --text-primary: #18181b; /* zinc-950 */
+    --text-secondary: #71717a; /* zinc-500 */
+    --border-color: rgba(228, 228, 231, 1); /* translucent zinc-200 */
+    --header-bg: rgba(255, 255, 255, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.5);
+    --grid-color: rgba(0, 0, 0, 0.3);
+    --key-shadow: #000000;
+    
+    /* Grid system */
+    --cell-size: 1.8vw;
+    --grid-offset: 5vw; /* Replace fixed 100px with relative unit to fix zoom drift */
+  }
+
+  .dark {
+    --bg-primary: #09090b; /* zinc-950 */
+    --bg-secondary: rgba(24, 24, 27, 0.4); /* translucent zinc-900 */
+    --text-primary: #f4f4f5; /* zinc-100 */
+    --text-secondary: #a1a1aa; /* zinc-400 */
+    --border-color: rgba(255, 255, 255, 0.2); /* translucent white border */
+    --header-bg: rgba(9, 9, 11, 0.4);
+    --card-bg: rgba(24, 24, 27, 0.4);
+    --grid-color: rgba(255, 255, 255, 0.3);
+    --key-shadow: #94a3b8;
+  }
+}
+
+/* Skewed grid background pattern - split into left and right with opposite skews */
+.grid-background-left,
+.grid-background-right {
+  position: absolute;
+  top: 0;
+  height: auto; 
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--cell-size) var(--cell-size);
+}
+
+.grid-background-left {
+  width: calc(50% + 1vw);
+  left: -0.75vw;
+  transform: skewY(-15deg);
+  transform-origin: top right;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+.grid-background-right {
+  width: calc(50% + 0.7vw);
+  right: -0.75vw;
+  transform: skewY(15deg);
+  transform-origin: top left;
+  background-position: right top;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+/* Ceiling grid effect for top corners */
+.grid-ceiling {
+  position: absolute;
+  top: -2.5vh;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  z-index: 0;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --ceiling-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2));
+  /* Clip the bottom - use grid-offset and tan(15deg) ≈ 0.268 for precise geometry */
+  clip-path: polygon(
+    0 0, 
+    100% 0, 
+    100% calc((50vw + var(--grid-offset)) * 0.268), 
+    50% calc(var(--grid-offset) * 0.268),
+    0 calc((50vw + var(--grid-offset)) * 0.268)
+  );
+}
+
+/* Floor grid effect for bottom center */
+.grid-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --floor-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2));
+  /* Clip the top - triangle shape matching 15-degree wall angles */
+  clip-path: polygon(
+    0 100%,                        /* Bottom left */
+    0 calc(90% + 0.5vh),
+    50% calc((90% + 0.5vh) - 50vw * 0.268), /* Peak center - height based on tan(15deg) */
+    100% calc(90% + 0.5vh),                      /* Bottom right */
+    100% 100%
+  );
+}
+
+/* Individual fading box */
+.fade-box {
+  position: absolute;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: var(--grid-color);
+  opacity: 0; /* Start hidden, animation will fade in */
+  animation: grid-box-fade var(--fade-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--fade-delay, 0s);
+}
+
+/* Ceiling/floor boxes - rhombus shape using clip-path to match grid */
+.fade-box-ceiling,
+.fade-box-floor {
+  --ceiling-cell: calc(var(--cell-size) / 0.966);
+  /* Size to contain the rhombus */
+  width: calc(var(--ceiling-cell) * 2);
+  height: calc(var(--ceiling-cell) * 0.55);
+  /* Clip to a wide diamond/rhombus shape matching 15deg grid lines */
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+
+
+
+
+/* Experimental squircle support */
+.squircle {
+  corner-shape: squircle;
+}
+
+/* Syntax highlighting styles */
+figure[data-rehype-pretty-code-figure] {
+  @apply relative;
+}
+
+figure[data-rehype-pretty-code-figure] pre {
+  @apply rounded-xl border border-[var(--border-color)] p-4 overflow-x-auto bg-[var(--bg-secondary)] text-sm leading-relaxed;
+}
+
+/* Handle dual themes using Shiki variables */
+/* For rehype-pretty-code (blog posts) */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* For inline shiki rendering (opinions pages) */
+pre.shiki span[style*="--shiki-light"],
+.shiki span[style*="--shiki-light"] {
+  color: var(--shiki-light) !important;
+}
+
+.dark pre.shiki span[style*="--shiki-dark"],
+.dark .shiki span[style*="--shiki-dark"] {
+  color: var(--shiki-dark) !important;
+}
+
+figure[data-rehype-pretty-code-figure] code {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  display: grid;
+}
+
+figure[data-rehype-pretty-code-figure] [data-line] {
+  @apply px-4 -mx-4 border-l-2 border-transparent;
+}
+
+figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  @apply bg-[var(--bg-secondary)] border-[var(--border-color)];
+}
+
+@keyframes demo-cursor-move {
+  0%, 10% { left: 65%; top: 65%; transform: scale(1); }
+  25% { left: 50%; top: 50%; transform: scale(1); }
+  30% { left: 50%; top: 50%; transform: scale(0.9); }
+  35% { left: 50%; top: 50%; transform: scale(1); }
+  45% { left: 50%; top: 50%; }
+  60%, 100% { left: 65%; top: 65%; }
+}
+
+@keyframes demo-dialog-cycle {
+  0%, 35% { opacity: 0; pointer-events: none; transform: scale(0.95); }
+  38%, 100% { opacity: 1; pointer-events: auto; transform: scale(1); }
+}
+
+@keyframes demo-button-press {
+  0%, 15% { transform: scale(1); --tw-gradient-from: rgba(107, 114, 128, 0.05); --tw-gradient-to: rgba(107, 114, 128, 0); }
+  20%, 25% { transform: scale(1); --tw-gradient-from: rgba(107, 114, 128, 0.1); --tw-gradient-to: rgba(107, 114, 128, 0.05); border-color: rgba(107, 114, 128, 0.2); }
+  30% { transform: scale(0.95); --tw-gradient-from: rgba(107, 114, 128, 0.1); --tw-gradient-to: rgba(107, 114, 128, 0.05); border-color: rgba(107, 114, 128, 0.2); }
+  35%, 45% { transform: scale(1); --tw-gradient-from: rgba(107, 114, 128, 0.1); --tw-gradient-to: rgba(107, 114, 128, 0.05); border-color: rgba(107, 114, 128, 0.2); }
+  50%, 100% { transform: scale(1); --tw-gradient-from: rgba(107, 114, 128, 0.05); --tw-gradient-to: rgba(107, 114, 128, 0); }
+}
+
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+
+@keyframes demo-confirm-cursor {
+  0% { left: 70%; top: 80%; transform: scale(1); }
+  20% { left: 50%; top: 50%; transform: scale(1); }
+  25% { left: 50%; top: 50%; transform: scale(0.9); }
+  28% { left: 50%; top: 50%; transform: scale(1); }
+  45%, 100% { left: 80%; top: 80%; transform: scale(1); }
+}
+
+@keyframes demo-confirm-dialog {
+  0%, 25% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+  28%, 100% { opacity: 1; transform: scale(1); pointer-events: auto; }
+}
+
+@keyframes demo-confirm-trigger {
+  0%, 20% { transform: scale(1); }
+  25% { transform: scale(0.95); }
+  30%, 100% { transform: scale(1); }
+}
+
+@keyframes demo-confirm-delete {
+  0%, 100% { transform: scale(1); }
+}
+
+@keyframes demo-esc-key {
+  /* Wait 1s (40% of 2.5s) */
+  0%, 40% { transform: translateY(0); box-shadow: 0 4px 0 var(--key-shadow); }
+  /* Press down */
+  45%, 55% { transform: translateY(4px); box-shadow: 0 0 0 var(--key-shadow); }
+  /* Release */
+  60%, 100% { transform: translateY(0); box-shadow: 0 4px 0 var(--key-shadow); }
+}
+
+@keyframes demo-esc-dialog {
+  /* Sync with key press down at 45% */
+  0%, 44% { opacity: 1; transform: scale(1); pointer-events: auto; }
+  45%, 100% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+}
+
+@keyframes demo-info-cursor {
+  0% { left: 50%; top: 50%; transform: scale(1); }
+  25% { left: 80%; top: 80%; transform: scale(1); }
+  35% { left: 80%; top: 80%; transform: scale(0.9); } /* Press */
+  40% { left: 80%; top: 80%; transform: scale(1); }   /* Release */
+  60% { left: 50%; top: 50%; transform: scale(1); }
+  100% { left: 50%; top: 50%; transform: scale(1); }
+}
+
+@keyframes demo-info-dialog {
+  0%, 35% { opacity: 1; transform: scale(1); pointer-events: auto; }
+  40%, 100% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+}
+
+@keyframes demo-info-ripple {
+   0%, 35% { opacity: 0; transform: scale(0); }
+   35% { opacity: 0.5; transform: scale(0); }
+   45% { opacity: 0; transform: scale(2); }
+   46%, 100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes demo-cursor-ripple {
+   0%, 30% { opacity: 0; transform: scale(0); }
+   30% { opacity: 0.5; transform: scale(0); }
+   36% { opacity: 0; transform: scale(2); }
+   37%, 100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes demo-confirm-ripple {
+   0%, 25% { opacity: 0; transform: scale(0); }
+   25% { opacity: 0.5; transform: scale(0); }
+   31% { opacity: 0; transform: scale(2); }
+   32%, 100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes demo-form-cursor {
+  0% { left: 50%; top: 50%; transform: scale(1); }
+  25% { left: 80%; top: 20%; transform: scale(1); }
+  35% { left: 80%; top: 20%; transform: scale(0.9); } /* Press */
+  40% { left: 80%; top: 20%; transform: scale(1); }   /* Release */
+  60% { left: 50%; top: 50%; transform: scale(1); }
+  100% { left: 50%; top: 50%; transform: scale(1); }
+}
+
+@keyframes demo-form-ripple {
+  0%, 35% { opacity: 0; transform: scale(0); }
+  35% { opacity: 0.5; transform: scale(0); }
+  45% { opacity: 0; transform: scale(2); }
+  46%, 100% { opacity: 0; transform: scale(2); }
+}
+
+
+
+
+@keyframes demo-form-dialog-pulse {
+  0%, 34% { transform: scale(1); }
+  35% { transform: scale(1.02); }
+  40% { transform: scale(1); }
+  45% { transform: scale(1.01); }
+  50%, 100% { transform: scale(1); }
+}
+
+@keyframes demo-discard-cursor {
+  0%, 45% { left: 90%; top: 90%; transform: scale(1); } /* Idle while typing */
+  55% { left: 58%; top: 75%; transform: scale(1); } /* Cancel Btn - adjusted left */
+  58% { left: 58%; top: 75%; transform: scale(0.9); } /* Press Cancel */
+  61% { left: 58%; top: 75%; transform: scale(1); }
+  80% { left: 80%; top: 80%; transform: scale(1); } /* Move away */
+  100% { left: 80%; top: 80%; transform: scale(1); }
+}
+
+@keyframes demo-discard-ripple {
+  0%, 57% { opacity: 0; transform: scale(0); }
+  /* Cancel Click */
+  58% { opacity: 0.5; transform: scale(0); }
+  65% { opacity: 0; transform: scale(2); }
+  /* End */
+  66%, 100% { opacity: 0; transform: scale(0); }
+}
+
+@keyframes demo-discard-typing {
+  0% { width: 0; border-right-color: black; animation-timing-function: step-end; }
+  6% { width: 0; border-right-color: transparent; animation-timing-function: step-end; }
+  12% { width: 0; border-right-color: black; animation-timing-function: step-end; }
+  18% { width: 0; border-right-color: transparent; animation-timing-function: step-end; }
+  20% { width: 0; border-right-color: black; animation-timing-function: steps(17, end); }
+  40% { width: 115px; border-right-color: black; animation-timing-function: step-end; }
+  46% { width: 115px; border-right-color: transparent; animation-timing-function: step-end; }
+  52% { width: 115px; border-right-color: black; animation-timing-function: step-end; }
+  55%, 100% { width: 115px; border-right-color: transparent; }
+}
+
+@keyframes demo-discard-dialog-2 {
+  0%, 59% { opacity: 0; pointer-events: none; transform: scale(0.95); }
+  62%, 100% { opacity: 1; pointer-events: auto; transform: scale(1); }
+}
+
+@keyframes demo-discard-main-dialog {
+  0%, 100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes demo-discard-btn-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes demo-inert-cursor {
+  0% { left: 50%; top: 50%; transform: scale(1); }
+  10% { left: 15%; top: 18%; transform: scale(1); } /* TL: Btn */
+  13% { left: 15%; top: 18%; transform: scale(0.9); }
+  16% { left: 15%; top: 18%; transform: scale(1); }
+  25% { left: 85%; top: 18%; transform: scale(1); } /* TR: Link */
+  28% { left: 85%; top: 18%; transform: scale(0.9); }
+  31% { left: 85%; top: 18%; transform: scale(1); }
+  45% { left: 15%; top: 82%; transform: scale(1); } /* BL: Select */
+  48% { left: 15%; top: 82%; transform: scale(0.9); }
+  51% { left: 15%; top: 82%; transform: scale(1); }
+  65% { left: 85%; top: 82%; transform: scale(1); } /* BR: Input */
+  68% { left: 85%; top: 82%; transform: scale(0.9); }
+  71% { left: 85%; top: 82%; transform: scale(1); }
+  85% { left: 50%; top: 60%; transform: scale(1); } /* Dialog Btn */
+  88% { left: 50%; top: 60%; transform: scale(0.9); }
+  91% { left: 50%; top: 60%; transform: scale(1); }
+  100% { left: 50%; top: 60%; transform: scale(1); }
+}
+
+@keyframes demo-inert-ripple {
+  0%, 12% { opacity: 0; transform: scale(0); }
+  /* TL Click (13%) */
+  13% { opacity: 0.5; transform: scale(0); }
+  20% { opacity: 0; transform: scale(2); }
+  /* Hold */
+  21%, 27% { opacity: 0; transform: scale(0); }
+  /* TR Click (28%) */
+  28% { opacity: 0.5; transform: scale(0); }
+  35% { opacity: 0; transform: scale(2); }
+  /* Hold */
+  36%, 47% { opacity: 0; transform: scale(0); }
+  /* BL Click (48%) */
+  48% { opacity: 0.5; transform: scale(0); }
+  55% { opacity: 0; transform: scale(2); }
+  /* Hold */
+  56%, 67% { opacity: 0; transform: scale(0); }
+  /* BR Click (68%) */
+  68% { opacity: 0.5; transform: scale(0); }
+  75% { opacity: 0; transform: scale(2); }
+  /* Hold */
+  76%, 87% { opacity: 0; transform: scale(0); }
+  /* Dialog Click (88%) */
+  88% { opacity: 0.5; transform: scale(0); }
+  95% { opacity: 0; transform: scale(2); }
+  96%, 100% { opacity: 0; transform: scale(0); }
+}
+
+@keyframes demo-focus-tab-press {
+  0%, 19% { transform: scale(1); }
+  20% { transform: scale(0.9); }
+  21%, 49% { transform: scale(1); }
+  50% { transform: scale(0.9); }
+  51%, 79% { transform: scale(1); }
+  80% { transform: scale(0.9); }
+  81%, 100% { transform: scale(1); }
+}
+
+@keyframes demo-focus-btn-1 {
+  0%, 19% { box-shadow: none; }
+  20%, 49% { box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--text-primary); }
+  50%, 79% { box-shadow: none; }
+  80%, 100% { box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--text-primary); }
+}
+
+@keyframes demo-focus-btn-2 {
+  0%, 49% { box-shadow: none; }
+  50%, 79% { box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--text-primary); }
+  80%, 100% { box-shadow: none; }
+}
+
+@keyframes demo-scroll-cursor {
+  0% { left: 80%; top: 80%; transform: scale(1); }
+  20% { left: 50%; top: 50%; transform: scale(1); }
+  25% { left: 50%; top: 50%; transform: scale(0.9); }
+  30% { left: 50%; top: 50%; transform: scale(1); }
+  45%, 100% { left: 80%; top: 80%; transform: scale(1); }
+}
+
+@keyframes demo-scroll-ripple {
+   0%, 25% { opacity: 0; transform: scale(0); }
+   25% { opacity: 0.5; transform: scale(0); }
+   31% { opacity: 0; transform: scale(2); }
+   32%, 100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes demo-scroll-dialog {
+  0%, 25% { opacity: 0; transform: scale(0.95); pointer-events: none; }
+  30%, 100% { opacity: 1; transform: scale(1); pointer-events: auto; }
+}
+
+@keyframes demo-scroll-scrollbar {
+  0%, 29% { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
+@keyframes button-demo-cursor-move {
+  0% { left: 70%; top: 80%; transform: scale(1); }
+  15% { left: 50%; top: 50%; transform: scale(1); }
+  25% { left: 50%; top: 50%; transform: scale(0.9); }
+  30% { left: 50%; top: 50%; transform: scale(1); }
+  45% { left: 50%; top: 50%; transform: scale(1); }
+  55% { left: 80%; top: 30%; transform: scale(1); }
+  100% { left: 80%; top: 30%; transform: scale(1); }
+}
+
+@keyframes button-demo-cursor-ripple {
+   0%, 25% { opacity: 0; transform: scale(0); }
+   25% { opacity: 0.5; transform: scale(0); }
+   31% { opacity: 0; transform: scale(2); }
+   32%, 100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes button-demo-content-idle {
+  0%, 29% { opacity: 1; transform: translateY(0); }
+  30% { opacity: 0; transform: translateY(10px); }
+  90% { opacity: 0; transform: translateY(10px); }
+  95%, 100% { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes button-demo-content-loading {
+  0%, 29% { opacity: 0; transform: translateY(10px); }
+  30% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; transform: translateY(0); }
+  71% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes button-demo-content-success {
+  0%, 70% { opacity: 0; transform: translateY(10px); }
+  71% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  95%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes button-demo-container-scale {
+  0%, 24% { transform: scale(1); }
+  25% { transform: scale(0.95); }
+  30%, 100% { transform: scale(1); }
+}
+
+@keyframes button-demo-highlight {
+  0%, 12% { opacity: 0; }
+  13%, 24% { opacity: 1; }
+  25%, 30% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes button-demo-border-success {
+  0%, 70% { border-color: rgba(228, 228, 231, 0.4); background-color: transparent; }
+  71%, 90% { border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.1); }
+  95%, 100% { border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.1); }
+}
+
+@keyframes button-demo-width {
+  0%, 29% { width: 78px; }
+  33%, 70% { width: 145px; }
+  75%, 90% { width: 100px; }
+  95%, 100% { width: 100px; }
+}
+
+/* Button Design Thumbnail Animations - 5s loop */
+@keyframes thumb-line-draw {
+  0% { opacity: 0; }
+  5% { opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  95%, 100% { opacity: 0; }
+}
+
+@keyframes thumb-circles-pop {
+  0% { transform: scale(0); opacity: 0; }
+  5% { transform: scale(0); opacity: 0; }
+  12% { transform: scale(1.2); opacity: 1; }
+  16% { transform: scale(0.9); }
+  20% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1); opacity: 1; }
+  95%, 100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes thumb-rect-draw {
+  0%, 5% { stroke-dashoffset: 200; opacity: 0; }
+  10% { stroke-dashoffset: 200; opacity: 1; }
+  30% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-text-fade {
+  0%, 40% { opacity: 0; stroke-dashoffset: 100; }
+  50% { opacity: 1; stroke-dashoffset: 0; }
+  80% { opacity: 1; stroke-dashoffset: 0; }
+  95%, 100% { opacity: 0; stroke-dashoffset: 100; }
+}
+
+@keyframes thumb-char-fade {
+  0%, 25% { opacity: 0; transform: translateY(4px); }
+  35% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  95%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
+/* Dialog Design Thumbnail Animations - 5s loop */
+@keyframes thumb-dialog-draw {
+  0%, 20% { stroke-dashoffset: 320; opacity: 0; }
+  25% { stroke-dashoffset: 320; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-line {
+  0%, 35% { stroke-dashoffset: 100; opacity: 0; }
+  40% { stroke-dashoffset: 100; opacity: 1; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-x {
+  0%, 40% { stroke-dashoffset: 10; opacity: 0; }
+  45% { stroke-dashoffset: 10; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-content {
+  0% { stroke-dashoffset: 80; opacity: 0; }
+  5% { stroke-dashoffset: 80; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-btn {
+  0% { stroke-dashoffset: 70; opacity: 0; }
+  5% { stroke-dashoffset: 70; opacity: 0; }
+  20% { stroke-dashoffset: 0; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Table Design Thumbnail Animations - 5s loop */
+@keyframes thumb-table-draw {
+  0%, 20% { stroke-dashoffset: 350; opacity: 0; }
+  25% { stroke-dashoffset: 350; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-header {
+  0%, 35% { stroke-dashoffset: 120; opacity: 0; }
+  40% { stroke-dashoffset: 120; opacity: 1; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-col {
+  0% { stroke-dashoffset: 60; opacity: 0; }
+  5% { stroke-dashoffset: 60; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-cell {
+  0% { stroke-dashoffset: 30; opacity: 0; }
+  5% { stroke-dashoffset: 30; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  70%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* TypeScript Guidelines Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-ts-logo-draw {
+  0%, 25% { stroke-dashoffset: 200; opacity: 0; }
+  35% { stroke-dashoffset: 200; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-ts-letter {
+  0%, 55% { stroke-dashoffset: 200; opacity: 0; }
+  60% { stroke-dashoffset: 200; opacity: 1; }
+  75% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Proximity Principle Thumbnail Animations - blueprint style */
+@keyframes thumb-proximity-divider {
+  0%, 15% { opacity: 0; stroke-dashoffset: 70; }
+  25% { opacity: 0.6; stroke-dashoffset: 0; }
+  70% { opacity: 0.6; stroke-dashoffset: 0; }
+  85%, 100% { opacity: 0; stroke-dashoffset: 70; }
+}
+
+@keyframes thumb-proximity-folder {
+  0%, 5% { opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  85%, 100% { opacity: 0; }
+}
+
+@keyframes thumb-proximity-draw {
+  0%, 10% { stroke-dashoffset: 80; opacity: 0; }
+  20% { stroke-dashoffset: 80; opacity: 0.5; }
+  40% { stroke-dashoffset: 0; opacity: 0.5; }
+  70% { stroke-dashoffset: 0; opacity: 0.5; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-draw-good {
+  0%, 10% { stroke-dashoffset: 200; opacity: 0; }
+  20% { stroke-dashoffset: 200; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-file {
+  0%, 15% { stroke-dashoffset: 60; opacity: 0; }
+  25% { stroke-dashoffset: 60; opacity: 0.4; }
+  40% { stroke-dashoffset: 0; opacity: 0.4; }
+  70% { stroke-dashoffset: 0; opacity: 0.4; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-file-good {
+  0%, 15% { stroke-dashoffset: 70; opacity: 0; }
+  25% { stroke-dashoffset: 70; opacity: 1; }
+  40% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-connection {
+  0%, 25% { opacity: 0; stroke-dashoffset: 20; }
+  35% { opacity: 0.4; stroke-dashoffset: 0; }
+  70% { opacity: 0.4; stroke-dashoffset: 0; }
+  85%, 100% { opacity: 0; stroke-dashoffset: 20; }
+}
+
+@keyframes thumb-proximity-mark {
+  0%, 35% { stroke-dashoffset: 20; opacity: 0; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 20; opacity: 0; }
+}
+
+@keyframes thumb-proximity-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes thumb-proximity-float-alt {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Data Loading Thumbnail Animations - Dynamic & Engaging */
+
+/* Cloud breathes/pulses subtly */
+@keyframes thumb-cloud-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Database lines blink to show activity */
+@keyframes thumb-db-line-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Flow line dashes animate to show movement */
+@keyframes thumb-flow-line-dash {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -4; }
+}
+
+/* Data packets stream from cloud to browser */
+@keyframes thumb-data-stream {
+  0% { 
+    transform: translateX(0); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% { 
+    transform: translateX(16px); 
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(20px); 
+    opacity: 0;
+  }
+}
+
+/* Glow effect for data transfer activity */
+@keyframes thumb-data-glow {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.15; }
+}
+
+/* Browser dots pulse subtly */
+@keyframes thumb-browser-dot {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Skeleton shimmer effect - moves across */
+@keyframes thumb-skeleton-shimmer {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+/* Content lines load in with a drawing effect */
+@keyframes thumb-content-load {
+  0%, 20% { stroke-dashoffset: 30; opacity: 0.3; }
+  40% { stroke-dashoffset: 0; opacity: 0.8; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0.8; }
+}
+
+/* Browser glows subtly when data arrives */
+@keyframes thumb-browser-glow {
+  0%, 30% { opacity: 0; }
+  50% { opacity: 0.05; }
+  70%, 100% { opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Icon fade in */
+@keyframes thumb-icon-fade {
+  0% { opacity: 0; transform: scale(0.9); }
+  8% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  95%, 100% { opacity: 0; transform: scale(0.9); }
+}
+
+/* Data Loading Thumbnail - Data flow arrow animation */
+@keyframes thumb-data-flow {
+  0%, 3% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  95%, 100% { opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Path draw animation */
+@keyframes thumb-path-draw {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  5% { stroke-dashoffset: 100; opacity: 1; }
+  30% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Data packet animation */
+@keyframes thumb-data-packet {
+  0%, 25% { opacity: 0; }
+  30% { opacity: 0.8; }
+  75% { opacity: 0.8; }
+  85%, 100% { opacity: 0; }
+}
+
+
+
+/* Handling Timestamps Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-time-db-top {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-db-body {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-db-mid {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-fade {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes thumb-time-arrow {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-arrow-head {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-screen {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-stand {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-clock {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-hand-h {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes thumb-time-hand-m {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(720deg); }
+}
+
+/* Null vs Undefined Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-null-undefined-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes thumb-null-q {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+  50% { transform: translateY(-3px) scale(1.1); opacity: 0.8; }
+}
+
+@keyframes thumb-null-box {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-null-chip {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-null-text {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+}
+

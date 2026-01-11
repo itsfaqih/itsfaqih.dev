@@ -1,0 +1,188 @@
+/**
+ * Table Design Thumbnail Animations
+ * Used by table-design-thumbnail.tsx
+ */
+
+@keyframes thumb-line-draw {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  95%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-circles-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  5% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  12% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  16% {
+    transform: scale(0.9);
+  }
+  20% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  95%,
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-table-draw {
+  0%,
+  20% {
+    stroke-dashoffset: 350;
+    opacity: 0;
+  }
+  25% {
+    stroke-dashoffset: 350;
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-table-header {
+  0%,
+  35% {
+    stroke-dashoffset: 120;
+    opacity: 0;
+  }
+  40% {
+    stroke-dashoffset: 120;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-table-col {
+  0% {
+    stroke-dashoffset: 60;
+    opacity: 0;
+  }
+  5% {
+    stroke-dashoffset: 60;
+    opacity: 0;
+  }
+  15% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-table-cell {
+  0% {
+    stroke-dashoffset: 30;
+    opacity: 0;
+  }
+  5% {
+    stroke-dashoffset: 30;
+    opacity: 0;
+  }
+  15% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  55% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+.lineDraw {
+  animation-name: thumb-line-draw;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.circlesPop {
+  animation-name: thumb-circles-pop;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.tableDraw {
+  animation-name: thumb-table-draw;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.tableHeader {
+  animation-name: thumb-table-header;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.tableCol {
+  animation-name: thumb-table-col;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.tableCell {
+  animation-name: thumb-table-cell;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

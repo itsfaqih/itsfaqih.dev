@@ -1,0 +1,70 @@
+/**
+ * Null vs Undefined Thumbnail Animations
+ * Used by null-vs-undefined-thumbnail.tsx
+ */
+
+@keyframes thumb-proximity-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes thumb-proximity-float-alt {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes thumb-null-undefined-fade {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes thumb-null-q {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-3px) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.float {
+  animation-name: thumb-proximity-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.floatAlt {
+  animation-name: thumb-proximity-float-alt;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.undefinedFade {
+  animation-name: thumb-null-undefined-fade;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.questionMark {
+  animation-name: thumb-null-q;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

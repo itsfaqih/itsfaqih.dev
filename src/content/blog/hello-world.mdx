@@ -1,0 +1,55 @@
+---
+title: Hello World
+publishedAt: 2023-01-01
+summary: My first post on this new site.
+---
+
+This is my first post!
+
+Here is a counter component to prove MDX is working:
+
+import { Counter } from "./counter";
+
+<Counter />
+
+## Syntax Highlighting Demo
+
+Here are some code examples:
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  role: "admin" | "user";
+}
+
+function getUser(id: number): User {
+  return {
+    id,
+    name: "Faqih",
+    role: "admin",
+  };
+}
+```
+
+```javascript
+const numbers = [1, 2, 3];
+const doubled = numbers.map((n) => n * 2);
+console.log(doubled);
+```
+
+```css
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+```
+
+```html
+<div class="card">
+  <h1>Hello World</h1>
+  <p>This is a demonstration of HTML highlighting.</p>
+</div>
+```

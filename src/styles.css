@@ -1,0 +1,387 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
+  --animate-ripple: ripple 0.6s ease-out forwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ripple {
+    from {
+      transform: scale(0);
+      opacity: 0.3;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-from-top {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dialog animations */
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
+  @keyframes dialog-out {
+    from {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.96);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* Shadcn-style semantic color tokens */
+    --background: oklch(0.98 0 0); /* #fafafa - slightly off-white */
+    --foreground: oklch(0.145 0 0); /* #18181b - zinc-950 */
+    
+    --card: oklch(1 0 0 / 50%); /* translucent white */
+    --card-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --popover: oklch(1 0 0); /* white */
+    --popover-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --brand: oklch(0.556 0.182 254.604); /* blue-600 */
+    --brand-foreground: oklch(0.985 0 0); /* near white */
+    
+    --neutral: oklch(0.97 0 0 / 50%); /* translucent light gray */
+    --neutral-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --muted: oklch(0.97 0 0); /* zinc-100 */
+    --muted-foreground: oklch(0.556 0 0); /* zinc-500 */
+    
+    --accent: oklch(0.97 0 0); /* zinc-100 */
+    --accent-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
+    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    
+    --negative: oklch(0.637 0.237 25.331); /* red-500 */
+    --negative-foreground: oklch(0.577 0.245 27.325); /* red-600 */
+    
+    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
+    --positive-foreground: oklch(0.596 0.145 163.225); /* emerald-600 */
+    
+    --border: oklch(0.922 0 0); /* zinc-200 */
+    --input: oklch(0.922 0 0); /* zinc-200 */
+    --ring: oklch(0.556 0.182 254.604); /* brand blue-600 */
+    
+    /* Legacy/custom variables for specific use cases */
+    --header-bg: oklch(1 0 0 / 60%); /* translucent white */
+    --grid-color: oklch(0 0 0 / 20%); /* translucent black */
+    --key-shadow: oklch(0 0 0); /* black */
+    
+    /* Border radius */
+    --radius: 0.75rem; /* 12px */
+  }
+
+  .dark {
+    --background: oklch(0.145 0 0); /* #09090b - zinc-950 */
+    --foreground: oklch(0.985 0 0); /* #f4f4f5 - zinc-100 */
+    
+    --card: oklch(0.205 0 0 / 40%); /* translucent zinc-900 */
+    --card-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --popover: oklch(0.269 0 0); /* zinc-800 */
+    --popover-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --brand: oklch(0.708 0.182 254.604); /* blue-400 */
+    --brand-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --neutral: oklch(0.269 0 0 / 40%); /* translucent zinc-800 */
+    --neutral-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --muted: oklch(0.269 0 0); /* zinc-800 */
+    --muted-foreground: oklch(0.708 0 0); /* zinc-400 */
+    
+    --accent: oklch(0.371 0 0); /* zinc-700 */
+    --accent-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --destructive: oklch(0.704 0.191 22.216); /* red-500 */
+    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    
+    --negative: oklch(0.637 0.237 25.331); /* red-500 */
+    --negative-foreground: oklch(0.808 0.114 19.571); /* red-300 */
+    
+    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
+    --positive-foreground: oklch(0.845 0.143 164.978); /* emerald-300 */
+    
+    --border: oklch(1 0 0 / 10%); /* translucent white */
+    --input: oklch(1 0 0 / 15%); /* translucent white */
+    --ring: oklch(0.708 0.182 254.604); /* brand blue-400 */
+    
+    /* Legacy/custom variables for specific use cases */
+    --header-bg: oklch(0.145 0 0 / 40%); /* translucent zinc-950 */
+    --grid-color: oklch(1 0 0 / 15%); /* translucent white */
+    --key-shadow: oklch(0.708 0 0); /* slate-400 */
+  }
+}
+
+/* Make CSS variables available as Tailwind utilities */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-negative: var(--negative);
+  --color-negative-foreground: var(--negative-foreground);
+  --color-positive: var(--positive);
+  --color-positive-foreground: var(--positive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  /* Legacy/custom colors */
+  --color-header-bg: var(--header-bg);
+  --color-grid: var(--grid-color);
+  
+  /* Border radius */
+  --radius: var(--radius);
+}
+
+/* Experimental squircle support */
+.squircle {
+  corner-shape: squircle;
+}
+
+/* Syntax highlighting styles */
+figure[data-rehype-pretty-code-figure] {
+  @apply relative;
+}
+
+figure[data-rehype-pretty-code-figure] pre {
+  @apply rounded-xl border border-(--border) p-4 overflow-x-auto bg-(--card) text-sm leading-relaxed;
+}
+
+/* Handle dual themes using Shiki variables */
+/* For rehype-pretty-code (blog posts) */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* For inline shiki rendering (opinions pages) */
+pre.shiki span[style*="--shiki-light"],
+.shiki span[style*="--shiki-light"] {
+  color: var(--shiki-light) !important;
+}
+
+.dark pre.shiki span[style*="--shiki-dark"],
+.dark .shiki span[style*="--shiki-dark"] {
+  color: var(--shiki-dark) !important;
+}
+
+figure[data-rehype-pretty-code-figure] code {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  display: grid;
+}
+
+figure[data-rehype-pretty-code-figure] [data-line] {
+  @apply px-4 -mx-4 border-l-2 border-transparent;
+}
+
+figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  @apply bg-(--card) border-(--border);
+}
+
+/* Grid Background Styles */
+@layer base {
+  :root {
+    /* Grid system */
+    --cell-size: 40px;
+    --grid-offset: 100px;
+  }
+}
+
+/* Skewed grid background pattern - split into left and right with opposite skews */
+.grid-background-left,
+.grid-background-right {
+  position: absolute;
+  top: calc(var(--grid-offset) * -1);
+  bottom: calc(var(--grid-offset) * -1);
+  top: 0;
+  height: auto; 
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--cell-size) var(--cell-size);
+}
+
+.grid-background-left {
+  width: calc(50% + 1vw);
+  left: -0.75vw;
+  transform: skewY(-15deg);
+  transform-origin: top right;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+.grid-background-right {
+  width: calc(50% + 0.7vw);
+  right: -0.75vw;
+  transform: skewY(15deg);
+  transform-origin: top left;
+  background-position: right top;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+/* Ceiling grid effect for top corners */
+.grid-ceiling {
+  position: absolute;
+  top: -2.5vh;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  z-index: 0;
+  background-position: center top;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --ceiling-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2));
+  /* Clip the bottom - use grid-offset and tan(15deg) ≈ 0.268 for precise geometry */
+  clip-path: polygon(
+    0 0, 
+    100% 0, 
+    100% calc((50vw + var(--grid-offset)) * 0.268), 
+    50% calc(var(--grid-offset) * 0.268),
+    0 calc((50vw + var(--grid-offset)) * 0.268)
+  );
+}
+
+/* Floor grid effect for bottom center */
+.grid-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  background-position: center bottom;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --floor-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) 
+      calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2));
+  /* Clip the top - triangle shape matching 15-degree wall angles */
+  clip-path: polygon(
+    0 calc((50vw + var(--grid-offset)) * 0.268),
+    50% calc(var(--grid-offset) * 0.268),
+    100% calc((50vw + var(--grid-offset)) * 0.268),
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Individual fading box */
+.fade-box {
+  position: absolute;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: var(--grid-color);
+  opacity: 0; /* Start hidden, animation will fade in */
+  animation: grid-box-fade var(--fade-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--fade-delay, 0s);
+}
+
+
+
+@keyframes grid-box-fade {
+  0% {
+    opacity: 0;
+  }
+  /* Fade in */
+  10% {
+    opacity: 0.8;
+  }
+  /* Hold visible for a shorter time */
+  35% {
+    opacity: 0.8;
+  }
+  /* Fade out */
+  50%, 100% {
+    opacity: 0;
+  }
+}

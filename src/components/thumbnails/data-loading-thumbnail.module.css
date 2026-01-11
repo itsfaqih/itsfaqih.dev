@@ -1,0 +1,36 @@
+/**
+ * Data Loading Thumbnail Animations
+ * Used by data-loading-thumbnail.tsx
+ */
+
+@keyframes thumb-proximity-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes thumb-proximity-float-alt {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.float {
+  animation-name: thumb-proximity-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.floatAlt {
+  animation-name: thumb-proximity-float-alt;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
