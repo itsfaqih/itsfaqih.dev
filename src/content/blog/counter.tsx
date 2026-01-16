@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Minus } from "lucide-react";
+import { PlusIcon, MinusIcon } from "@phosphor-icons/react";
 
 export default function Counter() {
   const [count, setCount] = useState(0);
@@ -11,7 +11,7 @@ export default function Counter() {
         className="p-2 rounded-md hover:bg-zinc-700 text-zinc-400 hover:text-white active:scale-95 transition-all duration-200"
         aria-label="Decrease count"
       >
-        <Minus size={18} />
+        <MinusIcon size={18} />
       </button>
 
       <div className="min-w-[80px] text-center">
@@ -23,7 +23,7 @@ export default function Counter() {
         className="p-2 rounded-md bg-zinc-700 text-white hover:bg-zinc-600 active:scale-95 transition-all duration-200"
         aria-label="Increase count"
       >
-        <Plus size={18} />
+        <PlusIcon size={18} />
       </button>
     </div>
   );

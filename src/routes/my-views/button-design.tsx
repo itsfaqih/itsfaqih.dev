@@ -1,22 +1,41 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
-import { useFakeCursor } from "../../components/fake-cursor";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { useState, useEffect } from "react";
+import { cn } from "@/cn";
+import {
+  AnimationDemo,
+  AnimationStage,
+  AnimationControls,
+  AnimatedCursor,
+  useAnimationDemo,
+} from "../../components/animation-demo";
+import { GlassyButton } from "../../components/glassy-button";
 import { PageContainer } from "../../components/page-container";
 import {
-  ArrowLeft,
-  Loader2,
-  MousePointer,
-  Check,
-  Ban,
-  Sparkles,
-  Play,
-  Pause,
-  ArrowRight,
-  Hand,
-  Settings,
-  Plus,
-} from "lucide-react";
-import { BestPractice, CodeExample, GuidelineHero } from "./components";
+  ArrowLeftIcon,
+  CircleNotchIcon,
+  CursorIcon,
+  CheckIcon,
+  ProhibitIcon,
+  SparkleIcon,
+  ArrowRightIcon,
+  CaretRightIcon,
+  HandIcon,
+  GearIcon,
+  PlusIcon,
+  TrashIcon,
+  WarningIcon,
+  XIcon,
+  PencilIcon,
+  ArrowUpRightIcon,
+  CaretDownIcon,
+  DownloadSimpleIcon,
+  ArrowsClockwiseIcon,
+  DeviceMobileIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react";
+import { SimpleTooltip } from "@/components/tooltip";
+import { BestPractice, CodeExample, GuidelineHero, ButtonVariantMatrix } from "./-components";
 
 export const Route = createFileRoute("/my-views/button-design")({
   component: ButtonStates,
@@ -26,293 +45,199 @@ export const Route = createFileRoute("/my-views/button-design")({
 // Interactive Button Demo Component
 // ============================================================================
 
-type ButtonState = "idle" | "hover" | "loading" | "disabled" | "pressing" | "success";
-
 function InteractiveButtonDemo() {
-  const [state, setState] = useState<ButtonState>("idle");
-  const [autoPlay, setAutoPlay] = useState(false);
+  return (
+    <AnimationDemo duration={6000} masterAnimationName="button-demo-cursor-move">
+      <InteractiveButtonDemoContent />
+    </AnimationDemo>
+  );
+}
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const cursor = useFakeCursor(containerRef);
+function InteractiveButtonDemoContent() {
+  const { status, animationStyle } = useAnimationDemo();
 
-  useEffect(() => {
-    if (autoPlay) cursor.show();
-    else cursor.hide();
-  }, [autoPlay, cursor.show, cursor.hide]);
-
-  useEffect(() => {
-    if (!autoPlay) return;
-
-    let timeout: NodeJS.Timeout;
-
-    const runSequence = () => {
-      // Sequence: Idle -> Hover -> Pressing -> Loading -> Success -> Idle
-
-      switch (state) {
-        case "idle":
-          timeout = setTimeout(() => {
-            if (buttonRef.current) cursor.moveTo(buttonRef.current);
-            setState("hover");
-          }, 1000);
-          break;
-        case "hover":
-          timeout = setTimeout(() => {
-            cursor.pressDown();
-            setState("pressing");
-          }, 800);
-          break;
-        case "pressing":
-          timeout = setTimeout(() => {
-            cursor.pressUp();
-            setState("loading");
-            cursor.setType("wait");
-          }, 300);
-          break;
-        case "loading":
-          // Move cursor away halfway through loading
-          setTimeout(() => {
-            cursor.setPosition({ x: "70%", y: "80%" });
-            cursor.setType("default");
-          }, 1200);
-          timeout = setTimeout(() => setState("success"), 2500);
-          break;
-        case "success":
-          timeout = setTimeout(() => setState("idle"), 1500);
-          break;
-        case "disabled":
-          timeout = setTimeout(() => setState("idle"), 2000);
-          break;
-      }
-    };
-
-    runSequence();
-
-    return () => clearTimeout(timeout);
-  }, [autoPlay, state, cursor]);
-
-  // Initial positioning
-  useEffect(() => {
-    if (autoPlay && state === "idle") {
-      cursor.setPosition({ x: "70%", y: "80%" });
-      cursor.setType("default");
-    }
-  }, [autoPlay, state === "idle"]);
-
-  const handleClick = () => {
-    if (state === "disabled" || state === "loading") return;
-
-    setState("pressing");
-    setTimeout(() => {
-      setState("loading");
-      setTimeout(() => {
-        setState("success");
-        setTimeout(() => {
-          setState("idle");
-        }, 1500);
-      }, 2000);
-    }, 150);
-  };
-
-  const getButtonStyles = () => {
-    const base =
-      "relative px-6 py-3 rounded-xl font-medium text-white transition-all duration-200 flex items-center justify-center gap-2 min-w-[160px]";
-
-    switch (state) {
-      case "idle":
-        return `${base} bg-indigo-600 hover:bg-indigo-700 active:scale-95 cursor-pointer`;
-      case "hover":
-        return `${base} bg-indigo-700 cursor-pointer shadow-lg shadow-indigo-500/25 -translate-y-0.5`;
-      case "loading":
-        return `${base} bg-indigo-600 cursor-wait`;
-      case "disabled":
-        return `${base} bg-zinc-400 dark:bg-zinc-600 cursor-not-allowed opacity-60`;
-      case "pressing":
-        return `${base} bg-indigo-700 scale-95`;
-      case "success":
-        return `${base} bg-emerald-600`;
-      default:
-        return base;
-    }
-  };
-
-  const getButtonContent = () => {
-    switch (state) {
-      case "idle":
-        return "Submit";
-      case "hover":
-        return "Submit";
-      case "loading":
-        return (
-          <>
-            <Loader2 size={18} className="animate-spin" />
-            Processing...
-          </>
-        );
-      case "disabled":
-        return "Submit";
-      case "pressing":
-        return "Submit";
-      case "success":
-        return (
-          <>
-            <Check size={18} />
-            Done!
-          </>
-        );
-      default:
-        return "Submit";
-    }
-  };
-
-  const stateInfo: Record<ButtonState, { label: string; description: string; color: string }> = {
-    idle: {
-      label: "Idle",
-      description: "Ready for interaction. Hover and click are available.",
-      color: "text-indigo-400",
-    },
-    hover: {
-      label: "Hover",
-      description: "Cursor over button. Shows interactivity.",
-      color: "text-purple-400",
-    },
-    loading: {
-      label: "Loading",
-      description: "Action in progress. Button is non-interactive.",
-      color: "text-amber-400",
-    },
-    disabled: {
-      label: "Disabled",
-      description: "Interaction is blocked. Shows reduced opacity.",
-      color: "text-zinc-400",
-    },
-    pressing: {
-      label: "Pressing",
-      description: "Active press state. Shows scale-down feedback.",
-      color: "text-emerald-400",
-    },
-    success: {
-      label: "Success",
-      description: "Action completed. Provides positive feedback.",
-      color: "text-emerald-400",
-    },
-  };
+  // Base styles: Primary variant
+  const base = cn(
+    "relative overflow-hidden inline-flex items-center justify-center gap-2 px-3 h-8.5 rounded-md text-blue-700 dark:text-blue-100 transition-all text-sm backdrop-blur-md border border-blue-500/20 dark:border-blue-400/30",
+    "bg-linear-to-b from-blue-500/10 to-blue-500/5 dark:from-blue-500/20 dark:to-blue-500/10",
+    "",
+  );
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
-      <div
-        ref={containerRef}
-        className="relative p-8 flex flex-col items-center justify-center min-h-[200px] bg-linear-to-br from-indigo-500/5 to-purple-500/5"
-      >
-        {cursor.RenderCursor()}
+    <>
+      <AnimationStage>
+        {/* Fake Cursor */}
+        <AnimatedCursor
+          moveAnimationName="button-demo-cursor-move"
+          rippleAnimationName="button-demo-cursor-ripple"
+        />
 
-        <button
-          ref={buttonRef}
-          onClick={handleClick}
-          disabled={state === "disabled" || state === "loading"}
-          className={getButtonStyles()}
+        {/* The Button */}
+        <div
+          className={cn(
+            base,
+            "cursor-default grid place-items-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+          )}
+          style={{
+            ...animationStyle,
+            animationName:
+              status !== "idle"
+                ? "button-demo-width, button-demo-container-scale, button-demo-border-success"
+                : "none",
+            borderColor: "rgba(228, 228, 231, 0.4)", // Default border
+          }}
         >
-          {getButtonContent()}
-        </button>
-      </div>
+          {/* Highlight Overlay (Hover Simulation) */}
+          <div
+            className="absolute inset-0 bg-linear-to-b from-blue-500/20 to-blue-500/10 dark:from-blue-400/30 dark:to-blue-400/20 pointer-events-none"
+            style={{
+              ...animationStyle,
+              animationName: status !== "idle" ? "button-demo-highlight" : "none",
+              opacity: 0,
+            }}
+          />
 
-      <div className="border-t border-(--border-color) p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <span className={`text-lg font-semibold ${stateInfo[state].color}`}>
-              {stateInfo[state].label}
-            </span>
-            <span className="text-sm text-(--text-secondary)">{stateInfo[state].description}</span>
-          </div>
-          <button
-            onClick={() => setAutoPlay(!autoPlay)}
-            className="relative overflow-hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-primary) transition-all text-sm backdrop-blur-md border border-gray-500/20 bg-linear-to-b from-gray-500/5 to-gray-500/0 hover:from-gray-500/10 hover:to-gray-500/5 before:absolute before:inset-0 before:bg-current before:opacity-0 before:scale-0 before:rounded-full before:transition-all active:before:duration-300 before:duration-0 active:before:scale-150 active:before:opacity-10 active:shadow-lg"
+          {/* Idle Content */}
+          <div
+            className="col-start-1 col-end-1 row-start-1 row-end-1 flex items-center gap-2"
+            style={{
+              ...animationStyle,
+              animationName: status !== "idle" ? "button-demo-content-idle" : "none",
+            }}
           >
-            {autoPlay ? <Pause size={14} /> : <Play size={14} />}
-            {autoPlay ? "Pause" : "Auto-play"}
-          </button>
-        </div>
-
-        {/* Finite State Machine Diagram */}
-        <div className="flex flex-col gap-4">
-          {/* Main flow: Idle → Hover → Pressing → Loading → Success → Idle */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {(["idle", "hover", "pressing", "loading", "success"] as ButtonState[]).map(
-              (s, index, arr) => (
-                <div key={s} className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setAutoPlay(false);
-                      setState(s);
-                    }}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm shadow-sm ${
-                      state === s
-                        ? "bg-indigo-500/20 text-indigo-400 border-2 border-indigo-500/50 shadow-indigo-500/20"
-                        : "bg-(--bg-primary)/50 text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color) hover:bg-(--bg-primary)/70"
-                    }`}
-                  >
-                    {stateInfo[s].label}
-                  </button>
-                  {index < arr.length - 1 && (
-                    <ArrowRight size={16} className="text-(--text-secondary) shrink-0" />
-                  )}
-                </div>
-              ),
-            )}
-            {/* Loop back arrow */}
-            <div className="flex items-center gap-2">
-              <ArrowRight size={16} className="text-(--text-secondary)" />
-              <span className="text-xs text-(--text-secondary) italic">loops</span>
-            </div>
+            Submit
           </div>
 
-          {/* Branch: Disabled state */}
-          <div className="flex items-center justify-center gap-2 text-sm text-(--text-secondary)">
-            <span className="italic">or when invalid:</span>
-            <ArrowRight size={14} />
-            <button
-              onClick={() => {
-                setAutoPlay(false);
-                setState("disabled");
-              }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm shadow-sm ${
-                state === "disabled"
-                  ? "bg-zinc-500/20 text-zinc-400 border-2 border-zinc-500/50"
-                  : "bg-(--bg-primary)/50 text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color) hover:bg-(--bg-primary)/70"
-              }`}
-            >
-              Disabled
-            </button>
+          {/* Loading Content */}
+          <div
+            className="col-start-1 col-end-1 row-start-1 row-end-1 flex items-center gap-2 justify-center"
+            style={{
+              ...animationStyle,
+              animationName: status !== "idle" ? "button-demo-content-loading" : "none",
+              opacity: 0,
+            }}
+          >
+            <CircleNotchIcon size={18} className="animate-spin" />
+            Processing...
+          </div>
+
+          {/* Success Content */}
+          <div
+            className="col-start-1 col-end-1 row-start-1 row-end-1 flex items-center gap-2 justify-center text-emerald-600 dark:text-emerald-400"
+            style={{
+              ...animationStyle,
+              animationName: status !== "idle" ? "button-demo-content-success" : "none",
+              opacity: 0,
+            }}
+          >
+            <CheckIcon size={18} />
+            Done!
           </div>
         </div>
-      </div>
-    </div>
+      </AnimationStage>
+
+      <AnimationControls title="Button Interaction">
+        <p className="text-sm text-(--text-secondary)">
+          <strong className="text-(--text-primary)">Complete Lifecycle:</strong> A well-designed
+          button handles idle, hover, press, loading, and success states seamlessly.
+        </p>
+      </AnimationControls>
+    </>
   );
 }
 
 // ============================================================================
-// State Card Component
+// Interactive Disabled Demo Component
 // ============================================================================
 
-function StateCard({
-  icon: Icon,
-  title,
-  description,
-  color,
-}: {
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  title: string;
-  description: string;
-  color: string;
-}) {
+function InteractiveDisabledDemo() {
   return (
-    <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
-      <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center mb-4`}>
-        <Icon size={20} className="text-white" />
-      </div>
-      <h3 className="font-semibold text-(--text-primary) mb-2">{title}</h3>
-      <p className="text-sm text-(--text-secondary)">{description}</p>
-    </div>
+    <AnimationDemo duration={4000} masterAnimationName="disabled-demo-cursor-move">
+      <InteractiveDisabledDemoContent />
+    </AnimationDemo>
+  );
+}
+
+function InteractiveDisabledDemoContent() {
+  const { status, animationStyle } = useAnimationDemo();
+
+  return (
+    <>
+      <style>
+        {`
+          @keyframes disabled-demo-cursor-move {
+            0% { transform: translate(100px, 80px); }
+            35% { transform: translate(0px, 0px); } /* Center/Over button */
+            65% { transform: translate(20px, -15px); } /* Still over button */
+            100% { transform: translate(100px, 80px); }
+          }
+           @keyframes disabled-demo-cursor-swap {
+            0%, 16% { opacity: 1; }
+            17%, 71% { opacity: 0; }
+            72%, 100% { opacity: 1; }
+          }
+          @keyframes disabled-demo-cursor-swap-inverse {
+            0%, 16% { opacity: 0; }
+            17%, 71% { opacity: 1; }
+            72%, 100% { opacity: 0; }
+          }
+        `}
+      </style>
+      <AnimationStage>
+        {/* Disabled Button - Centered */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <GlassyButton
+            disabled
+            className="w-24 opacity-60 cursor-not-allowed bg-none bg-zinc-200/50 dark:bg-zinc-800/50 backdrop-blur-none shadow-none border-black/5 dark:border-white/5"
+          >
+            Submit
+          </GlassyButton>
+        </div>
+
+        {/* Cursor Container - Origin at Center */}
+        <div
+          className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+          style={{
+            ...animationStyle,
+            animationName: status !== "idle" ? "disabled-demo-cursor-move" : "none",
+            marginLeft: "-6px", // Offset to center pointer tip visually
+            marginTop: "-2px",
+          }}
+        >
+          {/* Default Pointer */}
+          <div
+            className="absolute top-0 left-0"
+            style={{
+              animation:
+                status !== "idle" ? "4000ms disabled-demo-cursor-swap linear infinite" : "none",
+            }}
+          >
+            <CursorIcon className="fill-white text-black stroke-1 rotate-20" size={24} />
+          </div>
+
+          {/* Forbidden Cursor */}
+          <div
+            className="absolute top-0 left-0"
+            style={{
+              animation:
+                status !== "idle"
+                  ? "4000ms disabled-demo-cursor-swap-inverse linear infinite"
+                  : "none",
+              opacity: 0,
+            }}
+          >
+            <ProhibitIcon className="text-red-500" size={24} />
+          </div>
+        </div>
+      </AnimationStage>
+
+      <AnimationControls title="Disabled State Behavior">
+        <p className="text-sm text-(--text-secondary)">
+          <strong className="text-(--text-primary)">Visual Feedback:</strong> When a button is
+          disabled, the cursor should immediately change to indicate the action is forbidden.
+        </p>
+      </AnimationControls>
+    </>
   );
 }
 
@@ -326,31 +251,26 @@ function StateCard({
 
 type CodeState = "idle" | "hover" | "loading" | "disabled" | "pressing";
 
-const STATE_INFO: Record<CodeState, { label: string; description: string; color: string }> = {
+const STATE_INFO: Record<CodeState, { label: string; description: string }> = {
   idle: {
     label: "Idle",
     description: "The default resting state. Clearly clickable with base styling.",
-    color: "indigo",
   },
   hover: {
     label: "Hover",
     description: "Provides feedback when cursor is over the button. Signals interactivity.",
-    color: "purple",
   },
   loading: {
     label: "Loading",
     description: "Shows progress while processing. Prevents double-clicks.",
-    color: "amber",
   },
   disabled: {
     label: "Disabled",
     description: "Indicates unavailable action. Muted appearance, no pointer events.",
-    color: "zinc",
   },
   pressing: {
     label: "Pressing",
     description: "Visual feedback on click/tap. Scale-down or color shift.",
-    color: "emerald",
   },
 };
 
@@ -368,26 +288,24 @@ function InteractiveStateCode() {
     "flex items-center justify-center gap-2",
     "transition-all duration-200",
     
-    // Hover state
-    "hover:bg-indigo-700",
-    "hover:shadow-lg hover:shadow-indigo-500/25",
-    "hover:-translate-y-0.5",
+    // Hover state (Glassy overlay)
+    "hover:bg-zinc-500/5 dark:hover:bg-white/10",
+    "hover:shadow-lg",
     
     // Pressing state (active)
     "active:scale-95",
-    "active:translate-y-0",
     
     // Loading & Disabled conditional styles
     isLoading
-      ? "bg-indigo-600 cursor-wait"
+      ? "cursor-wait"
       : !isDisabled
-        ? "bg-zinc-400 cursor-not-allowed opacity-60"
-        : "bg-indigo-600 cursor-pointer"
+        ? "cursor-not-allowed opacity-60"
+        : "cursor-default"
   )}
 >
   {isLoading ? (
     <>
-      <Loader2 className="animate-spin" size={18} />
+      <CircleNotchIcon className="animate-spin" size={18} />
       Processing...
     </>
   ) : (
@@ -397,11 +315,11 @@ function InteractiveStateCode() {
 
   // Define which line ranges to highlight for each state
   const highlightRanges: Record<CodeState, number[]> = {
-    idle: [5, 6, 7, 8], // Base classes
-    hover: [11, 12, 13], // hover: classes
-    loading: [3, 20, 21, 27, 28, 29, 30, 31, 32, 33, 34], // isLoading conditional
-    disabled: [3, 22, 23], // disabled conditional
-    pressing: [16, 17], // active: classes
+    idle: [5, 6, 7], // Base classes
+    hover: [10, 11], // hover: classes
+    loading: [17, 24, 25, 26, 27, 28], // isLoading conditional
+    disabled: [19, 20], // disabled conditional
+    pressing: [14], // active: classes
   };
 
   // Explicit class mappings for Tailwind
@@ -409,52 +327,40 @@ function InteractiveStateCode() {
     CodeState,
     {
       tabActive: string;
-      tabActiveLight: string;
       labelColor: string;
       highlightBg: string;
-      highlightBgLight: string;
       highlightBorder: string;
     }
   > = {
     idle: {
-      tabActive: "bg-indigo-500/20 text-indigo-400 border-2 border-indigo-500/50",
-      tabActiveLight: "bg-indigo-100 text-indigo-700 border-2 border-indigo-300",
-      labelColor: "text-indigo-400 dark:text-indigo-400",
-      highlightBg: "bg-indigo-500/15 dark:bg-indigo-500/20",
-      highlightBgLight: "bg-indigo-100",
-      highlightBorder: "border-l-3 border-indigo-500",
+      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
+      labelColor: "text-zinc-900 dark:text-zinc-100",
+      highlightBg: "rgba(113, 113, 122, 0.1)",
+      highlightBorder: "#a1a1aa",
     },
     hover: {
-      tabActive: "bg-purple-500/20 text-purple-400 border-2 border-purple-500/50",
-      tabActiveLight: "bg-purple-100 text-purple-700 border-2 border-purple-300",
-      labelColor: "text-purple-400 dark:text-purple-400",
-      highlightBg: "bg-purple-500/15 dark:bg-purple-500/20",
-      highlightBgLight: "bg-purple-100",
-      highlightBorder: "border-l-3 border-purple-500",
+      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
+      labelColor: "text-zinc-900 dark:text-zinc-100",
+      highlightBg: "rgba(113, 113, 122, 0.1)",
+      highlightBorder: "#a1a1aa",
     },
     loading: {
-      tabActive: "bg-amber-500/20 text-amber-400 border-2 border-amber-500/50",
-      tabActiveLight: "bg-amber-100 text-amber-700 border-2 border-amber-300",
-      labelColor: "text-amber-400 dark:text-amber-400",
-      highlightBg: "bg-amber-500/15 dark:bg-amber-500/20",
-      highlightBgLight: "bg-amber-100",
-      highlightBorder: "border-l-3 border-amber-500",
+      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
+      labelColor: "text-zinc-900 dark:text-zinc-100",
+      highlightBg: "rgba(113, 113, 122, 0.1)",
+      highlightBorder: "#a1a1aa",
     },
     disabled: {
-      tabActive: "bg-zinc-500/20 text-zinc-400 border-2 border-zinc-500/50",
-      tabActiveLight: "bg-zinc-200 text-zinc-700 border-2 border-zinc-400",
-      labelColor: "text-zinc-400 dark:text-zinc-400",
-      highlightBg: "bg-zinc-500/15 dark:bg-zinc-500/20",
-      highlightBgLight: "bg-zinc-200",
-      highlightBorder: "border-l-3 border-zinc-500",
+      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
+      labelColor: "text-zinc-900 dark:text-zinc-100",
+      highlightBg: "rgba(113, 113, 122, 0.1)",
+      highlightBorder: "#a1a1aa",
     },
     pressing: {
-      tabActive: "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50",
-      tabActiveLight: "bg-emerald-100 text-emerald-700 border-2 border-emerald-300",
-      labelColor: "text-emerald-400 dark:text-emerald-400",
-      highlightBg: "bg-emerald-500/15 dark:bg-emerald-500/20",
-      highlightBgLight: "bg-emerald-100",
-      highlightBorder: "border-l-3 border-emerald-500",
+      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
+      labelColor: "text-zinc-900 dark:text-zinc-100",
+      highlightBg: "rgba(113, 113, 122, 0.1)",
+      highlightBorder: "#a1a1aa",
     },
   };
 
@@ -475,7 +381,7 @@ function InteractiveStateCode() {
   const highlightedLines = highlightRanges[activeState];
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden">
+    <div className="rounded-2xl squircle border border-(--border-color) bg-(--bg-secondary) overflow-hidden">
       {/* State selector tabs */}
       <div className="p-4 border-b border-(--border-color) bg-(--bg-primary)">
         <div className="flex flex-wrap gap-2">
@@ -488,7 +394,7 @@ function InteractiveStateCode() {
                 onClick={() => setActiveState(state)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? `${stateStyles[state].tabActive} dark:${stateStyles[state].tabActive}`
+                    ? `${stateStyles[state].tabActive}`
                     : "bg-(--bg-secondary) text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color)"
                 }`}
               >
@@ -542,29 +448,29 @@ function InteractiveStateCode() {
           `}
         </style>
         <div
-          className="interactive-code [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0 [&_code]:!text-sm"
+          className="interactive-code [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0! [&_code]:text-sm!"
           style={
             {
               "--highlight-bg":
                 activeState === "idle"
-                  ? "rgba(99, 102, 241, 0.15)"
+                  ? "rgba(113, 113, 122, 0.1)"
                   : activeState === "hover"
-                    ? "rgba(168, 85, 247, 0.15)"
+                    ? "rgba(113, 113, 122, 0.1)"
                     : activeState === "loading"
-                      ? "rgba(245, 158, 11, 0.15)"
+                      ? "rgba(113, 113, 122, 0.1)"
                       : activeState === "disabled"
-                        ? "rgba(113, 113, 122, 0.15)"
-                        : "rgba(16, 185, 129, 0.15)",
+                        ? "rgba(113, 113, 122, 0.1)"
+                        : "rgba(113, 113, 122, 0.1)",
               "--highlight-border":
                 activeState === "idle"
-                  ? "#6366f1"
+                  ? "#a1a1aa"
                   : activeState === "hover"
-                    ? "#a855f7"
+                    ? "#a1a1aa"
                     : activeState === "loading"
-                      ? "#f59e0b"
+                      ? "#a1a1aa"
                       : activeState === "disabled"
-                        ? "#71717a"
-                        : "#10b981",
+                        ? "#a1a1aa"
+                        : "#a1a1aa",
             } as React.CSSProperties
           }
         >
@@ -626,7 +532,7 @@ function ButtonStates() {
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
       <GuidelineHero
-        title="Mastering Button Interactions"
+        title="Button Design"
         description={
           <>
             The details that make buttons feel tangible and responsive.
@@ -637,9 +543,10 @@ function ButtonStates() {
           </>
         }
         badge={{
-          icon: Hand,
+          icon: HandIcon,
           text: "Interaction Design",
         }}
+        markdownUrl="/my-views/button-design.md"
       />
 
       {/* Interactive Demo */}
@@ -650,40 +557,71 @@ function ButtonStates() {
       {/* States Overview Grid */}
       <div className="mb-20">
         <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          The Five Essential States
+          The Essential States
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <StateCard
-            icon={Sparkles}
-            title="Idle State"
-            description="The default resting state. Clearly clickable with hover effects."
-            color="bg-indigo-500"
-          />
-          <StateCard
-            icon={MousePointer}
-            title="Hover State"
-            description="Provides feedback when cursor is over the button. Signals interactivity."
-            color="bg-purple-500"
-          />
-          <StateCard
-            icon={Hand}
-            title="Pressing State"
-            description="Visual feedback on press. Scale-down or click effect."
-            color="bg-emerald-500"
-          />
-          <StateCard
-            icon={Loader2}
-            title="Loading State"
-            description="Shows progress while waiting. Prevents double-clicks."
-            color="bg-amber-500"
-          />
-          <StateCard
-            icon={Ban}
-            title="Disabled State"
-            description="Indicates unavailable action. Reduced opacity and no pointer."
-            color="bg-zinc-500"
-          />
+        <div
+          className="grid grid-cols-2 md:grid-cols-3 gap-0 pl-px pt-px"
+          role="list"
+          aria-label="Button states"
+        >
+          {[
+            {
+              icon: SparkleIcon,
+              title: "Idle State",
+              description: "The default resting state. Clearly clickable with hover effects.",
+            },
+            {
+              icon: CursorIcon,
+              title: "Hover State",
+              description:
+                "Provides feedback when cursor is over the button. Signals interactivity.",
+            },
+            {
+              icon: HandIcon,
+              title: "Pressing State",
+              description: "Visual feedback on press. Scale-down or click effect.",
+            },
+            {
+              icon: CircleNotchIcon,
+              title: "Loading State",
+              description: "Shows progress while waiting. Prevents double-clicks.",
+            },
+            {
+              icon: ProhibitIcon,
+              title: "Disabled State",
+              description: "Indicates unavailable action. Reduced opacity and no pointer.",
+            },
+          ].map((state) => (
+            <div
+              key={state.title}
+              className="relative flex flex-col items-center justify-center gap-3 p-6 h-auto min-h-[200px] transition-all group hover:z-10 -ml-px -mt-px
+                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-(--text-secondary) before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
+                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-(--text-secondary) after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
+              role="listitem"
+            >
+              <div
+                className="w-10 h-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-(--text-primary)"
+                aria-hidden="true"
+              >
+                <state.icon size={20} />
+              </div>
+              <h3 className="font-semibold text-(--text-primary) text-center z-10">
+                {state.title}
+              </h3>
+              <p className="text-sm text-(--text-secondary) text-center leading-relaxed z-10">
+                {state.description}
+              </p>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {/* Disabled Demo Section */}
+      <div className="mb-20">
+        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
+          Disabled State UX
+        </h2>
+        <InteractiveDisabledDemo />
       </div>
 
       {/* Button States - Interactive Code Block */}
@@ -708,87 +646,144 @@ function ButtonStates() {
           padding should be adjusted to maintain visual balance.
         </p>
 
+        {/* Visual Style Variants */}
+        {/* Visual Style Variants */}
+        <div className="mb-12">
+          <h3 className="text-lg font-semibold text-(--text-primary) mb-3">Visual Hierarchy</h3>
+
+          <div className="mb-4 p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-col items-center gap-2">
+                <GlassyButton variant="primary">Primary Action</GlassyButton>
+                <span className="text-xs text-(--text-secondary)">Primary</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GlassyButton variant="secondary">Secondary Action</GlassyButton>
+                <span className="text-xs text-(--text-secondary)">Secondary</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GlassyButton variant="ghost">Ghost Action</GlassyButton>
+                <span className="text-xs text-(--text-secondary)">Ghost</span>
+              </div>
+            </div>
+            <p className="text-xs text-(--text-secondary) mt-4">
+              Use <strong>Primary</strong> for the main call-to-action, <strong>Secondary</strong>{" "}
+              for standard actions, and <strong>Ghost</strong> for low-priority or repetitive
+              actions.
+            </p>
+          </div>
+        </div>
+
+        {/* Destructive Actions */}
+        <div className="mb-12">
+          <h3 className="text-lg font-semibold text-(--text-primary) mb-3">Destructive Actions</h3>
+
+          <div className="mb-4 p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-col items-center gap-2">
+                <GlassyButton variant="destructive">Delete Project</GlassyButton>
+                <span className="text-xs text-(--text-secondary)">Destructive</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GlassyButton variant="ghost-destructive">Cancel Subscription</GlassyButton>
+                <span className="text-xs text-(--text-secondary)">Ghost Destructive</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+            <h4 className="font-semibold text-(--text-primary) mb-2 text-sm flex items-center gap-2">
+              <WarningIcon size={16} className="text-red-500" />
+              Avoid Red for Primary Actions
+            </h4>
+            <p className="text-sm text-(--text-secondary)">
+              Reserved red colors for <strong>destructive</strong> actions (delete, remove, block).
+              Using red for a primary action (like "Confirm" or "Save") creates cognitive friction
+              as users are trained to associate red with danger/warning.
+            </p>
+          </div>
+        </div>
+
+        {/* Variant States Matrix */}
+        <ButtonVariantMatrix />
+
         {/* Leading Icon Variant */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-(--text-primary) mb-3">With Leading Icon</h3>
 
           {/* Visual Demo */}
-          <div className="mb-4 p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+          <div className="mb-4 p-6 rounded-xl squircle border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex flex-wrap items-center gap-4">
-              <button className="pl-4 pr-6 py-3 rounded-xl bg-indigo-600 text-white font-medium flex items-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all duration-200">
-                <ArrowLeft size={18} />
+              <GlassyButton variant="ghost" leadingIcon={<ArrowLeftIcon size={18} />}>
                 Go Back
-              </button>
-              <button className="pl-4 pr-6 py-3 rounded-xl bg-emerald-600 text-white font-medium flex items-center gap-2 hover:bg-emerald-700 active:scale-95 transition-all duration-200">
-                <Check size={18} />
+              </GlassyButton>
+              <GlassyButton variant="primary" leadingIcon={<CheckIcon className="size-4" />}>
                 Approve
-              </button>
-              <button className="pl-4 pr-6 py-3 rounded-xl bg-purple-600 text-white font-medium flex items-center gap-2 hover:bg-purple-700 active:scale-95 transition-all duration-200">
-                <Sparkles size={18} />
-                Generate
-              </button>
+              </GlassyButton>
+              <GlassyButton variant="destructive" leadingIcon={<XIcon className="size-4" />}>
+                Reject
+              </GlassyButton>
+              <GlassyButton variant="secondary" leadingIcon={<PencilIcon className="size-4" />}>
+                Edit
+              </GlassyButton>
             </div>
             <p className="text-xs text-(--text-secondary) mt-3">Try hovering and clicking!</p>
           </div>
 
           {/* When to Use */}
-          <div className="mb-4 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-            <h4 className="font-medium text-(--text-primary) mb-2 text-sm">
+          {/* When to Use */}
+          <div className="mb-4 rounded-xl squircle border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
+            <h4 className="font-semibold text-(--text-primary) mb-4 text-sm">
               When to Use Leading Icons
             </h4>
-            <ul className="text-sm text-(--text-secondary) space-y-1.5">
-              <li className="flex items-start gap-2">
-                <span className="text-indigo-400">←</span>
-                <span>
-                  <strong>Back/Return actions</strong> — The arrow naturally points to where you're
-                  going
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-indigo-400">✓</span>
-                <span>
-                  <strong>Confirmation actions</strong> — Check marks before "Approve", "Confirm",
-                  "Accept"
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-indigo-400">+</span>
-                <span>
-                  <strong>Add/Create actions</strong> — Plus icon before "Add Item", "New Project"
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-indigo-400">★</span>
-                <span>
-                  <strong>Feature emphasis</strong> — Drawing attention to the action type first
-                </span>
-              </li>
-            </ul>
+            <div className="space-y-4">
+              {[
+                {
+                  icon: ArrowLeftIcon,
+                  title: "Back/Return actions",
+                  description: "The arrow naturally points to where you're going.",
+                },
+                {
+                  icon: CheckIcon,
+                  title: "Confirmation actions",
+                  description: 'Check marks before "Approve", "Confirm", "Accept".',
+                },
+                {
+                  icon: PlusIcon,
+                  title: "Add/Create actions",
+                  description: 'Plus icon before "Add Item", "New Project".',
+                },
+                {
+                  icon: SparkleIcon,
+                  title: "Feature emphasis",
+                  description: "Drawing attention to the action type first.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex gap-3 items-start">
+                  <div className="mt-0.5 p-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <item.icon size={14} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-(--text-primary)">{item.title}</p>
+                    <p className="text-xs text-(--text-secondary) leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <CodeExample
             title="Leading Icon Button"
-            code={`// Leading icon with adjusted padding
-<button
-  className="
-    pl-4 pr-6 py-3 rounded-xl
-    bg-indigo-600 text-white font-medium
-    flex items-center gap-2
-    hover:bg-indigo-700
-    transition-all duration-200
-  "
->
-  <ArrowLeft size={18} />
+            code={`// Using the leadingIcon prop automatically adjusts padding
+<GlassyButton leadingIcon={<ArrowLeftIcon size={18} />}>
   Go Back
-</button>
-
-// Key insight: Reduce LEFT padding when icon is on the left.
-// The icon itself provides visual weight, so less padding
-// is needed to achieve optical balance.
-//
-// Standard padding:  px-6 (24px both sides)
-// With leading icon: pl-4 pr-6 (16px left, 24px right)`}
-            description="Reduce padding on the side with the icon. Icons have inherent visual weight that substitutes for some padding."
+</GlassyButton>`}
+            description="The GlassyButton component automatically detects the icon and applies 'pl-2 pr-3' for optical balance."
           />
         </div>
 
@@ -799,18 +794,15 @@ function ButtonStates() {
           {/* Visual Demo */}
           <div className="mb-4 p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex flex-wrap items-center gap-4">
-              <button className="pl-6 pr-4 py-3 rounded-xl bg-indigo-600 text-white font-medium flex items-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all duration-200">
+              <GlassyButton variant="primary" trailingIcon={<ArrowRightIcon size={18} />}>
                 Continue
-                <ArrowRight size={18} />
-              </button>
-              <button className="pl-6 pr-4 py-3 rounded-xl bg-amber-600 text-white font-medium flex items-center gap-2 hover:bg-amber-700 active:scale-95 transition-all duration-200">
+              </GlassyButton>
+              <GlassyButton variant="secondary" trailingIcon={<ArrowRightIcon size={18} />}>
                 Next Step
-                <ArrowRight size={18} />
-              </button>
-              <button className="pl-6 pr-4 py-3 rounded-xl bg-rose-600 text-white font-medium flex items-center gap-2 hover:bg-rose-700 active:scale-95 transition-all duration-200">
-                Submit
-                <Check size={18} />
-              </button>
+              </GlassyButton>
+              <GlassyButton variant="ghost" trailingIcon={<CaretRightIcon size={18} />}>
+                Skip
+              </GlassyButton>
             </div>
             <p className="text-xs text-(--text-secondary) mt-3">
               Notice how the reduced right padding (pr-4) keeps the content visually centered.
@@ -818,37 +810,48 @@ function ButtonStates() {
           </div>
 
           {/* When to Use */}
-          <div className="mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <h4 className="font-medium text-(--text-primary) mb-2 text-sm">
+          {/* When to Use */}
+          <div className="mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
+            <h4 className="font-semibold text-(--text-primary) mb-4 text-sm">
               When to Use Trailing Icons
             </h4>
-            <ul className="text-sm text-(--text-secondary) space-y-1.5">
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400">→</span>
-                <span>
-                  <strong>Forward/Next actions</strong> — "Continue", "Next Step", "Proceed"
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400">↗</span>
-                <span>
-                  <strong>External links</strong> — Indicating the action opens something new
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400">▼</span>
-                <span>
-                  <strong>Dropdown triggers</strong> — Chevron indicating expandable content
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber-400">↓</span>
-                <span>
-                  <strong>Download actions</strong> — Arrow pointing down after "Download"
-                </span>
-              </li>
-            </ul>
-            <p className="text-xs text-(--text-secondary) mt-3 italic">
+            <div className="space-y-4">
+              {[
+                {
+                  icon: ArrowRightIcon,
+                  title: "Forward/Next actions",
+                  description: '"Continue", "Next Step", "Proceed".',
+                },
+                {
+                  icon: ArrowUpRightIcon,
+                  title: "External links",
+                  description: "Indicating the action opens something new.",
+                },
+                {
+                  icon: CaretDownIcon,
+                  title: "Dropdown triggers",
+                  description: "Chevron indicating expandable content.",
+                },
+                {
+                  icon: DownloadSimpleIcon,
+                  title: "Download actions",
+                  description: 'Arrow pointing down after "Download".',
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex gap-3 items-start">
+                  <div className="mt-0.5 p-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <item.icon size={14} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-(--text-primary)">{item.title}</p>
+                    <p className="text-xs text-(--text-secondary) leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-(--text-secondary) mt-4 italic border-t border-(--border-color) pt-3">
               Rule of thumb: Trailing icons often indicate <strong>direction</strong> or{" "}
               <strong>consequence</strong> of the action.
             </p>
@@ -856,29 +859,11 @@ function ButtonStates() {
 
           <CodeExample
             title="Trailing Icon Button"
-            code={`// Trailing icon with adjusted padding
-<button
-  className="
-    pl-6 pr-4 py-3 rounded-xl
-    bg-indigo-600 text-white font-medium
-    flex items-center gap-2
-    hover:bg-indigo-700
-    transition-all duration-200
-  "
->
+            code={`// Using the trailingIcon prop automatically adjusts padding
+<GlassyButton trailingIcon={<ArrowRightIcon size={18} />}>
   Continue
-  <ArrowRight size={18} />
-</button>
-
-// Key insight: Reduce RIGHT padding when icon is on the right.
-// This mirrors the leading icon approach.
-//
-// Standard padding:    px-6 (24px both sides)
-// With trailing icon:  pl-6 pr-4 (24px left, 16px right)
-//
-// The optical center of the button remains balanced
-// because the icon compensates for the reduced padding.`}
-            description="Mirror the leading icon approach: reduce padding on the icon side to maintain optical balance."
+</GlassyButton>`}
+            description="The GlassyButton component automatically detects the icon and applies 'pl-3 pr-2' for optical balance."
           />
         </div>
 
@@ -891,62 +876,28 @@ function ButtonStates() {
             <div className="flex flex-wrap items-center gap-4">
               {/* Square variants */}
               <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 active:scale-95 transition-all duration-200"
-                  aria-label="Settings"
-                >
-                  <Settings size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Square</span>
+                <SimpleTooltip content="Settings">
+                  <GlassyButton variant="ghost" className="size-8.5 p-0" aria-label="Settings">
+                    <GearIcon size={20} />
+                  </GlassyButton>
+                </SimpleTooltip>
+                <span className="text-xs text-(--text-secondary)">Square Ghost</span>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center hover:bg-emerald-700 active:scale-95 transition-all duration-200"
-                  aria-label="Add item"
-                >
-                  <Plus size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Square</span>
+                <SimpleTooltip content="Add item">
+                  <GlassyButton variant="secondary" className="size-8.5 p-0" aria-label="Add item">
+                    <PlusIcon size={20} />
+                  </GlassyButton>
+                </SimpleTooltip>
+                <span className="text-xs text-(--text-secondary)">Square Secondary</span>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-xl bg-amber-600 text-white flex items-center justify-center hover:bg-amber-700 active:scale-95 transition-all duration-200"
-                  aria-label="Play"
-                >
-                  <Play size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Square</span>
-              </div>
-
-              <div className="w-px h-12 bg-(--border-color) mx-2" />
-
-              {/* Circular variants */}
-              <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 active:scale-95 transition-all duration-200"
-                  aria-label="Settings"
-                >
-                  <Settings size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Circular</span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-full bg-rose-600 text-white flex items-center justify-center hover:bg-rose-700 active:scale-95 transition-all duration-200"
-                  aria-label="Add item"
-                >
-                  <Plus size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Circular</span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <button
-                  className="w-12 h-12 rounded-full bg-cyan-600 text-white flex items-center justify-center hover:bg-cyan-700 active:scale-95 transition-all duration-200"
-                  aria-label="Check"
-                >
-                  <Check size={20} />
-                </button>
-                <span className="text-xs text-(--text-secondary)">Circular</span>
+                <SimpleTooltip content="Delete">
+                  <GlassyButton variant="destructive" className="size-8.5 p-0" aria-label="Delete">
+                    <TrashIcon size={20} />
+                  </GlassyButton>
+                </SimpleTooltip>
+                <span className="text-xs text-(--text-secondary)">Square Destructive</span>
               </div>
             </div>
             <p className="text-xs text-(--text-secondary) mt-4">
@@ -955,39 +906,47 @@ function ButtonStates() {
           </div>
 
           {/* When to Use */}
-          <div className="mb-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <h4 className="font-medium text-(--text-primary) mb-2 text-sm">
+          {/* When to Use */}
+          <div className="mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
+            <h4 className="font-semibold text-(--text-primary) mb-4 text-sm">
               When to Use Icon-Only Buttons
             </h4>
-            <ul className="text-sm text-(--text-secondary) space-y-1.5">
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400">⚙️</span>
-                <span>
-                  <strong>Toolbars & action bars</strong> — Where space is limited and icons are
-                  universally understood
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400">🔁</span>
-                <span>
-                  <strong>Repeated actions</strong> — Close buttons, expand/collapse, media controls
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400">📱</span>
-                <span>
-                  <strong>Mobile interfaces</strong> — Maximizing touch target while saving
-                  horizontal space
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400">🎯</span>
-                <span>
-                  <strong>Universally recognized icons</strong> — Play, pause, close, settings,
-                  search
-                </span>
-              </li>
-            </ul>
+            <div className="space-y-4">
+              {[
+                {
+                  icon: GearIcon,
+                  title: "Toolbars & action bars",
+                  description: "Where space is limited and icons are universally understood.",
+                },
+                {
+                  icon: ArrowsClockwiseIcon,
+                  title: "Repeated actions",
+                  description: "Close buttons, expand/collapse, media controls.",
+                },
+                {
+                  icon: DeviceMobileIcon,
+                  title: "Mobile interfaces",
+                  description: "Maximizing touch target while saving horizontal space.",
+                },
+                {
+                  icon: MagnifyingGlassIcon,
+                  title: "Universally recognized icons",
+                  description: "Play, pause, close, settings, search.",
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex gap-3 items-start">
+                  <div className="mt-0.5 p-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <item.icon size={14} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-(--text-primary)">{item.title}</p>
+                    <p className="text-xs text-(--text-secondary) leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Accessibility Requirements */}
@@ -1009,10 +968,11 @@ function ButtonStates() {
                 </p>
               </div>
               <div>
-                <p className="font-medium text-(--text-primary)">Add a tooltip for sighted users</p>
+                <p className="font-medium text-(--text-primary)">Tooltip is mandatory</p>
                 <p className="text-xs mt-1">
-                  Even with universally recognized icons, tooltips eliminate ambiguity. Show the
-                  tooltip on hover/focus with a short delay (300-500ms).
+                  Icons can be ambiguous. Always provide a tooltip to explain the action. We use a
+                  custom <code className="px-1.5 py-0.5 rounded bg-(--bg-primary)">Tooltip</code>{" "}
+                  component (powered by Base UI) for consistent user experience.
                 </p>
               </div>
             </div>
@@ -1020,37 +980,18 @@ function ButtonStates() {
 
           <CodeExample
             title="Icon Only Button"
-            code={`// Icon-only button (square or circular)
-<button
-  className="
-    w-12 h-12 rounded-xl
-    bg-indigo-600 text-white
-    flex items-center justify-center
-    hover:bg-indigo-700
-    transition-all duration-200
-  "
-  aria-label="Settings"
->
-  <Settings size={20} />
-</button>
-
-// Circular variant
-<button
-  className="
-    w-12 h-12 rounded-full
-    bg-indigo-600 text-white
-    flex items-center justify-center
-    hover:bg-indigo-700
-    transition-all duration-200
-  "
-  aria-label="Add item"
->
-  <Plus size={20} />
-</button>
-
-// Critical: Always include aria-label for icon-only buttons!
-// Without visible text, screen readers need the label.`}
-            description="Icon-only buttons should be square or circular with equal width/height. Always include aria-label for accessibility."
+            code={`// 1. Mandatory Tooltip
+// 2. Square sizing (size-8.5 p-0)
+// 3. Aria-label for accessibility
+<SimpleTooltip content="Settings">
+  <GlassyButton 
+    className="size-8.5 p-0" 
+    aria-label="Settings"
+  >
+    <GearIcon size={20} />
+  </GlassyButton>
+</SimpleTooltip>`}
+            description="Icon-only buttons should be square (via explicit classes) and must always have a tooltip and aria-label."
           />
         </div>
 
@@ -1143,15 +1084,7 @@ function ButtonStates() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

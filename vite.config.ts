@@ -13,7 +13,7 @@ import { nitro } from "nitro/vite";
 
 const config = defineConfig({
   server: {
-    port: 3001,
+    port: 5173,
     host: "127.0.0.1",
   },
   plugins: [
@@ -39,11 +39,7 @@ const config = defineConfig({
       projects: ["./tsconfig.json"],
     }),
     tailwindcss(),
-    tanstackStart({
-      router: {
-        routeFileIgnorePattern: "components",
-      },
-    }),
+    tanstackStart(),
     viteReact(),
   ],
 });

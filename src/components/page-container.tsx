@@ -3,12 +3,13 @@ import { cn } from "../cn";
 
 interface PageContainerProps {
   children: ReactNode;
-  maxWidth?: "2xl" | "3xl";
+  maxWidth?: "2xl" | "3xl" | "4xl";
   className?: string;
 }
 
 export function PageContainer({ children, maxWidth = "2xl", className = "" }: PageContainerProps) {
-  const maxWidthClass = maxWidth === "3xl" ? "max-w-3xl" : "max-w-2xl";
+  const maxWidthClass =
+    maxWidth === "4xl" ? "max-w-4xl" : maxWidth === "3xl" ? "max-w-3xl" : "max-w-2xl";
 
   return (
     <div

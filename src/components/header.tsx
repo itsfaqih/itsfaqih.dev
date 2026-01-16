@@ -1,34 +1,15 @@
-import { Link } from "@tanstack/react-router";
-import { Home, FileText, Sun, Moon, Github, Linkedin, Mail } from "lucide-react";
-import { useEffect, useState } from "react";
-
-// ============================================================================
-// useTheme Hook (inlined - only used here)
-// ============================================================================
-
-function useTheme() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark" || saved === "light") return saved;
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
-    return "dark";
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
-  return { theme, toggleTheme };
-}
+import { Link, useLocation } from "@tanstack/react-router";
+import {
+  HouseIcon,
+  FileTextIcon,
+  SunIcon,
+  MoonIcon,
+  GithubLogoIcon,
+  LinkedinLogoIcon,
+  EnvelopeIcon,
+  ArrowLeftIcon,
+} from "@phosphor-icons/react";
+import { useTheme } from "../hooks/use-theme";
 
 // ============================================================================
 // Header Component
@@ -36,79 +17,98 @@ function useTheme() {
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+
+  const isMyViewsRoot = location.pathname === "/my-views" || location.pathname === "/my-views/";
+  const isMyViewsDetail = location.pathname.startsWith("/my-views/") && !isMyViewsRoot;
+
+  const showBackButton = isMyViewsRoot || isMyViewsDetail;
+  const backPath = isMyViewsDetail ? "/my-views" : "/";
 
   return (
     <>
       <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-        <div className="mx-auto bg-linear-to-b from-gray-500/10 to-gray-500/5 backdrop-blur-xl border border-gray-500/30 rounded-full px-3 py-2 flex items-center justify-center w-fit transition-all duration-300">
-          <nav className="flex items-center gap-1 mx-auto">
+        <div className="relative">
+          {showBackButton && (
             <Link
-              to="/"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-              activeProps={{
-                className:
-                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-secondary)]",
-              }}
+              to={backPath}
+              className="absolute flex items-center justify-center right-[calc(100%+12px)] top-1/2 -translate-y-1/2 bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full size-13 text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+              aria-label="Go Back"
             >
-              <Home size={16} />
-              <span className="hidden sm:inline">Home</span>
+              <ArrowLeftIcon size={18} />
             </Link>
-            <Link
-              to="/blog"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-              activeProps={{
-                className:
-                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-secondary)]",
-              }}
-            >
-              <FileText size={16} />
-              <span className="hidden sm:inline">Blog</span>
-            </Link>
+          )}
 
-            {/* Divider */}
-            <div className="w-px h-4 bg-[var(--border-color)] mx-1" />
-
-            {/* Social Icons */}
-            <div className="flex items-center gap-1">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-                aria-label="GitHub"
+          <div className="mx-auto bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full px-3 py-2 flex items-center justify-center w-fit transition-all duration-300">
+            <nav className="flex items-center gap-1 mx-auto">
+              <Link
+                to="/"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                activeProps={{
+                  className:
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-primary) bg-(--bg-secondary)",
+                }}
               >
-                <Github size={18} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-                aria-label="LinkedIn"
+                <HouseIcon size={16} />
+                <span className="hidden sm:inline">Home</span>
+              </Link>
+              <Link
+                to="/blog"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                activeProps={{
+                  className:
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-primary) bg-(--bg-secondary)",
+                }}
               >
-                <Linkedin size={18} />
-              </a>
-              <a
-                href="mailto:hello@faqih.dev"
-                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-                aria-label="Email"
+                <FileTextIcon size={16} />
+                <span className="hidden sm:inline">Blog</span>
+              </Link>
+
+              {/* Divider */}
+              <div className="w-px h-4 bg-(--border-color) mx-1" />
+
+              {/* Social Icons */}
+              <div className="flex items-center gap-1">
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  aria-label="GitHub"
+                >
+                  <GithubLogoIcon size={18} />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  aria-label="LinkedIn"
+                >
+                  <LinkedinLogoIcon size={18} />
+                </a>
+                <a
+                  href="mailto:hello@faqih.dev"
+                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  aria-label="Email"
+                >
+                  <EnvelopeIcon size={18} />
+                </a>
+              </div>
+
+              {/* Divider */}
+              <div className="w-px h-4 bg-(--border-color) mx-1" />
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                aria-label="Toggle theme"
               >
-                <Mail size={18} />
-              </a>
-            </div>
-
-            {/* Divider */}
-            <div className="w-px h-4 bg-[var(--border-color)] mx-1" />
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] active:scale-95 transition-all duration-200"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-          </nav>
+                {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+              </button>
+            </nav>
+          </div>
         </div>
       </header>
 

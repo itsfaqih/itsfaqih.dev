@@ -1,26 +1,22 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { useState, memo, useCallback } from "react";
+import { GlassyCard } from "../../components/glassy-card";
 import {
-  ChevronRight,
-  Folder,
-  File,
-  Check,
-  X,
-  Sparkles,
-  ArrowLeft,
-  MapPin,
-  FileCode,
-  FolderTree,
-  Zap,
-} from "lucide-react";
+  CaretRightIcon,
+  FolderIcon,
+  FileIcon,
+  CheckIcon,
+  XIcon,
+  SparkleIcon,
+  MapPinIcon,
+  FileCodeIcon,
+  TreeStructureIcon,
+  LightningIcon,
+} from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
-import {
-  CodeComparison,
-  CodeExample,
-  GuidelineHero,
-  PrincipleCard,
-  QuickRefCard,
-} from "./components";
+import { CodeComparison, CodeExample, GuidelineHero, QuickRefCard } from "./-components";
+import { GlassyButton } from "../../components/glassy-button";
 
 export const Route = createFileRoute("/my-views/proximity-principle")({
   component: ProximityPrinciple,
@@ -40,52 +36,70 @@ interface TreeNode {
 // Components
 // ============================================================================
 
-function TreeNodeComponent({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
+// Highlight styles hoisted outside component (rendering-hoist-jsx rule)
+const TREE_HIGHLIGHT_STYLES = {
+  good: "bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500",
+  bad: "bg-red-500/10 text-red-400 border-l-2 border-red-500",
+} as const;
+
+// Memoized to prevent unnecessary re-renders in recursive tree (rerender-memo rule)
+const TreeNodeComponent = memo(function TreeNodeComponent({
+  node,
+  depth = 0,
+}: {
+  node: TreeNode;
+  depth?: number;
+}) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
   const isFile = !hasChildren;
 
-  const highlightStyles = {
-    good: "bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500",
-    bad: "bg-red-500/10 text-red-400 border-l-2 border-red-500",
-  };
+  // Functional setState prevents stale closure (rerender-functional-setstate rule)
+  const toggleOpen = useCallback(() => {
+    if (hasChildren) {
+      setIsOpen((prev) => !prev);
+    }
+  }, [hasChildren]);
 
   return (
     <div className="select-none">
       <div
         className={`flex items-center gap-1.5 py-1 px-2 rounded-md transition-all cursor-default hover:bg-(--bg-secondary)/50 ${
-          node.highlight ? highlightStyles[node.highlight] : ""
+          node.highlight ? TREE_HIGHLIGHT_STYLES[node.highlight] : ""
         }`}
         style={{ paddingLeft: depth * 16 + 8 }}
-        onClick={() => hasChildren && setIsOpen(!isOpen)}
+        onClick={toggleOpen}
       >
-        {hasChildren && (
-          <ChevronRight
+        {/* Ternary for explicit conditional rendering (rendering-conditional-render rule) */}
+        {hasChildren ? (
+          <CaretRightIcon
             size={14}
-            className={`text-(--text-secondary) transition-transform ${isOpen ? `rotate-90` : ``}`}
+            weight="regular"
+            className={`text-(--text-secondary) transition-transform ${isOpen ? "rotate-90" : ""}`}
           />
+        ) : (
+          <span className="w-3.5" />
         )}
-        {!hasChildren && <span className="w-3.5" />}
 
         {isFile ? (
-          <File size={14} className="text-(--text-secondary)" />
+          <FileIcon size={14} weight="regular" className="text-(--text-secondary)" />
         ) : (
-          <Folder size={14} className="text-amber-500" />
+          <FolderIcon size={14} weight="regular" className="text-(--text-primary)" />
         )}
 
         <span className="text-sm font-mono">{node.name}</span>
       </div>
 
-      {hasChildren && isOpen && (
+      {hasChildren && isOpen ? (
         <div>
           {node.children!.map((child) => (
             <TreeNodeComponent key={child.name} node={child} depth={depth + 1} />
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
-}
+});
 
 function FileTreeComparison({
   badTree,
@@ -102,51 +116,57 @@ function FileTreeComparison({
 }) {
   if (showSingle) {
     return (
-      <div className="rounded-xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+      <GlassyCard className="overflow-hidden">
         <div className="px-4 py-3 border-b border-(--border-color) flex items-center gap-2">
-          <Check size={16} className="text-emerald-500" />
+          <CheckIcon size={14} className="inline mr-2" />
           <span className="font-medium text-(--text-primary)">Organized Structure</span>
         </div>
         <div className="p-4">
           <TreeNodeComponent node={goodTree} />
         </div>
         <div className="px-4 py-3 bg-emerald-500/5 border-t border-(--border-color) text-sm text-emerald-400">
-          <Check size={14} className="inline mr-2" />
+          <CheckIcon size={14} className="inline mr-2" />
           {goodReason}
         </div>
-      </div>
+      </GlassyCard>
     );
   }
 
   return (
     <div className="flex flex-col items-center lg:grid lg:grid-cols-2 gap-4">
       {/* Don't / Bad */}
-      <div className="rounded-xl border border-red-500/30 bg-(--bg-secondary)/30 backdrop-blur-md overflow-hidden shadow-sm hover:shadow-red-500/5 transition-all">
+      <GlassyCard
+        className="border-red-500/30 bg-(--bg-secondary)/30 hover:border-red-500/30 overflow-hidden"
+        hoverEffect={false}
+      >
         <div className="px-4 py-3 border-b border-red-500/30 bg-red-500/5 flex items-center gap-2">
-          <X size={16} className="text-red-400" />
+          <XIcon size={16} className="text-red-400" />
           <span className="font-medium text-red-400">Bad</span>
         </div>
         <div className="p-4">{badTree && <TreeNodeComponent node={badTree} />}</div>
         <div className="px-4 py-3 border-t border-red-500/30 bg-red-500/5 text-sm text-red-400">
-          <X size={14} className="inline mr-2" />
+          <XIcon size={14} className="inline mr-2" />
           {badReason}
         </div>
-      </div>
+      </GlassyCard>
 
       {/* Do / Good */}
-      <div className="rounded-xl border border-emerald-500/30 bg-(--bg-secondary)/30 backdrop-blur-md overflow-hidden shadow-sm hover:shadow-emerald-500/5 transition-all">
+      <GlassyCard
+        className="border-emerald-500/30 bg-(--bg-secondary)/30 hover:border-emerald-500/30 overflow-hidden"
+        hoverEffect={false}
+      >
         <div className="px-4 py-3 border-b border-emerald-500/30 bg-emerald-500/5 flex items-center gap-2">
-          <Check size={16} className="text-emerald-400" />
+          <CheckIcon size={16} className="text-emerald-400" />
           <span className="font-medium text-emerald-400">Good</span>
         </div>
         <div className="p-4">
           <TreeNodeComponent node={goodTree} />
         </div>
         <div className="px-4 py-3 border-t border-emerald-500/30 bg-emerald-500/5 text-sm text-emerald-400">
-          <Check size={14} className="inline mr-2" />
+          <CheckIcon size={14} className="inline mr-2" />
           {goodReason}
         </div>
-      </div>
+      </GlassyCard>
     </div>
   );
 }
@@ -204,9 +224,9 @@ function InteractiveDemo() {
   ];
 
   return (
-    <div className="rounded-xl border border-(--border-color) bg-linear-to-br from-indigo-500/5 to-purple-500/5 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="bg-(--bg-secondary) overflow-hidden">
       <div className="px-5 py-4 border-b border-(--border-color) flex items-center gap-2">
-        <Sparkles size={18} className="text-indigo-400" />
+        <SparkleIcon size={18} className="text-(--text-primary)" />
         <span className="font-medium text-(--text-primary)">Interactive Demo</span>
       </div>
 
@@ -226,30 +246,30 @@ function InteractiveDemo() {
         <p className="text-sm text-(--text-secondary) mb-4">{steps[step].description}</p>
 
         <div className="flex gap-2">
-          <button
-            onClick={() => setStep(Math.max(0, step - 1))}
+          <GlassyButton
+            onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-(--border-color) text-(--text-secondary) hover:bg-(--bg-secondary) disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="text-sm"
           >
             Previous
-          </button>
-          <button
-            onClick={() => setStep(Math.min(steps.length - 1, step + 1))}
+          </GlassyButton>
+          <GlassyButton
+            onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
             disabled={step === steps.length - 1}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="text-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             Next
-          </button>
+          </GlassyButton>
         </div>
       </div>
 
       <div className="h-1 bg-(--border-color)">
         <div
-          className="h-full bg-indigo-500 transition-all duration-300"
+          className="h-full bg-(--text-primary) transition-all duration-300"
           style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -271,9 +291,10 @@ function ProximityPrinciple() {
           </>
         }
         badge={{
-          icon: MapPin,
+          icon: MapPinIcon,
           text: "Code Structure Philosophy",
         }}
+        markdownUrl="/my-views/proximity-principle.md"
       />
 
       {/* Interactive Demo */}
@@ -286,27 +307,54 @@ function ProximityPrinciple() {
         <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
           The Core Principles
         </h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <PrincipleCard
-            icon={MapPin}
-            title="Colocate"
-            description="Put related code as close as possible to where it's used."
-          />
-          <PrincipleCard
-            icon={FileCode}
-            title="Inline First"
-            description="Don't extract until code is reused. Keep it inline by default."
-          />
-          <PrincipleCard
-            icon={FolderTree}
-            title="Lowest Common Ancestor"
-            description="When sharing code, place it at the nearest common parent directory."
-          />
-          <PrincipleCard
-            icon={Zap}
-            title="Prefer Fewer Files"
-            description="One file with related code beats many files requiring imports."
-          />
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-0 pl-px pt-px"
+          role="list"
+          aria-label="Proximity principles"
+        >
+          {[
+            {
+              icon: MapPinIcon,
+              title: "Colocate",
+              description: "Put related code as close as possible to where it's used.",
+            },
+            {
+              icon: FileCodeIcon,
+              title: "Inline First",
+              description: "Don't extract until code is reused. Keep it inline by default.",
+            },
+            {
+              icon: TreeStructureIcon,
+              title: "Lowest Common Ancestor",
+              description: "When sharing code, place it at the nearest common parent directory.",
+            },
+            {
+              icon: LightningIcon,
+              title: "Prefer Fewer Files",
+              description: "One file with related code beats many files requiring imports.",
+            },
+          ].map((principle) => (
+            <div
+              key={principle.title}
+              className="relative flex flex-col items-center justify-center gap-3 p-6 h-auto min-h-[200px] transition-all group hover:z-10 -ml-px -mt-px
+                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-(--text-secondary) before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
+                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-(--text-secondary) after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
+              role="listitem"
+            >
+              <div
+                className="w-10 h-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-(--text-primary)"
+                aria-hidden="true"
+              >
+                <principle.icon size={20} />
+              </div>
+              <h3 className="font-semibold text-(--text-primary) text-center z-10">
+                {principle.title}
+              </h3>
+              <p className="text-sm text-(--text-secondary) text-center leading-relaxed z-10">
+                {principle.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -518,8 +566,8 @@ function UserBadge() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-xl font-bold text-(--text-primary) mb-2">Follow Framework Rules</h2>
           <p className="text-(--text-secondary) mb-6">
-            Frameworks like Next.js or TanStack Router have strict rules. Follow them, even if it
-            adds nesting.
+            File-based routers (Next.js, TanStack Router) often turn <strong>every</strong> file
+            into a route. Co-location requires understanding how to "hide" files.
           </p>
         </div>
         <div className="max-w-3xl mx-auto">
@@ -536,7 +584,7 @@ function UserBadge() {
                 },
               ],
             }}
-            badReason="Framework tries to make 'post-header' a page route. Broken behavior."
+            badReason="Default behavior: 'post-header' becomes a public route (`/blog/post-header`). Ouch."
             goodTree={{
               name: "routes",
               children: [
@@ -545,14 +593,14 @@ function UserBadge() {
                   children: [
                     { name: "posts.tsx", highlight: "good" },
                     {
-                      name: "components",
+                      name: "components", // In strict routers, this needs config like `routeFileIgnorePattern`
                       children: [{ name: "post-header.tsx", highlight: "good" }],
                     },
                   ],
                 },
               ],
             }}
-            goodReason="Component is hidden from the router in a folder. Safe and sound."
+            goodReason="Using ignored folders (via config or convention like `_components`) keeps files safe."
           />
         </div>
       </div>
@@ -624,7 +672,7 @@ function UserBadge() {
 
       {/* Why This Matters */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-linear-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
           <h2 className="text-xl font-bold text-(--text-primary) mb-4">Why This Matters</h2>
           <ul className="space-y-3 text-(--text-secondary)">
             <li className="flex items-start gap-3">
@@ -652,16 +700,7 @@ function UserBadge() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

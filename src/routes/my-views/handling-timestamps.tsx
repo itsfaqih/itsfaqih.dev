@@ -1,19 +1,20 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { GlassyCard } from "../../components/glassy-card";
 import { useState } from "react";
 import {
-  ArrowLeft,
-  Clock,
-  Database,
-  Globe,
-  Server,
-  Monitor,
-  Calendar,
-  ArrowRight,
-  Check,
-  X,
-} from "lucide-react";
+  ClockIcon,
+  DatabaseIcon,
+  GlobeIcon,
+  HardDrivesIcon,
+  DesktopIcon,
+  CalendarBlankIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./components";
+import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
 import { PageContainer } from "../../components/page-container";
 
 export const Route = createFileRoute("/my-views/handling-timestamps")({
@@ -45,7 +46,7 @@ function TimezoneDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       <div className="p-6 space-y-6">
         <div>
           <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
@@ -57,7 +58,7 @@ function TimezoneDemo() {
         </div>
 
         <div className="flex items-center justify-center">
-          <ArrowRight size={20} className="text-(--text-secondary)" />
+          <ArrowRightIcon size={20} className="text-(--text-secondary)" />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
@@ -71,8 +72,8 @@ function TimezoneDemo() {
             <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
               Your Local Time ({userTimezone})
             </h3>
-            <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
-              <p className="text-indigo-400">{formatLocal(utcTime)}</p>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color)">
+              <p className="text-(--text-primary)">{formatLocal(utcTime)}</p>
             </div>
           </div>
         </div>
@@ -81,7 +82,7 @@ function TimezoneDemo() {
       <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
         ✓ Same UTC timestamp, displayed in user's local timezone
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -108,7 +109,7 @@ function FilterDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       <div className="p-6 space-y-6">
         <div>
           <h3 className="text-sm font-medium text-(--text-secondary) mb-3">
@@ -119,13 +120,13 @@ function FilterDemo() {
               type="date"
               value={inputDate}
               onChange={(e) => setInputDate(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
             />
             <input
               type="time"
               value={inputTime}
               onChange={(e) => setInputTime(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
             />
           </div>
         </div>
@@ -139,16 +140,16 @@ function FilterDemo() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <h3 className="text-sm font-medium text-(--text-secondary) mb-2">Option 1: UTC</h3>
-            <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 font-mono text-xs">
-              <span className="text-emerald-400">{getUTCEquivalent()}</span>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color) font-mono text-xs">
+              <span className="text-(--text-primary)">{getUTCEquivalent()}</span>
             </div>
           </div>
           <div>
             <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
               Option 2: With Offset
             </h3>
-            <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/30 font-mono text-xs">
-              <span className="text-indigo-400">{getWithOffset()}</span>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color) font-mono text-xs">
+              <span className="text-(--text-primary)">{getWithOffset()}</span>
             </div>
           </div>
         </div>
@@ -157,7 +158,7 @@ function FilterDemo() {
       <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
         ✓ Both formats include timezone info — backend knows the exact moment
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -173,17 +174,15 @@ function FlowStep({
   icon: Icon,
   title,
   description,
-  color,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
   description: string;
-  color: string;
 }) {
   return (
     <div className="flex items-start gap-4">
-      <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center shrink-0`}>
-        <Icon size={20} className="text-white" />
+      <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center shrink-0">
+        <Icon size={20} className="text-(--text-primary)" />
       </div>
       <div>
         <h3 className="font-semibold text-(--text-primary)">{title}</h3>
@@ -211,9 +210,10 @@ function HandlingTimestamps() {
           </>
         }
         badge={{
-          icon: Clock,
+          icon: ClockIcon,
           text: "Backend Pattern",
         }}
+        markdownUrl="/my-views/handling-timestamps.md"
       />
 
       {/* ================================================================== */}
@@ -227,24 +227,21 @@ function HandlingTimestamps() {
 
         <div className="space-y-6 mb-8">
           <FlowStep
-            icon={Database}
+            icon={DatabaseIcon}
             title="Store as UTC in Database"
             description="Always store timestamps in UTC (Coordinated Universal Time). No timezone offset, no ambiguity."
-            color="bg-emerald-500"
           />
           <div className="ml-5 border-l-2 border-dashed border-(--border-color) h-6" />
           <FlowStep
-            icon={Server}
+            icon={HardDrivesIcon}
             title="Return UTC from Backend"
             description="API responses should return timestamps in ISO 8601 format with UTC timezone (e.g., 2026-01-10T06:00:00.000Z)."
-            color="bg-indigo-500"
           />
           <div className="ml-5 border-l-2 border-dashed border-(--border-color) h-6" />
           <FlowStep
-            icon={Monitor}
+            icon={DesktopIcon}
             title="Display in Local Timezone"
             description="The frontend converts UTC to the user's local timezone for display. Users see times that make sense to them."
-            color="bg-amber-500"
           />
         </div>
 
@@ -310,9 +307,9 @@ const formatted = dayjs(apiResponse.createdAt)
 
         <FilterDemo />
 
-        <div className="mt-8 p-6 rounded-xl bg-amber-500/10 border border-amber-500/20">
-          <h3 className="font-semibold text-amber-400 mb-3 flex items-center gap-2">
-            <Calendar size={18} />
+        <div className="mt-8 p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
+          <h3 className="font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+            <CalendarBlankIcon size={18} />
             Example: Indonesia (UTC+7)
           </h3>
           <div className="space-y-3 text-sm text-(--text-secondary)">
@@ -376,7 +373,7 @@ fetch('/api/records', {
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
             <div className="flex items-center gap-2 mb-4">
-              <Check size={18} className="text-emerald-400" />
+              <CheckIcon size={18} className="text-emerald-400" />
               <h3 className="font-semibold text-emerald-400">Do</h3>
             </div>
             <ul className="space-y-3 text-sm text-(--text-secondary)">
@@ -405,7 +402,7 @@ fetch('/api/records', {
 
           <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
             <div className="flex items-center gap-2 mb-4">
-              <X size={18} className="text-red-400" />
+              <XIcon size={18} className="text-red-400" />
               <h3 className="font-semibold text-red-400">Don't</h3>
             </div>
             <ul className="space-y-3 text-sm text-(--text-secondary)">
@@ -436,38 +433,38 @@ fetch('/api/records', {
 
       {/* Summary */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-linear-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/20">
+        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
           <h2 className="text-xl font-bold text-(--text-primary) mb-4">Quick Reference</h2>
           <div className="space-y-3 text-(--text-secondary)">
             <div className="flex items-start gap-3">
-              <Database size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <DatabaseIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Database</strong> — Always store as UTC
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Server size={18} className="text-indigo-400 mt-0.5 shrink-0" />
+              <HardDrivesIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">API</strong> — Return ISO 8601 with Z
                 suffix
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Monitor size={18} className="text-amber-400 mt-0.5 shrink-0" />
+              <DesktopIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Frontend</strong> — new Date() +
                 Intl.DateTimeFormat
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Calendar size={18} className="text-purple-400 mt-0.5 shrink-0" />
+              <CalendarBlankIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Filter</strong> — Convert local input to
                 UTC before query
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Globe size={18} className="text-cyan-400 mt-0.5 shrink-0" />
+              <GlobeIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Rule</strong> — One source of truth (UTC),
                 display locally
@@ -478,15 +475,7 @@ fetch('/api/records', {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

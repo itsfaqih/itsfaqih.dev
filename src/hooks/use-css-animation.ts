@@ -46,8 +46,8 @@ export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimati
       if (status === "playing" && containerRef.current) {
         const anims = containerRef.current.getAnimations({ subtree: true });
         const master = anims.find((a) => {
-          // @ts-ignore - animationName is CSS specific but available in browsers
-          return a.animationName === masterAnimationName;
+          // CSSAnimation has animationName property
+          return (a as CSSAnimation).animationName === masterAnimationName;
         });
 
         if (master) {

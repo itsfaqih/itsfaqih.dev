@@ -1,18 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { useState, useEffect } from "react";
 import {
-  ArrowLeft,
-  Server,
-  Globe,
-  Zap,
-  Database,
-  RefreshCw,
-  AlertCircle,
-  Clock,
-  Layers,
-  Radio,
-  HardDrive,
-} from "lucide-react";
+  HardDrivesIcon,
+  GlobeIcon,
+  LightningIcon,
+  DatabaseIcon,
+  ArrowsClockwiseIcon,
+  WarningCircleIcon,
+  ClockIcon,
+  StackIcon,
+  BroadcastIcon,
+  HardDriveIcon,
+  ShieldCheckIcon,
+} from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import {
   BestPractice,
@@ -20,7 +21,8 @@ import {
   GuidelineHero,
   SectionHeading,
   TabbedCodeExample,
-} from "./components";
+} from "./-components";
+import { GlassyButton } from "../../components/glassy-button";
 
 export const Route = createFileRoute("/my-views/data-loading")({
   component: DataLoading,
@@ -50,7 +52,9 @@ function SWRDemo() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-(--text-primary)">Dashboard Stats</h3>
           <div className="flex items-center gap-2">
-            {isRefetching && <RefreshCw size={14} className="text-indigo-400 animate-spin" />}
+            {isRefetching && (
+              <ArrowsClockwiseIcon size={14} className="text-(--text-secondary) animate-spin" />
+            )}
             <span className="text-xs text-(--text-secondary)">Updated {lastUpdated}</span>
           </div>
         </div>
@@ -64,14 +68,14 @@ function SWRDemo() {
         <span className="text-sm text-(--text-secondary)">
           {isRefetching ? "Fetching fresh data..." : "Showing cached data"}
         </span>
-        <button
+        <GlassyButton
           onClick={simulateRefetch}
           disabled={isRefetching}
-          className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+          className="h-9 px-4 text-sm gap-2"
         >
-          <RefreshCw size={14} className={isRefetching ? "animate-spin" : ""} />
+          <ArrowsClockwiseIcon size={14} className={isRefetching ? "animate-spin" : ""} />
           Revalidate
-        </button>
+        </GlassyButton>
       </div>
     </div>
   );
@@ -143,20 +147,20 @@ function SkeletonDemo() {
         </label>
 
         <div className="flex gap-2">
-          <button
+          <GlassyButton
             onClick={() => simulateLoad(true)}
             disabled={isLoading}
-            className="px-4 py-2 rounded-lg bg-(--bg-primary) border border-(--border-color) text-sm text-(--text-primary) hover:bg-(--border-color) disabled:opacity-50 transition-colors"
+            className="px-4 py-2 h-auto text-sm"
           >
             Fast Load (100ms)
-          </button>
-          <button
+          </GlassyButton>
+          <GlassyButton
             onClick={() => simulateLoad(false)}
             disabled={isLoading}
-            className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 h-auto text-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             Slow Load (1.5s)
-          </button>
+          </GlassyButton>
         </div>
       </div>
     </div>
@@ -185,7 +189,7 @@ function ErrorDemo() {
       <div className="p-6">
         {state === "loading" && (
           <div className="flex items-center justify-center py-8">
-            <RefreshCw size={24} className="text-(--text-secondary) animate-spin" />
+            <ArrowsClockwiseIcon size={24} className="text-(--text-secondary) animate-spin" />
           </div>
         )}
 
@@ -201,14 +205,14 @@ function ErrorDemo() {
 
         {state === "error" && (
           <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
-            <AlertCircle size={32} className="text-red-400 mx-auto mb-3" />
+            <WarningCircleIcon size={32} className="text-red-400 mx-auto mb-3" />
             <p className="text-red-400 font-medium mb-1">Failed to load profile</p>
             <p className="text-sm text-red-400/70 mb-4">Network error. Please try again.</p>
             <button
               onClick={retry}
               className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2 mx-auto"
             >
-              <RefreshCw size={14} />
+              <ArrowsClockwiseIcon size={14} />
               Retry
             </button>
           </div>
@@ -230,6 +234,125 @@ function ErrorDemo() {
 }
 
 // ============================================================================
+// Interactive Demo: Data Parsing with Zod .catch()
+// ============================================================================
+
+function DataParsingDemo() {
+  const [highlightedJson, setHighlightedJson] = useState<string>("");
+  const [highlightedSchema, setHighlightedSchema] = useState<string>("");
+  const [highlightedResult, setHighlightedResult] = useState<string>("");
+
+  const rawJson = `{
+  "id": 1,
+  "name": "Alice"
+}`;
+
+  const zodSchema = `z.object({
+  id: z.number(),
+  name: z.string(),
+  // Fallback to "Unknown" if missing
+  city: z.string().catch("Unknown")
+})`;
+
+  const parsedResult = `{
+  "id": 1,
+  "name": "Alice",
+  "city": "Unknown"
+}`;
+
+  // Highlight all code blocks with Shiki
+  useEffect(() => {
+    import("shiki").then(({ codeToHtml }) => {
+      // JSON input
+      codeToHtml(rawJson, {
+        lang: "json",
+        themes: { light: "github-light", dark: "github-dark" },
+      }).then(setHighlightedJson);
+
+      // TypeScript schema
+      codeToHtml(zodSchema, {
+        lang: "typescript",
+        themes: { light: "github-light", dark: "github-dark" },
+      }).then(setHighlightedSchema);
+
+      // JSON result
+      codeToHtml(parsedResult, {
+        lang: "json",
+        themes: { light: "github-light", dark: "github-dark" },
+      }).then(setHighlightedResult);
+    });
+  }, [rawJson, zodSchema, parsedResult]);
+
+  return (
+    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden mb-8">
+      <div className="p-6">
+        <h3 className="font-semibold text-(--text-primary) mb-6">Safe Parsing with Fallbacks</h3>
+
+        <div className="space-y-6">
+          {/* Step 1: Raw Data */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
+              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+                1
+              </span>
+              Input: Raw API response or database query result
+            </div>
+            <div className="relative">
+              <div
+                className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                dangerouslySetInnerHTML={{ __html: highlightedJson || `<pre>${rawJson}</pre>` }}
+              />
+              <div className="absolute top-3 right-3">
+                <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-medium text-red-500">
+                  Missing "city"
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 2: Schema */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
+              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+                2
+              </span>
+              Process: Zod (or any) Schema
+            </div>
+            <div
+              className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+              dangerouslySetInnerHTML={{ __html: highlightedSchema || `<pre>${zodSchema}</pre>` }}
+            />
+          </div>
+
+          {/* Step 3: Result */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
+              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+                3
+              </span>
+              Output: Safe Data
+            </div>
+            <div className="relative">
+              <div
+                className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                dangerouslySetInnerHTML={{
+                  __html: highlightedResult || `<pre>${parsedResult}</pre>`,
+                }}
+              />
+              <div className="absolute top-3 right-3">
+                <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-medium text-emerald-500">
+                  Fallback Applied
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // Section Card Component
 // ============================================================================
 
@@ -237,18 +360,17 @@ function SectionCard({
   icon: Icon,
   title,
   children,
-  color,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
   children: React.ReactNode;
-  color: string;
+  color?: string; // Optional or removed completely. Since I removed usage, I can remove it from type or make it optional unused. Best to remove it.
 }) {
   return (
     <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
       <div className="flex items-center gap-3 mb-4">
-        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center`}>
-          <Icon size={20} className="text-white" />
+        <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+          <Icon size={20} className="text-(--text-primary)" />
         </div>
         <h3 className="font-semibold text-(--text-primary)">{title}</h3>
       </div>
@@ -277,9 +399,10 @@ function DataLoading() {
           </>
         }
         badge={{
-          icon: Zap,
+          icon: LightningIcon,
           text: "Performance Pattern",
         }}
+        markdownUrl="/my-views/data-loading.md"
       />
 
       {/* ================================================================== */}
@@ -295,7 +418,7 @@ function DataLoading() {
         />
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          <SectionCard icon={Server} title="Server-Side Rendering" color="bg-emerald-500">
+          <SectionCard icon={HardDrivesIcon} title="Server-Side Rendering" color="">
             <p>
               <strong className="text-(--text-primary)">Use when:</strong>
             </p>
@@ -307,7 +430,7 @@ function DataLoading() {
             </ul>
           </SectionCard>
 
-          <SectionCard icon={Globe} title="Single Page App" color="bg-indigo-500">
+          <SectionCard icon={GlobeIcon} title="Single Page App" color="">
             <p>
               <strong className="text-(--text-primary)">Use when:</strong>
             </p>
@@ -624,8 +747,8 @@ function useDelayedLoading(isLoading, delay = 200) {
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center">
-                <Radio size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+                <BroadcastIcon size={20} className="text-(--text-primary)" />
               </div>
               <h3 className="font-semibold text-(--text-primary)">WebSocket</h3>
             </div>
@@ -644,8 +767,8 @@ function useDelayedLoading(isLoading, delay = 200) {
 
           <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-cyan-500 flex items-center justify-center">
-                <RefreshCw size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+                <ArrowsClockwiseIcon size={20} className="text-(--text-primary)" />
               </div>
               <h3 className="font-semibold text-(--text-primary)">Interval HTTP</h3>
             </div>
@@ -688,13 +811,13 @@ function useDelayedLoading(isLoading, delay = 200) {
       <div className="mb-20">
         <SectionHeading
           title="Cache Persistence"
-          description="Not all data should be persisted to local storage. Some data must always be fresh."
+          description="Not all data should be persisted. Some data must always be fresh."
         />
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
             <div className="flex items-center gap-2 mb-3">
-              <AlertCircle size={18} className="text-red-400" />
+              <WarningCircleIcon size={18} className="text-red-400" />
               <h3 className="font-semibold text-red-400">Don't Persist</h3>
             </div>
             <p className="text-sm text-(--text-secondary) mb-4">
@@ -727,7 +850,7 @@ function useDelayedLoading(isLoading, delay = 200) {
 
           <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
             <div className="flex items-center gap-2 mb-3">
-              <HardDrive size={18} className="text-emerald-400" />
+              <HardDriveIcon size={18} className="text-emerald-400" />
               <h3 className="font-semibold text-emerald-400">OK to Persist</h3>
             </div>
             <p className="text-sm text-(--text-secondary) mb-4">Historical or reference data:</p>
@@ -779,74 +902,473 @@ function useDelayedLoading(isLoading, delay = 200) {
             description="If you do persist, set a reasonable time-to-live. Stale cache from 3 months ago is probably useless."
           />
         </div>
+
+        {/* Persistence Methods */}
+        <div className="mt-12">
+          <h3 className="text-lg font-semibold text-(--text-primary) mb-6">Persistence Methods</h3>
+          <div className="grid gap-4">
+            {/* LocalStorage */}
+            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
+                  <HardDriveIcon size={20} className="text-amber-500" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-(--text-primary)">LocalStorage</h4>
+                  <span className="text-xs text-(--text-secondary)">~5MB limit</span>
+                </div>
+              </div>
+              <div className="text-sm text-(--text-secondary) space-y-2">
+                <p>Simple key-value storage. Best for small, string-based data.</p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li>Synchronous API — can block main thread</li>
+                  <li>Only stores strings (requires JSON.stringify)</li>
+                  <li>Good for: user preferences, tokens, small cache</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* IndexedDB */}
+            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
+                  <DatabaseIcon size={20} className="text-blue-500" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-(--text-primary)">IndexedDB</h4>
+                  <span className="text-xs text-(--text-secondary)">No practical limit</span>
+                </div>
+              </div>
+              <div className="text-sm text-(--text-secondary) space-y-2">
+                <p>Full database in the browser. Best for structured, large datasets.</p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li>Asynchronous API — doesn't block UI</li>
+                  <li>Supports indexes, transactions, and cursors</li>
+                  <li>Good for: offline-first apps, large cache, complex queries</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Embedded Database */}
+            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
+                  <StackIcon size={20} className="text-emerald-500" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-(--text-primary)">Embedded Database</h4>
+                  <span className="text-xs text-(--text-secondary)">
+                    ElectricSQL, Turso, PGlite, etc.
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm text-(--text-secondary) space-y-2">
+                <p>Full SQL database running in the browser with sync capabilities.</p>
+                <ul className="list-disc list-inside space-y-1 mt-2">
+                  <li>Real SQL queries (SQLite-based)</li>
+                  <li>Automatic sync with remote database</li>
+                  <li>Good for: offline-first apps, local-first architecture, complex data</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Code examples for persistence */}
+        <div className="mt-8">
+          <TabbedCodeExample
+            title="Persistence Implementation"
+            tabs={[
+              {
+                label: "LocalStorage",
+                code: `import { QueryClient } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { gcTime: 1000 * 60 * 60 * 24 }, // 24 hours
+  },
+});
+
+// Simple localStorage persister
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: 'app-cache',
+});
+
+persistQueryClient({
+  queryClient,
+  persister,
+  maxAge: 1000 * 60 * 60 * 24, // 24 hours
+});`,
+              },
+              {
+                label: "IndexedDB",
+                code: `import { QueryClient } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { get, set, del } from 'idb-keyval';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { gcTime: 1000 * 60 * 60 * 24 * 7 }, // 7 days
+  },
+});
+
+// IndexedDB persister using idb-keyval
+const persister = createAsyncStoragePersister({
+  storage: {
+    getItem: async (key) => await get(key),
+    setItem: async (key, value) => await set(key, value),
+    removeItem: async (key) => await del(key),
+  },
+  key: 'app-cache',
+});
+
+persistQueryClient({
+  queryClient,
+  persister,
+  maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+});`,
+              },
+              {
+                label: "ElectricSQL",
+                code: `import { electrify } from 'electric-sql/browser';
+import { schema } from './generated/client';
+
+// Initialize ElectricSQL with SQLite
+const electric = await electrify(
+  await ElectricDatabase.init('my-app.db'),
+  schema,
+  { url: 'https://api.electric-sql.com' }
+);
+
+// Sync specific tables
+await electric.sync.table('users');
+await electric.sync.table('posts');
+
+// Use like a normal database - auto syncs!
+const users = await electric.db.users.findMany();
+
+// Changes sync bidirectionally
+await electric.db.users.create({
+  data: { name: 'Alice', email: 'alice@example.com' }
+});`,
+              },
+              {
+                label: "Turso (libSQL)",
+                code: `import { createClient } from '@libsql/client/web';
+
+// Connect to Turso embedded replica
+const client = createClient({
+  url: 'file:local.db',
+  syncUrl: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+// Sync with remote on startup
+await client.sync();
+
+// Query locally - instant response
+const users = await client.execute('SELECT * FROM users');
+
+// Mutations sync automatically
+await client.execute({
+  sql: 'INSERT INTO users (name, email) VALUES (?, ?)',
+  args: ['Alice', 'alice@example.com']
+});
+
+// Periodic sync for real-time updates
+setInterval(() => client.sync(), 30000);`,
+              },
+            ]}
+            description="Choose the right persistence method based on your data size and complexity. LocalStorage for simple needs, IndexedDB for larger cache, embedded databases for full offline-first experiences."
+          />
+        </div>
+      </div>
+
+      {/* ================================================================== */}
+      {/* SECTION 8: Parsing Data from External Source */}
+      {/* ================================================================== */}
+      <div className="mb-20">
+        <SectionHeading
+          title="Parsing Data from External Source"
+          description="Always validate and parse data from APIs or databases to catch issues early."
+        />
+
+        <DataParsingDemo />
+
+        <div className="mt-8 grid sm:grid-cols-2 gap-4 mb-8">
+          <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
+            <div className="flex items-center gap-2 mb-3">
+              <WarningCircleIcon size={18} className="text-red-400" />
+              <h3 className="font-semibold text-red-400">Without Parsing</h3>
+            </div>
+            <p className="text-sm text-(--text-secondary) mb-4">What can go wrong:</p>
+            <ul className="text-sm text-(--text-secondary) space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-red-400">✗</span>
+                <span>
+                  <strong className="text-(--text-primary)">Runtime crashes</strong> — Accessing{" "}
+                  <code className="text-xs bg-(--bg-primary) px-1 rounded">
+                    user.name.toUpperCase()
+                  </code>{" "}
+                  when name is undefined
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-red-400">✗</span>
+                <span>
+                  <strong className="text-(--text-primary)">Type mismatches</strong> — Expecting
+                  number, getting string like{" "}
+                  <code className="text-xs bg-(--bg-primary) px-1 rounded">"42"</code>
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-red-400">✗</span>
+                <span>
+                  <strong className="text-(--text-primary)">Silent failures</strong> — Missing
+                  fields that cause subtle bugs later
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldCheckIcon size={18} className="text-emerald-400" />
+              <h3 className="font-semibold text-emerald-400">With Parsing</h3>
+            </div>
+            <p className="text-sm text-(--text-secondary) mb-4">Benefits:</p>
+            <ul className="text-sm text-(--text-secondary) space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-emerald-400">✓</span>
+                <span>
+                  <strong className="text-(--text-primary)">Early error detection</strong> — Catch
+                  invalid data at the boundary
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-emerald-400">✓</span>
+                <span>
+                  <strong className="text-(--text-primary)">Type safety</strong> — TypeScript knows
+                  the exact shape after parsing
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-emerald-400">✓</span>
+                <span>
+                  <strong className="text-(--text-primary)">Graceful handling</strong> — Use
+                  fallbacks or show meaningful errors
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          <BestPractice
+            emoji="🛡️"
+            title="Parse at the boundary"
+            description="Validate data as soon as it enters your application — right after fetch() or database query. Don't let invalid data propagate."
+          />
+          <BestPractice
+            emoji="🔄"
+            title="Use fallback values"
+            description="For optional fields, provide sensible defaults. role: 'User' is better than role: undefined crashing your UI."
+          />
+          <BestPractice
+            emoji="📝"
+            title="Show meaningful errors"
+            description="When parsing fails, display a user-friendly message. Log the technical details to your observability tools."
+          />
+          <BestPractice
+            emoji="🎯"
+            title="Keep schemas in sync"
+            description="When your API changes, update your validation schemas. Zod/Yup schemas are living documentation of your data contracts."
+          />
+        </div>
+
+        <div className="mt-8">
+          <TabbedCodeExample
+            title="Data Validation with Zod"
+            tabs={[
+              {
+                label: "Basic Parsing",
+                code: `import { z } from 'zod';
+
+// Define the expected shape
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['Admin', 'User', 'Editor']).default('User'),
+  avatar: z.string().url().optional(),
+});
+
+type User = z.infer<typeof UserSchema>;
+
+// Parse API response
+async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(\`/api/users/\${id}\`);
+  const data = await response.json();
+  
+  // Parse and validate - throws if invalid
+  return UserSchema.parse(data);
+}`,
+              },
+              {
+                label: "Safe Parsing",
+                code: `import { z } from 'zod';
+
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['Admin', 'User', 'Editor']).default('User'),
+});
+
+async function fetchUser(id: string) {
+  const response = await fetch(\`/api/users/\${id}\`);
+  const data = await response.json();
+  
+  // safeParse doesn't throw - returns success/error
+  const result = UserSchema.safeParse(data);
+  
+  if (!result.success) {
+    // Handle validation errors gracefully
+    console.error('Validation failed:', result.error.issues);
+    
+    // Report to observability
+    captureException(result.error, { context: 'fetchUser' });
+    
+    // Return null or throw custom error
+    return null;
+  }
+  
+  // TypeScript knows result.data is User
+  return result.data;
+}`,
+              },
+              {
+                label: "With TanStack Query",
+                code: `import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
+
+const UsersSchema = z.array(z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+}));
+
+function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      
+      // Parse in queryFn - errors trigger error state
+      return UsersSchema.parse(data);
+    },
+  });
+}
+
+function UserList() {
+  const { data: users, error, isLoading } = useUsers();
+  
+  if (error instanceof z.ZodError) {
+    // Specific handling for validation errors
+    return <div>Invalid data received from server</div>;
+  }
+  
+  if (error) return <ErrorState error={error} />;
+  if (isLoading) return <Skeleton />;
+  
+  // users is typed correctly as User[]
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}`,
+              },
+            ]}
+            description="Zod provides runtime validation with TypeScript type inference. Parse external data to catch issues early."
+          />
+        </div>
       </div>
 
       {/* Summary */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-linear-to-br from-amber-500/10 to-indigo-500/10 border border-amber-500/20">
+        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
           <h2 className="text-xl font-bold text-(--text-primary) mb-4">Quick Reference</h2>
           <div className="space-y-3 text-(--text-secondary)">
             <div className="flex items-start gap-3">
-              <Server size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <HardDrivesIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">SSR</strong> — Use for SEO-critical,
                 important content
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Zap size={18} className="text-amber-400 mt-0.5 shrink-0" />
+              <LightningIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Loader</strong> — Trigger fetches on
                 navigation, not render
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Layers size={18} className="text-indigo-400 mt-0.5 shrink-0" />
+              <StackIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Defer</strong> — Don't block render, show
                 skeleton first
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Database size={18} className="text-cyan-400 mt-0.5 shrink-0" />
+              <DatabaseIcon size={18} className="text-cyan-400 mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Batch</strong> — Group queries when
                 possible, separate if heavy
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <RefreshCw size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <ArrowsClockwiseIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">SWR</strong> — Show stale data, indicate
                 background refresh
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Clock size={18} className="text-purple-400 mt-0.5 shrink-0" />
+              <ClockIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Spin Delay</strong> — Wait 200ms before
                 showing skeleton
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <AlertCircle size={18} className="text-red-400 mt-0.5 shrink-0" />
+              <WarningCircleIcon size={18} className="text-red-400 mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Errors</strong> — Inline, not toast.
                 Include retry. Log to observability.
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <Radio size={18} className="text-pink-400 mt-0.5 shrink-0" />
+              <BroadcastIcon size={18} className="text-pink-400 mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">WebSocket</strong> — Use for realtime data
                 that needs instant updates
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <HardDrive size={18} className="text-zinc-400 mt-0.5 shrink-0" />
+              <HardDriveIcon size={18} className="text-zinc-400 mt-0.5 shrink-0" />
               <span>
                 <strong className="text-(--text-primary)">Cache</strong> — Don't persist client
                 cache unless app works offline or needs latest data on revisit
+              </span>
+            </div>
+            <div className="flex items-start gap-3">
+              <ShieldCheckIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <span>
+                <strong className="text-(--text-primary)">Parse</strong> — Validate external data
+                with Zod. Use fallbacks or show meaningful errors.
               </span>
             </div>
           </div>
@@ -854,15 +1376,7 @@ function useDelayedLoading(isLoading, delay = 200) {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

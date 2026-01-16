@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MyViewsIndexRouteImport } from './routes/my-views/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as MyViewsTypescriptCodeWritingRouteImport } from './routes/my-views/typescript-code-writing'
 import { Route as MyViewsTableDesignRouteImport } from './routes/my-views/table-design'
@@ -24,6 +25,11 @@ import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyViewsIndexRoute = MyViewsIndexRouteImport.update({
+  id: '/my-views/',
+  path: '/my-views/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/my-views/table-design': typeof MyViewsTableDesignRoute
   '/my-views/typescript-code-writing': typeof MyViewsTypescriptCodeWritingRoute
   '/blog': typeof BlogIndexRoute
+  '/my-views': typeof MyViewsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/my-views/table-design': typeof MyViewsTableDesignRoute
   '/my-views/typescript-code-writing': typeof MyViewsTypescriptCodeWritingRoute
   '/blog': typeof BlogIndexRoute
+  '/my-views': typeof MyViewsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/my-views/table-design': typeof MyViewsTableDesignRoute
   '/my-views/typescript-code-writing': typeof MyViewsTypescriptCodeWritingRoute
   '/blog/': typeof BlogIndexRoute
+  '/my-views/': typeof MyViewsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/my-views/table-design'
     | '/my-views/typescript-code-writing'
     | '/blog'
+    | '/my-views'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/my-views/table-design'
     | '/my-views/typescript-code-writing'
     | '/blog'
+    | '/my-views'
   id:
     | '__root__'
     | '/'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/my-views/table-design'
     | '/my-views/typescript-code-writing'
     | '/blog/'
+    | '/my-views/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -174,6 +186,7 @@ export interface RootRouteChildren {
   MyViewsTableDesignRoute: typeof MyViewsTableDesignRoute
   MyViewsTypescriptCodeWritingRoute: typeof MyViewsTypescriptCodeWritingRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  MyViewsIndexRoute: typeof MyViewsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -183,6 +196,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-views/': {
+      id: '/my-views/'
+      path: '/my-views'
+      fullPath: '/my-views'
+      preLoaderRoute: typeof MyViewsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -270,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyViewsTableDesignRoute: MyViewsTableDesignRoute,
   MyViewsTypescriptCodeWritingRoute: MyViewsTypescriptCodeWritingRoute,
   BlogIndexRoute: BlogIndexRoute,
+  MyViewsIndexRoute: MyViewsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

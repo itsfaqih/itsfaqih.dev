@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileCode, Shield, Box, ArrowLeft } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { FileCodeIcon, ShieldIcon, PackageIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./components";
+import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
 
 export const Route = createFileRoute("/my-views/typescript-code-writing")({
   component: TypeScriptGuidelines,
@@ -22,9 +23,10 @@ function TypeScriptGuidelines() {
           </>
         }
         badge={{
-          icon: FileCode,
+          icon: FileCodeIcon,
           text: "Code Quality",
         }}
+        markdownUrl="/my-views/typescript-code-writing.md"
       />
 
       {/* ================================================================== */}
@@ -171,24 +173,24 @@ createUser({
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
             <div className="flex items-center gap-3 mb-4">
-              <Shield size={20} className="text-emerald-400" />
+              <ShieldIcon size={20} className="text-(--text-primary)" />
               <h3 className="font-semibold text-(--text-primary)">Must-Have Flags</h3>
             </div>
             <ul className="space-y-3 text-sm text-(--text-secondary)">
               <li className="flex flex-col gap-1">
-                <code className="text-(--accent-color) bg-(--accent-color)/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
                   "strict": true
                 </code>
                 <span>Enables strictNullChecks, noImplicitAny, etc.</span>
               </li>
               <li className="flex flex-col gap-1">
-                <code className="text-(--accent-color) bg-(--accent-color)/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
                   "noUncheckedIndexedAccess": true
                 </code>
                 <span>Forces you to check if array access / index signature is defined.</span>
               </li>
               <li className="flex flex-col gap-1">
-                <code className="text-(--accent-color) bg-(--accent-color)/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
                   "verbatimModuleSyntax": true
                 </code>
                 <span>Enforces consistent imports/exports and ESM compatibility.</span>
@@ -198,7 +200,7 @@ createUser({
 
           <div className="p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
             <div className="flex items-center gap-3 mb-4">
-              <Box size={20} className="text-indigo-400" />
+              <PackageIcon size={20} className="text-(--text-primary)" />
               <h3 className="font-semibold text-(--text-primary)">Module System</h3>
             </div>
             <p className="text-sm text-(--text-secondary) mb-4">
@@ -206,15 +208,15 @@ createUser({
             </p>
             <ul className="space-y-2 text-sm text-(--text-secondary)">
               <li className="flex items-center gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-(--text-primary)">✓</span>
                 <span>import / export syntax</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-(--text-primary)">✗</span>
                 <span>require() / module.exports</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-(--text-primary)">✓</span>
                 <span>Top-level await support</span>
               </li>
             </ul>
@@ -222,16 +224,7 @@ createUser({
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

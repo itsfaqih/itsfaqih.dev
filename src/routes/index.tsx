@@ -1,19 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getAllPosts } from "./blog/components/posts";
+import { getAllPosts } from "./blog/-components/posts";
 import { PageContainer } from "../components/page-container";
 import {
-  Github,
-  Linkedin,
-  Mail,
-  Twitter,
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { ReactNode, useState, useEffect, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+  GithubLogoIcon,
+  LinkedinLogoIcon,
+  EnvelopeIcon,
+  TwitterLogoIcon,
+  ArrowUpRightIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  CaretDownIcon,
+  CaretUpIcon,
+} from "@phosphor-icons/react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import { ReactNode, useState, useCallback, memo } from "react";
 import { cn } from "../cn";
+import { getGlassyClasses } from "../components/glassy-button";
+import { GuidelineCard } from "../components/guideline-card";
+import { GUIDELINES } from "../data/guidelines";
 
 // ============================================================================
 // Types
@@ -28,7 +32,7 @@ interface SectionProps {
 
 interface SocialLinkProps {
   href: string;
-  icon: LucideIcon;
+  icon: PhosphorIcon;
   label: string;
   isExternal?: boolean;
 }
@@ -92,34 +96,32 @@ function SocialLink({ href, icon: Icon, label, isExternal = true }: SocialLinkPr
   const externalProps = isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   return (
-    <a
-      href={href}
-      {...externalProps}
-      className="relative overflow-hidden inline-flex items-center gap-2 px-3 h-8.5 rounded-md text-(--text-primary) transition-all text-sm backdrop-blur-md border border-gray-500/20 bg-linear-to-b from-gray-500/5 to-gray-500/0 hover:from-gray-500/10 hover:to-gray-500/5 before:absolute before:inset-0 before:bg-current before:opacity-0 before:scale-0 before:rounded-full before:transition-all active:before:duration-300 before:duration-0 active:before:scale-150 active:before:opacity-10 active:shadow-lg"
-    >
+    <a href={href} {...externalProps} className={getGlassyClasses("h-8.5 justify-start gap-2")}>
       <Icon size={14} />
       {label}
     </a>
   );
 }
 
-function TechTag({ tag }: { tag: string }) {
+// Memoized since it renders the same tag multiple times in lists (rerender-memo rule)
+const TechTag = memo(function TechTag({ tag }: { tag: string }) {
   const iconSlug = TECH_ICON_MAP[tag];
 
   return (
     <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-(--bg-primary) border border-(--border-color) text-(--text-secondary)">
-      {iconSlug && (
+      {/* Ternary for explicit conditional rendering (rendering-conditional-render rule) */}
+      {iconSlug ? (
         <img
           src={`https://cdn.simpleicons.org/${iconSlug}`}
           alt=""
           className="w-3 h-3 opacity-60"
           style={{ filter: "var(--icon-filter, grayscale(100%))" }}
         />
-      )}
+      ) : null}
       {tag}
     </span>
   );
-}
+});
 
 function ListItem({
   title,
@@ -131,12 +133,12 @@ function ListItem({
   description,
 }: ListItemProps) {
   const Content = () => (
-    <div className="group relative grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-4 items-start p-4 -mx-4 rounded-2xl transition-all duration-300 border border-transparent hover:border-(--border-color) hover:bg-linear-to-br hover:from-gray-500/10 hover:to-gray-500/5 hover:backdrop-blur-md">
+    <div className="group relative grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-4 items-start p-4 -mx-4 rounded-2xl squircle transition-all duration-300 border border-transparent hover:border-(--border-color) hover:bg-linear-to-br hover:from-gray-500/10 hover:to-gray-500/5 hover:backdrop-blur-md">
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <h3 className="font-medium text-(--text-primary) text-sm transition-colors">{title}</h3>
           {isExternal && (
-            <ArrowUpRight
+            <ArrowUpRightIcon
               size={12}
               className="text-(--text-secondary) opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
             />
@@ -211,7 +213,7 @@ function TimelineItem({
             <div className="flex items-center gap-2">
               <h3 className="font-medium text-(--text-primary) text-base">{title}</h3>
               {isExternal && (
-                <ArrowUpRight
+                <ArrowUpRightIcon
                   size={14}
                   className="text-(--text-secondary) opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
                 />
@@ -260,202 +262,264 @@ function TimelineItem({
 }
 
 // ============================================================================
-// Guidelines Carousel Component
+// Experience Section Component (with expand/collapse)
 // ============================================================================
 
-const GUIDELINES = [
-  {
-    id: "proximity-principle",
-    label: "Code Structure",
-    title: "Proximity Principle",
-    description: "How code writings and files should be structured",
-    href: "/my-views/proximity-principle",
-  },
-  {
-    id: "typescript-code-writing",
-    label: "Code Quality",
-    title: "TypeScript Guidelines",
-    description: "Rules for writing clean and maintainable TypeScript",
-    href: "/my-views/typescript-code-writing",
-  },
-  {
-    id: "button-design",
-    label: "Components",
-    title: "Button Design",
-    description: "States, hover, variants, and icon alignment",
-    href: "/my-views/button-design",
-  },
-  {
-    id: "table-design",
-    label: "Components",
-    title: "Table Design",
-    description: "States, pagination, actions, and numbers",
-    href: "/my-views/table-design",
-  },
-  {
-    id: "dialog-design",
-    label: "Components",
-    title: "Dialog Design",
-    description: "Focus trap, inert background, and data safety patterns",
-    href: "/my-views/dialog-design",
-  },
-  {
-    id: "data-loading",
-    label: "Architecture",
-    title: "Data Loading",
-    description: "SSR, loaders, SWR, and error handling",
-    href: "/my-views/data-loading",
-  },
-  {
-    id: "handling-timestamps",
-    label: "Best Practices",
-    title: "Handling Timestamps",
-    description: "Store UTC, display local",
-    href: "/my-views/handling-timestamps",
-  },
-  {
-    id: "null-vs-undefined",
-    label: "JavaScript",
-    title: "Null vs Undefined",
-    description: "The difference between empty and missing values",
-    href: "/my-views/null-vs-undefined",
-  },
-];
+interface ExperienceSectionProps {
+  experience: {
+    title: string;
+    subtitle: string;
+    date: string;
+    description: string;
+    tags: string[];
+  }[];
+}
 
-function MyGuidelinesCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    containScroll: "trimSnaps",
-    dragFree: false,
-  });
+const INITIAL_EXPERIENCE_COUNT = 3;
 
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
+function ExperienceSection({ experience }: ExperienceSectionProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
+  const hasMore = experience.length > INITIAL_EXPERIENCE_COUNT;
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+  return (
+    <Section title="Experience">
+      <div className="relative">
+        {experience.map((job, index) => {
+          const isHidden = !isExpanded && index >= INITIAL_EXPERIENCE_COUNT;
+          const isLastVisible = isExpanded
+            ? index === experience.length - 1
+            : index === INITIAL_EXPERIENCE_COUNT - 1 && !hasMore;
+
+          return (
+            <div
+              key={index}
+              className="grid transition-all duration-300 ease-out"
+              style={{
+                gridTemplateRows: isHidden ? "0fr" : "1fr",
+                opacity: isHidden ? 0 : 1,
+              }}
+            >
+              <div className="overflow-hidden">
+                <TimelineItem
+                  title={job.title}
+                  subtitle={job.subtitle}
+                  date={job.date}
+                  description={job.description}
+                  tags={job.tags}
+                  isLast={isLastVisible}
+                />
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Bottom fade gradient - visible when collapsed with more items */}
+        {hasMore && (
+          <div
+            className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none transition-opacity duration-300"
+            style={{
+              background: "linear-gradient(to top, var(--bg-primary), transparent)",
+              opacity: isExpanded ? 0 : 1,
+            }}
+          />
+        )}
+      </div>
+
+      {hasMore && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={cn(
+            getGlassyClasses("justify-center gap-2 w-full mt-4", "ghost", true),
+            "text-sm",
+          )}
+        >
+          {isExpanded ? (
+            <>
+              <CaretUpIcon size={14} />
+              Show less
+            </>
+          ) : (
+            <>
+              <CaretDownIcon size={14} />
+              Show all ({experience.length})
+            </>
+          )}
+        </button>
+      )}
+    </Section>
+  );
+}
+
+// ============================================================================
+// Guidelines Carousel Component - 3D Curved Effect
+// ============================================================================
+
+function MyViewsCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const slideCount = GUIDELINES.length;
+
+  // Card dimensions
+  const CARD_WIDTH = 288; // w-72 = 18rem = 288px
+  const CARD_GAP = 32; // Gap between cards
+  const VISIBLE_RANGE = 2; // How many cards visible on each side
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
+    setCurrentIndex((prev) => (prev - 1 + slideCount) % slideCount);
+  }, [slideCount]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
+    setCurrentIndex((prev) => (prev + 1) % slideCount);
+  }, [slideCount]);
+
+  // Calculate the offset from center (-2, -1, 0, 1, 2, etc.)
+  const getDistanceFromCenter = useCallback(
+    (index: number): number => {
+      let distance = index - currentIndex;
+
+      // Handle loop wrapping - find shortest path
+      if (distance > slideCount / 2) {
+        distance -= slideCount;
+      } else if (distance < -slideCount / 2) {
+        distance += slideCount;
+      }
+
+      return distance;
+    },
+    [currentIndex, slideCount],
+  );
+
+  // Calculate 3D transforms for each slide
+  const getSlideStyles = useCallback(
+    (index: number): React.CSSProperties => {
+      const distance = getDistanceFromCenter(index);
+
+      // Only render slides within visible range
+      if (Math.abs(distance) > VISIBLE_RANGE + 1) {
+        return {
+          opacity: 0,
+          pointerEvents: "none",
+          visibility: "hidden",
+        };
+      }
+
+      // 3D curve parameters
+      const rotateY = distance * 20; // Rotation angle
+      const translateZ = -Math.abs(distance) * 80; // Push back based on distance
+      const translateY = Math.pow(Math.abs(distance), 1.5) * 15; // Vertical curve
+      const translateX = distance * (CARD_WIDTH + CARD_GAP); // Horizontal spacing
+
+      // Opacity fades for edge cards
+      const opacity = Math.max(0.4, 1 - Math.abs(distance) * 0.25);
+
+      return {
+        transform: `
+          translateX(${translateX}px)
+          translateZ(${translateZ}px)
+          translateY(${translateY}px)
+          rotateY(${rotateY}deg)
+        `,
+        opacity,
+        zIndex: 10 - Math.abs(distance),
+        transition: "all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
+        pointerEvents: Math.abs(distance) > 1 ? "none" : "auto",
+      } as React.CSSProperties;
+    },
+    [getDistanceFromCenter],
+  );
 
   return (
     <section className="mb-12 scroll-mt-24">
-      <h2 className="text-sm font-medium text-(--text-secondary) mb-4 uppercase tracking-wide">
-        My Views
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-medium text-(--text-secondary) uppercase tracking-wide">
+          My Views
+        </h2>
+        <Link
+          to="/my-views"
+          className="text-sm text-(--text-secondary) hover:text-(--text-primary) transition-colors flex items-center gap-1 group"
+        >
+          View More
+          <CaretRightIcon className="translate-y-[0.5px] group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </div>
 
-      {/* Embla Carousel - Full Bleed */}
-      <div className="w-screen ml-[calc(50%-50vw)] relative left-0 right-0">
-        <div className="overflow-hidden" ref={emblaRef}>
+      {/* 3D Curved Carousel */}
+      <div
+        className="relative w-full overflow-hidden"
+        style={{
+          height: "340px", // Fixed height for the carousel area
+        }}
+      >
+        {/* Perspective container - centers content and applies 3D */}
+        <div
+          className="absolute inset-0 flex items-start justify-center pt-4"
+          style={{
+            perspective: "1200px",
+            perspectiveOrigin: "center center",
+          }}
+        >
+          {/* Transform origin container */}
           <div
-            className="flex gap-4"
+            className="relative"
             style={{
-              paddingLeft: "max(1.5rem, calc((100vw - 42rem) / 2 + 1.5rem))",
-              paddingRight: 0,
+              transformStyle: "preserve-3d",
+              width: `${CARD_WIDTH}px`, // Same as card width so center card aligns
             }}
           >
             {GUIDELINES.map((guideline, i) => (
-              <Link
+              <div
                 key={guideline.id}
-                to={guideline.href}
-                className="group shrink-0 w-64"
+                className="absolute top-0 left-0"
                 style={{
-                  marginRight:
-                    i === GUIDELINES.length - 1
-                      ? "max(1.5rem, calc((100vw - 42rem) / 2 + 1.5rem))"
-                      : undefined,
+                  ...getSlideStyles(i),
+                  transformStyle: "preserve-3d",
+                  width: `${CARD_WIDTH}px`,
                 }}
               >
-                {" "}
-                {/* Card */}
-                <div className="relative h-48 rounded-xl overflow-hidden bg-linear-to-br from-(--bg-secondary) to-(--bg-primary) border border-(--border-color) transition-all duration-300 group-hover:border-(--text-secondary)/30 group-hover:shadow-lg group-hover:shadow-black/10 group-hover:-translate-y-1">
-                  {/* Decorative gradient overlay */}
-                  <div className="absolute inset-0 bg-linear-to-br from-white/3 to-transparent pointer-events-none" />
-
-                  {/* Subtle pattern */}
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 1px 1px, var(--border-color) 1px, transparent 0)`,
-                      backgroundSize: "24px 24px",
-                    }}
-                  />
-
-                  {/* Icon/Visual area - abstract shapes */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 rounded-2xl bg-(--bg-primary)/50 border border-(--border-color)/50 flex items-center justify-center backdrop-blur-sm transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-(--text-secondary)/20 to-transparent border border-(--border-color)" />
-                    </div>
-                  </div>
-                </div>
-                {/* Text content below card */}
-                <div className="mt-4 space-y-1">
-                  <span className="text-xs text-(--text-secondary) uppercase tracking-wide">
-                    {guideline.label}
-                  </span>
-                  <h3 className="font-medium text-(--text-primary) group-hover:text-(--accent-color) transition-colors flex items-center gap-1.5">
-                    {guideline.title}
-                    <ChevronRight
-                      size={14}
-                      className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200"
-                    />
-                  </h3>
-                  <p className="text-sm text-(--text-secondary) line-clamp-2">
-                    {guideline.description}
-                  </p>
-                </div>
-              </Link>
+                <GuidelineCard guideline={guideline} />
+              </div>
             ))}
           </div>
         </div>
+
+        {/* Left fade gradient */}
+        <div
+          className="absolute inset-y-0 left-0 w-32 pointer-events-none z-10"
+          style={{
+            background: "linear-gradient(to right, var(--bg-primary), transparent)",
+          }}
+        />
+
+        {/* Right fade gradient */}
+        <div
+          className="absolute inset-y-0 right-0 w-32 pointer-events-none z-10"
+          style={{
+            background: "linear-gradient(to left, var(--bg-primary), transparent)",
+          }}
+        />
       </div>
 
-      {/* Navigation Arrows - Below cards */}
-      <div className="flex items-center justify-end gap-2 mt-4">
+      {/* Navigation Arrows - Centered below cards */}
+      <div className="flex items-center justify-center gap-2 mt-4">
         <button
           onClick={scrollPrev}
-          disabled={!canScrollPrev}
           className={cn(
             "w-9 h-9 rounded-full bg-(--bg-secondary) border border-(--border-color) flex items-center justify-center transition-all duration-200",
-            canScrollPrev
-              ? "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer"
-              : "opacity-40 cursor-not-allowed",
+            "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer",
           )}
           aria-label="Scroll left"
         >
-          <ChevronLeft size={18} className="text-(--text-primary)" />
+          <CaretLeftIcon size={18} className="text-(--text-primary)" />
         </button>
         <button
           onClick={scrollNext}
-          disabled={!canScrollNext}
           className={cn(
             "w-9 h-9 rounded-full bg-(--bg-secondary) border border-(--border-color) flex items-center justify-center transition-all duration-200",
-            canScrollNext
-              ? "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer"
-              : "opacity-40 cursor-not-allowed",
+            "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer",
           )}
           aria-label="Scroll right"
         >
-          <ChevronRight size={18} className="text-(--text-primary)" />
+          <CaretRightIcon size={18} className="text-(--text-primary)" />
         </button>
       </div>
     </section>
@@ -485,39 +549,78 @@ export const Route = createFileRoute("/")({
       ],
       experience: [
         {
-          title: "Senior Frontend Developer",
-          subtitle: "TechCorp Inc.",
-          date: "2023 — Present",
-          description:
-            "Leading the frontend migration to Next.js and building a comprehensive design system.",
-          tags: ["React", "TypeScript", "Next.js", "Tailwind"],
+          title: "Mid Software Engineer",
+          subtitle: "EvidenceCare",
+          date: "Sep 2024 — Present",
+          description: "Building healthcare software solutions in the United States.",
+          tags: ["React", "TypeScript"],
         },
         {
-          title: "Full Stack Developer",
-          subtitle: "StartUp Studio",
-          date: "2021 — 2023",
+          title: "Full Stack Engineer",
+          subtitle: "VESTIS LABS",
+          date: "Sep 2023 — Sep 2024",
           description:
-            "Built and shipped multiple MVPs for early-stage startups using modern web stack.",
-          tags: ["Vue.js", "Node.js", "PostgreSQL", "AWS"],
+            "Reduced API calls by caching with React Query. Created e2e tests with 70%+ coverage using Playwright. Overhauled app design with glassmorphism and micro-interactions. Built a custom drag-and-drop page builder from scratch.",
+          tags: ["React", "TypeScript", "Tailwind CSS"],
+        },
+        {
+          title: "Full Stack Engineer",
+          subtitle: "Jatis Mobile",
+          date: "Sep 2022 — Aug 2023",
+          description:
+            "Built a client-side chatbot using XState and a chatbot flow builder with React Flow. Led a team of 4 developers. Recognized as top-performer of Q4 2022.",
+          tags: ["React", "TypeScript", "Tailwind CSS"],
+        },
+        {
+          title: "Founding Project Manager & Full-stack Developer",
+          subtitle: "Rapidev",
+          date: "Dec 2021 — Aug 2022",
+          description:
+            "Managed a product team of 10 for early-stage startups. Integrated Xendit and Midtrans payment gateways. Achieved 80% load time reduction through optimization.",
+          tags: ["React", "TypeScript", "Laravel"],
+        },
+        {
+          title: "Full Stack Engineer",
+          subtitle: "Freelance",
+          date: "Feb 2020 — Dec 2021",
+          description:
+            "Built applications for LPP Polytechnic Yogyakarta using Laravel, React, Vue, and InertiaJS. Crafted custom WordPress/Blogger templates and translated Figma designs to pixel-perfect websites.",
+          tags: ["React", "Vue.js", "Laravel", "PHP"],
+        },
+        {
+          title: "Frontend Engineer",
+          subtitle: "Mitra Integrasi Informatika",
+          date: "Sep 2020 — Feb 2021",
+          description:
+            "Implemented JWT authentication for multiple projects. Performed code reviews and managed repositories. Designed admin dashboard UI using Figma.",
+          tags: ["React", "TypeScript"],
         },
       ],
       projects: [
         {
-          title: "Personal Website",
-          subtitle: "Digital Garden",
+          title: "Schemata",
+          subtitle: "Frontend",
           description:
-            "A digital garden built with TanStack Start, React, and Tailwind CSS. Features light/dark mode, MDX blog, and a clean minimalist aesthetic.",
-          href: "https://github.com/yourusername/personal-website",
-          tags: ["TanStack Start", "React", "TypeScript", "Tailwind"],
+            "An Entity Relationship Diagram drag-and-drop builder for designing database schemas visually.",
+          href: "https://schemata.ruine.app",
+          tags: ["React", "TypeScript", "Tailwind CSS"],
           isExternal: true,
         },
         {
-          title: "Project Meteor",
-          subtitle: "SaaS Dashboard",
+          title: "Fama",
+          subtitle: "UI Design, Frontend",
           description:
-            "Real-time analytics dashboard for monitoring server health and application metrics.",
-          href: "#",
-          tags: ["React", "D3.js", "Supabase"],
+            "A beautiful portfolio website template designed for developers and designers to showcase their work.",
+          href: "https://old-itsfaqih.vercel.app",
+          tags: ["React", "TypeScript", "Tailwind CSS"],
+          isExternal: true,
+        },
+        {
+          title: "PHPID Learning",
+          subtitle: "UI Design",
+          description: "Learning platform UI design for the PHP Indonesia community.",
+          href: "https://learning-byphpid.netlify.app",
+          tags: ["Figma"],
           isExternal: true,
         },
       ],
@@ -544,12 +647,12 @@ function Index() {
           <p>High-agency, ambitious, and opinionated engineer with a customer service mindset.</p>
 
           <div className="flex flex-wrap gap-2 mt-4">
-            <SocialLink href="https://github.com" icon={Github} label="GitHub" />
-            <SocialLink href="https://linkedin.com" icon={Linkedin} label="LinkedIn" />
-            <SocialLink href="https://twitter.com" icon={Twitter} label="X" />
+            <SocialLink href="https://github.com" icon={GithubLogoIcon} label="GitHub" />
+            <SocialLink href="https://linkedin.com" icon={LinkedinLogoIcon} label="LinkedIn" />
+            <SocialLink href="https://twitter.com" icon={TwitterLogoIcon} label="X" />
             <SocialLink
               href="mailto:hello@faqih.dev"
-              icon={Mail}
+              icon={EnvelopeIcon}
               label="Email"
               isExternal={false}
             />
@@ -558,7 +661,7 @@ function Index() {
       </Section>
 
       {/* Opinions */}
-      <MyGuidelinesCarousel />
+      <MyViewsCarousel />
       {/* Tech Stack and Tools */}
       <Section title="Tech Stack & Tools">
         <div
@@ -591,19 +694,7 @@ function Index() {
       </Section>
 
       {/* Experience */}
-      <Section title="Experience">
-        {experience.map((job, index) => (
-          <TimelineItem
-            key={index}
-            title={job.title}
-            subtitle={job.subtitle}
-            date={job.date}
-            description={job.description}
-            tags={job.tags}
-            isLast={index === experience.length - 1}
-          />
-        ))}
-      </Section>
+      <ExperienceSection experience={experience} />
 
       {/* Projects */}
       <Section title="Projects">
@@ -622,7 +713,7 @@ function Index() {
 
       {/* Writing */}
       <Section title="Writing">
-        {posts.map((post: any) => (
+        {posts.map((post) => (
           <ListItem
             key={post.slug}
             title={post.frontmatter.title}

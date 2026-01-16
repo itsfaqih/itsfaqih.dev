@@ -1,9 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { getPost } from "./components/posts";
-import { Calendar, ArrowLeft, Clock, List } from "lucide-react";
+import { getPost } from "./-components/posts";
+import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "vaul";
-import { TableOfContents } from "./components/table-of-contents";
+import { TableOfContents } from "./-components/table-of-contents";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
@@ -22,6 +22,10 @@ export const Route = createFileRoute("/blog/$slug")({
 function BlogPost() {
   const { slug } = Route.useLoaderData();
   const post = getPost(slug);
+  if (!post) {
+    // This should never happen since loader already validates
+    throw new Error(`Post not found: ${slug}`);
+  }
   const Component = post.default;
   const [isTocOpen, setIsTocOpen] = useState(false);
 
@@ -40,7 +44,10 @@ function BlogPost() {
               to="/blog"
               className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors group mb-8 active:scale-95"
             >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeftIcon
+                size={16}
+                className="group-hover:-translate-x-1 transition-transform"
+              />
               Back to Blog
             </Link>
 
@@ -50,7 +57,7 @@ function BlogPost() {
                 <div className="flex flex-wrap items-center gap-4 mb-6">
                   {post.frontmatter.publishedAt && (
                     <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-                      <Calendar size={14} className="text-(--text-secondary)" />
+                      <CalendarBlankIcon size={14} className="text-(--text-secondary)" />
                       <time>
                         {new Date(post.frontmatter.publishedAt).toLocaleDateString("en-US", {
                           year: "numeric",
@@ -61,7 +68,7 @@ function BlogPost() {
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-                    <Clock size={14} className="text-(--text-secondary)" />
+                    <ClockIcon size={14} className="text-(--text-secondary)" />
                     <span>5 min read</span>
                   </div>
                 </div>
@@ -93,7 +100,7 @@ function BlogPost() {
                   to="/blog"
                   className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors group active:scale-95"
                 >
-                  <ArrowLeft
+                  <ArrowLeftIcon
                     size={16}
                     className="group-hover:-translate-x-1 transition-transform"
                   />
@@ -116,10 +123,10 @@ function BlogPost() {
       <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
         <Drawer.Trigger asChild>
           <button
-            className="fixed bottom-6 right-6 p-4 rounded-full bg-(--text-primary) text-(--bg-primary) shadow-xl lg:hidden z-50 hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-6 right-6 p-4 rounded-full bg-(--text-primary) text-(--bg-primary) lg:hidden z-50 hover:scale-105 active:scale-95 transition-all"
             aria-label="Table of Contents"
           >
-            <List size={24} />
+            <ListIcon size={24} />
           </button>
         </Drawer.Trigger>
         <Drawer.Portal>

@@ -1,21 +1,23 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
 import { useState } from "react";
 import {
-  ArrowLeft,
-  Table2,
-  AlertCircle,
-  Search,
-  ArrowRight,
-  RefreshCw,
-  FileX,
-  Database,
-  ChevronLeft,
-  ChevronRight,
-  MoreHorizontal,
-  Trash2,
-  Pencil,
-} from "lucide-react";
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./components";
+  TableIcon,
+  WarningCircleIcon,
+  MagnifyingGlassIcon,
+  ArrowRightIcon,
+  ArrowsClockwiseIcon,
+  FileXIcon,
+  DatabaseIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  DotsThreeIcon,
+  TrashIcon,
+  PencilSimpleIcon,
+} from "@phosphor-icons/react";
+import { GlassyCard } from "../../components/glassy-card";
+import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
+import { GlassyButton } from "../../components/glassy-button";
 import { PageContainer } from "../../components/page-container";
 
 export const Route = createFileRoute("/my-views/table-design")({
@@ -84,7 +86,7 @@ function InteractiveTableDemo() {
     loading: {
       label: "Loading",
       description: "Fetching data from the server. Show skeleton or spinner.",
-      color: "text-amber-400",
+      color: "text-zinc-400",
     },
     empty: {
       label: "Empty",
@@ -99,12 +101,12 @@ function InteractiveTableDemo() {
     data: {
       label: "Data",
       description: "Displaying table content. The normal state.",
-      color: "text-emerald-400",
+      color: "text-(--text-primary)",
     },
     searching: {
       label: "No Results",
       description: "Search returned no matches. Suggest alternatives.",
-      color: "text-indigo-400",
+      color: "text-zinc-400",
     },
   };
 
@@ -138,11 +140,9 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <Database size={40} className="text-(--text-secondary) opacity-50" />
+                  <DatabaseIcon size={40} className="text-(--text-secondary) opacity-50" />
                   <p className="text-(--text-secondary)">No users yet</p>
-                  <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors">
-                    Add First User
-                  </button>
+                  <GlassyButton className="text-sm">Add First User</GlassyButton>
                 </div>
               </td>
             </tr>
@@ -155,12 +155,12 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <AlertCircle size={40} className="text-red-400" />
+                  <WarningCircleIcon size={40} className="text-red-400" />
                   <p className="text-red-400">Failed to load users</p>
-                  <button className="px-4 py-2 rounded-lg bg-(--bg-primary) border border-(--border-color) text-sm font-medium text-(--text-primary) hover:bg-(--bg-secondary) transition-colors flex items-center gap-2">
-                    <RefreshCw size={14} />
+                  <GlassyButton className="text-sm gap-2">
+                    <ArrowsClockwiseIcon size={14} />
                     Try Again
-                  </button>
+                  </GlassyButton>
                 </div>
               </td>
             </tr>
@@ -173,7 +173,7 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <FileX size={40} className="text-(--text-secondary) opacity-50" />
+                  <FileXIcon size={40} className="text-(--text-secondary) opacity-50" />
                   <p className="text-(--text-secondary)">
                     No results for "
                     <span className="text-(--text-primary)">{searchQuery || "xyz"}</span>"
@@ -183,7 +183,7 @@ function InteractiveTableDemo() {
                       setSearchQuery("");
                       setState("data");
                     }}
-                    className="text-indigo-400 text-sm hover:underline"
+                    className="text-(--text-primary) text-sm hover:underline decoration-zinc-400 underline-offset-4"
                   >
                     Clear search
                   </button>
@@ -209,7 +209,7 @@ function InteractiveTableDemo() {
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user.status === "active"
-                        ? "bg-emerald-500/10 text-emerald-400"
+                        ? "bg-zinc-500/10 text-(--text-primary)"
                         : "bg-zinc-500/10 text-zinc-400"
                     }`}
                   >
@@ -224,11 +224,11 @@ function InteractiveTableDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       {/* Search Bar */}
       <div className="p-4 border-b border-(--border-color) flex items-center gap-3">
         <div className="relative flex-1">
-          <Search
+          <MagnifyingGlassIcon
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-secondary)"
           />
@@ -237,7 +237,7 @@ function InteractiveTableDemo() {
             placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="w-full pl-9 pr-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
           />
         </div>
       </div>
@@ -283,9 +283,9 @@ function InteractiveTableDemo() {
               <div key={s} className="flex items-center gap-2">
                 <button
                   onClick={() => setState(s)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm ${
                     state === s
-                      ? "bg-indigo-500/20 text-indigo-400 border-2 border-indigo-500/50 shadow-indigo-500/20"
+                      ? "bg-zinc-500/10 text-(--text-primary) border-2 border-zinc-500/20"
                       : "bg-(--bg-primary)/50 text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color) hover:bg-(--bg-primary)/70"
                   }`}
                 >
@@ -300,7 +300,7 @@ function InteractiveTableDemo() {
 
           <div className="flex items-center justify-center gap-2 text-sm text-(--text-secondary)">
             <span className="italic">with search:</span>
-            <ArrowRight size={14} />
+            <ArrowRightIcon size={14} />
             <button
               onClick={() => {
                 setSearchQuery("xyz");
@@ -308,7 +308,7 @@ function InteractiveTableDemo() {
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 state === "searching"
-                  ? "bg-indigo-500/20 text-indigo-400 border-2 border-indigo-500/50"
+                  ? "bg-zinc-500/10 text-(--text-primary) border-2 border-zinc-500/20"
                   : "bg-(--bg-primary) text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color)"
               }`}
             >
@@ -317,7 +317,7 @@ function InteractiveTableDemo() {
           </div>
         </div>
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -331,7 +331,7 @@ function PaginationDemo() {
   const totalPages = 5;
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       {/* Demo Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -368,7 +368,7 @@ function PaginationDemo() {
               disabled={currentPage === 1}
               className="p-2 rounded-lg hover:bg-(--bg-primary) disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft size={16} className="text-(--text-secondary)" />
+              <CaretLeftIcon size={16} className="text-(--text-secondary)" />
             </button>
             {[1, 2, 3, 4, 5].map((page) => (
               <button
@@ -376,7 +376,7 @@ function PaginationDemo() {
                 onClick={() => setCurrentPage(page)}
                 className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                   currentPage === page
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
                     : "text-(--text-secondary) hover:bg-(--bg-primary)"
                 }`}
               >
@@ -388,7 +388,7 @@ function PaginationDemo() {
               disabled={currentPage === totalPages}
               className="p-2 rounded-lg hover:bg-(--bg-primary) disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight size={16} className="text-(--text-secondary)" />
+              <CaretRightIcon size={16} className="text-(--text-secondary)" />
             </button>
           </div>
         </div>
@@ -406,7 +406,7 @@ function PaginationDemo() {
           Show pagination (hide when only 1 page)
         </label>
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -416,7 +416,7 @@ function PaginationDemo() {
 
 function ActionsDemo() {
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -443,13 +443,13 @@ function ActionsDemo() {
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
                     <button className="p-2 rounded-lg hover:bg-(--bg-secondary) transition-colors">
-                      <Pencil size={14} className="text-(--text-secondary)" />
+                      <PencilSimpleIcon size={14} className="text-(--text-secondary)" />
                     </button>
-                    <button className="p-2 rounded-lg hover:bg-red-500/10 transition-colors">
-                      <Trash2 size={14} className="text-red-400" />
+                    <button className="p-2 rounded-lg hover:bg-zinc-500/10 transition-colors">
+                      <TrashIcon size={14} className="text-(--text-primary)" />
                     </button>
                     <button className="p-2 rounded-lg hover:bg-(--bg-secondary) transition-colors">
-                      <MoreHorizontal size={14} className="text-(--text-secondary)" />
+                      <DotsThreeIcon size={14} className="text-(--text-secondary)" />
                     </button>
                   </div>
                 </td>
@@ -461,7 +461,7 @@ function ActionsDemo() {
       <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
         ✓ Actions column is right-aligned for predictable interaction
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -471,7 +471,7 @@ function ActionsDemo() {
 
 function NumbersDemo() {
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary)/50 backdrop-blur-md overflow-hidden shadow-sm">
+    <GlassyCard className="rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -504,7 +504,7 @@ function NumbersDemo() {
         <code className="px-1.5 py-0.5 rounded bg-(--bg-primary) text-xs">tabular-nums</code> and
         are right-aligned for easy scanning
       </div>
-    </div>
+    </GlassyCard>
   );
 }
 
@@ -531,9 +531,10 @@ function TableDesign() {
           </>
         }
         badge={{
-          icon: Table2,
+          icon: TableIcon,
           text: "UI/UX Pattern",
         }}
+        markdownUrl="/my-views/table-design.md"
       />
 
       {/* ================================================================== */}
@@ -741,15 +742,7 @@ const goToPage = (newPage: number) => {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }

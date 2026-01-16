@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Ban, HelpCircle } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { GuidelinePagination } from "./-components/guideline-pagination";
+import { ProhibitIcon, QuestionIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import {
   CodeComparison,
@@ -7,7 +8,7 @@ import {
   GuidelineHero,
   QuickRefCard,
   SectionHeading,
-} from "./components";
+} from "./-components";
 
 export const Route = createFileRoute("/my-views/null-vs-undefined")({
   component: NullVsUndefined,
@@ -27,9 +28,10 @@ function NullVsUndefined() {
           </>
         }
         badge={{
-          icon: HelpCircle,
+          icon: QuestionIcon,
           text: "JavaScript Fundamentals",
         }}
+        markdownUrl="/my-views/null-vs-undefined.md"
       />
 
       {/* Concept Section */}
@@ -39,10 +41,10 @@ function NullVsUndefined() {
           description="A mental model to keep them straight."
         />
         <div className="grid sm:grid-cols-2 gap-6">
-          <div className="p-6 rounded-xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
-                <HelpCircle size={24} />
+              <div className="p-2 rounded-lg bg-zinc-500/10 text-(--text-primary)">
+                <QuestionIcon size={24} />
               </div>
               <h3 className="text-lg font-bold text-(--text-primary)">Undefined</h3>
             </div>
@@ -53,10 +55,10 @@ function NullVsUndefined() {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-blue-500/20 bg-blue-500/5">
+          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
-                <Ban size={24} />
+              <div className="p-2 rounded-lg bg-zinc-500/10 text-(--text-primary)">
+                <ProhibitIcon size={24} />
               </div>
               <h3 className="text-lg font-bold text-(--text-primary)">Null</h3>
             </div>
@@ -165,15 +167,7 @@ if (data.assigneeId === null) {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </footer>
+      <GuidelinePagination />
     </PageContainer>
   );
 }
