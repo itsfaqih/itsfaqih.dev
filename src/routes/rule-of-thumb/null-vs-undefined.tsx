@@ -10,7 +10,7 @@ import {
   SectionHeading,
 } from "./-components";
 
-export const Route = createFileRoute("/my-views/null-vs-undefined")({
+export const Route = createFileRoute("/rule-of-thumb/null-vs-undefined")({
   component: NullVsUndefined,
 });
 
@@ -31,7 +31,7 @@ function NullVsUndefined() {
           icon: QuestionIcon,
           text: "JavaScript Fundamentals",
         }}
-        markdownUrl="/my-views/null-vs-undefined.md"
+        markdownUrl="/rule-of-thumb/null-vs-undefined.md"
       />
 
       {/* Concept Section */}

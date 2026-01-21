@@ -3,7 +3,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import Header from "../components/header";
-import GridBackground from "../components/grid-background";
+import ArchitecturalBackground from "../components/architectural-background";
 import { cn } from "../cn";
 
 import appCss from "../styles.css?url";
@@ -78,7 +78,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           "transition-colors duration-300",
         )}
       >
-        <GridBackground />
+        <ArchitecturalBackground />
         <Header />
         <main className="relative z-10">{children}</main>
         <TanStackDevtools

@@ -17,7 +17,7 @@ import {
 import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
 import { PageContainer } from "../../components/page-container";
 
-export const Route = createFileRoute("/my-views/handling-timestamps")({
+export const Route = createFileRoute("/rule-of-thumb/handling-timestamps")({
   component: HandlingTimestamps,
 });
 
@@ -213,7 +213,7 @@ function HandlingTimestamps() {
           icon: ClockIcon,
           text: "Backend Pattern",
         }}
-        markdownUrl="/my-views/handling-timestamps.md"
+        markdownUrl="/rule-of-thumb/handling-timestamps.md"
       />
 
       {/* ================================================================== */}

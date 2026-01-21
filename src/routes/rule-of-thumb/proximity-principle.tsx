@@ -18,7 +18,7 @@ import { PageContainer } from "../../components/page-container";
 import { CodeComparison, CodeExample, GuidelineHero, QuickRefCard } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 
-export const Route = createFileRoute("/my-views/proximity-principle")({
+export const Route = createFileRoute("/rule-of-thumb/proximity-principle")({
   component: ProximityPrinciple,
 });
 
@@ -294,7 +294,7 @@ function ProximityPrinciple() {
           icon: MapPinIcon,
           text: "Code Structure Philosophy",
         }}
-        markdownUrl="/my-views/proximity-principle.md"
+        markdownUrl="/rule-of-thumb/proximity-principle.md"
       />
 
       {/* Interactive Demo */}

@@ -355,7 +355,7 @@ function ExperienceSection({ experience }: ExperienceSectionProps) {
 // Guidelines Carousel Component - 3D Curved Effect
 // ============================================================================
 
-function MyViewsCarousel() {
+function RuleOfThumbsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const slideCount = GUIDELINES.length;
 
@@ -432,10 +432,10 @@ function MyViewsCarousel() {
     <section className="mb-12 scroll-mt-24">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-medium text-(--text-secondary) uppercase tracking-wide">
-          My Views
+          Rule of Thumb
         </h2>
         <Link
-          to="/my-views"
+          to="/rule-of-thumb"
           className="text-sm text-(--text-secondary) hover:text-(--text-primary) transition-colors flex items-center gap-1 group"
         >
           View More
@@ -661,7 +661,7 @@ function Index() {
       </Section>
 
       {/* Opinions */}
-      <MyViewsCarousel />
+      <RuleOfThumbsCarousel />
       {/* Tech Stack and Tools */}
       <Section title="Tech Stack & Tools">
         <div

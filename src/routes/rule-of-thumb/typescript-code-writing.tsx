@@ -4,7 +4,7 @@ import { FileCodeIcon, ShieldIcon, PackageIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
 
-export const Route = createFileRoute("/my-views/typescript-code-writing")({
+export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
   component: TypeScriptGuidelines,
 });
 
@@ -26,7 +26,7 @@ function TypeScriptGuidelines() {
           icon: FileCodeIcon,
           text: "Code Quality",
         }}
-        markdownUrl="/my-views/typescript-code-writing.md"
+        markdownUrl="/rule-of-thumb/typescript-code-writing.md"
       />
 
       {/* ================================================================== */}

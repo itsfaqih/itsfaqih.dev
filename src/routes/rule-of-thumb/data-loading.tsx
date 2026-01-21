@@ -24,7 +24,7 @@ import {
 } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 
-export const Route = createFileRoute("/my-views/data-loading")({
+export const Route = createFileRoute("/rule-of-thumb/data-loading")({
   component: DataLoading,
 });
 
@@ -402,7 +402,7 @@ function DataLoading() {
           icon: LightningIcon,
           text: "Performance Pattern",
         }}
-        markdownUrl="/my-views/data-loading.md"
+        markdownUrl="/rule-of-thumb/data-loading.md"
       />
 
       {/* ================================================================== */}

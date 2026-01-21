@@ -21,7 +21,7 @@ import {
 import { BestPractice, GuidelineHero } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 
-export const Route = createFileRoute("/my-views/dialog-design")({
+export const Route = createFileRoute("/rule-of-thumb/dialog-design")({
   component: DialogDesign,
 });
 
@@ -760,7 +760,7 @@ function DialogDesign() {
           </>
         }
         badge={{ icon: SpeakerHighIcon, text: "Accessibility & UX" }}
-        markdownUrl="/my-views/dialog-design.md"
+        markdownUrl="/rule-of-thumb/dialog-design.md"
       />
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">

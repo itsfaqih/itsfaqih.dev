@@ -2,6 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import { CSSProperties } from "react";
 import { ButtonDesignThumbnail } from "./thumbnails/button-design-thumbnail";
+import { DialogDesignThumbnail } from "./thumbnails/dialog-design-thumbnail";
+import { TableDesignThumbnail } from "./thumbnails/table-design-thumbnail";
+import { TypeScriptGuidelinesThumbnail } from "./thumbnails/typescript-guidelines-thumbnail";
+import { ProximityPrincipleThumbnail } from "./thumbnails/proximity-principle-thumbnail";
+import { DataLoadingThumbnail } from "./thumbnails/data-loading-thumbnail";
+import { HandlingTimestampsThumbnail } from "./thumbnails/handling-timestamps-thumbnail";
+import { NullVsUndefinedThumbnail } from "./thumbnails/null-vs-undefined-thumbnail";
 
 export interface Guideline {
   id: string;
@@ -20,6 +27,21 @@ function renderThumbnail(guidelineId: string) {
   switch (guidelineId) {
     case "button-design":
       return <ButtonDesignThumbnail />;
+    case "dialog-design":
+      return <DialogDesignThumbnail />;
+    case "table-design":
+      return <TableDesignThumbnail />;
+    case "typescript-code-writing":
+      return <TypeScriptGuidelinesThumbnail />;
+    case "proximity-principle":
+      return <ProximityPrincipleThumbnail />;
+    case "data-loading":
+      return <DataLoadingThumbnail />;
+    case "handling-timestamps":
+      return <HandlingTimestampsThumbnail />;
+    case "null-vs-undefined":
+      return <NullVsUndefinedThumbnail />;
+
     default:
       return (
         <div className="absolute inset-0 flex items-center justify-center">

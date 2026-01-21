@@ -1,10 +1,11 @@
 /**
- * Button Design Thumbnail
- * An animated blueprint showing button construction with looping draw effect.
+ * TypeScript Guidelines Thumbnail
+ * An animated blueprint showing the TypeScript logo with construction lines.
+ * Animation sequence: lines → circles → rectangle → text characters
  */
 
-export function ButtonDesignThumbnail() {
-  const duration = 7; // seconds
+export function TypeScriptGuidelinesThumbnail() {
+  const duration = 7; // seconds (matching button-design-thumbnail)
   const durationStr = `${duration}s`;
   const lineStyle = {
     stroke: "var(--grid-color)",
@@ -36,7 +37,7 @@ export function ButtonDesignThumbnail() {
 
   // Helper for staggered character animation
   const charAnim = (index: number) => {
-    const baseDelay = 8 * 0.15 + 4 * 0.1 + 0.1; // After lines, circles, and rect (reduced from 0.3 to 0.1)
+    const baseDelay = 8 * 0.15 + 4 * 0.1 + 0.1; // After lines, circles, and rect
     const stagger = 0.08;
     const delay = -(duration - (baseDelay + index * stagger));
     return {
@@ -45,87 +46,90 @@ export function ButtonDesignThumbnail() {
     };
   };
 
-  const buttonText = "Button";
+  const logoText = "TS";
 
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
-        {/* 1. Most top horizontal line (left-to-right) - y=35 */}
-        <line x1="0" x2="160" y1="35" y2="35" style={lineAnim(0)} />
+        {/* Construction lines - staggered animation in clockwise pattern */}
+        {/* 1. Top horizontal line (left edge of logo) */}
+        <line x1="50" x2="50" y1="0" y2="100" style={lineAnim(0)} />
 
-        {/* 2. Most right vertical line (top-to-bottom) - x=115 */}
-        <line x1="115" x2="115" y1="0" y2="100" style={lineAnim(1)} />
+        {/* 2. Right vertical line (right edge of logo) */}
+        <line x1="110" x2="110" y1="0" y2="100" style={lineAnim(1)} />
 
-        {/* 3. Most bottom horizontal line (right-to-left) - y=65 */}
-        <line x1="160" x2="0" y1="65" y2="65" style={lineAnim(2)} />
+        {/* 3. Bottom horizontal line */}
+        <line x1="0" x2="160" y1="80" y2="80" style={lineAnim(2)} />
 
-        {/* 4. Most left vertical line (bottom-to-top) - x=45 */}
-        <line x1="45" x2="45" y1="100" y2="0" style={lineAnim(3)} />
+        {/* 4. Left vertical line */}
+        <line x1="0" x2="160" y1="20" y2="20" style={lineAnim(3)} />
 
-        {/* 5. 2nd top horizontal line (left-to-right) - y=43 */}
-        <line x1="0" x2="160" y1="43" y2="43" style={lineAnim(4)} />
+        {/* 5. Inner left vertical line (corner radius guide) */}
+        <line x1="56" x2="56" y1="0" y2="100" style={lineAnim(4)} />
 
-        {/* 6. 2nd right vertical line (top-to-bottom) - x=107 */}
-        <line x1="107" x2="107" y1="0" y2="100" style={lineAnim(5)} />
+        {/* 6. Inner right vertical line */}
+        <line x1="104" x2="104" y1="0" y2="100" style={lineAnim(5)} />
 
-        {/* 7. 2nd bottom horizontal line (right-to-left) - y=57 */}
-        <line x1="160" x2="0" y1="57" y2="57" style={lineAnim(6)} />
+        {/* 7. Inner top horizontal line */}
+        <line x1="0" x2="160" y1="26" y2="26" style={lineAnim(6)} />
 
-        {/* 8. 2nd left vertical line (bottom-to-top) - x=53 */}
-        <line x1="53" x2="53" y1="100" y2="0" style={lineAnim(7)} />
+        {/* 8. Inner bottom horizontal line */}
+        <line x1="0" x2="160" y1="74" y2="74" style={lineAnim(7)} />
 
-        <g transform="translate(45,35)">
+        <g transform="translate(50, 20)">
           {/* Corner circles - pop animation in clockwise order from top-left */}
           <g fill="transparent" stroke="rgba(0,0,0,0.2)" strokeDasharray="4">
-            {/* 9. Top left corner circle */}
+            {/* Top left corner circle */}
             <circle
-              cx="4"
-              cy="4"
-              r="4"
+              cx="6"
+              cy="6"
+              r="6"
               style={{
                 ...circleAnim(0),
-                transformOrigin: "4px 4px",
+                transformOrigin: "6px 6px",
               }}
             />
-            {/* 10. Top right corner circle */}
+            {/* Top right corner circle */}
             <circle
-              cx="66"
-              cy="4"
-              r="4"
+              cx="54"
+              cy="6"
+              r="6"
               style={{
                 ...circleAnim(1),
-                transformOrigin: "66px 4px",
+                transformOrigin: "54px 6px",
               }}
             />
-            {/* 11. Bottom right corner circle */}
+            {/* Bottom right corner circle */}
             <circle
-              cx="66"
-              cy="26"
-              r="4"
+              cx="54"
+              cy="54"
+              r="6"
               style={{
                 ...circleAnim(2),
-                transformOrigin: "66px 26px",
+                transformOrigin: "54px 54px",
               }}
             />
-            {/* 12. Bottom left corner circle */}
+            {/* Bottom left corner circle */}
             <circle
-              cx="4"
-              cy="26"
-              r="4"
+              cx="6"
+              cy="54"
+              r="6"
               style={{
                 ...circleAnim(3),
-                transformOrigin: "4px 26px",
+                transformOrigin: "6px 54px",
               }}
             />
           </g>
 
-          {/* 13. Button rectangle - draw animation */}
+          {/* Logo rectangle - draw animation */}
           <rect
-            width="70"
-            height="30"
-            rx="4"
+            x="0"
+            y="0"
+            width="60"
+            height="60"
+            rx="6"
             fill="transparent"
-            strokeDasharray="200"
+            strokeDasharray="240"
             className="stroke-(--text-primary)"
             style={{
               animation: `thumb-rect-draw ${durationStr} ease-in-out infinite`,
@@ -133,20 +137,20 @@ export function ButtonDesignThumbnail() {
             }}
           />
 
-          {/* 14. Button text - staggered character animation */}
+          {/* TS text - staggered character animation */}
           <text
-            x="35"
-            y="16"
+            x="37"
+            y="46"
             textAnchor="middle"
             dominantBaseline="middle"
             fill="transparent"
             stroke="var(--text-primary)"
-            strokeWidth="0.4"
+            strokeWidth="0.8"
             fontFamily="Geist"
-            fontWeight="500"
-            fontSize="12"
+            fontWeight="700"
+            fontSize="28"
           >
-            {buttonText.split("").map((char, index) => (
+            {logoText.split("").map((char, index) => (
               <tspan
                 key={index}
                 style={{

@@ -37,7 +37,7 @@ import {
 import { SimpleTooltip } from "@/components/tooltip";
 import { BestPractice, CodeExample, GuidelineHero, ButtonVariantMatrix } from "./-components";
 
-export const Route = createFileRoute("/my-views/button-design")({
+export const Route = createFileRoute("/rule-of-thumb/button-design")({
   component: ButtonStates,
 });
 
@@ -546,7 +546,7 @@ function ButtonStates() {
           icon: HandIcon,
           text: "Interaction Design",
         }}
-        markdownUrl="/my-views/button-design.md"
+        markdownUrl="/rule-of-thumb/button-design.md"
       />
 
       {/* Interactive Demo */}

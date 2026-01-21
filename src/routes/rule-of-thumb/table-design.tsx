@@ -20,7 +20,7 @@ import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-com
 import { GlassyButton } from "../../components/glassy-button";
 import { PageContainer } from "../../components/page-container";
 
-export const Route = createFileRoute("/my-views/table-design")({
+export const Route = createFileRoute("/rule-of-thumb/table-design")({
   component: TableDesign,
 });
 
@@ -534,7 +534,7 @@ function TableDesign() {
           icon: TableIcon,
           text: "UI/UX Pattern",
         }}
-        markdownUrl="/my-views/table-design.md"
+        markdownUrl="/rule-of-thumb/table-design.md"
       />
 
       {/* ================================================================== */}

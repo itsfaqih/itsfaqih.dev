@@ -62,7 +62,7 @@
     --border-color: rgba(228, 228, 231, 1); /* translucent zinc-200 */
     --header-bg: rgba(255, 255, 255, 0.6);
     --card-bg: rgba(255, 255, 255, 0.5);
-    --grid-color: rgba(0, 0, 0, 0.2);
+    --grid-color: rgba(0, 0, 0, 0.3);
     --key-shadow: #000000;
     
     /* Grid system */
@@ -78,7 +78,7 @@
     --border-color: rgba(255, 255, 255, 0.2); /* translucent white border */
     --header-bg: rgba(9, 9, 11, 0.4);
     --card-bg: rgba(24, 24, 27, 0.4);
-    --grid-color: rgba(255, 255, 255, 0.15);
+    --grid-color: rgba(255, 255, 255, 0.3);
     --key-shadow: #94a3b8;
   }
 }
@@ -582,5 +582,385 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   33%, 70% { width: 145px; }
   75%, 90% { width: 100px; }
   95%, 100% { width: 100px; }
+}
+
+/* Button Design Thumbnail Animations - 5s loop */
+@keyframes thumb-line-draw {
+  0% { opacity: 0; }
+  5% { opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  95%, 100% { opacity: 0; }
+}
+
+@keyframes thumb-circles-pop {
+  0% { transform: scale(0); opacity: 0; }
+  5% { transform: scale(0); opacity: 0; }
+  12% { transform: scale(1.2); opacity: 1; }
+  16% { transform: scale(0.9); }
+  20% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1); opacity: 1; }
+  95%, 100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes thumb-rect-draw {
+  0%, 5% { stroke-dashoffset: 200; opacity: 0; }
+  10% { stroke-dashoffset: 200; opacity: 1; }
+  30% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-text-fade {
+  0%, 40% { opacity: 0; stroke-dashoffset: 100; }
+  50% { opacity: 1; stroke-dashoffset: 0; }
+  80% { opacity: 1; stroke-dashoffset: 0; }
+  95%, 100% { opacity: 0; stroke-dashoffset: 100; }
+}
+
+@keyframes thumb-char-fade {
+  0%, 25% { opacity: 0; transform: translateY(4px); }
+  35% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  95%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
+/* Dialog Design Thumbnail Animations - 5s loop */
+@keyframes thumb-dialog-draw {
+  0%, 20% { stroke-dashoffset: 320; opacity: 0; }
+  25% { stroke-dashoffset: 320; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-line {
+  0%, 35% { stroke-dashoffset: 100; opacity: 0; }
+  40% { stroke-dashoffset: 100; opacity: 1; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-x {
+  0%, 40% { stroke-dashoffset: 10; opacity: 0; }
+  45% { stroke-dashoffset: 10; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-content {
+  0% { stroke-dashoffset: 80; opacity: 0; }
+  5% { stroke-dashoffset: 80; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-dialog-btn {
+  0% { stroke-dashoffset: 70; opacity: 0; }
+  5% { stroke-dashoffset: 70; opacity: 0; }
+  20% { stroke-dashoffset: 0; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Table Design Thumbnail Animations - 5s loop */
+@keyframes thumb-table-draw {
+  0%, 20% { stroke-dashoffset: 350; opacity: 0; }
+  25% { stroke-dashoffset: 350; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-header {
+  0%, 35% { stroke-dashoffset: 120; opacity: 0; }
+  40% { stroke-dashoffset: 120; opacity: 1; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-col {
+  0% { stroke-dashoffset: 60; opacity: 0; }
+  5% { stroke-dashoffset: 60; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-table-cell {
+  0% { stroke-dashoffset: 30; opacity: 0; }
+  5% { stroke-dashoffset: 30; opacity: 0; }
+  15% { stroke-dashoffset: 0; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  70%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* TypeScript Guidelines Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-ts-logo-draw {
+  0%, 25% { stroke-dashoffset: 200; opacity: 0; }
+  35% { stroke-dashoffset: 200; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-ts-letter {
+  0%, 55% { stroke-dashoffset: 200; opacity: 0; }
+  60% { stroke-dashoffset: 200; opacity: 1; }
+  75% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Proximity Principle Thumbnail Animations - blueprint style */
+@keyframes thumb-proximity-divider {
+  0%, 15% { opacity: 0; stroke-dashoffset: 70; }
+  25% { opacity: 0.6; stroke-dashoffset: 0; }
+  70% { opacity: 0.6; stroke-dashoffset: 0; }
+  85%, 100% { opacity: 0; stroke-dashoffset: 70; }
+}
+
+@keyframes thumb-proximity-folder {
+  0%, 5% { opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  85%, 100% { opacity: 0; }
+}
+
+@keyframes thumb-proximity-draw {
+  0%, 10% { stroke-dashoffset: 80; opacity: 0; }
+  20% { stroke-dashoffset: 80; opacity: 0.5; }
+  40% { stroke-dashoffset: 0; opacity: 0.5; }
+  70% { stroke-dashoffset: 0; opacity: 0.5; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-draw-good {
+  0%, 10% { stroke-dashoffset: 200; opacity: 0; }
+  20% { stroke-dashoffset: 200; opacity: 1; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-file {
+  0%, 15% { stroke-dashoffset: 60; opacity: 0; }
+  25% { stroke-dashoffset: 60; opacity: 0.4; }
+  40% { stroke-dashoffset: 0; opacity: 0.4; }
+  70% { stroke-dashoffset: 0; opacity: 0.4; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-file-good {
+  0%, 15% { stroke-dashoffset: 70; opacity: 0; }
+  25% { stroke-dashoffset: 70; opacity: 1; }
+  40% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes thumb-proximity-connection {
+  0%, 25% { opacity: 0; stroke-dashoffset: 20; }
+  35% { opacity: 0.4; stroke-dashoffset: 0; }
+  70% { opacity: 0.4; stroke-dashoffset: 0; }
+  85%, 100% { opacity: 0; stroke-dashoffset: 20; }
+}
+
+@keyframes thumb-proximity-mark {
+  0%, 35% { stroke-dashoffset: 20; opacity: 0; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  70% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 20; opacity: 0; }
+}
+
+@keyframes thumb-proximity-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes thumb-proximity-float-alt {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Data Loading Thumbnail Animations - Dynamic & Engaging */
+
+/* Cloud breathes/pulses subtly */
+@keyframes thumb-cloud-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Database lines blink to show activity */
+@keyframes thumb-db-line-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Flow line dashes animate to show movement */
+@keyframes thumb-flow-line-dash {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -4; }
+}
+
+/* Data packets stream from cloud to browser */
+@keyframes thumb-data-stream {
+  0% { 
+    transform: translateX(0); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% { 
+    transform: translateX(16px); 
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(20px); 
+    opacity: 0;
+  }
+}
+
+/* Glow effect for data transfer activity */
+@keyframes thumb-data-glow {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.15; }
+}
+
+/* Browser dots pulse subtly */
+@keyframes thumb-browser-dot {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Skeleton shimmer effect - moves across */
+@keyframes thumb-skeleton-shimmer {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+/* Content lines load in with a drawing effect */
+@keyframes thumb-content-load {
+  0%, 20% { stroke-dashoffset: 30; opacity: 0.3; }
+  40% { stroke-dashoffset: 0; opacity: 0.8; }
+  60%, 100% { stroke-dashoffset: 0; opacity: 0.8; }
+}
+
+/* Browser glows subtly when data arrives */
+@keyframes thumb-browser-glow {
+  0%, 30% { opacity: 0; }
+  50% { opacity: 0.05; }
+  70%, 100% { opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Icon fade in */
+@keyframes thumb-icon-fade {
+  0% { opacity: 0; transform: scale(0.9); }
+  8% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  95%, 100% { opacity: 0; transform: scale(0.9); }
+}
+
+/* Data Loading Thumbnail - Data flow arrow animation */
+@keyframes thumb-data-flow {
+  0%, 3% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  95%, 100% { opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Path draw animation */
+@keyframes thumb-path-draw {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  5% { stroke-dashoffset: 100; opacity: 1; }
+  30% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  95%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Data Loading Thumbnail - Data packet animation */
+@keyframes thumb-data-packet {
+  0%, 25% { opacity: 0; }
+  30% { opacity: 0.8; }
+  75% { opacity: 0.8; }
+  85%, 100% { opacity: 0; }
+}
+
+
+
+/* Handling Timestamps Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-time-db-top {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-db-body {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-db-mid {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-fade {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes thumb-time-arrow {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-arrow-head {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-screen {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-stand {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-clock {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-time-hand-h {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes thumb-time-hand-m {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(720deg); }
+}
+
+/* Null vs Undefined Thumbnail Animations - continuous infinite loop */
+@keyframes thumb-null-undefined-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes thumb-null-q {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+  50% { transform: translateY(-3px) scale(1.1); opacity: 0.8; }
+}
+
+@keyframes thumb-null-box {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-null-chip {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes thumb-null-text {
+  0%, 100% { opacity: 1; transform: translateY(0); }
 }
 

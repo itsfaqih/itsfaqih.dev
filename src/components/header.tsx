@@ -19,11 +19,12 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
-  const isMyViewsRoot = location.pathname === "/my-views" || location.pathname === "/my-views/";
-  const isMyViewsDetail = location.pathname.startsWith("/my-views/") && !isMyViewsRoot;
+  const isRuleOfThumbRoot =
+    location.pathname === "/rule-of-thumb" || location.pathname === "/rule-of-thumb/";
+  const isRuleOfThumbDetail = location.pathname.startsWith("/rule-of-thumb/") && !isRuleOfThumbRoot;
 
-  const showBackButton = isMyViewsRoot || isMyViewsDetail;
-  const backPath = isMyViewsDetail ? "/my-views" : "/";
+  const showBackButton = isRuleOfThumbRoot || isRuleOfThumbDetail;
+  const backPath = isRuleOfThumbDetail ? "/rule-of-thumb" : "/";
 
   return (
     <>
