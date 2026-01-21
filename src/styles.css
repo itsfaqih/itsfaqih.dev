@@ -110,3 +110,143 @@ figure[data-rehype-pretty-code-figure] [data-line] {
 figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   @apply bg-(--bg-secondary) border-(--border-color);
 }
+
+/* Grid Background Styles */
+@layer base {
+  :root {
+    /* Grid system */
+    --cell-size: 1.8vw;
+    --grid-offset: 5vw; /* Replace fixed 100px with relative unit to fix zoom drift */
+  }
+}
+
+/* Skewed grid background pattern - split into left and right with opposite skews */
+.grid-background-left,
+.grid-background-right {
+  position: absolute;
+  top: calc(var(--grid-offset) * -1);
+  bottom: calc(var(--grid-offset) * -1);
+  top: 0;
+  height: auto; 
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--cell-size) var(--cell-size);
+}
+
+.grid-background-left {
+  width: calc(50% + 1vw);
+  left: -0.75vw;
+  transform: skewY(-15deg);
+  transform-origin: top right;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+.grid-background-right {
+  width: calc(50% + 0.7vw);
+  right: -0.75vw;
+  transform: skewY(15deg);
+  transform-origin: top left;
+  background-position: right top;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 90%,
+    0 90%
+  );
+}
+
+/* Ceiling grid effect for top corners */
+.grid-ceiling {
+  position: absolute;
+  top: -2.5vh;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  z-index: 0;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --ceiling-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--ceiling-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--ceiling-cell) / 2 - 0.5px), var(--grid-color) calc(var(--ceiling-cell) / 2));
+  /* Clip the bottom - use grid-offset and tan(15deg) ≈ 0.268 for precise geometry */
+  clip-path: polygon(
+    0 0, 
+    100% 0, 
+    100% calc((50vw + var(--grid-offset)) * 0.268), 
+    50% calc(var(--grid-offset) * 0.268),
+    0 calc((50vw + var(--grid-offset)) * 0.268)
+  );
+}
+
+/* Floor grid effect for bottom center */
+.grid-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  pointer-events: none;
+  /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
+  --floor-cell: calc(var(--cell-size) / 0.966);
+  background-image: 
+    repeating-linear-gradient(15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) 
+      calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2)),
+    repeating-linear-gradient(-15deg, transparent, transparent calc(var(--floor-cell) / 2 - 0.5px), 
+      var(--grid-color) calc(var(--floor-cell) / 2 - 0.5px), var(--grid-color) calc(var(--floor-cell) / 2));
+  /* Clip the top - triangle shape matching 15-degree wall angles */
+  clip-path: polygon(
+    0 calc((50vw + var(--grid-offset)) * 0.268),
+    50% calc(var(--grid-offset) * 0.268),
+    100% calc((50vw + var(--grid-offset)) * 0.268),
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Individual fading box */
+.fade-box {
+  position: absolute;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background-color: var(--grid-color);
+  opacity: 0; /* Start hidden, animation will fade in */
+  animation: grid-box-fade var(--fade-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--fade-delay, 0s);
+}
+
+/* Ceiling/floor boxes - rhombus shape using clip-path to match grid */
+.fade-box-ceiling,
+.fade-box-floor {
+  --ceiling-cell: calc(var(--cell-size) / 0.966);
+  /* Size to contain the rhombus */
+  width: calc(var(--ceiling-cell) * 2);
+  height: calc(var(--ceiling-cell) * 0.55);
+  /* Clip to a wide diamond/rhombus shape matching 15deg grid lines */
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+@keyframes grid-box-fade {
+  0%, 100% {
+    opacity: 0;
+  }
+  /* Fade in during first 15% of cycle */
+  15% {
+    opacity: 0.8;
+  }
+  /* Hold at full opacity for middle 70% */
+  85% {
+    opacity: 0.8;
+  }
+  /* Fade out during last 15% */
+}
