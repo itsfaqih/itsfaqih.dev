@@ -51,13 +51,13 @@ Note: Extracting for readability vs extracting for reuse are both valid. The key
 **Put related files as close as possible to where they're used.**
 
 When extracting shared code to a new file, place it at the **lowest common ancestor** of the files that need it.
- 
- ### 5. Follow Framework Rules
- 
- **Framework constraints override these guidelines.**
- 
- - If a framework (like Next.js or TanStack Router) enforces a specific file structure (e.g., file-based routing), follow it.
- - **Example:** If you need to colocate components in a route directory but the framework thinks they are routes, create a `components` folder to hold them.
+
+### 5. Follow Framework Rules
+
+**Framework constraints override these guidelines.**
+
+- If a framework (like Next.js or TanStack Router) enforces a specific file structure (e.g., file-based routing), follow it.
+- **Example:** If you need to colocate components in a route directory but the framework thinks they are routes, create a `components` folder to hold them.
 
 ---
 
@@ -208,14 +208,14 @@ Without suffixes, you'd see multiple `user.ts` files and have to guess which one
 
 ## Summary
 
-| Scenario                          | Action                                         |
-| --------------------------------- | ---------------------------------------------- |
-| Code used once                    | Keep it inline                                 |
-| Code is too long                  | Extract to function, keep in same file         |
-| Code reused in same file          | Extract to function, keep in same file         |
-| Code reused across files          | Extract to new file at lowest common ancestor  |
+| Scenario                          | Action                                           |
+| --------------------------------- | ------------------------------------------------ |
+| Code used once                    | Keep it inline                                   |
+| Code is too long                  | Extract to function, keep in same file           |
+| Code reused in same file          | Extract to function, keep in same file           |
+| Code reused across files          | Extract to new file at lowest common ancestor    |
 | React: Child has own state        | Extract to component (prevents parent re-render) |
-| Deciding where to put shared file | As close as possible to the files that need it |
+| Deciding where to put shared file | As close as possible to the files that need it   |
 
 ---
 

@@ -14,7 +14,7 @@ import {
   XIcon,
 } from "@phosphor-icons/react";
 
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
+import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
 import { PageContainer } from "../../components/page-container";
 
 export const Route = createFileRoute("/rule-of-thumb/handling-timestamps")({
@@ -200,7 +200,7 @@ function HandlingTimestamps() {
   return (
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Handling Timestamps"
         description={
           <>

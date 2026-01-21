@@ -4,6 +4,7 @@
  * Left: Scattered files (Bad) with X mark.
  * Right: Colocated files in folder (Good) with checkmark.
  */
+import styles from "./proximity-principle-thumbnail.module.css";
 
 export function ProximityPrincipleThumbnail() {
   return (
@@ -15,11 +16,7 @@ export function ProximityPrincipleThumbnail() {
         {/* ============ LEFT SIDE: Scattered/Bad ============ */}
         <g transform="translate(18, 10)">
           {/* Main folder icon at top - floating */}
-          <g
-            style={{
-              animation: "thumb-proximity-float 3s ease-in-out infinite",
-            }}
-          >
+          <g className={styles.float} style={{ animationDuration: "3s" }}>
             <path
               d="M4,4 L4,18 L26,18 L26,7 L15,7 L13,4 Z"
               fill="var(--bg-primary)"
@@ -36,10 +33,8 @@ export function ProximityPrincipleThumbnail() {
 
           {/* Scattered file 1 - far right - floating independently */}
           <g
-            style={{
-              animation: "thumb-proximity-float-alt 2.5s ease-in-out infinite",
-              animationDelay: "0.3s",
-            }}
+            className={styles.floatAlt}
+            style={{ animationDuration: "2.5s", animationDelay: "0.3s" }}
           >
             <g transform="translate(42, 25)">
               <rect
@@ -57,12 +52,7 @@ export function ProximityPrincipleThumbnail() {
           </g>
 
           {/* Scattered file 2 - bottom left - floating independently */}
-          <g
-            style={{
-              animation: "thumb-proximity-float 2.8s ease-in-out infinite",
-              animationDelay: "0.6s",
-            }}
-          >
+          <g className={styles.float} style={{ animationDuration: "2.8s", animationDelay: "0.6s" }}>
             <g transform="translate(5, 45)">
               <rect
                 width="14"
@@ -103,11 +93,7 @@ export function ProximityPrincipleThumbnail() {
         {/* ============ RIGHT SIDE: Colocated/Good ============ */}
         <g transform="translate(88, 10)">
           {/* Entire folder with files floats together as one unit */}
-          <g
-            style={{
-              animation: "thumb-proximity-float 3.5s ease-in-out infinite",
-            }}
-          >
+          <g className={styles.float} style={{ animationDuration: "3.5s" }}>
             {/* Large folder containing all files */}
             <path
               d="M2,4 L2,60 L56,60 L56,7 L22,7 L20,4 Z"

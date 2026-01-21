@@ -3,6 +3,7 @@
  * Visualizing the difference: Undefined (Ghostly/Missing) vs Null (Explicit Empty).
  * Metaphor: Dashed empty box vs Solid box containing a "Null" token.
  */
+import styles from "./null-vs-undefined-thumbnail.module.css";
 
 export function NullVsUndefinedThumbnail() {
   const duration = 5;
@@ -13,11 +14,7 @@ export function NullVsUndefinedThumbnail() {
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         <g transform="translate(35, 30)">
           {/* UNDEFINED: Ghostly/Optional Variable */}
-          <g
-            style={{
-              animation: "thumb-proximity-float 3s ease-in-out infinite",
-            }}
-          >
+          <g className={styles.float} style={{ animationDuration: "3s" }}>
             {/* Dashed outer box - representing "not initialized" */}
             <rect
               x="0"
@@ -27,9 +24,9 @@ export function NullVsUndefinedThumbnail() {
               rx="4"
               fill="transparent"
               strokeDasharray="4 4"
-              className="stroke-(--text-secondary)"
+              className={`stroke-(--text-secondary) ${styles.undefinedFade}`}
               style={{
-                animation: `thumb-null-undefined-fade ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 opacity: 0.5,
               }}
             />
@@ -39,9 +36,9 @@ export function NullVsUndefinedThumbnail() {
               y="24"
               textAnchor="middle"
               fontSize="18"
-              className="fill-(--text-secondary) font-mono"
+              className={`fill-(--text-secondary) font-mono ${styles.questionMark}`}
               style={{
-                animation: `thumb-null-q ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 transformOrigin: "18px 24px",
               }}
             >
@@ -62,10 +59,8 @@ export function NullVsUndefinedThumbnail() {
           {/* NULL: Explicit Empty Value */}
           <g transform="translate(56, 0)">
             <g
-              style={{
-                animation: "thumb-proximity-float-alt 3.5s ease-in-out infinite",
-                animationDelay: "0.5s",
-              }}
+              className={styles.floatAlt}
+              style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}
             >
               {/* Solid outer box - representing "initialized container" */}
               <rect

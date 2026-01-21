@@ -1,0 +1,249 @@
+/**
+ * Dialog Design Thumbnail Animations
+ * Used by dialog-design-thumbnail.tsx
+ * 5s loop animations for blueprint drawing effect
+ */
+
+/* Keyframe definitions */
+@keyframes thumb-line-draw {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  95%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-circles-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  5% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  12% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  16% {
+    transform: scale(0.9);
+  }
+  20% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  95%,
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-dialog-draw {
+  0%,
+  20% {
+    stroke-dashoffset: 320;
+    opacity: 0;
+  }
+  25% {
+    stroke-dashoffset: 320;
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-dialog-line {
+  0%,
+  35% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  40% {
+    stroke-dashoffset: 100;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-dialog-x {
+  0%,
+  40% {
+    stroke-dashoffset: 10;
+    opacity: 0;
+  }
+  45% {
+    stroke-dashoffset: 10;
+    opacity: 1;
+  }
+  55% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-dialog-content {
+  0% {
+    stroke-dashoffset: 80;
+    opacity: 0;
+  }
+  5% {
+    stroke-dashoffset: 80;
+    opacity: 0;
+  }
+  15% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-dialog-btn {
+  0% {
+    stroke-dashoffset: 70;
+    opacity: 0;
+  }
+  5% {
+    stroke-dashoffset: 70;
+    opacity: 0;
+  }
+  20% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes thumb-text-fade {
+  0%,
+  40% {
+    opacity: 0;
+    stroke-dashoffset: 100;
+  }
+  50% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  80% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  95%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 100;
+  }
+}
+
+/* Animation classes */
+.lineDraw {
+  animation-name: thumb-line-draw;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.circlesPop {
+  animation-name: thumb-circles-pop;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dialogDraw {
+  animation-name: thumb-dialog-draw;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dialogLine {
+  animation-name: thumb-dialog-line;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dialogX {
+  animation-name: thumb-dialog-x;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dialogContent {
+  animation-name: thumb-dialog-content;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.dialogBtn {
+  animation-name: thumb-dialog-btn;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.textFade {
+  animation-name: thumb-text-fade;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

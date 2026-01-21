@@ -16,7 +16,7 @@ import {
   PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { GlassyCard } from "../../components/glassy-card";
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
+import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 import { PageContainer } from "../../components/page-container";
 
@@ -519,7 +519,7 @@ function NumbersDemo() {
 function TableDesign() {
   return (
     <PageContainer maxWidth="3xl">
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Table Design"
         description={
           <>

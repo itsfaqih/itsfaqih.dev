@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { GuidelinePagination } from "./-components/guideline-pagination";
 import { FileCodeIcon, ShieldIcon, PackageIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
-import { BestPractice, CodeExample, GuidelineHero, SectionHeading } from "./-components";
+import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
 
 export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
   component: TypeScriptGuidelines,
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
 function TypeScriptGuidelines() {
   return (
     <PageContainer maxWidth="3xl">
-      <GuidelineHero
+      <RuleOfThumbHero
         title="TypeScript Guidelines"
         description={
           <>

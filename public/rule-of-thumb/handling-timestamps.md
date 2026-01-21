@@ -25,13 +25,13 @@ const localString = new Date(utcString).toLocaleString();
 
 When users input a date filter, they think in their **local** timezone. You must convert it to UTC representing that moment before querying.
 
--   User in Jakarta (UTC+7) selects `07:00 AM`.
--   This equals `00:00 AM UTC`.
--   Query the backend for records after `00:00 AM UTC`.
+- User in Jakarta (UTC+7) selects `07:00 AM`.
+- This equals `00:00 AM UTC`.
+- Query the backend for records after `00:00 AM UTC`.
 
 ## Do's and Don'ts
 
--   **Do**: Store all timestamps as UTC.
--   **Do**: Return ISO 8601 strings (Z suffix).
--   **Don't**: Store offsets in the DB if not needed.
--   **Don't**: Convert to user's timezone on the backend.
+- **Do**: Store all timestamps as UTC.
+- **Do**: Return ISO 8601 strings (Z suffix).
+- **Don't**: Store offsets in the DB if not needed.
+- **Don't**: Convert to user's timezone on the backend.

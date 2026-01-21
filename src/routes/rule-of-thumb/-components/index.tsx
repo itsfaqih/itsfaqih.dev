@@ -28,7 +28,7 @@ interface GuidelineHeroProps {
   markdownUrl?: string;
 }
 
-export function GuidelineHero({ title, description, badge, markdownUrl }: GuidelineHeroProps) {
+export function RuleOfThumbHero({ title, description, badge, markdownUrl }: GuidelineHeroProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -162,28 +162,6 @@ export function SectionHeading({ title, description }: SectionHeadingProps) {
       <h2 className="text-2xl font-bold text-(--text-primary) mb-4">{title}</h2>
       <p className="text-(--text-secondary)">{description}</p>
     </div>
-  );
-}
-
-// ============================================================================
-// Principle Card
-// ============================================================================
-
-interface PrincipleCardProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-}
-
-export function PrincipleCard({ icon: Icon, title, description }: PrincipleCardProps) {
-  return (
-    <GlassyCard className="p-6">
-      <div className="w-10 h-10 rounded-lg bg-zinc-500/10 backdrop-blur-sm flex items-center justify-center mb-4 ring-1 ring-inset ring-zinc-500/20">
-        <Icon size={20} className="text-(--text-primary)" />
-      </div>
-      <h3 className="font-semibold text-(--text-primary) mb-2">{title}</h3>
-      <p className="text-sm text-(--text-secondary) leading-relaxed">{description}</p>
-    </GlassyCard>
   );
 }
 

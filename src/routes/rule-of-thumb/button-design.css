@@ -1,0 +1,203 @@
+/**
+ * Button Design Route Demo Animations
+ * Used by button-design.tsx
+ * Interactive demo animations for button design patterns
+ * 
+ * Note: These keyframes are in a regular CSS file (not module) so they remain
+ * global and can be referenced by animation-name strings in JavaScript.
+ */
+
+/* Global keyframes for button design demos */
+@keyframes button-demo-cursor-move {
+  0% {
+    left: 70%;
+    top: 80%;
+    transform: scale(1);
+  }
+  15% {
+    left: 50%;
+    top: 50%;
+    transform: scale(1);
+  }
+  25% {
+    left: 50%;
+    top: 50%;
+    transform: scale(0.9);
+  }
+  30% {
+    left: 50%;
+    top: 50%;
+    transform: scale(1);
+  }
+  45% {
+    left: 50%;
+    top: 50%;
+    transform: scale(1);
+  }
+  55% {
+    left: 80%;
+    top: 30%;
+    transform: scale(1);
+  }
+  100% {
+    left: 80%;
+    top: 30%;
+    transform: scale(1);
+  }
+}
+
+@keyframes button-demo-cursor-ripple {
+  0%,
+  25% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  25% {
+    opacity: 0.5;
+    transform: scale(0);
+  }
+  31% {
+    opacity: 0;
+    transform: scale(2);
+  }
+  32%,
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@keyframes button-demo-content-idle {
+  0%,
+  29% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  90% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  95%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes button-demo-content-loading {
+  0%,
+  29% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  71% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes button-demo-content-success {
+  0%,
+  70% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  71% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  95%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes button-demo-container-scale {
+  0%,
+  24% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  30%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes button-demo-highlight {
+  0%,
+  12% {
+    opacity: 0;
+  }
+  13%,
+  24% {
+    opacity: 1;
+  }
+  25%,
+  30% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes button-demo-border-success {
+  0%,
+  70% {
+    border-color: rgba(228, 228, 231, 0.4);
+    background-color: transparent;
+  }
+  71%,
+  90% {
+    border-color: rgba(16, 185, 129, 0.5);
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+  95%,
+  100% {
+    border-color: rgba(16, 185, 129, 0.5);
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+}
+
+@keyframes button-demo-width {
+  0%,
+  29% {
+    width: 78px;
+  }
+  33%,
+  70% {
+    width: 145px;
+  }
+  75%,
+  90% {
+    width: 100px;
+  }
+  95%,
+  100% {
+    width: 100px;
+  }
+}

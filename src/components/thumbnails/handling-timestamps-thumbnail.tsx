@@ -3,6 +3,7 @@
  * An animated visual showing UTC storage -> Local display.
  * Logic: Database (UTC) -> Network -> Client (Local Time).
  */
+import styles from "./handling-timestamps-thumbnail.module.css";
 
 export function HandlingTimestampsThumbnail() {
   const duration = 5;
@@ -71,9 +72,10 @@ export function HandlingTimestampsThumbnail() {
                 x2="22"
                 y2="10"
                 strokeWidth="1"
+                className={styles.handHour}
                 style={{
                   transformOrigin: "22px 16px",
-                  animation: `thumb-time-hand-h ${durationStr} linear infinite`,
+                  animationDuration: durationStr,
                 }}
               />
               {/* Minute Hand */}
@@ -83,9 +85,10 @@ export function HandlingTimestampsThumbnail() {
                 x2="28"
                 y2="16"
                 strokeWidth="0.8"
+                className={styles.handMinute}
                 style={{
                   transformOrigin: "22px 16px",
-                  animation: `thumb-time-hand-m ${durationStr} linear infinite`,
+                  animationDuration: durationStr,
                 }}
               />
             </g>

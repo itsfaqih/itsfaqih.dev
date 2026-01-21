@@ -13,8 +13,8 @@ A visual guide to structuring code and files. Less jumping, more shipping.
 
 If code is only used once, keep it inline. Abstraction adds complexity.
 
--   **Bad**: Creating `utils/date.ts` for a function used once in `UserProfile.tsx`.
--   **Good**: Defining the function inside `UserProfile.tsx` or using it inline.
+- **Bad**: Creating `utils/date.ts` for a function used once in `UserProfile.tsx`.
+- **Good**: Defining the function inside `UserProfile.tsx` or using it inline.
 
 ## Exception: React State Isolation
 
@@ -32,8 +32,8 @@ function SearchInput({ onSearch }) {
 
 Splitting code across many files increases cognitive load. Keep related code together.
 
--   **Bad**: `UserProfile/` folder with `index.tsx`, `UserProfile.tsx`, `styles.ts`, `types.ts`, `hooks.ts`. (5 files for one component).
--   **Good**: `user-profile.tsx`. One file. Everything related is together.
+- **Bad**: `UserProfile/` folder with `index.tsx`, `UserProfile.tsx`, `styles.ts`, `types.ts`, `hooks.ts`. (5 files for one component).
+- **Good**: `user-profile.tsx`. One file. Everything related is together.
 
 ## Extract Only When Reused
 
@@ -51,14 +51,14 @@ When you do share code, place it at the nearest common parent. This makes it cle
 
 When organizing by type at scale, use suffixes for discoverability (Ctrl+P).
 
--   `user.schema.ts`
--   `use-auth.hook.ts`
--   `dashboard.page.tsx`
+- `user.schema.ts`
+- `use-auth.hook.ts`
+- `dashboard.page.tsx`
 
 ## Quick Reference
 
--   **Code used once** -> Keep it inline
--   **Code is too long** -> Extract to function, keep in file
--   **Code reused in same file** -> Extract to function, keep in file
--   **Code reused across files** -> Extract to lowest common ancestor
--   **React: Child has own state** -> Extract to component
+- **Code used once** -> Keep it inline
+- **Code is too long** -> Extract to function, keep in file
+- **Code reused in same file** -> Extract to function, keep in file
+- **Code reused across files** -> Extract to lowest common ancestor
+- **React: Child has own state** -> Extract to component

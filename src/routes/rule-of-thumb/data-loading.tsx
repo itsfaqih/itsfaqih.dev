@@ -18,7 +18,7 @@ import { PageContainer } from "../../components/page-container";
 import {
   BestPractice,
   CodeExample,
-  GuidelineHero,
+  RuleOfThumbHero,
   SectionHeading,
   TabbedCodeExample,
 } from "./-components";
@@ -387,7 +387,7 @@ function DataLoading() {
   return (
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Data Loading"
         description={
           <>

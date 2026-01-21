@@ -9,6 +9,7 @@ import {
   AnimatedCursor,
   useAnimationDemo,
 } from "../../components/animation-demo";
+import "./button-design.css";
 import { GlassyButton } from "../../components/glassy-button";
 import { PageContainer } from "../../components/page-container";
 import {
@@ -35,7 +36,7 @@ import {
   MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
 import { SimpleTooltip } from "@/components/tooltip";
-import { BestPractice, CodeExample, GuidelineHero, ButtonVariantMatrix } from "./-components";
+import { BestPractice, CodeExample, RuleOfThumbHero, ButtonVariantMatrix } from "./-components";
 
 export const Route = createFileRoute("/rule-of-thumb/button-design")({
   component: ButtonStates,
@@ -531,7 +532,7 @@ function ButtonStates() {
   return (
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Button Design"
         description={
           <>

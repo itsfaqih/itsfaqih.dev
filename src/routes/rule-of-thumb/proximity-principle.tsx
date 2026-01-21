@@ -15,7 +15,7 @@ import {
   LightningIcon,
 } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
-import { CodeComparison, CodeExample, GuidelineHero, QuickRefCard } from "./-components";
+import { CodeComparison, CodeExample, RuleOfThumbHero, QuickRefCard } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 
 export const Route = createFileRoute("/rule-of-thumb/proximity-principle")({
@@ -281,7 +281,7 @@ function ProximityPrinciple() {
   return (
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
-      <GuidelineHero
+      <RuleOfThumbHero
         title="The Proximity Principle"
         description={
           <>

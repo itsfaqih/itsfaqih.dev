@@ -2,6 +2,7 @@
  * Button Design Thumbnail
  * An animated blueprint showing button construction with looping draw effect.
  */
+import styles from "./button-design-thumbnail.module.css";
 
 export function ButtonDesignThumbnail() {
   const duration = 7; // seconds
@@ -18,7 +19,7 @@ export function ButtonDesignThumbnail() {
     const delay = -(duration - index * stagger); // Negative delay to offset start
     return {
       ...lineStyle,
-      animation: `thumb-line-draw ${durationStr} ease-in-out infinite`,
+      animationDuration: durationStr,
       animationDelay: `${delay}s`,
     };
   };
@@ -29,7 +30,7 @@ export function ButtonDesignThumbnail() {
     const stagger = 0.1;
     const delay = -(duration - (baseDelay + index * stagger));
     return {
-      animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+      animationDuration: durationStr,
       animationDelay: `${delay}s`,
     };
   };
@@ -40,7 +41,7 @@ export function ButtonDesignThumbnail() {
     const stagger = 0.08;
     const delay = -(duration - (baseDelay + index * stagger));
     return {
-      animation: `thumb-char-fade ${durationStr} ease-out infinite`,
+      animationDuration: durationStr,
       animationDelay: `${delay}s`,
     };
   };
@@ -51,28 +52,28 @@ export function ButtonDesignThumbnail() {
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* 1. Most top horizontal line (left-to-right) - y=35 */}
-        <line x1="0" x2="160" y1="35" y2="35" style={lineAnim(0)} />
+        <line x1="0" x2="160" y1="35" y2="35" className={styles.lineDraw} style={lineAnim(0)} />
 
         {/* 2. Most right vertical line (top-to-bottom) - x=115 */}
-        <line x1="115" x2="115" y1="0" y2="100" style={lineAnim(1)} />
+        <line x1="115" x2="115" y1="0" y2="100" className={styles.lineDraw} style={lineAnim(1)} />
 
         {/* 3. Most bottom horizontal line (right-to-left) - y=65 */}
-        <line x1="160" x2="0" y1="65" y2="65" style={lineAnim(2)} />
+        <line x1="160" x2="0" y1="65" y2="65" className={styles.lineDraw} style={lineAnim(2)} />
 
         {/* 4. Most left vertical line (bottom-to-top) - x=45 */}
-        <line x1="45" x2="45" y1="100" y2="0" style={lineAnim(3)} />
+        <line x1="45" x2="45" y1="100" y2="0" className={styles.lineDraw} style={lineAnim(3)} />
 
         {/* 5. 2nd top horizontal line (left-to-right) - y=43 */}
-        <line x1="0" x2="160" y1="43" y2="43" style={lineAnim(4)} />
+        <line x1="0" x2="160" y1="43" y2="43" className={styles.lineDraw} style={lineAnim(4)} />
 
         {/* 6. 2nd right vertical line (top-to-bottom) - x=107 */}
-        <line x1="107" x2="107" y1="0" y2="100" style={lineAnim(5)} />
+        <line x1="107" x2="107" y1="0" y2="100" className={styles.lineDraw} style={lineAnim(5)} />
 
         {/* 7. 2nd bottom horizontal line (right-to-left) - y=57 */}
-        <line x1="160" x2="0" y1="57" y2="57" style={lineAnim(6)} />
+        <line x1="160" x2="0" y1="57" y2="57" className={styles.lineDraw} style={lineAnim(6)} />
 
         {/* 8. 2nd left vertical line (bottom-to-top) - x=53 */}
-        <line x1="53" x2="53" y1="100" y2="0" style={lineAnim(7)} />
+        <line x1="53" x2="53" y1="100" y2="0" className={styles.lineDraw} style={lineAnim(7)} />
 
         <g transform="translate(45,35)">
           {/* Corner circles - pop animation in clockwise order from top-left */}
@@ -82,6 +83,7 @@ export function ButtonDesignThumbnail() {
               cx="4"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
                 ...circleAnim(0),
                 transformOrigin: "4px 4px",
@@ -92,6 +94,7 @@ export function ButtonDesignThumbnail() {
               cx="66"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
                 ...circleAnim(1),
                 transformOrigin: "66px 4px",
@@ -102,6 +105,7 @@ export function ButtonDesignThumbnail() {
               cx="66"
               cy="26"
               r="4"
+              className={styles.circlesPop}
               style={{
                 ...circleAnim(2),
                 transformOrigin: "66px 26px",
@@ -112,6 +116,7 @@ export function ButtonDesignThumbnail() {
               cx="4"
               cy="26"
               r="4"
+              className={styles.circlesPop}
               style={{
                 ...circleAnim(3),
                 transformOrigin: "4px 26px",
@@ -126,9 +131,9 @@ export function ButtonDesignThumbnail() {
             rx="4"
             fill="transparent"
             strokeDasharray="200"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.rectDraw}`}
             style={{
-              animation: `thumb-rect-draw ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
               animationDelay: `${-(duration - (8 * 0.15 + 4 * 0.1))}s`,
             }}
           />
@@ -149,6 +154,7 @@ export function ButtonDesignThumbnail() {
             {buttonText.split("").map((char, index) => (
               <tspan
                 key={index}
+                className={styles.charFade}
                 style={{
                   opacity: 0,
                   ...charAnim(index),

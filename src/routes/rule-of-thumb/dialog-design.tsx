@@ -7,6 +7,7 @@ import { Dialog } from "@base-ui/react";
 import { Drawer } from "vaul";
 import { getGlassyClasses } from "../../components/glassy-button";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import "./dialog-design.css";
 
 import {
   CursorIcon,
@@ -18,7 +19,7 @@ import {
   TargetIcon,
   SpeakerHighIcon,
 } from "@phosphor-icons/react";
-import { BestPractice, GuidelineHero } from "./-components";
+import { BestPractice, RuleOfThumbHero } from "./-components";
 import { GlassyButton } from "../../components/glassy-button";
 
 export const Route = createFileRoute("/rule-of-thumb/dialog-design")({
@@ -748,7 +749,7 @@ function InteractiveDemo() {
 function DialogDesign() {
   return (
     <PageContainer maxWidth="3xl">
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Dialog Design Guidelines"
         description={
           <>

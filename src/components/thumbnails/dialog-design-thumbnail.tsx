@@ -2,6 +2,7 @@
  * Dialog Design Thumbnail
  * An animated blueprint showing dialog construction with looping draw effect.
  */
+import styles from "./dialog-design-thumbnail.module.css";
 
 export function DialogDesignThumbnail() {
   const duration = 5; // seconds
@@ -18,7 +19,7 @@ export function DialogDesignThumbnail() {
     const delay = -(duration - index * stagger); // Negative delay to offset start
     return {
       ...lineStyle,
-      animation: `thumb-line-draw ${durationStr} ease-in-out infinite`,
+      animationDuration: durationStr,
       animationDelay: `${delay}s`,
     };
   };
@@ -27,24 +28,24 @@ export function DialogDesignThumbnail() {
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Horizontal construction lines - dialog edges */}
-        <line x1="0" x2="160" y1="20" y2="20" style={lineAnim(0)} />
-        <line x1="0" x2="160" y1="28" y2="28" style={lineAnim(1)} />
-        <line x1="0" x2="160" y1="80" y2="80" style={lineAnim(2)} />
-        <line x1="0" x2="160" y1="72" y2="72" style={lineAnim(3)} />
+        <line x1="0" x2="160" y1="20" y2="20" className={styles.lineDraw} style={lineAnim(0)} />
+        <line x1="0" x2="160" y1="28" y2="28" className={styles.lineDraw} style={lineAnim(1)} />
+        <line x1="0" x2="160" y1="80" y2="80" className={styles.lineDraw} style={lineAnim(2)} />
+        <line x1="0" x2="160" y1="72" y2="72" className={styles.lineDraw} style={lineAnim(3)} />
 
         {/* Vertical construction lines - dialog sides */}
-        <line x1="30" x2="30" y1="0%" y2="100%" style={lineAnim(4)} />
-        <line x1="38" x2="38" y1="0%" y2="100%" style={lineAnim(5)} />
-        <line x1="130" x2="130" y1="0%" y2="100%" style={lineAnim(6)} />
-        <line x1="122" x2="122" y1="0%" y2="100%" style={lineAnim(7)} />
+        <line x1="30" x2="30" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(4)} />
+        <line x1="38" x2="38" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(5)} />
+        <line x1="130" x2="130" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(6)} />
+        <line x1="122" x2="122" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(7)} />
 
         {/* Diagonal lines - for close button area (top right) */}
-        <line x1="110" x2="135" y1="0%" y2="50%" style={lineAnim(8)} />
-        <line x1="25" x2="50" y1="50%" y2="100%" style={lineAnim(9)} />
+        <line x1="110" x2="135" y1="0%" y2="50%" className={styles.lineDraw} style={lineAnim(8)} />
+        <line x1="25" x2="50" y1="50%" y2="100%" className={styles.lineDraw} style={lineAnim(9)} />
 
         {/* Additional horizontal lines - for content sections */}
-        <line x1="0" x2="160" y1="38" y2="38" style={lineAnim(10)} />
-        <line x1="0" x2="160" y1="62" y2="62" style={lineAnim(11)} />
+        <line x1="0" x2="160" y1="38" y2="38" className={styles.lineDraw} style={lineAnim(10)} />
+        <line x1="0" x2="160" y1="62" y2="62" className={styles.lineDraw} style={lineAnim(11)} />
 
         {/* Dialog group - centered */}
         <g transform="translate(30,20)">
@@ -54,8 +55,9 @@ export function DialogDesignThumbnail() {
               cx="4"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 0.8)}s`,
                 transformOrigin: "4px 4px",
               }}
@@ -64,8 +66,9 @@ export function DialogDesignThumbnail() {
               cx="4"
               cy="56"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 0.9)}s`,
                 transformOrigin: "4px 56px",
               }}
@@ -74,8 +77,9 @@ export function DialogDesignThumbnail() {
               cx="96"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.0)}s`,
                 transformOrigin: "96px 4px",
               }}
@@ -84,8 +88,9 @@ export function DialogDesignThumbnail() {
               cx="96"
               cy="56"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.1)}s`,
                 transformOrigin: "96px 56px",
               }}
@@ -99,9 +104,9 @@ export function DialogDesignThumbnail() {
             rx="4"
             fill="transparent"
             strokeDasharray="320"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.dialogDraw}`}
             style={{
-              animation: `thumb-dialog-draw ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           />
 
@@ -112,9 +117,9 @@ export function DialogDesignThumbnail() {
             y1="18"
             y2="18"
             strokeDasharray="100"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.dialogLine}`}
             style={{
-              animation: `thumb-dialog-line ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           />
 
@@ -123,14 +128,14 @@ export function DialogDesignThumbnail() {
             x="8"
             y="12"
             fill="transparent"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.textFade}`}
             strokeWidth="0.4"
             fontFamily="Geist"
             fontWeight="semibold"
             fontSize="7"
             strokeDasharray="100"
             style={{
-              animation: `thumb-text-fade ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           >
             Dialog
@@ -138,10 +143,10 @@ export function DialogDesignThumbnail() {
 
           {/* Close button X */}
           <g
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.dialogX}`}
             strokeWidth="1.2"
             style={{
-              animation: `thumb-dialog-x ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           >
             <line x1="86" y1="6" x2="92" y2="12" strokeDasharray="10" />
@@ -156,8 +161,9 @@ export function DialogDesignThumbnail() {
               x2="70"
               y2="28"
               strokeDasharray="80"
+              className={styles.dialogContent}
               style={{
-                animation: `thumb-dialog-content ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.5)}s`,
               }}
             />
@@ -167,8 +173,9 @@ export function DialogDesignThumbnail() {
               x2="55"
               y2="34"
               strokeDasharray="60"
+              className={styles.dialogContent}
               style={{
-                animation: `thumb-dialog-content ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.6)}s`,
               }}
             />
@@ -185,9 +192,9 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className="stroke-(--text-secondary)"
+              className={`stroke-(--text-secondary) ${styles.dialogBtn}`}
               style={{
-                animation: `thumb-dialog-btn ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.8)}s`,
               }}
             />
@@ -200,10 +207,10 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className="stroke-(--text-primary)"
+              className={`stroke-(--text-primary) ${styles.dialogBtn}`}
               strokeWidth="1"
               style={{
-                animation: `thumb-dialog-btn ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.9)}s`,
               }}
             />

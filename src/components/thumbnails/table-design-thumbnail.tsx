@@ -2,6 +2,7 @@
  * Table Design Thumbnail
  * An animated blueprint showing table construction with looping draw effect.
  */
+import styles from "./table-design-thumbnail.module.css";
 
 export function TableDesignThumbnail() {
   const duration = 5; // seconds
@@ -12,13 +13,12 @@ export function TableDesignThumbnail() {
   };
 
   // Helper to create line animation style with staggered start
-  // Using negative delay to offset start point within the animation cycle
   const lineAnim = (index: number) => {
-    const stagger = 0.04; // 40ms between each line
-    const delay = -(duration - index * stagger); // Negative delay to offset start
+    const stagger = 0.04;
+    const delay = -(duration - index * stagger);
     return {
       ...lineStyle,
-      animation: `thumb-line-draw ${durationStr} ease-in-out infinite`,
+      animationDuration: durationStr,
       animationDelay: `${delay}s`,
     };
   };
@@ -27,24 +27,24 @@ export function TableDesignThumbnail() {
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Horizontal construction lines - table edges */}
-        <line x1="0" x2="160" y1="18" y2="18" style={lineAnim(0)} />
-        <line x1="0" x2="160" y1="26" y2="26" style={lineAnim(1)} />
-        <line x1="0" x2="160" y1="82" y2="82" style={lineAnim(2)} />
-        <line x1="0" x2="160" y1="74" y2="74" style={lineAnim(3)} />
+        <line x1="0" x2="160" y1="18" y2="18" className={styles.lineDraw} style={lineAnim(0)} />
+        <line x1="0" x2="160" y1="26" y2="26" className={styles.lineDraw} style={lineAnim(1)} />
+        <line x1="0" x2="160" y1="82" y2="82" className={styles.lineDraw} style={lineAnim(2)} />
+        <line x1="0" x2="160" y1="74" y2="74" className={styles.lineDraw} style={lineAnim(3)} />
 
         {/* Vertical construction lines - table columns */}
-        <line x1="25" x2="25" y1="0%" y2="100%" style={lineAnim(4)} />
-        <line x1="33" x2="33" y1="0%" y2="100%" style={lineAnim(5)} />
-        <line x1="135" x2="135" y1="0%" y2="100%" style={lineAnim(6)} />
-        <line x1="127" x2="127" y1="0%" y2="100%" style={lineAnim(7)} />
+        <line x1="25" x2="25" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(4)} />
+        <line x1="33" x2="33" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(5)} />
+        <line x1="135" x2="135" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(6)} />
+        <line x1="127" x2="127" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(7)} />
 
         {/* Column divider lines */}
-        <line x1="60" x2="60" y1="0%" y2="100%" style={lineAnim(8)} />
-        <line x1="100" x2="100" y1="0%" y2="100%" style={lineAnim(9)} />
+        <line x1="60" x2="60" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(8)} />
+        <line x1="100" x2="100" y1="0%" y2="100%" className={styles.lineDraw} style={lineAnim(9)} />
 
         {/* Row divider lines */}
-        <line x1="0" x2="160" y1="42" y2="42" style={lineAnim(10)} />
-        <line x1="0" x2="160" y1="58" y2="58" style={lineAnim(11)} />
+        <line x1="0" x2="160" y1="42" y2="42" className={styles.lineDraw} style={lineAnim(10)} />
+        <line x1="0" x2="160" y1="58" y2="58" className={styles.lineDraw} style={lineAnim(11)} />
 
         {/* Table group - centered */}
         <g transform="translate(25,18)">
@@ -54,8 +54,9 @@ export function TableDesignThumbnail() {
               cx="4"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 0.8)}s`,
                 transformOrigin: "4px 4px",
               }}
@@ -64,8 +65,9 @@ export function TableDesignThumbnail() {
               cx="4"
               cy="60"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 0.9)}s`,
                 transformOrigin: "4px 60px",
               }}
@@ -74,8 +76,9 @@ export function TableDesignThumbnail() {
               cx="106"
               cy="4"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.0)}s`,
                 transformOrigin: "106px 4px",
               }}
@@ -84,8 +87,9 @@ export function TableDesignThumbnail() {
               cx="106"
               cy="60"
               r="4"
+              className={styles.circlesPop}
               style={{
-                animation: `thumb-circles-pop ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.1)}s`,
                 transformOrigin: "106px 60px",
               }}
@@ -99,9 +103,9 @@ export function TableDesignThumbnail() {
             rx="3"
             fill="transparent"
             strokeDasharray="350"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.tableDraw}`}
             style={{
-              animation: `thumb-table-draw ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           />
 
@@ -112,9 +116,9 @@ export function TableDesignThumbnail() {
             y1="16"
             y2="16"
             strokeDasharray="120"
-            className="stroke-(--text-primary)"
+            className={`stroke-(--text-primary) ${styles.tableHeader}`}
             style={{
-              animation: `thumb-table-header ${durationStr} ease-in-out infinite`,
+              animationDuration: durationStr,
             }}
           />
 
@@ -126,8 +130,9 @@ export function TableDesignThumbnail() {
               x2="36"
               y2="60"
               strokeDasharray="60"
+              className={styles.tableCol}
               style={{
-                animation: `thumb-table-col ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.4)}s`,
               }}
             />
@@ -137,8 +142,9 @@ export function TableDesignThumbnail() {
               x2="73"
               y2="60"
               strokeDasharray="60"
+              className={styles.tableCol}
               style={{
-                animation: `thumb-table-col ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.5)}s`,
               }}
             />
@@ -152,8 +158,9 @@ export function TableDesignThumbnail() {
               x2="28"
               y2="10"
               strokeDasharray="30"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.6)}s`,
               }}
             />
@@ -163,8 +170,9 @@ export function TableDesignThumbnail() {
               x2="66"
               y2="10"
               strokeDasharray="30"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.65)}s`,
               }}
             />
@@ -174,8 +182,9 @@ export function TableDesignThumbnail() {
               x2="103"
               y2="10"
               strokeDasharray="30"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.7)}s`,
               }}
             />
@@ -189,8 +198,9 @@ export function TableDesignThumbnail() {
               x2="24"
               y2="28"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.75)}s`,
               }}
             />
@@ -200,8 +210,9 @@ export function TableDesignThumbnail() {
               x2="62"
               y2="28"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.8)}s`,
               }}
             />
@@ -211,8 +222,9 @@ export function TableDesignThumbnail() {
               x2="99"
               y2="28"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.85)}s`,
               }}
             />
@@ -226,8 +238,9 @@ export function TableDesignThumbnail() {
               x2="26"
               y2="42"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.9)}s`,
               }}
             />
@@ -237,8 +250,9 @@ export function TableDesignThumbnail() {
               x2="60"
               y2="42"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.95)}s`,
               }}
             />
@@ -248,8 +262,9 @@ export function TableDesignThumbnail() {
               x2="97"
               y2="42"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 2.0)}s`,
               }}
             />
@@ -263,8 +278,9 @@ export function TableDesignThumbnail() {
               x2="22"
               y2="54"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 2.05)}s`,
               }}
             />
@@ -274,8 +290,9 @@ export function TableDesignThumbnail() {
               x2="64"
               y2="54"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 2.1)}s`,
               }}
             />
@@ -285,8 +302,9 @@ export function TableDesignThumbnail() {
               x2="101"
               y2="54"
               strokeDasharray="25"
+              className={styles.tableCell}
               style={{
-                animation: `thumb-table-cell ${durationStr} ease-in-out infinite`,
+                animationDuration: durationStr,
                 animationDelay: `${-(duration - 2.15)}s`,
               }}
             />

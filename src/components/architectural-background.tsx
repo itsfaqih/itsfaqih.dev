@@ -41,7 +41,7 @@ export default function ArchitecturalBackground() {
             />
 
             {/* Intersections - Crosses */}
-            <g className="text-[var(--text-secondary)] opacity-100">
+            <g className="text-(--text-secondary) opacity-100">
               <path
                 d="M -5 0 L 5 0 M 0 -5 L 0 5"
                 stroke="currentColor"
@@ -80,7 +80,7 @@ export default function ArchitecturalBackground() {
       <div
         className={cn(
           "absolute inset-0 h-full w-full z-10",
-          "bg-gradient-to-r from-transparent via-[var(--bg-primary)] to-transparent",
+          "bg-linear-to-r from-transparent via-(--bg-primary) to-transparent",
           "opacity-60",
         )}
       />

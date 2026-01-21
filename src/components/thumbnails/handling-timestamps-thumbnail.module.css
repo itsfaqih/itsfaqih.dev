@@ -1,0 +1,34 @@
+/**
+ * Handling Timestamps Thumbnail Animations
+ * Used by handling-timestamps-thumbnail.tsx
+ */
+
+@keyframes thumb-time-hand-h {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes thumb-time-hand-m {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(720deg);
+  }
+}
+
+.handHour {
+  animation-name: thumb-time-hand-h;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.handMinute {
+  animation-name: thumb-time-hand-m;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}

@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { GlassyCard } from "../../components/glassy-card";
 import { GUIDELINES } from "../../data/guidelines";
 import { PageContainer } from "../../components/page-container";
-import { GuidelineHero } from "./-components";
+import { RuleOfThumbHero } from "./-components";
 import { MagnifyingGlassIcon, SquaresFourIcon, CaretDown, X, Check } from "@phosphor-icons/react";
 import { GuidelineCard } from "../../components/guideline-card";
 import { Combobox } from "@base-ui/react/combobox";
@@ -47,7 +47,7 @@ function RuleOfThumbsIndex() {
 
   return (
     <PageContainer maxWidth="4xl">
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Rule of Thumb"
         description="A collection of opinions, guidelines, and patterns I've adopted for building high-quality web applications."
         badge={{
@@ -100,7 +100,6 @@ function RuleOfThumbsIndex() {
                   >
                     <X size={12} weight="bold" />
                   </button>
-                  b
                 </div>
                 {selectedCategories.length > 1 && (
                   <span className="text-xs text-(--text-secondary) whitespace-nowrap">
@@ -110,7 +109,7 @@ function RuleOfThumbsIndex() {
               </div>
             )}
             <Combobox.Input
-              placeholder={selectedCategories.length === 0 ? "Filter by category..." : ""}
+              placeholder="Filter by category..."
               className="flex-1 min-w-[100px] bg-transparent border-none outline-none text-(--text-primary) placeholder-(--text-secondary) text-sm"
             />
             <Combobox.Trigger className="text-(--text-secondary) hover:text-(--text-primary) transition-colors cursor-pointer">

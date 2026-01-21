@@ -3,17 +3,14 @@
  * An animated blueprint showing data flow from server to client through cache.
  * Floating animation style similar to Proximity Principle.
  */
+import styles from "./data-loading-thumbnail.module.css";
 
 export function DataLoadingThumbnail() {
   return (
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* ========== SERVER ICON (left) ========== */}
-        <g
-          style={{
-            animation: "thumb-proximity-float 3s ease-in-out infinite",
-          }}
-        >
+        <g className={styles.float} style={{ animationDuration: "3s" }}>
           {/* Cloud shape - centered at x=30 */}
           <path
             d="M18 52 C10 52 10 44 16 42 C15 37 22 34 27 37 C30 34 38 35 38 42 C44 42 44 52 36 52 Z"
@@ -57,12 +54,7 @@ export function DataLoadingThumbnail() {
         </g>
 
         {/* ========== CACHE ICON (center) ========== */}
-        <g
-          style={{
-            animation: "thumb-proximity-float-alt 4s ease-in-out infinite",
-            animationDelay: "0.5s",
-          }}
-        >
+        <g className={styles.floatAlt} style={{ animationDuration: "4s", animationDelay: "0.5s" }}>
           {/* Database cylinder - centered at x=80 */}
           <ellipse
             cx="80"
@@ -83,8 +75,8 @@ export function DataLoadingThumbnail() {
           <line
             x1="72"
             x2="88"
-            y1="45"
-            y2="45"
+            y1="47"
+            y2="47"
             stroke="var(--text-secondary)"
             strokeWidth="0.6"
             opacity="0.5"
@@ -115,12 +107,7 @@ export function DataLoadingThumbnail() {
         </g>
 
         {/* ========== CLIENT ICON (right) ========== */}
-        <g
-          style={{
-            animation: "thumb-proximity-float 3.5s ease-in-out infinite",
-            animationDelay: "1s",
-          }}
-        >
+        <g className={styles.float} style={{ animationDuration: "3.5s", animationDelay: "1s" }}>
           {/* Browser window - centered at x=130 */}
           <rect
             x="116"

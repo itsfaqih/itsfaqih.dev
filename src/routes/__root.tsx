@@ -11,10 +11,10 @@ import appCss from "../styles.css?url";
 export const Route = createRootRoute({
   notFoundComponent: () => (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <h1 className="text-2xl font-bold text-[var(--text-primary)]">Page Not Found</h1>
+      <h1 className="text-2xl font-bold text-(--text-primary)">Page Not Found</h1>
       <Link
         to="/"
-        className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline decoration-[var(--border-color)] underline-offset-4"
+        className="text-(--text-secondary) hover:text-(--text-primary) underline decoration-(--border-color) underline-offset-4"
       >
         Go back home
       </Link>
@@ -74,7 +74,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body
         className={cn(
           "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative",
-          "bg-[var(--bg-primary)] text-[var(--text-primary)]",
+          "bg-(--bg-primary) text-(--text-primary)",
           "transition-colors duration-300",
         )}
       >

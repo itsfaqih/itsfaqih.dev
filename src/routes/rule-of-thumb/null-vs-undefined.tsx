@@ -5,7 +5,7 @@ import { PageContainer } from "../../components/page-container";
 import {
   CodeComparison,
   CodeExample,
-  GuidelineHero,
+  RuleOfThumbHero,
   QuickRefCard,
   SectionHeading,
 } from "./-components";
@@ -18,7 +18,7 @@ function NullVsUndefined() {
   return (
     <PageContainer maxWidth="3xl">
       {/* Hero Section */}
-      <GuidelineHero
+      <RuleOfThumbHero
         title="Null vs Undefined"
         description={
           <>

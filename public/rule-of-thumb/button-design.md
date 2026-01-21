@@ -16,7 +16,7 @@ A well-designed button handles these five states seamlessly:
 ## Disabled State UX
 
 When a button is disabled, the cursor should immediately change to indicate the action is forbidden (`cursor: not-allowed`).
-Consider adding a tooltip explaining *why* it is disabled.
+Consider adding a tooltip explaining _why_ it is disabled.
 
 ## Code Implementation
 
@@ -33,7 +33,7 @@ A robust implementation handles all states in a unified component:
     // Active/Press
     "active:scale-95",
     // Loading/Disabled
-    isLoading ? "cursor-wait" : isDisabled ? "cursor-not-allowed opacity-60" : "cursor-default"
+    isLoading ? "cursor-wait" : isDisabled ? "cursor-not-allowed opacity-60" : "cursor-default",
   )}
 >
   {isLoading ? <Loader2 className="animate-spin" /> : "Submit"}
@@ -45,58 +45,67 @@ A robust implementation handles all states in a unified component:
 Different actions require different visual weights.
 
 ### Visual Hierarchy
--   **Primary**: Main call-to-action (e.g., "Save", "Submit").
--   **Secondary**: Standard actions (e.g., "Cancel", "Back").
--   **Ghost**: Low-priority or repetitive actions.
+
+- **Primary**: Main call-to-action (e.g., "Save", "Submit").
+- **Secondary**: Standard actions (e.g., "Cancel", "Back").
+- **Ghost**: Low-priority or repetitive actions.
 
 ### Destructive Actions
--   **Destructive**: High-impact negative actions (e.g., "Delete Project"). Use Red sparingly.
--   **Ghost Destructive**: Lower priority negative actions (e.g., "Unsubscribe").
+
+- **Destructive**: High-impact negative actions (e.g., "Delete Project"). Use Red sparingly.
+- **Ghost Destructive**: Lower priority negative actions (e.g., "Unsubscribe").
 
 **Avoid Red for Primary Actions**: Reserve red for destructive actions only. Using red for a "Confirm" button creates cognitive friction.
 
 ## Icon Integration
 
 ### Leading Icons
-Use for:
--   **Back/Return actions** (ArrowLeft)
--   **Confirmation actions** (Check)
--   **Add/Create actions** (Plus)
--   **Feature emphasis** (Sparkles)
 
-*Padding tip*: Apply `pl-2 pr-3` for optical balance when using a leading icon.
+Use for:
+
+- **Back/Return actions** (ArrowLeft)
+- **Confirmation actions** (Check)
+- **Add/Create actions** (Plus)
+- **Feature emphasis** (Sparkles)
+
+_Padding tip_: Apply `pl-2 pr-3` for optical balance when using a leading icon.
 
 ### Trailing Icons
-Use for:
--   **Forward/Next actions** ("Continue" -> ArrowRight)
--   **External links** (ArrowUpRight)
--   **Dropdown triggers** (ChevronDown)
--   **Download actions** (Download)
 
-*Padding tip*: Apply `pl-3 pr-2` for optical balance.
+Use for:
+
+- **Forward/Next actions** ("Continue" -> ArrowRight)
+- **External links** (ArrowUpRight)
+- **Dropdown triggers** (ChevronDown)
+- **Download actions** (Download)
+
+_Padding tip_: Apply `pl-3 pr-2` for optical balance.
 
 ### Icon-Only Buttons
+
 Use for:
--   **Toolbars & action bars** (Settings)
--   **Repeated actions** (Delete, Edit)
--   **Mobile interfaces** (Search)
+
+- **Toolbars & action bars** (Settings)
+- **Repeated actions** (Delete, Edit)
+- **Mobile interfaces** (Search)
 
 **Requirements**:
+
 1.  **Tooltip** is mandatory to explain the action.
 2.  **aria-label** is required for accessibility.
 3.  **Square aspect ratio** (e.g., `size-8.5 p-0`).
 
 ## Best Practices
 
--   **Keep transitions snappy**: Use 100-200ms.
--   **Prevent double-clicks**: Disable during loading.
--   **Update text**: "Submit" -> "Processing..." -> "Done!".
--   **Show success**: Briefly show a success state before resetting.
--   **Maintain contrast**: Ensure readability even when disabled.
+- **Keep transitions snappy**: Use 100-200ms.
+- **Prevent double-clicks**: Disable during loading.
+- **Update text**: "Submit" -> "Processing..." -> "Done!".
+- **Show success**: Briefly show a success state before resetting.
+- **Maintain contrast**: Ensure readability even when disabled.
 
 ## Why It Matters
 
--   **Reduces uncertainty**: Users know their action was registered.
--   **Prevents errors**: Block double-submissions.
--   **Feels premium**: Polished interactions build trust.
--   **Improves accessibility**: Clear states help everyone.
+- **Reduces uncertainty**: Users know their action was registered.
+- **Prevents errors**: Block double-submissions.
+- **Feels premium**: Polished interactions build trust.
+- **Improves accessibility**: Clear states help everyone.
