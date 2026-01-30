@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
-import { GlassyCard } from "../../components/glassy-card";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
+import { Card } from "../../components/card";
 import { useState } from "react";
 import {
-  ClockIcon,
   DatabaseIcon,
   GlobeIcon,
   HardDrivesIcon,
@@ -46,43 +45,43 @@ function TimezoneDemo() {
   };
 
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="p-6 space-y-6">
         <div>
-          <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
+          <h3 className="text-sm font-medium text-muted-foreground mb-2">
             Stored in Database (UTC)
           </h3>
-          <div className="p-4 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) font-mono text-sm">
+          <div className="p-4 rounded-lg bg-background/50 backdrop-blur-sm border border-border font-mono text-sm">
             <span className="text-emerald-400">{utcTime}</span>
           </div>
         </div>
 
         <div className="flex items-center justify-center">
-          <ArrowRightIcon size={20} className="text-(--text-secondary)" />
+          <ArrowRightIcon size={20} className="text-muted-foreground" />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-sm font-medium text-(--text-secondary) mb-2">Displayed as UTC</h3>
-            <div className="p-4 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color)">
-              <p className="text-(--text-primary)">{formatUTC(utcTime)}</p>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Displayed as UTC</h3>
+            <div className="p-4 rounded-lg bg-background/50 backdrop-blur-sm border border-border">
+              <p className="text-foreground">{formatUTC(utcTime)}</p>
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Your Local Time ({userTimezone})
             </h3>
-            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color)">
-              <p className="text-(--text-primary)">{formatLocal(utcTime)}</p>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-border">
+              <p className="text-foreground">{formatLocal(utcTime)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4 text-sm text-muted-foreground">
         ✓ Same UTC timestamp, displayed in user's local timezone
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -109,10 +108,10 @@ function FilterDemo() {
   };
 
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="p-6 space-y-6">
         <div>
-          <h3 className="text-sm font-medium text-(--text-secondary) mb-3">
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">
             User inputs filter date ({userTimezone})
           </h3>
           <div className="flex gap-3">
@@ -120,45 +119,45 @@ function FilterDemo() {
               type="date"
               value={inputDate}
               onChange={(e) => setInputDate(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
+              className="px-4 py-2 rounded-lg bg-background/50 backdrop-blur-sm border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
             />
             <input
               type="time"
               value={inputTime}
               onChange={(e) => setInputTime(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-(--text-primary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
+              className="px-4 py-2 rounded-lg bg-background/50 backdrop-blur-sm border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
             />
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-(--border-color)" />
-          <span className="text-xs text-(--text-secondary)">sent to backend as</span>
-          <div className="flex-1 h-px bg-(--border-color)" />
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted-foreground">sent to backend as</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-sm font-medium text-(--text-secondary) mb-2">Option 1: UTC</h3>
-            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color) font-mono text-xs">
-              <span className="text-(--text-primary)">{getUTCEquivalent()}</span>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Option 1: UTC</h3>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-border font-mono text-xs">
+              <span className="text-foreground">{getUTCEquivalent()}</span>
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-medium text-(--text-secondary) mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Option 2: With Offset
             </h3>
-            <div className="p-4 rounded-lg bg-zinc-500/10 border border-(--border-color) font-mono text-xs">
-              <span className="text-(--text-primary)">{getWithOffset()}</span>
+            <div className="p-4 rounded-lg bg-zinc-500/10 border border-border font-mono text-xs">
+              <span className="text-foreground">{getWithOffset()}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4 text-sm text-muted-foreground">
         ✓ Both formats include timezone info — backend knows the exact moment
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -181,12 +180,12 @@ function FlowStep({
 }) {
   return (
     <div className="flex items-start gap-4">
-      <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center shrink-0">
-        <Icon size={20} className="text-(--text-primary)" />
+      <div className="size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center shrink-0">
+        <Icon size={20} className="text-foreground" />
       </div>
       <div>
-        <h3 className="font-semibold text-(--text-primary)">{title}</h3>
-        <p className="text-sm text-(--text-secondary) mt-1">{description}</p>
+        <h3 className="font-semibold text-foreground">{title}</h3>
+        <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
     </div>
   );
@@ -206,12 +205,11 @@ function HandlingTimestamps() {
           <>
             The timezone problem, solved simply.
             <br />
-            <span className="text-(--text-primary) font-medium">Store UTC, display local.</span>
+            <span className="text-foreground font-medium">Store UTC, display local.</span>
           </>
         }
         badge={{
-          icon: ClockIcon,
-          text: "Backend Pattern",
+          text: "Best Practices",
         }}
         markdownUrl="/rule-of-thumb/handling-timestamps.md"
       />
@@ -231,13 +229,13 @@ function HandlingTimestamps() {
             title="Store as UTC in Database"
             description="Always store timestamps in UTC (Coordinated Universal Time). No timezone offset, no ambiguity."
           />
-          <div className="ml-5 border-l-2 border-dashed border-(--border-color) h-6" />
+          <div className="ml-5 border-l-2 border-dashed border-border h-6" />
           <FlowStep
             icon={HardDrivesIcon}
             title="Return UTC from Backend"
             description="API responses should return timestamps in ISO 8601 format with UTC timezone (e.g., 2026-01-10T06:00:00.000Z)."
           />
-          <div className="ml-5 border-l-2 border-dashed border-(--border-color) h-6" />
+          <div className="ml-5 border-l-2 border-dashed border-border h-6" />
           <FlowStep
             icon={DesktopIcon}
             title="Display in Local Timezone"
@@ -307,19 +305,19 @@ const formatted = dayjs(apiResponse.createdAt)
 
         <FilterDemo />
 
-        <div className="mt-8 p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
-          <h3 className="font-semibold text-(--text-primary) mb-3 flex items-center gap-2">
+        <div className="mt-8 p-6 rounded-xl bg-card border border-border">
+          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <CalendarBlankIcon size={18} />
             Example: Indonesia (UTC+7)
           </h3>
-          <div className="space-y-3 text-sm text-(--text-secondary)">
+          <div className="space-y-3 text-sm text-muted-foreground">
             <p>
               User in Jakarta selects:{" "}
-              <strong className="text-(--text-primary)">January 1, 2026 at 07:00 AM</strong>
+              <strong className="text-foreground">January 1, 2026 at 07:00 AM</strong>
             </p>
             <p>
               This equals in UTC:{" "}
-              <strong className="text-(--text-primary)">January 1, 2026 at 00:00</strong> (midnight)
+              <strong className="text-foreground">January 1, 2026 at 00:00</strong> (midnight)
             </p>
             <p>The backend query should use the UTC value to find records from that moment.</p>
           </div>
@@ -368,7 +366,7 @@ fetch('/api/records', {
       {/* SECTION 4: Do's and Don'ts */}
       {/* ================================================================== */}
       <div className="mb-20">
-        <h2 className="text-2xl font-bold text-(--text-primary) mb-8">Do's and Don'ts</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-8">Do's and Don'ts</h2>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
@@ -376,7 +374,7 @@ fetch('/api/records', {
               <CheckIcon size={18} className="text-emerald-400" />
               <h3 className="font-semibold text-emerald-400">Do</h3>
             </div>
-            <ul className="space-y-3 text-sm text-(--text-secondary)">
+            <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 mt-0.5">✓</span>
                 <span>Store all timestamps as UTC in the database</span>
@@ -405,7 +403,7 @@ fetch('/api/records', {
               <XIcon size={18} className="text-red-400" />
               <h3 className="font-semibold text-red-400">Don't</h3>
             </div>
-            <ul className="space-y-3 text-sm text-(--text-secondary)">
+            <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-red-400 mt-0.5">✗</span>
                 <span>Store timestamps with timezone offsets in DB</span>
@@ -433,40 +431,39 @@ fetch('/api/records', {
 
       {/* Summary */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-4">Quick Reference</h2>
-          <div className="space-y-3 text-(--text-secondary)">
+        <div className="p-8 rounded-2xl bg-card border border-border">
+          <h2 className="text-xl font-bold text-foreground mb-4">Quick Reference</h2>
+          <div className="space-y-3 text-muted-foreground">
             <div className="flex items-start gap-3">
-              <DatabaseIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <DatabaseIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Database</strong> — Always store as UTC
+                <strong className="text-foreground">Database</strong> — Always store as UTC
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <HardDrivesIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <HardDrivesIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">API</strong> — Return ISO 8601 with Z
-                suffix
+                <strong className="text-foreground">API</strong> — Return ISO 8601 with Z suffix
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <DesktopIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <DesktopIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Frontend</strong> — new Date() +
+                <strong className="text-foreground">Frontend</strong> — new Date() +
                 Intl.DateTimeFormat
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <CalendarBlankIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <CalendarBlankIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Filter</strong> — Convert local input to
-                UTC before query
+                <strong className="text-foreground">Filter</strong> — Convert local input to UTC
+                before query
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <GlobeIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <GlobeIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Rule</strong> — One source of truth (UTC),
+                <strong className="text-foreground">Rule</strong> — One source of truth (UTC),
                 display locally
               </span>
             </div>
@@ -475,7 +472,7 @@ fetch('/api/records', {
       </div>
 
       {/* Footer */}
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

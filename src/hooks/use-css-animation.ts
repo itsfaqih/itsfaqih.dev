@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 export type AnimationStatus = "idle" | "playing" | "paused" | "finished";
 
-interface UseCssAnimationConfig {
+type UseCssAnimationConfig = {
   duration: number;
   masterAnimationName: string;
 }

@@ -42,7 +42,7 @@ function BlogPost() {
             {/* Back */}
             <Link
               to="/blog"
-              className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors group mb-8 active:scale-95"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group mb-8 active:scale-95"
             >
               <ArrowLeftIcon
                 size={16}
@@ -56,8 +56,8 @@ function BlogPost() {
               <header className="mb-8">
                 <div className="flex flex-wrap items-center gap-4 mb-6">
                   {post.frontmatter.publishedAt && (
-                    <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-                      <CalendarBlankIcon size={14} className="text-(--text-secondary)" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CalendarBlankIcon size={14} className="text-muted-foreground" />
                       <time>
                         {new Date(post.frontmatter.publishedAt).toLocaleDateString("en-US", {
                           year: "numeric",
@@ -67,38 +67,38 @@ function BlogPost() {
                       </time>
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-                    <ClockIcon size={14} className="text-(--text-secondary)" />
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <ClockIcon size={14} className="text-muted-foreground" />
                     <span>5 min read</span>
                   </div>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl font-bold text-(--text-primary) leading-tight mb-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight mb-4">
                   {post.frontmatter.title}
                 </h1>
 
                 {post.frontmatter.summary && (
-                  <p className="text-lg text-(--text-secondary) leading-relaxed">
+                  <p className="text-lg text-muted-foreground leading-relaxed">
                     {post.frontmatter.summary}
                   </p>
                 )}
               </header>
 
               {/* Divider */}
-              <div className="h-px bg-(--border-color) mb-8" />
+              <div className="h-px bg-border mb-8" />
 
               {/* Content */}
-              <div className="prose prose-invert dark:prose-invert prose-zinc dark:prose-zinc max-w-none prose-headings:text-(--text-primary) prose-p:text-(--text-secondary) prose-strong:text-(--text-primary) prose-a:text-(--text-primary) prose-a:underline hover:prose-a:text-(--text-secondary) prose-code:text-(--text-primary) prose-pre:bg-(--bg-secondary) prose-pre:border prose-pre:border-(--border-color) prose-headings:scroll-mt-24">
+              <div className="prose prose-invert dark:prose-invert prose-zinc dark:prose-zinc max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-muted-foreground prose-code:text-foreground prose-pre:bg-card prose-pre:border prose-pre:border-border prose-headings:scroll-mt-24">
                 <Component />
               </div>
             </article>
 
             {/* Footer */}
-            <footer className="mt-8 pt-6 border-t border-(--border-color)">
+            <footer className="mt-8 pt-6 border-t border-border">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <Link
                   to="/blog"
-                  className="inline-flex items-center gap-2 text-(--text-secondary) hover:text-(--text-primary) transition-colors group active:scale-95"
+                  className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group active:scale-95"
                 >
                   <ArrowLeftIcon
                     size={16}
@@ -107,7 +107,7 @@ function BlogPost() {
                   Back to all posts
                 </Link>
 
-                <p className="text-sm text-(--text-secondary)">Thanks for reading!</p>
+                <p className="text-sm text-muted-foreground">Thanks for reading!</p>
               </div>
             </footer>
           </div>
@@ -123,7 +123,7 @@ function BlogPost() {
       <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
         <Drawer.Trigger asChild>
           <button
-            className="fixed bottom-6 right-6 p-4 rounded-full bg-(--text-primary) text-(--bg-primary) lg:hidden z-50 hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-6 right-6 p-4 rounded-full bg-foreground text-background lg:hidden z-50 hover:scale-105 active:scale-95 transition-all"
             aria-label="Table of Contents"
           >
             <ListIcon size={24} />
@@ -131,14 +131,14 @@ function BlogPost() {
         </Drawer.Trigger>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
-          <Drawer.Content className="bg-(--bg-primary) flex flex-col rounded-t-[10px] fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] outline-none border-t border-(--border-color)">
-            <div className="p-4 bg-(--bg-primary) rounded-t-[10px] flex-1 flex flex-col min-h-0">
+          <Drawer.Content className="bg-background flex flex-col rounded-t-[10px] fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] outline-none border-t border-border">
+            <div className="p-4 bg-background rounded-t-[10px] flex-1 flex flex-col min-h-0">
               <div
                 aria-hidden
-                className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-(--border-color) mb-6"
+                className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-border mb-6"
               />
               <div className="max-w-md mx-auto w-full flex-1 flex flex-col min-h-0">
-                <Drawer.Title className="font-bold text-lg text-(--text-primary) mb-4 shrink-0">
+                <Drawer.Title className="font-bold text-lg text-foreground mb-4 shrink-0">
                   Table of Contents
                 </Drawer.Title>
                 <div className="overflow-y-auto flex-1">

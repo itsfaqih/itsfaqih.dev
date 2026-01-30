@@ -1,15 +1,16 @@
-export interface Guideline {
+export type Guideline = {
   id: string;
   label: string;
   title: string;
   description: string;
   href: string;
+  comingSoon?: boolean;
 }
 
 export const GUIDELINES: Guideline[] = [
   {
     id: "proximity-principle",
-    label: "Code Structure",
+    label: "Code Writing",
     title: "Proximity Principle",
     description: "How code writings and files should be structured",
     href: "/rule-of-thumb/proximity-principle",
@@ -41,6 +42,14 @@ export const GUIDELINES: Guideline[] = [
     title: "Dialog Design",
     description: "Focus trap, inert background, and data safety patterns",
     href: "/rule-of-thumb/dialog-design",
+  },
+  {
+    id: "form-submission",
+    label: "UX Design",
+    title: "Form Submission",
+    description: "Validation, error handling, and user feedback",
+    href: "/rule-of-thumb/form-submission",
+    comingSoon: true,
   },
   {
     id: "data-loading",

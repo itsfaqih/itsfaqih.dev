@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { useState } from "react";
 import {
-  TableIcon,
   WarningCircleIcon,
   MagnifyingGlassIcon,
   ArrowRightIcon,
@@ -15,9 +14,9 @@ import {
   TrashIcon,
   PencilSimpleIcon,
 } from "@phosphor-icons/react";
-import { GlassyCard } from "../../components/glassy-card";
+import { Card } from "../../components/card";
 import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
-import { GlassyButton } from "../../components/glassy-button";
+import { Button } from "../../components/button";
 import { PageContainer } from "../../components/page-container";
 
 export const Route = createFileRoute("/rule-of-thumb/table-design")({
@@ -86,27 +85,27 @@ function InteractiveTableDemo() {
     loading: {
       label: "Loading",
       description: "Fetching data from the server. Show skeleton or spinner.",
-      color: "text-zinc-400",
+      color: "text-muted-foreground",
     },
     empty: {
       label: "Empty",
       description: "No data available. Provide helpful guidance.",
-      color: "text-zinc-400",
+      color: "text-muted-foreground",
     },
     error: {
       label: "Error",
       description: "Something went wrong. Show retry option.",
-      color: "text-red-400",
+      color: "text-destructive",
     },
     data: {
       label: "Data",
       description: "Displaying table content. The normal state.",
-      color: "text-(--text-primary)",
+      color: "text-foreground",
     },
     searching: {
       label: "No Results",
       description: "Search returned no matches. Suggest alternatives.",
-      color: "text-zinc-400",
+      color: "text-muted-foreground",
     },
   };
 
@@ -116,18 +115,18 @@ function InteractiveTableDemo() {
         return (
           <tbody>
             {[1, 2, 3].map((i) => (
-              <tr key={i} className="border-b border-(--border-color)">
+              <tr key={i} className="border-b border-border">
                 <td className="px-4 py-3">
-                  <div className="h-4 w-32 bg-(--border-color) rounded animate-pulse" />
+                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
                 </td>
                 <td className="px-4 py-3">
-                  <div className="h-4 w-40 bg-(--border-color) rounded animate-pulse" />
+                  <div className="h-4 w-40 bg-muted rounded animate-pulse" />
                 </td>
                 <td className="px-4 py-3">
-                  <div className="h-4 w-20 bg-(--border-color) rounded animate-pulse" />
+                  <div className="h-4 w-20 bg-muted rounded animate-pulse" />
                 </td>
                 <td className="px-4 py-3">
-                  <div className="h-4 w-16 bg-(--border-color) rounded animate-pulse" />
+                  <div className="h-4 w-16 bg-muted rounded animate-pulse" />
                 </td>
               </tr>
             ))}
@@ -140,9 +139,9 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <DatabaseIcon size={40} className="text-(--text-secondary) opacity-50" />
-                  <p className="text-(--text-secondary)">No users yet</p>
-                  <GlassyButton className="text-sm">Add First User</GlassyButton>
+                  <DatabaseIcon size={40} className="text-muted-foreground opacity-50" />
+                  <p className="text-muted-foreground">No users yet</p>
+                  <Button className="text-sm">Add First User</Button>
                 </div>
               </td>
             </tr>
@@ -155,12 +154,12 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <WarningCircleIcon size={40} className="text-red-400" />
-                  <p className="text-red-400">Failed to load users</p>
-                  <GlassyButton className="text-sm gap-2">
+                  <WarningCircleIcon size={40} className="text-destructive" />
+                  <p className="text-destructive">Failed to load users</p>
+                  <Button className="text-sm gap-2">
                     <ArrowsClockwiseIcon size={14} />
                     Try Again
-                  </GlassyButton>
+                  </Button>
                 </div>
               </td>
             </tr>
@@ -173,17 +172,16 @@ function InteractiveTableDemo() {
             <tr>
               <td colSpan={4} className="px-4 py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
-                  <FileXIcon size={40} className="text-(--text-secondary) opacity-50" />
-                  <p className="text-(--text-secondary)">
-                    No results for "
-                    <span className="text-(--text-primary)">{searchQuery || "xyz"}</span>"
+                  <FileXIcon size={40} className="text-muted-foreground opacity-50" />
+                  <p className="text-muted-foreground">
+                    No results for "<span className="text-foreground">{searchQuery || "xyz"}</span>"
                   </p>
                   <button
                     onClick={() => {
                       setSearchQuery("");
                       setState("data");
                     }}
-                    className="text-(--text-primary) text-sm hover:underline decoration-zinc-400 underline-offset-4"
+                    className="text-foreground text-sm hover:underline decoration-zinc-400 underline-offset-4"
                   >
                     Clear search
                   </button>
@@ -200,17 +198,17 @@ function InteractiveTableDemo() {
             {sampleUsers.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-(--border-color) hover:bg-(--bg-primary) transition-colors"
+                className="border-b border-border hover:bg-muted/50 transition-colors"
               >
-                <td className="px-4 py-3 text-(--text-primary)">{user.name}</td>
-                <td className="px-4 py-3 text-(--text-secondary)">{user.email}</td>
-                <td className="px-4 py-3 text-(--text-secondary)">{user.role}</td>
+                <td className="px-4 py-3 text-foreground">{user.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
+                <td className="px-4 py-3 text-muted-foreground">{user.role}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user.status === "active"
-                        ? "bg-zinc-500/10 text-(--text-primary)"
-                        : "bg-zinc-500/10 text-zinc-400"
+                        ? "bg-muted text-foreground"
+                        : "bg-muted text-zinc-400"
                     }`}
                   >
                     {user.status}
@@ -224,20 +222,20 @@ function InteractiveTableDemo() {
   };
 
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       {/* Search Bar */}
-      <div className="p-4 border-b border-(--border-color) flex items-center gap-3">
+      <div className="p-4 border-b border-border flex items-center gap-3">
         <div className="relative flex-1">
           <MagnifyingGlassIcon
             size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-secondary)"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <input
             type="text"
             placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-lg bg-(--bg-primary)/50 backdrop-blur-sm border border-(--border-color) text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none focus:ring-2 focus:ring-zinc-500/20"
+            className="w-full pl-9 pr-4 py-2 rounded-lg bg-background/50 backdrop-blur-sm border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
       </div>
@@ -246,17 +244,17 @@ function InteractiveTableDemo() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-(--border-color) bg-(--bg-primary)">
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Name
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Email
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Role
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Status
               </th>
             </tr>
@@ -266,13 +264,13 @@ function InteractiveTableDemo() {
       </div>
 
       {/* State Controls */}
-      <div className="border-t border-(--border-color) p-6">
+      <div className="border-t border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <span className={`text-lg font-semibold ${stateInfo[state].color}`}>
               {stateInfo[state].label}
             </span>
-            <span className="text-sm text-(--text-secondary)">{stateInfo[state].description}</span>
+            <span className="text-sm text-muted-foreground">{stateInfo[state].description}</span>
           </div>
         </div>
 
@@ -285,20 +283,18 @@ function InteractiveTableDemo() {
                   onClick={() => setState(s)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm ${
                     state === s
-                      ? "bg-zinc-500/10 text-(--text-primary) border-2 border-zinc-500/20"
-                      : "bg-(--bg-primary)/50 text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color) hover:bg-(--bg-primary)/70"
+                      ? "bg-muted text-foreground border-2 border-muted-foreground/20"
+                      : "bg-background/50 text-muted-foreground hover:text-foreground border border-border hover:bg-muted/70"
                   }`}
                 >
                   {stateInfo[s].label}
                 </button>
-                {index < arr.length - 1 && (
-                  <span className="text-(--text-secondary) text-xs">|</span>
-                )}
+                {index < arr.length - 1 && <span className="text-muted-foreground text-xs">|</span>}
               </div>
             ))}
           </div>
 
-          <div className="flex items-center justify-center gap-2 text-sm text-(--text-secondary)">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <span className="italic">with search:</span>
             <ArrowRightIcon size={14} />
             <button
@@ -308,8 +304,8 @@ function InteractiveTableDemo() {
               }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 state === "searching"
-                  ? "bg-zinc-500/10 text-(--text-primary) border-2 border-zinc-500/20"
-                  : "bg-(--bg-primary) text-(--text-secondary) hover:text-(--text-primary) border border-(--border-color)"
+                  ? "bg-muted text-foreground border-2 border-muted-foreground/20"
+                  : "bg-background text-muted-foreground hover:text-foreground border border-border"
               }`}
             >
               No Results
@@ -317,7 +313,7 @@ function InteractiveTableDemo() {
           </div>
         </div>
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -331,25 +327,25 @@ function PaginationDemo() {
   const totalPages = 5;
 
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       {/* Demo Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-(--border-color) bg-(--bg-primary)">
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Name
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Email
               </th>
             </tr>
           </thead>
           <tbody>
             {sampleUsers.slice(0, 3).map((user) => (
-              <tr key={user.id} className="border-b border-(--border-color)">
-                <td className="px-4 py-3 text-(--text-primary)">{user.name}</td>
-                <td className="px-4 py-3 text-(--text-secondary)">{user.email}</td>
+              <tr key={user.id} className="border-b border-border">
+                <td className="px-4 py-3 text-foreground">{user.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
               </tr>
             ))}
           </tbody>
@@ -358,26 +354,26 @@ function PaginationDemo() {
 
       {/* Pagination */}
       {showPagination && (
-        <div className="border-t border-(--border-color) px-4 py-3 flex items-center justify-between">
-          <span className="text-sm text-(--text-secondary)">
+        <div className="border-t border-border px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg hover:bg-(--bg-primary) disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <CaretLeftIcon size={16} className="text-(--text-secondary)" />
+              <CaretLeftIcon size={16} className="text-muted-foreground" />
             </button>
             {[1, 2, 3, 4, 5].map((page) => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                className={`size-8 rounded-lg text-sm font-medium transition-colors ${
                   currentPage === page
-                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                    : "text-(--text-secondary) hover:bg-(--bg-primary)"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {page}
@@ -386,27 +382,27 @@ function PaginationDemo() {
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg hover:bg-(--bg-primary) disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <CaretRightIcon size={16} className="text-(--text-secondary)" />
+              <CaretRightIcon size={16} className="text-muted-foreground" />
             </button>
           </div>
         </div>
       )}
 
       {/* Controls */}
-      <div className="border-t border-(--border-color) p-4">
-        <label className="flex items-center gap-2 text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4">
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
           <input
             type="checkbox"
             checked={showPagination}
             onChange={(e) => setShowPagination(e.target.checked)}
-            className="rounded"
+            className="rounded border-border bg-background text-brand focus:ring-brand"
           />
           Show pagination (hide when only 1 page)
         </label>
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -416,18 +412,18 @@ function PaginationDemo() {
 
 function ActionsDemo() {
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-(--border-color) bg-(--bg-primary)">
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Name
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Email
               </th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">
                 Actions
               </th>
             </tr>
@@ -436,20 +432,20 @@ function ActionsDemo() {
             {sampleUsers.slice(0, 3).map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-(--border-color) hover:bg-(--bg-primary) transition-colors"
+                className="border-b border-border hover:bg-muted/50 transition-colors"
               >
-                <td className="px-4 py-3 text-(--text-primary)">{user.name}</td>
-                <td className="px-4 py-3 text-(--text-secondary)">{user.email}</td>
+                <td className="px-4 py-3 text-foreground">{user.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 rounded-lg hover:bg-(--bg-secondary) transition-colors">
-                      <PencilSimpleIcon size={14} className="text-(--text-secondary)" />
+                    <button className="p-2 rounded-lg hover:bg-muted transition-colors">
+                      <PencilSimpleIcon size={14} className="text-muted-foreground" />
                     </button>
-                    <button className="p-2 rounded-lg hover:bg-zinc-500/10 transition-colors">
-                      <TrashIcon size={14} className="text-(--text-primary)" />
+                    <button className="p-2 rounded-lg hover:bg-destructive/10 transition-colors">
+                      <TrashIcon size={14} className="text-destructive" />
                     </button>
-                    <button className="p-2 rounded-lg hover:bg-(--bg-secondary) transition-colors">
-                      <DotsThreeIcon size={14} className="text-(--text-secondary)" />
+                    <button className="p-2 rounded-lg hover:bg-muted transition-colors">
+                      <DotsThreeIcon size={14} className="text-muted-foreground" />
                     </button>
                   </div>
                 </td>
@@ -458,10 +454,10 @@ function ActionsDemo() {
           </tbody>
         </table>
       </div>
-      <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4 text-sm text-muted-foreground">
         ✓ Actions column is right-aligned for predictable interaction
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -471,15 +467,15 @@ function ActionsDemo() {
 
 function NumbersDemo() {
   return (
-    <GlassyCard className="rounded-2xl overflow-hidden">
+    <Card className="rounded-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-(--border-color) bg-(--bg-primary)">
-              <th className="px-4 py-3 text-left text-sm font-medium text-(--text-secondary)">
+            <tr className="border-b border-border bg-muted/50">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                 Name
               </th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-(--text-secondary)">
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">
                 Revenue
               </th>
             </tr>
@@ -488,10 +484,10 @@ function NumbersDemo() {
             {sampleUsers.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-(--border-color) hover:bg-(--bg-primary) transition-colors"
+                className="border-b border-border hover:bg-muted/50 transition-colors"
               >
-                <td className="px-4 py-3 text-(--text-primary)">{user.name}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-(--text-primary)">
+                <td className="px-4 py-3 text-foreground">{user.name}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-foreground">
                   ${user.revenue.toLocaleString()}
                 </td>
               </tr>
@@ -499,12 +495,11 @@ function NumbersDemo() {
           </tbody>
         </table>
       </div>
-      <div className="border-t border-(--border-color) p-4 text-sm text-(--text-secondary)">
-        ✓ Numbers use{" "}
-        <code className="px-1.5 py-0.5 rounded bg-(--bg-primary) text-xs">tabular-nums</code> and
-        are right-aligned for easy scanning
+      <div className="border-t border-border p-4 text-sm text-muted-foreground">
+        ✓ Numbers use <code className="px-1.5 py-0.5 rounded bg-muted text-xs">tabular-nums</code>{" "}
+        and are right-aligned for easy scanning
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -525,14 +520,13 @@ function TableDesign() {
           <>
             Best practices for designing data tables.
             <br />
-            <span className="text-(--text-primary) font-medium">
+            <span className="text-foreground font-medium">
               Clear, scannable, and user-friendly.
             </span>
           </>
         }
         badge={{
-          icon: TableIcon,
-          text: "UI/UX Pattern",
+          text: "UX Design",
         }}
         markdownUrl="/rule-of-thumb/table-design.md"
       />
@@ -742,7 +736,7 @@ const goToPage = (newPage: number) => {
       </div>
 
       {/* Footer */}
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

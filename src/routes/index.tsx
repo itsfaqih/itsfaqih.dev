@@ -13,78 +13,76 @@ import {
   CaretUpIcon,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
-import { ReactNode, useState, useCallback, memo } from "react";
+import type { ReactNode } from "react";
+import { useState, useCallback, memo } from "react";
 import { cn } from "../cn";
-import { getGlassyClasses } from "../components/glassy-button";
-import { GuidelineCard } from "../components/guideline-card";
+import { Button, getButtonClasses } from "../components/button";
+import { RuleOfThumbCard } from "../components/rule-of-thumb-card";
 import { GUIDELINES } from "../data/guidelines";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface SectionProps {
+const TECH_ICON_MAP = {
+  react: "react",
+  typescript: "typescript",
+  nextjs: "nextdotjs",
+  tailwindcss: "tailwindcss",
+  vuejs: "vuedotjs",
+  nodejs: "nodedotjs",
+  postgresql: "postgresql",
+  aws: "amazonwebservices",
+  supabase: "supabase",
+  "tanstack-start": "tanstack",
+  laravel: "laravel",
+  php: "php",
+  mysql: "mysql",
+  figma: "figma",
+  express: "express",
+  mongodb: "mongodb",
+} as const;
+
+type TechTag = keyof typeof TECH_ICON_MAP;
+
+type SectionProps = {
   title: string;
   children: ReactNode;
   className?: string;
   id?: string;
-}
+};
 
-interface SocialLinkProps {
+type SocialLinkProps = {
   href: string;
   icon: PhosphorIcon;
   label: string;
   isExternal?: boolean;
-}
+};
 
-interface ListItemProps {
+type ListItemProps = {
   title: string;
   subtitle?: string;
   date?: string;
-  tags?: string[];
+  tags?: TechTag[];
   href?: string;
   isExternal?: boolean;
   description?: string;
-}
+};
 
-interface TimelineItemProps {
+type TimelineItemProps = {
   title: string;
   subtitle?: string;
   date?: string;
-  tags?: string[];
+  tags?: TechTag[];
   isExternal?: boolean;
-  description?: string;
+  description?: string[];
   isLast?: boolean;
-}
-
-// ============================================================================
-// Icon Map (shared between ListItem and TimelineItem)
-// ============================================================================
-
-const TECH_ICON_MAP: Record<string, string> = {
-  React: "react",
-  TypeScript: "typescript",
-  "Next.js": "nextdotjs",
-  Tailwind: "tailwindcss",
-  TailwindCSS: "tailwindcss",
-  "Tailwind CSS": "tailwindcss",
-  "Vue.js": "vuedotjs",
-  "Node.js": "nodedotjs",
-  PostgreSQL: "postgresql",
-  AWS: "amazonwebservices",
-  Supabase: "supabase",
-  "D3.js": "d3dotjs",
-  "TanStack Start": "tanstack",
 };
-
-// ============================================================================
-// Components
-// ============================================================================
 
 function Section({ title, children, className, id }: SectionProps) {
   return (
     <section id={id} className={cn("mb-12 scroll-mt-24", className)}>
-      <h2 className="text-sm font-medium text-(--text-secondary) mb-4 uppercase tracking-wide">
+      <h2 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide">
         {title}
       </h2>
       <div className="space-y-3">{children}</div>
@@ -96,32 +94,86 @@ function SocialLink({ href, icon: Icon, label, isExternal = true }: SocialLinkPr
   const externalProps = isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   return (
-    <a href={href} {...externalProps} className={getGlassyClasses("h-8.5 justify-start gap-2")}>
-      <Icon size={14} />
-      {label}
+    <a
+      href={href}
+      {...externalProps}
+      className={getButtonClasses({
+        variant: "secondary-neutral",
+        className: "cursor-pointer",
+        hasLeadingIcon: true,
+      })}
+    >
+      <span className="relative z-1 flex items-center gap-2">
+        <Icon size={14} />
+        {label}
+      </span>
     </a>
   );
 }
 
 // Memoized since it renders the same tag multiple times in lists (rerender-memo rule)
-const TechTag = memo(function TechTag({ tag }: { tag: string }) {
+const TechTagComponent = memo(function TechTagComponent({ tag }: { tag: TechTag }) {
   const iconSlug = TECH_ICON_MAP[tag];
+  const displayName = tag
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-(--bg-primary) border border-(--border-color) text-(--text-secondary)">
-      {/* Ternary for explicit conditional rendering (rendering-conditional-render rule) */}
-      {iconSlug ? (
-        <img
-          src={`https://cdn.simpleicons.org/${iconSlug}`}
-          alt=""
-          className="w-3 h-3 opacity-60"
-          style={{ filter: "var(--icon-filter, grayscale(100%))" }}
-        />
-      ) : null}
-      {tag}
+    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-background border border-border text-muted-foreground">
+      <img
+        src={`https://cdn.simpleicons.org/${iconSlug}`}
+        alt=""
+        className="size-3 opacity-60"
+        style={{ filter: "var(--icon-filter, grayscale(100%))" }}
+      />
+      {displayName}
     </span>
   );
 });
+
+function ListItemContent({
+  title,
+  subtitle,
+  date,
+  tags,
+  isExternal,
+  description,
+}: Omit<ListItemProps, "href">) {
+  return (
+    <div className="group relative grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-4 items-start p-4 -mx-4 rounded-2xl squircle transition-all duration-300 border border-transparent hover:border-border hover:bg-linear-to-br hover:from-gray-500/10 hover:to-gray-500/5 hover:backdrop-blur-md">
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2">
+          <h3 className="font-medium text-foreground text-sm transition-colors">{title}</h3>
+          {isExternal && (
+            <ArrowUpRightIcon
+              size={12}
+              className="text-muted-foreground opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
+            />
+          )}
+        </div>
+
+        {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+
+        {description && (
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">{description}</p>
+        )}
+
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {tags.map((tag) => (
+              <TechTagComponent key={tag} tag={tag} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {date && (
+        <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">{date}</span>
+      )}
+    </div>
+  );
+}
 
 function ListItem({
   title,
@@ -132,58 +184,24 @@ function ListItem({
   isExternal = false,
   description,
 }: ListItemProps) {
-  const Content = () => (
-    <div className="group relative grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-4 items-start p-4 -mx-4 rounded-2xl squircle transition-all duration-300 border border-transparent hover:border-(--border-color) hover:bg-linear-to-br hover:from-gray-500/10 hover:to-gray-500/5 hover:backdrop-blur-md">
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2">
-          <h3 className="font-medium text-(--text-primary) text-sm transition-colors">{title}</h3>
-          {isExternal && (
-            <ArrowUpRightIcon
-              size={12}
-              className="text-(--text-secondary) opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
-            />
-          )}
-        </div>
-
-        {subtitle && <p className="text-sm text-(--text-secondary)">{subtitle}</p>}
-
-        {description && (
-          <p className="text-sm text-(--text-secondary) leading-relaxed max-w-xl">{description}</p>
-        )}
-
-        {tags && tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {tags.map((tag) => (
-              <TechTag key={tag} tag={tag} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {date && (
-        <span className="text-xs text-(--text-secondary) tabular-nums whitespace-nowrap">
-          {date}
-        </span>
-      )}
-    </div>
-  );
+  const contentProps = { title, subtitle, date, tags, isExternal, description };
 
   if (href) {
     if (isExternal) {
       return (
         <a href={href} target="_blank" rel="noopener noreferrer" className="block">
-          <Content />
+          <ListItemContent {...contentProps} />
         </a>
       );
     }
     return (
       <Link to={href} className="block">
-        <Content />
+        <ListItemContent {...contentProps} />
       </Link>
     );
   }
 
-  return <Content />;
+  return <ListItemContent {...contentProps} />;
 }
 
 function TimelineItem({
@@ -200,10 +218,10 @@ function TimelineItem({
       {/* Timeline line and dot */}
       <div className="relative flex flex-col items-center">
         {/* Dot */}
-        <div className="w-2.5 h-2.5 rounded-full bg-(--text-primary) ring-4 ring-(--bg-primary) z-10 mt-1.5" />
+        <div className="size-2.5 rounded-full bg-foreground ring-4 ring-background z-10 mt-1.5" />
 
         {/* Connecting Line - absolutely positioned to connect perfectly */}
-        {!isLast && <div className="absolute top-2.5 bottom-[-40px] w-px bg-(--border-color)" />}
+        {!isLast && <div className="absolute top-2.5 bottom-[-40px] w-px bg-border" />}
       </div>
 
       {/* Content */}
@@ -211,49 +229,55 @@ function TimelineItem({
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-medium text-(--text-primary) text-base">{title}</h3>
+              <h3 className="font-medium text-foreground text-base">{title}</h3>
               {isExternal && (
                 <ArrowUpRightIcon
                   size={14}
-                  className="text-(--text-secondary) opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
+                  className="text-muted-foreground opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"
                 />
               )}
             </div>
 
-            {subtitle && <p className="text-sm text-(--text-secondary) mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
           </div>
 
           {date && (
-            <span className="text-sm text-(--text-secondary) tabular-nums whitespace-nowrap">
+            <span className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
               {date}
             </span>
           )}
         </div>
 
-        {description && (
-          <p className="text-sm text-(--text-secondary) leading-relaxed max-w-xl mb-3">
-            {description}
-          </p>
+        {description && description.length > 0 && (
+          <ul className="text-sm text-muted-foreground leading-relaxed max-w-xl mb-3 list-disc pl-4 space-y-1">
+            {description.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
         )}
 
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-(--bg-primary) border border-(--border-color) text-(--text-secondary)"
-              >
-                {TECH_ICON_MAP[tag] && (
+            {tags.map((tag) => {
+              const displayName = tag
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+              return (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-background border border-border text-muted-foreground"
+                >
                   <img
                     src={`https://cdn.simpleicons.org/${TECH_ICON_MAP[tag]}`}
                     alt=""
-                    className="w-3.5 h-3.5 opacity-70"
+                    className="size-3.5 opacity-70"
                     style={{ filter: "var(--icon-filter, grayscale(100%))" }}
                   />
-                )}
-                {tag}
-              </span>
-            ))}
+                  {displayName}
+                </span>
+              );
+            })}
           </div>
         )}
       </div>
@@ -265,15 +289,15 @@ function TimelineItem({
 // Experience Section Component (with expand/collapse)
 // ============================================================================
 
-interface ExperienceSectionProps {
+type ExperienceSectionProps = {
   experience: {
     title: string;
     subtitle: string;
     date: string;
-    description: string;
-    tags: string[];
+    description: string[];
+    tags: TechTag[];
   }[];
-}
+};
 
 const INITIAL_EXPERIENCE_COUNT = 3;
 
@@ -317,22 +341,19 @@ function ExperienceSection({ experience }: ExperienceSectionProps) {
         {/* Bottom fade gradient - visible when collapsed with more items */}
         {hasMore && (
           <div
-            className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none transition-opacity duration-300"
-            style={{
-              background: "linear-gradient(to top, var(--bg-primary), transparent)",
-              opacity: isExpanded ? 0 : 1,
-            }}
+            className={cn(
+              "bg-linear-to-b from-transparent via-transparent to-background absolute bottom-0 left-0 right-0 h-24 pointer-events-none transition-opacity duration-300",
+              isExpanded ? "opacity-0" : "opacity-100",
+            )}
           />
         )}
       </div>
 
       {hasMore && (
-        <button
+        <Button
+          variant="tertiary-neutral"
           onClick={() => setIsExpanded(!isExpanded)}
-          className={cn(
-            getGlassyClasses("justify-center gap-2 w-full mt-4", "ghost", true),
-            "text-sm",
-          )}
+          className="w-full"
         >
           {isExpanded ? (
             <>
@@ -345,15 +366,11 @@ function ExperienceSection({ experience }: ExperienceSectionProps) {
               Show all ({experience.length})
             </>
           )}
-        </button>
+        </Button>
       )}
     </Section>
   );
 }
-
-// ============================================================================
-// Guidelines Carousel Component - 3D Curved Effect
-// ============================================================================
 
 function RuleOfThumbsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -431,12 +448,12 @@ function RuleOfThumbsCarousel() {
   return (
     <section className="mb-12 scroll-mt-24">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-medium text-(--text-secondary) uppercase tracking-wide">
+        <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           Rule of Thumb
         </h2>
         <Link
           to="/rule-of-thumb"
-          className="text-sm text-(--text-secondary) hover:text-(--text-primary) transition-colors flex items-center gap-1 group"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
         >
           View More
           <CaretRightIcon className="translate-y-[0.5px] group-hover:translate-x-0.5 transition-transform" />
@@ -476,7 +493,7 @@ function RuleOfThumbsCarousel() {
                   width: `${CARD_WIDTH}px`,
                 }}
               >
-                <GuidelineCard guideline={guideline} />
+                <RuleOfThumbCard ruleOfThumb={guideline} />
               </div>
             ))}
           </div>
@@ -486,7 +503,7 @@ function RuleOfThumbsCarousel() {
         <div
           className="absolute inset-y-0 left-0 w-32 pointer-events-none z-10"
           style={{
-            background: "linear-gradient(to right, var(--bg-primary), transparent)",
+            background: "linear-gradient(to right, var(--background), transparent)",
           }}
         />
 
@@ -494,7 +511,7 @@ function RuleOfThumbsCarousel() {
         <div
           className="absolute inset-y-0 right-0 w-32 pointer-events-none z-10"
           style={{
-            background: "linear-gradient(to left, var(--bg-primary), transparent)",
+            background: "linear-gradient(to left, var(--background), transparent)",
           }}
         />
       </div>
@@ -504,22 +521,22 @@ function RuleOfThumbsCarousel() {
         <button
           onClick={scrollPrev}
           className={cn(
-            "w-9 h-9 rounded-full bg-(--bg-secondary) border border-(--border-color) flex items-center justify-center transition-all duration-200",
-            "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer",
+            "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
+            "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
           )}
           aria-label="Scroll left"
         >
-          <CaretLeftIcon size={18} className="text-(--text-primary)" />
+          <CaretLeftIcon size={18} className="text-foreground" />
         </button>
         <button
           onClick={scrollNext}
           className={cn(
-            "w-9 h-9 rounded-full bg-(--bg-secondary) border border-(--border-color) flex items-center justify-center transition-all duration-200",
-            "opacity-100 hover:bg-(--border-color) hover:scale-105 cursor-pointer",
+            "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
+            "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
           )}
           aria-label="Scroll right"
         >
-          <CaretRightIcon size={18} className="text-(--text-primary)" />
+          <CaretRightIcon size={18} className="text-foreground" />
         </button>
       </div>
     </section>
@@ -552,50 +569,83 @@ export const Route = createFileRoute("/")({
           title: "Mid Software Engineer",
           subtitle: "EvidenceCare",
           date: "Sep 2024 — Present",
-          description: "Building healthcare software solutions in the United States.",
-          tags: ["React", "TypeScript"],
+          description: [
+            "Authored technical documentation for scaffolding services, configuring reverse proxies, and setting up semantic release pipelines for UI applications.",
+            "Built an automated PR reviewer to validate database permissions and reduce runtime errors.",
+            "Modernized tooling and upgraded dependencies across all TypeScript codebases.",
+            "Optimized Docker image builds, reducing image size by approximately 30%.",
+          ],
+          tags: [
+            "react",
+            "typescript",
+            "tailwindcss",
+            "postgresql",
+            "aws",
+            "express",
+          ] as const satisfies TechTag[],
         },
         {
           title: "Full Stack Engineer",
           subtitle: "VESTIS LABS",
           date: "Sep 2023 — Sep 2024",
-          description:
-            "Reduced API calls by caching with React Query. Created e2e tests with 70%+ coverage using Playwright. Overhauled app design with glassmorphism and micro-interactions. Built a custom drag-and-drop page builder from scratch.",
-          tags: ["React", "TypeScript", "Tailwind CSS"],
+          description: [
+            "Reduced API calls by caching with React Query.",
+            "Created e2e tests with 70%+ coverage using Playwright.",
+            "Overhauled app design with glassmorphism and micro-interactions.",
+            "Built a custom drag-and-drop page builder from scratch.",
+          ],
+          tags: [
+            "react",
+            "typescript",
+            "tailwindcss",
+            "mongodb",
+            "express",
+          ] as const satisfies TechTag[],
         },
         {
           title: "Full Stack Engineer",
           subtitle: "Jatis Mobile",
           date: "Sep 2022 — Aug 2023",
-          description:
-            "Built a client-side chatbot using XState and a chatbot flow builder with React Flow. Led a team of 4 developers. Recognized as top-performer of Q4 2022.",
-          tags: ["React", "TypeScript", "Tailwind CSS"],
+          description: [
+            "Built a client-side chatbot using XState and a chatbot flow builder with React Flow.",
+            "Led a team of 4 developers.",
+            "Recognized as top-performer of Q4 2022.",
+          ],
+          tags: ["react", "typescript", "tailwindcss"] as const satisfies TechTag[],
         },
         {
           title: "Founding Project Manager & Full-stack Developer",
           subtitle: "Rapidev",
           date: "Dec 2021 — Aug 2022",
-          description:
-            "Managed a product team of 10 for early-stage startups. Integrated Xendit and Midtrans payment gateways. Achieved 80% load time reduction through optimization.",
-          tags: ["React", "TypeScript", "Laravel"],
+          description: [
+            "Managed a product team of 10 for early-stage startups.",
+            "Integrated Xendit and Midtrans payment gateways.",
+            "Achieved 80% load time reduction through optimization.",
+          ],
+          tags: ["react", "typescript", "laravel"] as const satisfies TechTag[],
         },
         {
           title: "Full Stack Engineer",
           subtitle: "Freelance",
           date: "Feb 2020 — Dec 2021",
-          description:
-            "Built applications for LPP Polytechnic Yogyakarta using Laravel, React, Vue, and InertiaJS. Crafted custom WordPress/Blogger templates and translated Figma designs to pixel-perfect websites.",
-          tags: ["React", "Vue.js", "Laravel", "PHP"],
+          description: [
+            "Built applications for LPP Polytechnic Yogyakarta using Laravel, React, Vue, and InertiaJS.",
+            "Crafted custom WordPress/Blogger templates and translated Figma designs to pixel-perfect websites.",
+          ],
+          tags: ["react", "vuejs", "laravel", "php"] as const satisfies TechTag[],
         },
         {
           title: "Frontend Engineer",
           subtitle: "Mitra Integrasi Informatika",
           date: "Sep 2020 — Feb 2021",
-          description:
-            "Implemented JWT authentication for multiple projects. Performed code reviews and managed repositories. Designed admin dashboard UI using Figma.",
-          tags: ["React", "TypeScript"],
+          description: [
+            "Implemented JWT authentication for multiple projects.",
+            "Performed code reviews and managed repositories.",
+            "Designed admin dashboard UI using Figma.",
+          ],
+          tags: ["react", "typescript", "figma"] as const satisfies TechTag[],
         },
-      ],
+      ] satisfies ExperienceSectionProps["experience"],
       projects: [
         {
           title: "Schemata",
@@ -603,7 +653,7 @@ export const Route = createFileRoute("/")({
           description:
             "An Entity Relationship Diagram drag-and-drop builder for designing database schemas visually.",
           href: "https://schemata.ruine.app",
-          tags: ["React", "TypeScript", "Tailwind CSS"],
+          tags: ["react", "typescript", "tailwindcss"] as const satisfies TechTag[],
           isExternal: true,
         },
         {
@@ -612,18 +662,19 @@ export const Route = createFileRoute("/")({
           description:
             "A beautiful portfolio website template designed for developers and designers to showcase their work.",
           href: "https://old-itsfaqih.vercel.app",
-          tags: ["React", "TypeScript", "Tailwind CSS"],
+          tags: ["react", "typescript", "tailwindcss"] as const satisfies TechTag[],
           isExternal: true,
         },
         {
           title: "PHPID Learning",
           subtitle: "UI Design",
+
           description: "Learning platform UI design for the PHP Indonesia community.",
           href: "https://learning-byphpid.netlify.app",
-          tags: ["Figma"],
+          tags: ["figma"] as const satisfies TechTag[],
           isExternal: true,
         },
-      ],
+      ] satisfies ListItemProps[],
     };
   },
 });
@@ -635,15 +686,13 @@ function Index() {
     <PageContainer>
       {/* Name/Title */}
       <section className="mb-16">
-        <h1 className="text-5xl font-bold text-(--text-primary) tracking-tight mb-4">
-          Faqih Muntashir
-        </h1>
-        <p className="text-xl text-(--text-secondary) mb-6">Developer & Writer</p>
+        <h1 className="text-5xl font-bold text-foreground tracking-tight mb-4">Faqih Muntashir</h1>
+        <p className="text-xl text-muted-foreground mb-6">Developer & Writer</p>
       </section>
 
       {/* About */}
       <Section title="About">
-        <div className="text-(--text-secondary) leading-relaxed">
+        <div className="text-muted-foreground leading-relaxed">
           <p>High-agency, ambitious, and opinionated engineer with a customer service mindset.</p>
 
           <div className="flex flex-wrap gap-2 mt-4">
@@ -673,11 +722,11 @@ function Index() {
             <div
               key={tech.name}
               className="relative flex flex-col items-center justify-center gap-3 p-4 h-32 transition-all group hover:z-10 -ml-px -mt-px
-                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/20 group-hover:before:border-(--text-secondary) before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
-                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/20 group-hover:after:border-(--text-secondary) after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
+                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/20 group-hover:before:border-muted-foreground before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
+                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/20 group-hover:after:border-muted-foreground after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
               role="listitem"
             >
-              <div className="w-8 h-8 flex items-center justify-center z-10" aria-hidden="true">
+              <div className="size-8 flex items-center justify-center z-10" aria-hidden="true">
                 <img
                   src={`https://cdn.simpleicons.org/${tech.icon}`}
                   alt=""
@@ -685,7 +734,7 @@ function Index() {
                   style={{ filter: "var(--icon-filter, grayscale(100%))" }}
                 />
               </div>
-              <span className="text-xs text-(--text-secondary) text-center leading-tight z-10 group-hover:text-(--text-primary) transition-colors">
+              <span className="text-xs text-muted-foreground text-center leading-tight z-10 group-hover:text-foreground transition-colors">
                 {tech.name}
               </span>
             </div>
@@ -731,9 +780,8 @@ function Index() {
         ))}
       </Section>
 
-      <footer className="mt-20 pt-8 border-t border-(--border-color) text-sm text-(--text-secondary) flex justify-between">
-        <span>© 2026 Faqih Muntashir</span>
-        <span>Built with TanStack Start</span>
+      <footer className="mt-20 pt-8 border-t border-border text-sm text-muted-foreground flex justify-center">
+        <span>© 2026</span>
       </footer>
     </PageContainer>
   );

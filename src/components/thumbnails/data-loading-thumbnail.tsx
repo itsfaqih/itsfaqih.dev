@@ -15,7 +15,7 @@ export function DataLoadingThumbnail() {
           <path
             d="M18 52 C10 52 10 44 16 42 C15 37 22 34 27 37 C30 34 38 35 38 42 C44 42 44 52 36 52 Z"
             fill="transparent"
-            stroke="var(--text-primary)"
+            stroke="var(--foreground)"
             strokeWidth="1"
           />
           {/* Server lines inside cloud */}
@@ -24,7 +24,7 @@ export function DataLoadingThumbnail() {
             x2="35"
             y1="45"
             y2="45"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -33,7 +33,7 @@ export function DataLoadingThumbnail() {
             x2="31"
             y1="48"
             y2="48"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -46,11 +46,11 @@ export function DataLoadingThumbnail() {
             x2="62"
             y1="47"
             y2="47"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="1"
             strokeDasharray="2 2"
           />
-          <polygon points="64,47 60,44.5 60,49.5" fill="var(--text-secondary)" opacity="0.7" />
+          <polygon points="64,47 60,44.5 60,49.5" fill="var(--muted-foreground)" opacity="0.7" />
         </g>
 
         {/* ========== CACHE ICON (center) ========== */}
@@ -62,13 +62,13 @@ export function DataLoadingThumbnail() {
             rx="12"
             ry="4"
             fill="transparent"
-            stroke="var(--text-primary)"
+            stroke="var(--foreground)"
             strokeWidth="1"
           />
           <path
             d="M68 38 L68 54 C68 58 92 58 92 54 L92 38"
             fill="transparent"
-            stroke="var(--text-primary)"
+            stroke="var(--foreground)"
             strokeWidth="1"
           />
           {/* Cache data lines */}
@@ -77,7 +77,7 @@ export function DataLoadingThumbnail() {
             x2="88"
             y1="47"
             y2="47"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -86,7 +86,7 @@ export function DataLoadingThumbnail() {
             x2="85"
             y1="50"
             y2="50"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -99,11 +99,11 @@ export function DataLoadingThumbnail() {
             x2="110"
             y1="47"
             y2="47"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="1"
             strokeDasharray="2 2"
           />
-          <polygon points="112,47 108,44.5 108,49.5" fill="var(--text-secondary)" opacity="0.7" />
+          <polygon points="112,47 108,44.5 108,49.5" fill="var(--muted-foreground)" opacity="0.7" />
         </g>
 
         {/* ========== CLIENT ICON (right) ========== */}
@@ -116,22 +116,22 @@ export function DataLoadingThumbnail() {
             height="24"
             rx="2"
             fill="transparent"
-            stroke="var(--text-primary)"
+            stroke="var(--foreground)"
             strokeWidth="1"
           />
           {/* Browser top bar */}
-          <line x1="116" x2="144" y1="41" y2="41" stroke="var(--text-primary)" strokeWidth="0.8" />
+          <line x1="116" x2="144" y1="41" y2="41" stroke="var(--foreground)" strokeWidth="0.8" />
           {/* Browser dots */}
-          <circle cx="120" cy="38" r="1" fill="var(--text-secondary)" opacity="0.6" />
-          <circle cx="124" cy="38" r="1" fill="var(--text-secondary)" opacity="0.6" />
-          <circle cx="128" cy="38" r="1" fill="var(--text-secondary)" opacity="0.6" />
+          <circle cx="120" cy="38" r="1" fill="var(--muted-foreground)" opacity="0.6" />
+          <circle cx="124" cy="38" r="1" fill="var(--muted-foreground)" opacity="0.6" />
+          <circle cx="128" cy="38" r="1" fill="var(--muted-foreground)" opacity="0.6" />
           {/* Content lines */}
           <line
             x1="120"
             x2="140"
             y1="46"
             y2="46"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -140,7 +140,7 @@ export function DataLoadingThumbnail() {
             x2="136"
             y1="50"
             y2="50"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -149,7 +149,7 @@ export function DataLoadingThumbnail() {
             x2="138"
             y1="54"
             y2="54"
-            stroke="var(--text-secondary)"
+            stroke="var(--muted-foreground)"
             strokeWidth="0.6"
             opacity="0.5"
           />
@@ -160,7 +160,7 @@ export function DataLoadingThumbnail() {
           x="27"
           y="68"
           textAnchor="middle"
-          fill="var(--text-primary)"
+          fill="var(--foreground)"
           fontSize="6"
           fontFamily="Geist"
         >
@@ -170,7 +170,7 @@ export function DataLoadingThumbnail() {
           x="80"
           y="68"
           textAnchor="middle"
-          fill="var(--text-primary)"
+          fill="var(--foreground)"
           fontSize="6"
           fontFamily="Geist"
         >
@@ -180,7 +180,7 @@ export function DataLoadingThumbnail() {
           x="130"
           y="68"
           textAnchor="middle"
-          fill="var(--text-primary)"
+          fill="var(--foreground)"
           fontSize="6"
           fontFamily="Geist"
         >
@@ -191,13 +191,13 @@ export function DataLoadingThumbnail() {
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-(--bg-primary) to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
         {/* Top fade */}
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-(--bg-primary) to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );

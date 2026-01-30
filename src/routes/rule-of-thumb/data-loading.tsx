@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { useState, useEffect } from "react";
 import {
   HardDrivesIcon,
@@ -22,7 +22,7 @@ import {
   SectionHeading,
   TabbedCodeExample,
 } from "./-components";
-import { GlassyButton } from "../../components/glassy-button";
+import { Button } from "../../components/button";
 
 export const Route = createFileRoute("/rule-of-thumb/data-loading")({
   component: DataLoading,
@@ -47,35 +47,35 @@ function SWRDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-(--text-primary)">Dashboard Stats</h3>
+          <h3 className="font-semibold text-foreground">Dashboard Stats</h3>
           <div className="flex items-center gap-2">
             {isRefetching && (
-              <ArrowsClockwiseIcon size={14} className="text-(--text-secondary) animate-spin" />
+              <ArrowsClockwiseIcon size={14} className="text-muted-foreground animate-spin" />
             )}
-            <span className="text-xs text-(--text-secondary)">Updated {lastUpdated}</span>
+            <span className="text-xs text-muted-foreground">Updated {lastUpdated}</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color)">
-          <p className="text-2xl font-bold text-(--text-primary) tabular-nums">{data}</p>
+        <div className="p-4 rounded-lg bg-background border border-border">
+          <p className="text-2xl font-bold text-foreground tabular-nums">{data}</p>
         </div>
       </div>
 
-      <div className="border-t border-(--border-color) p-4 flex items-center justify-between">
-        <span className="text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4 flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">
           {isRefetching ? "Fetching fresh data..." : "Showing cached data"}
         </span>
-        <GlassyButton
+        <Button
           onClick={simulateRefetch}
           disabled={isRefetching}
           className="h-9 px-4 text-sm gap-2"
         >
           <ArrowsClockwiseIcon size={14} className={isRefetching ? "animate-spin" : ""} />
           Revalidate
-        </GlassyButton>
+        </Button>
       </div>
     </div>
   );
@@ -115,28 +115,28 @@ function SkeletonDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="p-6">
         <div className="min-h-[120px] flex items-center justify-center">
           {isLoading && showSkeleton ? (
             <div className="w-full space-y-3">
-              <div className="h-6 w-3/4 bg-(--border-color) rounded animate-pulse" />
-              <div className="h-4 w-1/2 bg-(--border-color) rounded animate-pulse" />
-              <div className="h-4 w-2/3 bg-(--border-color) rounded animate-pulse" />
+              <div className="h-6 w-3/4 bg-border rounded animate-pulse" />
+              <div className="h-4 w-1/2 bg-border rounded animate-pulse" />
+              <div className="h-4 w-2/3 bg-border rounded animate-pulse" />
             </div>
           ) : isLoading ? (
-            <span className="text-(--text-secondary)">Loading...</span>
+            <></>
           ) : (
             <div className="w-full">
-              <h3 className="text-xl font-bold text-(--text-primary) mb-2">Data Loaded!</h3>
-              <p className="text-(--text-secondary)">This content was fetched from the server.</p>
+              <h3 className="text-xl font-bold text-foreground mb-2">Data Loaded!</h3>
+              <p className="text-muted-foreground">This content was fetched from the server.</p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="border-t border-(--border-color) p-4 space-y-4">
-        <label className="flex items-center gap-2 text-sm text-(--text-secondary)">
+      <div className="border-t border-border p-4 space-y-4">
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
           <input
             type="checkbox"
             checked={useSpinDelay}
@@ -147,20 +147,12 @@ function SkeletonDemo() {
         </label>
 
         <div className="flex gap-2">
-          <GlassyButton
-            onClick={() => simulateLoad(true)}
-            disabled={isLoading}
-            className="px-4 py-2 h-auto text-sm"
-          >
+          <Button onClick={() => simulateLoad(true)} disabled={isLoading}>
             Fast Load (100ms)
-          </GlassyButton>
-          <GlassyButton
-            onClick={() => simulateLoad(false)}
-            disabled={isLoading}
-            className="px-4 py-2 h-auto text-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          </Button>
+          <Button onClick={() => simulateLoad(false)} disabled={isLoading}>
             Slow Load (1.5s)
-          </GlassyButton>
+          </Button>
         </div>
       </div>
     </div>
@@ -185,20 +177,20 @@ function ErrorDemo() {
   };
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="p-6">
         {state === "loading" && (
           <div className="flex items-center justify-center py-8">
-            <ArrowsClockwiseIcon size={24} className="text-(--text-secondary) animate-spin" />
+            <ArrowsClockwiseIcon size={24} className="text-muted-foreground animate-spin" />
           </div>
         )}
 
         {state === "success" && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-(--text-primary)">User Profile</h3>
-            <div className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color)">
-              <p className="text-(--text-primary)">Alice Johnson</p>
-              <p className="text-sm text-(--text-secondary)">alice@example.com</p>
+            <h3 className="font-semibold text-foreground">User Profile</h3>
+            <div className="p-4 rounded-lg bg-background border border-border">
+              <p className="text-foreground">Alice Johnson</p>
+              <p className="text-sm text-muted-foreground">alice@example.com</p>
             </div>
           </div>
         )}
@@ -219,12 +211,12 @@ function ErrorDemo() {
         )}
       </div>
 
-      <div className="border-t border-(--border-color) p-4 flex items-center justify-between">
-        <span className="text-sm text-(--text-secondary)">✓ Error shown inline, not as toast</span>
+      <div className="border-t border-border p-4 flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">✓ Error shown inline, not as toast</span>
         <button
           onClick={simulateError}
           disabled={state === "loading"}
-          className="px-4 py-2 rounded-lg bg-(--bg-primary) border border-(--border-color) text-sm text-(--text-primary) hover:bg-(--border-color) disabled:opacity-50 transition-colors"
+          className="px-4 py-2 rounded-lg bg-background border border-border text-sm text-foreground hover:bg-border disabled:opacity-50 transition-colors"
         >
           Simulate Error
         </button>
@@ -284,22 +276,22 @@ function DataParsingDemo() {
   }, [rawJson, zodSchema, parsedResult]);
 
   return (
-    <div className="rounded-2xl border border-(--border-color) bg-(--bg-secondary) overflow-hidden mb-8">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden mb-8">
       <div className="p-6">
-        <h3 className="font-semibold text-(--text-primary) mb-6">Safe Parsing with Fallbacks</h3>
+        <h3 className="font-semibold text-foreground mb-6">Safe Parsing with Fallbacks</h3>
 
         <div className="space-y-6">
           {/* Step 1: Raw Data */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="size-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
                 1
               </span>
               Input: Raw API response or database query result
             </div>
             <div className="relative">
               <div
-                className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
                 dangerouslySetInnerHTML={{ __html: highlightedJson || `<pre>${rawJson}</pre>` }}
               />
               <div className="absolute top-3 right-3">
@@ -312,29 +304,29 @@ function DataParsingDemo() {
 
           {/* Step 2: Schema */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="size-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
                 2
               </span>
               Process: Zod (or any) Schema
             </div>
             <div
-              className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+              className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
               dangerouslySetInnerHTML={{ __html: highlightedSchema || `<pre>${zodSchema}</pre>` }}
             />
           </div>
 
           {/* Step 3: Result */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
-              <span className="w-5 h-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="size-5 rounded flex items-center justify-center bg-slate-500/10 text-slate-500 font-mono text-xs">
                 3
               </span>
               Output: Safe Data
             </div>
             <div className="relative">
               <div
-                className="p-4 rounded-lg bg-(--bg-primary) border border-(--border-color) text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
                 dangerouslySetInnerHTML={{
                   __html: highlightedResult || `<pre>${parsedResult}</pre>`,
                 }}
@@ -367,14 +359,14 @@ function SectionCard({
   color?: string; // Optional or removed completely. Since I removed usage, I can remove it from type or make it optional unused. Best to remove it.
 }) {
   return (
-    <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+    <div className="p-6 rounded-xl border border-border bg-card">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
-          <Icon size={20} className="text-(--text-primary)" />
+        <div className="size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+          <Icon size={20} className="text-foreground" />
         </div>
-        <h3 className="font-semibold text-(--text-primary)">{title}</h3>
+        <h3 className="font-semibold text-foreground">{title}</h3>
       </div>
-      <div className="text-sm text-(--text-secondary) space-y-2">{children}</div>
+      <div className="text-sm text-muted-foreground space-y-2">{children}</div>
     </div>
   );
 }
@@ -393,14 +385,11 @@ function DataLoading() {
           <>
             Strategies for fast, reliable data fetching.
             <br />
-            <span className="text-(--text-primary) font-medium">
-              Fast first paint, smooth updates.
-            </span>
+            <span className="text-foreground font-medium">Fast first paint, smooth updates.</span>
           </>
         }
         badge={{
-          icon: LightningIcon,
-          text: "Performance Pattern",
+          text: "Architecture",
         }}
         markdownUrl="/rule-of-thumb/data-loading.md"
       />
@@ -420,7 +409,7 @@ function DataLoading() {
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           <SectionCard icon={HardDrivesIcon} title="Server-Side Rendering" color="">
             <p>
-              <strong className="text-(--text-primary)">Use when:</strong>
+              <strong className="text-foreground">Use when:</strong>
             </p>
             <ul className="list-disc list-inside space-y-1 mt-2">
               <li>SEO is critical (crawlers need content)</li>
@@ -432,7 +421,7 @@ function DataLoading() {
 
           <SectionCard icon={GlobeIcon} title="Single Page App" color="">
             <p>
-              <strong className="text-(--text-primary)">Use when:</strong>
+              <strong className="text-foreground">Use when:</strong>
             </p>
             <ul className="list-disc list-inside space-y-1 mt-2">
               <li>Behind authentication (no SEO needed)</li>
@@ -574,35 +563,51 @@ function Dashboard() {
 
         <div className="mt-8">
           <CodeExample
-            title="SWR Pattern"
-            code={`import useSWR from 'swr';
+            title="Stale-While-Revalidate Pattern"
+            code={`import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
+
+const statsSchema = z.object({
+  totalUsers: z.number(),
+  activeUsers: z.number(),
+  revenue: z.number().catch(0),
+});
+
+async function fetchStats() {
+  const res = await fetch('/api/stats');
+  
+  if (!res.ok) {
+    throw new Error(\`HTTP \${res.status}: \${res.statusText}\`);
+  }
+  
+  const json = await res.json();
+  
+  return statsSchema.parse(json);
+}
 
 function Dashboard() {
-  const { data, error, isValidating } = useSWR(
-    '/api/stats',
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      dedupingInterval: 5000,
-    }
-  );
+  const { data, error, isFetching, refetch } = useQuery({
+    queryKey: ['stats'],
+    queryFn: fetchStats,
+    refetchOnWindowFocus: true,
+    staleTime: 5000,
+  });
 
   return (
     <div>
       <div className="flex items-center gap-2">
         <h1>Stats</h1>
         {/* Show spinner when revalidating */}
-        {isValidating && <Spinner size="sm" />}
+        {isFetching && <Spinner size="sm" />}
       </div>
       
       {/* Show stale data while revalidating */}
       {data && <StatsDisplay data={data} />}
       
-      {error && <ErrorState onRetry={mutate} />}
+      {error && <ErrorState onRetry={refetch} />}
     </div>
   );
 }`}
-            description="SWR provides automatic caching, revalidation, and background updates."
           />
         </div>
       </div>
@@ -745,16 +750,16 @@ function useDelayedLoading(isLoading, delay = 200) {
         />
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+          <div className="p-6 rounded-xl border border-border bg-card">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
-                <BroadcastIcon size={20} className="text-(--text-primary)" />
+              <div className="size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+                <BroadcastIcon size={20} className="text-foreground" />
               </div>
-              <h3 className="font-semibold text-(--text-primary)">WebSocket</h3>
+              <h3 className="font-semibold text-foreground">WebSocket</h3>
             </div>
-            <div className="text-sm text-(--text-secondary) space-y-2">
+            <div className="text-sm text-muted-foreground space-y-2">
               <p>
-                <strong className="text-(--text-primary)">Use when:</strong>
+                <strong className="text-foreground">Use when:</strong>
               </p>
               <ul className="list-disc list-inside space-y-1 mt-2">
                 <li>Updates need to be instant ({"<"}1 second)</li>
@@ -765,16 +770,16 @@ function useDelayedLoading(isLoading, delay = 200) {
             </div>
           </div>
 
-          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+          <div className="p-6 rounded-xl border border-border bg-card">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
-                <ArrowsClockwiseIcon size={20} className="text-(--text-primary)" />
+              <div className="size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center">
+                <ArrowsClockwiseIcon size={20} className="text-foreground" />
               </div>
-              <h3 className="font-semibold text-(--text-primary)">Interval HTTP</h3>
+              <h3 className="font-semibold text-foreground">Interval HTTP</h3>
             </div>
-            <div className="text-sm text-(--text-secondary) space-y-2">
+            <div className="text-sm text-muted-foreground space-y-2">
               <p>
-                <strong className="text-(--text-primary)">Use when:</strong>
+                <strong className="text-foreground">Use when:</strong>
               </p>
               <ul className="list-disc list-inside space-y-1 mt-2">
                 <li>Updates every 30+ seconds is acceptable</li>
@@ -820,28 +825,26 @@ function useDelayedLoading(isLoading, delay = 200) {
               <WarningCircleIcon size={18} className="text-red-400" />
               <h3 className="font-semibold text-red-400">Don't Persist</h3>
             </div>
-            <p className="text-sm text-(--text-secondary) mb-4">
-              Data that must always be accurate:
-            </p>
-            <ul className="text-sm text-(--text-secondary) space-y-2">
+            <p className="text-sm text-muted-foreground mb-4">Data that must always be accurate:</p>
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Bank balance</strong> — Stale balance
-                  could cause overdrafts or confusion
+                  <strong className="text-foreground">Bank balance</strong> — Stale balance could
+                  cause overdrafts or confusion
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Stock prices</strong> — Users make
-                  decisions based on current prices
+                  <strong className="text-foreground">Stock prices</strong> — Users make decisions
+                  based on current prices
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Inventory count</strong> — Could lead to
+                  <strong className="text-foreground">Inventory count</strong> — Could lead to
                   overselling
                 </span>
               </li>
@@ -853,26 +856,26 @@ function useDelayedLoading(isLoading, delay = 200) {
               <HardDriveIcon size={18} className="text-emerald-400" />
               <h3 className="font-semibold text-emerald-400">OK to Persist</h3>
             </div>
-            <p className="text-sm text-(--text-secondary) mb-4">Historical or reference data:</p>
-            <ul className="text-sm text-(--text-secondary) space-y-2">
+            <p className="text-sm text-muted-foreground mb-4">Historical or reference data:</p>
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">Transaction history</strong> — Past
-                  records don't change
+                  <strong className="text-foreground">Transaction history</strong> — Past records
+                  don't change
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">User preferences</strong> — Settings
-                  rarely change
+                  <strong className="text-foreground">User preferences</strong> — Settings rarely
+                  change
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">Static content</strong> — Blog posts,
+                  <strong className="text-foreground">Static content</strong> — Blog posts,
                   documentation
                 </span>
               </li>
@@ -905,20 +908,20 @@ function useDelayedLoading(isLoading, delay = 200) {
 
         {/* Persistence Methods */}
         <div className="mt-12">
-          <h3 className="text-lg font-semibold text-(--text-primary) mb-6">Persistence Methods</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-6">Persistence Methods</h3>
           <div className="grid gap-4">
             {/* LocalStorage */}
-            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+            <div className="p-6 rounded-xl border border-border bg-card">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
+                <div className="size-10 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
                   <HardDriveIcon size={20} className="text-amber-500" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-(--text-primary)">LocalStorage</h4>
-                  <span className="text-xs text-(--text-secondary)">~5MB limit</span>
+                  <h4 className="font-semibold text-foreground">LocalStorage</h4>
+                  <span className="text-xs text-muted-foreground">~5MB limit</span>
                 </div>
               </div>
-              <div className="text-sm text-(--text-secondary) space-y-2">
+              <div className="text-sm text-muted-foreground space-y-2">
                 <p>Simple key-value storage. Best for small, string-based data.</p>
                 <ul className="list-disc list-inside space-y-1 mt-2">
                   <li>Synchronous API — can block main thread</li>
@@ -929,17 +932,17 @@ function useDelayedLoading(isLoading, delay = 200) {
             </div>
 
             {/* IndexedDB */}
-            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+            <div className="p-6 rounded-xl border border-border bg-card">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
+                <div className="size-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
                   <DatabaseIcon size={20} className="text-blue-500" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-(--text-primary)">IndexedDB</h4>
-                  <span className="text-xs text-(--text-secondary)">No practical limit</span>
+                  <h4 className="font-semibold text-foreground">IndexedDB</h4>
+                  <span className="text-xs text-muted-foreground">No practical limit</span>
                 </div>
               </div>
-              <div className="text-sm text-(--text-secondary) space-y-2">
+              <div className="text-sm text-muted-foreground space-y-2">
                 <p>Full database in the browser. Best for structured, large datasets.</p>
                 <ul className="list-disc list-inside space-y-1 mt-2">
                   <li>Asynchronous API — doesn't block UI</li>
@@ -950,19 +953,19 @@ function useDelayedLoading(isLoading, delay = 200) {
             </div>
 
             {/* Embedded Database */}
-            <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+            <div className="p-6 rounded-xl border border-border bg-card">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
+                <div className="size-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
                   <StackIcon size={20} className="text-emerald-500" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-(--text-primary)">Embedded Database</h4>
-                  <span className="text-xs text-(--text-secondary)">
+                  <h4 className="font-semibold text-foreground">Embedded Database</h4>
+                  <span className="text-xs text-muted-foreground">
                     ElectricSQL, Turso, PGlite, etc.
                   </span>
                 </div>
               </div>
-              <div className="text-sm text-(--text-secondary) space-y-2">
+              <div className="text-sm text-muted-foreground space-y-2">
                 <p>Full SQL database running in the browser with sync capabilities.</p>
                 <ul className="list-disc list-inside space-y-1 mt-2">
                   <li>Real SQL queries (SQLite-based)</li>
@@ -1105,13 +1108,13 @@ setInterval(() => client.sync(), 30000);`,
               <WarningCircleIcon size={18} className="text-red-400" />
               <h3 className="font-semibold text-red-400">Without Parsing</h3>
             </div>
-            <p className="text-sm text-(--text-secondary) mb-4">What can go wrong:</p>
-            <ul className="text-sm text-(--text-secondary) space-y-2">
+            <p className="text-sm text-muted-foreground mb-4">What can go wrong:</p>
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Runtime crashes</strong> — Accessing{" "}
-                  <code className="text-xs bg-(--bg-primary) px-1 rounded">
+                  <strong className="text-foreground">Runtime crashes</strong> — Accessing{" "}
+                  <code className="text-xs bg-background px-1 rounded">
                     user.name.toUpperCase()
                   </code>{" "}
                   when name is undefined
@@ -1120,16 +1123,16 @@ setInterval(() => client.sync(), 30000);`,
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Type mismatches</strong> — Expecting
-                  number, getting string like{" "}
-                  <code className="text-xs bg-(--bg-primary) px-1 rounded">"42"</code>
+                  <strong className="text-foreground">Type mismatches</strong> — Expecting number,
+                  getting string like{" "}
+                  <code className="text-xs bg-background px-1 rounded">"42"</code>
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 <span>
-                  <strong className="text-(--text-primary)">Silent failures</strong> — Missing
-                  fields that cause subtle bugs later
+                  <strong className="text-foreground">Silent failures</strong> — Missing fields that
+                  cause subtle bugs later
                 </span>
               </li>
             </ul>
@@ -1140,27 +1143,27 @@ setInterval(() => client.sync(), 30000);`,
               <ShieldCheckIcon size={18} className="text-emerald-400" />
               <h3 className="font-semibold text-emerald-400">With Parsing</h3>
             </div>
-            <p className="text-sm text-(--text-secondary) mb-4">Benefits:</p>
-            <ul className="text-sm text-(--text-secondary) space-y-2">
+            <p className="text-sm text-muted-foreground mb-4">Benefits:</p>
+            <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">Early error detection</strong> — Catch
-                  invalid data at the boundary
+                  <strong className="text-foreground">Early error detection</strong> — Catch invalid
+                  data at the boundary
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">Type safety</strong> — TypeScript knows
-                  the exact shape after parsing
+                  <strong className="text-foreground">Type safety</strong> — TypeScript knows the
+                  exact shape after parsing
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400">✓</span>
                 <span>
-                  <strong className="text-(--text-primary)">Graceful handling</strong> — Use
-                  fallbacks or show meaningful errors
+                  <strong className="text-foreground">Graceful handling</strong> — Use fallbacks or
+                  show meaningful errors
                 </span>
               </li>
             </ul>
@@ -1298,77 +1301,77 @@ function UserList() {
 
       {/* Summary */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-4">Quick Reference</h2>
-          <div className="space-y-3 text-(--text-secondary)">
+        <div className="p-8 rounded-2xl bg-card border border-border">
+          <h2 className="text-xl font-bold text-foreground mb-4">Quick Reference</h2>
+          <div className="space-y-3 text-muted-foreground">
             <div className="flex items-start gap-3">
-              <HardDrivesIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <HardDrivesIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">SSR</strong> — Use for SEO-critical,
-                important content
+                <strong className="text-foreground">SSR</strong> — Use for SEO-critical, important
+                content
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <LightningIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <LightningIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Loader</strong> — Trigger fetches on
-                navigation, not render
+                <strong className="text-foreground">Loader</strong> — Trigger fetches on navigation,
+                not render
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <StackIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <StackIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Defer</strong> — Don't block render, show
+                <strong className="text-foreground">Defer</strong> — Don't block render, show
                 skeleton first
               </span>
             </div>
             <div className="flex items-start gap-3">
               <DatabaseIcon size={18} className="text-cyan-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Batch</strong> — Group queries when
-                possible, separate if heavy
+                <strong className="text-foreground">Batch</strong> — Group queries when possible,
+                separate if heavy
               </span>
             </div>
             <div className="flex items-start gap-3">
               <ArrowsClockwiseIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">SWR</strong> — Show stale data, indicate
+                <strong className="text-foreground">SWR</strong> — Show stale data, indicate
                 background refresh
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <ClockIcon size={18} className="text-(--text-primary) mt-0.5 shrink-0" />
+              <ClockIcon size={18} className="text-foreground mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Spin Delay</strong> — Wait 200ms before
-                showing skeleton
+                <strong className="text-foreground">Spin Delay</strong> — Wait 200ms before showing
+                skeleton
               </span>
             </div>
             <div className="flex items-start gap-3">
               <WarningCircleIcon size={18} className="text-red-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Errors</strong> — Inline, not toast.
-                Include retry. Log to observability.
+                <strong className="text-foreground">Errors</strong> — Inline, not toast. Include
+                retry. Log to observability.
               </span>
             </div>
             <div className="flex items-start gap-3">
               <BroadcastIcon size={18} className="text-pink-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">WebSocket</strong> — Use for realtime data
-                that needs instant updates
+                <strong className="text-foreground">WebSocket</strong> — Use for realtime data that
+                needs instant updates
               </span>
             </div>
             <div className="flex items-start gap-3">
               <HardDriveIcon size={18} className="text-zinc-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Cache</strong> — Don't persist client
-                cache unless app works offline or needs latest data on revisit
+                <strong className="text-foreground">Cache</strong> — Don't persist client cache
+                unless app works offline or needs latest data on revisit
               </span>
             </div>
             <div className="flex items-start gap-3">
               <ShieldCheckIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <span>
-                <strong className="text-(--text-primary)">Parse</strong> — Validate external data
-                with Zod. Use fallbacks or show meaningful errors.
+                <strong className="text-foreground">Parse</strong> — Validate external data with
+                Zod. Use fallbacks or show meaningful errors.
               </span>
             </div>
           </div>
@@ -1376,7 +1379,7 @@ function UserList() {
       </div>
 
       {/* Footer */}
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

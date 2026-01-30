@@ -24,7 +24,7 @@ export function NullVsUndefinedThumbnail() {
               rx="4"
               fill="transparent"
               strokeDasharray="4 4"
-              className={`stroke-(--text-secondary) ${styles.undefinedFade}`}
+              className={`stroke-muted-foreground ${styles.undefinedFade}`}
               style={{
                 animationDuration: durationStr,
                 opacity: 0.5,
@@ -36,7 +36,7 @@ export function NullVsUndefinedThumbnail() {
               y="24"
               textAnchor="middle"
               fontSize="18"
-              className={`fill-(--text-secondary) font-mono ${styles.questionMark}`}
+              className={`fill-muted-foreground font-mono ${styles.questionMark}`}
               style={{
                 animationDuration: durationStr,
                 transformOrigin: "18px 24px",
@@ -50,7 +50,7 @@ export function NullVsUndefinedThumbnail() {
               y="46"
               textAnchor="middle"
               fontSize="6"
-              className="fill-(--text-secondary) font-mono uppercase tracking-wider opacity-60"
+              className="fill-muted-foreground font-mono uppercase tracking-wider opacity-60"
             >
               Undefined
             </text>
@@ -70,7 +70,7 @@ export function NullVsUndefinedThumbnail() {
                 height="36"
                 rx="4"
                 fill="transparent"
-                className="stroke-(--text-primary)"
+                className="stroke-foreground"
               />
               {/* Inner "Void" Token - representing the explicit null value */}
               <g transform="translate(6, 12)">
@@ -79,14 +79,14 @@ export function NullVsUndefinedThumbnail() {
                   height="12"
                   rx="2"
                   fill="transparent"
-                  className="stroke-(--text-primary)"
+                  className="stroke-foreground"
                 />
                 <text
                   x="12"
                   y="8"
                   textAnchor="middle"
                   fontSize="6"
-                  className="fill-(--text-primary) font-mono font-bold"
+                  className="fill-foreground font-mono font-bold"
                 >
                   NULL
                 </text>
@@ -97,7 +97,7 @@ export function NullVsUndefinedThumbnail() {
                 y="46"
                 textAnchor="middle"
                 fontSize="6"
-                className="fill-(--text-primary) font-mono uppercase tracking-wider"
+                className="fill-foreground font-mono uppercase tracking-wider"
               >
                 Null
               </text>
@@ -107,10 +107,10 @@ export function NullVsUndefinedThumbnail() {
       </svg>
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-(--bg-primary) to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-(--bg-primary) to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-(--bg-primary) to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );

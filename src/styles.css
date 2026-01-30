@@ -35,28 +35,108 @@
 
 @layer base {
   :root {
-    --bg-primary: #fafafa; /* slightly off-white/gray */
-    --bg-secondary: rgba(255, 255, 255, 0.5); /* translucent white */
-    --text-primary: #18181b; /* zinc-950 */
-    --text-secondary: #71717a; /* zinc-500 */
-    --border-color: rgba(228, 228, 231, 1); /* translucent zinc-200 */
-    --header-bg: rgba(255, 255, 255, 0.6);
-    --card-bg: rgba(255, 255, 255, 0.5);
-    --grid-color: rgba(0, 0, 0, 0.3);
-    --key-shadow: #000000;
+    /* Shadcn-style semantic color tokens */
+    --background: oklch(0.98 0 0); /* #fafafa - slightly off-white */
+    --foreground: oklch(0.145 0 0); /* #18181b - zinc-950 */
+    
+    --card: oklch(1 0 0 / 50%); /* translucent white */
+    --card-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --popover: oklch(1 0 0); /* white */
+    --popover-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --brand: oklch(0.556 0.182 254.604); /* blue-600 */
+    --brand-foreground: oklch(0.985 0 0); /* near white */
+    
+    --neutral: oklch(0.97 0 0 / 50%); /* translucent light gray */
+    --neutral-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --muted: oklch(0.97 0 0); /* zinc-100 */
+    --muted-foreground: oklch(0.556 0 0); /* zinc-500 */
+    
+    --accent: oklch(0.97 0 0); /* zinc-100 */
+    --accent-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
+    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    
+    --border: oklch(0.922 0 0); /* zinc-200 */
+    --input: oklch(0.922 0 0); /* zinc-200 */
+    --ring: oklch(0.556 0.182 254.604); /* brand blue-600 */
+    
+    /* Legacy/custom variables for specific use cases */
+    --header-bg: oklch(1 0 0 / 60%); /* translucent white */
+    --grid-color: oklch(0 0 0 / 20%); /* translucent black */
+    --key-shadow: oklch(0 0 0); /* black */
+    
+    /* Border radius */
+    --radius: 0.75rem; /* 12px */
   }
 
   .dark {
-    --bg-primary: #09090b; /* zinc-950 */
-    --bg-secondary: rgba(24, 24, 27, 0.4); /* translucent zinc-900 */
-    --text-primary: #f4f4f5; /* zinc-100 */
-    --text-secondary: #a1a1aa; /* zinc-400 */
-    --border-color: rgba(255, 255, 255, 0.2); /* translucent white border */
-    --header-bg: rgba(9, 9, 11, 0.4);
-    --card-bg: rgba(24, 24, 27, 0.4);
-    --grid-color: rgba(255, 255, 255, 0.3);
-    --key-shadow: #94a3b8;
+    --background: oklch(0.145 0 0); /* #09090b - zinc-950 */
+    --foreground: oklch(0.985 0 0); /* #f4f4f5 - zinc-100 */
+    
+    --card: oklch(0.205 0 0 / 40%); /* translucent zinc-900 */
+    --card-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --popover: oklch(0.269 0 0); /* zinc-800 */
+    --popover-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --brand: oklch(0.708 0.182 254.604); /* blue-400 */
+    --brand-foreground: oklch(0.145 0 0); /* zinc-950 */
+    
+    --neutral: oklch(0.269 0 0 / 40%); /* translucent zinc-800 */
+    --neutral-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --muted: oklch(0.269 0 0); /* zinc-800 */
+    --muted-foreground: oklch(0.708 0 0); /* zinc-400 */
+    
+    --accent: oklch(0.371 0 0); /* zinc-700 */
+    --accent-foreground: oklch(0.985 0 0); /* zinc-100 */
+    
+    --destructive: oklch(0.704 0.191 22.216); /* red-500 */
+    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    
+    --border: oklch(1 0 0 / 10%); /* translucent white */
+    --input: oklch(1 0 0 / 15%); /* translucent white */
+    --ring: oklch(0.708 0.182 254.604); /* brand blue-400 */
+    
+    /* Legacy/custom variables for specific use cases */
+    --header-bg: oklch(0.145 0 0 / 40%); /* translucent zinc-950 */
+    --grid-color: oklch(1 0 0 / 15%); /* translucent white */
+    --key-shadow: oklch(0.708 0 0); /* slate-400 */
   }
+}
+
+/* Make CSS variables available as Tailwind utilities */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  /* Legacy/custom colors */
+  --color-header-bg: var(--header-bg);
+  --color-grid: var(--grid-color);
+  
+  /* Border radius */
+  --radius: var(--radius);
 }
 
 /* Experimental squircle support */
@@ -70,7 +150,7 @@ figure[data-rehype-pretty-code-figure] {
 }
 
 figure[data-rehype-pretty-code-figure] pre {
-  @apply rounded-xl border border-(--border-color) p-4 overflow-x-auto bg-(--bg-secondary) text-sm leading-relaxed;
+  @apply rounded-xl border border-(--border) p-4 overflow-x-auto bg-(--card) text-sm leading-relaxed;
 }
 
 /* Handle dual themes using Shiki variables */
@@ -108,15 +188,15 @@ figure[data-rehype-pretty-code-figure] [data-line] {
 }
 
 figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
-  @apply bg-(--bg-secondary) border-(--border-color);
+  @apply bg-(--card) border-(--border);
 }
 
 /* Grid Background Styles */
 @layer base {
   :root {
     /* Grid system */
-    --cell-size: 1.8vw;
-    --grid-offset: 5vw; /* Replace fixed 100px with relative unit to fix zoom drift */
+    --cell-size: 40px;
+    --grid-offset: 100px;
   }
 }
 
@@ -172,6 +252,7 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   height: 50vh;
   pointer-events: none;
   z-index: 0;
+  background-position: center top;
   /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
   --ceiling-cell: calc(var(--cell-size) / 0.966);
   background-image: 
@@ -197,6 +278,7 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   right: 0;
   height: 50vh;
   pointer-events: none;
+  background-position: center bottom;
   /* Use wall cell size divided by cos(15deg) ≈ 0.966 to match perpendicular spacing */
   --floor-cell: calc(var(--cell-size) / 0.966);
   background-image: 
@@ -225,28 +307,22 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   animation-delay: var(--fade-delay, 0s);
 }
 
-/* Ceiling/floor boxes - rhombus shape using clip-path to match grid */
-.fade-box-ceiling,
-.fade-box-floor {
-  --ceiling-cell: calc(var(--cell-size) / 0.966);
-  /* Size to contain the rhombus */
-  width: calc(var(--ceiling-cell) * 2);
-  height: calc(var(--ceiling-cell) * 0.55);
-  /* Clip to a wide diamond/rhombus shape matching 15deg grid lines */
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-}
+
 
 @keyframes grid-box-fade {
-  0%, 100% {
+  0% {
     opacity: 0;
   }
-  /* Fade in during first 15% of cycle */
-  15% {
+  /* Fade in */
+  10% {
     opacity: 0.8;
   }
-  /* Hold at full opacity for middle 70% */
-  85% {
+  /* Hold visible for a shorter time */
+  35% {
     opacity: 0.8;
   }
-  /* Fade out during last 15% */
+  /* Fade out */
+  50%, 100% {
+    opacity: 0;
+  }
 }

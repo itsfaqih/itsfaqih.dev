@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
-import { FileCodeIcon, ShieldIcon, PackageIcon } from "@phosphor-icons/react";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
+import { ShieldIcon, PackageIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
 
@@ -17,14 +17,11 @@ function TypeScriptGuidelines() {
           <>
             Patterns for writing clean, robust, and maintainable TypeScript.
             <br />
-            <span className="text-(--text-primary) font-medium">
-              Strict defaults, explicit intent.
-            </span>
+            <span className="text-foreground font-medium">Strict defaults, explicit intent.</span>
           </>
         }
         badge={{
-          icon: FileCodeIcon,
-          text: "Code Quality",
+          text: "Code Writing",
         }}
         markdownUrl="/rule-of-thumb/typescript-code-writing.md"
       />
@@ -80,40 +77,73 @@ export function calculateTotal(items: Item[]) {
           <BestPractice
             emoji="📝"
             title='Use "type" by default'
-            description='Use "type" for most definitions (unions, primitives, tuples) as it"s more flexible. Use "interface" specifically when you need declaration merging or object-oriented patterns.'
+            description='Use "type" for definitions (unions, primitives, simple objects). Use "interface" only when you need to extend other types (prefer "extends" over "&") or for declaration merging.'
           />
           <BestPractice
             emoji="🏗️"
             title="Unions over Enums"
-            description="TypeScript enums can be problematic at runtime/bundle-size. Union types of string literals are simpler, safer, and compile away."
+            description="Avoid enums as they emit runtime code and reduce interoperability. String literal unions are simpler, purely type-level, and compatible with modern Node.js type-stripping."
           />
           <BestPractice
             emoji="🧠"
             title="Infer when possible"
-            description="Don't write types that TypeScript can infer automatically. It reduces noise and ensures the type matches the actual value."
+            description="Use inference to reduce noise. Only annotate explicitly when documenting intent or enforcing contracts."
           />
         </div>
 
         <CodeExample
+          title="Type vs Interface"
+          code={`// ✅ Use type for simple objects
+type User = {
+  id: string;
+  name: string;
+}
+
+// ❌ Avoid intersection for extension
+type Admin = User & {
+  permissions: string[];
+}
+
+// ✅ Use interface for extension
+interface Admin extends User {
+  permissions: string[];
+}`}
+        />
+
+        <CodeExample
           title="Types vs Enums"
           code={`// ❌ Avoid this
-enum UserRole {
+enum UserRoleEnum {
   Admin = "ADMIN",
   Editor = "EDITOR",
   Viewer = "VIEWER"
 }
 
-// ❌ Avoid redundant typing
-const x: number = 5; // 'number' is unnecessary
-const y = 5; // inferred as number
-
 // ✅ Do this
-type UserRole = "admin" | "editor" | "viewer";
+type UserRole = "ADMIN" | "EDITOR" | "VIEWER";
+const UserRoleEnum = {
+  Admin: "ADMIN",
+  Editor: "EDITOR",
+  Viewer: "VIEWER"
+} as const`}
+          description="String literal unions are simpler and don't emit runtime code."
+        />
 
-function setRole(role: UserRole) {
-  // TypeScript provides autocomplete for strings
+        <CodeExample
+          title="Type Inference"
+          code={`// ❌ Avoid unnecessary explicit typing
+const x: number = 5; // it's a constant, it's not going to change to other types
+const items: string[] = ["a", "b", "c"];
+
+// ✅ Do this - let TypeScript infer
+const y = 5; // inferred as number
+const items = ["a", "b", "c"]; // inferred as string[]
+
+// ✅ Annotate when enforcing a contract
+function getUser(): User { // explicit return type documents intent
+  return { id: "1", name: "Alice" };
 }`}
-          description="String unions are lightweight and structurally typed, unlike nominal Enums."
+          description="Only add type annotations when they add value - for function signatures, public APIs, or to catch errors."
         />
       </div>
 
@@ -141,7 +171,7 @@ function createUser(name: string, email: string, role: string, isActive: boolean
 createUser("Alice", "alice@example.com", "admin", true); // what is "true"?
 
 // ✅ Do this
-interface CreateUserOptions {
+type CreateUserOptions = {
   name: string;
   email: string;
   role?: "admin" | "user";
@@ -171,26 +201,26 @@ createUser({
         />
 
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center gap-3 mb-4">
-              <ShieldIcon size={20} className="text-(--text-primary)" />
-              <h3 className="font-semibold text-(--text-primary)">Must-Have Flags</h3>
+              <ShieldIcon size={20} className="text-foreground" />
+              <h3 className="font-semibold text-foreground">Must-Have Flags</h3>
             </div>
-            <ul className="space-y-3 text-sm text-(--text-secondary)">
+            <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex flex-col gap-1">
-                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
                   "strict": true
                 </code>
                 <span>Enables strictNullChecks, noImplicitAny, etc.</span>
               </li>
               <li className="flex flex-col gap-1">
-                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
                   "noUncheckedIndexedAccess": true
                 </code>
                 <span>Forces you to check if array access / index signature is defined.</span>
               </li>
               <li className="flex flex-col gap-1">
-                <code className="text-(--text-primary) bg-zinc-500/10 px-1.5 py-0.5 rounded w-fit">
+                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
                   "verbatimModuleSyntax": true
                 </code>
                 <span>Enforces consistent imports/exports and ESM compatibility.</span>
@@ -198,25 +228,25 @@ createUser({
             </ul>
           </div>
 
-          <div className="p-6 rounded-xl bg-(--bg-secondary) border border-(--border-color)">
+          <div className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-center gap-3 mb-4">
-              <PackageIcon size={20} className="text-(--text-primary)" />
-              <h3 className="font-semibold text-(--text-primary)">Module System</h3>
+              <PackageIcon size={20} className="text-foreground" />
+              <h3 className="font-semibold text-foreground">Module System</h3>
             </div>
-            <p className="text-sm text-(--text-secondary) mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Use <strong>ESM (ECMAScript Modules)</strong> exclusively.
             </p>
-            <ul className="space-y-2 text-sm text-(--text-secondary)">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
-                <span className="text-(--text-primary)">✓</span>
+                <span className="text-foreground">✓</span>
                 <span>import / export syntax</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-(--text-primary)">✗</span>
+                <span className="text-foreground">✗</span>
                 <span>require() / module.exports</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-(--text-primary)">✓</span>
+                <span className="text-foreground">✓</span>
                 <span>Top-level await support</span>
               </li>
             </ul>
@@ -224,7 +254,7 @@ createUser({
         </div>
       </div>
 
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

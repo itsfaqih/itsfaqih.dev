@@ -11,7 +11,7 @@ export function ProximityPrincipleThumbnail() {
     <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Center divider - dashed */}
-        <line x1="80" y1="15" x2="80" y2="85" stroke="var(--border-color)" strokeDasharray="3 2" />
+        <line x1="80" y1="15" x2="80" y2="85" stroke="var(--border)" strokeDasharray="3 2" />
 
         {/* ============ LEFT SIDE: Scattered/Bad ============ */}
         <g transform="translate(18, 10)">
@@ -19,14 +19,14 @@ export function ProximityPrincipleThumbnail() {
           <g className={styles.float} style={{ animationDuration: "3s" }}>
             <path
               d="M4,4 L4,18 L26,18 L26,7 L15,7 L13,4 Z"
-              fill="var(--bg-primary)"
-              stroke="var(--text-primary)"
+              fill="var(--background)"
+              stroke="var(--foreground)"
               strokeWidth="1"
             />
           </g>
 
           {/* Connection lines showing scattered relationship - dotted */}
-          <g stroke="var(--text-primary)" strokeWidth="0.6" strokeDasharray="2 2">
+          <g stroke="var(--foreground)" strokeWidth="0.6" strokeDasharray="2 2">
             <path d="M15,18 Q32,22 48,27" fill="none" />
             <path d="M15,18 Q8,32 12,45" fill="none" />
           </g>
@@ -41,13 +41,13 @@ export function ProximityPrincipleThumbnail() {
                 width="14"
                 height="18"
                 rx="2"
-                fill="var(--bg-primary)"
-                stroke="var(--text-primary)"
+                fill="var(--background)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="3" y1="5" x2="11" y2="5" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="3" y1="8" x2="9" y2="8" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="3" y1="11" x2="10" y2="11" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="3" y1="5" x2="11" y2="5" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="3" y1="8" x2="9" y2="8" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="3" y1="11" x2="10" y2="11" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
           </g>
 
@@ -58,12 +58,12 @@ export function ProximityPrincipleThumbnail() {
                 width="14"
                 height="18"
                 rx="2"
-                fill="var(--bg-primary)"
-                stroke="var(--text-primary)"
+                fill="var(--background)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="3" y1="5" x2="11" y2="5" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="3" y1="8" x2="9" y2="8" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="3" y1="5" x2="11" y2="5" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="3" y1="8" x2="9" y2="8" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
           </g>
 
@@ -98,7 +98,7 @@ export function ProximityPrincipleThumbnail() {
             <path
               d="M2,4 L2,60 L56,60 L56,7 L22,7 L20,4 Z"
               fill="none"
-              stroke="var(--text-primary)"
+              stroke="var(--foreground)"
               strokeWidth="1"
             />
 
@@ -109,12 +109,12 @@ export function ProximityPrincipleThumbnail() {
                 height="18"
                 rx="2"
                 fill="none"
-                stroke="var(--text-primary)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="9" x2="13" y2="9" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="12" x2="15" y2="12" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="9" x2="13" y2="9" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="12" x2="15" y2="12" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
 
             {/* File 2 */}
@@ -124,12 +124,12 @@ export function ProximityPrincipleThumbnail() {
                 height="18"
                 rx="2"
                 fill="none"
-                stroke="var(--text-primary)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="9" x2="12" y2="9" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="12" x2="14" y2="12" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="9" x2="12" y2="9" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="12" x2="14" y2="12" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
 
             {/* File 3 */}
@@ -139,12 +139,12 @@ export function ProximityPrincipleThumbnail() {
                 height="18"
                 rx="2"
                 fill="none"
-                stroke="var(--text-primary)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="9" x2="11" y2="9" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="12" x2="15" y2="12" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="9" x2="11" y2="9" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="12" x2="15" y2="12" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
 
             {/* File 4 */}
@@ -154,12 +154,12 @@ export function ProximityPrincipleThumbnail() {
                 height="18"
                 rx="2"
                 fill="none"
-                stroke="var(--text-primary)"
+                stroke="var(--foreground)"
                 strokeWidth="0.8"
               />
-              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="9" x2="10" y2="9" stroke="var(--text-primary)" strokeWidth="0.5" />
-              <line x1="4" y1="12" x2="13" y2="12" stroke="var(--text-primary)" strokeWidth="0.5" />
+              <line x1="4" y1="6" x2="16" y2="6" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="9" x2="10" y2="9" stroke="var(--foreground)" strokeWidth="0.5" />
+              <line x1="4" y1="12" x2="13" y2="12" stroke="var(--foreground)" strokeWidth="0.5" />
             </g>
           </g>
 
@@ -179,10 +179,10 @@ export function ProximityPrincipleThumbnail() {
 
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 t -0 bottom-0 w-1/5 bg-linear-to-r from-(--bg-primary) to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/5 bg-linear-to-l from-(--bg-primary) to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/5 bg-linear-to-b from-(--bg-primary) to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/5 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 t -0 bottom-0 w-1/5 bg-linear-to-r from-background to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/5 bg-linear-to-l from-background to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/5 bg-linear-to-b from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/5 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );

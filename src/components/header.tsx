@@ -15,7 +15,7 @@ import { useTheme } from "../hooks/use-theme";
 // Header Component
 // ============================================================================
 
-export default function Header() {
+export function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
@@ -33,7 +33,7 @@ export default function Header() {
           {showBackButton && (
             <Link
               to={backPath}
-              className="absolute flex items-center justify-center right-[calc(100%+12px)] top-1/2 -translate-y-1/2 bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full size-13 text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+              className="absolute flex items-center justify-center right-[calc(100%+12px)] top-1/2 -translate-y-1/2 bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full size-13 text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
               aria-label="Go Back"
             >
               <ArrowLeftIcon size={18} />
@@ -44,10 +44,10 @@ export default function Header() {
             <nav className="flex items-center gap-1 mx-auto">
               <Link
                 to="/"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                 activeProps={{
                   className:
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-primary) bg-(--bg-secondary)",
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-accent",
                 }}
               >
                 <HouseIcon size={16} />
@@ -55,10 +55,10 @@ export default function Header() {
               </Link>
               <Link
                 to="/blog"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                 activeProps={{
                   className:
-                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-(--text-primary) bg-(--bg-secondary)",
+                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-accent",
                 }}
               >
                 <FileTextIcon size={16} />
@@ -66,7 +66,7 @@ export default function Header() {
               </Link>
 
               {/* Divider */}
-              <div className="w-px h-4 bg-(--border-color) mx-1" />
+              <div className="w-px h-4 bg-border mx-1" />
 
               {/* Social Icons */}
               <div className="flex items-center gap-1">
@@ -74,7 +74,7 @@ export default function Header() {
                   href="https://github.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                   aria-label="GitHub"
                 >
                   <GithubLogoIcon size={18} />
@@ -83,14 +83,14 @@ export default function Header() {
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                   aria-label="LinkedIn"
                 >
                   <LinkedinLogoIcon size={18} />
                 </a>
                 <a
                   href="mailto:hello@faqih.dev"
-                  className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                   aria-label="Email"
                 >
                   <EnvelopeIcon size={18} />
@@ -98,12 +98,12 @@ export default function Header() {
               </div>
 
               {/* Divider */}
-              <div className="w-px h-4 bg-(--border-color) mx-1" />
+              <div className="w-px h-4 bg-border mx-1" />
 
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-secondary) active:scale-95 transition-all duration-200"
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { ProhibitIcon, QuestionIcon } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import {
@@ -24,12 +24,11 @@ function NullVsUndefined() {
           <>
             Two ways to say "nothing", but with very different meanings.
             <br />
-            <span className="text-(--text-primary) font-medium">Know the difference.</span>
+            <span className="text-foreground font-medium">Know the difference.</span>
           </>
         }
         badge={{
-          icon: QuestionIcon,
-          text: "JavaScript Fundamentals",
+          text: "Code Writing",
         }}
         markdownUrl="/rule-of-thumb/null-vs-undefined.md"
       />
@@ -41,29 +40,29 @@ function NullVsUndefined() {
           description="A mental model to keep them straight."
         />
         <div className="grid sm:grid-cols-2 gap-6">
-          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+          <div className="p-6 rounded-xl border border-border bg-card">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-500/10 text-(--text-primary)">
+              <div className="p-2 rounded-lg bg-zinc-500/10 text-foreground">
                 <QuestionIcon size={24} />
               </div>
-              <h3 className="text-lg font-bold text-(--text-primary)">Undefined</h3>
+              <h3 className="text-lg font-bold text-foreground">Undefined</h3>
             </div>
-            <p className="text-(--text-secondary) font-medium mb-2">"No value provided"</p>
-            <p className="text-sm text-(--text-secondary)">
+            <p className="text-muted-foreground font-medium mb-2">"No value provided"</p>
+            <p className="text-sm text-muted-foreground">
               The variable exists, but nothing has been put into it yet. It's the default state of
               things.
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-(--border-color) bg-(--bg-secondary)">
+          <div className="p-6 rounded-xl border border-border bg-card">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-zinc-500/10 text-(--text-primary)">
+              <div className="p-2 rounded-lg bg-zinc-500/10 text-foreground">
                 <ProhibitIcon size={24} />
               </div>
-              <h3 className="text-lg font-bold text-(--text-primary)">Null</h3>
+              <h3 className="text-lg font-bold text-foreground">Null</h3>
             </div>
-            <p className="text-(--text-secondary) font-medium mb-2">"Empty value"</p>
-            <p className="text-sm text-(--text-secondary)">
+            <p className="text-muted-foreground font-medium mb-2">"Empty value"</p>
+            <p className="text-sm text-muted-foreground">
               Intentionally set to be empty. We checked, and the answer is explicitly "nothing".
             </p>
           </div>
@@ -151,9 +150,7 @@ if (data.assigneeId === null) {
 
       {/* Quick Reference */}
       <div className="mb-16">
-        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          Quick Reference
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">Quick Reference</h2>
         <div className="space-y-3">
           <QuickRefCard
             emoji="❓"
@@ -167,7 +164,7 @@ if (data.assigneeId === null) {
       </div>
 
       {/* Footer */}
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

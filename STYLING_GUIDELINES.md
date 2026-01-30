@@ -14,7 +14,7 @@ Do not use CSS selectors (like `body`, `h1`, `.my-class`) in `styles.css` to app
 ```css
 /* styles.css */
 body {
-  background-color: var(--bg-primary);
+  background-color: var(--background);
   font-family: "Inter", sans-serif;
 }
 ```
@@ -23,7 +23,7 @@ body {
 Apply classes directly in your layout file (e.g., `__root.tsx`):
 
 ```tsx
-<body className="bg-[var(--bg-primary)] font-sans ...">
+<body className="bg-background font-sans ...">
 ```
 
 ### 2. Use Tailwind Theme Configuration
@@ -31,7 +31,7 @@ Apply classes directly in your layout file (e.g., `__root.tsx`):
 Define your design tokens (fonts, colors, etc.) in the Tailwind configuration (or CSS variables compliant with Tailwind) and access them via utility classes.
 
 - **Fonts:** Use `font-sans` (mapped to Inter in config).
-- **Colors:** Use utilities like `text-blue-500` or arbitrary values for CSS variables `text-[var(--text-primary)]`.
+- **Colors:** Use semantic tokens like `text-primary` or `bg-card`.
 
 ### 3. Arbitrary Values for Complex Styles
 
@@ -68,9 +68,9 @@ import { cn } from "../cn";
 - Type-safe with TypeScript
 - Cleaner syntax than template literals
 
-### 5. Prefer Tailwind Theme Variables Over Custom CSS Variables
+### 5. Prefer Semantic Theme Variables
 
-In Tailwind CSS v4, define design tokens in the `@theme` block instead of creating custom CSS variables in `@layer base`. Theme variables automatically become utility classes.
+We follow shadcn/ui theming conventions. Define design tokens in the CSS variables and expose them via `@theme` block.
 
 **Incorrect:**
 
@@ -80,11 +80,6 @@ In Tailwind CSS v4, define design tokens in the `@theme` block instead of creati
   :root {
     --bg-primary: #fafafa;
     --text-primary: #18181b;
-  }
-
-  .dark {
-    --bg-primary: #0f0f11;
-    --text-primary: #f4f4f5;
   }
 }
 ```
@@ -97,23 +92,19 @@ In Tailwind CSS v4, define design tokens in the `@theme` block instead of creati
 
 ```css
 /* styles.css */
-@theme {
-  --color-primary: #fafafa;
-  --color-text: #18181b;
+:root {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.145 0 0);
+}
 
-  --color-primary-dark: #0f0f11;
-  --color-text-dark: #f4f4f5;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 ```
 
 ```tsx
-<div className="bg-primary dark:bg-primary-dark text-text dark:text-text-dark">
-```
-
-**Even Better - Use Tailwind's Built-in Colors:**
-
-```tsx
-<div className="bg-zinc-50 dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50">
+<div className="bg-background text-foreground">
 ```
 
 **When Custom CSS Variables Are Acceptable:**

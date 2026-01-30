@@ -131,7 +131,7 @@ export function ButtonDesignThumbnail() {
             rx="4"
             fill="transparent"
             strokeDasharray="200"
-            className={`stroke-(--text-primary) ${styles.rectDraw}`}
+            className={`stroke-foreground ${styles.rectDraw}`}
             style={{
               animationDuration: durationStr,
               animationDelay: `${-(duration - (8 * 0.15 + 4 * 0.1))}s`,
@@ -145,7 +145,7 @@ export function ButtonDesignThumbnail() {
             textAnchor="middle"
             dominantBaseline="middle"
             fill="transparent"
-            stroke="var(--text-primary)"
+            stroke="var(--foreground)"
             strokeWidth="0.4"
             fontFamily="Geist"
             fontWeight="500"
@@ -170,13 +170,13 @@ export function ButtonDesignThumbnail() {
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-(--bg-primary) to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
         {/* Top fade */}
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-(--bg-primary) to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );

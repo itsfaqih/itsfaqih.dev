@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { cn } from "../cn";
 
-interface CodeBlockProps {
+type CodeBlockProps = {
   code: string;
   lang?: string;
   className?: string;
-}
+};
 
 export function CodeBlock({ code, lang = "tsx", className }: CodeBlockProps) {
   const [highlighted, setHighlighted] = useState<string>("");

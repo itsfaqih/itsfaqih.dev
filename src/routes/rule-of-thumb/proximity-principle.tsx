@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { useState, memo, useCallback } from "react";
-import { GlassyCard } from "../../components/glassy-card";
+import { Card } from "../../components/card";
 import {
   CaretRightIcon,
   FolderIcon,
@@ -16,7 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
 import { CodeComparison, CodeExample, RuleOfThumbHero, QuickRefCard } from "./-components";
-import { GlassyButton } from "../../components/glassy-button";
+import { Button } from "../../components/button";
 
 export const Route = createFileRoute("/rule-of-thumb/proximity-principle")({
   component: ProximityPrinciple,
@@ -26,11 +26,11 @@ export const Route = createFileRoute("/rule-of-thumb/proximity-principle")({
 // Types
 // ============================================================================
 
-interface TreeNode {
+type TreeNode = {
   name: string;
   children?: TreeNode[];
   highlight?: "good" | "bad";
-}
+};
 
 // ============================================================================
 // Components
@@ -64,7 +64,7 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
   return (
     <div className="select-none">
       <div
-        className={`flex items-center gap-1.5 py-1 px-2 rounded-md transition-all cursor-default hover:bg-(--bg-secondary)/50 ${
+        className={`flex items-center gap-1.5 py-1 px-2 rounded-md transition-all cursor-default hover:bg-muted/50 ${
           node.highlight ? TREE_HIGHLIGHT_STYLES[node.highlight] : ""
         }`}
         style={{ paddingLeft: depth * 16 + 8 }}
@@ -75,16 +75,16 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
           <CaretRightIcon
             size={14}
             weight="regular"
-            className={`text-(--text-secondary) transition-transform ${isOpen ? "rotate-90" : ""}`}
+            className={`text-muted-foreground transition-transform ${isOpen ? "rotate-90" : ""}`}
           />
         ) : (
           <span className="w-3.5" />
         )}
 
         {isFile ? (
-          <FileIcon size={14} weight="regular" className="text-(--text-secondary)" />
+          <FileIcon size={14} weight="regular" className="text-muted-foreground" />
         ) : (
-          <FolderIcon size={14} weight="regular" className="text-(--text-primary)" />
+          <FolderIcon size={14} weight="regular" className="text-foreground" />
         )}
 
         <span className="text-sm font-mono">{node.name}</span>
@@ -116,27 +116,27 @@ function FileTreeComparison({
 }) {
   if (showSingle) {
     return (
-      <GlassyCard className="overflow-hidden">
-        <div className="px-4 py-3 border-b border-(--border-color) flex items-center gap-2">
+      <Card className="overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
           <CheckIcon size={14} className="inline mr-2" />
-          <span className="font-medium text-(--text-primary)">Organized Structure</span>
+          <span className="font-medium text-foreground">Organized Structure</span>
         </div>
         <div className="p-4">
           <TreeNodeComponent node={goodTree} />
         </div>
-        <div className="px-4 py-3 bg-emerald-500/5 border-t border-(--border-color) text-sm text-emerald-400">
+        <div className="px-4 py-3 bg-emerald-500/5 border-t border-border text-sm text-emerald-400">
           <CheckIcon size={14} className="inline mr-2" />
           {goodReason}
         </div>
-      </GlassyCard>
+      </Card>
     );
   }
 
   return (
     <div className="flex flex-col items-center lg:grid lg:grid-cols-2 gap-4">
       {/* Don't / Bad */}
-      <GlassyCard
-        className="border-red-500/30 bg-(--bg-secondary)/30 hover:border-red-500/30 overflow-hidden"
+      <Card
+        className="border-red-500/30 bg-card/30 hover:border-red-500/30 overflow-hidden"
         hoverEffect={false}
       >
         <div className="px-4 py-3 border-b border-red-500/30 bg-red-500/5 flex items-center gap-2">
@@ -148,11 +148,11 @@ function FileTreeComparison({
           <XIcon size={14} className="inline mr-2" />
           {badReason}
         </div>
-      </GlassyCard>
+      </Card>
 
       {/* Do / Good */}
-      <GlassyCard
-        className="border-emerald-500/30 bg-(--bg-secondary)/30 hover:border-emerald-500/30 overflow-hidden"
+      <Card
+        className="border-emerald-500/30 bg-card/30 hover:border-emerald-500/30 overflow-hidden"
         hoverEffect={false}
       >
         <div className="px-4 py-3 border-b border-emerald-500/30 bg-emerald-500/5 flex items-center gap-2">
@@ -166,7 +166,7 @@ function FileTreeComparison({
           <CheckIcon size={14} className="inline mr-2" />
           {goodReason}
         </div>
-      </GlassyCard>
+      </Card>
     </div>
   );
 }
@@ -224,52 +224,56 @@ function InteractiveDemo() {
   ];
 
   return (
-    <GlassyCard className="bg-(--bg-secondary) overflow-hidden">
-      <div className="px-5 py-4 border-b border-(--border-color) flex items-center gap-2">
-        <SparkleIcon size={18} className="text-(--text-primary)" />
-        <span className="font-medium text-(--text-primary)">Interactive Demo</span>
+    <Card className="bg-card overflow-hidden">
+      <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+        <SparkleIcon size={18} className="text-foreground" />
+        <span className="font-medium text-foreground">Interactive Demo</span>
       </div>
 
       <div className="p-5">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-xs text-(--text-secondary) uppercase tracking-wide">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">
             Step {step + 1} of {steps.length}
           </span>
         </div>
 
-        <h3 className="text-lg font-semibold text-(--text-primary) mb-4">{steps[step].title}</h3>
+        {steps[step] && (
+          <>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{steps[step].title}</h3>
 
-        <div className="p-4 bg-(--bg-primary)/50 backdrop-blur-sm rounded-lg border border-(--border-color) mb-4">
-          <TreeNodeComponent node={steps[step].tree} />
-        </div>
+            <div className="p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border mb-4">
+              <TreeNodeComponent node={steps[step].tree} />
+            </div>
 
-        <p className="text-sm text-(--text-secondary) mb-4">{steps[step].description}</p>
+            <p className="text-sm text-muted-foreground mb-4">{steps[step].description}</p>
+          </>
+        )}
 
         <div className="flex gap-2">
-          <GlassyButton
+          <Button
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
             className="text-sm"
           >
             Previous
-          </GlassyButton>
-          <GlassyButton
+          </Button>
+          <Button
             onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
             disabled={step === steps.length - 1}
             className="text-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             Next
-          </GlassyButton>
+          </Button>
         </div>
       </div>
 
-      <div className="h-1 bg-(--border-color)">
+      <div className="h-1 bg-border">
         <div
-          className="h-full bg-(--text-primary) transition-all duration-300"
+          className="h-full bg-foreground transition-all duration-300"
           style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
-    </GlassyCard>
+    </Card>
   );
 }
 
@@ -287,12 +291,11 @@ function ProximityPrinciple() {
           <>
             A visual guide to structuring code and files.
             <br />
-            <span className="text-(--text-primary) font-medium">Less jumping, more shipping.</span>
+            <span className="text-foreground font-medium">Less jumping, more shipping.</span>
           </>
         }
         badge={{
-          icon: MapPinIcon,
-          text: "Code Structure Philosophy",
+          text: "Code Writing",
         }}
         markdownUrl="/rule-of-thumb/proximity-principle.md"
       />
@@ -304,9 +307,7 @@ function ProximityPrinciple() {
 
       {/* Core Principles Grid */}
       <div className="mb-20">
-        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          The Core Principles
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">The Core Principles</h2>
         <div
           className="grid grid-cols-1 sm:grid-cols-2 gap-0 pl-px pt-px"
           role="list"
@@ -337,20 +338,18 @@ function ProximityPrinciple() {
             <div
               key={principle.title}
               className="relative flex flex-col items-center justify-center gap-3 p-6 h-auto min-h-[200px] transition-all group hover:z-10 -ml-px -mt-px
-                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-(--text-secondary) before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
-                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-(--text-secondary) after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
+                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-muted-foreground before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
+                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-muted-foreground after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
               role="listitem"
             >
               <div
-                className="w-10 h-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-(--text-primary)"
+                className="size-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-foreground"
                 aria-hidden="true"
               >
                 <principle.icon size={20} />
               </div>
-              <h3 className="font-semibold text-(--text-primary) text-center z-10">
-                {principle.title}
-              </h3>
-              <p className="text-sm text-(--text-secondary) text-center leading-relaxed z-10">
+              <h3 className="font-semibold text-foreground text-center z-10">{principle.title}</h3>
+              <p className="text-sm text-muted-foreground text-center leading-relaxed z-10">
                 {principle.description}
               </p>
             </div>
@@ -361,10 +360,8 @@ function ProximityPrinciple() {
       {/* Principle 1 */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">
-            Don't Abstract Prematurely
-          </h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Don't Abstract Prematurely</h2>
+          <p className="text-muted-foreground mb-6">
             If code is only used once, keep it inline. Abstraction adds complexity.
           </p>
         </div>
@@ -404,10 +401,10 @@ function UserProfile() {
       {/* Principle 2 */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">
+          <h2 className="text-xl font-bold text-foreground mb-2">
             Exception: React State Isolation
           </h2>
-          <p className="text-(--text-secondary) mb-6">
+          <p className="text-muted-foreground mb-6">
             Extract a child component when it has its own state — even if only used once. This
             prevents the parent from re-rendering when the child's state changes.
           </p>
@@ -439,8 +436,8 @@ function Parent() {
       {/* Principle 3 */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">Prefer Fewer Files</h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Prefer Fewer Files</h2>
+          <p className="text-muted-foreground mb-6">
             Splitting code across many files increases cognitive load. Keep related code together.
           </p>
         </div>
@@ -484,8 +481,8 @@ function Parent() {
       {/* Principle 3 */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">Extract Only When Reused</h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Extract Only When Reused</h2>
+          <p className="text-muted-foreground mb-6">
             Only move code to a separate file when it's needed in multiple files.
           </p>
         </div>
@@ -523,8 +520,8 @@ function UserBadge() {
       {/* Principle 4 */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">Lowest Common Ancestor</h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Lowest Common Ancestor</h2>
+          <p className="text-muted-foreground mb-6">
             When you do share code, place it at the nearest common parent.
           </p>
         </div>
@@ -564,8 +561,8 @@ function UserBadge() {
 
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">Follow Framework Rules</h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Follow Framework Rules</h2>
+          <p className="text-muted-foreground mb-6">
             File-based routers (Next.js, TanStack Router) often turn <strong>every</strong> file
             into a route. Co-location requires understanding how to "hide" files.
           </p>
@@ -608,8 +605,8 @@ function UserBadge() {
       {/* File Suffixes */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-2">Bonus: File Suffixes</h2>
-          <p className="text-(--text-secondary) mb-6">
+          <h2 className="text-xl font-bold text-foreground mb-2">Bonus: File Suffixes</h2>
+          <p className="text-muted-foreground mb-6">
             When organizing by type at scale, use suffixes for discoverability.
           </p>
         </div>
@@ -642,9 +639,7 @@ function UserBadge() {
 
       {/* Quick Reference */}
       <div className="mb-16">
-        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          Quick Reference
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">Quick Reference</h2>
         <div className="space-y-3">
           <QuickRefCard emoji="1️⃣" title="Code used once" action="Keep it inline" />
           <QuickRefCard
@@ -672,35 +667,35 @@ function UserBadge() {
 
       {/* Why This Matters */}
       <div className="mb-20">
-        <div className="p-8 rounded-2xl bg-(--bg-secondary) border border-(--border-color)">
-          <h2 className="text-xl font-bold text-(--text-primary) mb-4">Why This Matters</h2>
-          <ul className="space-y-3 text-(--text-secondary)">
+        <div className="p-8 rounded-2xl bg-card border border-border">
+          <h2 className="text-xl font-bold text-foreground mb-4">Why This Matters</h2>
+          <ul className="space-y-3 text-muted-foreground">
             <li className="flex items-start gap-3">
               <span className="text-lg">🧠</span>
               <span>
-                <strong className="text-(--text-primary)">Reduces cognitive load</strong> — Less
-                jumping between files
+                <strong className="text-foreground">Reduces cognitive load</strong> — Less jumping
+                between files
               </span>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-lg">🚀</span>
               <span>
-                <strong className="text-(--text-primary)">Faster shipping</strong> — Less time spent
+                <strong className="text-foreground">Faster shipping</strong> — Less time spent
                 managing file structure
               </span>
             </li>
             <li className="flex items-start gap-3">
               <span className="text-lg">🧹</span>
               <span>
-                <strong className="text-(--text-primary)">Easier cleanup</strong> — Delete a file
-                and everything goes with it
+                <strong className="text-foreground">Easier cleanup</strong> — Delete a file and
+                everything goes with it
               </span>
             </li>
           </ul>
         </div>
       </div>
 
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

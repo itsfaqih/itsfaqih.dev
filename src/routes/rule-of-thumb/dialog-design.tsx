@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GuidelinePagination } from "./-components/guideline-pagination";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 // Force refresh
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageContainer } from "../../components/page-container";
 import { Dialog } from "@base-ui/react";
 import { Drawer } from "vaul";
-import { getGlassyClasses } from "../../components/glassy-button";
+import { getButtonClasses } from "../../components/button";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import "./dialog-design.css";
 
@@ -20,7 +20,7 @@ import {
   SpeakerHighIcon,
 } from "@phosphor-icons/react";
 import { BestPractice, RuleOfThumbHero } from "./-components";
-import { GlassyButton } from "../../components/glassy-button";
+import { Button } from "../../components/button";
 
 export const Route = createFileRoute("/rule-of-thumb/dialog-design")({
   component: DialogDesign,
@@ -38,7 +38,7 @@ import {
 // For non-button elements (like divs acting as buttons/labels)
 function FakeButton({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={getGlassyClasses(className)} {...props}>
+    <div className={getButtonClasses({ variant: "neutral", className })} {...props}>
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ function MockDialog({
   return (
     <div
       className={cn(
-        "absolute left-1/2 top-1/2 z-20 outline-none p-6 rounded-xl squircle bg-(--bg-primary) border border-(--border-color)",
+        "absolute left-1/2 top-1/2 z-20 outline-none p-6 rounded-xl squircle bg-background border border-border",
         className || "w-full max-w-sm",
       )}
       style={{
@@ -130,7 +130,35 @@ function FocusTrapDemo() {
 }
 
 function FocusTrapDemoContent() {
-  const { status, animationStyle } = useAnimationDemo();
+  const { status } = useAnimationDemo();
+  const [focusedButton, setFocusedButton] = useState<"none" | "btn1" | "btn2">("none");
+
+  // Sync focus state with animation timing (duration is 4000ms)
+  // TAB presses at 20%, 50%, 80% of the animation cycle
+  // 20% = 800ms → btn1 focused
+  // 50% = 2000ms → btn2 focused
+  // 80% = 3200ms → btn1 focused again
+  useEffect(() => {
+    if (status !== "playing") {
+      setFocusedButton("none");
+      return;
+    }
+
+    // Start with btn1 focused after first TAB press (20% = 800ms)
+    const timer1 = setTimeout(() => setFocusedButton("btn1"), 800);
+    // Switch to btn2 after second TAB press (50% = 2000ms)
+    const timer2 = setTimeout(() => setFocusedButton("btn2"), 2000);
+    // Switch back to btn1 after third TAB press (80% = 3200ms)
+    const timer3 = setTimeout(() => setFocusedButton("btn1"), 3200);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [status]);
+
+  const focusRingClasses = "ring-2 ring-ring ring-offset-2 ring-offset-background";
 
   return (
     <>
@@ -140,37 +168,31 @@ function FocusTrapDemoContent() {
 
         <MockBackdrop />
         <MockDialog className="w-full max-w-xs">
-          <div className="font-semibold text-(--text-primary) mb-4">Focus Trap Demo</div>
+          <div className="font-semibold text-foreground mb-4">Focus Trap Demo</div>
           <div className="flex gap-2">
-            <button
-              className="flex-1 px-4 py-2 rounded-lg border border-(--border-color) text-(--text-secondary) transition-shadow"
-              style={{
-                ...animationStyle,
-                animationName: status !== "idle" ? "demo-focus-btn-1" : "none",
-              }}
+            <Button
+              variant="tertiary-neutral"
+              className={cn("flex-1", focusedButton === "btn1" && focusRingClasses)}
             >
               Cancel
-            </button>
-            <button
-              className="flex-1 px-4 py-2 rounded-lg bg-black text-white transition-shadow hover:bg-zinc-800"
-              style={{
-                ...animationStyle,
-                animationName: status !== "idle" ? "demo-focus-btn-2" : "none",
-              }}
+            </Button>
+            <Button
+              variant="brand"
+              className={cn("flex-1", focusedButton === "btn2" && focusRingClasses)}
             >
               Confirm
-            </button>
+            </Button>
           </div>
-          <div className="text-xs text-(--text-secondary) mt-4 text-center">
+          <div className="text-xs text-muted-foreground mt-4 text-center">
             Tab key cycles focus within the dialog.
           </div>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Focus Trap">
-        <p className="text-sm text-(--text-secondary)">
-          <strong className="text-(--text-primary)">Focus Trap:</strong> Keeps keyboard focus inside
-          the dialog.
+        <p className="text-sm text-muted-foreground">
+          <strong className="text-foreground">Focus Trap:</strong> Keeps keyboard focus inside the
+          dialog.
         </p>
       </AnimationControls>
     </>
@@ -198,24 +220,24 @@ function EscapeCloseDemoContent() {
 
         <MockDialog animationName="demo-esc-dialog">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-(--text-primary)">Press ESC to Close</div>
-            <XIcon size={18} className="text-(--text-secondary)" />
+            <div className="font-semibold text-foreground">Press ESC to Close</div>
+            <XIcon size={18} className="text-muted-foreground" />
           </div>
-          <div className="text-sm text-(--text-secondary) mb-4">
+          <div className="text-sm text-muted-foreground mb-4">
             Keyboard users expect Escape to dismiss dialogs.
           </div>
-          <div className="w-full h-8.5 rounded-lg bg-black text-white flex items-center justify-center text-sm font-medium shadow-sm ring-2 ring-black ring-offset-1 dark:ring-offset-black">
+          <Button
+            variant="brand"
+            className="w-full ring-2 ring-brand ring-offset-1 dark:ring-offset-black"
+          >
             Or Click Here
-          </div>
+          </Button>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Escape Key">
-        <p className="text-sm text-(--text-secondary)">
-          Listen for{" "}
-          <code className="px-1 py-0.5 rounded bg-(--bg-secondary) text-(--text-primary)">
-            keydown
-          </code>{" "}
+        <p className="text-sm text-muted-foreground">
+          Listen for <code className="px-1 py-0.5 rounded bg-card text-foreground">keydown</code>{" "}
           events.
         </p>
       </AnimationControls>
@@ -258,86 +280,153 @@ function AutoFocusFormDemoContent() {
 
         <MockDialog animationName="demo-dialog-cycle" className="w-full max-w-xs">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-(--text-primary)">Add Item</div>
-            <XIcon size={18} className="text-(--text-secondary)" />
+            <div className="font-semibold text-foreground">Add Item</div>
+            <XIcon size={18} className="text-muted-foreground" />
           </div>
-          <div className="w-full h-8.5 rounded-lg border border-(--border-color) bg-(--bg-secondary) mb-4 ring-2 ring-black flex items-center px-2.5 text-sm text-(--text-primary)">
+          <div className="w-full h-8.5 rounded-lg border border-border bg-card mb-4 ring-2 ring-black flex items-center px-2.5 text-sm text-foreground">
             <span className="w-[1.5px] h-5 bg-black block animate-[caret-blink_1s_step-end_infinite]"></span>
           </div>
-          <div className="text-xs text-(--text-secondary) mb-4">✨ Input is auto-focused</div>
+          <div className="text-xs text-muted-foreground mb-4">✨ Input is auto-focused</div>
           <FakeButton className="w-full">Add</FakeButton>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Form Dialog">
-        <p className="text-sm text-(--text-secondary)">Focus the first input field.</p>
+        <p className="text-sm text-muted-foreground">Focus the first input field.</p>
       </AnimationControls>
     </>
   );
 }
 
-function AutoFocusConfirmDemo() {
+function AutoFocusIrreversibleDemo() {
   return (
-    <AnimationDemo duration={5000} masterAnimationName="demo-confirm-cursor">
-      <AutoFocusConfirmDemoContent />
+    <AnimationDemo duration={5000} masterAnimationName="demo-deletion-cursor">
+      <AutoFocusIrreversibleDemoContent />
     </AnimationDemo>
   );
 }
 
-function AutoFocusConfirmDemoContent() {
+function AutoFocusIrreversibleDemoContent() {
   const { status, animationStyle } = useAnimationDemo();
 
   return (
     <>
       <AnimationStage>
         {/* Trigger Button */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden inline-flex items-center gap-2 px-3 h-8.5 rounded-md text-white bg-black pointer-events-none"
+        <Button
+          variant="destructive"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
           style={{
             ...animationStyle,
-            animationName: status !== "idle" ? "demo-confirm-trigger" : "none",
+            animationName: status !== "idle" ? "demo-deletion-trigger" : "none",
           }}
         >
-          Delete Item
-        </div>
+          Delete Account
+        </Button>
 
         {/* Fake Cursor */}
         <AnimatedCursor
-          moveAnimationName="demo-confirm-cursor"
-          rippleAnimationName="demo-confirm-ripple"
+          moveAnimationName="demo-deletion-cursor"
+          rippleAnimationName="demo-deletion-ripple"
         />
 
-        <MockBackdrop animationName="demo-confirm-dialog" />
+        <MockBackdrop animationName="demo-deletion-dialog" />
 
-        <MockDialog animationName="demo-confirm-dialog" className="w-full max-w-xs">
+        <MockDialog animationName="demo-deletion-dialog" className="w-full max-w-xs">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-(--text-primary)">Delete Item?</div>
+            <div className="font-semibold text-foreground">Delete Account?</div>
           </div>
-          <div className="text-sm text-(--text-secondary) mb-6">This action cannot be undone.</div>
+          <div className="text-sm text-muted-foreground mb-6">This action cannot be undone.</div>
 
           <div className="flex gap-2">
-            <div className="flex-1 h-8.5 flex items-center justify-center rounded-lg border border-(--border-color) text-(--text-secondary) text-sm">
-              Cancel
-            </div>
-            {/* Delete Button */}
-            <div
-              className="flex-1 h-8.5 rounded-lg bg-black text-white flex items-center justify-center text-sm font-medium ring-2 ring-black ring-offset-1 dark:ring-offset-black"
-              style={{
-                ...animationStyle,
-                animationName: status !== "idle" ? "demo-confirm-delete" : "none",
-              }}
+            <Button
+              variant="tertiary-neutral"
+              className="flex-1 ring-2 ring-ring ring-offset-2 ring-offset-background pointer-events-none"
             >
+              Cancel
+            </Button>
+            <Button variant="destructive" className="flex-1 pointer-events-none">
               Delete
-            </div>
+            </Button>
           </div>
-          <p className="text-xs text-(--text-secondary) mt-4 text-center">
-            ✨ Delete button is auto-focused
+          <p className="text-xs text-muted-foreground mt-4 text-center">
+            ✨ Cancel button is auto-focused
           </p>
         </MockDialog>
       </AnimationStage>
 
-      <AnimationControls title="Confirmation">
-        <p className="text-sm text-(--text-secondary)">Focus the primary action.</p>
+      <AnimationControls title="Irreversible Action">
+        <p className="text-sm text-muted-foreground">
+          Focus the <strong className="text-foreground">Cancel button</strong> for irreversible
+          actions.
+        </p>
+      </AnimationControls>
+    </>
+  );
+}
+
+function AutoFocusReversibleDemo() {
+  return (
+    <AnimationDemo duration={5000} masterAnimationName="demo-approval-cursor">
+      <AutoFocusReversibleDemoContent />
+    </AnimationDemo>
+  );
+}
+
+function AutoFocusReversibleDemoContent() {
+  const { status, animationStyle } = useAnimationDemo();
+
+  return (
+    <>
+      <AnimationStage>
+        {/* Trigger Button */}
+        <Button
+          variant="destructive"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{
+            ...animationStyle,
+            animationName: status !== "idle" ? "demo-approval-trigger" : "none",
+          }}
+        >
+          Archive Item
+        </Button>
+
+        {/* Fake Cursor */}
+        <AnimatedCursor
+          moveAnimationName="demo-approval-cursor"
+          rippleAnimationName="demo-approval-ripple"
+        />
+
+        <MockBackdrop animationName="demo-approval-dialog" />
+
+        <MockDialog animationName="demo-approval-dialog" className="w-full max-w-xs">
+          <div className="flex items-center justify-between mb-2">
+            <div className="font-semibold text-foreground">Archive this item?</div>
+          </div>
+          <div className="text-sm text-muted-foreground mb-6">You can restore it later.</div>
+
+          <div className="flex gap-2">
+            <Button variant="tertiary-neutral" className="flex-1 pointer-events-none">
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1 ring-2 ring-destructive ring-offset-2 ring-offset-background pointer-events-none"
+            >
+              Archive
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-4 text-center">
+            ✨ Archive button is auto-focused
+          </p>
+        </MockDialog>
+      </AnimationStage>
+
+      <AnimationControls title="Reversible Action">
+        <p className="text-sm text-muted-foreground">
+          Focus the <strong className="text-foreground">primary action</strong> for reversible
+          actions.
+        </p>
       </AnimationControls>
     </>
   );
@@ -365,20 +454,21 @@ function InfoDialogDemoContent() {
 
         <MockDialog animationName="demo-info-dialog" className="w-full max-w-xs">
           <div className="flex items-center justify-between mb-4">
-            <div className="font-semibold text-(--text-primary)">Information</div>
-            <XIcon size={18} className="text-(--text-secondary)" />
+            <div className="font-semibold text-foreground">Information</div>
+            <XIcon size={18} className="text-muted-foreground" />
           </div>
-          <div className="text-sm text-(--text-secondary) mb-6">
-            Click anywhere outside to close.
-          </div>
-          <div className="w-full h-8.5 rounded-lg bg-black text-white flex items-center justify-center text-sm font-medium ring-2 ring-black ring-offset-1 dark:ring-offset-black">
+          <div className="text-sm text-muted-foreground mb-6">Click anywhere outside to close.</div>
+          <Button
+            variant="brand"
+            className="w-full ring-2 ring-brand ring-offset-1 dark:ring-offset-black pointer-events-none"
+          >
             Got it
-          </div>
+          </Button>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Info Dialog">
-        <p className="text-sm text-(--text-secondary)">
+        <p className="text-sm text-muted-foreground">
           Info dialogs should be dismissible by clicking the backdrop.
         </p>
       </AnimationControls>
@@ -409,25 +499,28 @@ function FormDialogDemoContent() {
 
         <MockDialog animationName="demo-form-dialog-pulse">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-(--text-primary)">Edit Profile</div>
-            <XIcon size={18} className="text-(--text-secondary)" />
+            <div className="font-semibold text-foreground">Edit Profile</div>
+            <XIcon size={18} className="text-muted-foreground" />
           </div>
-          <div className="text-sm text-(--text-secondary) mb-4">Data loss prevention.</div>
+          <div className="text-sm text-muted-foreground mb-4">Data loss prevention.</div>
 
           <div
             onClick={(e) => e.preventDefault()}
-            className="w-full px-4 py-2 rounded-lg border border-(--border-color) bg-(--bg-secondary) text-(--text-primary) mb-4 text-sm"
+            className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground mb-4 text-sm"
           >
             Your name...
           </div>
-          <div className="w-full h-8.5 rounded-lg bg-black text-white flex items-center justify-center text-sm font-medium ring-2 ring-black ring-offset-1 dark:ring-offset-black">
+          <Button
+            variant="brand"
+            className="w-full ring-2 ring-brand ring-offset-1 dark:ring-offset-black pointer-events-none"
+          >
             Save Changes
-          </div>
+          </Button>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Form Dialog">
-        <p className="text-sm text-(--text-secondary)">
+        <p className="text-sm text-muted-foreground">
           Form dialogs should NOT close on backdrop click to prevent data loss.
         </p>
       </AnimationControls>
@@ -461,12 +554,12 @@ function DiscardConfirmDemoContent() {
         {/* Main Dialog (Edit Profile) */}
         <MockDialog animationName="demo-discard-main-dialog">
           <div className="flex items-center justify-between mb-2">
-            <div className="font-semibold text-(--text-primary)">Edit Profile</div>
-            <XIcon size={18} className="text-(--text-secondary)" />
+            <div className="font-semibold text-foreground">Edit Profile</div>
+            <XIcon size={18} className="text-muted-foreground" />
           </div>
-          <div className="text-sm text-(--text-secondary) mb-4">Make changes to your profile.</div>
+          <div className="text-sm text-muted-foreground mb-4">Make changes to your profile.</div>
 
-          <div className="w-full px-4 py-2 rounded-lg border border-(--border-color) bg-(--bg-secondary) text-(--text-primary) mb-4 text-sm h-24 overflow-hidden relative">
+          <div className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground mb-4 text-sm h-24 overflow-hidden relative">
             <span
               className="inline-block whitespace-nowrap overflow-hidden border-r-2 border-transparent align-bottom"
               style={{
@@ -479,10 +572,12 @@ function DiscardConfirmDemoContent() {
             </span>
           </div>
           <div className="flex gap-2 justify-end">
-            <div className="px-3 py-1.5 rounded-md border border-(--border-color) text-sm text-(--text-secondary)">
+            <Button variant="tertiary-neutral" className="pointer-events-none">
               Cancel
-            </div>
-            <div className="px-3 py-1.5 rounded-md bg-black text-white text-sm">Save</div>
+            </Button>
+            <Button variant="brand" className="pointer-events-none">
+              Save
+            </Button>
           </div>
         </MockDialog>
 
@@ -493,25 +588,23 @@ function DiscardConfirmDemoContent() {
           className="w-full max-w-[280px]"
           transform="scale(0.95)" /* Start slightly smaller/hidden logic handled by keyframes */
         >
-          <div className="font-semibold text-(--text-primary) mb-2">Discard Changes?</div>
-          <div className="text-sm text-(--text-secondary) mb-4">
+          <div className="font-semibold text-foreground mb-2">Discard Changes?</div>
+          <div className="text-sm text-muted-foreground mb-4">
             You have unsaved changes. Are you sure you want to discard them?
           </div>
           <div className="flex gap-2 justify-end">
-            <div className="px-3 py-1.5 rounded-md border border-(--border-color) text-sm text-(--text-secondary)">
+            <Button variant="tertiary-neutral" className="pointer-events-none">
               Keep Editing
-            </div>
-            <div className="px-3 py-1.5 rounded-md bg-red-600 text-white text-sm font-medium">
+            </Button>
+            <Button variant="destructive" className="pointer-events-none">
               Discard
-            </div>
+            </Button>
           </div>
         </MockDialog>
       </AnimationStage>
 
       <AnimationControls title="Discard Confirmation">
-        <p className="text-sm text-(--text-secondary)">
-          Confirm before discarding unsaved changes.
-        </p>
+        <p className="text-sm text-muted-foreground">Confirm before discarding unsaved changes.</p>
       </AnimationControls>
     </>
   );
@@ -538,19 +631,19 @@ function ScrollLockDemoContent() {
         />
 
         {/* The Page Content (Mock Browser) */}
-        <div className="absolute inset-x-12 inset-y-8 bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-(--border-color) overflow-hidden flex flex-col">
+        <div className="absolute inset-x-12 inset-y-8 bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-border overflow-hidden flex flex-col">
           {/* Mock Content Area */}
           <div className="relative flex-1 p-8 space-y-6">
-            <div className="h-4 w-1/3 bg-(--bg-secondary) rounded animate-pulse" />
+            <div className="h-4 w-1/3 bg-card rounded animate-pulse" />
             <div className="space-y-3">
-              <div className="h-2 w-full bg-(--bg-secondary) rounded" />
-              <div className="h-2 w-5/6 bg-(--bg-secondary) rounded" />
-              <div className="h-2 w-full bg-(--bg-secondary) rounded" />
+              <div className="h-2 w-full bg-card rounded" />
+              <div className="h-2 w-5/6 bg-card rounded" />
+              <div className="h-2 w-full bg-card rounded" />
             </div>
             <div className="space-y-3 opacity-50">
-              <div className="h-2 w-full bg-(--bg-secondary) rounded" />
-              <div className="h-2 w-4/5 bg-(--bg-secondary) rounded" />
-              <div className="h-2 w-full bg-(--bg-secondary) rounded" />
+              <div className="h-2 w-full bg-card rounded" />
+              <div className="h-2 w-4/5 bg-card rounded" />
+              <div className="h-2 w-full bg-card rounded" />
             </div>
           </div>
 
@@ -563,7 +656,7 @@ function ScrollLockDemoContent() {
 
           {/* Mock Scrollbar */}
           <div
-            className="absolute right-0 top-0 bottom-0 w-3 border-l border-(--border-color) bg-(--bg-secondary) p-0.5 transition-opacity"
+            className="absolute right-0 top-0 bottom-0 w-3 border-l border-border bg-card p-0.5 transition-opacity"
             style={{
               ...animationStyle,
               animationName: status !== "idle" ? "demo-scroll-scrollbar" : "none",
@@ -589,17 +682,15 @@ function ScrollLockDemoContent() {
               }}
             ></div>
             <div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[240px] p-6 rounded-xl bg-(--bg-primary) border border-(--border-color)"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[240px] p-6 rounded-xl bg-background border border-border"
               style={{
                 ...animationStyle,
                 animationName: status !== "idle" ? "demo-scroll-dialog" : "none",
                 opacity: 0,
               }}
             >
-              <div className="font-semibold text-(--text-primary) mb-2 text-center">
-                Scroll Locked
-              </div>
-              <div className="text-xs text-(--text-secondary) text-center">
+              <div className="font-semibold text-foreground mb-2 text-center">Scroll Locked</div>
+              <div className="text-xs text-muted-foreground text-center">
                 The scrollbar disappears to prevent background scrolling.
               </div>
             </div>
@@ -608,7 +699,7 @@ function ScrollLockDemoContent() {
       </AnimationStage>
 
       <AnimationControls title="Scroll Locking">
-        <p className="text-sm text-(--text-secondary)">
+        <p className="text-sm text-muted-foreground">
           Prevent page scrolling when the dialog is open.
         </p>
       </AnimationControls>
@@ -639,16 +730,16 @@ function ResponsiveDialog({
         <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 animate-in fade-in-0" />
-          <Drawer.Content className="bg-(--bg-primary) flex flex-col rounded-t-[10px] h-auto max-h-[96%] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-(--border-color) outline-none animate-in slide-in-from-bottom-full duration-300">
-            <div className="p-4 bg-(--bg-primary) rounded-t-[10px] flex-1 overflow-auto">
+          <Drawer.Content className="bg-background flex flex-col rounded-t-[10px] h-auto max-h-[96%] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-border outline-none animate-in slide-in-from-bottom-full duration-300">
+            <div className="p-4 bg-background rounded-t-[10px] flex-1 overflow-auto">
               {/* Handle */}
               <div className="mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-700 mb-8" />
               <div className="max-w-md mx-auto pb-8">
-                <Drawer.Title className="font-bold mb-2 text-(--text-primary) text-xl">
+                <Drawer.Title className="font-bold mb-2 text-foreground text-xl">
                   {title}
                 </Drawer.Title>
                 {description && (
-                  <Drawer.Description className="text-(--text-secondary) mb-6 text-sm">
+                  <Drawer.Description className="text-muted-foreground mb-6 text-sm">
                     {description}
                   </Drawer.Description>
                 )}
@@ -666,17 +757,15 @@ function ResponsiveDialog({
       <Dialog.Trigger render={trigger as React.ReactElement} />
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-all duration-200 opacity-0 data-[state=open]:opacity-100" />
-        <Dialog.Popup className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-(--border-color) bg-(--bg-primary) p-6 shadow-lg duration-200 opacity-0 scale-95 data-[state=open]:opacity-100 data-[state=open]:scale-100 rounded-xl outline-none">
+        <Dialog.Popup className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-border bg-background p-6 shadow-lg duration-200 opacity-0 scale-95 data-[state=open]:opacity-100 data-[state=open]:scale-100 rounded-xl outline-none">
           <div className="flex items-center justify-between mb-2">
-            <Dialog.Title className="text-lg font-semibold text-(--text-primary)">
-              {title}
-            </Dialog.Title>
-            <Dialog.Close className="text-(--text-secondary) hover:text-(--text-primary) p-1 rounded hover:bg-(--bg-secondary) transition-colors cursor-pointer">
+            <Dialog.Title className="text-lg font-semibold text-foreground">{title}</Dialog.Title>
+            <Dialog.Close className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-accent transition-colors cursor-pointer">
               <XIcon size={18} />
             </Dialog.Close>
           </div>
           {description && (
-            <Dialog.Description className="text-sm text-(--text-secondary) mb-4">
+            <Dialog.Description className="text-sm text-muted-foreground mb-4">
               {description}
             </Dialog.Description>
           )}
@@ -691,10 +780,10 @@ function InteractiveDemo() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="p-12 rounded-2xl squircle border border-(--border-color) bg-(--bg-secondary) flex flex-col items-center justify-center gap-6 text-center">
+    <div className="p-12 rounded-2xl squircle border border-border bg-card flex flex-col items-center justify-center gap-6 text-center">
       <div className="max-w-md">
-        <h3 className="text-2xl font-bold text-(--text-primary) mb-2">Try the Real Deal</h3>
-        <p className="text-(--text-secondary)">
+        <h3 className="text-2xl font-bold text-foreground mb-2">Try the Real Deal</h3>
+        <p className="text-muted-foreground">
           Experience clear focus trap, scroll locking, and accessible interactions.
         </p>
       </div>
@@ -704,41 +793,35 @@ function InteractiveDemo() {
         title="Interactive Dialog"
         description="This is a fully accessible modal dialog with scroll locking."
         trigger={
-          <GlassyButton onClick={() => setIsOpen(true)} className="h-12 px-8 text-lg">
+          <Button onClick={() => setIsOpen(true)} className="h-12 px-8 text-lg">
             Open Interactive Dialog <CursorIcon size={18} />
-          </GlassyButton>
+          </Button>
         }
       >
         <div className="space-y-4 pt-2">
           <div className="space-y-2 text-left">
-            <label className="text-sm font-medium text-(--text-primary)">Email address</label>
+            <label className="text-sm font-medium text-foreground">Email address</label>
             <input
               type="email"
               placeholder="you@example.com"
-              className="w-full px-3 py-2 rounded-md border border-(--border-color) bg-(--bg-secondary) text-(--text-primary) focus:ring-2 focus:ring-zinc-500 outline-none"
+              className="w-full px-3 py-2 rounded-md border border-border bg-card text-foreground focus:ring-2 focus:ring-zinc-500 outline-none"
               autoFocus
             />
           </div>
           <div className="space-y-2 text-left">
-            <label className="text-sm font-medium text-(--text-primary)">Feedback</label>
+            <label className="text-sm font-medium text-foreground">Feedback</label>
             <textarea
               placeholder="Your thoughts..."
-              className="w-full px-3 py-2 rounded-md border border-(--border-color) bg-(--bg-secondary) text-(--text-primary) focus:ring-2 focus:ring-zinc-500 outline-none h-24 resize-none"
+              className="w-full px-3 py-2 rounded-md border border-border bg-card text-foreground focus:ring-2 focus:ring-zinc-500 outline-none h-24 resize-none"
             ></textarea>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="px-4 py-2 rounded-md hover:bg-(--bg-secondary) transition-colors text-(--text-secondary)"
-            >
+            <Button variant="tertiary-neutral" onClick={() => setIsOpen(false)}>
               Cancel
-            </button>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="px-4 py-2 rounded-md bg-zinc-900 text-white hover:bg-zinc-800 transition-colors dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-            >
+            </Button>
+            <Button variant="brand" onClick={() => setIsOpen(false)}>
               Submit
-            </button>
+            </Button>
           </div>
         </div>
       </ResponsiveDialog>
@@ -755,18 +838,19 @@ function DialogDesign() {
           <>
             Accessible, intuitive modal dialogs.
             <br />
-            <span className="text-(--text-primary) font-medium">
+            <span className="text-foreground font-medium">
               Focus management, keyboard navigation, and data safety.
             </span>
           </>
         }
-        badge={{ icon: SpeakerHighIcon, text: "Accessibility & UX" }}
+        badge={{ text: "UX Design" }}
         markdownUrl="/rule-of-thumb/dialog-design.md"
       />
       <div className="mb-16">
-        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          The Principles
-        </h2>
+        <InteractiveDemo />
+      </div>
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">The Principles</h2>
         <div
           className="grid grid-cols-2 md:grid-cols-3 gap-0 pl-px pt-px"
           role="list"
@@ -807,20 +891,18 @@ function DialogDesign() {
             <div
               key={principle.title}
               className="relative flex flex-col items-center justify-center gap-3 p-6 h-auto min-h-[200px] transition-all group hover:z-10 -ml-px -mt-px
-                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-(--text-secondary) before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
-                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-(--text-secondary) after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
+                before:pointer-events-none before:absolute before:-inset-x-2 before:top-0 before:bottom-0 before:border-t before:border-b before:border-zinc-200 dark:before:border-white/10 group-hover:before:border-muted-foreground before:transition-colors before:mask-[linear-gradient(to_right,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]
+                after:pointer-events-none after:absolute after:-inset-y-2 after:left-0 after:right-0 after:border-l after:border-r after:border-zinc-200 dark:after:border-white/10 group-hover:after:border-muted-foreground after:transition-colors after:mask-[linear-gradient(to_bottom,transparent,black_0.25rem,black_calc(100%-0.25rem),transparent)]"
               role="listitem"
             >
               <div
-                className="w-10 h-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-(--text-primary)"
+                className="size-10 flex items-center justify-center z-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 text-foreground"
                 aria-hidden="true"
               >
                 <principle.icon size={20} />
               </div>
-              <h3 className="font-semibold text-(--text-primary) text-center z-10">
-                {principle.title}
-              </h3>
-              <p className="text-sm text-(--text-secondary) text-center leading-relaxed z-10">
+              <h3 className="font-semibold text-foreground text-center z-10">{principle.title}</h3>
+              <p className="text-sm text-muted-foreground text-center leading-relaxed z-10">
                 {principle.description}
               </p>
             </div>
@@ -828,44 +910,45 @@ function DialogDesign() {
         </div>
       </div>
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Focus Trap</h2>
-        <p className="text-(--text-secondary) mb-6">Focus should cycle within the modal only.</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">Focus Trap</h2>
+        <p className="text-muted-foreground mb-6">Focus should cycle within the modal only.</p>
         <FocusTrapDemo />
       </div>
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Escape Key to Close</h2>
-        <p className="text-(--text-secondary) mb-6">Always allow closing with Escape.</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">Escape Key to Close</h2>
+        <p className="text-muted-foreground mb-6">Always allow closing with Escape.</p>
         <EscapeCloseDemo />
       </div>
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Smart Auto-Focus</h2>
-        <p className="text-(--text-secondary) mb-6">Focus the most relevant element on open.</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">Smart Auto-Focus</h2>
+        <p className="text-muted-foreground mb-6">Focus the most relevant element on open.</p>
         <div className="space-y-12">
           <div>
-            <h3 className="text-lg font-semibold text-(--text-primary) mb-4">Form Dialogs</h3>
-            <p className="text-(--text-secondary) mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Form Dialogs</h3>
+            <p className="text-muted-foreground mb-4">
               For forms, focus the first interactive input field. This allows users to start typing
               immediately.
             </p>
             <AutoFocusFormDemo />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-(--text-primary) mb-4">
-              Confirmation Dialogs
-            </h3>
-            <p className="text-(--text-secondary) mb-4">
-              For confirmations, focus the primary action button (e.g., "Delete") or the "Cancel"
-              button if the action is destructive and you want to prevent accidental clicks. In this
-              demo, we focus the destructive action for speed, assuming a deliberate trigger.
+            <h3 className="text-lg font-semibold text-foreground mb-4">Confirmation Dialogs</h3>
+            <p className="text-muted-foreground mb-4">
+              Focus strategy depends on <strong>reversibility</strong>. For{" "}
+              <strong>reversible actions</strong>, focus the primary CTA for efficiency. For{" "}
+              <strong>irreversible actions</strong>, focus the Cancel button to prevent accidents.
             </p>
-            <AutoFocusConfirmDemo />
+            <div className="space-y-6">
+              <AutoFocusIrreversibleDemo />
+              <AutoFocusReversibleDemo />
+            </div>
           </div>
         </div>
       </div>
 
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Backdrop Click Behavior</h2>
-        <p className="text-(--text-secondary) mb-6">
+        <h2 className="text-xl font-bold text-foreground mb-2">Backdrop Click Behavior</h2>
+        <p className="text-muted-foreground mb-6">
           Disable backdrop close for forms to prevent data loss. Info dialogs can be dismissed by
           clicking outside.
         </p>
@@ -875,32 +958,21 @@ function DialogDesign() {
         </div>
       </div>
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Discard Confirmation</h2>
-        <p className="text-(--text-secondary) mb-6">Confirm before discarding unsaved changes.</p>
+        <h2 className="text-xl font-bold text-foreground mb-2">Discard Confirmation</h2>
+        <p className="text-muted-foreground mb-6">Confirm before discarding unsaved changes.</p>
         <DiscardConfirmDemo />
       </div>
       <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Scroll Locking</h2>
-        <p className="text-(--text-secondary) mb-6">
+        <h2 className="text-xl font-bold text-foreground mb-2">Scroll Locking</h2>
+        <p className="text-muted-foreground mb-6">
           Dialogs should prevent the page from scrolling while open. Ideally, use{" "}
-          <code className="px-1 py-0.5 rounded bg-(--bg-secondary) text-(--text-primary)">
-            overflow: hidden
-          </code>{" "}
-          on the body and compensate for the missing scrollbar to avoid layout shifts.
+          <code className="px-1 py-0.5 rounded bg-card text-foreground">overflow: hidden</code> on
+          the body and compensate for the missing scrollbar to avoid layout shifts.
         </p>
         <ScrollLockDemo />
       </div>
-      <div className="mb-16">
-        <h2 className="text-xl font-bold text-(--text-primary) mb-2">Interactive Example</h2>
-        <p className="text-(--text-secondary) mb-6">
-          Put it all together in a real-world scenario.
-        </p>
-        <InteractiveDemo />
-      </div>
       <div className="mb-20">
-        <h2 className="text-2xl font-bold text-(--text-primary) text-center mb-8">
-          Best Practices
-        </h2>
+        <h2 className="text-2xl font-bold text-foreground text-center mb-8">Best Practices</h2>
         <div className="space-y-4">
           <BestPractice
             emoji="🎯"
@@ -925,7 +997,7 @@ function DialogDesign() {
           />
         </div>
       </div>
-      <GuidelinePagination />
+      <RuleOfThumbPagination />
     </PageContainer>
   );
 }

@@ -103,7 +103,7 @@ export function TableDesignThumbnail() {
             rx="3"
             fill="transparent"
             strokeDasharray="350"
-            className={`stroke-(--text-primary) ${styles.tableDraw}`}
+            className={`stroke-foreground ${styles.tableDraw}`}
             style={{
               animationDuration: durationStr,
             }}
@@ -116,14 +116,14 @@ export function TableDesignThumbnail() {
             y1="16"
             y2="16"
             strokeDasharray="120"
-            className={`stroke-(--text-primary) ${styles.tableHeader}`}
+            className={`stroke-foreground ${styles.tableHeader}`}
             style={{
               animationDuration: durationStr,
             }}
           />
 
           {/* Column dividers */}
-          <g className="stroke-(--text-secondary)" strokeWidth="0.5">
+          <g className="stroke-muted-foreground" strokeWidth="0.5">
             <line
               x1="36"
               y1="4"
@@ -151,7 +151,7 @@ export function TableDesignThumbnail() {
           </g>
 
           {/* Header text placeholders */}
-          <g className="stroke-(--text-primary)" strokeWidth="0.5">
+          <g className="stroke-foreground" strokeWidth="0.5">
             <line
               x1="6"
               y1="10"
@@ -191,7 +191,7 @@ export function TableDesignThumbnail() {
           </g>
 
           {/* Row 1 content */}
-          <g className="stroke-(--text-secondary)" strokeWidth="0.5">
+          <g className="stroke-muted-foreground" strokeWidth="0.5">
             <line
               x1="6"
               y1="28"
@@ -231,7 +231,7 @@ export function TableDesignThumbnail() {
           </g>
 
           {/* Row 2 content */}
-          <g className="stroke-(--text-secondary)" strokeWidth="0.5">
+          <g className="stroke-muted-foreground" strokeWidth="0.5">
             <line
               x1="6"
               y1="42"
@@ -271,7 +271,7 @@ export function TableDesignThumbnail() {
           </g>
 
           {/* Row 3 content */}
-          <g className="stroke-(--text-secondary)" strokeWidth="0.5">
+          <g className="stroke-muted-foreground" strokeWidth="0.5">
             <line
               x1="6"
               y1="54"
@@ -315,13 +315,13 @@ export function TableDesignThumbnail() {
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-(--bg-primary) to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
         {/* Top fade */}
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-(--bg-primary) to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );

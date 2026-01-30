@@ -2,8 +2,8 @@ import { HeadContent, Scripts, createRootRoute, Link } from "@tanstack/react-rou
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
-import Header from "../components/header";
-import GridBackground from "../components/grid-background";
+import { Header } from "../components/header";
+import { GridBackground } from "../components/grid-background";
 import { cn } from "../cn";
 
 import appCss from "../styles.css?url";
@@ -11,10 +11,10 @@ import appCss from "../styles.css?url";
 export const Route = createRootRoute({
   notFoundComponent: () => (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <h1 className="text-2xl font-bold text-(--text-primary)">Page Not Found</h1>
+      <h1 className="text-2xl font-bold text-foreground">Page Not Found</h1>
       <Link
         to="/"
-        className="text-(--text-secondary) hover:text-(--text-primary) underline decoration-(--border-color) underline-offset-4"
+        className="text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4"
       >
         Go back home
       </Link>
@@ -41,6 +41,10 @@ export const Route = createRootRoute({
         href: "https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500;600;700;800&display=swap",
       },
     ],
+    scripts:
+      process.env.NODE_ENV === "development"
+        ? [{ src: "//unpkg.com/react-grab/dist/index.global.js", crossOrigin: "anonymous" }]
+        : [],
   }),
 
   shellComponent: RootDocument,
@@ -74,7 +78,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body
         className={cn(
           "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative",
-          "bg-(--bg-primary) text-(--text-primary)",
+          "bg-background text-foreground",
           "transition-colors duration-300",
         )}
       >

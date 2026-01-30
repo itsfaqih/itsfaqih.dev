@@ -1,6 +1,6 @@
 import { cn } from "../cn";
 
-export default function ArchitecturalBackground() {
+export function ArchitecturalBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       <svg
@@ -41,7 +41,7 @@ export default function ArchitecturalBackground() {
             />
 
             {/* Intersections - Crosses */}
-            <g className="text-(--text-secondary) opacity-100">
+            <g className="text-muted-foreground opacity-100">
               <path
                 d="M -5 0 L 5 0 M 0 -5 L 0 5"
                 stroke="currentColor"
@@ -71,7 +71,7 @@ export default function ArchitecturalBackground() {
       <div
         className={cn(
           "absolute inset-0 h-full w-full z-10",
-          "bg-[radial-gradient(transparent_0%,var(--bg-primary)_100%)]",
+          "bg-[radial-gradient(transparent_0%,var(--background)_100%)]",
           "opacity-80",
         )}
       />
@@ -80,7 +80,7 @@ export default function ArchitecturalBackground() {
       <div
         className={cn(
           "absolute inset-0 h-full w-full z-10",
-          "bg-linear-to-r from-transparent via-(--bg-primary) to-transparent",
+          "bg-linear-to-r from-transparent via-background to-transparent",
           "opacity-60",
         )}
       />

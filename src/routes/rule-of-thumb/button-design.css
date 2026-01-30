@@ -168,18 +168,21 @@
 @keyframes button-demo-border-success {
   0%,
   70% {
-    border-color: rgba(228, 228, 231, 0.4);
-    background-color: transparent;
+    border-color: color-mix(in srgb, var(--brand), transparent 80%);
+    background-color: color-mix(in srgb, var(--brand), transparent 10%);
+    opacity: 1;
   }
   71%,
   90% {
-    border-color: rgba(16, 185, 129, 0.5);
-    background-color: rgba(16, 185, 129, 0.1);
+    border-color: color-mix(in srgb, var(--brand), transparent 80%);
+    background-color: color-mix(in srgb, var(--brand), transparent 10%);
+    opacity: 0.6;
   }
   95%,
   100% {
-    border-color: rgba(16, 185, 129, 0.5);
-    background-color: rgba(16, 185, 129, 0.1);
+    border-color: color-mix(in srgb, var(--brand), transparent 80%);
+    background-color: color-mix(in srgb, var(--brand), transparent 10%);
+    opacity: 0.6;
   }
 }
 
@@ -190,14 +193,22 @@
   }
   33%,
   70% {
-    width: 145px;
+    width: 130px;
   }
   75%,
-  90% {
-    width: 100px;
-  }
-  95%,
   100% {
-    width: 100px;
+    width: 115px;
   }
+}
+
+@keyframes button-demo-cursor-swap-default {
+  0%, 29% { opacity: 1; }
+  30%, 47% { opacity: 0; }
+  48%, 100% { opacity: 1; }
+}
+
+@keyframes button-demo-cursor-swap-spinner {
+  0%, 29% { opacity: 0; }
+  30%, 47% { opacity: 1; }
+  48%, 100% { opacity: 0; }
 }

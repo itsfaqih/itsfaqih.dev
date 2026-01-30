@@ -1,17 +1,17 @@
 import type { ComponentType } from "react";
 
-export interface BlogFrontmatter {
+export type BlogFrontmatter = {
   title: string;
   summary?: string;
   publishedAt: string;
 }
 
-export interface BlogModule {
+export type BlogModule = {
   default: ComponentType;
   frontmatter: BlogFrontmatter;
 }
 
-export interface BlogPost {
+export type BlogPost = {
   slug: string;
   frontmatter: BlogFrontmatter;
 }

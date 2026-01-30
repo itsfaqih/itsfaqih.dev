@@ -1,9 +1,10 @@
 import { createContext, useContext, useMemo } from "react";
 import { useCssAnimation } from "../hooks/use-css-animation";
 import { cn } from "@/cn";
-import { GlassyButton } from "./glassy-button";
-import { GlassyCard } from "./glassy-card";
-import { PlayIcon, PauseIcon, ArrowCounterClockwiseIcon, CursorIcon } from "@phosphor-icons/react";
+import { Button } from "./button";
+import { Card } from "./card";
+import { PlayIcon, PauseIcon, ArrowCounterClockwiseIcon } from "@phosphor-icons/react";
+import { Cursor } from "./cursor";
 
 export const ANIMATION_STYLE_DEFAULTS = {
   animationIterationCount: "1",
@@ -46,9 +47,9 @@ export function AnimationDemo({
 
   return (
     <AnimationDemoContext.Provider value={{ ...animationData, animationStyle }}>
-      <GlassyCard className={cn("rounded-2xl overflow-hidden h-full flex flex-col", className)}>
+      <Card className={cn("rounded-2xl overflow-hidden h-full flex flex-col", className)}>
         {children}
-      </GlassyCard>
+      </Card>
     </AnimationDemoContext.Provider>
   );
 }
@@ -78,9 +79,9 @@ export function AnimationStage({
           onClick={restart}
           icon={
             status === "finished" ? (
-              <ArrowCounterClockwiseIcon size={24} className="text-black ml-0" />
+              <ArrowCounterClockwiseIcon size={24} className="text-foreground" />
             ) : (
-              <PlayIcon size={24} className="fill-black text-black ml-1" />
+              <PlayIcon size={24} className="fill-foreground text-foreground" />
             )
           }
           label={status === "finished" ? "Replay" : "Watch Demo"}
@@ -104,13 +105,13 @@ export function DemoOverlay({
   textClass?: string;
 }) {
   return (
-    <div className="absolute inset-0 z-60 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-sm transition-all duration-500 pointer-events-auto">
+    <div className="absolute inset-0 z-60 flex items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-500 pointer-events-auto">
       <button
         onClick={onClick}
-        className="flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-white/50 dark:bg-black/50 p-4 rounded-2xl backdrop-blur-sm"
+        className="flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-background/50 p-4 rounded-2xl backdrop-blur-sm"
       >
         <div
-          className={`p-4 rounded-full border backdrop-blur-md transition-colors ${circleClass}`}
+          className={`size-14 flex items-center justify-center rounded-full border backdrop-blur-md transition-colors ${circleClass}`}
         >
           {icon}
         </div>
@@ -124,16 +125,16 @@ function AnimationSlider(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       type="range"
-      className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125"
+      className="flex-1 h-1.5 bg-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125"
       {...props}
     />
   );
 }
 
-interface AnimationControlsProps {
+type AnimationControlsProps = {
   title: string;
   children?: React.ReactNode;
-}
+};
 
 export function AnimationControls({ title, children }: AnimationControlsProps) {
   const { progress, handleSeek: seek, togglePlay, status } = useAnimationDemo();
@@ -143,10 +144,10 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
   };
 
   return (
-    <div className="border-t border-(--border-color) p-6 pointer-events-auto">
+    <div className="border-t border-border p-6 pointer-events-auto">
       <div className="flex items-center justify-between mb-4">
-        <span className="font-semibold text-black dark:text-white">{title}</span>
-        <GlassyButton onClick={togglePlay}>
+        <span className="font-semibold text-foreground">{title}</span>
+        <Button onClick={togglePlay}>
           {status === "playing" ? (
             <>
               <PauseIcon size={14} /> Pause
@@ -160,7 +161,7 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
               <PlayIcon size={14} /> Play
             </>
           )}
-        </GlassyButton>
+        </Button>
       </div>
       <div className="flex items-center gap-3 mb-2">
         <AnimationSlider min="0" max="100" value={progress} onChange={onSeek} />
@@ -170,12 +171,12 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
   );
 }
 
-interface AnimatedCursorProps {
+type AnimatedCursorProps = {
   moveAnimationName: string;
   rippleAnimationName: string;
   className?: string;
   transform?: string;
-}
+};
 
 export function AnimatedCursor({
   moveAnimationName,
@@ -196,10 +197,10 @@ export function AnimatedCursor({
         transform: transform,
       }}
     >
-      <CursorIcon className="fill-white stroke-1 rotate-20" />
+      <Cursor />
       {/* Ripple */}
       <div
-        className="absolute top-0 left-0 w-8 h-8 rounded-full bg-black/50 dark:bg-white/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute top-0 left-0 size-8 rounded-full bg-foreground/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
         style={{
           ...animationStyle,
           animationName: rippleAnimationName,

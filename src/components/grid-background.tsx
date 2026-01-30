@@ -1,22 +1,69 @@
 import { cn } from "../cn";
 
-// Animation timing configuration
-const CYCLE_DURATION = 4; // Total animation cycle in seconds
-const DELAY_PER_BOX = 0.3; // Delay between each box fade
+// Configuration
+const ROWS = 15;
+const ROW_SPACING = 3; // Grid rows between each box row
+const BOXES_PER_ROW = 3;
+const CYCLE_DURATION = 15; // seconds for full animation cycle
+const DELAY_PER_BOX = CYCLE_DURATION / BOXES_PER_ROW; // 5 seconds between each box
 
-interface FadeBoxProps {
-  position: string;
+// Horizontal positions for boxes (spread across the grid width)
+// These define the specific grid column indices where boxes should appear
+const LEFT_POSITIONS = [
+  [2, 12, 22],
+  [6, 16, 25],
+  [3, 14, 20],
+  [8, 18, 24],
+  [1, 10, 21],
+  [5, 15, 23],
+  [2, 11, 19],
+  [7, 17, 25],
+  [4, 13, 22],
+  [1, 9, 20],
+  [6, 16, 24],
+  [3, 12, 21],
+  [8, 18, 25],
+  [2, 14, 23],
+  [5, 10, 19],
+];
+
+const RIGHT_POSITIONS = [
+  [3, 13, 23],
+  [7, 17, 25],
+  [2, 11, 21],
+  [6, 15, 24],
+  [1, 10, 20],
+  [5, 14, 22],
+  [3, 12, 19],
+  [8, 16, 25],
+  [2, 11, 21],
+  [6, 15, 23],
+  [1, 9, 18],
+  [4, 13, 22],
+  [7, 17, 24],
+  [2, 10, 20],
+  [5, 14, 23],
+];
+
+type FadeBoxProps = {
+  position: number;
   row: number;
   delay: number;
   side: "left" | "right";
-}
+};
 
 function FadeBox({ position, row, delay, side }: FadeBoxProps) {
+  const positionStyle =
+    side === "left"
+      ? { left: `calc(var(--cell-size) * ${position})` }
+      : { right: `calc(var(--cell-size) * ${position})` };
+
   return (
     <div
-      className={`fade-box fade-box-${side}`}
+      className="fade-box"
       style={{
-        [position]: `calc(var(--cell-size) * ${row})`,
+        ...positionStyle,
+        top: `calc(var(--cell-size) * ${row})`,
         ["--fade-delay" as string]: `${delay}s`,
         ["--fade-duration" as string]: `${CYCLE_DURATION}s`,
       }}
@@ -24,21 +71,24 @@ function FadeBox({ position, row, delay, side }: FadeBoxProps) {
   );
 }
 
-const ROWS_PER_SIDE = 8;
-const BOXES_PER_ROW = 3;
+type WallGridProps = {
+  side: "left" | "right";
+};
 
-function WallGrid({ side }: { side: "left" | "right" }) {
+function WallGrid({ side }: WallGridProps) {
+  const positions = side === "left" ? LEFT_POSITIONS : RIGHT_POSITIONS;
   const className = side === "left" ? "grid-background-left" : "grid-background-right";
-  const baseOffset = side === "left" ? 0 : 2;
+
+  // Offset for right wall to add variety
+  const baseOffset = side === "right" ? 2.5 : 0;
 
   return (
     <div className={className}>
-      {Array.from({ length: ROWS_PER_SIDE }, (_, rowIndex) => {
-        const row = rowIndex + 1;
+      {Array.from({ length: ROWS }, (_, rowIndex) => {
+        const row = 1 + rowIndex * ROW_SPACING; // Grid row position
+        const rowPositions = positions[rowIndex % positions.length];
 
-        // Position boxes at 1/4, 1/2, 3/4 of viewport width
-        const rowPositions =
-          side === "left" ? ["left", "left", "left"] : ["right", "right", "right"];
+        if (!rowPositions) return null;
 
         // Rotate which column fades first based on row
         // Row 0: order [0,1,2] -> left first
@@ -72,99 +122,31 @@ function WallGrid({ side }: { side: "left" | "right" }) {
   );
 }
 
-interface CeilingFloorBoxProps {
-  col: number;
-  row: number;
-  delay: number;
-  isFloor?: boolean;
-}
-
-function CeilingFloorBox({ col, row, delay, isFloor }: CeilingFloorBoxProps) {
-  // Position boxes at grid intersections
-  // The grid lines are at ±15 degrees and spaced at (cell-size / 0.966 / 2) intervals
-  // Grid line intersections form a diamond pattern
-
-  // The grid cell unit (half the ceiling-cell for line spacing)
-  // Horizontal: lines repeat every (cell-size / 0.966 / 2)
-  // Vertical: intersection points are every (cell-size / 0.966 / 2) / tan(15deg) ≈ cell-size / 0.966 / 2 / 0.268
-  // But for simpler even/odd alignment: vertically every (cell-size / 0.966 / 2) works
-
-  // Spread across full width - use larger column steps
-  const centerCol = Math.floor(CEILING_COLS / 2);
-  const colOffset = col - centerCol;
-
-  // Each row of boxes: skip every 2 grid rows for spacing
-  // Offset horizontal by half a cell on odd rows for diamond pattern
-  const isOddRow = row % 2 === 1;
-  const horizontalShift = isOddRow ? 0.5 : 0;
-
-  // Grid cell step for positioning
-  const cellStep = 2; // Position every 2 grid cells apart for spread
-
-  const verticalStyle = isFloor
-    ? { bottom: `calc(var(--cell-size) / 0.966 / 2 * ${(row + 1) * cellStep})` }
-    : { top: `calc(var(--cell-size) / 0.966 / 2 * ${(row + 1) * cellStep})` };
-
-  return (
-    <div
-      className={`fade-box ${isFloor ? "fade-box-floor" : "fade-box-ceiling"}`}
-      style={{
-        // Position horizontally with spread and diamond-pattern offset
-        left: `calc(50% + var(--cell-size) / 0.966 / 2 * ${colOffset * cellStep + horizontalShift})`,
-        transform: "translateX(-50%)",
-        ...verticalStyle,
-        ["--fade-delay" as string]: `${delay}s`,
-        ["--fade-duration" as string]: `${CYCLE_DURATION}s`,
-      }}
-    />
-  );
-}
-
 // Configuration for ceiling/floor grids - spread more columns across width
-const CEILING_COLS = 11; // More columns for wider spread
-const CEILING_ROWS = 3; // Fewer rows, more spread apart
+// Tiles removed as per request, but keeping component for grid lines
 
 function CeilingFloorGrid({ isFloor }: { isFloor?: boolean }) {
   const className = isFloor ? "grid-floor" : "grid-ceiling";
-  const baseOffset = isFloor ? 1.5 : 0;
 
-  return (
-    <div className={className}>
-      {Array.from({ length: CEILING_ROWS }, (_, rowIndex) =>
-        Array.from({ length: CEILING_COLS }, (_, colIndex) => {
-          // Rotate which column fades first based on row (same as walls)
-          const columnOrder = [
-            (0 + rowIndex) % BOXES_PER_ROW,
-            (1 + rowIndex) % BOXES_PER_ROW,
-            (2 + rowIndex) % BOXES_PER_ROW,
-          ];
-          const fadeOrder = columnOrder[colIndex % BOXES_PER_ROW];
-          const rowOffset = (rowIndex * 1.2 + colIndex * 0.4) % DELAY_PER_BOX;
-
-          return (
-            <CeilingFloorBox
-              key={`${isFloor ? "floor" : "ceiling"}-${rowIndex}-${colIndex}`}
-              col={colIndex}
-              row={rowIndex}
-              delay={baseOffset + rowOffset + fadeOrder * DELAY_PER_BOX}
-              isFloor={isFloor}
-            />
-          );
-        }),
-      )}
-    </div>
-  );
+  return <div className={className} />;
 }
 
-export default function GridBackground() {
+export function GridBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* Gradient fade overlay for edges */}
       <div
         className={cn(
           "absolute inset-0 h-full pointer-events-none z-1",
-          "dark:bg-[radial-gradient(ellipse_at_center,rgb(15,15,17)_0%,rgb(15,15,17)_45%,rgba(15,15,17,0)_100%)]",
-          "bg-[radial-gradient(ellipse_at_center,rgb(250,250,250)_0%,rgb(250,250,250)_45%,rgba(250,250,250,0)_100%)]",
+          "bg-[linear-gradient(to_right,transparent_0%,var(--background)_25%,var(--background)_75%,transparent_100%)] opacity-80",
+        )}
+      />
+
+      {/* Vertical gradient wash */}
+      <div
+        className={cn(
+          "absolute inset-0 w-full pointer-events-none z-1",
+          "bg-[linear-gradient(to_bottom,transparent_0%,var(--background)_25%,var(--background)_75%,transparent_100%)] opacity-80",
         )}
       />
 

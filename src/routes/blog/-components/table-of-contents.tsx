@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { cn } from "../../../cn";
 
-interface TableOfContentsProps {
+type TableOfContentsProps = {
   className?: string;
   onLinkClick?: () => void;
-}
+};
 
-interface Heading {
+type Heading = {
   id: string;
   text: string;
   level: number;
-}
+};
 
 export function TableOfContents({ className, onLinkClick }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<Heading[]>([]);
@@ -51,7 +51,7 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
 
   return (
     <nav className={cn("space-y-2", className)}>
-      <p className="font-medium text-sm text-[var(--text-primary)] mb-4">On this page</p>
+      <p className="font-medium text-sm text-foreground mb-4">On this page</p>
       <ul className="text-base lg:text-sm [&:has(a:hover)_li:not(:hover)]:opacity-50">
         {headings.map((heading) => (
           <li
@@ -62,10 +62,8 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
             <a
               href={`#${heading.id}`}
               className={cn(
-                "block py-3 lg:py-1.5 transition-colors duration-1000 hover:duration-0 hover:text-[var(--text-primary)]",
-                activeId === heading.id
-                  ? "text-[var(--text-primary)] font-medium"
-                  : "text-[var(--text-secondary)]",
+                "block py-3 lg:py-1.5 transition-colors duration-1000 hover:duration-0 hover:text-foreground",
+                activeId === heading.id ? "text-foreground font-medium" : "text-muted-foreground",
               )}
               onClick={(e) => {
                 e.preventDefault();

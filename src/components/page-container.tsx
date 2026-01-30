@@ -1,11 +1,11 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { cn } from "../cn";
 
-interface PageContainerProps {
+type PageContainerProps = {
   children: ReactNode;
   maxWidth?: "2xl" | "3xl" | "4xl";
   className?: string;
-}
+};
 
 export function PageContainer({ children, maxWidth = "2xl", className = "" }: PageContainerProps) {
   const maxWidthClass =

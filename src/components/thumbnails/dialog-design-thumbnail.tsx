@@ -104,7 +104,7 @@ export function DialogDesignThumbnail() {
             rx="4"
             fill="transparent"
             strokeDasharray="320"
-            className={`stroke-(--text-primary) ${styles.dialogDraw}`}
+            className={`stroke-foreground ${styles.dialogDraw}`}
             style={{
               animationDuration: durationStr,
             }}
@@ -117,7 +117,7 @@ export function DialogDesignThumbnail() {
             y1="18"
             y2="18"
             strokeDasharray="100"
-            className={`stroke-(--text-primary) ${styles.dialogLine}`}
+            className={`stroke-foreground ${styles.dialogLine}`}
             style={{
               animationDuration: durationStr,
             }}
@@ -128,7 +128,7 @@ export function DialogDesignThumbnail() {
             x="8"
             y="12"
             fill="transparent"
-            className={`stroke-(--text-primary) ${styles.textFade}`}
+            className={`stroke-foreground ${styles.textFade}`}
             strokeWidth="0.4"
             fontFamily="Geist"
             fontWeight="semibold"
@@ -143,7 +143,7 @@ export function DialogDesignThumbnail() {
 
           {/* Close button X */}
           <g
-            className={`stroke-(--text-primary) ${styles.dialogX}`}
+            className={`stroke-foreground ${styles.dialogX}`}
             strokeWidth="1.2"
             style={{
               animationDuration: durationStr,
@@ -154,7 +154,7 @@ export function DialogDesignThumbnail() {
           </g>
 
           {/* Content placeholder lines */}
-          <g className="stroke-(--text-secondary)" strokeWidth="0.5">
+          <g className="stroke-muted-foreground" strokeWidth="0.5">
             <line
               x1="8"
               y1="28"
@@ -192,7 +192,7 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className={`stroke-(--text-secondary) ${styles.dialogBtn}`}
+              className={`stroke-muted-foreground ${styles.dialogBtn}`}
               style={{
                 animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.8)}s`,
@@ -207,7 +207,7 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className={`stroke-(--text-primary) ${styles.dialogBtn}`}
+              className={`stroke-foreground ${styles.dialogBtn}`}
               strokeWidth="1"
               style={{
                 animationDuration: durationStr,
@@ -221,13 +221,13 @@ export function DialogDesignThumbnail() {
       {/* Gradient fade overlays */}
       <div className="pointer-events-none absolute inset-0">
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-(--bg-primary) to-transparent" />
+        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-(--bg-primary) to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
         {/* Top fade */}
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-(--bg-primary) to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-(--bg-primary) to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
       </div>
     </div>
   );
