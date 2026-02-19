@@ -1,0 +1,39 @@
+{
+  "name": "personal-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bunx --bun vite",
+    "build": "tsc -b && bunx --bun vite build",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "format": "oxfmt --write .",
+    "preview": "bunx --bun vite preview"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.2.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-router": "^1.160.2",
+    "geist": "^1.7.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@tanstack/router-plugin": "^1.160.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "oxfmt": "^0.33.0",
+    "oxlint": "^1.48.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0-beta.13"
+  },
+  "overrides": {
+    "vite": "^8.0.0-beta.13"
+  }
+}
