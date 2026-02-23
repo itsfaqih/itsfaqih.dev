@@ -1,20 +1,39 @@
 <!doctype html>
-<html lang="en" class="font-mono antialiased">
+<html lang="en" class="font-sans antialiased">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faqih Muntashir</title>
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon-black-white.svg" />
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon-transparent-black.svg" media="(prefers-color-scheme: light)" />
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon-transparent-white.svg" media="(prefers-color-scheme: dark)" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicons/favicon-black-white.svg"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicons/favicon-transparent-black.svg"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicons/favicon-transparent-white.svg"
+      media="(prefers-color-scheme: dark)"
+    />
     <script>
-      (function() {
+      (function () {
         try {
-          var isDark = localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var isDark =
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
           document.documentElement.classList.toggle("dark", isDark);
-          document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+          document.documentElement.style.colorScheme = isDark
+            ? "dark"
+            : "light";
         } catch (e) {}
-      })()
+      })();
     </script>
   </head>
   <body class="bg-background text-foreground">

@@ -57,7 +57,7 @@ export function ThemeToggle() {
 	if (!mounted) {
 		return (
 			<button
-				className="fixed top-12 right-12 z-50 p-2.5 rounded-full bg-background/80 backdrop-blur-md border border-foreground/10 shadow-sm transition-colors duration-200 cursor-default text-foreground opacity-0 pointer-events-none"
+				className="fixed top-12 right-12 z-50 p-2.5 rounded-full bg-background border border-foreground/10 shadow-sm transition-colors duration-200 cursor-default text-foreground opacity-0 pointer-events-none"
 				aria-hidden="true"
 			>
 				<div className="w-5 h-5" />
@@ -68,7 +68,7 @@ export function ThemeToggle() {
 	return (
 		<button
 			onClick={toggleTheme}
-			className="fixed top-6 right-6 sm:top-12 sm:right-12 p-2.5 rounded-full bg-background/80 backdrop-blur-md border border-foreground/10 shadow-sm hover:bg-foreground/5 transition-colors duration-200 cursor-pointer text-foreground"
+			className="fixed top-6 right-6 sm:top-12 sm:right-12 p-2.5 rounded-full bg-background border border-foreground/10 shadow-sm hover:bg-foreground/5 transition-colors duration-200 cursor-pointer text-foreground"
 			aria-label={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
 		>
 			{resolvedTheme === "dark" ? (
