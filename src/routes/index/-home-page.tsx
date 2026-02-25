@@ -560,6 +560,8 @@ export function HomePage(): React.JSX.Element {
     0,
   );
   const isDraggingTechItem = techDragSource !== null;
+  const isInventoryDropZoneActive = techDropTarget?.zone === "inventory";
+  const isHotbarDropZoneActive = techDropTarget?.zone === "hotbar";
   const techDndSensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -1003,53 +1005,61 @@ export function HomePage(): React.JSX.Element {
                 onDragEnd={handleTechDragEnd}
                 onDragCancel={clearTechDragState}
               >
-                <div className="overflow-x-auto pb-1">
-                  <div className="tech-inventory-frame mx-auto w-max max-w-full rounded-xl p-2 @xl:p-3">
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <h3 className="text-sm @xl:text-base uppercase tracking-[0.2em] opacity-85">
-                        Inventory
-                      </h3>
-                      <span className="rounded-full border border-foreground/20 px-2.5 py-1 text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.14em] opacity-80">
-                        {inventoryFilledCount}/{TECH_INVENTORY_SLOT_COUNT} slots
-                      </span>
-                    </div>
+                <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 @xl:gap-5">
+                  <div className="overflow-x-auto pb-1">
+                    <div
+                      className={`tech-panel-card tech-panel-card-inventory mx-auto w-max max-w-full rounded-md p-3 @xl:p-4 ${
+                        isInventoryDropZoneActive ? "tech-panel-card-active" : ""
+                      }`}
+                    >
+                      <div className="tech-panel-header mb-3 flex items-center justify-between gap-2">
+                        <h3 className="text-sm @xl:text-base uppercase tracking-[0.2em] opacity-85">
+                          Inventory
+                        </h3>
+                        <span className="rounded-full border border-foreground/20 bg-foreground/[0.03] px-2.5 py-1 text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.14em] opacity-80">
+                          {inventoryFilledCount}/{TECH_INVENTORY_SLOT_COUNT} slots
+                        </span>
+                      </div>
 
-                    <div className="grid grid-cols-5 gap-1.5 @xl:gap-2">
-                      {inventorySlots.map((item, index) => {
-                        const isDragOrigin =
-                          techDragSource?.zone === "inventory" &&
-                          techDragSource.index === index;
-                        return (
-                          <TechSlot.Inventory
-                            key={`inventory-slot-${index}`}
-                            index={index}
-                            item={item}
-                            isDragOrigin={isDragOrigin}
-                            isDropTarget={
-                              techDropTarget?.zone === "inventory" &&
-                              techDropTarget.index === index
-                            }
-                            isDraggingTechItem={isDraggingTechItem}
-                          />
-                        );
-                      })}
+                      <div className="tech-slot-grid tech-slot-grid-inventory grid grid-cols-5 gap-1.5 @xl:gap-2">
+                        {inventorySlots.map((item, index) => {
+                          const isDragOrigin =
+                            techDragSource?.zone === "inventory" &&
+                            techDragSource.index === index;
+                          return (
+                            <TechSlot.Inventory
+                              key={`inventory-slot-${index}`}
+                              index={index}
+                              item={item}
+                              isDragOrigin={isDragOrigin}
+                              isDropTarget={
+                                techDropTarget?.zone === "inventory" &&
+                                techDropTarget.index === index
+                              }
+                              isDraggingTechItem={isDraggingTechItem}
+                            />
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 @xl:mt-5">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <h3 className="text-xs @xl:text-sm uppercase tracking-[0.2em] opacity-85">
-                      Hotbar
-                    </h3>
-                    <span className="text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.12em] opacity-70">
-                      Active Stack
-                    </span>
                   </div>
 
                   <div className="overflow-x-auto pb-1">
-                    <div className="tech-hotbar-frame mx-auto w-max rounded-lg p-1.5 @xl:p-2">
-                      <div className="grid grid-cols-9 gap-1.5 @xl:gap-2">
+                    <div
+                      className={`tech-panel-card tech-panel-card-hotbar mx-auto w-max max-w-full rounded-md p-2.5 @xl:p-3 ${
+                        isHotbarDropZoneActive ? "tech-panel-card-active" : ""
+                      }`}
+                    >
+                      <div className="tech-panel-header mb-2 flex items-center justify-between gap-2">
+                        <h3 className="text-xs @xl:text-sm uppercase tracking-[0.2em] opacity-85">
+                          Hotbar
+                        </h3>
+                        <span className="rounded-full border border-foreground/20 bg-foreground/[0.03] px-2 py-0.5 text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.12em] opacity-75">
+                          Active Stack
+                        </span>
+                      </div>
+
+                      <div className="tech-slot-grid tech-slot-grid-hotbar grid grid-cols-9 gap-1.5 @xl:gap-2">
                         {hotbarSlots.map((item, index) => {
                           const isDragOrigin =
                             techDragSource?.zone === "hotbar" &&
@@ -1075,7 +1085,7 @@ export function HomePage(): React.JSX.Element {
 
                 <DragOverlay dropAnimation={null}>
                   {draggedTechItem ? (
-                    <div className="tech-slot tech-slot-drag-proxy aspect-square w-11 @xl:w-14 p-1">
+                    <div className="tech-slot tech-slot-card tech-slot-drag-proxy aspect-square w-11 @xl:w-14 p-1">
                       <div className="tech-slot-visual h-full w-full">
                         <img
                           src={getTechIconSrc(draggedTechItem)}
@@ -1089,8 +1099,12 @@ export function HomePage(): React.JSX.Element {
                 </DragOverlay>
 
                 <PreviewCard.Portal>
-                  <PreviewCard.Positioner sideOffset={10} side="top">
-                    <PreviewCard.Popup className="tech-preview-popup w-72 max-w-[88vw] rounded-lg border border-foreground/20 bg-background/95 p-3 shadow-2xl outline-none opacity-100 scale-100 transition-[opacity,transform] duration-150 data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95">
+                  <PreviewCard.Positioner
+                    sideOffset={14}
+                    side="top"
+                    className="tech-preview-positioner"
+                  >
+                    <PreviewCard.Popup className="tech-preview-popup tech-preview-popup-layer w-72 max-w-[88vw] rounded-lg border border-foreground/20 bg-background/95 p-3 shadow-2xl outline-none opacity-100 scale-100 transition-[opacity,transform] duration-150 data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95">
                       {payload && TECH_PREVIEW_LOOKUP[payload] && (
                         <div className="flex flex-col gap-2">
                           <h4 className="text-sm @xl:text-base uppercase tracking-[0.18em] font-semibold">
@@ -1135,7 +1149,7 @@ function InventoryTechSlot({
       isDragOrigin={isDragOrigin}
       isDropTarget={isDropTarget}
       isDraggingTechItem={isDraggingTechItem}
-      className={`tech-slot aspect-square w-11 @xl:w-14 p-1 ${
+      className={`tech-slot tech-slot-card aspect-square w-11 @xl:w-14 p-1 ${
         item ? "tech-slot-filled" : "tech-slot-empty"
       }`}
       style={
@@ -1166,8 +1180,8 @@ function HotbarTechSlot({
       isDragOrigin={isDragOrigin}
       isDropTarget={isDropTarget}
       isDraggingTechItem={isDraggingTechItem}
-      className={`tech-slot tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
-        item ? "tech-slot-active" : "tech-slot-empty"
+      className={`tech-slot tech-slot-card tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
+        item ? "tech-slot-filled tech-slot-hotbar-active" : "tech-slot-empty"
       }`}
       style={
         item
@@ -1214,7 +1228,7 @@ function TechSlotBase({
     <div
       ref={setDroppableRef}
       className={`${className} ${showDropTarget ? "tech-slot-drop-target" : ""} ${
-        showDropOverState ? "tech-slot-active" : ""
+        showDropOverState ? "tech-slot-drop-over" : ""
       } ${isDragOrigin ? "tech-slot-drag-origin" : ""}`}
       style={style}
     >
