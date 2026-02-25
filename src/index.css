@@ -412,6 +412,63 @@
     0 6px 14px color-mix(in oklch, var(--foreground) 15%, transparent);
 }
 
+.tech-slot-drop-target {
+  border-color: color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 72%, white 16%);
+  transform: translateY(-1px) scale(1.04);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 80%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 34%, transparent),
+    0 0 0 2px color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 36%, transparent),
+    0 10px 20px color-mix(in oklch, var(--foreground) 20%, transparent);
+  animation: tech-slot-drop-target-pulse 920ms ease-in-out infinite;
+}
+
+.tech-slot-drop-target::before {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, white 55%, transparent),
+    inset 0 0 0 999px color-mix(
+      in oklch,
+      var(--tech-slot-accent, var(--foreground)) 9%,
+      transparent
+    );
+}
+
+.tech-slot-drop-target::after {
+  content: "Drop";
+  position: absolute;
+  top: -0.38rem;
+  right: -0.42rem;
+  border-radius: 999px;
+  padding: 0.12rem 0.3rem;
+  font-size: 0.42rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--background) 96%, black 4%);
+  background: color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 78%, white 12%);
+  box-shadow: 0 3px 10px color-mix(in oklch, var(--foreground) 18%, transparent);
+  pointer-events: none;
+}
+
+@keyframes tech-slot-drop-target-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, white 80%, transparent),
+      inset 0 -2px 0 color-mix(in oklch, black 34%, transparent),
+      0 0 0 2px color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 34%, transparent),
+      0 10px 20px color-mix(in oklch, var(--foreground) 20%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, white 82%, transparent),
+      inset 0 -2px 0 color-mix(in oklch, black 35%, transparent),
+      0 0 0 3px color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 42%, transparent),
+      0 12px 24px color-mix(in oklch, var(--foreground) 24%, transparent);
+  }
+}
+
 .tech-slot-hotbar:hover {
   border-color: color-mix(in oklch, var(--foreground) 32%, transparent);
 }
@@ -448,6 +505,17 @@
   box-shadow:
     inset 0 1px 0 color-mix(in oklch, white 62%, transparent),
     inset 0 -2px 0 color-mix(in oklch, black 25%, transparent);
+}
+
+.tech-drag-active .tech-slot-drop-target,
+.tech-drag-active .tech-slot-drop-target:hover {
+  transform: translateY(-1px) scale(1.04);
+  border-color: color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 72%, white 16%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 80%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 34%, transparent),
+    0 0 0 2px color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 36%, transparent),
+    0 10px 20px color-mix(in oklch, var(--foreground) 20%, transparent);
 }
 
 .tech-slot-icon-image {

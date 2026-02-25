@@ -4,6 +4,7 @@ import {
   closestCenter,
   DndContext,
   DragOverlay,
+  pointerWithin,
   PointerSensor,
   TouchSensor,
   useDraggable,
@@ -11,6 +12,7 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
   type UniqueIdentifier,
 } from "@dnd-kit/core";
@@ -112,6 +114,7 @@ type TechStackSlotProps = {
   index: number;
   item: TechStackItem | null;
   isDragOrigin: boolean;
+  isDropTarget: boolean;
   isDraggingTechItem: boolean;
   className: string;
   style?: React.CSSProperties;
@@ -255,6 +258,7 @@ const TECH_STACK = [
 
 const TECH_INVENTORY_SLOT_COUNT = 25;
 const TECH_HOTBAR_SLOT_COUNT = 9;
+const TECH_DROP_SNAP_DISTANCE_PX = 22;
 const HOTBAR_TECH_NAMES = [
   "TypeScript",
   "React",
@@ -334,6 +338,16 @@ function parseTechSlotId(id: UniqueIdentifier): TechDragSource | null {
   return { zone, index };
 }
 
+function getDistanceFromPointToRect(
+  x: number,
+  y: number,
+  rect: { top: number; right: number; bottom: number; left: number },
+): number {
+  const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
+  const dy = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0;
+  return Math.hypot(dx, dy);
+}
+
 function scrambleText(target: string, revealCount: number): string {
   return target
     .split("")
@@ -383,6 +397,9 @@ function Home(): React.JSX.Element {
     null,
   );
   const [draggedTechItem, setDraggedTechItem] = React.useState<TechStackItem | null>(
+    null,
+  );
+  const [techDropTarget, setTechDropTarget] = React.useState<TechDragSource | null>(
     null,
   );
   const experienceSectionRef = React.useRef<HTMLElement | null>(null);
@@ -639,6 +656,47 @@ function Home(): React.JSX.Element {
       },
     }),
   );
+  const techCollisionDetection = React.useCallback(
+    (args: Parameters<typeof closestCenter>[0]) => {
+      const directPointerCollisions = pointerWithin(args);
+      if (directPointerCollisions.length > 0) {
+        return directPointerCollisions;
+      }
+
+      if (args.pointerCoordinates) {
+        const { x, y } = args.pointerCoordinates;
+        const nearbyDroppables = args.droppableContainers.filter((container) => {
+          const rect = args.droppableRects.get(container.id);
+          if (!rect) {
+            return false;
+          }
+
+          const distance = getDistanceFromPointToRect(x, y, rect);
+          return distance <= TECH_DROP_SNAP_DISTANCE_PX;
+        });
+
+        if (nearbyDroppables.length > 0) {
+          return closestCenter({
+            ...args,
+            collisionRect: {
+              top: y,
+              right: x,
+              bottom: y,
+              left: x,
+              width: 0,
+              height: 0,
+            },
+            droppableContainers: nearbyDroppables,
+          });
+        }
+
+        return [];
+      }
+
+      return closestCenter(args);
+    },
+    [],
+  );
 
   function swapTechSlots(source: TechDragSource, target: TechDragSource): void {
     const nextInventory = [...inventorySlots];
@@ -665,6 +723,7 @@ function Home(): React.JSX.Element {
       flushSync(() => {
         setTechDragSource(null);
         setDraggedTechItem(null);
+        setTechDropTarget(null);
       });
       return;
     }
@@ -675,6 +734,7 @@ function Home(): React.JSX.Element {
       flushSync(() => {
         setTechDragSource(null);
         setDraggedTechItem(null);
+        setTechDropTarget(null);
       });
       return;
     }
@@ -682,16 +742,23 @@ function Home(): React.JSX.Element {
     flushSync(() => {
       setTechDragSource(source);
       setDraggedTechItem(sourceItem);
+      setTechDropTarget(null);
     });
+  }
+
+  function handleTechDragOver(event: DragOverEvent): void {
+    const target = event.over ? parseTechSlotId(event.over.id) : null;
+    setTechDropTarget(target);
   }
 
   function handleTechDragEnd(event: DragEndEvent): void {
     const source = parseTechSlotId(event.active.id);
-    const target = event.over ? parseTechSlotId(event.over.id) : null;
+    const target = techDropTarget ?? (event.over ? parseTechSlotId(event.over.id) : null);
     if (!source || !target) {
       flushSync(() => {
         setTechDragSource(null);
         setDraggedTechItem(null);
+        setTechDropTarget(null);
       });
       return;
     }
@@ -699,6 +766,7 @@ function Home(): React.JSX.Element {
       flushSync(() => {
         setTechDragSource(null);
         setDraggedTechItem(null);
+        setTechDropTarget(null);
       });
       return;
     }
@@ -707,6 +775,7 @@ function Home(): React.JSX.Element {
       swapTechSlots(source, target);
       setTechDragSource(null);
       setDraggedTechItem(null);
+      setTechDropTarget(null);
     });
   }
 
@@ -995,13 +1064,15 @@ function Home(): React.JSX.Element {
             {({ payload }) => (
               <DndContext
                 sensors={techDndSensors}
-                collisionDetection={closestCenter}
+                collisionDetection={techCollisionDetection}
                 onDragStart={handleTechDragStart}
+                onDragOver={handleTechDragOver}
                 onDragEnd={handleTechDragEnd}
                 onDragCancel={() => {
                   flushSync(() => {
                     setTechDragSource(null);
                     setDraggedTechItem(null);
+                    setTechDropTarget(null);
                   });
                 }}
               >
@@ -1028,6 +1099,10 @@ function Home(): React.JSX.Element {
                             index={index}
                             item={item}
                             isDragOrigin={isDragOrigin}
+                            isDropTarget={
+                              techDropTarget?.zone === "inventory" &&
+                              techDropTarget.index === index
+                            }
                             isDraggingTechItem={isDraggingTechItem}
                             className={`tech-slot aspect-square w-11 @xl:w-14 p-1 ${
                               item ? "tech-slot-filled" : "tech-slot-empty"
@@ -1072,6 +1147,10 @@ function Home(): React.JSX.Element {
                               index={index}
                               item={item}
                               isDragOrigin={isDragOrigin}
+                              isDropTarget={
+                                techDropTarget?.zone === "hotbar" &&
+                                techDropTarget.index === index
+                              }
                               isDraggingTechItem={isDraggingTechItem}
                               className={`tech-slot tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
                                 item ? "tech-slot-active" : "tech-slot-empty"
@@ -1140,6 +1219,7 @@ function TechStackSlot({
   index,
   item,
   isDragOrigin,
+  isDropTarget,
   isDraggingTechItem,
   className,
   style,
@@ -1159,13 +1239,15 @@ function TechStackSlot({
     id: slotId,
     disabled: item === null,
   });
+  const showDropTarget = isDropTarget && !isDragOrigin;
+  const showDropOverState = isOver && !isDragOrigin && !showDropTarget;
 
   return (
     <div
       ref={setDroppableRef}
-      className={`${className} ${isOver && !isDragOrigin ? "tech-slot-active" : ""} ${
-        isDragOrigin ? "tech-slot-drag-origin" : ""
-      }`}
+      className={`${className} ${showDropTarget ? "tech-slot-drop-target" : ""} ${
+        showDropOverState ? "tech-slot-active" : ""
+      } ${isDragOrigin ? "tech-slot-drag-origin" : ""}`}
       style={style}
     >
       {item ? (
