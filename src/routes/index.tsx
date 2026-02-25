@@ -56,12 +56,9 @@ type ExternalLinkProps = {
   children: React.ReactNode;
 };
 
-type ScrambleLockTextProps = {
+type ScrambleTextProps = {
   finalText: string;
   renderedText: string;
-  block?: boolean;
-  edgeBleed?: boolean;
-  allowMarquee?: boolean;
 };
 
 type ScrambleTextSegment = {
@@ -87,6 +84,10 @@ type MissionStatus = "completed" | "in-progress";
 type TechInventoryCategory = "Frontend" | "Backend" | "DevOps" | "Design Tools";
 type TechSlotZone = "inventory" | "hotbar";
 type TechDragSource = { zone: TechSlotZone; index: number };
+type TechSlotsState = {
+  inventory: Array<TechStackItem | null>;
+  hotbar: Array<TechStackItem | null>;
+};
 
 type ExperienceItem = {
   title: string;
@@ -109,13 +110,16 @@ type TechPreviewPayload = {
   usedIn: readonly string[];
 };
 
-type TechStackSlotProps = {
-  zone: TechSlotZone;
+type TechSlotStateProps = {
   index: number;
   item: TechStackItem | null;
   isDragOrigin: boolean;
   isDropTarget: boolean;
   isDraggingTechItem: boolean;
+};
+
+type TechSlotBaseProps = TechSlotStateProps & {
+  zone: TechSlotZone;
   className: string;
   style?: React.CSSProperties;
   emptyLabel: React.ReactNode;
@@ -267,8 +271,11 @@ const HOTBAR_TECH_NAMES = [
   "Node.js",
   "Express",
 ] as const;
+const TECH_STACK_BY_NAME = new Map(
+  TECH_STACK.map((item) => [item.name, item] as const),
+);
 const HOTBAR_ACTIVE_ITEMS = HOTBAR_TECH_NAMES.flatMap((name) => {
-  const item = TECH_STACK.find((tech) => tech.name === name);
+  const item = TECH_STACK_BY_NAME.get(name);
   return item ? [item] : [];
 });
 const HOTBAR_ACTIVE_ITEM_NAMES = new Set(
@@ -338,6 +345,19 @@ function parseTechSlotId(id: UniqueIdentifier): TechDragSource | null {
   return { zone, index };
 }
 
+function isSameTechDragSource(
+  left: TechDragSource | null,
+  right: TechDragSource | null,
+): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
+  return left.zone === right.zone && left.index === right.index;
+}
+
 function getDistanceFromPointToRect(
   x: number,
   y: number,
@@ -387,12 +407,10 @@ function Home(): React.JSX.Element {
   const [experienceScrambleNow, setExperienceScrambleNow] = React.useState<
     number | null
   >(null);
-  const [inventorySlots, setInventorySlots] = React.useState<
-    Array<TechStackItem | null>
-  >(() => [...TECH_INVENTORY_SLOTS]);
-  const [hotbarSlots, setHotbarSlots] = React.useState<Array<TechStackItem | null>>(
-    () => [...TECH_HOTBAR_SLOTS],
-  );
+  const [techSlots, setTechSlots] = React.useState<TechSlotsState>(() => ({
+    inventory: [...TECH_INVENTORY_SLOTS],
+    hotbar: [...TECH_HOTBAR_SLOTS],
+  }));
   const [techDragSource, setTechDragSource] = React.useState<TechDragSource | null>(
     null,
   );
@@ -404,7 +422,11 @@ function Home(): React.JSX.Element {
   );
   const experienceSectionRef = React.useRef<HTMLElement | null>(null);
   const experienceScrambleStartRef = React.useRef<number | null>(null);
+  const techSlotsRef = React.useRef(techSlots);
+  const techDropTargetRef = React.useRef<TechDragSource | null>(null);
   const selectedExperience = EXPERIENCES[selectedExperienceIndex];
+  const inventorySlots = techSlots.inventory;
+  const hotbarSlots = techSlots.hotbar;
 
   React.useEffect(() => {
     let frame = 0;
@@ -491,26 +513,25 @@ function Home(): React.JSX.Element {
     return () => window.clearInterval(intervalId);
   }, [isExperienceItemsVisible]);
 
+  React.useEffect(() => {
+    techSlotsRef.current = techSlots;
+  }, [techSlots]);
+
+  React.useEffect(() => {
+    techDropTargetRef.current = techDropTarget;
+  }, [techDropTarget]);
+
   function scrambleDescription(text: string): string {
     return scrambleByProgress(text, introProgress);
   }
 
-  function renderIntroText(
-    text: string,
-    options?: { block?: boolean },
-  ): React.ReactNode {
+  function renderIntroInlineText(text: string): React.ReactNode {
     const rendered = scrambleDescription(text);
     if (rendered === text) {
       return text;
     }
 
-    return (
-      <ScrambleLockText
-        finalText={text}
-        renderedText={rendered}
-        block={options?.block}
-      />
-    );
+    return <ScrambleText.Inline finalText={text} renderedText={rendered} />;
   }
 
   function scrambleExperienceCardText(text: string, delayMs = 0): string {
@@ -528,30 +549,34 @@ function Home(): React.JSX.Element {
     return scrambleByProgress(text, progress);
   }
 
-  function renderExperienceCardText(
-    text: string,
-    options?: {
-      block?: boolean;
-      delayMs?: number;
-      edgeBleed?: boolean;
-      allowMarquee?: boolean;
-    },
-  ): React.ReactNode {
-    const rendered = scrambleExperienceCardText(text, options?.delayMs ?? 0);
+  function renderExperienceInlineText(text: string, delayMs = 0): React.ReactNode {
+    const rendered = scrambleExperienceCardText(text, delayMs);
     const hasScrambleStarted = experienceScrambleStartRef.current !== null;
     if (!hasScrambleStarted) {
       return text;
     }
 
-    return (
-      <ScrambleLockText
-        finalText={text}
-        renderedText={rendered}
-        block={options?.block}
-        edgeBleed={options?.edgeBleed}
-        allowMarquee={options?.allowMarquee}
-      />
-    );
+    return <ScrambleText.Inline finalText={text} renderedText={rendered} />;
+  }
+
+  function renderExperienceBlockText(text: string, delayMs = 0): React.ReactNode {
+    const rendered = scrambleExperienceCardText(text, delayMs);
+    const hasScrambleStarted = experienceScrambleStartRef.current !== null;
+    if (!hasScrambleStarted) {
+      return text;
+    }
+
+    return <ScrambleText.Block finalText={text} renderedText={rendered} />;
+  }
+
+  function renderExperienceMarqueeText(text: string, delayMs = 0): React.ReactNode {
+    const rendered = scrambleExperienceCardText(text, delayMs);
+    const hasScrambleStarted = experienceScrambleStartRef.current !== null;
+    if (!hasScrambleStarted) {
+      return text;
+    }
+
+    return <ScrambleText.Marquee finalText={text} renderedText={rendered} />;
   }
 
   function selectMission(index: number): void {
@@ -559,21 +584,12 @@ function Home(): React.JSX.Element {
     setIsMissionDrawerOpen(false);
   }
 
-  function renderMissionStatusBadge(
+  function renderMissionStatusBadgeBase(
     status: MissionStatus,
-    options?: { active?: boolean; compact?: boolean },
+    sizeClass: string,
+    toneClass: string,
   ): React.JSX.Element {
-    const isActive = options?.active ?? false;
-    const isCompact = options?.compact ?? false;
     const label = status === "in-progress" ? "In Progress" : "Completed";
-    const sizeClass = isCompact
-      ? "px-2 py-0.5 text-[0.58rem] @xl:text-[0.62rem]"
-      : "px-2.5 py-1 text-[0.62rem] @xl:text-[0.68rem]";
-    const toneClass = isActive
-      ? "border-current/35 bg-current/10 text-current"
-      : status === "in-progress"
-        ? "border-amber-500/40 bg-amber-500/12 text-amber-700 dark:text-amber-300"
-        : "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
 
     return (
       <span
@@ -584,27 +600,63 @@ function Home(): React.JSX.Element {
     );
   }
 
-  function renderMissionButton(
+  function renderMissionStatusBadge(status: MissionStatus): React.JSX.Element {
+    const toneClass =
+      status === "in-progress"
+        ? "border-amber-500/40 bg-amber-500/12 text-amber-700 dark:text-amber-300"
+        : "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+
+    return renderMissionStatusBadgeBase(
+      status,
+      "px-2.5 py-1 text-[0.62rem] @xl:text-[0.68rem]",
+      toneClass,
+    );
+  }
+
+  function renderMissionStatusBadgeCompact(status: MissionStatus): React.JSX.Element {
+    const toneClass =
+      status === "in-progress"
+        ? "border-amber-500/40 bg-amber-500/12 text-amber-700 dark:text-amber-300"
+        : "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+
+    return renderMissionStatusBadgeBase(
+      status,
+      "px-2 py-0.5 text-[0.58rem] @xl:text-[0.62rem]",
+      toneClass,
+    );
+  }
+
+  function renderMissionStatusBadgeCompactSelected(
+    status: MissionStatus,
+  ): React.JSX.Element {
+    return renderMissionStatusBadgeBase(
+      status,
+      "px-2 py-0.5 text-[0.58rem] @xl:text-[0.62rem]",
+      "border-current/35 bg-current/10 text-current",
+    );
+  }
+
+  function renderMissionButtonBase(
     index: number,
-    options?: { animated?: boolean },
+    variant: "animated" | "static",
   ): React.JSX.Element {
     const experience = EXPERIENCES[index];
     const isActive = index === selectedExperienceIndex;
     const missionDelay = index * EXPERIENCE_ITEM_STAGGER_STEP_MS;
-    const shouldAnimate = options?.animated ?? true;
+    const isAnimated = variant === "animated";
 
     return (
       <button
         key={`${experience.subtitle}-${experience.date}`}
         type="button"
         onClick={() => selectMission(index)}
-        className={`${shouldAnimate ? "mission-item-intro " : ""}text-left rounded-md border px-4 py-3 @xl:px-5 @xl:py-4 transition-colors ${
+        className={`${isAnimated ? "mission-item-intro " : ""}text-left rounded-md border px-4 py-3 @xl:px-5 @xl:py-4 transition-colors ${
           isActive
             ? "border-foreground bg-foreground text-background"
             : "border-foreground/20 hover:border-foreground/50 hover:bg-foreground/5"
         }`}
         style={
-          shouldAnimate
+          isAnimated
             ? ({
                 "--mission-delay": `${missionDelay}ms`,
               } as React.CSSProperties)
@@ -613,34 +665,35 @@ function Home(): React.JSX.Element {
       >
         <div className="flex items-center justify-between gap-2">
           <span className="text-base @xl:text-lg font-medium tracking-wide whitespace-nowrap">
-            {renderExperienceCardText(experience.subtitle, {
-              delayMs: missionDelay,
-            })}
+            {renderExperienceInlineText(experience.subtitle, missionDelay)}
           </span>
           <span className="text-sm @xl:text-base opacity-80">
-            {renderExperienceCardText(`#${index + 1}`, {
-              delayMs: missionDelay,
-            })}
+            {renderExperienceInlineText(`#${index + 1}`, missionDelay)}
           </span>
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-2">
           <span className="text-sm @xl:text-base opacity-70 whitespace-nowrap">
-            {renderExperienceCardText(experience.date, {
-              delayMs: missionDelay,
-            })}
+            {renderExperienceInlineText(experience.date, missionDelay)}
           </span>
-          {renderMissionStatusBadge(experience.status, {
-            active: isActive,
-            compact: true,
-          })}
+          {isActive
+            ? renderMissionStatusBadgeCompactSelected(experience.status)
+            : renderMissionStatusBadgeCompact(experience.status)}
         </div>
       </button>
     );
   }
 
-  const inventoryFilledCount = React.useMemo(
-    () => inventorySlots.filter((item) => item !== null).length,
-    [inventorySlots],
+  function renderAnimatedMissionButton(index: number): React.JSX.Element {
+    return renderMissionButtonBase(index, "animated");
+  }
+
+  function renderStaticMissionButton(index: number): React.JSX.Element {
+    return renderMissionButtonBase(index, "static");
+  }
+
+  const inventoryFilledCount = inventorySlots.reduce(
+    (count, item) => (item ? count + 1 : count),
+    0,
   );
   const isDraggingTechItem = techDragSource !== null;
   const techDndSensors = useSensors(
@@ -698,86 +751,105 @@ function Home(): React.JSX.Element {
     [],
   );
 
-  function swapTechSlots(source: TechDragSource, target: TechDragSource): void {
-    const nextInventory = [...inventorySlots];
-    const nextHotbar = [...hotbarSlots];
-    const sourceSlots = source.zone === "inventory" ? nextInventory : nextHotbar;
-    const targetSlots = target.zone === "inventory" ? nextInventory : nextHotbar;
-    const sourceItem = sourceSlots[source.index];
-    if (!sourceItem) {
-      return;
-    }
-
-    [sourceSlots[source.index], targetSlots[target.index]] = [
-      targetSlots[target.index],
-      sourceItem,
-    ];
-
-    setInventorySlots(nextInventory);
-    setHotbarSlots(nextHotbar);
-  }
-
-  function handleTechDragStart(event: DragStartEvent): void {
-    const source = parseTechSlotId(event.active.id);
-    if (!source) {
-      flushSync(() => {
-        setTechDragSource(null);
-        setDraggedTechItem(null);
-        setTechDropTarget(null);
-      });
-      return;
-    }
-
-    const sourceSlots = source.zone === "inventory" ? inventorySlots : hotbarSlots;
-    const sourceItem = sourceSlots[source.index];
-    if (!sourceItem) {
-      flushSync(() => {
-        setTechDragSource(null);
-        setDraggedTechItem(null);
-        setTechDropTarget(null);
-      });
-      return;
-    }
-
+  const clearTechDragState = React.useCallback((): void => {
+    techDropTargetRef.current = null;
     flushSync(() => {
-      setTechDragSource(source);
-      setDraggedTechItem(sourceItem);
-      setTechDropTarget(null);
-    });
-  }
-
-  function handleTechDragOver(event: DragOverEvent): void {
-    const target = event.over ? parseTechSlotId(event.over.id) : null;
-    setTechDropTarget(target);
-  }
-
-  function handleTechDragEnd(event: DragEndEvent): void {
-    const source = parseTechSlotId(event.active.id);
-    const target = techDropTarget ?? (event.over ? parseTechSlotId(event.over.id) : null);
-    if (!source || !target) {
-      flushSync(() => {
-        setTechDragSource(null);
-        setDraggedTechItem(null);
-        setTechDropTarget(null);
-      });
-      return;
-    }
-    if (source.zone === target.zone && source.index === target.index) {
-      flushSync(() => {
-        setTechDragSource(null);
-        setDraggedTechItem(null);
-        setTechDropTarget(null);
-      });
-      return;
-    }
-
-    flushSync(() => {
-      swapTechSlots(source, target);
       setTechDragSource(null);
       setDraggedTechItem(null);
       setTechDropTarget(null);
     });
-  }
+  }, []);
+
+  const swapTechSlots = React.useCallback(
+    (source: TechDragSource, target: TechDragSource): void => {
+      setTechSlots((current) => {
+        const nextInventory = [...current.inventory];
+        const nextHotbar = [...current.hotbar];
+        const sourceSlots = source.zone === "inventory" ? nextInventory : nextHotbar;
+        const targetSlots = target.zone === "inventory" ? nextInventory : nextHotbar;
+        const sourceItem = sourceSlots[source.index];
+        if (!sourceItem) {
+          return current;
+        }
+
+        [sourceSlots[source.index], targetSlots[target.index]] = [
+          targetSlots[target.index],
+          sourceItem,
+        ];
+
+        const nextSlots: TechSlotsState = {
+          inventory: nextInventory,
+          hotbar: nextHotbar,
+        };
+        techSlotsRef.current = nextSlots;
+        return nextSlots;
+      });
+    },
+    [],
+  );
+
+  const handleTechDragStart = React.useCallback(
+    (event: DragStartEvent): void => {
+      const source = parseTechSlotId(event.active.id);
+      if (!source) {
+        clearTechDragState();
+        return;
+      }
+
+      const currentSlots = techSlotsRef.current;
+      const sourceSlots =
+        source.zone === "inventory" ? currentSlots.inventory : currentSlots.hotbar;
+      const sourceItem = sourceSlots[source.index];
+      if (!sourceItem) {
+        clearTechDragState();
+        return;
+      }
+
+      techDropTargetRef.current = null;
+      flushSync(() => {
+        setTechDragSource(source);
+        setDraggedTechItem(sourceItem);
+        setTechDropTarget(null);
+      });
+    },
+    [clearTechDragState],
+  );
+
+  const handleTechDragOver = React.useCallback((event: DragOverEvent): void => {
+    const target = event.over ? parseTechSlotId(event.over.id) : null;
+    setTechDropTarget((current) => {
+      if (isSameTechDragSource(current, target)) {
+        return current;
+      }
+      techDropTargetRef.current = target;
+      return target;
+    });
+  }, []);
+
+  const handleTechDragEnd = React.useCallback(
+    (event: DragEndEvent): void => {
+      const source = parseTechSlotId(event.active.id);
+      const target =
+        techDropTargetRef.current ?? (event.over ? parseTechSlotId(event.over.id) : null);
+      if (!source || !target) {
+        clearTechDragState();
+        return;
+      }
+      if (isSameTechDragSource(source, target)) {
+        clearTechDragState();
+        return;
+      }
+
+      techDropTargetRef.current = null;
+      flushSync(() => {
+        swapTechSlots(source, target);
+        setTechDragSource(null);
+        setDraggedTechItem(null);
+        setTechDropTarget(null);
+      });
+    },
+    [clearTechDragState, swapTechSlots],
+  );
 
   return (
     <main className="pt-8 lg:pt-12">
@@ -796,47 +868,47 @@ function Home(): React.JSX.Element {
         </h1>
         <div className="text-lg @xl:text-xl @3xl:text-3xl pt-4 @xl:pt-6 @3xl:pt-10 pb-8 flex flex-col gap-4 leading-relaxed text-pretty">
           <p>
-            {renderIntroText(
+            {renderIntroInlineText(
               "Full-stack engineer based in Yogyakarta, Indonesia with 5+ years of professional experience. Currently building healthcare software at ",
             )}
             <ExternalLink href="https://evidencecare.com">
-              {renderIntroText("EvidenceCare")}
+              {renderIntroInlineText("EvidenceCare")}
             </ExternalLink>
-            {renderIntroText(" for the US market.")}
+            {renderIntroInlineText(" for the US market.")}
           </p>
           <p>
-            {renderIntroText("Created ")}
+            {renderIntroInlineText("Created ")}
             <ExternalLink href="https://github.com/itsfaqih/fama">
-              {renderIntroText("Fama")}
+              {renderIntroInlineText("Fama")}
             </ExternalLink>
-            {renderIntroText(
+            {renderIntroInlineText(
               ", an open source portfolio template with 230+ GitHub stars and 48 forks. Built ",
             )}
             <ExternalLink href="https://schemata.ruine.app">
-              {renderIntroText("Schemata")}
+              {renderIntroInlineText("Schemata")}
             </ExternalLink>
-            {renderIntroText(
+            {renderIntroInlineText(
               ", a drag-and-drop ERD builder for visual database schema design.",
             )}
           </p>
           <p>
-            {renderIntroText(
+            {renderIntroInlineText(
               "Led cross-functional product teams of 10 engineers and designers. Recognized as top performer at ",
             )}
             <ExternalLink href="https://jatismobile.com/">
-              {renderIntroText("Jatis Mobile")}
+              {renderIntroInlineText("Jatis Mobile")}
             </ExternalLink>
-            {renderIntroText(
+            {renderIntroInlineText(
               " (Q4 2022). Contributed to the Indonesian PHP community through ",
             )}
             <ExternalLink href="https://www.figma.com/design/qNIg0A9h7PnrFdOVSBbMEH/PHPID-Online-Learning-Redesign?node-id=0-1&t=PcPvOnrKzLginYqa-1">
-              {renderIntroText("UI design work")}
+              {renderIntroInlineText("UI design work")}
             </ExternalLink>
-            {renderIntroText(" for ")}
+            {renderIntroInlineText(" for ")}
             <ExternalLink href="https://github.com/phpid-jakarta/phpid-learning">
-              {renderIntroText("PHPID Learning")}
+              {renderIntroInlineText("PHPID Learning")}
             </ExternalLink>
-            {renderIntroText(".")}
+            {renderIntroInlineText(".")}
           </p>
 
           <PreviewCard.Root<string> handle={linkPreviewHandle}>
@@ -866,28 +938,28 @@ function Home(): React.JSX.Element {
             <div className="mission-card-intro mission-card-intro-list mission-card-surface mission-card-border rounded-lg p-3 @xl:p-4 lg:w-[25rem] lg:shrink-0 lg:[transform:perspective(1200px)_rotateY(6deg)]">
               <div>
                 <div className="text-base uppercase tracking-[0.2em] opacity-60 px-2 py-1">
-                  {renderExperienceCardText("Missions")}
+                  {renderExperienceInlineText("Missions")}
                 </div>
                 <div className="px-2 py-1 flex flex-wrap gap-1.5 @xl:gap-2 text-[0.58rem] @xl:text-[0.66rem] uppercase tracking-[0.14em] opacity-85">
                   <span className="rounded-full border border-foreground/20 px-2 py-0.5 @xl:px-2.5 @xl:py-1">
-                    {renderExperienceCardText(`${TOTAL_MISSION_COUNT} Total`)}
+                    {renderExperienceInlineText(`${TOTAL_MISSION_COUNT} Total`)}
                   </span>
                   <span className="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5 @xl:px-2.5 @xl:py-1 text-emerald-700 dark:text-emerald-300">
-                    {renderExperienceCardText(
+                    {renderExperienceInlineText(
                       `${COMPLETED_MISSION_COUNT} Completed`,
                     )}
                   </span>
                   <span className="rounded-full border border-amber-500/40 bg-amber-500/12 px-2 py-0.5 @xl:px-2.5 @xl:py-1 text-amber-700 dark:text-amber-300">
-                    {renderExperienceCardText(
+                    {renderExperienceInlineText(
                       `${IN_PROGRESS_MISSION_COUNT} In Progress`,
                     )}
                   </span>
                 </div>
                 <div className="mt-2 flex flex-col gap-2 md:max-lg:hidden">
-                  {EXPERIENCES.map((_, index) => renderMissionButton(index))}
+                  {EXPERIENCES.map((_, index) => renderAnimatedMissionButton(index))}
                 </div>
                 <div className="mt-2 hidden md:max-lg:flex md:max-lg:flex-col md:max-lg:gap-2">
-                  {renderMissionButton(selectedExperienceIndex)}
+                  {renderAnimatedMissionButton(selectedExperienceIndex)}
 
                   <Drawer.Root
                     open={isMissionDrawerOpen}
@@ -895,7 +967,7 @@ function Home(): React.JSX.Element {
                     swipeDirection="down"
                   >
                     <Drawer.Trigger className="rounded-md border border-foreground/35 px-4 py-3 text-sm uppercase tracking-[0.18em] text-left hover:border-foreground/60 hover:bg-foreground/5 transition-colors">
-                      {renderExperienceCardText("View More")}
+                      {renderExperienceInlineText("View More")}
                     </Drawer.Trigger>
                     <Drawer.Portal>
                       <Drawer.Backdrop className="fixed inset-0 z-40 bg-background/65 backdrop-blur-[1.5px] transition-opacity duration-200 data-starting-style:opacity-0 data-ending-style:opacity-0" />
@@ -912,7 +984,7 @@ function Home(): React.JSX.Element {
                             </div>
                             <div className="flex flex-col gap-2 pb-1">
                               {EXPERIENCES.map((_, index) =>
-                                renderMissionButton(index, { animated: false }),
+                                renderStaticMissionButton(index),
                               )}
                             </div>
                           </Drawer.Content>
@@ -937,12 +1009,7 @@ function Home(): React.JSX.Element {
                       className="mission-detail-stagger text-3xl @xl:text-5xl font-bold whitespace-nowrap [--scramble-edge-bleed-inline:1.25rem] @xl:[--scramble-edge-bleed-inline:2rem]"
                       style={{ "--detail-delay": "0ms" } as React.CSSProperties}
                     >
-                      {renderExperienceCardText(selectedExperience.title, {
-                        block: true,
-                        delayMs: 0,
-                        edgeBleed: true,
-                        allowMarquee: true,
-                      })}
+                      {renderExperienceMarqueeText(selectedExperience.title, 0)}
                     </div>
                     <div
                       className="mission-detail-stagger mt-3 text-lg @xl:text-2xl opacity-80"
@@ -952,10 +1019,10 @@ function Home(): React.JSX.Element {
                         } as React.CSSProperties
                       }
                     >
-                      {renderExperienceCardText(selectedExperience.subtitle, {
-                        block: true,
-                        delayMs: EXPERIENCE_DETAIL_STAGGER_MS,
-                      })}
+                      {renderExperienceBlockText(
+                        selectedExperience.subtitle,
+                        EXPERIENCE_DETAIL_STAGGER_MS,
+                      )}
                     </div>
                   </div>
                   <div
@@ -967,9 +1034,10 @@ function Home(): React.JSX.Element {
                     }
                   >
                     <span>
-                      {renderExperienceCardText(selectedExperience.date, {
-                        delayMs: EXPERIENCE_DETAIL_STAGGER_MS * 2,
-                      })}
+                      {renderExperienceInlineText(
+                        selectedExperience.date,
+                        EXPERIENCE_DETAIL_STAGGER_MS * 2,
+                      )}
                     </span>
                     {renderMissionStatusBadge(selectedExperience.status)}
                   </div>
@@ -984,9 +1052,10 @@ function Home(): React.JSX.Element {
                   }
                 >
                   <div className="text-base uppercase tracking-[0.2em] opacity-60 mb-3">
-                    {renderExperienceCardText("Objectives", {
-                      delayMs: EXPERIENCE_DETAIL_STAGGER_MS * 3,
-                    })}
+                    {renderExperienceInlineText(
+                      "Objectives",
+                      EXPERIENCE_DETAIL_STAGGER_MS * 3,
+                    )}
                   </div>
                   <ul className="space-y-3">
                     {selectedExperience.description.map((item, index) => (
@@ -1001,12 +1070,11 @@ function Home(): React.JSX.Element {
                       >
                         <span className="opacity-60 mt-[2px]">▸</span>
                         <span>
-                          {renderExperienceCardText(item, {
-                            block: true,
-                            delayMs:
-                              EXPERIENCE_DETAIL_OBJECTIVE_OFFSET_MS +
+                          {renderExperienceBlockText(
+                            item,
+                            EXPERIENCE_DETAIL_OBJECTIVE_OFFSET_MS +
                               index * EXPERIENCE_OBJECTIVE_STAGGER_MS,
-                          })}
+                          )}
                         </span>
                       </li>
                     ))}
@@ -1022,9 +1090,10 @@ function Home(): React.JSX.Element {
                   }
                 >
                   <div className="text-base uppercase tracking-[0.2em] opacity-60 mb-3">
-                    {renderExperienceCardText("Loadout", {
-                      delayMs: EXPERIENCE_DETAIL_OBJECTIVE_OFFSET_MS,
-                    })}
+                    {renderExperienceInlineText(
+                      "Loadout",
+                      EXPERIENCE_DETAIL_OBJECTIVE_OFFSET_MS,
+                    )}
                   </div>
                   <div className="flex flex-wrap gap-2.5">
                     {selectedExperience.tags.map((tag, index) => (
@@ -1037,11 +1106,11 @@ function Home(): React.JSX.Element {
                           } as React.CSSProperties
                         }
                       >
-                        {renderExperienceCardText(tag, {
-                          delayMs:
-                            EXPERIENCE_DETAIL_SKILL_OFFSET_MS +
+                        {renderExperienceInlineText(
+                          tag,
+                          EXPERIENCE_DETAIL_SKILL_OFFSET_MS +
                             index * EXPERIENCE_SKILL_STAGGER_MS,
-                        })}
+                        )}
                       </span>
                     ))}
                   </div>
@@ -1068,13 +1137,7 @@ function Home(): React.JSX.Element {
                 onDragStart={handleTechDragStart}
                 onDragOver={handleTechDragOver}
                 onDragEnd={handleTechDragEnd}
-                onDragCancel={() => {
-                  flushSync(() => {
-                    setTechDragSource(null);
-                    setDraggedTechItem(null);
-                    setTechDropTarget(null);
-                  });
-                }}
+                onDragCancel={clearTechDragState}
               >
                 <div className="overflow-x-auto pb-1">
                   <div className="tech-inventory-frame mx-auto w-max max-w-full rounded-xl p-2 @xl:p-3">
@@ -1093,9 +1156,8 @@ function Home(): React.JSX.Element {
                           techDragSource?.zone === "inventory" &&
                           techDragSource.index === index;
                         return (
-                          <TechStackSlot
+                          <TechSlot.Inventory
                             key={`inventory-slot-${index}`}
-                            zone="inventory"
                             index={index}
                             item={item}
                             isDragOrigin={isDragOrigin}
@@ -1104,18 +1166,6 @@ function Home(): React.JSX.Element {
                               techDropTarget.index === index
                             }
                             isDraggingTechItem={isDraggingTechItem}
-                            className={`tech-slot aspect-square w-11 @xl:w-14 p-1 ${
-                              item ? "tech-slot-filled" : "tech-slot-empty"
-                            }`}
-                            style={
-                              item
-                                ? ({
-                                    "--tech-slot-accent": item.color,
-                                  } as React.CSSProperties)
-                                : undefined
-                            }
-                            emptyLabel="Empty"
-                            emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.12em] opacity-40"
                           />
                         );
                       })}
@@ -1141,9 +1191,8 @@ function Home(): React.JSX.Element {
                             techDragSource?.zone === "hotbar" &&
                             techDragSource.index === index;
                           return (
-                            <TechStackSlot
+                            <TechSlot.Hotbar
                               key={`hotbar-slot-${index}`}
-                              zone="hotbar"
                               index={index}
                               item={item}
                               isDragOrigin={isDragOrigin}
@@ -1152,18 +1201,6 @@ function Home(): React.JSX.Element {
                                 techDropTarget.index === index
                               }
                               isDraggingTechItem={isDraggingTechItem}
-                              className={`tech-slot tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
-                                item ? "tech-slot-active" : "tech-slot-empty"
-                              }`}
-                              style={
-                                item
-                                  ? ({
-                                      "--tech-slot-accent": item.color,
-                                    } as React.CSSProperties)
-                                  : undefined
-                              }
-                              emptyLabel="-"
-                              emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.1em] opacity-35"
                             />
                           );
                         })}
@@ -1214,7 +1251,74 @@ function Home(): React.JSX.Element {
   );
 }
 
-function TechStackSlot({
+const TechSlot = {
+  Inventory: InventoryTechSlot,
+  Hotbar: HotbarTechSlot,
+} as const;
+
+function InventoryTechSlot({
+  index,
+  item,
+  isDragOrigin,
+  isDropTarget,
+  isDraggingTechItem,
+}: TechSlotStateProps): React.JSX.Element {
+  return (
+    <TechSlotBase
+      zone="inventory"
+      index={index}
+      item={item}
+      isDragOrigin={isDragOrigin}
+      isDropTarget={isDropTarget}
+      isDraggingTechItem={isDraggingTechItem}
+      className={`tech-slot aspect-square w-11 @xl:w-14 p-1 ${
+        item ? "tech-slot-filled" : "tech-slot-empty"
+      }`}
+      style={
+        item
+          ? ({
+              "--tech-slot-accent": item.color,
+            } as React.CSSProperties)
+          : undefined
+      }
+      emptyLabel="Empty"
+      emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.12em] opacity-40"
+    />
+  );
+}
+
+function HotbarTechSlot({
+  index,
+  item,
+  isDragOrigin,
+  isDropTarget,
+  isDraggingTechItem,
+}: TechSlotStateProps): React.JSX.Element {
+  return (
+    <TechSlotBase
+      zone="hotbar"
+      index={index}
+      item={item}
+      isDragOrigin={isDragOrigin}
+      isDropTarget={isDropTarget}
+      isDraggingTechItem={isDraggingTechItem}
+      className={`tech-slot tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
+        item ? "tech-slot-active" : "tech-slot-empty"
+      }`}
+      style={
+        item
+          ? ({
+              "--tech-slot-accent": item.color,
+            } as React.CSSProperties)
+          : undefined
+      }
+      emptyLabel="-"
+      emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.1em] opacity-35"
+    />
+  );
+}
+
+function TechSlotBase({
   zone,
   index,
   item,
@@ -1225,7 +1329,7 @@ function TechStackSlot({
   style,
   emptyLabel,
   emptyClassName,
-}: TechStackSlotProps): React.JSX.Element {
+}: TechSlotBaseProps): React.JSX.Element {
   const slotId = createTechSlotId(zone, index);
   const { isOver, setNodeRef: setDroppableRef } = useDroppable({
     id: slotId,
@@ -1278,13 +1382,84 @@ function TechStackSlot({
   );
 }
 
-function ScrambleLockText({
+const ScrambleText = {
+  Inline: ScrambleInlineText,
+  Block: ScrambleBlockText,
+  Marquee: ScrambleMarqueeText,
+} as const;
+
+function getScrambleInlineSegments(
+  finalText: string,
+  renderedText: string,
+): ScrambleTextSegment[] | null {
+  const finalSegments = finalText.split(/(\s+)/);
+  const renderedSegments = renderedText.split(/(\s+)/);
+  if (finalSegments.length !== renderedSegments.length) {
+    return null;
+  }
+
+  return finalSegments.map(
+    (segment, index): ScrambleTextSegment => ({
+      final: segment,
+      rendered: renderedSegments[index] ?? segment,
+      isWhitespace: /\s+/.test(segment),
+    }),
+  );
+}
+
+function ScrambleInlineText({
   finalText,
   renderedText,
-  block = false,
-  edgeBleed = false,
-  allowMarquee = false,
-}: ScrambleLockTextProps): React.JSX.Element {
+}: ScrambleTextProps): React.JSX.Element {
+  const inlineSegments = React.useMemo(
+    () => getScrambleInlineSegments(finalText, renderedText),
+    [finalText, renderedText],
+  );
+
+  if (!inlineSegments) {
+    return <span>{renderedText}</span>;
+  }
+
+  return (
+    <span className="scramble-lock-text scramble-lock-text-inline">
+      {inlineSegments.map((segment, index) => (
+        <React.Fragment key={`${index}-${segment.final}`}>
+          {segment.isWhitespace ? (
+            segment.final
+          ) : (
+            <span className="scramble-lock-inline-word">
+              <span className="scramble-lock-text-base">{segment.final}</span>
+              <span className="scramble-lock-text-overlay" aria-hidden="true">
+                {segment.rendered}
+              </span>
+            </span>
+          )}
+        </React.Fragment>
+      ))}
+    </span>
+  );
+}
+
+function ScrambleBlockText({
+  finalText,
+  renderedText,
+}: ScrambleTextProps): React.JSX.Element {
+  return (
+    <span className="scramble-lock-text scramble-lock-text-block">
+      <span className="scramble-lock-text-track">
+        <span className="scramble-lock-text-base">{finalText}</span>
+        <span className="scramble-lock-text-overlay" aria-hidden="true">
+          {renderedText}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function ScrambleMarqueeText({
+  finalText,
+  renderedText,
+}: ScrambleTextProps): React.JSX.Element {
   const wrapperRef = React.useRef<HTMLSpanElement | null>(null);
   const trackRef = React.useRef<HTMLSpanElement | null>(null);
   const [marqueeDistancePx, setMarqueeDistancePx] = React.useState(0);
@@ -1292,7 +1467,7 @@ function ScrambleLockText({
   React.useEffect(() => {
     const wrapper = wrapperRef.current;
     const track = trackRef.current;
-    if (!wrapper || !track || !block || !allowMarquee) {
+    if (!wrapper || !track) {
       setMarqueeDistancePx(0);
       return;
     }
@@ -1309,59 +1484,14 @@ function ScrambleLockText({
     observer.observe(track);
 
     return () => observer.disconnect();
-  }, [allowMarquee, block, finalText]);
-
-  const inlineSegments = React.useMemo(() => {
-    if (block) {
-      return null;
-    }
-
-    const finalSegments = finalText.split(/(\s+)/);
-    const renderedSegments = renderedText.split(/(\s+)/);
-    if (finalSegments.length !== renderedSegments.length) {
-      return null;
-    }
-
-    return finalSegments.map(
-      (segment, index): ScrambleTextSegment => ({
-        final: segment,
-        rendered: renderedSegments[index] ?? segment,
-        isWhitespace: /\s+/.test(segment),
-      }),
-    );
-  }, [block, finalText, renderedText]);
-
-  if (!block) {
-    if (!inlineSegments) {
-      return <span>{renderedText}</span>;
-    }
-
-    return (
-      <span className="scramble-lock-text scramble-lock-text-inline">
-        {inlineSegments.map((segment, index) => (
-          <React.Fragment key={`${index}-${segment.final}`}>
-            {segment.isWhitespace ? (
-              segment.final
-            ) : (
-              <span className="scramble-lock-inline-word">
-                <span className="scramble-lock-text-base">{segment.final}</span>
-                <span className="scramble-lock-text-overlay" aria-hidden="true">
-                  {segment.rendered}
-                </span>
-              </span>
-            )}
-          </React.Fragment>
-        ))}
-      </span>
-    );
-  }
+  }, [finalText, renderedText]);
 
   const marqueeDurationSec = Math.max(4.5, marqueeDistancePx / 30 + 1.8);
 
   return (
     <span
       ref={wrapperRef}
-      className={`scramble-lock-text ${block ? "scramble-lock-text-block" : ""} ${block && allowMarquee ? "scramble-lock-text-block-nowrap" : ""} ${edgeBleed ? "scramble-lock-text-edge-bleed" : ""} ${marqueeDistancePx > 0 ? "scramble-lock-text-marquee" : ""}`}
+      className={`scramble-lock-text scramble-lock-text-block scramble-lock-text-block-nowrap scramble-lock-text-edge-bleed ${marqueeDistancePx > 0 ? "scramble-lock-text-marquee" : ""}`}
       style={
         marqueeDistancePx > 0
           ? ({
