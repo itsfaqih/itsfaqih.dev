@@ -128,3 +128,319 @@
   opacity: 0.75;
   animation-duration: 520ms;
 }
+
+@keyframes mission-card-distort-left {
+  from {
+    opacity: 0;
+    filter: blur(12px) contrast(1.35);
+    clip-path: inset(0 100% 0 0);
+  }
+  45% {
+    opacity: 0.82;
+    filter: blur(7px) contrast(1.25);
+    clip-path: inset(3% 2% 5% 4%);
+  }
+  72% {
+    opacity: 0.94;
+    filter: blur(4px) contrast(1.12);
+    clip-path: inset(1% 3% 2% 1%);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes mission-card-distort-right {
+  from {
+    opacity: 0;
+    filter: blur(12px) contrast(1.35);
+    clip-path: inset(0 0 0 100%);
+  }
+  45% {
+    opacity: 0.82;
+    filter: blur(7px) contrast(1.25);
+    clip-path: inset(4% 4% 3% 2%);
+  }
+  72% {
+    opacity: 0.94;
+    filter: blur(4px) contrast(1.12);
+    clip-path: inset(2% 1% 1% 3%);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes mission-item-stagger-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mission-detail-stagger-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mission-skill-stagger-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mission-card-intro {
+  opacity: 0;
+  filter: blur(12px) contrast(1.35);
+  will-change: opacity, filter, clip-path;
+}
+
+.mission-card-surface {
+  background: linear-gradient(180deg, color-mix(in oklch, var(--background) 96%, white 4%) 0%, transparent 100%);
+}
+
+.mission-card-border {
+  position: relative;
+}
+
+.mission-card-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 24%, transparent) 0%, transparent 100%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.mission-card-intro-list {
+  clip-path: inset(0 100% 0 0);
+}
+
+.mission-card-intro-detail {
+  clip-path: inset(0 0 0 100%);
+}
+
+.mission-item-intro {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: opacity, transform;
+}
+
+.mission-detail-stagger {
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: opacity, transform;
+}
+
+.mission-objective-stagger {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: opacity, transform;
+}
+
+.mission-skill-stagger {
+  opacity: 0;
+  transform: translateX(-16px);
+  will-change: opacity, transform;
+}
+
+.experience-visible .mission-card-intro-list {
+  animation: mission-card-distort-left 860ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.experience-visible .mission-card-intro-detail {
+  animation: mission-card-distort-right 860ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms forwards;
+}
+
+.experience-items-visible .mission-item-intro {
+  animation: mission-item-stagger-rise 540ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--mission-delay, 0ms);
+}
+
+.experience-items-visible .mission-detail-stagger {
+  animation: mission-detail-stagger-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--detail-delay, 0ms);
+}
+
+.experience-items-visible .mission-objective-stagger {
+  animation: mission-detail-stagger-rise 460ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: calc(420ms + var(--objective-delay, 0ms));
+}
+
+.experience-items-visible .mission-skill-stagger {
+  animation: mission-skill-stagger-slide 420ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: calc(560ms + var(--skill-delay, 0ms));
+}
+
+.mission-drawer-popup {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.mission-drawer-popup[data-starting-style],
+.mission-drawer-popup[data-ending-style] {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.scramble-lock-text {
+  position: relative;
+}
+
+.scramble-lock-text-inline {
+  display: inline;
+  white-space: inherit;
+}
+
+.scramble-lock-inline-word {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.scramble-lock-text-track {
+  position: relative;
+  display: inline;
+}
+
+.scramble-lock-text-base {
+  color: transparent;
+}
+
+.scramble-lock-inline-word .scramble-lock-text-overlay {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.scramble-lock-text-block {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.scramble-lock-text-block.scramble-lock-text-edge-bleed {
+  max-width: none;
+  width: calc(100% + (2 * var(--scramble-edge-bleed-inline, 0px)));
+  margin-inline: calc(-1 * var(--scramble-edge-bleed-inline, 0px));
+}
+
+.scramble-lock-text-block .scramble-lock-text-base {
+  white-space: inherit;
+  overflow-wrap: inherit;
+}
+
+.scramble-lock-text-block .scramble-lock-text-overlay {
+  position: absolute;
+  inset: 0;
+  white-space: inherit;
+  overflow-wrap: inherit;
+  pointer-events: none;
+}
+
+.scramble-lock-text-block .scramble-lock-text-track {
+  display: block;
+  width: 100%;
+  white-space: inherit;
+}
+
+.scramble-lock-text-block.scramble-lock-text-block-nowrap .scramble-lock-text-track {
+  display: inline-block;
+  width: max-content;
+  white-space: nowrap;
+}
+
+.scramble-lock-text-block.scramble-lock-text-edge-bleed .scramble-lock-text-track {
+  padding-inline: var(--scramble-edge-bleed-inline, 0px);
+}
+
+.scramble-lock-text-block.scramble-lock-text-edge-bleed .scramble-lock-text-overlay {
+  box-sizing: border-box;
+  padding-inline: var(--scramble-edge-bleed-inline, 0px);
+}
+
+@keyframes scramble-marquee-snap-back {
+  0%,
+  16% {
+    transform: translateX(0);
+  }
+  82%,
+  90% {
+    transform: translateX(var(--scramble-marquee-distance, 0px));
+  }
+  90.01%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.scramble-lock-text-marquee {
+  --scramble-edge-fade: clamp(0.75rem, 5%, 1.25rem);
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--scramble-edge-fade),
+    black calc(100% - var(--scramble-edge-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--scramble-edge-fade),
+    black calc(100% - var(--scramble-edge-fade)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.scramble-lock-text-marquee .scramble-lock-text-track {
+  animation: scramble-marquee-snap-back var(--scramble-marquee-duration, 5s)
+    linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-card-intro,
+  .mission-item-intro,
+  .mission-detail-stagger,
+  .mission-objective-stagger,
+  .mission-skill-stagger {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    animation: none;
+  }
+}
