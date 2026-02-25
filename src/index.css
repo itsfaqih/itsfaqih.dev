@@ -309,6 +309,169 @@
   transform: translateY(100%);
 }
 
+.tech-inventory-frame {
+  border: 1px solid color-mix(in oklch, var(--foreground) 24%, transparent);
+  background:
+    radial-gradient(
+      circle at 15% 8%,
+      color-mix(in oklch, var(--foreground) 10%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--background) 96%, var(--foreground) 4%),
+      color-mix(in oklch, var(--background) 92%, var(--foreground) 8%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 65%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 20%, transparent),
+    0 12px 30px color-mix(in oklch, var(--foreground) 14%, transparent);
+}
+
+.tech-hotbar-frame {
+  border: 1px solid color-mix(in oklch, var(--foreground) 24%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--background) 94%, var(--foreground) 6%),
+    color-mix(in oklch, var(--background) 90%, var(--foreground) 10%)
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 64%, transparent),
+    inset 0 -1px 0 color-mix(in oklch, black 22%, transparent);
+}
+
+.tech-slot {
+  position: relative;
+  border-radius: 0.25rem;
+  border: 2px solid color-mix(in oklch, var(--foreground) 24%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--background) 90%, var(--foreground) 10%),
+      color-mix(in oklch, var(--background) 82%, var(--foreground) 18%)
+    ),
+    color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 10%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 62%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 25%, transparent);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.tech-slot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--background) 65%, transparent);
+}
+
+.tech-slot:hover {
+  border-color: color-mix(in oklch, var(--tech-slot-accent, var(--foreground)) 62%, white 16%);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 72%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 32%, transparent),
+    0 6px 16px color-mix(in oklch, var(--foreground) 16%, transparent);
+}
+
+.tech-slot-empty {
+  opacity: 0.7;
+}
+
+.tech-slot-drag-origin {
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--foreground) 26%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--background) 94%, var(--foreground) 6%),
+      color-mix(in oklch, var(--background) 90%, var(--foreground) 10%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 52%, transparent),
+    inset 0 -1px 0 color-mix(in oklch, black 20%, transparent);
+}
+
+.tech-slot-drag-proxy {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 78%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 34%, transparent),
+    0 12px 24px color-mix(in oklch, var(--foreground) 20%, transparent);
+}
+
+.tech-slot-active {
+  border-color: color-mix(in oklch, var(--foreground) 24%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 72%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 32%, transparent),
+    0 6px 14px color-mix(in oklch, var(--foreground) 15%, transparent);
+}
+
+.tech-slot-hotbar:hover {
+  border-color: color-mix(in oklch, var(--foreground) 32%, transparent);
+}
+
+.tech-slot-visual {
+  display: block;
+  border-radius: 0.18rem;
+  background: color-mix(in oklch, var(--background) 94%, var(--foreground) 6%);
+}
+
+.tech-slot-preview-trigger {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  -webkit-user-drag: none;
+}
+
+.tech-slot-preview-trigger:focus-visible {
+  outline: 1px solid color-mix(in oklch, var(--foreground) 52%, transparent);
+  outline-offset: 1px;
+}
+
+.tech-preview-disabled {
+  pointer-events: none;
+}
+
+.tech-drag-active .tech-slot:hover:not(.tech-slot-drag-origin) {
+  transform: none;
+  border-color: color-mix(in oklch, var(--foreground) 24%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 62%, transparent),
+    inset 0 -2px 0 color-mix(in oklch, black 25%, transparent);
+}
+
+.tech-slot-icon-image {
+  display: block;
+}
+
+.tech-preview-popup {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--background) 97%, var(--foreground) 3%),
+      color-mix(in oklch, var(--background) 92%, var(--foreground) 8%)
+    ),
+    radial-gradient(
+      circle at 20% 10%,
+      color-mix(in oklch, var(--foreground) 9%, transparent),
+      transparent 45%
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 68%, transparent),
+    inset 0 -1px 0 color-mix(in oklch, black 24%, transparent),
+    0 14px 28px color-mix(in oklch, var(--foreground) 16%, transparent);
+}
+
 .scramble-lock-text {
   position: relative;
 }

@@ -1,13 +1,29 @@
 import { DrawerPreview as Drawer } from "@base-ui/react/drawer";
 import { PreviewCard } from "@base-ui/react/preview-card";
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
 import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
+import { flushSync } from "react-dom";
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 const linkPreviewHandle = PreviewCard.createHandle<string>();
+const techPreviewHandle = PreviewCard.createHandle<string>();
 const NAME_LINES = ["Faqih", "Muntashir."] as const;
 const GLITCH_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*+-=";
 const INTRO_TOTAL_FRAMES = 30;
@@ -66,6 +82,9 @@ type TechTag =
   | "figma";
 
 type MissionStatus = "completed" | "in-progress";
+type TechInventoryCategory = "Frontend" | "Backend" | "DevOps" | "Design Tools";
+type TechSlotZone = "inventory" | "hotbar";
+type TechDragSource = { zone: TechSlotZone; index: number };
 
 type ExperienceItem = {
   title: string;
@@ -74,6 +93,30 @@ type ExperienceItem = {
   status: MissionStatus;
   description: readonly string[];
   tags: readonly TechTag[];
+};
+
+type TechStackItem = {
+  name: string;
+  icon: string;
+  color: string;
+  category: TechInventoryCategory;
+};
+
+type TechPreviewPayload = {
+  name: string;
+  usedIn: readonly string[];
+};
+
+type TechStackSlotProps = {
+  zone: TechSlotZone;
+  index: number;
+  item: TechStackItem | null;
+  isDragOrigin: boolean;
+  isDraggingTechItem: boolean;
+  className: string;
+  style?: React.CSSProperties;
+  emptyLabel: React.ReactNode;
+  emptyClassName: string;
 };
 
 const EXPERIENCES = [
@@ -181,6 +224,116 @@ const IN_PROGRESS_MISSION_COUNT = EXPERIENCES.filter(
 ).length;
 const COMPLETED_MISSION_COUNT = TOTAL_MISSION_COUNT - IN_PROGRESS_MISSION_COUNT;
 
+const TECH_STACK = [
+  {
+    name: "TypeScript",
+    icon: "typescript",
+    color: "#3178C6",
+    category: "Frontend",
+  },
+  { name: "React", icon: "react", color: "#61DAFB", category: "Frontend" },
+  { name: "Astro", icon: "astro", color: "#FF5D01", category: "Frontend" },
+  {
+    name: "Tailwind CSS",
+    icon: "tailwindcss",
+    color: "#06B6D4",
+    category: "Frontend",
+  },
+  { name: "Laravel", icon: "laravel", color: "#FF2D20", category: "Backend" },
+  { name: "MySQL", icon: "mysql", color: "#4479A1", category: "Backend" },
+  { name: "PHP", icon: "php", color: "#777BB4", category: "Backend" },
+  {
+    name: "PostgreSQL",
+    icon: "postgresql",
+    color: "#4169E1",
+    category: "Backend",
+  },
+  { name: "Node.js", icon: "nodedotjs", color: "#339933", category: "Backend" },
+  { name: "Express", icon: "express", color: "#000000", category: "Backend" },
+  { name: "Figma", icon: "figma", color: "#F24E1E", category: "Design Tools" },
+] as const satisfies readonly TechStackItem[];
+
+const TECH_INVENTORY_SLOT_COUNT = 25;
+const TECH_HOTBAR_SLOT_COUNT = 9;
+const HOTBAR_TECH_NAMES = [
+  "TypeScript",
+  "React",
+  "Tailwind CSS",
+  "PostgreSQL",
+  "Node.js",
+  "Express",
+] as const;
+const HOTBAR_ACTIVE_ITEMS = HOTBAR_TECH_NAMES.flatMap((name) => {
+  const item = TECH_STACK.find((tech) => tech.name === name);
+  return item ? [item] : [];
+});
+const HOTBAR_ACTIVE_ITEM_NAMES = new Set(
+  HOTBAR_ACTIVE_ITEMS.map((item) => item.name),
+);
+const INVENTORY_ONLY_ITEMS = TECH_STACK.filter(
+  (item) => !HOTBAR_ACTIVE_ITEM_NAMES.has(item.name),
+);
+const TECH_INVENTORY_SLOTS = Array.from(
+  { length: TECH_INVENTORY_SLOT_COUNT },
+  (_, index) => INVENTORY_ONLY_ITEMS[index] ?? null,
+);
+const TECH_HOTBAR_SLOTS = Array.from(
+  { length: TECH_HOTBAR_SLOT_COUNT },
+  (_, index) => HOTBAR_ACTIVE_ITEMS[index] ?? null,
+);
+const TECH_TAG_BY_ICON: Record<string, TechTag | undefined> = {
+  typescript: "typescript",
+  react: "react",
+  astro: undefined,
+  tailwindcss: "tailwindcss",
+  laravel: "laravel",
+  mysql: undefined,
+  php: "php",
+  postgresql: "postgresql",
+  nodedotjs: undefined,
+  express: "express",
+  figma: "figma",
+};
+const TECH_PREVIEW_LOOKUP: Record<string, TechPreviewPayload> = Object.fromEntries(
+  TECH_STACK.map((item) => {
+    const mappedTag = TECH_TAG_BY_ICON[item.icon];
+    const usedIn = mappedTag
+      ? EXPERIENCES.filter((experience) =>
+          (experience.tags as readonly TechTag[]).includes(mappedTag),
+        ).map((experience) => experience.subtitle)
+      : [];
+    return [
+      item.name,
+      {
+        name: item.name,
+        usedIn,
+      } satisfies TechPreviewPayload,
+    ];
+  }),
+);
+
+function getTechIconSrc(item: TechStackItem): string {
+  return `https://cdn.simpleicons.org/${item.icon}/${item.color.replace("#", "")}`;
+}
+
+function createTechSlotId(zone: TechSlotZone, index: number): string {
+  return `${zone}:${index}`;
+}
+
+function parseTechSlotId(id: UniqueIdentifier): TechDragSource | null {
+  const [zone, rawIndex] = String(id).split(":");
+  if ((zone !== "inventory" && zone !== "hotbar") || rawIndex === undefined) {
+    return null;
+  }
+
+  const index = Number(rawIndex);
+  if (!Number.isInteger(index)) {
+    return null;
+  }
+
+  return { zone, index };
+}
+
 function scrambleText(target: string, revealCount: number): string {
   return target
     .split("")
@@ -220,6 +373,18 @@ function Home(): React.JSX.Element {
   const [experienceScrambleNow, setExperienceScrambleNow] = React.useState<
     number | null
   >(null);
+  const [inventorySlots, setInventorySlots] = React.useState<
+    Array<TechStackItem | null>
+  >(() => [...TECH_INVENTORY_SLOTS]);
+  const [hotbarSlots, setHotbarSlots] = React.useState<Array<TechStackItem | null>>(
+    () => [...TECH_HOTBAR_SLOTS],
+  );
+  const [techDragSource, setTechDragSource] = React.useState<TechDragSource | null>(
+    null,
+  );
+  const [draggedTechItem, setDraggedTechItem] = React.useState<TechStackItem | null>(
+    null,
+  );
   const experienceSectionRef = React.useRef<HTMLElement | null>(null);
   const experienceScrambleStartRef = React.useRef<number | null>(null);
   const selectedExperience = EXPERIENCES[selectedExperienceIndex];
@@ -454,6 +619,95 @@ function Home(): React.JSX.Element {
         </div>
       </button>
     );
+  }
+
+  const inventoryFilledCount = React.useMemo(
+    () => inventorySlots.filter((item) => item !== null).length,
+    [inventorySlots],
+  );
+  const isDraggingTechItem = techDragSource !== null;
+  const techDndSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 120,
+        tolerance: 8,
+      },
+    }),
+  );
+
+  function swapTechSlots(source: TechDragSource, target: TechDragSource): void {
+    const nextInventory = [...inventorySlots];
+    const nextHotbar = [...hotbarSlots];
+    const sourceSlots = source.zone === "inventory" ? nextInventory : nextHotbar;
+    const targetSlots = target.zone === "inventory" ? nextInventory : nextHotbar;
+    const sourceItem = sourceSlots[source.index];
+    if (!sourceItem) {
+      return;
+    }
+
+    [sourceSlots[source.index], targetSlots[target.index]] = [
+      targetSlots[target.index],
+      sourceItem,
+    ];
+
+    setInventorySlots(nextInventory);
+    setHotbarSlots(nextHotbar);
+  }
+
+  function handleTechDragStart(event: DragStartEvent): void {
+    const source = parseTechSlotId(event.active.id);
+    if (!source) {
+      flushSync(() => {
+        setTechDragSource(null);
+        setDraggedTechItem(null);
+      });
+      return;
+    }
+
+    const sourceSlots = source.zone === "inventory" ? inventorySlots : hotbarSlots;
+    const sourceItem = sourceSlots[source.index];
+    if (!sourceItem) {
+      flushSync(() => {
+        setTechDragSource(null);
+        setDraggedTechItem(null);
+      });
+      return;
+    }
+
+    flushSync(() => {
+      setTechDragSource(source);
+      setDraggedTechItem(sourceItem);
+    });
+  }
+
+  function handleTechDragEnd(event: DragEndEvent): void {
+    const source = parseTechSlotId(event.active.id);
+    const target = event.over ? parseTechSlotId(event.over.id) : null;
+    if (!source || !target) {
+      flushSync(() => {
+        setTechDragSource(null);
+        setDraggedTechItem(null);
+      });
+      return;
+    }
+    if (source.zone === target.zone && source.index === target.index) {
+      flushSync(() => {
+        setTechDragSource(null);
+        setDraggedTechItem(null);
+      });
+      return;
+    }
+
+    flushSync(() => {
+      swapTechSlots(source, target);
+      setTechDragSource(null);
+      setDraggedTechItem(null);
+    });
   }
 
   return (
@@ -727,8 +981,218 @@ function Home(): React.JSX.Element {
             </article>
           </article>
         </section>
+
+        <section
+          className={`pb-14 @xl:pb-20 ${isDraggingTechItem ? "tech-drag-active" : ""}`}
+        >
+          <div className="mb-8 @xl:mb-10">
+            <h2 className="text-center text-3xl @xl:text-6xl font-bold tracking-wide">
+              Tech Stack &amp; Tools
+            </h2>
+          </div>
+
+          <PreviewCard.Root handle={techPreviewHandle}>
+            {({ payload }) => (
+              <DndContext
+                sensors={techDndSensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleTechDragStart}
+                onDragEnd={handleTechDragEnd}
+                onDragCancel={() => {
+                  flushSync(() => {
+                    setTechDragSource(null);
+                    setDraggedTechItem(null);
+                  });
+                }}
+              >
+                <div className="overflow-x-auto pb-1">
+                  <div className="tech-inventory-frame mx-auto w-max max-w-full rounded-xl p-2 @xl:p-3">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <h3 className="text-sm @xl:text-base uppercase tracking-[0.2em] opacity-85">
+                        Inventory
+                      </h3>
+                      <span className="rounded-full border border-foreground/20 px-2.5 py-1 text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.14em] opacity-80">
+                        {inventoryFilledCount}/{TECH_INVENTORY_SLOT_COUNT} slots
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-1.5 @xl:gap-2">
+                      {inventorySlots.map((item, index) => {
+                        const isDragOrigin =
+                          techDragSource?.zone === "inventory" &&
+                          techDragSource.index === index;
+                        return (
+                          <TechStackSlot
+                            key={`inventory-slot-${index}`}
+                            zone="inventory"
+                            index={index}
+                            item={item}
+                            isDragOrigin={isDragOrigin}
+                            isDraggingTechItem={isDraggingTechItem}
+                            className={`tech-slot aspect-square w-11 @xl:w-14 p-1 ${
+                              item ? "tech-slot-filled" : "tech-slot-empty"
+                            }`}
+                            style={
+                              item
+                                ? ({
+                                    "--tech-slot-accent": item.color,
+                                  } as React.CSSProperties)
+                                : undefined
+                            }
+                            emptyLabel="Empty"
+                            emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.12em] opacity-40"
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 @xl:mt-5">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <h3 className="text-xs @xl:text-sm uppercase tracking-[0.2em] opacity-85">
+                      Hotbar
+                    </h3>
+                    <span className="text-[0.56rem] @xl:text-[0.66rem] uppercase tracking-[0.12em] opacity-70">
+                      Active Stack
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto pb-1">
+                    <div className="tech-hotbar-frame mx-auto w-max rounded-lg p-1.5 @xl:p-2">
+                      <div className="grid grid-cols-9 gap-1.5 @xl:gap-2">
+                        {hotbarSlots.map((item, index) => {
+                          const isDragOrigin =
+                            techDragSource?.zone === "hotbar" &&
+                            techDragSource.index === index;
+                          return (
+                            <TechStackSlot
+                              key={`hotbar-slot-${index}`}
+                              zone="hotbar"
+                              index={index}
+                              item={item}
+                              isDragOrigin={isDragOrigin}
+                              isDraggingTechItem={isDraggingTechItem}
+                              className={`tech-slot tech-slot-hotbar aspect-square w-11 @xl:w-14 p-1 ${
+                                item ? "tech-slot-active" : "tech-slot-empty"
+                              }`}
+                              style={
+                                item
+                                  ? ({
+                                      "--tech-slot-accent": item.color,
+                                    } as React.CSSProperties)
+                                  : undefined
+                              }
+                              emptyLabel="-"
+                              emptyClassName="flex h-full items-center justify-center text-[0.5rem] uppercase tracking-[0.1em] opacity-35"
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <DragOverlay dropAnimation={null}>
+                  {draggedTechItem ? (
+                    <div className="tech-slot tech-slot-drag-proxy aspect-square w-11 @xl:w-14 p-1">
+                      <div className="tech-slot-visual h-full w-full">
+                        <img
+                          src={getTechIconSrc(draggedTechItem)}
+                          alt={draggedTechItem.name}
+                          className="tech-slot-icon-image h-full w-full object-contain p-1"
+                          draggable={false}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </DragOverlay>
+
+                <PreviewCard.Portal>
+                  <PreviewCard.Positioner sideOffset={10} side="top">
+                    <PreviewCard.Popup className="tech-preview-popup w-72 max-w-[88vw] rounded-lg border border-foreground/20 bg-background/95 p-3 shadow-2xl outline-none opacity-100 scale-100 transition-[opacity,transform] duration-150 data-starting-style:opacity-0 data-starting-style:scale-95 data-ending-style:opacity-0 data-ending-style:scale-95">
+                      {payload && TECH_PREVIEW_LOOKUP[payload] && (
+                        <div className="flex flex-col gap-2">
+                          <h4 className="text-sm @xl:text-base uppercase tracking-[0.18em] font-semibold">
+                            {TECH_PREVIEW_LOOKUP[payload].name}
+                          </h4>
+                          <p className="text-xs @xl:text-sm opacity-85 leading-relaxed">
+                            {TECH_PREVIEW_LOOKUP[payload].usedIn.length > 0
+                              ? `Used in: ${TECH_PREVIEW_LOOKUP[payload].usedIn.join(", ")}`
+                              : "Used in: No listed experience yet."}
+                          </p>
+                        </div>
+                      )}
+                    </PreviewCard.Popup>
+                  </PreviewCard.Positioner>
+                </PreviewCard.Portal>
+              </DndContext>
+            )}
+          </PreviewCard.Root>
+        </section>
       </section>
     </main>
+  );
+}
+
+function TechStackSlot({
+  zone,
+  index,
+  item,
+  isDragOrigin,
+  isDraggingTechItem,
+  className,
+  style,
+  emptyLabel,
+  emptyClassName,
+}: TechStackSlotProps): React.JSX.Element {
+  const slotId = createTechSlotId(zone, index);
+  const { isOver, setNodeRef: setDroppableRef } = useDroppable({
+    id: slotId,
+  });
+  const {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef: setDraggableRef,
+  } = useDraggable({
+    id: slotId,
+    disabled: item === null,
+  });
+
+  return (
+    <div
+      ref={setDroppableRef}
+      className={`${className} ${isOver && !isDragOrigin ? "tech-slot-active" : ""} ${
+        isDragOrigin ? "tech-slot-drag-origin" : ""
+      }`}
+      style={style}
+    >
+      {item ? (
+        <PreviewCard.Trigger
+          ref={setDraggableRef}
+          handle={techPreviewHandle}
+          payload={item.name}
+          render={<button type="button" />}
+          className={`tech-slot-preview-trigger tech-slot-visual h-full w-full ${
+            isDragOrigin ? "cursor-grabbing" : "cursor-grab"
+          } ${isDraggingTechItem ? "tech-preview-disabled" : ""}`}
+          style={isDragging ? { opacity: 0 } : isDragOrigin ? { opacity: 0.12 } : undefined}
+          {...listeners}
+          {...attributes}
+        >
+          <img
+            src={getTechIconSrc(item)}
+            alt={item.name}
+            loading="lazy"
+            draggable={false}
+            className="tech-slot-icon-image h-full w-full object-contain p-1"
+          />
+        </PreviewCard.Trigger>
+      ) : (
+        <div className={emptyClassName}>{emptyLabel}</div>
+      )}
+    </div>
   );
 }
 
