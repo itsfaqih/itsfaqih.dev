@@ -11,3 +11,14 @@
   - Good: `style: switch root font to sans and remove frosted theme toggle styles`
   - Bad: `chore: commit remaining UI updates`
 - If needed, add a body with 1-3 bullets for key file-level changes.
+
+## File Naming Convention
+
+- Use kebab-case for all file names and folder names.
+- Do not use PascalCase or camelCase for new files.
+- For TanStack Router special files, keep the framework-required names:
+  - `__root.tsx`
+  - `index.tsx`
+  - `route.tsx`
+  - `*.lazy.tsx`
+- For non-route modules inside `src/routes`, prefix with `-` so TanStack Router ignores them, and keep the remainder kebab-case (example: `-home-page.tsx`, `-components/link-preview.tsx`).
