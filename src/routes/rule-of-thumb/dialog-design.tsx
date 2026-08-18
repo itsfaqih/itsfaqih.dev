@@ -1,14 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
-// Force refresh
 import { useState, useEffect } from "react";
 import { PageContainer } from "../../components/page-container";
 import { Dialog } from "@base-ui/react";
 import { Drawer } from "vaul";
-import { getButtonClasses } from "../../components/button";
+import { Button, getButtonClasses } from "../../components/button";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { cn } from "@/cn";
+import {
+  AnimationDemo,
+  AnimationStage,
+  AnimationControls,
+  AnimatedCursor,
+  useAnimationDemo,
+} from "../../components/animation-demo";
 import "./dialog-design.css";
-
 import {
   CursorIcon,
   XIcon,
@@ -20,20 +26,10 @@ import {
   SpeakerHighIcon,
 } from "@phosphor-icons/react";
 import { BestPractice, RuleOfThumbHero } from "./-components";
-import { Button } from "../../components/button";
 
 export const Route = createFileRoute("/rule-of-thumb/dialog-design")({
   component: DialogDesign,
 });
-
-import { cn } from "@/cn";
-import {
-  AnimationDemo,
-  AnimationStage,
-  AnimationControls,
-  AnimatedCursor,
-  useAnimationDemo,
-} from "../../components/animation-demo";
 
 // For non-button elements (like divs acting as buttons/labels)
 function FakeButton({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {

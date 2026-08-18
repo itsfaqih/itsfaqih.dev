@@ -280,10 +280,6 @@ function InteractiveDisabledDemoContent() {
 }
 
 // ============================================================================
-// Code Example Component with Syntax Highlighting
-// ============================================================================
-
-// ============================================================================
 // Interactive State Code Component
 // ============================================================================
 
@@ -369,53 +365,10 @@ function InteractiveStateCode() {
     pressing: [18], // active: classes
   };
 
-  // Explicit class mappings for Tailwind
-  const stateStyles: Record<
-    CodeState,
-    {
-      tabActive: string;
-      labelColor: string;
-      highlightBg: string;
-      highlightBorder: string;
-    }
-  > = {
-    idle: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-    hover: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-    focus: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-    pending: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-    disabled: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-    pressing: {
-      tabActive: "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20",
-      labelColor: "text-zinc-900 dark:text-zinc-100",
-      highlightBg: "rgba(113, 113, 122, 0.1)",
-      highlightBorder: "#a1a1aa",
-    },
-  };
+  const HIGHLIGHT_BG = "rgba(113, 113, 122, 0.1)";
+  const HIGHLIGHT_BORDER = "#a1a1aa";
+  const TAB_ACTIVE = "bg-zinc-500/10 text-zinc-900 dark:text-zinc-100 border-zinc-500/20";
+  const LABEL_COLOR = "text-zinc-900 dark:text-zinc-100";
 
   // Use shiki for syntax highlighting
   useEffect(() => {
@@ -430,7 +383,6 @@ function InteractiveStateCode() {
     });
   }, [code]);
 
-  const styles = stateStyles[activeState];
   const highlightedLines = highlightRanges[activeState];
 
   return (
@@ -445,11 +397,10 @@ function InteractiveStateCode() {
               <button
                 key={state}
                 onClick={() => setActiveState(state)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? `${stateStyles[state].tabActive}`
-                    : "bg-card text-muted-foreground hover:text-foreground border border-border"
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive
+                  ? TAB_ACTIVE
+                  : "bg-card text-muted-foreground hover:text-foreground border border-border"
+                  }`}
               >
                 {info.label}
               </button>
@@ -461,7 +412,7 @@ function InteractiveStateCode() {
       {/* Description */}
       <div className="px-4 py-3 border-b border-border bg-background">
         <p className="text-sm text-muted-foreground">
-          <span className={`font-medium ${styles.labelColor}`}>
+          <span className={`font-medium ${LABEL_COLOR}`}>
             {STATE_INFO[activeState].label}:
           </span>{" "}
           {STATE_INFO[activeState].description}
@@ -504,26 +455,8 @@ function InteractiveStateCode() {
           className="interactive-code [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0! [&_code]:text-sm!"
           style={
             {
-              "--highlight-bg":
-                activeState === "idle"
-                  ? "rgba(113, 113, 122, 0.1)"
-                  : activeState === "hover"
-                    ? "rgba(113, 113, 122, 0.1)"
-                    : activeState === "pending"
-                      ? "rgba(113, 113, 122, 0.1)"
-                      : activeState === "disabled"
-                        ? "rgba(113, 113, 122, 0.1)"
-                        : "rgba(113, 113, 122, 0.1)",
-              "--highlight-border":
-                activeState === "idle"
-                  ? "#a1a1aa"
-                  : activeState === "hover"
-                    ? "#a1a1aa"
-                    : activeState === "pending"
-                      ? "#a1a1aa"
-                      : activeState === "disabled"
-                        ? "#a1a1aa"
-                        : "#a1a1aa",
+              "--highlight-bg": HIGHLIGHT_BG,
+              "--highlight-border": HIGHLIGHT_BORDER,
             } as React.CSSProperties
           }
         >
@@ -577,10 +510,6 @@ function InteractiveStateCode() {
     </div>
   );
 }
-
-// ============================================================================
-// Best Practice Item Component
-// ============================================================================
 
 // ============================================================================
 // Main Page Component
@@ -862,7 +791,6 @@ function ButtonStates() {
           </div>
 
           {/* When to Use */}
-          {/* When to Use */}
           <div className="mb-4 rounded-xl squircle border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
             <h4 className="font-semibold text-foreground mb-4 text-sm">
               When to Use Leading Icons
@@ -943,7 +871,6 @@ function ButtonStates() {
             </p>
           </div>
 
-          {/* When to Use */}
           {/* When to Use */}
           <div className="mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
             <h4 className="font-semibold text-foreground mb-4 text-sm">
@@ -1039,7 +966,6 @@ function ButtonStates() {
             </p>
           </div>
 
-          {/* When to Use */}
           {/* When to Use */}
           <div className="mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5">
             <h4 className="font-semibold text-foreground mb-4 text-sm">

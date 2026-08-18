@@ -52,7 +52,7 @@ function TimezoneDemo() {
             Stored in Database (UTC)
           </h3>
           <div className="p-4 rounded-lg bg-background/50 backdrop-blur-sm border border-border font-mono text-sm">
-            <span className="text-emerald-400">{utcTime}</span>
+            <span className="text-positive-foreground">{utcTime}</span>
           </div>
         </div>
 
@@ -160,10 +160,6 @@ function FilterDemo() {
     </Card>
   );
 }
-
-// ============================================================================
-// Code Example Component with Syntax Highlighting
-// ============================================================================
 
 // ============================================================================
 // Flow Step Component
@@ -369,59 +365,59 @@ fetch('/api/records', {
         <h2 className="text-2xl font-bold text-foreground mb-8">Do's and Don'ts</h2>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
+          <div className="p-6 rounded-xl border border-positive/30 bg-positive/10">
             <div className="flex items-center gap-2 mb-4">
-              <CheckIcon size={18} className="text-emerald-400" />
-              <h3 className="font-semibold text-emerald-400">Do</h3>
+              <CheckIcon size={18} className="text-positive-foreground" />
+              <h3 className="font-semibold text-positive-foreground">Do</h3>
             </div>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">✓</span>
+                <span className="text-positive-foreground mt-0.5">✓</span>
                 <span>Store all timestamps as UTC in the database</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">✓</span>
+                <span className="text-positive-foreground mt-0.5">✓</span>
                 <span>Return ISO 8601 strings from API (with Z suffix)</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">✓</span>
+                <span className="text-positive-foreground mt-0.5">✓</span>
                 <span>Let the frontend handle timezone conversion</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">✓</span>
+                <span className="text-positive-foreground mt-0.5">✓</span>
                 <span>Convert user date inputs to UTC before API calls</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">✓</span>
+                <span className="text-positive-foreground mt-0.5">✓</span>
                 <span>Use Intl.DateTimeFormat or date libraries for display</span>
               </li>
             </ul>
           </div>
 
-          <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
+          <div className="p-6 rounded-xl border border-negative/30 bg-negative/10">
             <div className="flex items-center gap-2 mb-4">
-              <XIcon size={18} className="text-red-400" />
-              <h3 className="font-semibold text-red-400">Don't</h3>
+              <XIcon size={18} className="text-negative-foreground" />
+              <h3 className="font-semibold text-negative-foreground">Don't</h3>
             </div>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">✗</span>
+                <span className="text-negative-foreground mt-0.5">✗</span>
                 <span>Store timestamps with timezone offsets in DB</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">✗</span>
+                <span className="text-negative-foreground mt-0.5">✗</span>
                 <span>Convert to user's timezone on the backend</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">✗</span>
+                <span className="text-negative-foreground mt-0.5">✗</span>
                 <span>Send dates without timezone info</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">✗</span>
+                <span className="text-negative-foreground mt-0.5">✗</span>
                 <span>Assume server timezone = user timezone</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">✗</span>
+                <span className="text-negative-foreground mt-0.5">✗</span>
                 <span>Use string manipulation for date math</span>
               </li>
             </ul>

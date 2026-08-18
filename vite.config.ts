@@ -7,7 +7,6 @@ import rehypeSlug from "rehype-slug";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
@@ -15,6 +14,9 @@ const config = defineConfig({
   server: {
     port: 5173,
     host: "127.0.0.1",
+  },
+  resolve: {
+    tsconfigPaths: true,
   },
   plugins: [
     mdx({
@@ -35,9 +37,6 @@ const config = defineConfig({
     }),
     devtools(),
     nitro(),
-    viteTsConfigPaths({
-      projects: ["./tsconfig.json"],
-    }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),

@@ -5,6 +5,7 @@ export type Guideline = {
   description: string;
   href: string;
   comingSoon?: boolean;
+  hidden?: boolean;
 }
 
 export const GUIDELINES: Guideline[] = [
@@ -21,6 +22,7 @@ export const GUIDELINES: Guideline[] = [
     title: "TypeScript Guidelines",
     description: "Rules for writing clean and maintainable TypeScript",
     href: "/rule-of-thumb/typescript-code-writing",
+    hidden: true,
   },
   {
     id: "button-design",
@@ -28,6 +30,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Button Design",
     description: "States, hover, variants, and icon alignment",
     href: "/rule-of-thumb/button-design",
+    hidden: true,
   },
   {
     id: "table-design",
@@ -35,6 +38,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Table Design",
     description: "States, pagination, actions, and numbers",
     href: "/rule-of-thumb/table-design",
+    hidden: true,
   },
   {
     id: "dialog-design",
@@ -42,6 +46,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Dialog Design",
     description: "Focus trap, inert background, and data safety patterns",
     href: "/rule-of-thumb/dialog-design",
+    hidden: true,
   },
   {
     id: "form-submission",
@@ -50,6 +55,7 @@ export const GUIDELINES: Guideline[] = [
     description: "Validation, error handling, and user feedback",
     href: "/rule-of-thumb/form-submission",
     comingSoon: true,
+    hidden: true,
   },
   {
     id: "data-loading",
@@ -57,6 +63,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Data Loading",
     description: "SSR, loaders, SWR, and error handling",
     href: "/rule-of-thumb/data-loading",
+    hidden: true,
   },
   {
     id: "handling-timestamps",
@@ -64,6 +71,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Handling Timestamps",
     description: "Store UTC, display local",
     href: "/rule-of-thumb/handling-timestamps",
+    hidden: true,
   },
   {
     id: "null-vs-undefined",
@@ -71,5 +79,6 @@ export const GUIDELINES: Guideline[] = [
     title: "Null vs Undefined",
     description: "The difference between empty and missing values",
     href: "/rule-of-thumb/null-vs-undefined",
+    hidden: true,
   },
 ];

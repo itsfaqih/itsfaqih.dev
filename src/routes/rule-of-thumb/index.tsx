@@ -24,11 +24,16 @@ type CategoryItem = {
   value: string;
 };
 
-// Extract unique categories from guidelines
-const CATEGORIES: CategoryItem[] = [...new Set(GUIDELINES.map((g) => g.label))].map((label) => ({
-  label,
-  value: label,
-}));
+// Get visible guidelines (not hidden)
+const VISIBLE_GUIDELINES = GUIDELINES.filter((g) => !g.hidden);
+
+// Extract unique categories from visible guidelines
+const CATEGORIES: CategoryItem[] = [...new Set(VISIBLE_GUIDELINES.map((g) => g.label))].map(
+  (label) => ({
+    label,
+    value: label,
+  }),
+);
 
 function RuleOfThumbsIndex() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +43,7 @@ function RuleOfThumbsIndex() {
     const query = searchQuery.toLowerCase();
     const selectedLabels = selectedCategories.map((c) => c.label);
 
-    return GUIDELINES.filter((guideline) => {
+    return VISIBLE_GUIDELINES.filter((guideline) => {
       const matchesSearch =
         guideline.title.toLowerCase().includes(query) ||
         guideline.description.toLowerCase().includes(query) ||
@@ -58,7 +63,7 @@ function RuleOfThumbsIndex() {
         description="A collection of opinions, guidelines, and patterns I've adopted for building high-quality web applications."
         badge={{
           icon: SquaresFourIcon,
-          text: `${GUIDELINES.length} Guidelines`,
+          text: `${VISIBLE_GUIDELINES.length} Guidelines`,
         }}
       />
 
@@ -125,14 +130,12 @@ function RuleOfThumbsIndex() {
           <Combobox.Portal>
             <Combobox.Positioner sideOffset={8} className="z-50">
               <Combobox.Popup className="rounded-xl border border-border backdrop-blur-xl shadow-lg overflow-hidden min-w-[200px] bg-white dark:bg-zinc-900">
-                <Combobox.Empty
-                  render={
-                    <div className="text-center py-2 text-sm text-muted-foreground">
-                      No categories found.
-                    </div>
-                  }
-                />
-                <Combobox.List className="p-1.5">
+                <Combobox.Empty>
+                  <div className="text-center py-2 text-sm text-muted-foreground">
+                    No categories found.
+                  </div>
+                </Combobox.Empty>
+                <Combobox.List>
                   <Combobox.Collection>
                     {(item: CategoryItem) => (
                       <Combobox.Item

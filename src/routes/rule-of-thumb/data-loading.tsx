@@ -196,13 +196,13 @@ function ErrorDemo() {
         )}
 
         {state === "error" && (
-          <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
-            <WarningCircleIcon size={32} className="text-red-400 mx-auto mb-3" />
-            <p className="text-red-400 font-medium mb-1">Failed to load profile</p>
-            <p className="text-sm text-red-400/70 mb-4">Network error. Please try again.</p>
+          <div className="p-6 rounded-lg bg-negative/10 border border-negative/30 text-center">
+            <WarningCircleIcon size={32} className="text-negative-foreground mx-auto mb-3" />
+            <p className="text-negative-foreground font-medium mb-1">Failed to load profile</p>
+            <p className="text-sm text-negative-foreground/70 mb-4">Network error. Please try again.</p>
             <button
               onClick={retry}
-              className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-colors flex items-center gap-2 mx-auto"
+              className="px-4 py-2 rounded-lg bg-negative/20 text-negative-foreground text-sm font-medium hover:bg-negative/30 transition-colors flex items-center gap-2 mx-auto"
             >
               <ArrowsClockwiseIcon size={14} />
               Retry
@@ -291,11 +291,11 @@ function DataParsingDemo() {
             </div>
             <div className="relative">
               <div
-                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0!"
                 dangerouslySetInnerHTML={{ __html: highlightedJson || `<pre>${rawJson}</pre>` }}
               />
               <div className="absolute top-3 right-3">
-                <div className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[10px] font-medium text-red-500">
+                <div className="px-2 py-1 rounded bg-negative/10 border border-negative/20 text-[10px] font-medium text-negative-foreground">
                   Missing "city"
                 </div>
               </div>
@@ -311,7 +311,7 @@ function DataParsingDemo() {
               Process: Zod (or any) Schema
             </div>
             <div
-              className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+              className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0!"
               dangerouslySetInnerHTML={{ __html: highlightedSchema || `<pre>${zodSchema}</pre>` }}
             />
           </div>
@@ -326,13 +326,13 @@ function DataParsingDemo() {
             </div>
             <div className="relative">
               <div
-                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!p-0 [&_pre]:!m-0"
+                className="p-4 rounded-lg bg-background border border-border text-xs overflow-x-auto [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0!"
                 dangerouslySetInnerHTML={{
                   __html: highlightedResult || `<pre>${parsedResult}</pre>`,
                 }}
               />
               <div className="absolute top-3 right-3">
-                <div className="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-medium text-emerald-500">
+                <div className="px-2 py-1 rounded bg-positive/10 border border-positive/20 text-[10px] font-medium text-positive-foreground">
                   Fallback Applied
                 </div>
               </div>
@@ -356,7 +356,6 @@ function SectionCard({
   icon: React.ComponentType<{ size?: number; className?: string }>;
   title: string;
   children: React.ReactNode;
-  color?: string; // Optional or removed completely. Since I removed usage, I can remove it from type or make it optional unused. Best to remove it.
 }) {
   return (
     <div className="p-6 rounded-xl border border-border bg-card">
@@ -397,9 +396,6 @@ function DataLoading() {
       {/* ================================================================== */}
       {/* SECTION 1: SSR vs SPA Decision */}
       {/* ================================================================== */}
-      {/* ================================================================== */}
-      {/* SECTION 1: SSR vs SPA Decision */}
-      {/* ================================================================== */}
       <div className="mb-20">
         <SectionHeading
           title="SSR vs SPA"
@@ -407,7 +403,7 @@ function DataLoading() {
         />
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          <SectionCard icon={HardDrivesIcon} title="Server-Side Rendering" color="">
+          <SectionCard icon={HardDrivesIcon} title="Server-Side Rendering">
             <p>
               <strong className="text-foreground">Use when:</strong>
             </p>
@@ -419,7 +415,7 @@ function DataLoading() {
             </ul>
           </SectionCard>
 
-          <SectionCard icon={GlobeIcon} title="Single Page App" color="">
+          <SectionCard icon={GlobeIcon} title="Single Page App">
             <p>
               <strong className="text-foreground">Use when:</strong>
             </p>
@@ -820,29 +816,29 @@ function useDelayedLoading(isLoading, delay = 200) {
         />
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
+          <div className="p-6 rounded-xl border border-negative/30 bg-negative/10">
             <div className="flex items-center gap-2 mb-3">
-              <WarningCircleIcon size={18} className="text-red-400" />
-              <h3 className="font-semibold text-red-400">Don't Persist</h3>
+              <WarningCircleIcon size={18} className="text-negative-foreground" />
+              <h3 className="font-semibold text-negative-foreground">Don't Persist</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">Data that must always be accurate:</p>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Bank balance</strong> — Stale balance could
                   cause overdrafts or confusion
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Stock prices</strong> — Users make decisions
                   based on current prices
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Inventory count</strong> — Could lead to
                   overselling
@@ -851,29 +847,29 @@ function useDelayedLoading(isLoading, delay = 200) {
             </ul>
           </div>
 
-          <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
+          <div className="p-6 rounded-xl border border-positive/30 bg-positive/10">
             <div className="flex items-center gap-2 mb-3">
-              <HardDriveIcon size={18} className="text-emerald-400" />
-              <h3 className="font-semibold text-emerald-400">OK to Persist</h3>
+              <HardDriveIcon size={18} className="text-positive-foreground" />
+              <h3 className="font-semibold text-positive-foreground">OK to Persist</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">Historical or reference data:</p>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">Transaction history</strong> — Past records
                   don't change
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">User preferences</strong> — Settings rarely
                   change
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">Static content</strong> — Blog posts,
                   documentation
@@ -955,8 +951,8 @@ function useDelayedLoading(isLoading, delay = 200) {
             {/* Embedded Database */}
             <div className="p-6 rounded-xl border border-border bg-card">
               <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center">
-                  <StackIcon size={20} className="text-emerald-500" />
+                <div className="size-10 rounded-lg bg-positive/10 dark:bg-positive/20 flex items-center justify-center">
+                  <StackIcon size={20} className="text-positive-foreground" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground">Embedded Database</h4>
@@ -1103,15 +1099,15 @@ setInterval(() => client.sync(), 30000);`,
         <DataParsingDemo />
 
         <div className="mt-8 grid sm:grid-cols-2 gap-4 mb-8">
-          <div className="p-6 rounded-xl border border-red-500/30 bg-red-500/5">
+          <div className="p-6 rounded-xl border border-negative/30 bg-negative/10">
             <div className="flex items-center gap-2 mb-3">
-              <WarningCircleIcon size={18} className="text-red-400" />
-              <h3 className="font-semibold text-red-400">Without Parsing</h3>
+              <WarningCircleIcon size={18} className="text-negative-foreground" />
+              <h3 className="font-semibold text-negative-foreground">Without Parsing</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">What can go wrong:</p>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Runtime crashes</strong> — Accessing{" "}
                   <code className="text-xs bg-background px-1 rounded">
@@ -1121,7 +1117,7 @@ setInterval(() => client.sync(), 30000);`,
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Type mismatches</strong> — Expecting number,
                   getting string like{" "}
@@ -1129,7 +1125,7 @@ setInterval(() => client.sync(), 30000);`,
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-400">✗</span>
+                <span className="text-negative-foreground">✗</span>
                 <span>
                   <strong className="text-foreground">Silent failures</strong> — Missing fields that
                   cause subtle bugs later
@@ -1138,29 +1134,29 @@ setInterval(() => client.sync(), 30000);`,
             </ul>
           </div>
 
-          <div className="p-6 rounded-xl border border-emerald-500/30 bg-emerald-500/5">
+          <div className="p-6 rounded-xl border border-positive/30 bg-positive/10">
             <div className="flex items-center gap-2 mb-3">
-              <ShieldCheckIcon size={18} className="text-emerald-400" />
-              <h3 className="font-semibold text-emerald-400">With Parsing</h3>
+              <ShieldCheckIcon size={18} className="text-positive-foreground" />
+              <h3 className="font-semibold text-positive-foreground">With Parsing</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">Benefits:</p>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">Early error detection</strong> — Catch invalid
                   data at the boundary
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">Type safety</strong> — TypeScript knows the
                   exact shape after parsing
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-400">✓</span>
+                <span className="text-positive-foreground">✓</span>
                 <span>
                   <strong className="text-foreground">Graceful handling</strong> — Use fallbacks or
                   show meaningful errors
@@ -1333,7 +1329,7 @@ function UserList() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <ArrowsClockwiseIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <ArrowsClockwiseIcon size={18} className="text-positive-foreground mt-0.5 shrink-0" />
               <span>
                 <strong className="text-foreground">SWR</strong> — Show stale data, indicate
                 background refresh
@@ -1347,7 +1343,7 @@ function UserList() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <WarningCircleIcon size={18} className="text-red-400 mt-0.5 shrink-0" />
+              <WarningCircleIcon size={18} className="text-negative-foreground mt-0.5 shrink-0" />
               <span>
                 <strong className="text-foreground">Errors</strong> — Inline, not toast. Include
                 retry. Log to observability.
@@ -1368,7 +1364,7 @@ function UserList() {
               </span>
             </div>
             <div className="flex items-start gap-3">
-              <ShieldCheckIcon size={18} className="text-emerald-400 mt-0.5 shrink-0" />
+              <ShieldCheckIcon size={18} className="text-positive-foreground mt-0.5 shrink-0" />
               <span>
                 <strong className="text-foreground">Parse</strong> — Validate external data with
                 Zod. Use fallbacks or show meaningful errors.

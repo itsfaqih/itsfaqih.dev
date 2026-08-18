@@ -31,6 +31,49 @@
       opacity: 0;
     }
   }
+
+  @keyframes slide-in-from-top {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dialog animations */
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
+  @keyframes dialog-out {
+    from {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px) scale(0.96);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -59,6 +102,12 @@
     
     --destructive: oklch(0.577 0.245 27.325); /* red-600 */
     --destructive-foreground: oklch(0.985 0 0); /* near white */
+    
+    --negative: oklch(0.637 0.237 25.331); /* red-500 */
+    --negative-foreground: oklch(0.577 0.245 27.325); /* red-600 */
+    
+    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
+    --positive-foreground: oklch(0.596 0.145 163.225); /* emerald-600 */
     
     --border: oklch(0.922 0 0); /* zinc-200 */
     --input: oklch(0.922 0 0); /* zinc-200 */
@@ -98,6 +147,12 @@
     --destructive: oklch(0.704 0.191 22.216); /* red-500 */
     --destructive-foreground: oklch(0.985 0 0); /* near white */
     
+    --negative: oklch(0.637 0.237 25.331); /* red-500 */
+    --negative-foreground: oklch(0.808 0.114 19.571); /* red-300 */
+    
+    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
+    --positive-foreground: oklch(0.845 0.143 164.978); /* emerald-300 */
+    
     --border: oklch(1 0 0 / 10%); /* translucent white */
     --input: oklch(1 0 0 / 15%); /* translucent white */
     --ring: oklch(0.708 0.182 254.604); /* brand blue-400 */
@@ -127,6 +182,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-negative: var(--negative);
+  --color-negative-foreground: var(--negative-foreground);
+  --color-positive: var(--positive);
+  --color-positive-foreground: var(--positive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

@@ -98,8 +98,8 @@ export interface FileRoutesByFullPath {
   '/rule-of-thumb/proximity-principle': typeof RuleOfThumbProximityPrincipleRoute
   '/rule-of-thumb/table-design': typeof RuleOfThumbTableDesignRoute
   '/rule-of-thumb/typescript-code-writing': typeof RuleOfThumbTypescriptCodeWritingRoute
-  '/blog': typeof BlogIndexRoute
-  '/rule-of-thumb': typeof RuleOfThumbIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/rule-of-thumb/': typeof RuleOfThumbIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -143,8 +143,8 @@ export interface FileRouteTypes {
     | '/rule-of-thumb/proximity-principle'
     | '/rule-of-thumb/table-design'
     | '/rule-of-thumb/typescript-code-writing'
-    | '/blog'
-    | '/rule-of-thumb'
+    | '/blog/'
+    | '/rule-of-thumb/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -202,14 +202,14 @@ declare module '@tanstack/react-router' {
     '/rule-of-thumb/': {
       id: '/rule-of-thumb/'
       path: '/rule-of-thumb'
-      fullPath: '/rule-of-thumb'
+      fullPath: '/rule-of-thumb/'
       preLoaderRoute: typeof RuleOfThumbIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
-      fullPath: '/blog'
+      fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

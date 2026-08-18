@@ -29,7 +29,7 @@ const TECH_ICON_MAP = {
   typescript: "typescript",
   nextjs: "nextdotjs",
   tailwindcss: "tailwindcss",
-  vuejs: "vuedotjs",
+  vue: "vuedotjs",
   nodejs: "nodedotjs",
   postgresql: "postgresql",
   aws: "amazonwebservices",
@@ -42,6 +42,25 @@ const TECH_ICON_MAP = {
   express: "express",
   mongodb: "mongodb",
 } as const;
+
+const TECH_DISPLAY_NAME_MAP: Record<keyof typeof TECH_ICON_MAP, string> = {
+  react: "React",
+  typescript: "TypeScript",
+  nextjs: "Next.js",
+  tailwindcss: "Tailwind CSS",
+  vue: "Vue",
+  nodejs: "Node.js",
+  postgresql: "PostgreSQL",
+  aws: "AWS",
+  supabase: "Supabase",
+  "tanstack-start": "TanStack Start",
+  laravel: "Laravel",
+  php: "PHP",
+  mysql: "MySQL",
+  figma: "Figma",
+  express: "Express",
+  mongodb: "MongoDB",
+};
 
 type TechTag = keyof typeof TECH_ICON_MAP;
 
@@ -111,13 +130,23 @@ function SocialLink({ href, icon: Icon, label, isExternal = true }: SocialLinkPr
   );
 }
 
-// Memoized since it renders the same tag multiple times in lists (rerender-memo rule)
+function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-0.5 text-foreground hover:underline"
+    >
+      {children}
+      <ArrowUpRightIcon size={12} className="opacity-60" />
+    </a>
+  );
+}
+
 const TechTagComponent = memo(function TechTagComponent({ tag }: { tag: TechTag }) {
   const iconSlug = TECH_ICON_MAP[tag];
-  const displayName = tag
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  const displayName = TECH_DISPLAY_NAME_MAP[tag];
 
   return (
     <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-background border border-border text-muted-foreground">
@@ -258,26 +287,9 @@ function TimelineItem({
 
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => {
-              const displayName = tag
-                .split("-")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ");
-              return (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-background border border-border text-muted-foreground"
-                >
-                  <img
-                    src={`https://cdn.simpleicons.org/${TECH_ICON_MAP[tag]}`}
-                    alt=""
-                    className="size-3.5 opacity-70"
-                    style={{ filter: "var(--icon-filter, grayscale(100%))" }}
-                  />
-                  {displayName}
-                </span>
-              );
-            })}
+            {tags.map((tag) => (
+              <TechTagComponent key={tag} tag={tag} />
+            ))}
           </div>
         )}
       </div>
@@ -290,7 +302,7 @@ function TimelineItem({
 // ============================================================================
 
 type ExperienceSectionProps = {
-  experience: {
+  experiences: {
     title: string;
     subtitle: string;
     date: string;
@@ -301,18 +313,18 @@ type ExperienceSectionProps = {
 
 const INITIAL_EXPERIENCE_COUNT = 3;
 
-function ExperienceSection({ experience }: ExperienceSectionProps) {
+function ExperienceSection({ experiences }: ExperienceSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const hasMore = experience.length > INITIAL_EXPERIENCE_COUNT;
+  const hasMore = experiences.length > INITIAL_EXPERIENCE_COUNT;
 
   return (
     <Section title="Experience">
       <div className="relative">
-        {experience.map((job, index) => {
+        {experiences.map((job, index) => {
           const isHidden = !isExpanded && index >= INITIAL_EXPERIENCE_COUNT;
           const isLastVisible = isExpanded
-            ? index === experience.length - 1
+            ? index === experiences.length - 1
             : index === INITIAL_EXPERIENCE_COUNT - 1 && !hasMore;
 
           return (
@@ -363,7 +375,7 @@ function ExperienceSection({ experience }: ExperienceSectionProps) {
           ) : (
             <>
               <CaretDownIcon size={14} />
-              Show all ({experience.length})
+              Show all ({experiences.length})
             </>
           )}
         </Button>
@@ -374,7 +386,8 @@ function ExperienceSection({ experience }: ExperienceSectionProps) {
 
 function RuleOfThumbsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const slideCount = GUIDELINES.length;
+  const visibleGuidelines = GUIDELINES.filter((g) => !g.hidden);
+  const slideCount = visibleGuidelines.length;
 
   // Card dimensions
   const CARD_WIDTH = 288; // w-72 = 18rem = 288px
@@ -483,7 +496,7 @@ function RuleOfThumbsCarousel() {
               width: `${CARD_WIDTH}px`, // Same as card width so center card aligns
             }}
           >
-            {GUIDELINES.map((guideline, i) => (
+            {visibleGuidelines.map((guideline, i) => (
               <div
                 key={guideline.id}
                 className="absolute top-0 left-0"
@@ -516,29 +529,31 @@ function RuleOfThumbsCarousel() {
         />
       </div>
 
-      {/* Navigation Arrows - Centered below cards */}
-      <div className="flex items-center justify-center gap-2 mt-4">
-        <button
-          onClick={scrollPrev}
-          className={cn(
-            "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
-            "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
-          )}
-          aria-label="Scroll left"
-        >
-          <CaretLeftIcon size={18} className="text-foreground" />
-        </button>
-        <button
-          onClick={scrollNext}
-          className={cn(
-            "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
-            "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
-          )}
-          aria-label="Scroll right"
-        >
-          <CaretRightIcon size={18} className="text-foreground" />
-        </button>
-      </div>
+      {/* Navigation Arrows - Centered below cards (hidden when less than 2 items) */}
+      {slideCount >= 2 && (
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <button
+            onClick={scrollPrev}
+            className={cn(
+              "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
+              "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
+            )}
+            aria-label="Scroll left"
+          >
+            <CaretLeftIcon size={18} className="text-foreground" />
+          </button>
+          <button
+            onClick={scrollNext}
+            className={cn(
+              "size-9 rounded-full bg-card border border-border flex items-center justify-center transition-all duration-200",
+              "opacity-100 hover:bg-border hover:scale-105 cursor-pointer",
+            )}
+            aria-label="Scroll right"
+          >
+            <CaretRightIcon size={18} className="text-foreground" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -562,6 +577,7 @@ export const Route = createFileRoute("/")({
         { name: "PHP", icon: "php", color: "#777BB4" },
         { name: "PostgreSQL", icon: "postgresql", color: "#4169E1" },
         { name: "Node.js", icon: "nodedotjs", color: "#339933" },
+        { name: "Express", icon: "express", color: "#000000" },
         { name: "Figma", icon: "figma", color: "#F24E1E" },
       ],
       experience: [
@@ -570,7 +586,7 @@ export const Route = createFileRoute("/")({
           subtitle: "EvidenceCare",
           date: "Sep 2024 — Present",
           description: [
-            "Authored technical documentation for scaffolding services, configuring reverse proxies, and setting up semantic release pipelines for UI applications.",
+            "Authored technical documentation for service scaffolding, reverse proxy configuration, and semantic release pipelines.",
             "Built an automated PR reviewer to validate database permissions and reduce runtime errors.",
             "Modernized tooling and upgraded dependencies across all TypeScript codebases.",
             "Optimized Docker image builds, reducing image size by approximately 30%.",
@@ -632,7 +648,7 @@ export const Route = createFileRoute("/")({
             "Built applications for LPP Polytechnic Yogyakarta using Laravel, React, Vue, and InertiaJS.",
             "Crafted custom WordPress/Blogger templates and translated Figma designs to pixel-perfect websites.",
           ],
-          tags: ["react", "vuejs", "laravel", "php"] as const satisfies TechTag[],
+          tags: ["react", "vue", "laravel", "php"] as const satisfies TechTag[],
         },
         {
           title: "Frontend Engineer",
@@ -645,7 +661,7 @@ export const Route = createFileRoute("/")({
           ],
           tags: ["react", "typescript", "figma"] as const satisfies TechTag[],
         },
-      ] satisfies ExperienceSectionProps["experience"],
+      ] satisfies ExperienceSectionProps["experiences"],
       projects: [
         {
           title: "Schemata",
@@ -680,7 +696,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { posts, techStack, experience, projects } = Route.useLoaderData();
+  const { techStack, experience, projects } = Route.useLoaderData();
 
   return (
     <PageContainer>
@@ -692,13 +708,37 @@ function Index() {
 
       {/* About */}
       <Section title="About">
-        <div className="text-muted-foreground leading-relaxed">
-          <p>High-agency, ambitious, and opinionated engineer with a customer service mindset.</p>
+        <div className="text-muted-foreground leading-relaxed space-y-3">
+          <p>
+            Full-stack engineer based in Yogyakarta, Indonesia with 5+ years of professional
+            experience. Currently building healthcare software at{" "}
+            <ExternalLink href="https://evidencecare.com">EvidenceCare</ExternalLink>{" "}
+            for the US market.
+          </p>
+          <p>
+            Created <ExternalLink href="https://github.com/itsfaqih/fama">Fama</ExternalLink>, an
+            open source portfolio template with 230+ GitHub stars and 48 forks. Built{" "}
+            <ExternalLink href="https://schemata.ruine.app">Schemata</ExternalLink>, a
+            drag-and-drop ERD builder for visual database schema design.
+          </p>
+          <p>
+            Led cross-functional product teams of up to 10 engineers and designers. Recognized as
+            top performer at <ExternalLink href="https://jatismobile.com/">Jatis Mobile</ExternalLink> (Q4 2022). Contributed to the Indonesian PHP community
+            through UI design work for{" "}
+            <ExternalLink href="https://github.com/phpid-jakarta/phpid-learning">
+              PHPID Learning
+            </ExternalLink>
+            .
+          </p>
 
           <div className="flex flex-wrap gap-2 mt-4">
-            <SocialLink href="https://github.com" icon={GithubLogoIcon} label="GitHub" />
-            <SocialLink href="https://linkedin.com" icon={LinkedinLogoIcon} label="LinkedIn" />
-            <SocialLink href="https://twitter.com" icon={TwitterLogoIcon} label="X" />
+            <SocialLink href="https://github.com/itsfaqih" icon={GithubLogoIcon} label="GitHub" />
+            <SocialLink
+              href="https://linkedin.com/in/itsfaqih"
+              icon={LinkedinLogoIcon}
+              label="LinkedIn"
+            />
+            <SocialLink href="https://twitter.com/itsfaqih_" icon={TwitterLogoIcon} label="X" />
             <SocialLink
               href="mailto:hello@faqih.dev"
               icon={EnvelopeIcon}
@@ -743,7 +783,7 @@ function Index() {
       </Section>
 
       {/* Experience */}
-      <ExperienceSection experience={experience} />
+      <ExperienceSection experiences={experience} />
 
       {/* Projects */}
       <Section title="Projects">
@@ -760,7 +800,7 @@ function Index() {
         ))}
       </Section>
 
-      {/* Writing */}
+      {/* Hidden Writing section - uncomment to show
       <Section title="Writing">
         {posts.map((post) => (
           <ListItem
@@ -779,6 +819,7 @@ function Index() {
           />
         ))}
       </Section>
+      */}
 
       <footer className="mt-20 pt-8 border-t border-border text-sm text-muted-foreground flex justify-center">
         <span>© 2026</span>

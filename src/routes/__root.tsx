@@ -4,6 +4,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { Header } from "../components/header";
 import { GridBackground } from "../components/grid-background";
+import { CommandPalette } from "../components/command-palette";
 import { cn } from "../cn";
 
 import appCss from "../styles.css?url";
@@ -84,6 +85,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       >
         <GridBackground />
         <Header />
+        <CommandPalette />
         <main className="relative z-10">{children}</main>
         <TanStackDevtools
           config={{ position: "bottom-right" }}

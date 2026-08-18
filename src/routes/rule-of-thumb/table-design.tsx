@@ -205,11 +205,10 @@ function InteractiveTableDemo() {
                 <td className="px-4 py-3 text-muted-foreground">{user.role}</td>
                 <td className="px-4 py-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.status === "active"
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === "active"
                         ? "bg-muted text-foreground"
                         : "bg-muted text-zinc-400"
-                    }`}
+                      }`}
                   >
                     {user.status}
                   </span>
@@ -281,11 +280,10 @@ function InteractiveTableDemo() {
               <div key={s} className="flex items-center gap-2">
                 <button
                   onClick={() => setState(s)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm ${
-                    state === s
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm ${state === s
                       ? "bg-muted text-foreground border-2 border-muted-foreground/20"
                       : "bg-background/50 text-muted-foreground hover:text-foreground border border-border hover:bg-muted/70"
-                  }`}
+                    }`}
                 >
                   {stateInfo[s].label}
                 </button>
@@ -302,11 +300,10 @@ function InteractiveTableDemo() {
                 setSearchQuery("xyz");
                 setState("searching");
               }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                state === "searching"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${state === "searching"
                   ? "bg-muted text-foreground border-2 border-muted-foreground/20"
                   : "bg-background text-muted-foreground hover:text-foreground border border-border"
-              }`}
+                }`}
             >
               No Results
             </button>
@@ -370,11 +367,10 @@ function PaginationDemo() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`size-8 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === page
+                className={`size-8 rounded-lg text-sm font-medium transition-colors ${currentPage === page
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {page}
               </button>
@@ -502,10 +498,6 @@ function NumbersDemo() {
     </Card>
   );
 }
-
-// ============================================================================
-// Code Example Component with Syntax Highlighting
-// ============================================================================
 
 // ============================================================================
 // Main Page Component

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   HouseIcon,
-  FileTextIcon,
+  // FileTextIcon, // Hidden: uncomment when Blog link is re-enabled
   SunIcon,
   MoonIcon,
   GithubLogoIcon,
@@ -10,6 +10,7 @@ import {
   ArrowLeftIcon,
 } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
+import { CommandPaletteTrigger } from "./command-palette";
 
 // ============================================================================
 // Header Component
@@ -53,6 +54,7 @@ export function Header() {
                 <HouseIcon size={16} />
                 <span className="hidden sm:inline">Home</span>
               </Link>
+              {/* Hidden Blog link - uncomment to show
               <Link
                 to="/blog"
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200"
@@ -64,6 +66,7 @@ export function Header() {
                 <FileTextIcon size={16} />
                 <span className="hidden sm:inline">Blog</span>
               </Link>
+              */}
 
               {/* Divider */}
               <div className="w-px h-4 bg-border mx-1" />
@@ -96,6 +99,12 @@ export function Header() {
                   <EnvelopeIcon size={18} />
                 </a>
               </div>
+
+              {/* Divider */}
+              <div className="w-px h-4 bg-border mx-1" />
+
+              {/* Search / Command Palette */}
+              <CommandPaletteTrigger />
 
               {/* Divider */}
               <div className="w-px h-4 bg-border mx-1" />

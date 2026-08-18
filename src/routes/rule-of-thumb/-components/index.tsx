@@ -31,7 +31,7 @@ type GuidelineHeroProps = {
 export function RuleOfThumbHero({ title, description, badge, markdownUrl }: GuidelineHeroProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  async function handleCopy() {
     if (!markdownUrl) return;
     try {
       const res = await fetch(markdownUrl);
@@ -42,9 +42,9 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
-  const handleDownload = async () => {
+  async function handleDownload() {
     if (!markdownUrl) return;
     try {
       const res = await fetch(markdownUrl);
@@ -61,7 +61,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
   return (
     <div className="text-center mb-16">
@@ -213,37 +213,37 @@ export function CodeComparison({
     <div className="flex flex-col items-center lg:grid lg:grid-cols-2 gap-4">
       {/* Don't / Bad */}
       <Card
-        className="border-red-500/30 bg-card/30 hover:border-red-500/30 overflow-hidden"
+        className="border-negative/30 bg-card/30 hover:border-negative/30 overflow-hidden"
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-red-500/30 bg-red-500/5 flex items-center gap-2">
-          <XIcon size={16} className="text-red-400" />
-          <span className="font-medium text-red-400">{badTitle}</span>
+        <div className="px-4 py-3 border-b border-negative/30 bg-negative/10 flex items-center gap-2">
+          <XIcon size={16} className="text-negative-foreground" />
+          <span className="font-medium text-negative-foreground">{badTitle}</span>
         </div>
         <div className="p-4 overflow-x-auto">
           <CodeBlock code={badCode} />
         </div>
-        <div className="px-4 py-3 border-t border-red-500/30 bg-red-500/5 text-sm text-red-400">
-          <XIcon size={14} className="inline mr-2" />
-          {badReason}
+        <div className="px-4 py-3 border-t border-negative/30 bg-negative/10 text-sm text-negative-foreground flex items-start gap-2">
+          <XIcon size={14} className="shrink-0 mt-1" />
+          <span>{badReason}</span>
         </div>
       </Card>
 
       {/* Do / Good */}
       <Card
-        className="border-emerald-500/30 bg-card/30 hover:border-emerald-500/30 overflow-hidden"
+        className="border-positive/30 bg-card/30 hover:border-positive/30 overflow-hidden"
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-emerald-500/30 bg-emerald-500/5 flex items-center gap-2">
-          <CheckIcon size={16} className="text-emerald-400" />
-          <span className="font-medium text-emerald-400">{goodTitle}</span>
+        <div className="px-4 py-3 border-b border-positive/30 bg-positive/10 flex items-center gap-2">
+          <CheckIcon size={16} className="text-positive-foreground" />
+          <span className="font-medium text-positive-foreground">{goodTitle}</span>
         </div>
         <div className="p-4 overflow-x-auto">
           <CodeBlock code={goodCode} />
         </div>
-        <div className="px-4 py-3 border-t border-emerald-500/30 bg-emerald-500/5 text-sm text-emerald-400">
-          <CheckIcon size={14} className="inline mr-2" />
-          {goodReason}
+        <div className="px-4 py-3 border-t border-positive/30 bg-positive/10 text-sm text-positive-foreground flex items-start gap-2">
+          <CheckIcon size={14} className="shrink-0 mt-0.5" />
+          <span>{goodReason}</span>
         </div>
       </Card>
     </div>
@@ -269,7 +269,7 @@ export function CodeExample({ title, code, description }: CodeExampleProps) {
       <div className="p-4 overflow-x-auto">
         <CodeBlock code={code} />
       </div>
-      {Boolean(description) && (
+      {description && (
         <div className="px-4 py-3 border-t border-border bg-background text-sm text-muted-foreground">
           {description}
         </div>
@@ -325,7 +325,47 @@ export function TabbedCodeExample({ title, tabs, description }: TabbedCodeExampl
 }
 
 // ============================================================================
-// Quick Ref Card
+// Quick Ref Table
+// ============================================================================
+
+type QuickRefItem = {
+  scenario: string;
+  action: string;
+};
+
+type QuickRefTableProps = {
+  items: QuickRefItem[];
+};
+
+export function QuickRefTable({ items }: QuickRefTableProps) {
+  return (
+    <div className="relative">
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-4 group">
+          {/* Timeline column */}
+          <div className="flex flex-col items-center shrink-0">
+            <div className="size-7 rounded-full bg-zinc-500/10 dark:bg-zinc-500/20 border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover:border-foreground/30 group-hover:text-foreground transition-colors">
+              {i + 1}
+            </div>
+            {i < items.length - 1 && (
+              <div className="w-px flex-1 border-l border-dashed border-border" />
+            )}
+          </div>
+          {/* Content */}
+          <div className="pb-6 pt-0.5">
+            <p className="text-sm">
+              <span className="font-medium text-foreground">{item.scenario}</span>
+              <span className="text-muted-foreground"> → {item.action}</span>
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// Quick Ref Card (used by other pages)
 // ============================================================================
 
 type QuickRefCardProps = {
@@ -337,11 +377,12 @@ type QuickRefCardProps = {
 export function QuickRefCard({ emoji, title, action }: QuickRefCardProps) {
   return (
     <Card className="flex items-center gap-4 p-4">
-      <div className="text-2xl">{emoji}</div>
-      <div>
-        <p className="font-medium text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground">{action}</p>
-      </div>
+      <div className="text-2xl shrink-0">{emoji}</div>
+      <p className="text-sm sm:text-base">
+        <span className="font-medium text-foreground">{title}</span>
+        <span className="text-muted-foreground"> → </span>
+        <span className="text-muted-foreground">{action}</span>
+      </p>
     </Card>
   );
 }

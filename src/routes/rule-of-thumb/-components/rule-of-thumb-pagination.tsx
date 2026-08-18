@@ -5,12 +5,14 @@ import { Card } from "../../../components/card";
 
 export function RuleOfThumbPagination() {
   const location = useLocation();
-  const currentIndex = GUIDELINES.findIndex((g) => g.href === location.pathname);
+  // Filter out hidden guidelines for pagination
+  const visibleGuidelines = GUIDELINES.filter((g) => !g.hidden);
+  const currentIndex = visibleGuidelines.findIndex((g) => g.href === location.pathname);
 
   if (currentIndex === -1) return null;
 
-  const prevGuideline = GUIDELINES[currentIndex - 1];
-  const nextGuideline = GUIDELINES[currentIndex + 1];
+  const prevGuideline = visibleGuidelines[currentIndex - 1];
+  const nextGuideline = visibleGuidelines[currentIndex + 1];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-16 pt-8 border-t border-border">
@@ -25,9 +27,7 @@ export function RuleOfThumbPagination() {
               />
               Previous View
             </div>
-            <span className="font-semibold text-foreground text-lg">
-              {prevGuideline.title}
-            </span>
+            <span className="font-semibold text-foreground text-lg">{prevGuideline.title}</span>
           </Card>
         </Link>
       ) : (
@@ -45,9 +45,7 @@ export function RuleOfThumbPagination() {
                 className="group-hover:translate-x-1 transition-transform"
               />
             </div>
-            <span className="font-semibold text-foreground text-lg">
-              {nextGuideline.title}
-            </span>
+            <span className="font-semibold text-foreground text-lg">{nextGuideline.title}</span>
           </Card>
         </Link>
       ) : (

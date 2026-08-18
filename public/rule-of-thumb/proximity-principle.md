@@ -47,7 +47,16 @@ Only move code to a separate file when it's needed in multiple files.
 
 When you do share code, place it at the nearest common parent. This makes it clear which scope the utility belongs to.
 
-## Bonus: File Suffixes
+> **Tip**: Avoid generic directory names like `features/`. Use specific names that describe what the directory contains: `pages/`, `routes/`, `controllers/`, etc.
+
+## Exception: Global Code
+
+For something that we can expect to be used globally (e.g. a button component) or used almost everywhere, it's better to put them in a "type" directory (e.g. `components/`, `schemas/`).
+
+- **Bad**: Placing `button.tsx` inside `pages/` at the lowest ancestor — it doesn't belong to any page.
+- **Good**: Placing `button.tsx` in `components/`. Globally used code lives in a type directory. Clear intent, easy to find.
+
+## File Suffixes
 
 When organizing by type at scale, use suffixes for discoverability (Ctrl+P).
 
@@ -61,4 +70,5 @@ When organizing by type at scale, use suffixes for discoverability (Ctrl+P).
 - **Code is too long** -> Extract to function, keep in file
 - **Code reused in same file** -> Extract to function, keep in file
 - **Code reused across files** -> Extract to lowest common ancestor
+- **Code used globally / almost everywhere** -> Put in a type directory (e.g. components/, schemas/)
 - **React: Child has own state** -> Extract to component

@@ -8,15 +8,13 @@ import {
   FileIcon,
   CheckIcon,
   XIcon,
-  SparkleIcon,
   MapPinIcon,
   FileCodeIcon,
   TreeStructureIcon,
   LightningIcon,
 } from "@phosphor-icons/react";
 import { PageContainer } from "../../components/page-container";
-import { CodeComparison, CodeExample, RuleOfThumbHero, QuickRefCard } from "./-components";
-import { Button } from "../../components/button";
+import { CodeComparison, CodeExample, RuleOfThumbHero, QuickRefTable } from "./-components";
 
 export const Route = createFileRoute("/rule-of-thumb/proximity-principle")({
   component: ProximityPrinciple,
@@ -36,13 +34,29 @@ type TreeNode = {
 // Components
 // ============================================================================
 
-// Highlight styles hoisted outside component (rendering-hoist-jsx rule)
 const TREE_HIGHLIGHT_STYLES = {
-  good: "bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500",
-  bad: "bg-red-500/10 text-red-400 border-l-2 border-red-500",
+  good: "bg-positive/10 text-positive-foreground",
+  bad: "bg-negative/10 text-negative-foreground",
 } as const;
 
-// Memoized to prevent unnecessary re-renders in recursive tree (rerender-memo rule)
+const TREE_BORDER_STYLES = {
+  good: "border-l-2 border-positive",
+  bad: "border-l-2 border-negative",
+} as const;
+
+function groupByHighlight(children: TreeNode[]) {
+  const groups: { highlight?: "good" | "bad"; nodes: TreeNode[] }[] = [];
+  for (const child of children) {
+    const last = groups[groups.length - 1];
+    if (last && last.highlight === child.highlight) {
+      last.nodes.push(child);
+    } else {
+      groups.push({ highlight: child.highlight, nodes: [child] });
+    }
+  }
+  return groups;
+}
+
 const TreeNodeComponent = memo(function TreeNodeComponent({
   node,
   depth = 0,
@@ -52,9 +66,7 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
-  const isFile = !hasChildren;
 
-  // Functional setState prevents stale closure (rerender-functional-setstate rule)
   const toggleOpen = useCallback(() => {
     if (hasChildren) {
       setIsOpen((prev) => !prev);
@@ -64,13 +76,12 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
   return (
     <div className="select-none">
       <div
-        className={`flex items-center gap-1.5 py-1 px-2 rounded-md transition-all cursor-default hover:bg-muted/50 ${
-          node.highlight ? TREE_HIGHLIGHT_STYLES[node.highlight] : ""
-        }`}
+        className={`flex items-center gap-1.5 py-1 px-2 rounded-md transition-all cursor-default hover:bg-muted/50 ${node.highlight ? TREE_HIGHLIGHT_STYLES[node.highlight] : ""
+          }`}
         style={{ paddingLeft: depth * 16 + 8 }}
         onClick={toggleOpen}
       >
-        {/* Ternary for explicit conditional rendering (rendering-conditional-render rule) */}
+
         {hasChildren ? (
           <CaretRightIcon
             size={14}
@@ -81,10 +92,10 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
           <span className="w-3.5" />
         )}
 
-        {isFile ? (
-          <FileIcon size={14} weight="regular" className="text-muted-foreground" />
-        ) : (
+        {hasChildren ? (
           <FolderIcon size={14} weight="regular" className="text-foreground" />
+        ) : (
+          <FileIcon size={14} weight="regular" className="text-muted-foreground" />
         )}
 
         <span className="text-sm font-mono">{node.name}</span>
@@ -92,9 +103,19 @@ const TreeNodeComponent = memo(function TreeNodeComponent({
 
       {hasChildren && isOpen ? (
         <div>
-          {node.children!.map((child) => (
-            <TreeNodeComponent key={child.name} node={child} depth={depth + 1} />
-          ))}
+          {groupByHighlight(node.children!).map((group, i) =>
+            group.highlight ? (
+              <div key={i} className={TREE_BORDER_STYLES[group.highlight]}>
+                {group.nodes.map((child) => (
+                  <TreeNodeComponent key={child.name} node={child} depth={depth + 1} />
+                ))}
+              </div>
+            ) : (
+              group.nodes.map((child) => (
+                <TreeNodeComponent key={child.name} node={child} depth={depth + 1} />
+              ))
+            )
+          )}
         </div>
       ) : null}
     </div>
@@ -124,9 +145,9 @@ function FileTreeComparison({
         <div className="p-4">
           <TreeNodeComponent node={goodTree} />
         </div>
-        <div className="px-4 py-3 bg-emerald-500/5 border-t border-border text-sm text-emerald-400">
-          <CheckIcon size={14} className="inline mr-2" />
-          {goodReason}
+        <div className="px-4 py-3 bg-positive/10 border-t border-border text-sm text-positive-foreground flex items-start gap-2">
+          <CheckIcon size={14} className="shrink-0 mt-0.5" />
+          <span>{goodReason}</span>
         </div>
       </Card>
     );
@@ -136,144 +157,38 @@ function FileTreeComparison({
     <div className="flex flex-col items-center lg:grid lg:grid-cols-2 gap-4">
       {/* Don't / Bad */}
       <Card
-        className="border-red-500/30 bg-card/30 hover:border-red-500/30 overflow-hidden"
+        className="border-negative/30 bg-card/30 hover:border-negative/30 overflow-hidden"
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-red-500/30 bg-red-500/5 flex items-center gap-2">
-          <XIcon size={16} className="text-red-400" />
-          <span className="font-medium text-red-400">Bad</span>
+        <div className="px-4 py-3 border-b border-negative/30 bg-negative/10 flex items-center gap-2">
+          <XIcon size={16} className="text-negative-foreground" />
+          <span className="font-medium text-negative-foreground">Bad</span>
         </div>
         <div className="p-4">{badTree && <TreeNodeComponent node={badTree} />}</div>
-        <div className="px-4 py-3 border-t border-red-500/30 bg-red-500/5 text-sm text-red-400">
-          <XIcon size={14} className="inline mr-2" />
-          {badReason}
+        <div className="px-4 py-3 border-t border-negative/30 bg-negative/10 text-sm text-negative-foreground flex items-start gap-2">
+          <XIcon size={14} className="shrink-0 mt-1" />
+          <span>{badReason}</span>
         </div>
       </Card>
 
       {/* Do / Good */}
       <Card
-        className="border-emerald-500/30 bg-card/30 hover:border-emerald-500/30 overflow-hidden"
+        className="border-positive/30 bg-card/30 hover:border-positive/30 overflow-hidden"
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-emerald-500/30 bg-emerald-500/5 flex items-center gap-2">
-          <CheckIcon size={16} className="text-emerald-400" />
-          <span className="font-medium text-emerald-400">Good</span>
+        <div className="px-4 py-3 border-b border-positive/30 bg-positive/10 flex items-center gap-2">
+          <CheckIcon size={16} className="text-positive-foreground" />
+          <span className="font-medium text-positive-foreground">Good</span>
         </div>
         <div className="p-4">
           <TreeNodeComponent node={goodTree} />
         </div>
-        <div className="px-4 py-3 border-t border-emerald-500/30 bg-emerald-500/5 text-sm text-emerald-400">
-          <CheckIcon size={14} className="inline mr-2" />
-          {goodReason}
+        <div className="px-4 py-3 border-t border-positive/30 bg-positive/10 text-sm text-positive-foreground flex items-start gap-2">
+          <CheckIcon size={14} className="shrink-0 mt-0.5" />
+          <span>{goodReason}</span>
         </div>
       </Card>
     </div>
-  );
-}
-
-function InteractiveDemo() {
-  const [step, setStep] = useState(0);
-
-  const steps = [
-    {
-      title: "You write some code...",
-      tree: {
-        name: "src",
-        children: [
-          {
-            name: "components",
-            children: [{ name: "dashboard.tsx", highlight: "good" as const }],
-          },
-        ],
-      },
-      description: "Everything starts in one file. Clean and simple.",
-    },
-    {
-      title: "You need to reuse something...",
-      tree: {
-        name: "src",
-        children: [
-          {
-            name: "components",
-            children: [
-              { name: "dashboard.tsx", highlight: "good" as const },
-              { name: "settings.tsx", highlight: "good" as const },
-            ],
-          },
-        ],
-      },
-      description: "Both files need the same utility. Time to extract!",
-    },
-    {
-      title: "But where do you put it?",
-      tree: {
-        name: "src",
-        children: [
-          {
-            name: "components",
-            children: [
-              { name: "shared.ts", highlight: "good" as const },
-              { name: "dashboard.tsx" },
-              { name: "settings.tsx" },
-            ],
-          },
-        ],
-      },
-      description: "At the lowest common ancestor! Both files can easily import it.",
-    },
-  ];
-
-  return (
-    <Card className="bg-card overflow-hidden">
-      <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-        <SparkleIcon size={18} className="text-foreground" />
-        <span className="font-medium text-foreground">Interactive Demo</span>
-      </div>
-
-      <div className="p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xs text-muted-foreground uppercase tracking-wide">
-            Step {step + 1} of {steps.length}
-          </span>
-        </div>
-
-        {steps[step] && (
-          <>
-            <h3 className="text-lg font-semibold text-foreground mb-4">{steps[step].title}</h3>
-
-            <div className="p-4 bg-background/50 backdrop-blur-sm rounded-lg border border-border mb-4">
-              <TreeNodeComponent node={steps[step].tree} />
-            </div>
-
-            <p className="text-sm text-muted-foreground mb-4">{steps[step].description}</p>
-          </>
-        )}
-
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
-            disabled={step === 0}
-            className="text-sm"
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
-            disabled={step === steps.length - 1}
-            className="text-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-
-      <div className="h-1 bg-border">
-        <div
-          className="h-full bg-foreground transition-all duration-300"
-          style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-        />
-      </div>
-    </Card>
   );
 }
 
@@ -300,10 +215,6 @@ function ProximityPrinciple() {
         markdownUrl="/rule-of-thumb/proximity-principle.md"
       />
 
-      {/* Interactive Demo */}
-      <div className="mb-16">
-        <InteractiveDemo />
-      </div>
 
       {/* Core Principles Grid */}
       <div className="mb-20">
@@ -524,37 +435,114 @@ function UserBadge() {
           <p className="text-muted-foreground mb-6">
             When you do share code, place it at the nearest common parent.
           </p>
+          <p className="text-sm text-muted-foreground mb-6 pl-4 border-l-2 border-border">
+            <strong className="text-foreground">Tip:</strong> Avoid generic directory names like <code className="text-sm bg-muted px-1.5 py-0.5 rounded">features/</code>. Use specific names that describe what the directory contains: <code className="text-sm bg-muted px-1.5 py-0.5 rounded">pages/</code>, <code className="text-sm bg-muted px-1.5 py-0.5 rounded">routes/</code>, <code className="text-sm bg-muted px-1.5 py-0.5 rounded">controllers/</code>, etc.
+          </p>
         </div>
         <div className="max-w-3xl mx-auto">
           <FileTreeComparison
             badTree={{
               name: "src",
               children: [
-                { name: "utils", children: [{ name: "format-date.ts", highlight: "bad" }] },
                 {
-                  name: "features",
+                  name: "pages",
                   children: [
-                    { name: "profile", children: [{ name: "user-profile.tsx" }] },
-                    { name: "activity", children: [{ name: "user-activity.tsx" }] },
+                    { name: "format-date.ts", highlight: "bad" },
+                    {
+                      name: "profile",
+                      children: [
+                        { name: "user-profile.tsx" },
+                        {
+                          name: "components",
+                          children: [{ name: "profile-header.tsx" }],
+                        },
+                      ],
+                    },
+                    {
+                      name: "activity",
+                      children: [{ name: "user-activity.tsx" }],
+                    },
                   ],
                 },
               ],
             }}
-            badReason="Shared code is far from where it's used. Deep import paths."
+            badReason="format-date.ts looks like a page. Misleading without a directory to clarify its purpose."
             goodTree={{
               name: "src",
               children: [
                 {
-                  name: "features",
+                  name: "pages",
                   children: [
-                    { name: "format-date.ts", highlight: "good" },
-                    { name: "profile", children: [{ name: "user-profile.tsx" }] },
-                    { name: "activity", children: [{ name: "user-activity.tsx" }] },
+                    {
+                      name: "utils",
+                      children: [{ name: "format-date.ts", highlight: "good" }],
+                    },
+                    {
+                      name: "profile",
+                      children: [
+                        { name: "user-profile.tsx" },
+                        {
+                          name: "components",
+                          children: [{ name: "profile-header.tsx" }],
+                        },
+                      ],
+                    },
+                    {
+                      name: "activity",
+                      children: [{ name: "user-activity.tsx" }],
+                    },
                   ],
                 },
               ],
             }}
-            goodReason="Shared code at the lowest common ancestor. Both features can easily access it."
+            goodReason="A utils directory clarifies intent. Still at the lowest common ancestor."
+          />
+        </div>
+      </div>
+
+      {/* Global Code in Type Directories */}
+      <div className="mb-16">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-xl font-bold text-foreground mb-2">Exception: Global Code</h2>
+          <p className="text-muted-foreground mb-6">
+            For something that we can expect to be used globally (e.g. a button component) or used almost everywhere, it's better to put them in a "type" directory (e.g. <code className="text-sm bg-muted px-1.5 py-0.5 rounded">components/</code>, <code className="text-sm bg-muted px-1.5 py-0.5 rounded">schemas/</code>).
+          </p>
+        </div>
+        <div className="max-w-3xl mx-auto">
+          <FileTreeComparison
+            badTree={{
+              name: "src",
+              children: [
+                {
+                  name: "pages",
+                  children: [
+                    { name: "button.tsx", highlight: "bad" },
+                    { name: "profile", children: [{ name: "user-profile.tsx" }] },
+                    { name: "settings", children: [{ name: "settings-page.tsx" }] },
+                    { name: "dashboard", children: [{ name: "dashboard.tsx" }] },
+                  ],
+                },
+              ],
+            }}
+            badReason="Button is used everywhere, but placed at the lowest ancestor. It doesn't belong to any page."
+            goodTree={{
+              name: "src",
+              children: [
+                {
+                  name: "components",
+                  children: [{ name: "button.tsx", highlight: "good" }],
+                },
+                {
+                  name: "pages",
+                  children: [
+                    { name: "profile", children: [{ name: "user-profile.tsx" }] },
+                    { name: "settings", children: [{ name: "settings-page.tsx" }] },
+                    { name: "dashboard", children: [{ name: "dashboard.tsx" }] },
+                  ],
+                },
+              ],
+            }}
+            goodReason="Globally used code lives in a type directory. Clear intent, easy to find."
           />
         </div>
       </div>
@@ -590,14 +578,14 @@ function UserBadge() {
                   children: [
                     { name: "posts.tsx", highlight: "good" },
                     {
-                      name: "components", // In strict routers, this needs config like `routeFileIgnorePattern`
+                      name: "-components",
                       children: [{ name: "post-header.tsx", highlight: "good" }],
                     },
                   ],
                 },
               ],
             }}
-            goodReason="Using ignored folders (via config or convention like `_components`) keeps files safe."
+            goodReason="Using ignored folders (via config or convention like `-components`) keeps files safe."
           />
         </div>
       </div>
@@ -605,7 +593,7 @@ function UserBadge() {
       {/* File Suffixes */}
       <div className="mb-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-xl font-bold text-foreground mb-2">Bonus: File Suffixes</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">File Suffixes</h2>
           <p className="text-muted-foreground mb-6">
             When organizing by type at scale, use suffixes for discoverability.
           </p>
@@ -640,27 +628,16 @@ function UserBadge() {
       {/* Quick Reference */}
       <div className="mb-16">
         <h2 className="text-2xl font-bold text-foreground text-center mb-8">Quick Reference</h2>
-        <div className="space-y-3">
-          <QuickRefCard emoji="1️⃣" title="Code used once" action="Keep it inline" />
-          <QuickRefCard
-            emoji="📏"
-            title="Code is too long"
-            action="Extract to function, keep in file"
-          />
-          <QuickRefCard
-            emoji="📄"
-            title="Code reused in same file"
-            action="Extract to function, keep in file"
-          />
-          <QuickRefCard
-            emoji="📁"
-            title="Code reused across files"
-            action="Extract to lowest common ancestor"
-          />
-          <QuickRefCard
-            emoji="⚛️"
-            title="React: Child has own state"
-            action="Extract to component (prevents parent re-render)"
+        <div className="flex justify-center">
+          <QuickRefTable
+            items={[
+              { scenario: "Code used once", action: "Keep it inline" },
+              { scenario: "Code is too long", action: "Extract to function, keep in file" },
+              { scenario: "Code reused in same file", action: "Extract to function, keep in file" },
+              { scenario: "Code reused across files", action: "Extract to lowest common ancestor" },
+              { scenario: "Code used globally / almost everywhere", action: "Put in a type directory (e.g. components/, schemas/)" },
+              { scenario: "React: Child has own state", action: "Extract to component (prevents parent re-render)" },
+            ]}
           />
         </div>
       </div>

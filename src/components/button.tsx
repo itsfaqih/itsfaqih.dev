@@ -105,15 +105,18 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const computedPadding = padding
-    ? padding
-    : leadingIcon && trailingIcon
-      ? "compact"
-      : leadingIcon
-        ? "leading"
-        : trailingIcon
-          ? "trailing"
-          : "default";
+  let computedPadding: VariantProps<typeof buttonVariants>["padding"] = padding;
+  if (!computedPadding) {
+    if (leadingIcon && trailingIcon) {
+      computedPadding = "compact";
+    } else if (leadingIcon) {
+      computedPadding = "leading";
+    } else if (trailingIcon) {
+      computedPadding = "trailing";
+    } else {
+      computedPadding = "default";
+    }
+  }
   return (
     <button
       ref={ref}
@@ -143,14 +146,14 @@ export function getButtonClasses({
   hasLeadingIcon?: boolean;
   hasTrailingIcon?: boolean;
 }) {
-  const computedPadding =
-    hasLeadingIcon && hasTrailingIcon
-      ? "compact"
-      : hasLeadingIcon
-        ? "leading"
-        : hasTrailingIcon
-          ? "trailing"
-          : "default";
+  let computedPadding: VariantProps<typeof buttonVariants>["padding"] = "default";
+  if (hasLeadingIcon && hasTrailingIcon) {
+    computedPadding = "compact";
+  } else if (hasLeadingIcon) {
+    computedPadding = "leading";
+  } else if (hasTrailingIcon) {
+    computedPadding = "trailing";
+  }
 
   return cn(buttonVariants({ variant, padding: computedPadding, className }));
 }
