@@ -79,6 +79,5 @@ export const GUIDELINES: Guideline[] = [
     title: "Null vs Undefined",
     description: "The difference between empty and missing values",
     href: "/rule-of-thumb/null-vs-undefined",
-    hidden: true,
   },
 ];

@@ -1,3 +1,4 @@
+import { cx } from "@/stylex";
 import { cn } from "../cn";
 
 // Configuration
@@ -60,7 +61,7 @@ function FadeBox({ position, row, delay, side }: FadeBoxProps) {
 
   return (
     <div
-      className="fade-box"
+      className={cx("fade-box")}
       style={{
         ...positionStyle,
         top: `calc(var(--cell-size) * ${row})`,
@@ -83,7 +84,7 @@ function WallGrid({ side }: WallGridProps) {
   const baseOffset = side === "right" ? 2.5 : 0;
 
   return (
-    <div className={className}>
+    <div className={cn(className)}>
       {Array.from({ length: ROWS }, (_, rowIndex) => {
         const row = 1 + rowIndex * ROW_SPACING; // Grid row position
         const rowPositions = positions[rowIndex % positions.length];
@@ -128,12 +129,12 @@ function WallGrid({ side }: WallGridProps) {
 function CeilingFloorGrid({ isFloor }: { isFloor?: boolean }) {
   const className = isFloor ? "grid-floor" : "grid-ceiling";
 
-  return <div className={className} />;
+  return <div className={cn(className)} />;
 }
 
 export function GridBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className={cx("absolute inset-0 overflow-hidden pointer-events-none")}>
       {/* Gradient fade overlay for edges */}
       <div
         className={cn(

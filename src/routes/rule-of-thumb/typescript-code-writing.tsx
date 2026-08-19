@@ -1,3 +1,4 @@
+import { cx } from "@/stylex";
 import { createFileRoute } from "@tanstack/react-router";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { ShieldIcon, PackageIcon } from "@phosphor-icons/react";
@@ -17,7 +18,7 @@ function TypeScriptGuidelines() {
           <>
             Patterns for writing clean, robust, and maintainable TypeScript.
             <br />
-            <span className="text-foreground font-medium">Strict defaults, explicit intent.</span>
+            <span className={cx("text-foreground font-medium")}>Strict defaults, explicit intent.</span>
           </>
         }
         badge={{
@@ -29,13 +30,13 @@ function TypeScriptGuidelines() {
       {/* ================================================================== */}
       {/* SECTION 1: Exports and Functions */}
       {/* ================================================================== */}
-      <div className="mb-20">
+      <div className={cx("mb-20")}>
         <SectionHeading
           title="Exports & Functions"
           description="Consistent module structure makes code easier to navigate and refactor."
         />
 
-        <div className="space-y-4 mb-8">
+        <div className={cx("space-y-4 mb-8")}>
           <BestPractice
             emoji="📦"
             title="Prefer Named Exports"
@@ -67,13 +68,13 @@ export function calculateTotal(items: Item[]) {
       {/* ================================================================== */}
       {/* SECTION 2: Type Definitions */}
       {/* ================================================================== */}
-      <div className="mb-20">
+      <div className={cx("mb-20")}>
         <SectionHeading
           title="Type Definitions"
           description="How to define data shapes relative to flexibility and performance."
         />
 
-        <div className="space-y-4 mb-8">
+        <div className={cx("space-y-4 mb-8")}>
           <BestPractice
             emoji="📝"
             title='Use "type" by default'
@@ -150,7 +151,7 @@ function getUser(): User { // explicit return type documents intent
       {/* ================================================================== */}
       {/* SECTION 3: Function Parameters */}
       {/* ================================================================== */}
-      <div className="mb-20">
+      <div className={cx("mb-20")}>
         <SectionHeading
           title="Function Parameters"
           description="Managing arguments for readability and extensibility."
@@ -162,7 +163,7 @@ function getUser(): User { // explicit return type documents intent
           description="When a function takes more than two parameters, combine them into a single object argument. This improves readability (named args) and makes adding new optional parameters non-breaking."
         />
 
-        <div className="mt-6">
+        <div className={cx("mt-6")}>
           <CodeExample
             title="Object Parameters"
             code={`// ❌ Avoid this
@@ -194,33 +195,33 @@ createUser({
       {/* ================================================================== */}
       {/* SECTION 4: Strictness & Configuration */}
       {/* ================================================================== */}
-      <div className="mb-20">
+      <div className={cx("mb-20")}>
         <SectionHeading
           title="Strictness & Config"
           description="The foundation of a safe codebase."
         />
 
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="p-6 rounded-xl bg-card border border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <ShieldIcon size={20} className="text-foreground" />
-              <h3 className="font-semibold text-foreground">Must-Have Flags</h3>
+        <div className={cx("grid sm:grid-cols-2 gap-4")}>
+          <div className={cx("p-6 rounded-xl bg-card border border-border")}>
+            <div className={cx("flex items-center gap-3 mb-4")}>
+              <ShieldIcon size={20} className={cx("text-foreground")} />
+              <h3 className={cx("font-semibold text-foreground")}>Must-Have Flags</h3>
             </div>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex flex-col gap-1">
-                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
+            <ul className={cx("space-y-3 text-sm text-muted-foreground")}>
+              <li className={cx("flex flex-col gap-1")}>
+                <code className={cx("text-foreground bg-muted px-1.5 py-0.5 rounded w-fit")}>
                   "strict": true
                 </code>
                 <span>Enables strictNullChecks, noImplicitAny, etc.</span>
               </li>
-              <li className="flex flex-col gap-1">
-                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
+              <li className={cx("flex flex-col gap-1")}>
+                <code className={cx("text-foreground bg-muted px-1.5 py-0.5 rounded w-fit")}>
                   "noUncheckedIndexedAccess": true
                 </code>
                 <span>Forces you to check if array access / index signature is defined.</span>
               </li>
-              <li className="flex flex-col gap-1">
-                <code className="text-foreground bg-muted px-1.5 py-0.5 rounded w-fit">
+              <li className={cx("flex flex-col gap-1")}>
+                <code className={cx("text-foreground bg-muted px-1.5 py-0.5 rounded w-fit")}>
                   "verbatimModuleSyntax": true
                 </code>
                 <span>Enforces consistent imports/exports and ESM compatibility.</span>
@@ -228,25 +229,25 @@ createUser({
             </ul>
           </div>
 
-          <div className="p-6 rounded-xl bg-card border border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <PackageIcon size={20} className="text-foreground" />
-              <h3 className="font-semibold text-foreground">Module System</h3>
+          <div className={cx("p-6 rounded-xl bg-card border border-border")}>
+            <div className={cx("flex items-center gap-3 mb-4")}>
+              <PackageIcon size={20} className={cx("text-foreground")} />
+              <h3 className={cx("font-semibold text-foreground")}>Module System</h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className={cx("text-sm text-muted-foreground mb-4")}>
               Use <strong>ESM (ECMAScript Modules)</strong> exclusively.
             </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <span className="text-foreground">✓</span>
+            <ul className={cx("space-y-2 text-sm text-muted-foreground")}>
+              <li className={cx("flex items-center gap-2")}>
+                <span className={cx("text-foreground")}>✓</span>
                 <span>import / export syntax</span>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-foreground">✗</span>
+              <li className={cx("flex items-center gap-2")}>
+                <span className={cx("text-foreground")}>✗</span>
                 <span>require() / module.exports</span>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-foreground">✓</span>
+              <li className={cx("flex items-center gap-2")}>
+                <span className={cx("text-foreground")}>✓</span>
                 <span>Top-level await support</span>
               </li>
             </ul>

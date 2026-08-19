@@ -3,6 +3,7 @@
  * An animated visual showing UTC storage -> Local display.
  * Logic: Database (UTC) -> Network -> Client (Local Time).
  */
+import { cx } from "@/stylex";
 import styles from "./handling-timestamps-thumbnail.module.css";
 
 export function HandlingTimestampsThumbnail() {
@@ -10,12 +11,12 @@ export function HandlingTimestampsThumbnail() {
   const durationStr = `${duration}s`;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className={cx("absolute inset-0 flex items-center justify-center overflow-hidden")}>
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Centered Group: Width ~116, Height ~36. Centered in 160x100 */}
         <g transform="translate(14, 22)">
           {/* Database Group (Left) */}
-          <g className="stroke-foreground" strokeWidth={1} fill="transparent">
+          <g className={cx("stroke-foreground")} strokeWidth={1} fill="transparent">
             {/* Cylinder Top */}
             <ellipse cx="20" cy="15" rx="12" ry="5" />
             {/* Cylinder Body lines (left & right) + Bottom Curve */}
@@ -28,14 +29,14 @@ export function HandlingTimestampsThumbnail() {
               y="28"
               fontSize="8"
               fontWeight="bold"
-              className="fill-foreground stroke-none font-mono"
+              className={cx("fill-foreground stroke-none font-mono")}
             >
               UTC
             </text>
           </g>
 
           {/* Connection Arrow */}
-          <g className="stroke-muted-foreground" strokeWidth={1}>
+          <g className={cx("stroke-muted-foreground")} strokeWidth={1}>
             <line x1="36" y1="25" x2="75" y2="25" />
             {/* Arrowhead */}
             <path d="M72 22 L75 25 L72 28" />
@@ -51,20 +52,20 @@ export function HandlingTimestampsThumbnail() {
               height="32"
               rx="2"
               fill="transparent"
-              className="stroke-foreground"
+              className={cx("stroke-foreground")}
             />
             {/* Stand */}
             <path
               d="M12 32 L12 36 L32 36 L32 32"
               fill="transparent"
-              className="stroke-foreground"
+              className={cx("stroke-foreground")}
             />
 
             {/* Clock Face Inside Screen */}
-            <circle cx="22" cy="16" r="10" fill="transparent" className="stroke-foreground" />
+            <circle cx="22" cy="16" r="10" fill="transparent" className={cx("stroke-foreground")} />
 
             {/* Clock Hands - Keeping subtle rotation for life, but no drawing/fading */}
-            <g strokeLinecap="round" className="stroke-foreground">
+            <g strokeLinecap="round" className={cx("stroke-foreground")}>
               {/* Hour Hand */}
               <line
                 x1="22"
@@ -96,11 +97,11 @@ export function HandlingTimestampsThumbnail() {
         </g>
       </svg>
       {/* Gradient fade overlays */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
+      <div className={cx("pointer-events-none absolute inset-0")}>
+        <div className={cx("absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent")} />
+        <div className={cx("absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent")} />
+        <div className={cx("absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent")} />
+        <div className={cx("absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent")} />
       </div>
     </div>
   );

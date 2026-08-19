@@ -1,39 +1,35 @@
-import { cn } from "@/cn";
-import type { ElementType, ComponentPropsWithoutRef } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cx } from "@/stylex";
+import type { ComponentPropsWithoutRef, ElementType } from "react";
 
-const cardVariants = cva(
-  "rounded-xl border border-border bg-card backdrop-blur-md transition-all duration-300",
-  {
-    variants: {
-      hoverEffect: {
-        true: "hover:border-muted-foreground/30",
-        false: "",
-      },
-    },
-    defaultVariants: {
-      hoverEffect: true,
-    },
-  },
-);
-
-export interface CardProps<T extends ElementType> extends VariantProps<typeof cardVariants> {
-  as?: T;
+type CardOwnProps = {
   children: React.ReactNode;
   className?: string;
+  hoverEffect?: boolean;
+  as?: ElementType;
+};
+
+export interface CardProps<T extends ElementType = "div"> extends CardOwnProps {
+  as?: T;
 }
 
 export function Card<T extends ElementType = "div">({
   as,
   children,
   className,
-  hoverEffect,
+  hoverEffect = true,
   ...props
-}: CardProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof CardProps<T> | "hoverEffect">) {
+}: CardProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof CardOwnProps>) {
   const Component = as || "div";
 
   return (
-    <Component className={cn(cardVariants({ hoverEffect, className }))} {...props}>
+    <Component
+      className={cx(
+        "rounded-xl border border-border bg-card backdrop-blur-md transition-all duration-300",
+        hoverEffect && "hover:border-muted-foreground/30",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </Component>
   );

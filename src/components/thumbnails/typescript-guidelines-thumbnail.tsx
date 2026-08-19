@@ -3,6 +3,7 @@
  * An animated blueprint showing the TypeScript logo with construction lines.
  * Animation sequence: lines → circles → rectangle → text characters
  */
+import { cx } from "@/stylex";
 import styles from "./typescript-guidelines-thumbnail.module.css";
 
 export function TypeScriptGuidelinesThumbnail() {
@@ -49,7 +50,7 @@ export function TypeScriptGuidelinesThumbnail() {
   const logoText = "TS";
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className={cx("absolute inset-0 flex items-center justify-center overflow-hidden")}>
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Construction lines - staggered animation in clockwise pattern */}
         <line x1="50" x2="50" y1="0" y2="100" className={styles.lineDraw} style={lineAnim(0)} />
@@ -115,7 +116,7 @@ export function TypeScriptGuidelinesThumbnail() {
             rx="6"
             fill="transparent"
             strokeDasharray="240"
-            className={`stroke-foreground ${styles.rectDraw}`}
+            className={cx(`stroke-foreground ${styles.rectDraw}`)}
             style={{
               animationDuration: durationStr,
               animationDelay: `${-(duration - (8 * 0.15 + 4 * 0.1))}s`,
@@ -152,11 +153,11 @@ export function TypeScriptGuidelinesThumbnail() {
       </svg>
 
       {/* Gradient fade overlays */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
+      <div className={cx("pointer-events-none absolute inset-0")}>
+        <div className={cx("absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent")} />
+        <div className={cx("absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent")} />
+        <div className={cx("absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent")} />
+        <div className={cx("absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent")} />
       </div>
     </div>
   );

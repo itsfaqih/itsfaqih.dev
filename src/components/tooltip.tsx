@@ -1,3 +1,4 @@
+import { cx } from "@/stylex";
 import * as React from "react";
 import { Tooltip } from "@base-ui/react";
 import { cn } from "@/cn";
@@ -32,7 +33,7 @@ export function SimpleTooltip({
               )}
             >
               {content}
-              <Tooltip.Arrow className="fill-background" />
+              <Tooltip.Arrow className={cx("fill-background")} />
             </Tooltip.Popup>
           </Tooltip.Positioner>
         </Tooltip.Portal>

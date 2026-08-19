@@ -10,26 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RuleOfThumbIndexRouteImport } from './routes/rule-of-thumb/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as RuleOfThumbTypescriptCodeWritingRouteImport } from './routes/rule-of-thumb/typescript-code-writing'
-import { Route as RuleOfThumbTableDesignRouteImport } from './routes/rule-of-thumb/table-design'
-import { Route as RuleOfThumbProximityPrincipleRouteImport } from './routes/rule-of-thumb/proximity-principle'
-import { Route as RuleOfThumbNullVsUndefinedRouteImport } from './routes/rule-of-thumb/null-vs-undefined'
-import { Route as RuleOfThumbHandlingTimestampsRouteImport } from './routes/rule-of-thumb/handling-timestamps'
-import { Route as RuleOfThumbDialogDesignRouteImport } from './routes/rule-of-thumb/dialog-design'
-import { Route as RuleOfThumbDataLoadingRouteImport } from './routes/rule-of-thumb/data-loading'
-import { Route as RuleOfThumbButtonDesignRouteImport } from './routes/rule-of-thumb/button-design'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as RuleOfThumbIndexRouteImport } from './routes/rule-of-thumb/index'
+import { Route as RuleOfThumbButtonDesignRouteImport } from './routes/rule-of-thumb/button-design'
+import { Route as RuleOfThumbDataLoadingRouteImport } from './routes/rule-of-thumb/data-loading'
+import { Route as RuleOfThumbDialogDesignRouteImport } from './routes/rule-of-thumb/dialog-design'
+import { Route as RuleOfThumbHandlingTimestampsRouteImport } from './routes/rule-of-thumb/handling-timestamps'
+import { Route as RuleOfThumbNullVsUndefinedRouteImport } from './routes/rule-of-thumb/null-vs-undefined'
+import { Route as RuleOfThumbProximityPrincipleRouteImport } from './routes/rule-of-thumb/proximity-principle'
+import { Route as RuleOfThumbTableDesignRouteImport } from './routes/rule-of-thumb/table-design'
+import { Route as RuleOfThumbTypescriptCodeWritingRouteImport } from './routes/rule-of-thumb/typescript-code-writing'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RuleOfThumbIndexRoute = RuleOfThumbIndexRouteImport.update({
-  id: '/rule-of-thumb/',
-  path: '/rule-of-thumb/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -37,21 +32,35 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RuleOfThumbTypescriptCodeWritingRoute =
-  RuleOfThumbTypescriptCodeWritingRouteImport.update({
-    id: '/rule-of-thumb/typescript-code-writing',
-    path: '/rule-of-thumb/typescript-code-writing',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const RuleOfThumbTableDesignRoute = RuleOfThumbTableDesignRouteImport.update({
-  id: '/rule-of-thumb/table-design',
-  path: '/rule-of-thumb/table-design',
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RuleOfThumbProximityPrincipleRoute =
-  RuleOfThumbProximityPrincipleRouteImport.update({
-    id: '/rule-of-thumb/proximity-principle',
-    path: '/rule-of-thumb/proximity-principle',
+const RuleOfThumbIndexRoute = RuleOfThumbIndexRouteImport.update({
+  id: '/rule-of-thumb/',
+  path: '/rule-of-thumb/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuleOfThumbButtonDesignRoute = RuleOfThumbButtonDesignRouteImport.update({
+  id: '/rule-of-thumb/button-design',
+  path: '/rule-of-thumb/button-design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuleOfThumbDataLoadingRoute = RuleOfThumbDataLoadingRouteImport.update({
+  id: '/rule-of-thumb/data-loading',
+  path: '/rule-of-thumb/data-loading',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuleOfThumbDialogDesignRoute = RuleOfThumbDialogDesignRouteImport.update({
+  id: '/rule-of-thumb/dialog-design',
+  path: '/rule-of-thumb/dialog-design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuleOfThumbHandlingTimestampsRoute =
+  RuleOfThumbHandlingTimestampsRouteImport.update({
+    id: '/rule-of-thumb/handling-timestamps',
+    path: '/rule-of-thumb/handling-timestamps',
     getParentRoute: () => rootRouteImport,
   } as any)
 const RuleOfThumbNullVsUndefinedRoute =
@@ -60,32 +69,23 @@ const RuleOfThumbNullVsUndefinedRoute =
     path: '/rule-of-thumb/null-vs-undefined',
     getParentRoute: () => rootRouteImport,
   } as any)
-const RuleOfThumbHandlingTimestampsRoute =
-  RuleOfThumbHandlingTimestampsRouteImport.update({
-    id: '/rule-of-thumb/handling-timestamps',
-    path: '/rule-of-thumb/handling-timestamps',
+const RuleOfThumbProximityPrincipleRoute =
+  RuleOfThumbProximityPrincipleRouteImport.update({
+    id: '/rule-of-thumb/proximity-principle',
+    path: '/rule-of-thumb/proximity-principle',
     getParentRoute: () => rootRouteImport,
   } as any)
-const RuleOfThumbDialogDesignRoute = RuleOfThumbDialogDesignRouteImport.update({
-  id: '/rule-of-thumb/dialog-design',
-  path: '/rule-of-thumb/dialog-design',
+const RuleOfThumbTableDesignRoute = RuleOfThumbTableDesignRouteImport.update({
+  id: '/rule-of-thumb/table-design',
+  path: '/rule-of-thumb/table-design',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RuleOfThumbDataLoadingRoute = RuleOfThumbDataLoadingRouteImport.update({
-  id: '/rule-of-thumb/data-loading',
-  path: '/rule-of-thumb/data-loading',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RuleOfThumbButtonDesignRoute = RuleOfThumbButtonDesignRouteImport.update({
-  id: '/rule-of-thumb/button-design',
-  path: '/rule-of-thumb/button-design',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const RuleOfThumbTypescriptCodeWritingRoute =
+  RuleOfThumbTypescriptCodeWritingRouteImport.update({
+    id: '/rule-of-thumb/typescript-code-writing',
+    path: '/rule-of-thumb/typescript-code-writing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,13 +199,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rule-of-thumb/': {
-      id: '/rule-of-thumb/'
-      path: '/rule-of-thumb'
-      fullPath: '/rule-of-thumb/'
-      preLoaderRoute: typeof RuleOfThumbIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -213,53 +206,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rule-of-thumb/typescript-code-writing': {
-      id: '/rule-of-thumb/typescript-code-writing'
-      path: '/rule-of-thumb/typescript-code-writing'
-      fullPath: '/rule-of-thumb/typescript-code-writing'
-      preLoaderRoute: typeof RuleOfThumbTypescriptCodeWritingRouteImport
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rule-of-thumb/table-design': {
-      id: '/rule-of-thumb/table-design'
-      path: '/rule-of-thumb/table-design'
-      fullPath: '/rule-of-thumb/table-design'
-      preLoaderRoute: typeof RuleOfThumbTableDesignRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rule-of-thumb/proximity-principle': {
-      id: '/rule-of-thumb/proximity-principle'
-      path: '/rule-of-thumb/proximity-principle'
-      fullPath: '/rule-of-thumb/proximity-principle'
-      preLoaderRoute: typeof RuleOfThumbProximityPrincipleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rule-of-thumb/null-vs-undefined': {
-      id: '/rule-of-thumb/null-vs-undefined'
-      path: '/rule-of-thumb/null-vs-undefined'
-      fullPath: '/rule-of-thumb/null-vs-undefined'
-      preLoaderRoute: typeof RuleOfThumbNullVsUndefinedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rule-of-thumb/handling-timestamps': {
-      id: '/rule-of-thumb/handling-timestamps'
-      path: '/rule-of-thumb/handling-timestamps'
-      fullPath: '/rule-of-thumb/handling-timestamps'
-      preLoaderRoute: typeof RuleOfThumbHandlingTimestampsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rule-of-thumb/dialog-design': {
-      id: '/rule-of-thumb/dialog-design'
-      path: '/rule-of-thumb/dialog-design'
-      fullPath: '/rule-of-thumb/dialog-design'
-      preLoaderRoute: typeof RuleOfThumbDialogDesignRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rule-of-thumb/data-loading': {
-      id: '/rule-of-thumb/data-loading'
-      path: '/rule-of-thumb/data-loading'
-      fullPath: '/rule-of-thumb/data-loading'
-      preLoaderRoute: typeof RuleOfThumbDataLoadingRouteImport
+    '/rule-of-thumb/': {
+      id: '/rule-of-thumb/'
+      path: '/rule-of-thumb'
+      fullPath: '/rule-of-thumb/'
+      preLoaderRoute: typeof RuleOfThumbIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rule-of-thumb/button-design': {
@@ -269,11 +227,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RuleOfThumbButtonDesignRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
+    '/rule-of-thumb/data-loading': {
+      id: '/rule-of-thumb/data-loading'
+      path: '/rule-of-thumb/data-loading'
+      fullPath: '/rule-of-thumb/data-loading'
+      preLoaderRoute: typeof RuleOfThumbDataLoadingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/dialog-design': {
+      id: '/rule-of-thumb/dialog-design'
+      path: '/rule-of-thumb/dialog-design'
+      fullPath: '/rule-of-thumb/dialog-design'
+      preLoaderRoute: typeof RuleOfThumbDialogDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/handling-timestamps': {
+      id: '/rule-of-thumb/handling-timestamps'
+      path: '/rule-of-thumb/handling-timestamps'
+      fullPath: '/rule-of-thumb/handling-timestamps'
+      preLoaderRoute: typeof RuleOfThumbHandlingTimestampsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/null-vs-undefined': {
+      id: '/rule-of-thumb/null-vs-undefined'
+      path: '/rule-of-thumb/null-vs-undefined'
+      fullPath: '/rule-of-thumb/null-vs-undefined'
+      preLoaderRoute: typeof RuleOfThumbNullVsUndefinedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/proximity-principle': {
+      id: '/rule-of-thumb/proximity-principle'
+      path: '/rule-of-thumb/proximity-principle'
+      fullPath: '/rule-of-thumb/proximity-principle'
+      preLoaderRoute: typeof RuleOfThumbProximityPrincipleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/table-design': {
+      id: '/rule-of-thumb/table-design'
+      path: '/rule-of-thumb/table-design'
+      fullPath: '/rule-of-thumb/table-design'
+      preLoaderRoute: typeof RuleOfThumbTableDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rule-of-thumb/typescript-code-writing': {
+      id: '/rule-of-thumb/typescript-code-writing'
+      path: '/rule-of-thumb/typescript-code-writing'
+      fullPath: '/rule-of-thumb/typescript-code-writing'
+      preLoaderRoute: typeof RuleOfThumbTypescriptCodeWritingRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

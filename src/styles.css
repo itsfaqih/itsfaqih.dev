@@ -1,78 +1,143 @@
-@import "tailwindcss";
-@plugin "@tailwindcss/typography";
+@import "./stylex-fallback.css";
 
-@variant dark (&:where(.dark, .dark *));
-
-@theme {
+:root {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
   --animate-fade-in: fade-in 0.4s ease-out forwards;
   --animate-ripple: ripple 0.6s ease-out forwards;
+}
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+.responsive-dialog-backdrop {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.responsive-dialog-popup {
+  transition:
+    scale 200ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .responsive-dialog-backdrop {
+    transition-duration: 150ms;
   }
 
-  @keyframes ripple {
-    from {
-      transform: scale(0);
-      opacity: 0.3;
-    }
-    to {
-      transform: scale(1);
-      opacity: 0;
-    }
+  .responsive-dialog-popup {
+    transition: opacity 200ms var(--ease-out);
+    scale: 1;
+  }
+}
+
+.tree-children {
+  transition:
+    grid-template-rows 200ms var(--ease-out),
+    opacity 150ms var(--ease-out);
+}
+
+.tree-caret {
+  transition: transform 200ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-children {
+    transition: opacity 150ms var(--ease-out);
   }
 
-  @keyframes slide-in-from-top {
-    from {
-      opacity: 0;
-      transform: translateY(-16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .tree-caret {
+    transition: none;
+  }
+}
+
+.guideline-category-popup {
+  transform-origin: var(--transform-origin, top center);
+  transition:
+    transform 150ms var(--ease-out),
+    opacity 150ms var(--ease-out);
+}
+
+.guideline-category-popup[data-starting-style],
+.guideline-category-popup[data-ending-style] {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guideline-category-popup {
+    transition: opacity 150ms var(--ease-out);
+    transform-origin: top center;
   }
 
-  /* Dialog animations */
-  @keyframes dialog-in {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-8px) scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
-    }
+  .guideline-category-popup[data-starting-style],
+  .guideline-category-popup[data-ending-style] {
+    transform: none;
   }
+}
 
-  @keyframes dialog-out {
-    from {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: translateX(-50%) translateY(-8px) scale(0.96);
-    }
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  @keyframes fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dialog animations */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.96);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
@@ -164,40 +229,6 @@
   }
 }
 
-/* Make CSS variables available as Tailwind utilities */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
-  --color-neutral: var(--neutral);
-  --color-neutral-foreground: var(--neutral-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-negative: var(--negative);
-  --color-negative-foreground: var(--negative-foreground);
-  --color-positive: var(--positive);
-  --color-positive-foreground: var(--positive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  
-  /* Legacy/custom colors */
-  --color-header-bg: var(--header-bg);
-  --color-grid: var(--grid-color);
-  
-  /* Border radius */
-  --radius: var(--radius);
-}
-
 /* Experimental squircle support */
 .squircle {
   corner-shape: squircle;
@@ -205,11 +236,17 @@
 
 /* Syntax highlighting styles */
 figure[data-rehype-pretty-code-figure] {
-  @apply relative;
+  position: relative;
 }
 
 figure[data-rehype-pretty-code-figure] pre {
-  @apply rounded-xl border border-(--border) p-4 overflow-x-auto bg-(--card) text-sm leading-relaxed;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow-x: auto;
+  background: var(--card);
+  font-size: 0.875rem;
+  line-height: 1.625;
 }
 
 /* Handle dual themes using Shiki variables */
@@ -243,11 +280,14 @@ figure[data-rehype-pretty-code-figure] code {
 }
 
 figure[data-rehype-pretty-code-figure] [data-line] {
-  @apply px-4 -mx-4 border-l-2 border-transparent;
+  padding-inline: 1rem;
+  margin-inline: -1rem;
+  border-inline-start: 2px solid transparent;
 }
 
 figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
-  @apply bg-(--card) border-(--border);
+  background: var(--card);
+  border-color: var(--border);
 }
 
 /* Grid Background Styles */

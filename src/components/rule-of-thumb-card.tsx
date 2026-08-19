@@ -1,3 +1,4 @@
+import { cx } from "@/stylex";
 import { Link } from "@tanstack/react-router";
 import { CaretRightIcon } from "@phosphor-icons/react";
 import type { CSSProperties } from "react";
@@ -45,9 +46,9 @@ function renderThumbnail(ruleOfThumbId: string) {
 
     default:
       return (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="size-24 rounded-2xl bg-background/50 border border-border/50 flex items-center justify-center backdrop-blur-sm transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-            <div className="size-10 rounded-lg bg-linear-to-br from-muted-foreground/20 to-transparent border border-border" />
+        <div className={cx("absolute inset-0 flex items-center justify-center")}>
+          <div className={cx("size-24 rounded-2xl bg-background/50 border border-border/50 flex items-center justify-center backdrop-blur-sm transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3")}>
+            <div className={cx("size-10 rounded-lg bg-linear-to-br from-muted-foreground/20 to-transparent border border-border")} />
           </div>
         </div>
       );
@@ -59,14 +60,14 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
     <>
       {/* Card */}
       <div
-        className={`relative h-48 rounded-xl squircle overflow-hidden bg-linear-to-br from-card to-background border border-border transition-all duration-300 ${!ruleOfThumb.comingSoon ? "group-hover:border-muted-foreground/30 group-hover:-translate-y-1" : "opacity-60"}`}
+        className={cx(`relative h-48 rounded-xl squircle overflow-hidden bg-linear-to-br from-card to-background border border-border transition-all duration-300 ${!ruleOfThumb.comingSoon ? "group-hover:border-muted-foreground/30 group-hover:-translate-y-1" : "opacity-60"}`)}
       >
         {/* Decorative gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-white/3 to-transparent pointer-events-none" />
+        <div className={cx("absolute inset-0 bg-linear-to-br from-white/3 to-transparent pointer-events-none")} />
 
         {/* Subtle pattern */}
         <div
-          className="absolute inset-0 opacity-20"
+          className={cx("absolute inset-0 opacity-20")}
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0)`,
             backgroundSize: "24px 24px",
@@ -78,28 +79,28 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
 
         {/* Coming Soon Badge */}
         {ruleOfThumb.comingSoon && (
-          <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-muted-foreground">
+          <div className={cx("absolute top-3 right-3 px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-muted-foreground")}>
             Coming Soon
           </div>
         )}
       </div>
       {/* Text content below card - constrained to card width */}
-      <div className="mt-4 space-y-1 w-full overflow-hidden">
-        <span className="text-xs text-muted-foreground uppercase tracking-wide block truncate">
+      <div className={cx("mt-4 space-y-1 w-full overflow-hidden")}>
+        <span className={cx("text-xs text-muted-foreground uppercase tracking-wide block truncate")}>
           {ruleOfThumb.label}
         </span>
         <h3
-          className={`font-medium transition-colors flex items-center gap-1.5 ${ruleOfThumb.comingSoon ? "text-muted-foreground" : "text-foreground group-hover:text-(--accent-color)"}`}
+          className={cx(`font-medium transition-colors flex items-center gap-1.5 ${ruleOfThumb.comingSoon ? "text-muted-foreground" : "text-foreground group-hover:text-(--accent-color)"}`)}
         >
-          <span className="truncate">{ruleOfThumb.title}</span>
+          <span className={cx("truncate")}>{ruleOfThumb.title}</span>
           {!ruleOfThumb.comingSoon && (
             <CaretRightIcon
               size={14}
-              className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 shrink-0"
+              className={cx("opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 shrink-0")}
             />
           )}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2">{ruleOfThumb.description}</p>
+        <p className={cx("text-sm text-muted-foreground line-clamp-2")}>{ruleOfThumb.description}</p>
       </div>
     </>
   );
@@ -107,7 +108,7 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
   if (ruleOfThumb.comingSoon) {
     return (
       <div
-        className="block"
+        className={cx("block")}
         style={{
           width: "288px", // Fixed width - w-72 = 18rem = 288px
           flexShrink: 0,
@@ -122,7 +123,7 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
   return (
     <Link
       to={ruleOfThumb.href}
-      className="group block"
+      className={cx("group block")}
       style={{
         width: "288px", // Fixed width - w-72 = 18rem = 288px
         flexShrink: 0,

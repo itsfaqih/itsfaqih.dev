@@ -3,6 +3,7 @@
  * Visualizing the difference: Undefined (Ghostly/Missing) vs Null (Explicit Empty).
  * Metaphor: Dashed empty box vs Solid box containing a "Null" token.
  */
+import { cx } from "@/stylex";
 import styles from "./null-vs-undefined-thumbnail.module.css";
 
 export function NullVsUndefinedThumbnail() {
@@ -10,7 +11,7 @@ export function NullVsUndefinedThumbnail() {
   const durationStr = `${duration}s`;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className={cx("absolute inset-0 flex items-center justify-center overflow-hidden")}>
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         <g transform="translate(35, 30)">
           {/* UNDEFINED: Ghostly/Optional Variable */}
@@ -24,7 +25,7 @@ export function NullVsUndefinedThumbnail() {
               rx="4"
               fill="transparent"
               strokeDasharray="4 4"
-              className={`stroke-muted-foreground ${styles.undefinedFade}`}
+              className={cx(`stroke-muted-foreground ${styles.undefinedFade}`)}
               style={{
                 animationDuration: durationStr,
                 opacity: 0.5,
@@ -36,7 +37,7 @@ export function NullVsUndefinedThumbnail() {
               y="24"
               textAnchor="middle"
               fontSize="18"
-              className={`fill-muted-foreground font-mono ${styles.questionMark}`}
+              className={cx(`fill-muted-foreground font-mono ${styles.questionMark}`)}
               style={{
                 animationDuration: durationStr,
                 transformOrigin: "18px 24px",
@@ -50,7 +51,7 @@ export function NullVsUndefinedThumbnail() {
               y="46"
               textAnchor="middle"
               fontSize="6"
-              className="fill-muted-foreground font-mono uppercase tracking-wider opacity-60"
+              className={cx("fill-muted-foreground font-mono uppercase tracking-wider opacity-60")}
             >
               Undefined
             </text>
@@ -70,7 +71,7 @@ export function NullVsUndefinedThumbnail() {
                 height="36"
                 rx="4"
                 fill="transparent"
-                className="stroke-foreground"
+                className={cx("stroke-foreground")}
               />
               {/* Inner "Void" Token - representing the explicit null value */}
               <g transform="translate(6, 12)">
@@ -79,14 +80,14 @@ export function NullVsUndefinedThumbnail() {
                   height="12"
                   rx="2"
                   fill="transparent"
-                  className="stroke-foreground"
+                  className={cx("stroke-foreground")}
                 />
                 <text
                   x="12"
                   y="8"
                   textAnchor="middle"
                   fontSize="6"
-                  className="fill-foreground font-mono font-bold"
+                  className={cx("fill-foreground font-mono font-bold")}
                 >
                   NULL
                 </text>
@@ -97,7 +98,7 @@ export function NullVsUndefinedThumbnail() {
                 y="46"
                 textAnchor="middle"
                 fontSize="6"
-                className="fill-foreground font-mono uppercase tracking-wider"
+                className={cx("fill-foreground font-mono uppercase tracking-wider")}
               >
                 Null
               </text>
@@ -106,11 +107,11 @@ export function NullVsUndefinedThumbnail() {
         </g>
       </svg>
       {/* Gradient fade overlays */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
+      <div className={cx("pointer-events-none absolute inset-0")}>
+        <div className={cx("absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent")} />
+        <div className={cx("absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent")} />
+        <div className={cx("absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent")} />
+        <div className={cx("absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent")} />
       </div>
     </div>
   );

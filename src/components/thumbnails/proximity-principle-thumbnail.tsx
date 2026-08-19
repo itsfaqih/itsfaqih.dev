@@ -4,11 +4,12 @@
  * Left: Scattered files (Bad) with X mark.
  * Right: Colocated files in folder (Good) with checkmark.
  */
+import { cx } from "@/stylex";
 import styles from "./proximity-principle-thumbnail.module.css";
 
 export function ProximityPrincipleThumbnail() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className={cx("absolute inset-0 flex items-center justify-center overflow-hidden")}>
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Center divider - dashed */}
         <line x1="80" y1="15" x2="80" y2="85" stroke="var(--border)" strokeDasharray="3 2" />
@@ -178,11 +179,11 @@ export function ProximityPrincipleThumbnail() {
       </svg>
 
       {/* Gradient fade overlays */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-0 t -0 bottom-0 w-1/5 bg-linear-to-r from-background to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-1/5 bg-linear-to-l from-background to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-1/5 bg-linear-to-b from-background to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/5 bg-linear-to-t from-background to-transparent" />
+      <div className={cx("pointer-events-none absolute inset-0")}>
+        <div className={cx("absolute left-0 t -0 bottom-0 w-1/5 bg-linear-to-r from-background to-transparent")} />
+        <div className={cx("absolute right-0 top-0 bottom-0 w-1/5 bg-linear-to-l from-background to-transparent")} />
+        <div className={cx("absolute top-0 left-0 right-0 h-1/5 bg-linear-to-b from-background to-transparent")} />
+        <div className={cx("absolute bottom-0 left-0 right-0 h-1/5 bg-linear-to-t from-background to-transparent")} />
       </div>
     </div>
   );

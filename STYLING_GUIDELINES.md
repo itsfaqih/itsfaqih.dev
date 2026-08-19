@@ -2,118 +2,102 @@
 
 ## Core Philosophy
 
-This project prioritizes **Tailwind CSS utility classes** over custom CSS rules. Avoid writing raw CSS or `@apply` blocks in `.css` files whenever possible. Instead, apply styling directly to the HTML/JSX elements.
+This project uses **StyleX** for extracted, type-safe component styles. Prefer static StyleX styles and the shared `cx` helper over adding a new utility framework or writing ad-hoc inline style objects.
 
 ## Rules
 
-### 1. Avoid Raw CSS in `styles.css`
+### 1. Define New Component Styles with StyleX
 
-Do not use CSS selectors (like `body`, `h1`, `.my-class`) in `styles.css` to apply styles.
-**Incorrect:**
+Use `stylex.create` for reusable styles and `stylex.props` when rendering a host element:
 
-```css
-/* styles.css */
-body {
-  background-color: var(--background);
-  font-family: "Inter", sans-serif;
+```tsx
+import * as stylex from "@stylexjs/stylex";
+
+const styles = stylex.create({
+  card: {
+    borderRadius: "0.75rem",
+    padding: "1rem",
+    backgroundColor: "var(--card)",
+  },
+  interactive: {
+    cursor: "pointer",
+    ":hover": {
+      borderColor: "var(--muted-foreground)",
+    },
+  },
+});
+
+export function Card() {
+  return <article {...stylex.props(styles.card, styles.interactive)} />;
 }
 ```
 
-**Correct:**
-Apply classes directly in your layout file (e.g., `__root.tsx`):
+Keep style definitions static so the Vite StyleX plugin can extract them at build time.
+
+### 2. Use `cx` for Existing Utility Composition
+
+The current site has a large amount of existing utility-style markup. Use `cx` from `src/stylex.ts` when combining those styles or accepting a `className` prop:
 
 ```tsx
-<body className="bg-background font-sans ...">
+import { cx } from "@/stylex";
+
+<div className={cx("flex items-center gap-2", className)} />;
 ```
 
-### 2. Use Tailwind Theme Configuration
+`src/cn.ts` remains as a compatibility wrapper for components that already import `cn`. Do not add another class-merging dependency.
 
-Define your design tokens (fonts, colors, etc.) in the Tailwind configuration (or CSS variables compliant with Tailwind) and access them via utility classes.
+### 3. Prefer Semantic Theme Variables
 
-- **Fonts:** Use `font-sans` (mapped to Inter in config).
-- **Colors:** Use semantic tokens like `text-primary` or `bg-card`.
-
-### 3. Arbitrary Values for Complex Styles
-
-For one-off complex styles like background patterns, use Tailwind's arbitrary value syntax instead of creating a custom class.
-
-**Example:**
+Theme tokens live in `src/styles.css` and are shared by StyleX and the selector fallbacks:
 
 ```tsx
-<div className="bg-[radial-gradient(var(--dot-color)_1px,transparent_1px)] bg-[length:24px_24px]">
+const styles = stylex.create({
+  root: {
+    color: "var(--foreground)",
+    backgroundColor: "var(--background)",
+  },
+});
 ```
 
-### 4. Use `cn` Utility for ClassName Merging
+Use semantic variables such as `--background`, `--foreground`, `--card`, `--muted-foreground`, `--border`, and `--brand` instead of duplicating color values.
 
-When combining multiple classNames (especially when accepting a `className` prop), always use the `cn` utility from `src/cn.ts`. This utility uses `clsx` and `tailwind-merge` to properly merge and deduplicate Tailwind classes.
+### 4. Keep Global CSS Focused
 
-**Incorrect:**
+Global CSS is appropriate for:
+
+- theme variable definitions and color-mode switching;
+- document-level resets and typography;
+- keyframes and page-wide backgrounds;
+- syntax-highlighter and third-party component overrides;
+- selector relationships that StyleX cannot express as an atomic rule, such as descendant typography or parent-state selectors.
+
+Do not add a new global utility class when a local StyleX rule can express the same style.
+
+### 5. Preserve Interactive and Responsive States
+
+Use StyleX pseudo-classes and media queries for new work:
 
 ```tsx
-<div className={`${baseClasses} ${className}`}>
+const styles = stylex.create({
+  link: {
+    color: "var(--muted-foreground)",
+    ":hover": { color: "var(--foreground)" },
+    "@media (min-width: 640px)": { fontSize: "0.875rem" },
+  },
+});
 ```
 
-**Correct:**
+When a state depends on a third-party component's data attribute or on a parent selector, keep the selector in the dedicated fallback stylesheet rather than introducing another styling dependency.
 
-```tsx
-import { cn } from "../cn";
+## Verification
 
-<div className={cn(baseClasses, className)}>
+After styling changes, run:
+
+```bash
+bun run typecheck
+bun run lint
+bun run test
+bun run build
 ```
 
-**Benefits:**
-
-- Properly handles conditional classes
-- Deduplicates conflicting Tailwind classes (e.g., `text-red-500` overrides `text-blue-500`)
-- Type-safe with TypeScript
-- Cleaner syntax than template literals
-
-### 5. Prefer Semantic Theme Variables
-
-We follow shadcn/ui theming conventions. Define design tokens in the CSS variables and expose them via `@theme` block.
-
-**Incorrect:**
-
-```css
-/* styles.css */
-@layer base {
-  :root {
-    --bg-primary: #fafafa;
-    --text-primary: #18181b;
-  }
-}
-```
-
-```tsx
-<div className="bg-[var(--bg-primary)] text-[var(--text-primary)]">
-```
-
-**Correct:**
-
-```css
-/* styles.css */
-:root {
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.145 0 0);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-```
-
-```tsx
-<div className="bg-background text-foreground">
-```
-
-**When Custom CSS Variables Are Acceptable:**
-
-- Third-party library overrides that don't support Tailwind classes
-- Complex calculated values that need to be referenced in multiple places
-- Values that need to be dynamically updated via JavaScript
-
-## Exceptions
-
-- **CSS Variables Definition:** It is acceptable to define global CSS variables (like theme colors) in a `@layer base` block in `styles.css`.
-- **Third-Party Overrides:** Sometimes specific overrides for libraries (like syntax highlighters) may require CSS if they don't support class injection easily.
+The StyleX Vite plugin must be active in `vite.config.ts`, and production builds must contain the extracted StyleX CSS asset.

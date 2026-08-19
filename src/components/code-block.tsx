@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "../cn";
+import { highlightCode } from "../utils/shiki-loader";
 
 type CodeBlockProps = {
   code: string;
@@ -13,18 +14,10 @@ export function CodeBlock({ code, lang = "tsx", className }: CodeBlockProps) {
   useEffect(() => {
     let mounted = true;
 
-    import("shiki").then(({ codeToHtml }) => {
-      codeToHtml(code, {
-        lang,
-        themes: {
-          light: "github-light",
-          dark: "github-dark",
-        },
-      }).then((html) => {
-        if (mounted) {
-          setHighlighted(html);
-        }
-      });
+    highlightCode(code, lang).then((html) => {
+      if (mounted) {
+        setHighlighted(html);
+      }
     });
 
     return () => {

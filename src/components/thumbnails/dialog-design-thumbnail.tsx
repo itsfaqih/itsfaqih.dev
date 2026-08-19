@@ -2,6 +2,7 @@
  * Dialog Design Thumbnail
  * An animated blueprint showing dialog construction with looping draw effect.
  */
+import { cx } from "@/stylex";
 import styles from "./dialog-design-thumbnail.module.css";
 
 export function DialogDesignThumbnail() {
@@ -25,7 +26,7 @@ export function DialogDesignThumbnail() {
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className={cx("absolute inset-0 flex items-center justify-center overflow-hidden")}>
       <svg viewBox="0 0 160 100" strokeWidth={0.5} xmlns="http://www.w3.org/2000/svg">
         {/* Horizontal construction lines - dialog edges */}
         <line x1="0" x2="160" y1="20" y2="20" className={styles.lineDraw} style={lineAnim(0)} />
@@ -104,7 +105,7 @@ export function DialogDesignThumbnail() {
             rx="4"
             fill="transparent"
             strokeDasharray="320"
-            className={`stroke-foreground ${styles.dialogDraw}`}
+            className={cx(`stroke-foreground ${styles.dialogDraw}`)}
             style={{
               animationDuration: durationStr,
             }}
@@ -117,7 +118,7 @@ export function DialogDesignThumbnail() {
             y1="18"
             y2="18"
             strokeDasharray="100"
-            className={`stroke-foreground ${styles.dialogLine}`}
+            className={cx(`stroke-foreground ${styles.dialogLine}`)}
             style={{
               animationDuration: durationStr,
             }}
@@ -128,7 +129,7 @@ export function DialogDesignThumbnail() {
             x="8"
             y="12"
             fill="transparent"
-            className={`stroke-foreground ${styles.textFade}`}
+            className={cx(`stroke-foreground ${styles.textFade}`)}
             strokeWidth="0.4"
             fontFamily="Geist"
             fontWeight="semibold"
@@ -143,7 +144,7 @@ export function DialogDesignThumbnail() {
 
           {/* Close button X */}
           <g
-            className={`stroke-foreground ${styles.dialogX}`}
+            className={cx(`stroke-foreground ${styles.dialogX}`)}
             strokeWidth="1.2"
             style={{
               animationDuration: durationStr,
@@ -154,7 +155,7 @@ export function DialogDesignThumbnail() {
           </g>
 
           {/* Content placeholder lines */}
-          <g className="stroke-muted-foreground" strokeWidth="0.5">
+          <g className={cx("stroke-muted-foreground")} strokeWidth="0.5">
             <line
               x1="8"
               y1="28"
@@ -192,7 +193,7 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className={`stroke-muted-foreground ${styles.dialogBtn}`}
+              className={cx(`stroke-muted-foreground ${styles.dialogBtn}`)}
               style={{
                 animationDuration: durationStr,
                 animationDelay: `${-(duration - 1.8)}s`,
@@ -207,7 +208,7 @@ export function DialogDesignThumbnail() {
               rx="2"
               fill="transparent"
               strokeDasharray="70"
-              className={`stroke-foreground ${styles.dialogBtn}`}
+              className={cx(`stroke-foreground ${styles.dialogBtn}`)}
               strokeWidth="1"
               style={{
                 animationDuration: durationStr,
@@ -219,15 +220,15 @@ export function DialogDesignThumbnail() {
       </svg>
 
       {/* Gradient fade overlays */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className={cx("pointer-events-none absolute inset-0")}>
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent" />
+        <div className={cx("absolute left-0 top-0 bottom-0 w-1/4 bg-linear-to-r from-background to-transparent")} />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent" />
+        <div className={cx("absolute right-0 top-0 bottom-0 w-1/4 bg-linear-to-l from-background to-transparent")} />
         {/* Top fade */}
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent" />
+        <div className={cx("absolute top-0 left-0 right-0 h-1/4 bg-linear-to-b from-background to-transparent")} />
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent" />
+        <div className={cx("absolute bottom-0 left-0 right-0 h-1/4 bg-linear-to-t from-background to-transparent")} />
       </div>
     </div>
   );

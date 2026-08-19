@@ -1,3 +1,4 @@
+import { cx } from "@/stylex";
 import { HeadContent, Scripts, createRootRoute, Link } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -11,11 +12,11 @@ import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
   notFoundComponent: () => (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <h1 className="text-2xl font-bold text-foreground">Page Not Found</h1>
+    <div className={cx("flex flex-col items-center justify-center min-h-[60vh] space-y-4")}>
+      <h1 className={cx("text-2xl font-bold text-foreground")}>Page Not Found</h1>
       <Link
         to="/"
-        className="text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4"
+        className={cx("text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4")}
       >
         Go back home
       </Link>
@@ -25,16 +26,19 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Faqih Muntashir - Developer & Writer" },
+      { title: "Faqih Muntashir - Full Stack Engineer" },
       {
         name: "description",
         content:
-          "Personal website of Faqih Muntashir - a developer writing about technology, design, and web development.",
+          "Personal website of Faqih Muntashir, a full-stack engineer based in Yogyakarta, Indonesia.",
       },
       { name: "theme-color", content: "#0a0a0f" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      ...(process.env.NODE_ENV === "development"
+        ? [{ rel: "stylesheet", href: "/virtual:stylex.css" }]
+        : []),
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -53,7 +57,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={cx("scroll-smooth")}>
       <head>
         <HeadContent />
         <script
@@ -86,7 +90,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <GridBackground />
         <Header />
         <CommandPalette />
-        <main className="relative z-10">{children}</main>
+        <main className={cx("relative z-10")}>{children}</main>
         <TanStackDevtools
           config={{ position: "bottom-right" }}
           plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}

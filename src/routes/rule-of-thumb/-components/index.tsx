@@ -1,4 +1,5 @@
-import { getButtonClasses } from "../../../components/button";
+import { cx } from "@/stylex";
+import { getButtonClasses } from "../../../components/button-styles";
 import { Card } from "../../../components/card";
 import { Tabs } from "@base-ui/react/tabs";
 import { Menu } from "@base-ui/react/menu";
@@ -28,14 +29,20 @@ type GuidelineHeroProps = {
   markdownUrl?: string;
 };
 
+async function readMarkdown(markdownUrl: string) {
+  const response = await fetch(markdownUrl);
+  if (!response.ok) return null;
+  return response.text();
+}
+
 export function RuleOfThumbHero({ title, description, badge, markdownUrl }: GuidelineHeroProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     if (!markdownUrl) return;
     try {
-      const res = await fetch(markdownUrl);
-      const text = await res.text();
+      const text = await readMarkdown(markdownUrl);
+      if (text === null) return;
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -47,8 +54,8 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
   async function handleDownload() {
     if (!markdownUrl) return;
     try {
-      const res = await fetch(markdownUrl);
-      const text = await res.text();
+      const text = await readMarkdown(markdownUrl);
+      if (text === null) return;
       const blob = new Blob([text], { type: "text/markdown" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -64,27 +71,27 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
   }
 
   return (
-    <div className="text-center mb-16">
+    <div className={cx("text-center mb-16")}>
       {badge && (
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-500/10 backdrop-blur-md border border-border text-foreground text-sm font-medium">
+        <div className={cx("flex justify-center mb-6")}>
+          <div className={cx("inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-500/10 backdrop-blur-md border border-border text-foreground text-sm font-medium")}>
             {badge.icon && <badge.icon size={16} />}
             {badge.text}
           </div>
         </div>
       )}
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6">
+      <h1 className={cx("text-4xl sm:text-5xl font-bold text-foreground tracking-tight mb-6")}>
         {title}
       </h1>
 
-      <div className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8">
+      <div className={cx("text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8")}>
         {description}
       </div>
 
       {markdownUrl && (
-        <div className="flex items-center justify-center relative">
-          <div className="inline-flex rounded-md shadow-sm">
+        <div className={cx("flex items-center justify-center relative")}>
+          <div className={cx("inline-flex rounded-md shadow-sm")}>
             <a
               href={markdownUrl}
               target="_blank"
@@ -94,7 +101,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
                 variant: "neutral",
               })}
             >
-              <MarkdownLogoIcon size={16} className="mr-2" />
+              <MarkdownLogoIcon size={16} className={cx("mr-2")} />
               View Markdown
             </a>
             <Menu.Root>
@@ -109,7 +116,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
                 <CaretDownIcon size={16} />
               </Menu.Trigger>
               <Menu.Portal>
-                <Menu.Positioner side="bottom" align="end" sideOffset={8} className="z-50">
+                <Menu.Positioner side="bottom" align="end" sideOffset={8} className={cx("z-50")}>
                   <Menu.Popup
                     className={cn(
                       "w-fit rounded-xl border border-border bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl p-1 shadow-lg z-50 flex flex-col outline-none origin-top",
@@ -120,7 +127,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
                   >
                     <Menu.Item
                       onClick={handleDownload}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors cursor-pointer outline-none select-none hover:bg-accent data-highlighted:bg-card"
+                      className={cx("flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors cursor-pointer outline-none select-none hover:bg-accent data-highlighted:bg-card")}
                     >
                       <DownloadSimpleIcon size={16} />
                       Download Markdown
@@ -128,7 +135,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
                     <Menu.Item
                       onClick={handleCopy}
                       closeOnClick={false}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors cursor-pointer outline-none select-none hover:bg-accent data-highlighted:bg-card"
+                      className={cx("flex items-center gap-2 px-3 py-2 text-sm font-medium text-foreground rounded-lg transition-colors cursor-pointer outline-none select-none hover:bg-accent data-highlighted:bg-card")}
                     >
                       {copied ? (
                         <CheckIcon size={16} weight="regular" />
@@ -159,9 +166,9 @@ type SectionHeadingProps = {
 
 export function SectionHeading({ title, description }: SectionHeadingProps) {
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-foreground mb-4">{title}</h2>
-      <p className="text-muted-foreground">{description}</p>
+    <div className={cx("mb-8")}>
+      <h2 className={cx("text-2xl font-bold text-foreground mb-4")}>{title}</h2>
+      <p className={cx("text-muted-foreground")}>{description}</p>
     </div>
   );
 }
@@ -178,11 +185,11 @@ type BestPracticeProps = {
 
 export function BestPractice({ emoji, title, description }: BestPracticeProps) {
   return (
-    <Card className="flex items-start gap-4 p-4">
-      <span className="text-2xl mt-1">{emoji}</span>
+    <Card className={cx("flex items-start gap-4 p-4")}>
+      <span className={cx("text-2xl mt-1")}>{emoji}</span>
       <div>
-        <h4 className="font-medium text-foreground mb-1">{title}</h4>
-        <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+        <h4 className={cx("font-medium text-foreground mb-1")}>{title}</h4>
+        <p className={cx("text-sm text-muted-foreground leading-relaxed")}>{description}</p>
       </div>
     </Card>
   );
@@ -210,39 +217,39 @@ export function CodeComparison({
   goodReason,
 }: CodeComparisonProps) {
   return (
-    <div className="flex flex-col items-center lg:grid lg:grid-cols-2 gap-4">
+    <div className={cx("flex flex-col items-center lg:grid lg:grid-cols-2 gap-4")}>
       {/* Don't / Bad */}
       <Card
-        className="border-negative/30 bg-card/30 hover:border-negative/30 overflow-hidden"
+        className={cx("border-negative/30 bg-card/30 hover:border-negative/30 overflow-hidden")}
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-negative/30 bg-negative/10 flex items-center gap-2">
-          <XIcon size={16} className="text-negative-foreground" />
-          <span className="font-medium text-negative-foreground">{badTitle}</span>
+        <div className={cx("px-4 py-3 border-b border-negative/30 bg-negative/10 flex items-center gap-2")}>
+          <XIcon size={16} className={cx("text-negative-foreground")} />
+          <span className={cx("font-medium text-negative-foreground")}>{badTitle}</span>
         </div>
-        <div className="p-4 overflow-x-auto">
+        <div className={cx("p-4 overflow-x-auto")}>
           <CodeBlock code={badCode} />
         </div>
-        <div className="px-4 py-3 border-t border-negative/30 bg-negative/10 text-sm text-negative-foreground flex items-start gap-2">
-          <XIcon size={14} className="shrink-0 mt-1" />
+        <div className={cx("px-4 py-3 border-t border-negative/30 bg-negative/10 text-sm text-negative-foreground flex items-start gap-2")}>
+          <XIcon size={14} className={cx("shrink-0 mt-1")} />
           <span>{badReason}</span>
         </div>
       </Card>
 
       {/* Do / Good */}
       <Card
-        className="border-positive/30 bg-card/30 hover:border-positive/30 overflow-hidden"
+        className={cx("border-positive/30 bg-card/30 hover:border-positive/30 overflow-hidden")}
         hoverEffect={false}
       >
-        <div className="px-4 py-3 border-b border-positive/30 bg-positive/10 flex items-center gap-2">
-          <CheckIcon size={16} className="text-positive-foreground" />
-          <span className="font-medium text-positive-foreground">{goodTitle}</span>
+        <div className={cx("px-4 py-3 border-b border-positive/30 bg-positive/10 flex items-center gap-2")}>
+          <CheckIcon size={16} className={cx("text-positive-foreground")} />
+          <span className={cx("font-medium text-positive-foreground")}>{goodTitle}</span>
         </div>
-        <div className="p-4 overflow-x-auto">
+        <div className={cx("p-4 overflow-x-auto")}>
           <CodeBlock code={goodCode} />
         </div>
-        <div className="px-4 py-3 border-t border-positive/30 bg-positive/10 text-sm text-positive-foreground flex items-start gap-2">
-          <CheckIcon size={14} className="shrink-0 mt-0.5" />
+        <div className={cx("px-4 py-3 border-t border-positive/30 bg-positive/10 text-sm text-positive-foreground flex items-start gap-2")}>
+          <CheckIcon size={14} className={cx("shrink-0 mt-0.5")} />
           <span>{goodReason}</span>
         </div>
       </Card>
@@ -262,15 +269,15 @@ type CodeExampleProps = {
 
 export function CodeExample({ title, code, description }: CodeExampleProps) {
   return (
-    <Card className="overflow-hidden">
-      <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-        <span className="font-medium text-foreground">{title}</span>
+    <Card className={cx("overflow-hidden")}>
+      <div className={cx("px-4 py-3 border-b border-border flex items-center gap-2")}>
+        <span className={cx("font-medium text-foreground")}>{title}</span>
       </div>
-      <div className="p-4 overflow-x-auto">
+      <div className={cx("p-4 overflow-x-auto")}>
         <CodeBlock code={code} />
       </div>
       {description && (
-        <div className="px-4 py-3 border-t border-border bg-background text-sm text-muted-foreground">
+        <div className={cx("px-4 py-3 border-t border-border bg-background text-sm text-muted-foreground")}>
           {description}
         </div>
       )}
@@ -295,16 +302,16 @@ type TabbedCodeExampleProps = {
 
 export function TabbedCodeExample({ title, tabs, description }: TabbedCodeExampleProps) {
   return (
-    <Card className="overflow-hidden">
+    <Card className={cx("overflow-hidden")}>
       <Tabs.Root defaultValue={tabs[0]?.label}>
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-4">
-          <span className="font-medium text-foreground">{title}</span>
-          <Tabs.List className="flex gap-1 bg-background rounded-lg p-1">
+        <div className={cx("px-4 py-3 border-b border-border flex items-center justify-between gap-4")}>
+          <span className={cx("font-medium text-foreground")}>{title}</span>
+          <Tabs.List className={cx("flex gap-1 bg-background rounded-lg p-1")}>
             {tabs.map((tab) => (
               <Tabs.Tab
                 key={tab.label}
                 value={tab.label}
-                className="px-3 py-1.5 text-xs font-medium rounded-md transition-all text-muted-foreground hover:text-foreground hover:bg-accent data-selected:bg-zinc-500/10 data-selected:text-foreground"
+                className={cx("px-3 py-1.5 text-xs font-medium rounded-md transition-all text-muted-foreground hover:text-foreground hover:bg-accent data-selected:bg-zinc-500/10 data-selected:text-foreground")}
               >
                 {tab.label}
               </Tabs.Tab>
@@ -312,11 +319,11 @@ export function TabbedCodeExample({ title, tabs, description }: TabbedCodeExampl
           </Tabs.List>
         </div>
         {tabs.map((tab) => (
-          <Tabs.Panel key={tab.label} value={tab.label} className="p-4 overflow-x-auto">
+          <Tabs.Panel key={tab.label} value={tab.label} className={cx("p-4 overflow-x-auto")}>
             <CodeBlock code={tab.code} />
           </Tabs.Panel>
         ))}
-        <div className="px-4 py-3 border-t border-border bg-background text-sm text-muted-foreground">
+        <div className={cx("px-4 py-3 border-t border-border bg-background text-sm text-muted-foreground")}>
           {description}
         </div>
       </Tabs.Root>
@@ -339,23 +346,23 @@ type QuickRefTableProps = {
 
 export function QuickRefTable({ items }: QuickRefTableProps) {
   return (
-    <div className="relative">
+    <div className={cx("relative")}>
       {items.map((item, i) => (
-        <div key={i} className="flex gap-4 group">
+        <div key={`${item.scenario}:${item.action}`} className={cx("flex gap-4 group")}>
           {/* Timeline column */}
-          <div className="flex flex-col items-center shrink-0">
-            <div className="size-7 rounded-full bg-zinc-500/10 dark:bg-zinc-500/20 border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover:border-foreground/30 group-hover:text-foreground transition-colors">
+          <div className={cx("flex flex-col items-center shrink-0")}>
+            <div className={cx("size-7 rounded-full bg-zinc-500/10 dark:bg-zinc-500/20 border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover:border-foreground/30 group-hover:text-foreground transition-colors")}>
               {i + 1}
             </div>
             {i < items.length - 1 && (
-              <div className="w-px flex-1 border-l border-dashed border-border" />
+              <div className={cx("w-px flex-1 border-l border-dashed border-border")} />
             )}
           </div>
           {/* Content */}
-          <div className="pb-6 pt-0.5">
-            <p className="text-sm">
-              <span className="font-medium text-foreground">{item.scenario}</span>
-              <span className="text-muted-foreground"> → {item.action}</span>
+          <div className={cx("pb-6 pt-0.5")}>
+            <p className={cx("text-sm")}>
+              <span className={cx("font-medium text-foreground")}>{item.scenario}</span>
+              <span className={cx("text-muted-foreground")}> → {item.action}</span>
             </p>
           </div>
         </div>
@@ -376,15 +383,15 @@ type QuickRefCardProps = {
 
 export function QuickRefCard({ emoji, title, action }: QuickRefCardProps) {
   return (
-    <Card className="flex items-center gap-4 p-4">
-      <div className="text-2xl shrink-0">{emoji}</div>
-      <p className="text-sm sm:text-base">
-        <span className="font-medium text-foreground">{title}</span>
-        <span className="text-muted-foreground"> → </span>
-        <span className="text-muted-foreground">{action}</span>
+    <Card className={cx("flex items-center gap-4 p-4")}>
+      <div className={cx("text-2xl shrink-0")}>{emoji}</div>
+      <p className={cx("text-sm sm:text-base")}>
+        <span className={cx("font-medium text-foreground")}>{title}</span>
+        <span className={cx("text-muted-foreground")}> → </span>
+        <span className={cx("text-muted-foreground")}>{action}</span>
       </p>
     </Card>
   );
 }
 
-export * from "./button-variant-matrix";
+export { ButtonVariantMatrix } from "./button-variant-matrix";

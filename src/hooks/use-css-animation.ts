@@ -1,10 +1,31 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type AnimationStatus = "idle" | "playing" | "paused" | "finished";
 
 type UseCssAnimationConfig = {
   duration: number;
   masterAnimationName: string;
+};
+
+function setAnimationTime(container: HTMLDivElement | null, timeMs: number) {
+  if (!container) return;
+  for (const animation of container.getAnimations({ subtree: true })) {
+    animation.currentTime = timeMs;
+  }
+}
+
+function pauseAnimations(container: HTMLDivElement | null) {
+  if (!container) return;
+  for (const animation of container.getAnimations({ subtree: true })) {
+    animation.pause();
+  }
+}
+
+function playAnimations(container: HTMLDivElement | null) {
+  if (!container) return;
+  for (const animation of container.getAnimations({ subtree: true })) {
+    animation.play();
+  }
 }
 
 export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimationConfig) {
@@ -12,48 +33,28 @@ export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimati
   const [progress, setProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const setAnimationTime = useCallback((timeMs: number) => {
-    if (!containerRef.current) return;
-    const anims = containerRef.current.getAnimations({ subtree: true });
-    anims.forEach((anim) => {
-      anim.currentTime = timeMs;
-    });
-  }, []);
-
-  const pauseAnimations = useCallback(() => {
-    if (!containerRef.current) return;
-    const anims = containerRef.current.getAnimations({ subtree: true });
-    anims.forEach((anim) => anim.pause());
-  }, []);
-
-  const playAnimations = useCallback(() => {
-    if (!containerRef.current) return;
-    const anims = containerRef.current.getAnimations({ subtree: true });
-    anims.forEach((anim) => anim.play());
-  }, []);
-
   useEffect(() => {
     if (status === "playing") {
-      playAnimations();
+      playAnimations(containerRef.current);
     } else {
-      pauseAnimations();
+      pauseAnimations(containerRef.current);
     }
-  }, [status, playAnimations, pauseAnimations]);
+  }, [status]);
 
   useEffect(() => {
-    let frameId: number;
+    let frameId = 0;
     const loop = () => {
-      if (status === "playing" && containerRef.current) {
-        const anims = containerRef.current.getAnimations({ subtree: true });
-        const master = anims.find((a) => {
-          // CSSAnimation has animationName property
-          return (a as CSSAnimation).animationName === masterAnimationName;
-        });
+      const container = containerRef.current;
+      if (status === "playing" && container) {
+        const animations = container.getAnimations({ subtree: true });
+        const master = animations.find(
+          (animation) => (animation as CSSAnimation).animationName === masterAnimationName,
+        );
 
         if (master) {
-          const t = (master.currentTime as number) || 0;
-          setProgress((t / duration) * 100);
-          if (t >= duration) {
+          const currentTime = (master.currentTime as number) || 0;
+          setProgress((currentTime / duration) * 100);
+          if (currentTime >= duration) {
             setStatus("finished");
             setProgress(100);
           }
@@ -61,21 +62,22 @@ export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimati
       }
       frameId = requestAnimationFrame(loop);
     };
+
     loop();
     return () => cancelAnimationFrame(frameId);
   }, [status, duration, masterAnimationName]);
 
-  const handleSeek = (val: number) => {
-    setProgress(val);
+  const handleSeek = (value: number) => {
+    setProgress(value);
     if (status !== "paused") {
       setStatus("paused");
     }
-    setAnimationTime((val / 100) * duration);
+    setAnimationTime(containerRef.current, (value / 100) * duration);
   };
 
   const restart = () => {
     setProgress(0);
-    setAnimationTime(0);
+    setAnimationTime(containerRef.current, 0);
     setStatus("playing");
   };
 

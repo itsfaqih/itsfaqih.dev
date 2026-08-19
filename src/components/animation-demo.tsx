@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo } from "react";
+import { cx } from "@/stylex";
+import { createContext, useContext } from "react";
 import { useCssAnimation } from "../hooks/use-css-animation";
 import { cn } from "@/cn";
 import { Button } from "./button";
@@ -6,7 +7,7 @@ import { Card } from "./card";
 import { PlayIcon, PauseIcon, ArrowCounterClockwiseIcon } from "@phosphor-icons/react";
 import { Cursor } from "./cursor";
 
-export const ANIMATION_STYLE_DEFAULTS = {
+const ANIMATION_STYLE_DEFAULTS = {
   animationIterationCount: "1",
   animationFillMode: "forwards",
   animationPlayState: "paused",
@@ -37,13 +38,10 @@ export function AnimationDemo({
 }) {
   const animationData = useCssAnimation({ duration, masterAnimationName });
 
-  const animationStyle = useMemo(
-    () => ({
-      animationDuration: `${duration}ms`,
-      ...ANIMATION_STYLE_DEFAULTS,
-    }),
-    [duration],
-  );
+  const animationStyle = {
+    animationDuration: `${duration}ms`,
+    ...ANIMATION_STYLE_DEFAULTS,
+  };
 
   return (
     <AnimationDemoContext.Provider value={{ ...animationData, animationStyle }}>
@@ -70,7 +68,7 @@ export function AnimationStage({
         className,
       )}
     >
-      <div ref={containerRef} className="absolute inset-0 w-full h-full pointer-events-none">
+      <div ref={containerRef} className={cx("absolute inset-0 w-full h-full pointer-events-none")}>
         {children}
       </div>
 
@@ -79,9 +77,9 @@ export function AnimationStage({
           onClick={restart}
           icon={
             status === "finished" ? (
-              <ArrowCounterClockwiseIcon size={24} className="text-foreground" />
+              <ArrowCounterClockwiseIcon size={24} className={cx("text-foreground")} />
             ) : (
-              <PlayIcon size={24} className="fill-foreground text-foreground" />
+              <PlayIcon size={24} className={cx("fill-foreground text-foreground")} />
             )
           }
           label={status === "finished" ? "Replay" : "Watch Demo"}
@@ -91,7 +89,7 @@ export function AnimationStage({
   );
 }
 
-export function DemoOverlay({
+function DemoOverlay({
   onClick,
   icon,
   label,
@@ -105,17 +103,17 @@ export function DemoOverlay({
   textClass?: string;
 }) {
   return (
-    <div className="absolute inset-0 z-60 flex items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-500 pointer-events-auto">
+    <div className={cx("absolute inset-0 z-60 flex items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-500 pointer-events-auto")}>
       <button
         onClick={onClick}
-        className="flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-background/50 p-4 rounded-2xl backdrop-blur-sm"
+        className={cx("flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-background/50 p-4 rounded-2xl backdrop-blur-sm")}
       >
         <div
-          className={`size-14 flex items-center justify-center rounded-full border backdrop-blur-md transition-colors ${circleClass}`}
+          className={cx(`size-14 flex items-center justify-center rounded-full border backdrop-blur-md transition-colors ${circleClass}`)}
         >
           {icon}
         </div>
-        <span className={`text-sm font-medium ${textClass}`}>{label}</span>
+        <span className={cx(`text-sm font-medium ${textClass}`)}>{label}</span>
       </button>
     </div>
   );
@@ -125,7 +123,7 @@ function AnimationSlider(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       type="range"
-      className="flex-1 h-1.5 bg-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125"
+      className={cx("flex-1 h-1.5 bg-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125")}
       {...props}
     />
   );
@@ -144,9 +142,9 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
   };
 
   return (
-    <div className="border-t border-border p-6 pointer-events-auto">
-      <div className="flex items-center justify-between mb-4">
-        <span className="font-semibold text-foreground">{title}</span>
+    <div className={cx("border-t border-border p-6 pointer-events-auto")}>
+      <div className={cx("flex items-center justify-between mb-4")}>
+        <span className={cx("font-semibold text-foreground")}>{title}</span>
         <Button onClick={togglePlay}>
           {status === "playing" ? (
             <>
@@ -163,7 +161,7 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
           )}
         </Button>
       </div>
-      <div className="flex items-center gap-3 mb-2">
+      <div className={cx("flex items-center gap-3 mb-2")}>
         <AnimationSlider min="0" max="100" value={progress} onChange={onSeek} />
       </div>
       {children}
@@ -200,7 +198,7 @@ export function AnimatedCursor({
       <Cursor />
       {/* Ripple */}
       <div
-        className="absolute top-0 left-0 size-8 rounded-full bg-foreground/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        className={cx("absolute top-0 left-0 size-8 rounded-full bg-foreground/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none")}
         style={{
           ...animationStyle,
           animationName: rippleAnimationName,
