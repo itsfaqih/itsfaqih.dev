@@ -25,6 +25,22 @@ This project uses [Vitest](https://vitest.dev/) for testing. You can run the tes
 bun run test
 ```
 
+## Storybook
+
+Storybook is configured for the TanStack React/Vite stack and uses the same global theme and StyleX fallback styles as the website. Start the component workbench with:
+
+```bash
+bun run storybook
+```
+
+Build the static Storybook bundle with:
+
+```bash
+bun run build-storybook
+```
+
+Stories live in `src/stories` and intentionally use an explicit `*.stories.tsx` glob so the website's route MDX content stays on the TanStack Start pipeline.
+
 ## Styling
 
 This project uses [StyleX](https://stylexjs.com/) for extracted component styling. A small global stylesheet remains for theme tokens, typography, animations, and selectors that cannot be represented as atomic StyleX rules.

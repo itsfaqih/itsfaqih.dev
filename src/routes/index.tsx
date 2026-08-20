@@ -145,7 +145,8 @@ export const Route = createFileRoute("/")({
           subtitle: "Vestis Labs",
           date: "Sep 2023 — Sep 2024",
           description: [
-            "Joined as a Frontend Engineer and expanded responsibilities into full-stack engineering as project needs grew.",
+            "Overhauled the website's UI design to improve consistency and clarity.",
+            "Designed the data model for the digital ID website and its drag-and-drop builder.",
             "Reduced API calls and improved page load times by implementing in-memory caching with React Query and HTTP caching.",
             "Simplified more than 80% of the code structure by co-locating related code and removing unnecessary abstractions.",
             "Improved image annotator performance and UX by moving rendering from React to direct DOM manipulation and adding mobile compatibility.",
@@ -160,7 +161,7 @@ export const Route = createFileRoute("/")({
           description: [
             "Joined as a Web Designer and grew into a Full Stack Engineer role by taking on broader product and engineering responsibilities.",
             "Eliminated potential server-side chatbot costs by building a client-side chatbot from scratch with XState to simulate a WhatsApp-style experience.",
-            "Built a drag-and-drop chatbot flow builder using React Flow, Tailwind CSS, and AdonisJS for creating and managing conversational flows.",
+            "Designed the entire UI and built the chatbot flow builder from scratch through deployment using React Flow, Tailwind CSS, and AdonisJS.",
             "Led a team of 4 developers to deliver one of the company's main products.",
             "Recognized as one of the top performers in Q4 2022 among hundreds of colleagues.",
           ],
@@ -280,7 +281,7 @@ function Index() {
     Route.useLoaderData();
 
   return (
-    <PageContainer>
+    <PageContainer className="home-page-container">
       {/* Name/Title */}
       <section className={cx("mb-16")}>
         <h1 className={cx("text-5xl font-bold text-foreground tracking-tight mb-4")}>

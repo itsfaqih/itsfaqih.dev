@@ -313,6 +313,9 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
   background-size: var(--cell-size) var(--cell-size);
+  /* Fade the walls out before they meet the floor plane. */
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 90%);
+  mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 90%);
 }
 
 .grid-background-left {
@@ -424,4 +427,50 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
   50%, 100% {
     opacity: 0;
   }
+}
+
+/* Home page main content background */
+.home-page-container {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-page-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.00) 0%,
+    rgba(255, 255, 255, 1.00) 25%,
+    rgba(255, 255, 255, 1.00) 75%,
+    rgba(255, 255, 255, 0.00) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 85%,
+    transparent 100%
+  );
+  opacity: 0.90;
+}
+
+.dark .home-page-container::before {
+  background: linear-gradient(
+    90deg,
+    rgba(9, 9, 11, 0.00) 0%,
+    rgba(9, 9, 11, 1.00) 25%,
+    rgba(9, 9, 11, 1.00) 75%,
+    rgba(9, 9, 11, 0.00) 100%
+  );
 }
