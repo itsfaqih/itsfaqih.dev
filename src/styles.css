@@ -10,6 +10,16 @@
   --animate-ripple: ripple 0.6s ease-out forwards;
 }
 
+.header-spacer {
+  height: 73px;
+}
+
+@media (max-width: 639px) {
+  .header-spacer {
+    height: 48px !important;
+  }
+}
+
 .desktop-navigation {
   display: block !important;
 }

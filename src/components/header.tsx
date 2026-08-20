@@ -200,7 +200,7 @@ export function Header() {
       </Drawer.Root>
 
       {/* Spacer */}
-      <div className={cx("h-[73px]")} />
+      <div className={cx("header-spacer")} />
     </>
   );
 }
