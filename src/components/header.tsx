@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { cx } from "@/stylex";
+import { Drawer } from "@base-ui/react/drawer";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   HouseIcon,
@@ -8,6 +10,7 @@ import {
   LinkedinLogoIcon,
   EnvelopeIcon,
   ArrowLeftIcon,
+  ListIcon,
 } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
 import { CommandPaletteTrigger } from "./command-palette";
@@ -19,6 +22,9 @@ import { CommandPaletteTrigger } from "./command-palette";
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const closeMenu = () => setIsMenuOpen(false);
 
   const isRuleOfThumbRoot =
     location.pathname === "/rule-of-thumb" || location.pathname === "/rule-of-thumb/";
@@ -29,7 +35,7 @@ export function Header() {
 
   return (
     <>
-      <header className={cx("fixed top-4 left-1/2 -translate-x-1/2 z-50")}>
+      <header className={cx("desktop-navigation fixed top-4 left-1/2 -translate-x-1/2 z-50")}>
         <div className={cx("relative")}>
           {showBackButton && (
             <Link
@@ -107,6 +113,91 @@ export function Header() {
           </div>
         </div>
       </header>
+
+      {showBackButton && (
+        <Link
+          to={backPath}
+          className={cx("mobile-menu-back-button sm:hidden flex items-center justify-center bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+          aria-label="Go Back"
+        >
+          <ArrowLeftIcon size={18} />
+        </Link>
+      )}
+
+      <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen} swipeDirection="down">
+        <Drawer.Trigger
+          className={cx("mobile-menu-trigger sm:hidden flex items-center justify-center bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+          aria-label="Open menu"
+        >
+          <ListIcon size={22} />
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Backdrop className={cx("mobile-menu-backdrop fixed inset-0 z-[60]")} />
+          <Drawer.Viewport className={cx("mobile-menu-viewport fixed inset-0 z-[60] flex items-end justify-center pointer-events-none")}>
+            <Drawer.Popup
+              className={cx("mobile-menu-popup pointer-events-auto w-full max-h-[80dvh] overflow-y-auto rounded-t-3xl border border-border bg-background/95 backdrop-blur-xl px-5 pt-3 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl outline-none")}
+            >
+              <Drawer.Content className={cx("mobile-menu-content mx-auto w-full max-w-md")}>
+                <div className={cx("mobile-menu-grip mx-auto mb-5 h-1.5 w-12 rounded-full bg-border")} aria-hidden />
+                <Drawer.Title className={cx("mobile-menu-title mb-4 text-lg font-bold text-foreground")}>Menu</Drawer.Title>
+                <nav className={cx("mobile-menu-list flex flex-col gap-1")} aria-label="Mobile navigation">
+                  <Link
+                    to="/"
+                    onClick={closeMenu}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    activeProps={{
+                      className: "mobile-menu-item mobile-menu-item-active",
+                    }}
+                  >
+                    <HouseIcon size={20} />
+                    <span>Home</span>
+                  </Link>
+                  <a
+                    href="https://github.com/itsfaqih"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeMenu}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                  >
+                    <GithubLogoIcon size={20} />
+                    <span>GitHub</span>
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/itsfaqih"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeMenu}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                  >
+                    <LinkedinLogoIcon size={20} />
+                    <span>LinkedIn</span>
+                  </a>
+                  <a
+                    href="mailto:itsfaqih@gmail.com"
+                    onClick={closeMenu}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                  >
+                    <EnvelopeIcon size={20} />
+                    <span>Email</span>
+                  </a>
+                  <div className={cx("mobile-menu-divider my-2 h-px bg-border")} />
+                  <CommandPaletteTrigger showLabel onOpen={closeMenu} className="mobile-menu-item" />
+                  <button
+                    onClick={() => {
+                      toggleTheme();
+                      closeMenu();
+                    }}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                  >
+                    {theme === "dark" ? <SunIcon size={20} /> : <MoonIcon size={20} />}
+                    <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+                  </button>
+                </nav>
+              </Drawer.Content>
+            </Drawer.Popup>
+          </Drawer.Viewport>
+        </Drawer.Portal>
+      </Drawer.Root>
 
       {/* Spacer */}
       <div className={cx("h-[73px]")} />
