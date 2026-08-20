@@ -13,7 +13,22 @@ import {
   ListIcon,
 } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
+import { useLiquidGLTarget } from "../hooks/use-liquid-glass";
 import { CommandPaletteTrigger } from "./command-palette";
+
+const DESKTOP_NAV_LIQUID_OPTIONS = {
+  refraction: 0.018,
+  aberration: 0.003,
+  bevelDepth: 0.125,
+  bevelWidth: 0.2,
+  frost: 0.6,
+  shadow: false,
+  specular: true,
+};
+
+const DESKTOP_BACK_LIQUID_OPTIONS = {
+  tilt: false,
+};
 
 // ============================================================================
 // Header Component
@@ -32,26 +47,38 @@ export function Header() {
 
   const showBackButton = isRuleOfThumbRoot || isRuleOfThumbDetail;
   const backPath = isRuleOfThumbDetail ? "/rule-of-thumb" : "/";
+  const desktopNavRef = useLiquidGLTarget<HTMLDivElement>(true, DESKTOP_NAV_LIQUID_OPTIONS);
+  const desktopBackRef = useLiquidGLTarget<HTMLDivElement>(true, DESKTOP_BACK_LIQUID_OPTIONS);
+  const mobileBackRef = useLiquidGLTarget<HTMLDivElement>();
+  const mobileMenuTriggerRef = useLiquidGLTarget<HTMLDivElement>();
 
   return (
     <>
       <header className={cx("desktop-navigation fixed top-4 left-1/2 -translate-x-1/2 z-50")}>
         <div className={cx("relative")}>
-          {showBackButton && (
+          <div
+            ref={desktopBackRef}
+            className={cx("liquid-gl-target desktop-menu-back-button", !showBackButton && "liquid-gl-hidden")}
+            aria-hidden={!showBackButton}
+          >
             <Link
               to={backPath}
-              className={cx("absolute flex items-center justify-center right-[calc(100%+12px)] top-1/2 -translate-y-1/2 bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full size-13 text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+              className={cx("liquid-gl-content desktop-menu-back-button-content")}
               aria-label="Go Back"
+              tabIndex={showBackButton ? 0 : -1}
             >
               <ArrowLeftIcon size={18} />
             </Link>
-          )}
+          </div>
 
-          <div className={cx("mx-auto bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full px-3 py-2 flex items-center justify-center w-fit transition-all duration-300")}>
-            <nav className={cx("flex items-center gap-1 mx-auto")}>
+          <div
+            ref={desktopNavRef}
+            className={cx("liquid-gl-target desktop-menu-surface mx-auto bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full px-3 py-2 flex items-center justify-center w-fit transition-all duration-300")}
+          >
+            <nav className={cx("liquid-gl-content flex items-center gap-1 mx-auto")}>
               <Link
                 to="/"
-                className={cx("flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+                className={cx("flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200")}
                 activeProps={{
                   className:
                     "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium text-foreground bg-accent",
@@ -69,7 +96,7 @@ export function Header() {
                   href="https://github.com/itsfaqih"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200")}
                   aria-label="GitHub"
                 >
                   <GithubLogoIcon size={18} />
@@ -78,14 +105,14 @@ export function Header() {
                   href="https://www.linkedin.com/in/itsfaqih"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200")}
                   aria-label="LinkedIn"
                 >
                   <LinkedinLogoIcon size={18} />
                 </a>
                 <a
                   href="mailto:itsfaqih@gmail.com"
-                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+                  className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200")}
                   aria-label="Email"
                 >
                   <EnvelopeIcon size={18} />
@@ -104,33 +131,41 @@ export function Header() {
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+                className={cx("p-2 rounded-lg text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200")}
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
               </button>
             </nav>
           </div>
+
         </div>
       </header>
 
-      {showBackButton && (
+      <div
+        ref={mobileBackRef}
+        className={cx("liquid-gl-target mobile-menu-back-button", !showBackButton && "liquid-gl-hidden")}
+        aria-hidden={!showBackButton}
+      >
         <Link
           to={backPath}
-          className={cx("mobile-menu-back-button sm:hidden flex items-center justify-center bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
+          className={cx("liquid-gl-content mobile-menu-glass-content")}
           aria-label="Go Back"
+          tabIndex={showBackButton ? 0 : -1}
         >
           <ArrowLeftIcon size={18} />
         </Link>
-      )}
+      </div>
 
       <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen} swipeDirection="down">
-        <Drawer.Trigger
-          className={cx("mobile-menu-trigger sm:hidden flex items-center justify-center bg-linear-to-b from-white/40 to-white/30 dark:from-gray-500/40 dark:to-gray-500/30 backdrop-blur-xl border border-gray-500/30 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200")}
-          aria-label="Open menu"
-        >
-          <ListIcon size={22} />
-        </Drawer.Trigger>
+        <div ref={mobileMenuTriggerRef} className={cx("liquid-gl-target mobile-menu-trigger")}>
+          <Drawer.Trigger
+            className={cx("liquid-gl-content mobile-menu-glass-content")}
+            aria-label="Open menu"
+          >
+            <ListIcon size={22} />
+          </Drawer.Trigger>
+        </div>
         <Drawer.Portal>
           <Drawer.Backdrop className={cx("mobile-menu-backdrop fixed inset-0 z-[60]")} />
           <Drawer.Viewport className={cx("mobile-menu-viewport fixed inset-0 z-[60] flex items-end justify-center pointer-events-none")}>
@@ -144,7 +179,7 @@ export function Header() {
                   <Link
                     to="/"
                     onClick={closeMenu}
-                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all")}
                     activeProps={{
                       className: "mobile-menu-item mobile-menu-item-active",
                     }}
@@ -157,7 +192,7 @@ export function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={closeMenu}
-                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all")}
                   >
                     <GithubLogoIcon size={20} />
                     <span>GitHub</span>
@@ -167,7 +202,7 @@ export function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={closeMenu}
-                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all")}
                   >
                     <LinkedinLogoIcon size={20} />
                     <span>LinkedIn</span>
@@ -175,7 +210,7 @@ export function Header() {
                   <a
                     href="mailto:itsfaqih@gmail.com"
                     onClick={closeMenu}
-                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all")}
                   >
                     <EnvelopeIcon size={20} />
                     <span>Email</span>
@@ -187,7 +222,7 @@ export function Header() {
                       toggleTheme();
                       closeMenu();
                     }}
-                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:bg-accent hover:text-foreground active:scale-[0.98] transition-all")}
+                    className={cx("mobile-menu-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all")}
                   >
                     {theme === "dark" ? <SunIcon size={20} /> : <MoonIcon size={20} />}
                     <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>

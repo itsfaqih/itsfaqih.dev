@@ -134,7 +134,7 @@ function CeilingFloorGrid({ isFloor }: { isFloor?: boolean }) {
 
 export function GridBackground() {
   return (
-    <div className={cx("absolute inset-0 overflow-hidden pointer-events-none")}>
+    <div className={cx("grid-background-visual absolute inset-0 overflow-hidden pointer-events-none")}>
       {/* Gradient fade overlay for edges */}
       <div
         className={cn(

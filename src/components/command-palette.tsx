@@ -29,7 +29,7 @@ export function CommandPaletteTrigger({ showLabel = false, onOpen, className }: 
     <button
       onClick={handleClick}
       className={cx(
-        "flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent active:scale-95 transition-all duration-200 border border-transparent hover:border-border cursor-pointer",
+        "flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground active:scale-95 transition-all duration-200 border border-transparent hover:border-border cursor-pointer",
         showLabel && "w-full justify-start px-3 py-2.5 text-base",
         className,
       )}

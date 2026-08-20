@@ -1,5 +1,41 @@
 @import "./stylex-fallback.css";
 
+@property --navbar-surface-top {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.60);
+}
+
+@property --navbar-surface-bottom {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.54);
+}
+
+@property --navbar-surface-highlight {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgba(255, 255, 255, 0.52);
+}
+
+@property --navbar-surface-blur {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 2px;
+}
+
+@property --navbar-surface-saturation {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 125%;
+}
+
+@property --navbar-border-strength {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 5%;
+}
+
 :root {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
@@ -8,6 +44,29 @@
 
   --animate-fade-in: fade-in 0.4s ease-out forwards;
   --animate-ripple: ripple 0.6s ease-out forwards;
+
+  --navbar-surface-top: rgba(255, 255, 255, 0.60);
+  --navbar-surface-bottom: rgba(255, 255, 255, 0.54);
+  --navbar-surface-highlight: rgba(255, 255, 255, 0.52);
+  --navbar-surface-blur: 2px;
+  --navbar-surface-saturation: 125%;
+  --navbar-border-strength: 5%;
+  transition:
+    --navbar-surface-top 320ms var(--ease-out),
+    --navbar-surface-bottom 320ms var(--ease-out),
+    --navbar-surface-highlight 320ms var(--ease-out),
+    --navbar-surface-blur 320ms var(--ease-out),
+    --navbar-surface-saturation 320ms var(--ease-out),
+    --navbar-border-strength 320ms var(--ease-out);
+}
+
+.dark {
+  --navbar-surface-top: rgba(12, 12, 18, 0.60);
+  --navbar-surface-bottom: rgba(12, 12, 18, 0.54);
+  --navbar-surface-highlight: rgba(255, 255, 255, 0.14);
+  --navbar-surface-blur: 2px;
+  --navbar-surface-saturation: 125%;
+  --navbar-border-strength: 5%;
 }
 
 .header-spacer {
@@ -32,6 +91,170 @@
 
 .desktop-navigation {
   display: block !important;
+}
+
+.liquid-gl-target {
+  isolation: isolate;
+}
+
+.liquid-gl-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.liquid-gl-target.liquid-gl-hidden {
+  display: none !important;
+}
+
+.liquid-gl-content {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+/*
+ * LiquidGL renders the refraction layer on a separate canvas and makes the
+ * target background transparent. Keep the effect, but add a stable surface
+ * behind the controls so page text cannot compete with the navigation.
+ */
+.desktop-menu-surface {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent) !important;
+  transition: border-color 320ms var(--ease-out);
+}
+
+.desktop-menu-surface::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, var(--navbar-surface-top), var(--navbar-surface-bottom));
+  box-shadow: inset 0 1px 0 var(--navbar-surface-highlight);
+  content: "";
+  pointer-events: none;
+  backdrop-filter: blur(var(--navbar-surface-blur)) saturate(var(--navbar-surface-saturation));
+  -webkit-backdrop-filter: blur(var(--navbar-surface-blur)) saturate(var(--navbar-surface-saturation));
+}
+
+.desktop-menu-surface::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  transition:
+    --navbar-border-strength 320ms var(--ease-out),
+    border-color 320ms var(--ease-out);
+}
+
+.desktop-menu-surface .liquid-gl-content a,
+.desktop-menu-surface .liquid-gl-content button {
+  color: var(--foreground) !important;
+}
+
+.desktop-menu-surface .liquid-gl-content a,
+.desktop-menu-surface .liquid-gl-content button {
+  transition:
+    color 320ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.desktop-navigation .desktop-menu-back-button {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent) !important;
+  transition: border-color 320ms var(--ease-out);
+}
+
+.desktop-navigation .desktop-menu-back-button::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, var(--navbar-surface-top), var(--navbar-surface-bottom));
+  box-shadow: inset 0 1px 0 var(--navbar-surface-highlight);
+  content: "";
+  pointer-events: none;
+  backdrop-filter: blur(var(--navbar-surface-blur)) saturate(var(--navbar-surface-saturation));
+  -webkit-backdrop-filter: blur(var(--navbar-surface-blur)) saturate(var(--navbar-surface-saturation));
+}
+
+.desktop-navigation .desktop-menu-back-button::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  transition:
+    --navbar-border-strength 320ms var(--ease-out),
+    border-color 320ms var(--ease-out);
+}
+
+.desktop-navigation .desktop-menu-back-button-content {
+  color: var(--foreground) !important;
+}
+
+/* Keep navbar hover feedback on the icon instead of adding a color block. */
+.desktop-menu-surface .liquid-gl-content a > svg,
+.desktop-menu-surface .liquid-gl-content button > svg,
+.desktop-menu-back-button-content > svg,
+.mobile-menu-glass-content > svg,
+.mobile-menu-item > svg {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 200ms var(--ease-out);
+}
+
+.desktop-menu-surface .liquid-gl-content a:hover > svg,
+.desktop-menu-surface .liquid-gl-content button:hover > svg,
+.desktop-menu-back-button-content:hover > svg,
+.mobile-menu-glass-content:hover > svg,
+.mobile-menu-item:hover > svg {
+  transform: scale(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-menu-surface .liquid-gl-content a > svg,
+  .desktop-menu-surface .liquid-gl-content button > svg,
+  .desktop-menu-back-button-content > svg,
+  .mobile-menu-glass-content > svg,
+  .mobile-menu-item > svg {
+    transition: none;
+  }
+
+  .desktop-menu-surface .liquid-gl-content a:hover > svg,
+  .desktop-menu-surface .liquid-gl-content button:hover > svg,
+  .desktop-menu-back-button-content:hover > svg,
+  .mobile-menu-glass-content:hover > svg,
+  .mobile-menu-item:hover > svg {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  .desktop-menu-surface,
+  .desktop-menu-surface::before,
+  .desktop-menu-surface::after,
+  .desktop-menu-surface .liquid-gl-content a,
+  .desktop-menu-surface .liquid-gl-content button,
+  .desktop-navigation .desktop-menu-back-button,
+  .desktop-navigation .desktop-menu-back-button::before,
+  .desktop-navigation .desktop-menu-back-button::after,
+  .desktop-navigation .desktop-menu-back-button-content {
+    transition: none;
+  }
+}
+
+.grid-background-visual {
+  z-index: 1;
 }
 
 @media (max-width: 639px) {
@@ -61,23 +284,72 @@
     transform 200ms var(--ease-out);
 }
 
+.desktop-menu-back-button {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 12px);
+  display: flex;
+  width: 3.25rem;
+  height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.4), rgb(255 255 255 / 0.3));
+  color: var(--muted-foreground);
+  transform: translateY(-50%);
+}
+
+.desktop-menu-back-button-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.desktop-menu-back-button-content:hover,
+.mobile-menu-glass-content:hover {
+  color: var(--foreground);
+}
+
+.desktop-menu-back-button-content:active,
+.mobile-menu-glass-content:active {
+  transform: scale(0.95);
+}
+
+.mobile-menu-glass-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
 .mobile-menu-back-button {
   left: 1rem;
 }
 
 .mobile-menu-trigger {
   right: 1rem;
-}
-
-.mobile-menu-back-button:hover,
-.mobile-menu-trigger:hover {
-  background-color: var(--accent);
-  color: var(--foreground);
-}
-
-.mobile-menu-back-button:active,
-.mobile-menu-trigger:active {
-  transform: scale(0.95);
 }
 
 @media (min-width: 640px) {
@@ -186,7 +458,6 @@
   cursor: pointer;
 }
 
-.mobile-menu-item:hover,
 .mobile-menu-item-active {
   background-color: var(--accent);
   color: var(--foreground);
@@ -207,6 +478,11 @@
 
   .mobile-menu-back-button,
   .mobile-menu-trigger {
+    transition: none;
+  }
+
+  .desktop-menu-back-button-content,
+  .mobile-menu-glass-content {
     transition: none;
   }
 }

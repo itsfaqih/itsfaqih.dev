@@ -14,6 +14,7 @@
         "@tanstack/react-router-devtools": "^1.167.1",
         "@tanstack/react-start": "^1.168.47",
         "@types/mdx": "^2.0.14",
+        "liquid-gl": "^2.0.1",
         "nitro": "^3.0.260610-beta",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
@@ -1014,6 +1015,8 @@
     "lightningcss-win32-arm64-msvc": ["lightningcss-win32-arm64-msvc@1.33.0", "", { "os": "win32", "cpu": "arm64" }, "sha512-1K+MPfLSFVpphzpdbfkhlWk6wBrTObBzS2T6db10PNOZgR9GoVsAWzwNyuhUYYbTp23j+4RrncfujZ4uAzXvwA=="],
 
     "lightningcss-win32-x64-msvc": ["lightningcss-win32-x64-msvc@1.33.0", "", { "os": "win32", "cpu": "x64" }, "sha512-OlEICDx/Xl0FqSp4bry8zFnCvGpig3Gl4gCquvYwHuqJKEC1+n9NgDniFvqHGmMv1ZkqDJrDqKKSykTDX+ehuA=="],
+
+    "liquid-gl": ["liquid-gl@2.0.1", "", {}, "sha512-4HTE7uwAeTlT3VZe6gUSHrGpfIb8SivqQAG9TAel9HJp776rqHbEpgviFoaGsgf1KAsrIkQ/uyOuVxqixOWMZg=="],
 
     "longest-streak": ["longest-streak@3.1.0", "", {}, "sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g=="],
 
