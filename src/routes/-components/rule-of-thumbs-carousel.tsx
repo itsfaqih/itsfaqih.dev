@@ -131,7 +131,7 @@ export function RuleOfThumbsCarousel() {
 
         {/* Left fade gradient */}
         <div
-          className={cx("absolute inset-y-0 left-0 w-32 pointer-events-none z-10")}
+          className={cx("absolute inset-y-0 left-0 w-16 pointer-events-none z-10")}
           style={{
             background: "linear-gradient(to right, var(--background), transparent)",
           }}
@@ -139,7 +139,7 @@ export function RuleOfThumbsCarousel() {
 
         {/* Right fade gradient */}
         <div
-          className={cx("absolute inset-y-0 right-0 w-32 pointer-events-none z-10")}
+          className={cx("absolute inset-y-0 right-0 w-16 pointer-events-none z-10")}
           style={{
             background: "linear-gradient(to left, var(--background), transparent)",
           }}
