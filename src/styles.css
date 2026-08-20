@@ -89,6 +89,12 @@
   }
 }
 
+@media (min-width: 640px) {
+  .home-page-container {
+    padding-top: 27px !important;
+  }
+}
+
 .desktop-navigation {
   display: block !important;
 }

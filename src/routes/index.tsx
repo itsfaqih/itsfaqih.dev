@@ -283,11 +283,11 @@ function Index() {
   return (
     <PageContainer className="home-page-container">
       {/* Name/Title */}
-      <section className={cx("mb-16")}>
+      <section className={cx("mb-4")}>
         <h1 className={cx("text-5xl font-bold text-foreground tracking-tight mb-4")}>
           Faqih Muntashir
         </h1>
-        <p className={cx("text-xl text-muted-foreground mb-6")}>Full Stack Engineer</p>
+        <p className={cx("text-xl text-muted-foreground mb-4")}>Full Stack Engineer</p>
       </section>
 
       {/* About */}
