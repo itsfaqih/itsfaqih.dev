@@ -35,6 +35,19 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0a0a0f" },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicons/favicon-black-white.svg" },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicons/favicon-transparent-black.svg",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/favicons/favicon-transparent-white.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
       { rel: "stylesheet", href: appCss },
       ...(process.env.NODE_ENV === "development"
         ? [{ rel: "stylesheet", href: "/virtual:stylex.css" }]
