@@ -38,7 +38,10 @@ const config = defineConfig({
     }),
     devtools(),
     nitro(),
-    stylex.vite({ devMode: "css-only" }),
+    stylex.vite({
+      devMode: "css-only",
+      cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
+    }),
     tanstackStart(),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
