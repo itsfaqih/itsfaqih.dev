@@ -16,7 +16,17 @@
 
 @media (max-width: 639px) {
   .header-spacer {
-    height: 48px !important;
+    height: 24px !important;
+  }
+}
+
+.page-container {
+  padding-top: 96px !important;
+}
+
+@media (max-width: 639px) {
+  .page-container {
+    padding-top: 0 !important;
   }
 }
 
