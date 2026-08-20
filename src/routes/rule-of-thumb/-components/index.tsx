@@ -217,7 +217,7 @@ export function CodeComparison({
   goodReason,
 }: CodeComparisonProps) {
   return (
-    <div className={cx("flex flex-col items-center lg:grid lg:grid-cols-2 gap-4")}>
+    <div className={cx("flex flex-col items-stretch lg:grid lg:grid-cols-2 gap-4")}>
       {/* Don't / Bad */}
       <Card
         className={cx("border-negative/30 bg-card/30 hover:border-negative/30 overflow-hidden")}
