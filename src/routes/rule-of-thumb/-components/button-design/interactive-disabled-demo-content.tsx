@@ -38,7 +38,7 @@ export function InteractiveDisabledDemoContent() {
         <div className={cx("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2")}>
           <Button
             disabled
-            className={cx("w-24 opacity-60 cursor-not-allowed bg-none bg-zinc-200/50 dark:bg-zinc-800/50 backdrop-blur-none shadow-none border-black/5 dark:border-white/5")}
+            className={cx("w-24 cursor-not-allowed bg-none bg-muted backdrop-blur-none shadow-none border-border")}
           >
             Submit
           </Button>
@@ -76,7 +76,7 @@ export function InteractiveDisabledDemoContent() {
               opacity: 0,
             }}
           >
-            <ProhibitIcon className={cx("text-red-500")} size={24} />
+            <ProhibitIcon className={cx("text-negative-foreground")} size={24} />
           </div>
         </div>
       </AnimationStage>

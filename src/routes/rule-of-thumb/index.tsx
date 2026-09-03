@@ -55,7 +55,7 @@ function RuleOfThumbsIndex() {
   });
 
   return (
-    <PageContainer maxWidth="4xl">
+    <PageContainer maxWidth="4xl" className="rule-of-thumb-page-spacing">
       <RuleOfThumbHero
         title="Rule of Thumb"
         description="A collection of opinions, guidelines, and patterns I've adopted for building high-quality web applications."
@@ -108,7 +108,7 @@ function RuleOfThumbsIndex() {
                         selectedCategories.filter((c) => c.value !== selectedCategories[0]!.value),
                       );
                     }}
-                    className={cx("shrink-0 hover:text-red-500 transition-colors cursor-pointer")}
+                    className={cx("guideline-filter-remove shrink-0 transition-colors cursor-pointer")}
                   >
                     <XIcon size={12} weight="bold" />
                   </button>
@@ -135,7 +135,7 @@ function RuleOfThumbsIndex() {
           </Card>
           <Combobox.Portal>
             <Combobox.Positioner sideOffset={8} className={cx("z-50")}>
-              <Combobox.Popup className={cx("guideline-category-popup rounded-xl border border-border backdrop-blur-xl shadow-lg overflow-hidden min-w-[200px] bg-white dark:bg-zinc-900")}>
+              <Combobox.Popup className={cx("guideline-category-popup rounded-xl border border-border backdrop-blur-xl shadow-lg overflow-hidden min-w-[200px] bg-popover")}>
                 <Combobox.Empty>
                   <div className={cx("text-center py-2 text-sm text-muted-foreground")}>
                     No categories found.

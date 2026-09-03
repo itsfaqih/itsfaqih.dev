@@ -142,7 +142,7 @@ export function InteractiveTableDemo() {
                   <span
                     className={cx(`px-2 py-1 rounded-full text-xs font-medium ${user.status === "active"
                         ? "bg-muted text-foreground"
-                        : "bg-muted text-zinc-400"
+                        : "bg-muted text-muted-foreground"
                       }`)}
                   >
                     {user.status}

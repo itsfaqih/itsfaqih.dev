@@ -11,7 +11,7 @@ export function DestructiveActions() {
         <div className={cx("mb-12")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>Destructive Actions</h3>
 
-          <div className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex flex-wrap items-center gap-4")}>
               <div className={cx("flex flex-col items-center gap-2")}>
                 <Button variant="destructive">Delete Project</Button>
@@ -30,12 +30,12 @@ export function DestructiveActions() {
             </div>
           </div>
 
-          <div className={cx("p-4 rounded-xl bg-red-500/10 border border-red-500/20")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl border button-destructive-callout")}>
             <h4 className={cx("font-semibold text-foreground mb-2 text-sm flex items-center gap-2")}>
-              <WarningIcon size={16} className={cx("text-red-500")} />
+              <WarningIcon size={16} className={cx("text-negative-foreground")} />
               Avoid Red for Primary Actions
             </h4>
-            <p className={cx("text-sm text-muted-foreground")}>
+            <p className={cx("text-sm text-foreground")}>
               Reserved red colors for <strong>destructive</strong> actions (delete, remove, block).
               Using red for a primary action (like "Confirm" or "Save") creates cognitive friction
               as users are trained to associate red with danger/warning.

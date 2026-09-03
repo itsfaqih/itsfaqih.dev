@@ -12,7 +12,7 @@ export function ScrollLockDemoContent() {
 
   return (
     <>
-      <AnimationStage className={cx("bg-zinc-50 dark:bg-zinc-950/50")}>
+      <AnimationStage className={cx("bg-background")}>
         {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-scroll-cursor"
@@ -22,7 +22,7 @@ export function ScrollLockDemoContent() {
         {/* The Page Content (Mock Browser) */}
         <div
           className={cx(
-            "absolute inset-x-12 inset-y-8 bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-border overflow-hidden flex flex-col",
+            "absolute inset-x-12 inset-y-8 bg-card rounded-lg shadow-sm border border-border overflow-hidden flex flex-col",
           )}
         >
           {/* Mock Content Area */}
@@ -61,7 +61,7 @@ export function ScrollLockDemoContent() {
               animationName: status !== "idle" ? "demo-scroll-scrollbar" : "none",
             }}
           >
-            <div className={cx("w-full h-16 bg-gray-300 dark:bg-gray-600 rounded-full")} />
+            <div className={cx("w-full h-16 bg-muted rounded-full")} />
           </div>
 
           {/* Backdrop & Dialog inside the "browser window" */}

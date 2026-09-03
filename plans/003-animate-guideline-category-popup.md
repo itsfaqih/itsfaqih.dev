@@ -131,8 +131,8 @@ the scale movement.
 
 ## Verification
 
-- **Mechanical**: Run `bun run typecheck`, `bun run lint`, `bun run test`, and `bun run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
-- **Feel check**: Run the site with `bun run dev --host 127.0.0.1 --port 4174`, open `/rule-of-thumb/`, and open the category filter several times.
+- **Mechanical**: Run `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
+- **Feel check**: Run the site with `npm run dev --host 127.0.0.1 --port 4174`, open `/rule-of-thumb/`, and open the category filter several times.
   - Confirm the popup enters from the filter trigger's side with a subtle `scale(0.95)` to `scale(1)` and opacity transition over 150ms.
   - Confirm it exits using the same origin and does not jump toward the viewport center.
   - Open and close repeatedly during the transition; the CSS transition must retarget smoothly rather than replay a keyframe from zero.

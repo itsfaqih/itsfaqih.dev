@@ -14,7 +14,7 @@ import { TriggerFetchingSection } from "./section-trigger-fetching";
 
 export function DataLoadingPage() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       <RuleOfThumbHero
         title="Data Loading"
         description={

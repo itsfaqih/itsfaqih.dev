@@ -20,7 +20,7 @@ export function CachePersistenceSection() {
         />
 
         <div className={cx("grid sm:grid-cols-2 gap-4 mb-8")}>
-          <div className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
             <div className={cx("flex items-center gap-2 mb-3")}>
               <WarningCircleIcon size={18} className={cx("text-negative-foreground")} />
               <h3 className={cx("font-semibold text-negative-foreground")}>Don't Persist</h3>
@@ -51,7 +51,7 @@ export function CachePersistenceSection() {
             </ul>
           </div>
 
-          <div className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
             <div className={cx("flex items-center gap-2 mb-3")}>
               <HardDriveIcon size={18} className={cx("text-positive-foreground")} />
               <h3 className={cx("font-semibold text-positive-foreground")}>OK to Persist</h3>
@@ -111,7 +111,7 @@ export function CachePersistenceSection() {
           <h3 className={cx("text-lg font-semibold text-foreground mb-6")}>Persistence Methods</h3>
           <div className={cx("grid gap-4")}>
             {/* LocalStorage */}
-            <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center")}>
                   <HardDriveIcon size={20} className={cx("text-amber-500")} />
@@ -132,7 +132,7 @@ export function CachePersistenceSection() {
             </div>
 
             {/* IndexedDB */}
-            <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center")}>
                   <DatabaseIcon size={20} className={cx("text-blue-500")} />
@@ -153,7 +153,7 @@ export function CachePersistenceSection() {
             </div>
 
             {/* Embedded Database */}
-            <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-positive/10 dark:bg-positive/20 flex items-center justify-center")}>
                   <StackIcon size={20} className={cx("text-positive-foreground")} />

@@ -34,7 +34,7 @@ export function SkeletonDemo() {
   };
 
   return (
-    <div className={cx("rounded-2xl border border-border bg-card overflow-hidden")}>
+    <div data-rule-of-thumb-card="true" className={cx("rounded-2xl border border-border bg-card overflow-hidden")}>
       <div className={cx("p-6")}>
         <div className={cx("min-h-[120px] flex items-center justify-center")}>
           {isLoading && showSkeleton ? (

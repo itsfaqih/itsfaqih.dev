@@ -763,6 +763,9 @@ export const utilityStyles = stylex.create({
   "table": {
     "display": "table"
   },
+  "text-accent-foreground": {
+    "color": "var(--accent-foreground)"
+  },
   "text-amber-500": {
     "color": "oklch(76.9% .188 70.08)"
   },

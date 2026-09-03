@@ -23,6 +23,7 @@ export function Card<T extends ElementType = "div">({
 
   return (
     <Component
+      data-rule-of-thumb-card="true"
       className={cx(
         "rounded-xl border border-border bg-card backdrop-blur-md transition-all duration-300",
         hoverEffect && "hover:border-muted-foreground/30",

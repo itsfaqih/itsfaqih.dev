@@ -17,7 +17,7 @@ export const Route = createFileRoute("/rule-of-thumb/null-vs-undefined")({
 
 function NullVsUndefined() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       {/* Hero Section */}
       <RuleOfThumbHero
         title="Null vs Undefined"
@@ -41,9 +41,9 @@ function NullVsUndefined() {
           description="A mental model to keep them straight."
         />
         <div className={cx("grid sm:grid-cols-2 gap-6")}>
-          <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex items-center gap-3 mb-4")}>
-              <div className={cx("p-2 rounded-lg bg-zinc-500/10 text-foreground")}>
+              <div className={cx("p-2 rounded-lg bg-accent text-accent-foreground")}>
                 <QuestionIcon size={24} />
               </div>
               <h3 className={cx("text-lg font-bold text-foreground")}>Undefined</h3>
@@ -55,9 +55,9 @@ function NullVsUndefined() {
             </p>
           </div>
 
-          <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex items-center gap-3 mb-4")}>
-              <div className={cx("p-2 rounded-lg bg-zinc-500/10 text-foreground")}>
+              <div className={cx("p-2 rounded-lg bg-accent text-accent-foreground")}>
                 <ProhibitIcon size={24} />
               </div>
               <h3 className={cx("text-lg font-bold text-foreground")}>Null</h3>

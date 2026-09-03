@@ -9,7 +9,6 @@ export function ButtonVariantMatrix() {
     { name: "Neutral", id: "neutral" },
     { name: "Destructive", id: "destructive" },
     { name: "Secondary Brand", id: "secondary-brand" },
-    { name: "Secondary Neutral", id: "secondary-neutral" },
     { name: "Secondary Destr.", id: "secondary-destructive" },
     { name: "Tertiary Neutral", id: "tertiary-neutral" },
     { name: "Tertiary Brand", id: "tertiary-brand" },
@@ -19,8 +18,11 @@ export function ButtonVariantMatrix() {
   return (
     <div className={cx("mb-16")}>
       <h3 className={cx("text-lg font-semibold text-foreground mb-6")}>Variant States</h3>
-      <div className={cx("overflow-x-auto rounded-xl border border-border bg-card")}>
-        <table className={cx("w-full text-left border-collapse min-w-[900px]")}>
+      <div
+        data-rule-of-thumb-card="true"
+        className={cx("button-variant-matrix-scroll overflow-x-auto rounded-xl border border-border bg-card")}
+      >
+        <table className={cx("text-left border-collapse", "button-variant-matrix-table")}>
           <thead>
             <tr className={cx("border-b border-border bg-muted/50")}>
               <th className={cx("p-4 font-medium text-muted-foreground text-xs uppercase tracking-wider")}>
@@ -62,9 +64,7 @@ export function ButtonVariantMatrix() {
                     variant={row.id}
                     className={cn(
                       "pointer-events-none after:opacity-100",
-                      row.id === "tertiary-neutral" && "border-border/40",
-                      row.id === "tertiary-brand" && "border-brand/20",
-                      row.id === "tertiary-destructive" && "border-destructive/20",
+                      row.id === "tertiary-neutral" && "button-tertiary-neutral-hover-state",
                     )}
                   >
                     Button
@@ -88,9 +88,9 @@ export function ButtonVariantMatrix() {
                     variant={row.id}
                     className={cn(
                       "pointer-events-none scale-95 after:opacity-100 before:opacity-10 before:scale-150 before:duration-0",
-                      row.id === "tertiary-neutral" && "border-border/40",
-                      row.id === "tertiary-brand" && "border-brand/20",
-                      row.id === "tertiary-destructive" && "border-destructive/20",
+                      row.id === "tertiary-neutral" && "button-tertiary-neutral-pressing-state",
+                      row.id === "tertiary-brand" && "button-tertiary-brand-pressing-state",
+                      row.id === "tertiary-destructive" && "button-tertiary-destructive-pressing-state",
                     )}
                   >
                     Button
@@ -109,8 +109,8 @@ export function ButtonVariantMatrix() {
                   <div className={cx("w-fit cursor-wait")}>
                     <Button
                       variant={row.id}
-                      disabled
-                      className={cx("pointer-events-none disabled:opacity-80 cursor-wait min-w-[100px]")}
+                      isPending
+                      className={cx("pointer-events-none cursor-wait min-w-[100px]")}
                       leadingIcon={<CircleNotchIcon className={cx("animate-spin")} size={16} />}
                     >
                       Pending

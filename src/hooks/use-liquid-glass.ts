@@ -31,12 +31,27 @@ let liquidGLPromise: Promise<LiquidGL> | undefined;
 let themeObserver: MutationObserver | undefined;
 let themeRecaptureFrame: number | undefined;
 let themeFinalRecaptureTimer: number | undefined;
+let viewportSyncFrame: number | undefined;
+let viewportSyncRegistered = false;
+
+type LiquidGLLensRuntime = {
+  el?: HTMLElement;
+  updateMetrics?: () => void;
+  _shadowSyncFn?: () => void;
+};
+
+type LiquidGLRendererRuntime = {
+  captureSnapshot?: () => Promise<boolean> | boolean;
+  canvas?: HTMLCanvasElement;
+  _resizeCanvas?: () => void;
+  _renderLens?: (lens: LiquidGLLensRuntime) => void;
+  render?: () => void;
+  lenses?: LiquidGLLensRuntime[];
+  mobileViewportOffsetsPatched?: boolean;
+};
 
 type LiquidGLWindow = Window & {
-  __liquidGLRenderer__?: {
-    captureSnapshot?: () => Promise<boolean> | boolean;
-    canvas?: HTMLCanvasElement;
-  };
+  __liquidGLRenderer__?: LiquidGLRendererRuntime;
 };
 
 const liquidGLOptions = (
@@ -102,6 +117,101 @@ function ensureThemeSynchronization() {
   });
 }
 
+function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRendererRuntime) {
+  if (renderer.mobileViewportOffsetsPatched || !renderer._renderLens) return;
+
+  const originalRenderLens = renderer._renderLens;
+  renderer._renderLens = (lens) => {
+    const isMobileFixedLens =
+      window.matchMedia("(max-width: 639px)").matches &&
+      lens.el &&
+      window.getComputedStyle(lens.el).position === "fixed";
+    const viewport = window.visualViewport;
+
+    if (!isMobileFixedLens || !viewport || Math.abs(viewport.scale - 1) >= 0.01) {
+      originalRenderLens.call(renderer, lens);
+      return;
+    }
+
+    // liquidGL adds visualViewport.offsetTop to fixed lens coordinates. On
+    // Android Chrome, fixed getBoundingClientRect() values are already in the
+    // visual viewport, so that compensation moves the WebGL lens below its
+    // button by the toolbar height. Keep the real viewport object for all
+    // other code and neutralize the offset only during this renderer call.
+    const viewportDescriptor = Object.getOwnPropertyDescriptor(window, "visualViewport");
+    const correctedViewport = new Proxy(viewport, {
+      get(target, property) {
+        if (property === "offsetTop" || property === "offsetLeft") return 0;
+        const value = Reflect.get(target, property, target);
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+    });
+
+    try {
+      Object.defineProperty(window, "visualViewport", {
+        configurable: true,
+        value: correctedViewport,
+      });
+      originalRenderLens.call(renderer, lens);
+    } finally {
+      if (viewportDescriptor) {
+        Object.defineProperty(window, "visualViewport", viewportDescriptor);
+      } else {
+        const windowWithOptionalViewport = window as unknown as { visualViewport?: VisualViewport };
+        delete windowWithOptionalViewport.visualViewport;
+      }
+    }
+  };
+  renderer.mobileViewportOffsetsPatched = true;
+}
+
+function syncLiquidGLViewport() {
+  const renderer = (window as LiquidGLWindow).__liquidGLRenderer__;
+  if (!renderer) return;
+
+  ensureMobileLiquidGLViewportCorrection(renderer);
+
+  // liquidGL skips its debounced resize work while scrolling. Android Chrome
+  // can resize or move the visual viewport as its browser chrome collapses, so
+  // refresh the shared canvas and every lens on the next paint frame instead.
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const canvas = renderer.canvas;
+  const canvasNeedsResize =
+    !canvas ||
+    canvas.width !== window.innerWidth * dpr ||
+    canvas.height !== window.innerHeight * dpr;
+
+  if (canvasNeedsResize) {
+    renderer._resizeCanvas?.();
+  }
+
+  renderer.lenses?.forEach((lens) => {
+    lens.updateMetrics?.();
+    lens._shadowSyncFn?.();
+  });
+  renderer.render?.();
+}
+
+function ensureViewportSynchronization() {
+  if (viewportSyncRegistered || typeof window === "undefined") return;
+
+  const scheduleSync = () => {
+    if (viewportSyncFrame !== undefined) return;
+
+    viewportSyncFrame = window.requestAnimationFrame(() => {
+      viewportSyncFrame = undefined;
+      syncLiquidGLViewport();
+    });
+  };
+
+  window.addEventListener("resize", scheduleSync, { passive: true });
+  window.addEventListener("scroll", scheduleSync, { passive: true });
+  window.addEventListener("orientationchange", scheduleSync, { passive: true });
+  window.visualViewport?.addEventListener("resize", scheduleSync, { passive: true });
+  window.visualViewport?.addEventListener("scroll", scheduleSync, { passive: true });
+  viewportSyncRegistered = true;
+}
+
 function initializeLiquidGL(target: HTMLElement, options: LiquidGLTuningOptions = {}) {
   if (
     initializedTargets.has(target) ||
@@ -123,6 +233,7 @@ function initializeLiquidGL(target: HTMLElement, options: LiquidGLTuningOptions 
       liquidGL(liquidGLOptions(prefersReducedMotion, `[${TARGET_ATTRIBUTE}="${id}"]`, options));
       initializedTargets.add(target);
       target.setAttribute(INITIALIZED_ATTRIBUTE, "");
+      syncLiquidGLViewport();
     })
     .catch((error: unknown) => {
       console.warn("liquidGL could not be initialized for the header.", error);
@@ -187,6 +298,7 @@ export function useLiquidGLTarget<T extends HTMLElement>(enabled = true, options
   useEffect(() => {
     if (!enabled || !targetRef.current) return;
     ensureThemeSynchronization();
+    ensureViewportSynchronization();
     return scheduleLiquidGLInitialization(targetRef.current, () => latestOptionsRef.current);
   }, [enabled]);
 

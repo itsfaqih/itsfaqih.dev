@@ -17,7 +17,7 @@ export function DataLoadingSummary() {
     <>
 {/* Summary */}
       <div className={cx("mb-20")}>
-        <div className={cx("p-8 rounded-2xl bg-card border border-border")}>
+        <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-card border border-border")}>
           <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Quick Reference</h2>
           <div className={cx("space-y-3 text-muted-foreground")}>
             <div className={cx("flex items-start gap-3")}>
@@ -77,7 +77,7 @@ export function DataLoadingSummary() {
               </span>
             </div>
             <div className={cx("flex items-start gap-3")}>
-              <HardDriveIcon size={18} className={cx("text-zinc-400 mt-0.5 shrink-0")} />
+              <HardDriveIcon size={18} className={cx("text-muted-foreground mt-0.5 shrink-0")} />
               <span>
                 <strong className={cx("text-foreground")}>Cache</strong> — Don't persist client cache
                 unless app works offline or needs latest data on revisit

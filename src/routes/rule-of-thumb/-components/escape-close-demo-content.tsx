@@ -27,7 +27,7 @@ export function EscapeCloseDemoContent() {
           </div>
           <Button
             variant="brand"
-            className={cx("w-full ring-2 ring-brand ring-offset-1 dark:ring-offset-black")}
+            className={cx("w-full ring-2 ring-brand ring-offset-1 ring-offset-background")}
           >
             Or Click Here
           </Button>

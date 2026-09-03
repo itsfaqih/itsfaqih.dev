@@ -19,7 +19,7 @@ export function RuleOfThumbPagination() {
     <div className={cx("grid grid-cols-1 sm:grid-cols-2 gap-4 mt-16 pt-8 border-t border-border")}>
       {/* Previous */}
       {prevGuideline ? (
-        <Link to={prevGuideline.href} className={cx("group block h-full")}>
+        <Link to={prevGuideline.href} preload="intent" className={cx("group block h-full")}>
           <Card className={cx("h-full p-6 flex flex-col items-start gap-2 group-hover:border-muted-foreground/50 transition-colors")}>
             <div className={cx("flex items-center gap-2 text-sm text-muted-foreground mb-1")}>
               <ArrowLeftIcon

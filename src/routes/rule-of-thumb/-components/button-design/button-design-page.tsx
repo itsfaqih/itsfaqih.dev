@@ -12,7 +12,7 @@ import { WhyButtonStatesMatter } from "./why-button-states-matter";
 
 export function ButtonDesignPage() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       <RuleOfThumbHero
         title="Button Design"
         description={

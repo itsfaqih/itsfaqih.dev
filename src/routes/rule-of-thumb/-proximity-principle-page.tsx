@@ -16,7 +16,7 @@ import { WhyThisMattersSection } from "./-proximity-principle-why-this-matters-s
 
 export function ProximityPrinciple() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       <RuleOfThumbHero
         title="The Proximity Principle"
         description={

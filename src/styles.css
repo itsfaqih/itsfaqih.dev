@@ -69,6 +69,52 @@
   --navbar-border-strength: 5%;
 }
 
+/* Keep mobile clipping from reserving a visible scrollbar gutter. */
+html,
+body.site-shell {
+  overflow-x: clip !important;
+}
+
+/* Diffs resolves its system theme from the rendered body color scheme. */
+body.site-shell {
+  color-scheme: light;
+}
+
+.dark body.site-shell {
+  color-scheme: dark;
+}
+
+.code-block {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--card);
+  color: var(--foreground);
+  /* The shadow DOM uses light-dark(); pin it to the site's explicit mode. */
+  color-scheme: light;
+  --diffs-gap-block: 0.5rem;
+  --diffs-line-height: 1.625rem;
+  --diffs-font-family: var(--font-mono);
+  --diffs-header-font-family: var(--font-sans);
+  --diffs-light-bg: var(--card);
+  --diffs-dark-bg: var(--card);
+}
+
+.dark .code-block {
+  color-scheme: dark;
+}
+
+/* Embedded code belongs to the surrounding card; do not draw a second card. */
+[data-rule-of-thumb-card="true"] .code-block {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
 .header-spacer {
   height: 73px;
 }
@@ -86,6 +132,41 @@
 @media (max-width: 639px) {
   .page-container {
     padding-top: 0 !important;
+  }
+}
+
+.rule-of-thumb-feature-grid-section {
+  container-name: rule-of-thumb-feature-grid;
+  container-type: inline-size;
+}
+
+.rule-of-thumb-feature-grid {
+  box-sizing: border-box;
+}
+
+/* Shared edges are drawn twice, so keep them thin and low-contrast. */
+.rule-of-thumb-feature-grid > li::before {
+  border-top-width: 0.5px;
+  border-bottom-width: 0.5px;
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.rule-of-thumb-feature-grid > li::after {
+  border-left-width: 0.5px;
+  border-right-width: 0.5px;
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.rule-of-thumb-feature-grid > li:hover::before,
+.rule-of-thumb-feature-grid > li:hover::after {
+  border-color: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+}
+
+@container rule-of-thumb-feature-grid (max-width: 40rem) {
+  .rule-of-thumb-feature-grid {
+    width: calc(100% + 3rem);
+    margin-inline: -1.5rem;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -279,15 +360,51 @@
   height: 3rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent);
   border-radius: 9999px;
-  background: linear-gradient(to bottom, rgb(255 255 255 / 0.4), rgb(255 255 255 / 0.3));
+  background: transparent;
   color: var(--muted-foreground);
-  backdrop-filter: blur(24px);
+  box-shadow:
+    0 10px 30px color-mix(in srgb, var(--foreground) 12%, transparent),
+    0 0 0 0.5px color-mix(in srgb, var(--foreground) 5%, transparent);
   transition:
     color 200ms var(--ease-out),
     background-color 200ms var(--ease-out),
-    transform 200ms var(--ease-out);
+    transform 200ms var(--ease-out),
+    border-color 320ms var(--ease-out);
+}
+
+.mobile-menu-back-button::before,
+.mobile-menu-trigger::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(110% 85% at 20% 8%, rgb(255 255 255 / 0.34), transparent 48%),
+    radial-gradient(90% 120% at 80% 94%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 64%),
+    linear-gradient(to bottom, var(--navbar-surface-top), var(--navbar-surface-bottom));
+  box-shadow: inset 0 1px 0 var(--navbar-surface-highlight);
+  content: "";
+  pointer-events: none;
+  backdrop-filter: blur(22px) saturate(175%);
+  -webkit-backdrop-filter: blur(22px) saturate(175%);
+}
+
+.mobile-menu-back-button::after,
+.mobile-menu-trigger::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid color-mix(in srgb, var(--foreground) var(--navbar-border-strength), transparent);
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.24), transparent 36%, transparent 66%, rgb(255 255 255 / 0.08));
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: border-color 320ms var(--ease-out);
 }
 
 .desktop-menu-back-button {
@@ -483,7 +600,11 @@
   }
 
   .mobile-menu-back-button,
-  .mobile-menu-trigger {
+  .mobile-menu-trigger,
+  .mobile-menu-back-button::before,
+  .mobile-menu-back-button::after,
+  .mobile-menu-trigger::before,
+  .mobile-menu-trigger::after {
     transition: none;
   }
 
@@ -680,8 +801,8 @@
     --popover: oklch(0.269 0 0); /* zinc-800 */
     --popover-foreground: oklch(0.985 0 0); /* zinc-100 */
     
-    --brand: oklch(0.708 0.182 254.604); /* blue-400 */
-    --brand-foreground: oklch(0.145 0 0); /* zinc-950 */
+    --brand: oklch(0.556 0.182 254.604); /* blue-600 */
+    --brand-foreground: oklch(0.985 0 0); /* near white */
     
     --neutral: oklch(0.269 0 0 / 40%); /* translucent zinc-800 */
     --neutral-foreground: oklch(0.985 0 0); /* zinc-100 */
@@ -692,7 +813,7 @@
     --accent: oklch(0.371 0 0); /* zinc-700 */
     --accent-foreground: oklch(0.985 0 0); /* zinc-100 */
     
-    --destructive: oklch(0.704 0.191 22.216); /* red-500 */
+    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
     --destructive-foreground: oklch(0.985 0 0); /* near white */
     
     --negative: oklch(0.637 0.237 25.331); /* red-500 */
@@ -715,62 +836,6 @@
 /* Experimental squircle support */
 .squircle {
   corner-shape: squircle;
-}
-
-/* Syntax highlighting styles */
-figure[data-rehype-pretty-code-figure] {
-  position: relative;
-}
-
-figure[data-rehype-pretty-code-figure] pre {
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  overflow-x: auto;
-  background: var(--card);
-  font-size: 0.875rem;
-  line-height: 1.625;
-}
-
-/* Handle dual themes using Shiki variables */
-/* For rehype-pretty-code (blog posts) */
-code[data-theme*=" "],
-code[data-theme*=" "] span {
-  color: var(--shiki-light);
-  background-color: var(--shiki-light-bg);
-}
-
-.dark code[data-theme*=" "],
-.dark code[data-theme*=" "] span {
-  color: var(--shiki-dark);
-  background-color: var(--shiki-dark-bg);
-}
-
-/* For inline shiki rendering (opinions pages) */
-pre.shiki span[style*="--shiki-light"],
-.shiki span[style*="--shiki-light"] {
-  color: var(--shiki-light) !important;
-}
-
-.dark pre.shiki span[style*="--shiki-dark"],
-.dark .shiki span[style*="--shiki-dark"] {
-  color: var(--shiki-dark) !important;
-}
-
-figure[data-rehype-pretty-code-figure] code {
-  font-family: "Geist Mono", ui-monospace, monospace;
-  display: grid;
-}
-
-figure[data-rehype-pretty-code-figure] [data-line] {
-  padding-inline: 1rem;
-  margin-inline: -1rem;
-  border-inline-start: 2px solid transparent;
-}
-
-figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
-  background: var(--card);
-  border-color: var(--border);
 }
 
 /* Grid Background Styles */
@@ -956,4 +1021,478 @@ figure[data-rehype-pretty-code-figure] [data-highlighted-line] {
     rgba(9, 9, 11, 1.00) 75%,
     rgba(9, 9, 11, 0.00) 100%
   );
+}
+
+/* Final mobile main-content background tuning for every PageContainer. */
+@media (max-width: 639px) {
+  .page-container {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .page-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, #FFFFFF 0%, #FFFFFF 100%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%);
+    opacity: 0.90;
+  }
+
+  .dark .page-container::before {
+    background: linear-gradient(90deg, transparent 0%, #09090B 0%, #09090B 100%, transparent 100%);
+  }
+}
+
+/* Let rule-of-thumb cards use the full mobile viewport while keeping text padded. */
+.rule-of-thumb-page {
+  container-name: rule-of-thumb-page;
+  container-type: inline-size;
+}
+
+/* Let the matrix size to its content instead of stretching seven columns to
+ * the viewport. Cap the scroll viewport at the screen when the content is
+ * wider than it, so the page itself never gains horizontal overflow. */
+.button-variant-matrix-scroll {
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  transform: translateX(calc(50vw - 50%));
+  scrollbar-color: color-mix(in srgb, var(--foreground) 28%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.button-variant-matrix-table {
+  width: max-content;
+}
+
+@media (min-width: 640px) {
+  .page-container.rule-of-thumb-page,
+  .page-container.rule-of-thumb-page-spacing {
+    padding-top: 32px !important;
+  }
+}
+
+/* Make only the carousel viewport full-bleed; keep its heading and controls
+ * aligned with the surrounding page content. */
+.rule-of-thumbs-carousel-viewport {
+  width: 100vw !important;
+  margin-inline: calc(50% - 50vw) !important;
+}
+
+.rule-of-thumbs-carousel-control {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background-color: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.rule-of-thumbs-carousel-control:hover {
+  background-color: var(--border);
+  border-color: var(--border);
+  transform: translateY(-1px) scale(1.04);
+}
+
+.rule-of-thumbs-carousel-control:active {
+  background-color: var(--border);
+  border-color: var(--border);
+  transform: translateY(1px) scale(0.94);
+}
+
+.rule-of-thumbs-carousel-control:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rule-of-thumbs-carousel-control {
+    transition: none;
+  }
+
+  .rule-of-thumbs-carousel-control:hover,
+  .rule-of-thumbs-carousel-control:active {
+    transform: none;
+  }
+}
+
+/* Embla measures an invisible track; the visible cards keep the original
+ * absolute-origin 3D positioning. */
+.rule-of-thumbs-carousel-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 32px;
+  padding-top: 16px;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+.rule-of-thumbs-carousel-measure-slide {
+  flex: 0 0 288px;
+  min-width: 0;
+}
+
+.rule-of-thumbs-carousel-3d-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rule-of-thumbs-carousel-3d-slide {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 288px;
+  margin-left: -144px;
+}
+
+@media (max-width: 639px) {
+  /* Match the mobile PageContainer px-6 inset: 1.5rem on each side. */
+  .rule-of-thumbs-carousel-container {
+    gap: 32px;
+    padding-inline: 0;
+  }
+
+  .rule-of-thumbs-carousel-measure-slide {
+    flex-basis: calc(100vw - 3rem);
+  }
+
+  .rule-of-thumbs-carousel-3d-slide {
+    left: 50%;
+    width: calc(100vw - 3rem);
+    margin-left: calc((3rem - 100vw) / 2);
+  }
+
+  .rule-of-thumbs-carousel-fade {
+    display: block;
+  }
+}
+
+@container rule-of-thumb-page (max-width: 40rem) {
+  .rule-of-thumb-page [data-rule-of-thumb-card="true"] {
+    width: 100vw !important;
+    max-width: none !important;
+    margin-inline: calc(50% - 50vw);
+    border-radius: 0 !important;
+  }
+}
+
+/* Keep the code surface visible while letting the complete example scroll. */
+.interactive-state-code-block {
+  position: sticky;
+  top: 5rem;
+  z-index: 20;
+}
+
+.interactive-state-code-scroll-area {
+  width: 100%;
+  height: min(20rem, calc(100dvh - 10rem));
+  min-height: 16rem;
+  background-color: var(--background);
+}
+
+.interactive-state-code-scroll-viewport {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  --interactive-state-code-fade-size: 2.25rem;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-start)),
+    black calc(100% - min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-end, var(--interactive-state-code-fade-size)))),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-start)),
+    black calc(100% - min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-end, var(--interactive-state-code-fade-size)))),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.interactive-state-code-scroll-content {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+}
+
+.interactive-state-code-scrollbar {
+  display: flex;
+  justify-content: center;
+  width: 0.75rem;
+  margin: 0.25rem;
+  padding: 0.25rem 0.125rem;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.interactive-state-code-scrollbar[data-hovering],
+.interactive-state-code-scrollbar[data-scrolling] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.interactive-state-code-scrollbar[data-scrolling] {
+  transition-duration: 0ms;
+}
+
+.interactive-state-code-scroll-thumb {
+  width: 100%;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--foreground) 32%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-state-code-scrollbar {
+    transition: none;
+  }
+}
+
+/* State selector tabs use independent status chips with one active treatment. */
+.interactive-state-code-tab {
+  display: inline-flex;
+  min-height: 2.375rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.8125rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.interactive-state-code-tab:hover {
+  background-color: color-mix(in srgb, var(--brand) 16%, var(--background));
+  border-color: color-mix(in srgb, var(--brand) 58%, transparent);
+  color: var(--brand);
+}
+
+.interactive-state-code-tab:active {
+  transform: scale(0.98);
+}
+
+.interactive-state-code-tab-active {
+  background-color: color-mix(in srgb, var(--brand) 16%, var(--background));
+  color: var(--brand);
+  border-color: color-mix(in srgb, var(--brand) 58%, transparent);
+}
+
+.dark .interactive-state-code-tab-active {
+  color: var(--ring);
+}
+
+.interactive-state-code-tab:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-state-code-tab {
+    transition: none;
+  }
+
+  .interactive-state-code-tab:active {
+    transform: none;
+  }
+}
+
+/* Keep tertiary button hover and pressing surfaces explicit; these are not StyleX utilities. */
+.button-tertiary-neutral-hover-surface {
+  background-color: transparent !important;
+}
+
+.button-tertiary-neutral-hover-surface:hover,
+.button-tertiary-neutral-hover-state {
+  background-color: color-mix(in srgb, var(--foreground) 1%, var(--background)) !important;
+}
+
+.dark .button-tertiary-neutral-hover-surface:hover,
+.dark .button-tertiary-neutral-hover-state {
+  background-color: color-mix(in srgb, var(--foreground) 8%, var(--background)) !important;
+}
+
+.button-tertiary-neutral-pressing-state {
+  background-color: color-mix(in srgb, var(--foreground) 5%, var(--background)) !important;
+}
+
+.dark .button-tertiary-neutral-pressing-state {
+  background-color: color-mix(in srgb, var(--foreground) 10%, var(--background)) !important;
+}
+
+.button-tertiary-neutral-hover-surface::after {
+  background-color: transparent;
+}
+
+.dark .button-tertiary-neutral-hover-surface {
+  color: var(--foreground) !important;
+}
+
+.button-tertiary-neutral-hover-surface:active::after,
+.button-tertiary-neutral-pressing-state::after {
+  background-color: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.dark .button-tertiary-neutral-hover-surface:active::after,
+.dark .button-tertiary-neutral-pressing-state::after {
+  background-color: color-mix(in srgb, var(--foreground) 36%, transparent);
+}
+
+.button-tertiary-neutral-hover-surface:active::before,
+.button-tertiary-neutral-pressing-state::before {
+  opacity: 0.06 !important;
+}
+
+.button-tertiary-brand-hover-surface::after {
+  background-color: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+
+.button-tertiary-brand-hover-surface:active::after,
+.button-tertiary-brand-pressing-state::after {
+  background-color: color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.button-tertiary-destructive-hover-surface::after {
+  background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
+}
+
+.button-tertiary-destructive-hover-surface:active::after,
+.button-tertiary-destructive-pressing-state::after {
+  background-color: color-mix(in srgb, var(--destructive) 16%, transparent);
+}
+
+.dark .button-tertiary-brand-hover-surface::after {
+  background-color: color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+.dark .button-tertiary-brand-hover-surface:active::after,
+.dark .button-tertiary-brand-pressing-state::after {
+  background-color: color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+.dark .button-tertiary-destructive-hover-surface::after {
+  background-color: color-mix(in srgb, var(--destructive) 18%, transparent);
+}
+
+.dark .button-tertiary-destructive-hover-surface:active::after,
+.dark .button-tertiary-destructive-pressing-state::after {
+  background-color: color-mix(in srgb, var(--destructive) 24%, transparent);
+}
+
+/* Red callouts need a visible dark-mode surface without dimming their copy. */
+.button-destructive-callout {
+  background-color: color-mix(in srgb, var(--destructive) 10%, var(--background)) !important;
+  border-color: color-mix(in srgb, var(--destructive) 36%, var(--border)) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .button-destructive-callout {
+  background-color: color-mix(in srgb, var(--destructive) 24%, var(--background)) !important;
+  border-color: color-mix(in srgb, var(--destructive) 52%, transparent) !important;
+}
+
+.button-destructive-callout-code {
+  color: color-mix(in srgb, var(--negative-foreground) 80%, var(--foreground)) !important;
+}
+
+.guideline-filter-remove:hover {
+  color: var(--negative-foreground);
+}
+
+/* Demo overlays use a restrained semantic gray surface without opacity reduction. */
+.demo-overlay-surface {
+  background-color: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
+  background-image: none !important;
+}
+
+.dark .demo-overlay-surface {
+  background-color: color-mix(in srgb, var(--foreground) 18%, transparent) !important;
+}
+
+/* Dark mode keeps secondary surfaces quieter without removing their tint. */
+.dark .button-secondary-brand-surface {
+  background-color: oklch(0.18 0 0) !important;
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent) !important;
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--brand) 16%, transparent),
+    color-mix(in srgb, var(--brand) 8%, transparent)
+  );
+}
+
+.dark .button-secondary-neutral-surface {
+  background-color: oklch(0.18 0 0) !important;
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--foreground) 10%, transparent),
+    color-mix(in srgb, var(--foreground) 5%, transparent)
+  );
+}
+
+.dark .button-secondary-destructive-surface {
+  background-color: oklch(0.18 0 0) !important;
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--destructive) 10%, transparent),
+    color-mix(in srgb, var(--destructive) 5%, transparent)
+  );
+}
+
+/* Brighter dark-mode brand text keeps secondary and tertiary labels readable. */
+.dark .button-secondary-brand-surface,
+.dark .button-tertiary-brand-hover-surface {
+  color: oklch(0.708 0.182 254.604) !important; /* blue-400 */
+}
+
+/* Disabled buttons keep the former tertiary-neutral hover surface without fading their content. */
+.button-disabled-state:disabled {
+  background-color: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  color: var(--muted-foreground) !important;
+  opacity: 1 !important;
+}
+
+.dark .button-disabled-state:disabled {
+  background-color: color-mix(in srgb, var(--foreground) 32%, transparent) !important;
+}
+
+.button-disabled-state:disabled::before,
+.button-disabled-state:disabled::after {
+  opacity: 0 !important;
 }

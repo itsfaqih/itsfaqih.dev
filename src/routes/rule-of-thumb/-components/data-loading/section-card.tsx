@@ -11,10 +11,10 @@ export function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <div className={cx("p-6 rounded-xl border border-border bg-card")}>
+    <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
       <div className={cx("flex items-center gap-3 mb-4")}>
-        <div className={cx("size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center")}>
-          <Icon size={20} className={cx("text-foreground")} />
+        <div className={cx("size-10 rounded-lg bg-accent text-accent-foreground flex items-center justify-center")}>
+          <Icon size={20} className={cx("text-accent-foreground")} />
         </div>
         <h3 className={cx("font-semibold text-foreground")}>{title}</h3>
       </div>

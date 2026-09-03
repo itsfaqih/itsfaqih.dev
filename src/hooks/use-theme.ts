@@ -3,7 +3,10 @@ import { useEffect, useSyncExternalStore } from "react";
 export type Theme = "light" | "dark";
 
 const THEME_CHANGE_EVENT = "theme-change";
-const getServerSnapshot = (): Theme => "dark";
+
+// The server cannot read the visitor's system preference. The inline script in
+// the root document applies the real preference before the page is painted.
+const getServerSnapshot = (): Theme => "light";
 
 function readTheme(): Theme {
   if (typeof window === "undefined") return getServerSnapshot();
@@ -39,7 +42,6 @@ export function useTheme() {
 
   useEffect(() => {
     applyThemeClass(theme);
-    window.localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {

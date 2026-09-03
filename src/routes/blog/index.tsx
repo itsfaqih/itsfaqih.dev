@@ -103,6 +103,7 @@ function BlogIndex() {
         <div className={cx("mt-8 pt-6 border-t border-border")}>
           <Link
             to="/"
+            preload="intent"
             className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group")}
           >
             <ArrowRightIcon

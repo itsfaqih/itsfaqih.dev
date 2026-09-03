@@ -39,7 +39,7 @@ export function ResponsiveDialog({
               {/* Handle */}
               <div
                 className={cx(
-                  "mx-auto w-12 h-1.5 shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-700 mb-8",
+                  "mx-auto w-12 h-1.5 shrink-0 rounded-full bg-muted mb-8",
                 )}
               />
               <div className={cx("max-w-md mx-auto pb-8")}>

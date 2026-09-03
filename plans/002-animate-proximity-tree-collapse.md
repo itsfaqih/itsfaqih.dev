@@ -145,8 +145,8 @@ variant keeps the opacity cue but removes the caret rotation and layout travel.
 
 ## Verification
 
-- **Mechanical**: Run `bun run typecheck`, `bun run lint`, `bun run test`, and `bun run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
-- **Feel check**: Run the site with `bun run dev --host 127.0.0.1 --port 4174`, open a proximity-principle page, and use both the Good and Bad file-tree examples.
+- **Mechanical**: Run `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
+- **Feel check**: Run the site with `npm run dev --host 127.0.0.1 --port 4174`, open a proximity-principle page, and use both the Good and Bad file-tree examples.
   - Confirm the caret rotates over 200ms and the child tree expands/collapses over approximately 200ms without clipping the final open state.
   - Click the same node repeatedly during expansion and collapse; the transition must retarget from the current row state instead of restarting from zero.
   - Confirm no sibling node moves horizontally and no border/highlight style changes because of the animation.

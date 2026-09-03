@@ -41,7 +41,7 @@ export function FormDialogDemoContent() {
           <Button
             variant="brand"
             className={cx(
-              "w-full ring-2 ring-brand ring-offset-1 dark:ring-offset-black pointer-events-none",
+              "w-full ring-2 ring-brand ring-offset-1 ring-offset-background pointer-events-none",
             )}
           >
             Save Changes

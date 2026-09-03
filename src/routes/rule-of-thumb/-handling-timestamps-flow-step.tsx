@@ -12,8 +12,8 @@ export function FlowStep({
 }) {
   return (
     <div className={cx("flex items-start gap-4")}>
-      <div className={cx("size-10 rounded-lg bg-zinc-500/10 dark:bg-zinc-500/20 flex items-center justify-center shrink-0")}>
-        <Icon size={20} className={cx("text-foreground")} />
+      <div className={cx("size-10 rounded-lg bg-accent text-accent-foreground flex items-center justify-center shrink-0")}>
+        <Icon size={20} className={cx("text-accent-foreground")} />
       </div>
       <div>
         <h3 className={cx("font-semibold text-foreground")}>{title}</h3>

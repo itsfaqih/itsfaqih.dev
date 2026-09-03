@@ -11,7 +11,7 @@ export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
 
 function TypeScriptGuidelines() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       <RuleOfThumbHero
         title="TypeScript Guidelines"
         description={
@@ -202,7 +202,7 @@ createUser({
         />
 
         <div className={cx("grid sm:grid-cols-2 gap-4")}>
-          <div className={cx("p-6 rounded-xl bg-card border border-border")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl bg-card border border-border")}>
             <div className={cx("flex items-center gap-3 mb-4")}>
               <ShieldIcon size={20} className={cx("text-foreground")} />
               <h3 className={cx("font-semibold text-foreground")}>Must-Have Flags</h3>
@@ -229,7 +229,7 @@ createUser({
             </ul>
           </div>
 
-          <div className={cx("p-6 rounded-xl bg-card border border-border")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl bg-card border border-border")}>
             <div className={cx("flex items-center gap-3 mb-4")}>
               <PackageIcon size={20} className={cx("text-foreground")} />
               <h3 className={cx("font-semibold text-foreground")}>Module System</h3>

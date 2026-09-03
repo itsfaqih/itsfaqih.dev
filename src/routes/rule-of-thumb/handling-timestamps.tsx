@@ -35,7 +35,7 @@ export const Route = createFileRoute("/rule-of-thumb/handling-timestamps")({
 
 function HandlingTimestamps() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       {/* Hero Section */}
       <RuleOfThumbHero
         title="Handling Timestamps"
@@ -143,7 +143,7 @@ const formatted = dayjs(apiResponse.createdAt)
 
         <FilterDemo />
 
-        <div className={cx("mt-8 p-6 rounded-xl bg-card border border-border")}>
+        <div data-rule-of-thumb-card="true" className={cx("mt-8 p-6 rounded-xl bg-card border border-border")}>
           <h3 className={cx("font-semibold text-foreground mb-3 flex items-center gap-2")}>
             <CalendarBlankIcon size={18} />
             Example: Indonesia (UTC+7)
@@ -207,7 +207,7 @@ fetch('/api/records', {
         <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Do's and Don'ts</h2>
 
         <div className={cx("grid sm:grid-cols-2 gap-4")}>
-          <div className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
             <div className={cx("flex items-center gap-2 mb-4")}>
               <CheckIcon size={18} className={cx("text-positive-foreground")} />
               <h3 className={cx("font-semibold text-positive-foreground")}>Do</h3>
@@ -236,7 +236,7 @@ fetch('/api/records', {
             </ul>
           </div>
 
-          <div className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
             <div className={cx("flex items-center gap-2 mb-4")}>
               <XIcon size={18} className={cx("text-negative-foreground")} />
               <h3 className={cx("font-semibold text-negative-foreground")}>Don't</h3>
@@ -269,7 +269,7 @@ fetch('/api/records', {
 
       {/* Summary */}
       <div className={cx("mb-20")}>
-        <div className={cx("p-8 rounded-2xl bg-card border border-border")}>
+        <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-card border border-border")}>
           <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Quick Reference</h2>
           <div className={cx("space-y-3 text-muted-foreground")}>
             <div className={cx("flex items-start gap-3")}>

@@ -20,7 +20,7 @@ export function TrailingIconVariant() {
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>With Trailing Icon</h3>
 
           {/* Visual Demo */}
-          <div className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex flex-wrap items-center gap-4")}>
               <Button variant="brand" trailingIcon={<ArrowRightIcon size={18} />}>
                 Continue
@@ -44,7 +44,7 @@ export function TrailingIconVariant() {
           </div>
 
           {/* When to Use */}
-          <div className={cx("mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 rounded-xl border border-border bg-card p-5")}>
             <h4 className={cx("font-semibold text-foreground mb-4 text-sm")}>
               When to Use Trailing Icons
             </h4>
@@ -72,7 +72,7 @@ export function TrailingIconVariant() {
                 },
               ].map((item) => (
                 <div key={item.title} className={cx("flex gap-3 items-start")}>
-                  <div className={cx("mt-0.5 p-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300")}>
+                  <div className={cx("mt-0.5 p-1 rounded-md bg-accent text-accent-foreground")}>
                     <item.icon size={14} />
                   </div>
                   <div>

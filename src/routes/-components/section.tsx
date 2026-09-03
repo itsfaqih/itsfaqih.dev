@@ -7,14 +7,17 @@ export type SectionProps = {
   children: ReactNode;
   className?: string;
   id?: string;
+  hideTitle?: boolean;
 };
 
-export function Section({ title, children, className, id }: SectionProps) {
+export function Section({ title, children, className, id, hideTitle = false }: SectionProps) {
   return (
     <section id={id} className={cn("mb-12 scroll-mt-24", className)}>
-      <h2 className={cx("text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide")}>
-        {title}
-      </h2>
+      {!hideTitle && (
+        <h2 className={cx("text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wide")}>
+          {title}
+        </h2>
+      )}
       <div className={cx("space-y-3")}>{children}</div>
     </section>
   );

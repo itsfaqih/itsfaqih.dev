@@ -21,7 +21,7 @@ export function IconOnlyVariant() {
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>Icon Only</h3>
 
           {/* Visual Demo */}
-          <div className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex flex-wrap items-center gap-4")}>
               {/* Square variants */}
               <div className={cx("flex flex-col items-center gap-2")}>
@@ -55,7 +55,7 @@ export function IconOnlyVariant() {
           </div>
 
           {/* When to Use */}
-          <div className={cx("mb-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 p-5")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 rounded-xl border border-border bg-card p-5")}>
             <h4 className={cx("font-semibold text-foreground mb-4 text-sm")}>
               When to Use Icon-Only Buttons
             </h4>
@@ -83,7 +83,7 @@ export function IconOnlyVariant() {
                 },
               ].map((item) => (
                 <div key={item.title} className={cx("flex gap-3 items-start")}>
-                  <div className={cx("mt-0.5 p-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300")}>
+                  <div className={cx("mt-0.5 p-1 rounded-md bg-accent text-accent-foreground")}>
                     <item.icon size={14} />
                   </div>
                   <div>
@@ -98,15 +98,15 @@ export function IconOnlyVariant() {
           </div>
 
           {/* Accessibility Requirements */}
-          <div className={cx("mb-4 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20")}>
+          <div data-rule-of-thumb-card="true" className={cx("mb-4 p-4 rounded-xl border button-destructive-callout")}>
             <h4 className={cx("font-semibold text-foreground mb-2 text-sm flex items-center gap-2")}>
               <span>⚠️</span> Required: Accessibility & Clarity
             </h4>
-            <div className={cx("space-y-3 text-sm text-muted-foreground")}>
+            <div className={cx("space-y-3 text-sm text-foreground")}>
               <div>
                 <p className={cx("font-medium text-foreground")}>
                   Always add{" "}
-                  <code className={cx("px-1.5 py-0.5 rounded bg-background text-rose-400")}>
+                  <code className={cx("px-1.5 py-0.5 rounded bg-background text-negative-foreground button-destructive-callout-code")}>
                     aria-label
                   </code>
                 </p>

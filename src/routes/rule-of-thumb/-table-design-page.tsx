@@ -9,7 +9,7 @@ import { TableStatesSection } from "./-table-design-states-section";
 
 export function TableDesign() {
   return (
-    <PageContainer maxWidth="3xl">
+    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
       <RuleOfThumbHero
         title="Table Design"
         description={

@@ -16,6 +16,7 @@ export const Route = createRootRoute({
       <h1 className={cx("text-2xl font-bold text-foreground")}>Page Not Found</h1>
       <Link
         to="/"
+        preload="intent"
         className={cx("text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4")}
       >
         Go back home
@@ -95,7 +96,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body
         className={cn(
-          "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative",
+          "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative site-shell",
           "bg-background text-foreground",
           "transition-colors duration-300",
         )}

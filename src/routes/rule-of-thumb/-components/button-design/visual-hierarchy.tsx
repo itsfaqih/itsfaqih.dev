@@ -16,7 +16,7 @@ export function VisualHierarchy() {
               <span className={cx("size-2 rounded-full bg-brand")} />
               Primary (Filled)
             </h4>
-            <div className={cx("p-4 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl border border-border bg-card")}>
               <div className={cx("flex flex-wrap items-center gap-3 mb-3")}>
                 <Button variant="brand">Submit</Button>
                 <Button variant="neutral">Cancel</Button>
@@ -36,7 +36,7 @@ export function VisualHierarchy() {
               <span className={cx("size-2 rounded-full bg-brand/30")} />
               Secondary (Tinted)
             </h4>
-            <div className={cx("p-4 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl border border-border bg-card")}>
               <div className={cx("flex flex-wrap items-center gap-3 mb-3")}>
                 <Button variant="secondary-brand">Edit Profile</Button>
                 <Button variant="secondary-neutral">View Details</Button>
@@ -56,7 +56,7 @@ export function VisualHierarchy() {
               <span className={cx("size-2 rounded-full border border-muted-foreground")} />
               Tertiary (Minimal)
             </h4>
-            <div className={cx("p-4 rounded-xl border border-border bg-card")}>
+            <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl border border-border bg-card")}>
               <div className={cx("flex flex-wrap items-center gap-3 mb-3")}>
                 <Button variant="tertiary-brand">Learn More</Button>
                 <Button variant="tertiary-neutral">Skip</Button>
@@ -70,7 +70,7 @@ export function VisualHierarchy() {
           </div>
 
           {/* Summary Card */}
-          <div className={cx("p-4 rounded-xl bg-muted/30 border border-border")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl bg-muted/30 border border-border")}>
             <h4 className={cx("font-semibold text-foreground mb-3 text-sm")}>Quick Reference</h4>
             <div className={cx("grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs")}>
               <div>

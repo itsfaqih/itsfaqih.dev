@@ -18,7 +18,7 @@ export function DataParsingSection() {
         <DataParsingDemo />
 
         <div className={cx("mt-8 grid sm:grid-cols-2 gap-4 mb-8")}>
-          <div className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
             <div className={cx("flex items-center gap-2 mb-3")}>
               <WarningCircleIcon size={18} className={cx("text-negative-foreground")} />
               <h3 className={cx("font-semibold text-negative-foreground")}>Without Parsing</h3>
@@ -53,7 +53,7 @@ export function DataParsingSection() {
             </ul>
           </div>
 
-          <div className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
+          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
             <div className={cx("flex items-center gap-2 mb-3")}>
               <ShieldCheckIcon size={18} className={cx("text-positive-foreground")} />
               <h3 className={cx("font-semibold text-positive-foreground")}>With Parsing</h3>

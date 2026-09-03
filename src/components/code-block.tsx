@@ -1,41 +1,144 @@
-import { useEffect, useState } from "react";
+import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
+import { isValidElement, useMemo, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from "react";
 import { cn } from "../cn";
-import { highlightCode } from "../utils/shiki-loader";
 
 type CodeBlockProps = {
   code: string;
   lang?: string;
   className?: string;
+  style?: CSSProperties;
+  highlightLines?: readonly number[];
+  highlightBackground?: string;
+  highlightBorder?: string;
 };
 
-export function CodeBlock({ code, lang = "tsx", className }: CodeBlockProps) {
-  const [highlighted, setHighlighted] = useState<string>("");
+const LANGUAGE_EXTENSIONS: Record<string, string> = {
+  bash: "sh",
+  css: "css",
+  html: "html",
+  javascript: "js",
+  jsx: "jsx",
+  json: "json",
+  markdown: "md",
+  mdx: "mdx",
+  shell: "sh",
+  text: "txt",
+  ts: "ts",
+  tsx: "tsx",
+  typescript: "ts",
+  yaml: "yml",
+};
 
-  useEffect(() => {
-    let mounted = true;
+function normalizeLanguage(language: string) {
+  const normalized = language.trim().toLowerCase();
+  return normalized || "text";
+}
 
-    highlightCode(code, lang).then((html) => {
-      if (mounted) {
-        setHighlighted(html);
-      }
-    });
+function getFilename(language: string) {
+  return `example.${LANGUAGE_EXTENSIONS[language] ?? language}`;
+}
 
-    return () => {
-      mounted = false;
-    };
-  }, [code, lang]);
+function createHighlightStyles(
+  highlightLines: readonly number[] | undefined,
+  highlightBackground = "color-mix(in srgb, var(--diffs-bg) 86%, var(--diffs-mixer))",
+  highlightBorder = "var(--diffs-fg)",
+) {
+  const lines = [...new Set(highlightLines?.filter((line) => Number.isInteger(line) && line > 0) ?? [])];
+  if (lines.length === 0) return undefined;
 
-  if (!highlighted) {
-    return <div className={cn("text-sm font-mono whitespace-pre", className)}>{code}</div>;
-  }
+  const highlightedSelectors = lines.map((line) => `:host [data-line="${line}"]`).join(",\n");
+
+  return `
+    :host [data-line] {
+      opacity: 0.4;
+      transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    ${highlightedSelectors} {
+      opacity: 1;
+      background-color: ${highlightBackground};
+      box-shadow: inset 3px 0 ${highlightBorder};
+    }
+  `;
+}
+
+export function CodeBlock({
+  code,
+  lang = "tsx",
+  className,
+  style,
+  highlightLines,
+  highlightBackground,
+  highlightBorder,
+}: CodeBlockProps) {
+  const language = normalizeLanguage(lang);
+  const file = useMemo<FileContents>(
+    () => ({
+      name: getFilename(language),
+      contents: code,
+      lang: language,
+    }),
+    [code, language],
+  );
+  const options = useMemo<FileOptions<undefined>>(
+    () => ({
+      theme: {
+        light: "github-light",
+        dark: "github-dark",
+      },
+      themeType: "system",
+      overflow: "scroll",
+      disableLineNumbers: false,
+      disableFileHeader: true,
+      unsafeCSS: createHighlightStyles(highlightLines, highlightBackground, highlightBorder),
+    }),
+    [highlightBackground, highlightBorder, highlightLines],
+  );
 
   return (
-    <div
-      className={cn(
-        "text-sm leading-loose! [&_pre]:bg-transparent! [&_pre]:p-0! [&_pre]:m-0! [&_code]:text-sm!",
-        className,
-      )}
-      dangerouslySetInnerHTML={{ __html: highlighted }}
+    <File
+      file={file}
+      options={options}
+      className={cn("code-block", className)}
+      style={
+        {
+          "--diffs-font-family": "var(--font-mono)",
+          "--diffs-header-font-family": "var(--font-sans)",
+          ...style,
+        } as CSSProperties
+      }
     />
   );
+}
+
+type MarkdownCodeElementProps = {
+  children?: ReactNode;
+  className?: string;
+  "data-language"?: string;
+};
+
+function readText(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(readText).join("");
+  if (!isValidElement(node)) return "";
+
+  return readText((node.props as MarkdownCodeElementProps).children);
+}
+
+export function MarkdownCodeBlock(props: ComponentPropsWithoutRef<"pre">) {
+  const codeElement = isValidElement(props.children) ? props.children : undefined;
+  const codeProps = codeElement?.props as MarkdownCodeElementProps | undefined;
+  const className = codeProps?.className ?? "";
+  const language =
+    codeProps?.["data-language"] ??
+    className.match(/(?:^|\s)language-([^\s]+)/)?.[1] ??
+    "text";
+  const rawCode = readText(codeProps?.children ?? props.children);
+  const code = rawCode.endsWith(String.fromCharCode(13, 10))
+    ? rawCode.slice(0, -2)
+    : rawCode.endsWith("\n")
+      ? rawCode.slice(0, -1)
+      : rawCode;
+
+  return <CodeBlock code={code} lang={language} />;
 }

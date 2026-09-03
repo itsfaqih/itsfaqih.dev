@@ -113,7 +113,7 @@ export const Route = createFileRoute("/")({
         },
         {
           label: "AI tools",
-          items: ["Claude Code", "OpenAI Codex", "OpenRouter"],
+          items: ["Claude Code", "OpenAI Codex", "OpenRouter", "Hermes", "OpenCode"],
         },
       ],
       experience: [
@@ -123,11 +123,11 @@ export const Route = createFileRoute("/")({
           subtitle: "EvidenceCare",
           date: "Sep 2024 — Present",
           description: [
-            "Spearheaded the design and development of an MCP that cut development time for a single project component by 66%; the broader project is projected to save approximately $15K per month.",
+            "Spearheaded the design and development of an MCP and a linter; the MCP cut development time for a single project component by 66%, and the broader project is projected to save approximately $15K per month.",
             "Reduced deployment time from several hours to minutes by collaborating on database migration optimization for both fresh environments and existing databases.",
             "Standardized modern tooling across TypeScript codebases, improving startup time (ts-node to tsx), build performance (CRA to Vite), linting and formatting (Prettier/ESLint to Biome), testing (Jest to Vitest), type safety (Joi to Zod), install size, and bundle size.",
-            "Reduced Docker image size by 30% by introducing an optimized image build process.",
-            "Improved developer experience by configuring the development environment firewall so local services could connect to development services with less friction.",
+            "Reduced Docker image size by 30% for select projects by introducing an optimized image build process.",
+            "Architected solutions to support multi-tenancy on a single RDS instance and to enable PHI-safe logging.",
             "Reduced runtime issues by building an automated PR reviewer that validates database permissions before merge.",
           ],
           tags: [
@@ -137,6 +137,11 @@ export const Route = createFileRoute("/")({
             "biome",
             "vitest",
             "zod",
+            "snowflake",
+            "express",
+            "react-router",
+            "postgresql",
+            "tailwindcss",
           ] as const satisfies TechTag[],
         },
         {
@@ -151,7 +156,15 @@ export const Route = createFileRoute("/")({
             "Simplified more than 80% of the code structure by co-locating related code and removing unnecessary abstractions.",
             "Improved image annotator performance and UX by moving rendering from React to direct DOM manipulation and adding mobile compatibility.",
           ],
-          tags: ["react", "typescript", "mongodb", "express"] as const satisfies TechTag[],
+          tags: [
+            "react",
+            "typescript",
+            "mongodb",
+            "express",
+            "nextjs",
+            "tanstack-router",
+            "tailwindcss",
+          ] as const satisfies TechTag[],
         },
         {
           id: "jatis-mobile-full-stack-engineer",
@@ -172,6 +185,7 @@ export const Route = createFileRoute("/")({
             "xstate",
             "reactflow",
             "adonisjs",
+            "figma",
           ] as const satisfies TechTag[],
         },
         {
@@ -291,7 +305,7 @@ function Index() {
       </section>
 
       {/* About */}
-      <Section title="About">
+      <Section title="About" hideTitle>
         <div className={cx("text-muted-foreground leading-relaxed space-y-3")}>
           <p>
             Full-stack engineer based in Yogyakarta, Indonesia with 5+ years of professional
@@ -299,26 +313,6 @@ function Index() {
             Currently building healthcare software at{" "}
             <ExternalLink href="https://evidencecare.com">EvidenceCare</ExternalLink> for the US
             market.
-          </p>
-          <p>
-            At <ExternalLink href="https://evidencecare.com">EvidenceCare</ExternalLink>, helped
-            reduce deployment times from hours to minutes, standardized modern TypeScript tooling
-            across codebases, reduced Docker image size by 30%, improved developer workflows, and
-            built automated checks to prevent database permission issues before release.
-          </p>
-          <p>
-            Creator of <ExternalLink href="https://github.com/itsfaqih/fama">Fama</ExternalLink>, an
-            open source portfolio template with 230+ GitHub stars and 48 forks, and builder of{" "}
-            <ExternalLink href="https://schemata.ruine.app/">Schemata</ExternalLink>, a
-            drag-and-drop ERD builder for visual database schema design. Experience also includes
-            leading cross-functional product teams of up to 10 engineers and designers, recognition
-            as a top performer at{" "}
-            <ExternalLink href="https://jatismobile.com/">Jatis Mobile</ExternalLink> in Q4 2022,
-            and contributing to the Indonesian PHP community through UI design work for{" "}
-            <ExternalLink href="https://www.figma.com/design/qNIg0A9h7PnrFdOVSBbMEH/PHPID-Online-Learning-Redesign?node-id=0-1&t=PcPvOnrKzLginYqa-1">
-              PHPID Learning
-            </ExternalLink>
-            .
           </p>
 
           <div className={cx("flex flex-wrap gap-2 mt-4")}>

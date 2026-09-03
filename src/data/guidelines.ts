@@ -30,7 +30,6 @@ export const GUIDELINES: Guideline[] = [
     title: "Button Design",
     description: "States, hover, variants, and icon alignment",
     href: "/rule-of-thumb/button-design",
-    hidden: true,
   },
   {
     id: "table-design",

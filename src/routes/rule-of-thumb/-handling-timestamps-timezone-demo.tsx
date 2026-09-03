@@ -45,7 +45,7 @@ export function TimezoneDemo() {
             <h3 className={cx("text-sm font-medium text-muted-foreground mb-2")}>
               Your Local Time ({USER_TIMEZONE})
             </h3>
-            <div className={cx("p-4 rounded-lg bg-zinc-500/10 border border-border")}>
+            <div className={cx("p-4 rounded-lg bg-muted border border-border")}>
               <p className={cx("text-foreground")}>{LOCAL_TIME_FORMATTER.format(new Date(utcTime))}</p>
             </div>
           </div>

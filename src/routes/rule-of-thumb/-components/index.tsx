@@ -74,7 +74,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
     <div className={cx("text-center mb-16")}>
       {badge && (
         <div className={cx("flex justify-center mb-6")}>
-          <div className={cx("inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-500/10 backdrop-blur-md border border-border text-foreground text-sm font-medium")}>
+          <div className={cx("inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent backdrop-blur-md border border-border text-accent-foreground text-sm font-medium")}>
             {badge.icon && <badge.icon size={16} />}
             {badge.text}
           </div>
@@ -119,7 +119,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
                 <Menu.Positioner side="bottom" align="end" sideOffset={8} className={cx("z-50")}>
                   <Menu.Popup
                     className={cn(
-                      "w-fit rounded-xl border border-border bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl p-1 shadow-lg z-50 flex flex-col outline-none origin-top",
+                      "w-fit rounded-xl border border-border bg-popover backdrop-blur-xl p-1 shadow-lg z-50 flex flex-col outline-none origin-top",
                       "transition-[transform,opacity,scale] duration-150",
                       "data-starting-style:scale-95 data-starting-style:opacity-0",
                       "data-ending-style:scale-95 data-ending-style:opacity-0",
@@ -227,7 +227,7 @@ export function CodeComparison({
           <XIcon size={16} className={cx("text-negative-foreground")} />
           <span className={cx("font-medium text-negative-foreground")}>{badTitle}</span>
         </div>
-        <div className={cx("p-4 overflow-x-auto")}>
+        <div className={cx("overflow-x-auto")}>
           <CodeBlock code={badCode} />
         </div>
         <div className={cx("px-4 py-3 border-t border-negative/30 bg-negative/10 text-sm text-negative-foreground flex items-start gap-2")}>
@@ -245,7 +245,7 @@ export function CodeComparison({
           <CheckIcon size={16} className={cx("text-positive-foreground")} />
           <span className={cx("font-medium text-positive-foreground")}>{goodTitle}</span>
         </div>
-        <div className={cx("p-4 overflow-x-auto")}>
+        <div className={cx("overflow-x-auto")}>
           <CodeBlock code={goodCode} />
         </div>
         <div className={cx("px-4 py-3 border-t border-positive/30 bg-positive/10 text-sm text-positive-foreground flex items-start gap-2")}>
@@ -273,7 +273,7 @@ export function CodeExample({ title, code, description }: CodeExampleProps) {
       <div className={cx("px-4 py-3 border-b border-border flex items-center gap-2")}>
         <span className={cx("font-medium text-foreground")}>{title}</span>
       </div>
-      <div className={cx("p-4 overflow-x-auto")}>
+      <div className={cx("overflow-x-auto")}>
         <CodeBlock code={code} />
       </div>
       {description && (
@@ -319,7 +319,7 @@ export function TabbedCodeExample({ title, tabs, description }: TabbedCodeExampl
           </Tabs.List>
         </div>
         {tabs.map((tab) => (
-          <Tabs.Panel key={tab.label} value={tab.label} className={cx("p-4 overflow-x-auto")}>
+          <Tabs.Panel key={tab.label} value={tab.label} className={cx("overflow-x-auto")}>
             <CodeBlock code={tab.code} />
           </Tabs.Panel>
         ))}
@@ -351,7 +351,7 @@ export function QuickRefTable({ items }: QuickRefTableProps) {
         <div key={`${item.scenario}:${item.action}`} className={cx("flex gap-4 group")}>
           {/* Timeline column */}
           <div className={cx("flex flex-col items-center shrink-0")}>
-            <div className={cx("size-7 rounded-full bg-zinc-500/10 dark:bg-zinc-500/20 border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground group-hover:border-foreground/30 group-hover:text-foreground transition-colors")}>
+            <div className={cx("size-7 rounded-full bg-accent text-accent-foreground border border-border flex items-center justify-center text-xs font-semibold text-accent-foreground group-hover:border-foreground/30 group-hover:text-foreground transition-colors")}>
               {i + 1}
             </div>
             {i < items.length - 1 && (

@@ -18,7 +18,7 @@ export function SWRDemo() {
   };
 
   return (
-    <div className={cx("rounded-2xl border border-border bg-card overflow-hidden")}>
+    <div data-rule-of-thumb-card="true" className={cx("rounded-2xl border border-border bg-card overflow-hidden")}>
       <div className={cx("p-6")}>
         <div className={cx("flex items-center justify-between mb-4")}>
           <h3 className={cx("font-semibold text-foreground")}>Dashboard Stats</h3>

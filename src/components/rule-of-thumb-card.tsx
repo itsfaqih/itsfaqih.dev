@@ -23,6 +23,7 @@ export type RuleOfThumb = {
 type RuleOfThumbCardProps = {
   ruleOfThumb: RuleOfThumb;
   style?: CSSProperties;
+  preload?: false | "intent" | "viewport" | "render";
 };
 
 function renderThumbnail(ruleOfThumbId: string) {
@@ -55,11 +56,12 @@ function renderThumbnail(ruleOfThumbId: string) {
   }
 }
 
-export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
+export function RuleOfThumbCard({ ruleOfThumb, style, preload }: RuleOfThumbCardProps) {
   const cardContent = (
     <>
       {/* Card */}
       <div
+        data-rule-of-thumb-card="true"
         className={cx(`relative h-48 rounded-xl squircle overflow-hidden bg-linear-to-br from-card to-background border border-border transition-all duration-300 ${!ruleOfThumb.comingSoon ? "group-hover:border-muted-foreground/30 group-hover:-translate-y-1" : "opacity-60"}`)}
       >
         {/* Decorative gradient overlay */}
@@ -108,6 +110,7 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
   if (ruleOfThumb.comingSoon) {
     return (
       <div
+        data-rule-of-thumb-card="true"
         className={cx("block")}
         style={{
           width: "288px", // Fixed width - w-72 = 18rem = 288px
@@ -123,6 +126,8 @@ export function RuleOfThumbCard({ ruleOfThumb, style }: RuleOfThumbCardProps) {
   return (
     <Link
       to={ruleOfThumb.href}
+      preload={preload}
+      data-rule-of-thumb-card="true"
       className={cx("group block")}
       style={{
         width: "288px", // Fixed width - w-72 = 18rem = 288px

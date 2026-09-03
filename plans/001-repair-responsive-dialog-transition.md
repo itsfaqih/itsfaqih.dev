@@ -131,8 +131,8 @@ feedback but removes the scale movement.
 
 ## Verification
 
-- **Mechanical**: Run `bun run typecheck`, `bun run lint`, `bun run test`, and `bun run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
-- **Feel check**: Run the site with `bun run dev --host 127.0.0.1 --port 4174`, open `/rule-of-thumb/dialog-design`, and trigger the interactive dialog on a desktop-width viewport.
+- **Mechanical**: Run `npm run typecheck`, `npm run lint`, `npm run test`, and `npm run build` from `/Users/itsfaqih/itsfaqih.dev`. Each must exit 0. Run `git -c core.whitespace=cr-at-eol diff --check` after the edit.
+- **Feel check**: Run the site with `npm run dev --host 127.0.0.1 --port 4174`, open `/rule-of-thumb/dialog-design`, and trigger the interactive dialog on a desktop-width viewport.
   - Confirm the backdrop fades in/out without changing unrelated properties.
   - Confirm the centered popup scales from `0.95` to `1` and fades within 200ms; it must not slide from the top or bottom.
   - Close and reopen repeatedly while the transition is running; the CSS transition must retarget from the current state rather than restart from a keyframe.

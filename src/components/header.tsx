@@ -24,9 +24,15 @@ const DESKTOP_NAV_LIQUID_OPTIONS = {
   frost: 0.6,
   shadow: false,
   specular: true,
+  tilt: false,
 };
 
 const DESKTOP_BACK_LIQUID_OPTIONS = {
+  tilt: false,
+};
+
+const MOBILE_LIQUID_OPTIONS = {
+  shadow: false,
   tilt: false,
 };
 
@@ -49,8 +55,8 @@ export function Header() {
   const backPath = isRuleOfThumbDetail ? "/rule-of-thumb" : "/";
   const desktopNavRef = useLiquidGLTarget<HTMLDivElement>(true, DESKTOP_NAV_LIQUID_OPTIONS);
   const desktopBackRef = useLiquidGLTarget<HTMLDivElement>(true, DESKTOP_BACK_LIQUID_OPTIONS);
-  const mobileBackRef = useLiquidGLTarget<HTMLDivElement>();
-  const mobileMenuTriggerRef = useLiquidGLTarget<HTMLDivElement>();
+  const mobileBackRef = useLiquidGLTarget<HTMLDivElement>(true, MOBILE_LIQUID_OPTIONS);
+  const mobileMenuTriggerRef = useLiquidGLTarget<HTMLDivElement>(true, MOBILE_LIQUID_OPTIONS);
 
   return (
     <>
@@ -63,6 +69,7 @@ export function Header() {
           >
             <Link
               to={backPath}
+              preload="intent"
               className={cx("liquid-gl-content desktop-menu-back-button-content")}
               aria-label="Go Back"
               tabIndex={showBackButton ? 0 : -1}
@@ -149,6 +156,7 @@ export function Header() {
       >
         <Link
           to={backPath}
+          preload="intent"
           className={cx("liquid-gl-content mobile-menu-glass-content")}
           aria-label="Go Back"
           tabIndex={showBackButton ? 0 : -1}

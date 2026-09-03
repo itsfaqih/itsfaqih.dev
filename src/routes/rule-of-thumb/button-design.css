@@ -149,10 +149,10 @@
 
 @keyframes button-demo-highlight {
   0%,
-  12% {
+  9% {
     opacity: 0;
   }
-  13%,
+  10%,
   24% {
     opacity: 1;
   }
@@ -176,13 +176,13 @@
   90% {
     border-color: color-mix(in srgb, var(--brand), transparent 80%);
     background-color: color-mix(in srgb, var(--brand), transparent 10%);
-    opacity: 0.6;
+    opacity: 1;
   }
   95%,
   100% {
     border-color: color-mix(in srgb, var(--brand), transparent 80%);
     background-color: color-mix(in srgb, var(--brand), transparent 10%);
-    opacity: 0.6;
+    opacity: 1;
   }
 }
 

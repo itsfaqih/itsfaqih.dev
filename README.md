@@ -6,15 +6,15 @@ To run this application:
 
 ```bash
 bun install
-bun run dev
+npm run dev
 ```
 
 # Building For Production
 
-To build this application for production:
+The production build uses TanStack Start static prerendering. It generates complete HTML files for the site's discoverable routes in `.output/public`, so the site can be served from static hosting without a runtime server. React still hydrates in the browser, keeping client-side navigation and interactions.
 
 ```bash
-bun run build
+npm run build
 ```
 
 ## Testing
@@ -22,7 +22,7 @@ bun run build
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
 ```bash
-bun run test
+npm run test
 ```
 
 ## Storybook
@@ -30,13 +30,13 @@ bun run test
 Storybook is configured for the TanStack React/Vite stack and uses the same global theme and StyleX fallback styles as the website. Start the component workbench with:
 
 ```bash
-bun run storybook
+npm run storybook
 ```
 
 Build the static Storybook bundle with:
 
 ```bash
-bun run build-storybook
+npm run build-storybook
 ```
 
 Stories live in `src/stories` and intentionally use an explicit `*.stories.tsx` glob so the website's route MDX content stays on the TanStack Start pipeline.

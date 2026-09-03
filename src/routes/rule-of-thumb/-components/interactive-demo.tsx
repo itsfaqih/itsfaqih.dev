@@ -16,6 +16,7 @@ export function InteractiveDemo() {
 
   return (
     <div
+      data-rule-of-thumb-card="true"
       className={cx(
         "p-12 rounded-2xl squircle border border-border bg-card flex flex-col items-center justify-center gap-6 text-center",
       )}

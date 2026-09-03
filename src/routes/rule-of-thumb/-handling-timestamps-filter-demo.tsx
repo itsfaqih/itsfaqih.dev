@@ -61,7 +61,7 @@ export function FilterDemo() {
         <div className={cx("grid sm:grid-cols-2 gap-4")}>
           <div>
             <h3 className={cx("text-sm font-medium text-muted-foreground mb-2")}>Option 1: UTC</h3>
-            <div className={cx("p-4 rounded-lg bg-zinc-500/10 border border-border font-mono text-xs")}>
+            <div className={cx("p-4 rounded-lg bg-muted border border-border font-mono text-xs")}>
               <span className={cx("text-foreground")}>{getUTCEquivalent()}</span>
             </div>
           </div>
@@ -69,7 +69,7 @@ export function FilterDemo() {
             <h3 className={cx("text-sm font-medium text-muted-foreground mb-2")}>
               Option 2: With Offset
             </h3>
-            <div className={cx("p-4 rounded-lg bg-zinc-500/10 border border-border font-mono text-xs")}>
+            <div className={cx("p-4 rounded-lg bg-muted border border-border font-mono text-xs")}>
               <span className={cx("text-foreground")}>{getWithOffset()}</span>
             </div>
           </div>

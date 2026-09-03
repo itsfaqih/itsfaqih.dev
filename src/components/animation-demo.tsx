@@ -41,6 +41,8 @@ export function AnimationDemo({
   const animationStyle = {
     animationDuration: `${duration}ms`,
     ...ANIMATION_STYLE_DEFAULTS,
+    // Keep newly-created CSS animations in sync with React state.
+    animationPlayState: animationData.status === "playing" ? "running" : "paused",
   };
 
   return (
@@ -94,7 +96,7 @@ function DemoOverlay({
   icon,
   label,
   circleClass = "bg-black/10 border-black/20 group-hover:bg-black/20",
-  textClass = "text-black",
+  textClass = "text-foreground",
 }: {
   onClick: () => void;
   icon: React.ReactNode;
@@ -103,10 +105,18 @@ function DemoOverlay({
   textClass?: string;
 }) {
   return (
-    <div className={cx("absolute inset-0 z-60 flex items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-500 pointer-events-auto")}>
+    <div
+      className={cx("absolute inset-0 z-60 flex items-center justify-center demo-overlay-surface backdrop-blur-sm transition-all duration-500 pointer-events-auto")}
+      onClick={onClick}
+      role="presentation"
+    >
       <button
-        onClick={onClick}
-        className={cx("flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-background/50 p-4 rounded-2xl backdrop-blur-sm")}
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onClick();
+        }}
+        className={cx("flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 demo-overlay-surface p-4 rounded-2xl backdrop-blur-sm")}
       >
         <div
           className={cx(`size-14 flex items-center justify-center rounded-full border backdrop-blur-md transition-colors ${circleClass}`)}

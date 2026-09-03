@@ -3,7 +3,7 @@ import { cx } from "@/stylex";
 export function WhyThisMattersSection() {
   return (
     <div className={cx("mb-20")}>
-      <div className={cx("p-8 rounded-2xl bg-card border border-border")}>
+      <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-card border border-border")}>
         <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Why This Matters</h2>
         <ul className={cx("space-y-3 text-muted-foreground")}>
           <li className={cx("flex items-start gap-3")}>

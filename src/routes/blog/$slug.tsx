@@ -2,6 +2,7 @@ import { cx } from "@/stylex";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { getPost } from "./-components/posts";
+import { MarkdownCodeBlock } from "@/components/code-block";
 import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "vaul";
 import { TableOfContents } from "./-components/table-of-contents";
@@ -50,6 +51,7 @@ function BlogPost() {
             {/* Back */}
             <Link
               to="/blog"
+              preload="intent"
               className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group mb-8 active:scale-95")}
             >
               <ArrowLeftIcon
@@ -93,7 +95,7 @@ function BlogPost() {
 
               {/* Content */}
               <div className={cx("prose prose-invert dark:prose-invert prose-zinc dark:prose-zinc max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-muted-foreground prose-code:text-foreground prose-pre:bg-card prose-pre:border prose-pre:border-border prose-headings:scroll-mt-24")}>
-                <Component />
+                <Component components={{ pre: MarkdownCodeBlock }} />
               </div>
             </article>
 
@@ -102,6 +104,7 @@ function BlogPost() {
               <div className={cx("flex flex-col sm:flex-row items-center justify-between gap-4")}>
                 <Link
                   to="/blog"
+                  preload="intent"
                   className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group active:scale-95")}
                 >
                   <ArrowLeftIcon
