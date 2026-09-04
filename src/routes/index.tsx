@@ -311,7 +311,7 @@ function Index() {
             Full-stack engineer based in Yogyakarta, Indonesia with 5+ years of professional
             experience building web products across healthcare, SaaS, and internal tooling.
             Currently building healthcare software at{" "}
-            <ExternalLink href="https://evidencecare.com">EvidenceCare</ExternalLink> for the US
+            <ExternalLink href="https://evidence.care">EvidenceCare</ExternalLink> for the US
             market.
           </p>
 
