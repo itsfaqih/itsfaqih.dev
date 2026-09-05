@@ -277,21 +277,13 @@ export const Route = createFileRoute("/")({
           isExternal: true,
         },
       ] satisfies ProjectListItem[],
-      achievements: [
-        "3rd Place, LKS Klaten 2016 (Regency Level) - Jul 2016",
-        "2nd Place, Central Java OlympicAD Pentasbora 2017 (Province Level) - Aug 2017",
-        "1st Place, LKS Klaten 2017 (Regency Level) - Sep 2017",
-        "1st Place, OlympicAD V 2017 (National Level) - Oct 2017",
-        "3rd Place, CODE 2020 (National Level) - Jul 2020",
-        '2nd Place, "Keep Being Creative from Home" Web Design Contest (National Level) - Dec 2020',
-      ],
       languages: ["Indonesian (Native)", "English (B2)"],
     };
   },
 });
 
 function Index() {
-  const { skills, toolGroups, experience, projects, achievements, languages } =
+  const { skills, toolGroups, experience, projects, languages } =
     Route.useLoaderData();
 
   return (
@@ -385,18 +377,6 @@ function Index() {
             isExternal={project.isExternal}
           />
         ))}
-      </Section>
-
-      {/* Achievements */}
-      <Section title="Achievements">
-        <ul className={cx("space-y-2 text-sm leading-relaxed text-muted-foreground")}>
-          {achievements.map((achievement) => (
-            <li key={achievement} className={cx("flex gap-3")}>
-              <span aria-hidden="true">•</span>
-              <span>{achievement}</span>
-            </li>
-          ))}
-        </ul>
       </Section>
 
       {/* Languages */}
