@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { cx } from "@/stylex";
 import { cn } from "../cn";
 
@@ -59,17 +60,17 @@ function FadeBox({ position, row, delay, side }: FadeBoxProps) {
       ? { left: `calc(var(--cell-size) * ${position})` }
       : { right: `calc(var(--cell-size) * ${position})` };
 
-  return (
-    <div
-      className={cx("fade-box")}
-      style={{
-        ...positionStyle,
-        top: `calc(var(--cell-size) * ${row})`,
-        ["--fade-delay" as string]: `${delay}s`,
-        ["--fade-duration" as string]: `${CYCLE_DURATION}s`,
-      }}
-    />
-  );
+  const style: CSSProperties & {
+    "--fade-delay": string;
+    "--fade-duration": string;
+  } = {
+    ...positionStyle,
+    top: `calc(var(--cell-size) * ${row})`,
+    "--fade-delay": `${delay}s`,
+    "--fade-duration": `${CYCLE_DURATION}s`,
+  };
+
+  return <div className={cx("fade-box")} style={style} />;
 }
 
 type WallGridProps = {

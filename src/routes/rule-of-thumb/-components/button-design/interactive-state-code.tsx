@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { CodeBlock } from "@/components/code-block";
 
-type CodeState = "idle" | "hover" | "focus" | "pending" | "disabled" | "pressing";
+const CODE_STATES = ["idle", "hover", "focus", "pending", "disabled", "pressing"] as const;
+
+type CodeState = (typeof CODE_STATES)[number];
 
 const STATE_INFO: Record<CodeState, { label: string; description: string }> = {
   idle: {
@@ -143,7 +145,7 @@ export function InteractiveStateCode() {
           role="group"
           aria-label="Button state examples"
         >
-          {(Object.keys(STATE_INFO) as CodeState[]).map((state) => {
+          {CODE_STATES.map((state) => {
             const info = STATE_INFO[state];
             const isActive = activeState === state;
             return (

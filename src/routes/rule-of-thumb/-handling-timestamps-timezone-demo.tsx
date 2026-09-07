@@ -1,22 +1,31 @@
 import { cx } from "@/stylex";
 import { ArrowRightIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "../../components/card";
 
-const USER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const LOCAL_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "long",
-  timeZone: USER_TIMEZONE,
-});
 const UTC_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
   timeStyle: "long",
   timeZone: "UTC",
 });
 
-export function TimezoneDemo() {
-  const [utcTime] = useState(() => new Date().toISOString());
+type TimezoneDemoProps = {
+  initialUtcTime: string;
+};
+
+export function TimezoneDemo({ initialUtcTime }: TimezoneDemoProps) {
+  const [utcTime, setUtcTime] = useState(initialUtcTime);
+  const [userTimezone, setUserTimezone] = useState("UTC");
+  const localTimeFormatter = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "long",
+    timeZone: userTimezone,
+  });
+
+  useEffect(() => {
+    setUtcTime(new Date().toISOString());
+    setUserTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, []);
 
   return (
     <Card className={cx("rounded-2xl overflow-hidden")}>
@@ -43,10 +52,10 @@ export function TimezoneDemo() {
           </div>
           <div>
             <h3 className={cx("text-sm font-medium text-muted-foreground mb-2")}>
-              Your Local Time ({USER_TIMEZONE})
+              Your Local Time ({userTimezone})
             </h3>
             <div className={cx("p-4 rounded-lg bg-muted border border-border")}>
-              <p className={cx("text-foreground")}>{LOCAL_TIME_FORMATTER.format(new Date(utcTime))}</p>
+              <p className={cx("text-foreground")}>{localTimeFormatter.format(new Date(utcTime))}</p>
             </div>
           </div>
         </div>

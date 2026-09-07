@@ -40,11 +40,6 @@ function BlogPost() {
 
   return (
     <div className={cx("relative min-h-screen")}>
-      {/* Background */}
-      <div className={cx("absolute inset-0 overflow-hidden pointer-events-none")}>
-        {/* Background removed for solid design */}
-      </div>
-
       <div className={cx("relative max-w-6xl mx-auto px-6 pt-8 sm:pt-24 pb-12 animate-fade-in")}>
         <div className={cx("grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12 items-start")}>
           <div>

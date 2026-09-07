@@ -18,11 +18,6 @@ function BlogIndex() {
 
   return (
     <div className={cx("relative min-h-screen")}>
-      {/* Background */}
-      <div className={cx("absolute inset-0 overflow-hidden pointer-events-none")}>
-        {/* Background removed for solid design */}
-      </div>
-
       <PageContainer maxWidth="3xl" className={cx("relative pb-12")}>
         {/* Header */}
         <div className={cx("mb-8")}>

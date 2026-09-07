@@ -39,6 +39,8 @@ const STATE_INFO: Record<TableState, { label: string; description: string; color
   },
 };
 
+const TABLE_STATES = ["loading", "data", "empty", "error"] as const;
+
 export function InteractiveTableDemo() {
   const [state, setState] = useState<TableState>("data");
   const [searchQuery, setSearchQuery] = useState("");
@@ -204,7 +206,7 @@ export function InteractiveTableDemo() {
 
         <div className={cx("flex flex-col gap-4")}>
           <div className={cx("flex flex-wrap items-center justify-center gap-2")}>
-            {(["loading", "data", "empty", "error"] as TableState[]).map((nextState, index, states) => (
+            {TABLE_STATES.map((nextState, index, states) => (
               <div key={nextState} className={cx("flex items-center gap-2")}>
                 <button
                   type="button"

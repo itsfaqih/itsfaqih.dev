@@ -1,5 +1,5 @@
 import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
-import { isValidElement, useMemo, type ComponentPropsWithoutRef, type CSSProperties, type ReactNode } from "react";
+import { isValidElement, useMemo, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
 import { cn } from "../cn";
 
 type CodeBlockProps = {
@@ -12,7 +12,7 @@ type CodeBlockProps = {
   highlightBorder?: string;
 };
 
-const LANGUAGE_EXTENSIONS: Record<string, string> = {
+const LANGUAGE_EXTENSIONS = new Map(Object.entries({
   bash: "sh",
   css: "css",
   html: "html",
@@ -27,7 +27,7 @@ const LANGUAGE_EXTENSIONS: Record<string, string> = {
   tsx: "tsx",
   typescript: "ts",
   yaml: "yml",
-};
+}));
 
 function normalizeLanguage(language: string) {
   const normalized = language.trim().toLowerCase();
@@ -35,7 +35,7 @@ function normalizeLanguage(language: string) {
 }
 
 function getFilename(language: string) {
-  return `example.${LANGUAGE_EXTENSIONS[language] ?? language}`;
+  return `example.${LANGUAGE_EXTENSIONS.get(language) ?? language}`;
 }
 
 function createHighlightStyles(
@@ -95,39 +95,59 @@ export function CodeBlock({
     [highlightBackground, highlightBorder, highlightLines],
   );
 
+  const fileStyle: CSSProperties & {
+    "--diffs-font-family": string;
+    "--diffs-header-font-family": string;
+  } = {
+    "--diffs-font-family": "var(--font-mono)",
+    "--diffs-header-font-family": "var(--font-sans)",
+    ...style,
+  };
+
   return (
     <File
       file={file}
       options={options}
       className={cn("code-block", className)}
-      style={
-        {
-          "--diffs-font-family": "var(--font-mono)",
-          "--diffs-header-font-family": "var(--font-sans)",
-          ...style,
-        } as CSSProperties
-      }
+      style={fileStyle}
     />
   );
 }
 
+type MarkdownCodeChild =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | ReactElement<MarkdownCodeElementProps>
+  | readonly MarkdownCodeChild[];
+
 type MarkdownCodeElementProps = {
-  children?: ReactNode;
+  children?: MarkdownCodeChild;
   className?: string;
   "data-language"?: string;
 };
 
-function readText(node: ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(readText).join("");
-  if (!isValidElement(node)) return "";
-
-  return readText((node.props as MarkdownCodeElementProps).children);
+function isCodeChildren(node: MarkdownCodeChild): node is readonly MarkdownCodeChild[] {
+  return Array.isArray(node);
 }
 
-export function MarkdownCodeBlock(props: ComponentPropsWithoutRef<"pre">) {
-  const codeElement = isValidElement(props.children) ? props.children : undefined;
-  const codeProps = codeElement?.props as MarkdownCodeElementProps | undefined;
+function readText(node: MarkdownCodeChild): string {
+  if (node == null || node === true || node === false) return "";
+  if (isCodeChildren(node)) return node.map(readText).join("");
+  if (isValidElement<MarkdownCodeElementProps>(node)) return readText(node.props.children);
+  return String(node);
+}
+
+type MarkdownCodeBlockProps = Omit<ComponentPropsWithoutRef<"pre">, "children"> & {
+  children?: MarkdownCodeChild;
+};
+
+export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
+  const codeProps = isValidElement<MarkdownCodeElementProps>(props.children)
+    ? props.children.props
+    : undefined;
   const className = codeProps?.className ?? "";
   const language =
     codeProps?.["data-language"] ??

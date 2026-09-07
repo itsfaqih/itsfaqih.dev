@@ -52,6 +52,7 @@ export function useCommandPalette() {
   const [parentItemId, setParentItemId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const copiedResetTimerRef = useRef<number>(undefined);
   const navigate = useNavigate();
 
 
@@ -121,13 +122,18 @@ export function useCommandPalette() {
         icon: copied ? <CheckIcon size={18} /> : <EnvelopeIcon size={18} />,
         category: "action",
         keywords: ["email", "contact", "mail", "clipboard"],
-        action: () => {
-          navigator.clipboard.writeText("itsfaqih@gmail.com");
-          setCopied(true);
-          setTimeout(() => {
-            setCopied(false);
-            closeAndReset();
-          }, 1500);
+        action: async () => {
+          try {
+            await navigator.clipboard.writeText("itsfaqih@gmail.com");
+            setCopied(true);
+            copiedResetTimerRef.current = window.setTimeout(() => {
+              copiedResetTimerRef.current = undefined;
+              setCopied(false);
+              closeAndReset();
+            }, 1500);
+          } catch (error) {
+            console.warn("Could not copy the email address.", error);
+          }
         },
       },
   ];
@@ -295,22 +301,29 @@ export function useCommandPalette() {
 
   // Reset on close
   useEffect(() => {
+    let resetTimer: number | undefined;
     if (!isOpen) {
-      const timer = setTimeout(() => {
+      if (copiedResetTimerRef.current !== undefined) {
+        window.clearTimeout(copiedResetTimerRef.current);
+        copiedResetTimerRef.current = undefined;
+      }
+      setCopied(false);
+      resetTimer = window.setTimeout(() => {
         setNavigationLevel("root");
         setInputValue("");
         setHighlightedIndex(0);
       }, 150);
-      return () => clearTimeout(timer);
     }
+    return () => {
+      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
+    };
   }, [isOpen]);
 
   // Auto-focus input when opening or changing level
   useEffect(() => {
-    if (isOpen) {
-      // Small delay to ensure DOM is ready after Dialog opens
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
   }, [isOpen, navigationLevel]);
 
   // ── A11y IDs ─────────────────────────────────────────────────────────

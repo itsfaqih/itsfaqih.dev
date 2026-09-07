@@ -1,14 +1,11 @@
 import { useEffect, useRef } from "react";
+import type liquidGL from "liquid-gl";
+import type { LiquidGLRenderer } from "liquid-gl";
 
 const TARGET_ATTRIBUTE = "data-liquid-gl-target";
 const INITIALIZED_ATTRIBUTE = "data-liquid-gl-initialized";
 const INITIALIZATION_DELAY_MS = 120;
 const THEME_TRANSITION_DURATION_MS = 320;
-
-type IdleWindow = Window & {
-  requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
-  cancelIdleCallback?: (handle: number) => void;
-};
 
 export type LiquidGLTuningOptions = {
   refraction?: number;
@@ -27,32 +24,12 @@ export type LiquidGLTuningOptions = {
 const initializedTargets = new WeakSet<HTMLElement>();
 const pendingTargets = new WeakSet<HTMLElement>();
 let targetId = 0;
-let liquidGLPromise: Promise<LiquidGL> | undefined;
+let liquidGLPromise: Promise<typeof liquidGL> | undefined;
 let themeObserver: MutationObserver | undefined;
 let themeRecaptureFrame: number | undefined;
 let themeFinalRecaptureTimer: number | undefined;
 let viewportSyncFrame: number | undefined;
 let viewportSyncRegistered = false;
-
-type LiquidGLLensRuntime = {
-  el?: HTMLElement;
-  updateMetrics?: () => void;
-  _shadowSyncFn?: () => void;
-};
-
-type LiquidGLRendererRuntime = {
-  captureSnapshot?: () => Promise<boolean> | boolean;
-  canvas?: HTMLCanvasElement;
-  _resizeCanvas?: () => void;
-  _renderLens?: (lens: LiquidGLLensRuntime) => void;
-  render?: () => void;
-  lenses?: LiquidGLLensRuntime[];
-  mobileViewportOffsetsPatched?: boolean;
-};
-
-type LiquidGLWindow = Window & {
-  __liquidGLRenderer__?: LiquidGLRendererRuntime;
-};
 
 const liquidGLOptions = (
   prefersReducedMotion: boolean,
@@ -83,7 +60,7 @@ function loadLiquidGL() {
 }
 
 function ensureThemeSynchronization() {
-  if (themeObserver || typeof MutationObserver === "undefined") return;
+  if (themeObserver || globalThis.MutationObserver === undefined) return;
 
   themeObserver = new MutationObserver(() => {
     if (themeRecaptureFrame !== undefined) {
@@ -93,21 +70,21 @@ function ensureThemeSynchronization() {
       window.clearTimeout(themeFinalRecaptureTimer);
     }
 
-    const renderer = (window as LiquidGLWindow).__liquidGLRenderer__;
+    const renderer = window.__liquidGLRenderer__;
 
     // Refresh the WebGL snapshot as soon as the root theme class changes.
     // Waiting for the CSS transition to finish leaves the glass rendering the
     // previous theme while the rest of the page is already transitioning.
     themeRecaptureFrame = window.requestAnimationFrame(() => {
       themeRecaptureFrame = undefined;
-      void renderer?.captureSnapshot?.();
+      void renderer?.captureSnapshot();
     });
 
     // Capture once more after the CSS colors settle so the refracted texture
     // ends on the exact final theme values without delaying the first update.
     themeFinalRecaptureTimer = window.setTimeout(() => {
       themeFinalRecaptureTimer = undefined;
-      void renderer?.captureSnapshot?.();
+      void renderer?.captureSnapshot();
     }, THEME_TRANSITION_DURATION_MS);
   });
 
@@ -117,14 +94,13 @@ function ensureThemeSynchronization() {
   });
 }
 
-function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRendererRuntime) {
-  if (renderer.mobileViewportOffsetsPatched || !renderer._renderLens) return;
+export function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRenderer) {
+  if (renderer.mobileViewportOffsetsPatched) return;
 
   const originalRenderLens = renderer._renderLens;
   renderer._renderLens = (lens) => {
     const isMobileFixedLens =
       window.matchMedia("(max-width: 639px)").matches &&
-      lens.el &&
       window.getComputedStyle(lens.el).position === "fixed";
     const viewport = window.visualViewport;
 
@@ -139,13 +115,20 @@ function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRendererRuntim
     // button by the toolbar height. Keep the real viewport object for all
     // other code and neutralize the offset only during this renderer call.
     const viewportDescriptor = Object.getOwnPropertyDescriptor(window, "visualViewport");
-    const correctedViewport = new Proxy(viewport, {
-      get(target, property) {
-        if (property === "offsetTop" || property === "offsetLeft") return 0;
-        const value = Reflect.get(target, property, target);
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-    });
+    const correctedViewport: VisualViewport = {
+      offsetTop: 0,
+      offsetLeft: 0,
+      get height() { return viewport.height; },
+      get width() { return viewport.width; },
+      get pageTop() { return viewport.pageTop; },
+      get pageLeft() { return viewport.pageLeft; },
+      get scale() { return viewport.scale; },
+      get onresize() { return viewport.onresize; },
+      get onscroll() { return viewport.onscroll; },
+      addEventListener: viewport.addEventListener.bind(viewport),
+      removeEventListener: viewport.removeEventListener.bind(viewport),
+      dispatchEvent: viewport.dispatchEvent.bind(viewport),
+    };
 
     try {
       Object.defineProperty(window, "visualViewport", {
@@ -157,8 +140,7 @@ function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRendererRuntim
       if (viewportDescriptor) {
         Object.defineProperty(window, "visualViewport", viewportDescriptor);
       } else {
-        const windowWithOptionalViewport = window as unknown as { visualViewport?: VisualViewport };
-        delete windowWithOptionalViewport.visualViewport;
+        Reflect.deleteProperty(window, "visualViewport");
       }
     }
   };
@@ -166,7 +148,7 @@ function ensureMobileLiquidGLViewportCorrection(renderer: LiquidGLRendererRuntim
 }
 
 function syncLiquidGLViewport() {
-  const renderer = (window as LiquidGLWindow).__liquidGLRenderer__;
+  const renderer = window.__liquidGLRenderer__;
   if (!renderer) return;
 
   ensureMobileLiquidGLViewportCorrection(renderer);
@@ -177,23 +159,22 @@ function syncLiquidGLViewport() {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const canvas = renderer.canvas;
   const canvasNeedsResize =
-    !canvas ||
     canvas.width !== window.innerWidth * dpr ||
     canvas.height !== window.innerHeight * dpr;
 
   if (canvasNeedsResize) {
-    renderer._resizeCanvas?.();
+    renderer._resizeCanvas();
   }
 
-  renderer.lenses?.forEach((lens) => {
-    lens.updateMetrics?.();
+  renderer.lenses.forEach((lens) => {
+    lens.updateMetrics();
     lens._shadowSyncFn?.();
   });
-  renderer.render?.();
+  renderer.render();
 }
 
 function ensureViewportSynchronization() {
-  if (viewportSyncRegistered || typeof window === "undefined") return;
+  if (viewportSyncRegistered || globalThis.window === undefined) return;
 
   const scheduleSync = () => {
     if (viewportSyncFrame !== undefined) return;
@@ -212,7 +193,7 @@ function ensureViewportSynchronization() {
   viewportSyncRegistered = true;
 }
 
-function initializeLiquidGL(target: HTMLElement, options: LiquidGLTuningOptions = {}) {
+async function initializeLiquidGL(target: HTMLElement, options: LiquidGLTuningOptions = {}) {
   if (
     initializedTargets.has(target) ||
     pendingTargets.has(target) ||
@@ -225,22 +206,20 @@ function initializeLiquidGL(target: HTMLElement, options: LiquidGLTuningOptions 
   const id = `liquid-gl-${++targetId}`;
   target.setAttribute(TARGET_ATTRIBUTE, id);
 
-  loadLiquidGL()
-    .then((liquidGL) => {
-      if (!target.isConnected) return;
+  try {
+    const liquidGL = await loadLiquidGL();
+    if (!target.isConnected) return;
 
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      liquidGL(liquidGLOptions(prefersReducedMotion, `[${TARGET_ATTRIBUTE}="${id}"]`, options));
-      initializedTargets.add(target);
-      target.setAttribute(INITIALIZED_ATTRIBUTE, "");
-      syncLiquidGLViewport();
-    })
-    .catch((error: unknown) => {
-      console.warn("liquidGL could not be initialized for the header.", error);
-    })
-    .finally(() => {
-      pendingTargets.delete(target);
-    });
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    liquidGL(liquidGLOptions(prefersReducedMotion, `[${TARGET_ATTRIBUTE}="${id}"]`, options));
+    initializedTargets.add(target);
+    target.setAttribute(INITIALIZED_ATTRIBUTE, "");
+    syncLiquidGLViewport();
+  } catch (error) {
+    console.warn("liquidGL could not be initialized for the header.", error);
+  } finally {
+    pendingTargets.delete(target);
+  }
 }
 
 function scheduleLiquidGLInitialization(
@@ -254,16 +233,15 @@ function scheduleLiquidGLInitialization(
 
   const attemptInitialization = () => {
     if (!cancelled && target.isConnected) {
-      initializeLiquidGL(target, getOptions());
+      void initializeLiquidGL(target, getOptions());
     }
   };
 
   const scheduleIdleWork = () => {
     if (cancelled) return;
 
-    const idleWindow = window as IdleWindow;
-    if (idleWindow.requestIdleCallback) {
-      idleId = idleWindow.requestIdleCallback(attemptInitialization, { timeout: 2000 });
+    if (window.requestIdleCallback) {
+      idleId = window.requestIdleCallback(attemptInitialization, { timeout: 2000 });
     } else {
       attemptInitialization();
     }
@@ -285,7 +263,7 @@ function scheduleLiquidGLInitialization(
     if (loadListener) window.removeEventListener("load", loadListener);
     if (delayId !== undefined) window.clearTimeout(delayId);
     if (idleId !== undefined) {
-      (window as IdleWindow).cancelIdleCallback?.(idleId);
+      window.cancelIdleCallback?.(idleId);
     }
   };
 }
@@ -304,21 +282,3 @@ export function useLiquidGLTarget<T extends HTMLElement>(enabled = true, options
 
   return targetRef;
 }
-
-type LiquidGL = (options: {
-  target: string;
-  snapshot: string;
-  resolution: number;
-  refraction: number;
-  aberration: number;
-  bevelDepth: number;
-  bevelWidth: number;
-  frost: number;
-  shadow: boolean;
-  specular: boolean;
-  reveal: "none" | "fade";
-  tilt: boolean;
-  tiltFactor: number;
-  tiltEase: number;
-  magnify: number;
-}) => unknown;

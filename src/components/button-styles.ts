@@ -1,4 +1,5 @@
 import { cx } from "@/stylex";
+import type { ReactNode } from "react";
 
 export type ButtonVariant =
   | "neutral"
@@ -96,8 +97,8 @@ export type ButtonClassNamesOptions = {
   variant?: ButtonVariant;
   className?: string;
   padding?: ButtonPadding;
-  leadingIcon?: unknown;
-  trailingIcon?: unknown;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
   isPending?: boolean;
 };
 

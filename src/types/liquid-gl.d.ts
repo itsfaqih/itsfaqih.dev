@@ -1,6 +1,6 @@
 declare module "liquid-gl" {
-  const liquidGL: (options: {
-    target: string;
+  export interface LiquidGLOptions {
+    target?: string;
     snapshot?: string;
     resolution?: number;
     refraction?: number;
@@ -15,7 +15,33 @@ declare module "liquid-gl" {
     tiltFactor?: number;
     tiltEase?: number;
     magnify?: number;
-  }) => unknown;
+  }
+
+  // The runtime surface consumed by the site, verified against liquid-gl 2.0.1.
+  export interface LiquidGLLens {
+    el: HTMLElement;
+    updateMetrics(): void;
+    _shadowSyncFn?: () => void;
+  }
+
+  export interface LiquidGLRenderer {
+    captureSnapshot(): Promise<boolean | undefined>;
+    canvas: HTMLCanvasElement;
+    _resizeCanvas(): void;
+    _renderLens(lens: LiquidGLLens): void;
+    render(): void;
+    lenses: LiquidGLLens[];
+    // Site-owned marker on the shared renderer; survives hook remounts.
+    mobileViewportOffsetsPatched?: boolean;
+  }
+
+  function liquidGL(
+    options?: LiquidGLOptions,
+  ): LiquidGLLens | LiquidGLLens[] | Element | Element[] | undefined;
 
   export default liquidGL;
+}
+
+interface Window {
+  __liquidGLRenderer__?: import("liquid-gl").LiquidGLRenderer;
 }

@@ -16,7 +16,7 @@ export function ResponsiveDialog({
   children: ReactNode;
   title: string;
   description?: string;
-  trigger: ReactNode;
+  trigger: ReactElement;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -62,7 +62,7 @@ export function ResponsiveDialog({
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger render={trigger as ReactElement} />
+      <Dialog.Trigger render={trigger} />
       <Dialog.Portal>
         <Dialog.Backdrop
           className={cx(

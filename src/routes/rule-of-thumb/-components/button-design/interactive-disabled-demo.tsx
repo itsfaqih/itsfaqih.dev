@@ -3,7 +3,12 @@ import { InteractiveDisabledDemoContent } from "./interactive-disabled-demo-cont
 
 export function InteractiveDisabledDemo() {
   return (
-    <AnimationDemo duration={4000} masterAnimationName="disabled-demo-cursor-move">
+    <AnimationDemo
+      duration={4000}
+      masterAnimationName="disabled-demo-cursor-move"
+      autoplay
+      loop
+    >
       <InteractiveDisabledDemoContent />
     </AnimationDemo>
   );

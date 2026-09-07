@@ -19,24 +19,16 @@ import { PageContainer } from "../../components/page-container";
 
 export const Route = createFileRoute("/rule-of-thumb/handling-timestamps")({
   component: HandlingTimestamps,
+  loader: () => ({
+    demoUtcTime: new Date().toISOString(),
+  }),
 });
 
-
-
-// ============================================================================
-// Flow Step Component
-// ============================================================================
-
-
-
-// ============================================================================
-// Main Page Component
-// ============================================================================
-
 function HandlingTimestamps() {
+  const { demoUtcTime } = Route.useLoaderData();
+
   return (
     <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
-      {/* Hero Section */}
       <RuleOfThumbHero
         title="Handling Timestamps"
         description={
@@ -52,9 +44,6 @@ function HandlingTimestamps() {
         markdownUrl="/rule-of-thumb/handling-timestamps.md"
       />
 
-      {/* ================================================================== */}
-      {/* SECTION 1: The Flow */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="The Timestamp Flow"
@@ -88,16 +77,13 @@ function HandlingTimestamps() {
         />
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 2: Live Demo - Display */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Displaying Timestamps"
           description="Store one UTC value, display it in the user's local timezone."
         />
 
-        <TimezoneDemo />
+        <TimezoneDemo initialUtcTime={demoUtcTime} />
 
         <div className={cx("mt-8")}>
           <CodeExample
@@ -132,9 +118,6 @@ const formatted = dayjs(apiResponse.createdAt)
         </div>
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 3: Filtering */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Filtering by Date"
@@ -200,9 +183,6 @@ fetch('/api/records', {
         </div>
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 4: Do's and Don'ts */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Do's and Don'ts</h2>
 
@@ -267,7 +247,6 @@ fetch('/api/records', {
         </div>
       </div>
 
-      {/* Summary */}
       <div className={cx("mb-20")}>
         <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-card border border-border")}>
           <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Quick Reference</h2>
@@ -309,7 +288,6 @@ fetch('/api/records', {
         </div>
       </div>
 
-      {/* Footer */}
       <RuleOfThumbPagination />
     </PageContainer>
   );

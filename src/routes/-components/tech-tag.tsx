@@ -27,7 +27,7 @@ const TECH_ICON_MAP = {
   vitest: "vitest",
   zod: "zod",
   xstate: "xstate",
-  reactflow: "reactflow",
+  reactflow: "xyflow",
   adonisjs: "adonisjs",
   framer: "framer",
   bun: "bun",

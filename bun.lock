@@ -27,6 +27,7 @@
       },
       "devDependencies": {
         "@babel/core": "^8.0.1",
+        "@oxlint/plugins": "1.79.0",
         "@rolldown/plugin-babel": "^0.2.3",
         "@storybook/addon-a11y": "^10.5.9",
         "@storybook/addon-docs": "^10.5.9",
@@ -42,7 +43,7 @@
         "babel-plugin-react-compiler": "^1.0.0",
         "jsdom": "^30.0.1",
         "oxfmt": "^0.64.0",
-        "oxlint": "^1.79.0",
+        "oxlint": "1.79.0",
         "storybook": "^10.5.9",
         "typescript": "^7.0.2",
         "unplugin": "^2.3.11",
@@ -448,6 +449,8 @@
     "@oxlint/binding-win32-ia32-msvc": ["@oxlint/binding-win32-ia32-msvc@1.79.0", "", { "os": "win32", "cpu": "ia32" }, "sha512-+KyXjIvcpaXmWW/j9NNY5yWjrIVxaX18VyIheQy3jwc2GSYgpCr7MGI/HxIGQ/shAL5IWEKbhsqoMpAO5Stiog=="],
 
     "@oxlint/binding-win32-x64-msvc": ["@oxlint/binding-win32-x64-msvc@1.79.0", "", { "os": "win32", "cpu": "x64" }, "sha512-mEelcCMMBS57sIXh2veGMNy+pQwuGtcMxHxGIZWQ5Ba9pJ5jCCUFOZB9E2JhBaxGsURe+WGe0zJp4RVre52gpQ=="],
+
+    "@oxlint/plugins": ["@oxlint/plugins@1.79.0", "", {}, "sha512-S0uyoxakDINJ4DPgqxGlEEvrdSMeQb7Z2lKVjxoY2gwsbZbfg2Xr8Klfeo5ZeraHmmdBCELFUHkSe6KEmBpMvg=="],
 
     "@phosphor-icons/react": ["@phosphor-icons/react@2.1.10", "", { "peerDependencies": { "react": ">= 16.8", "react-dom": ">= 16.8" } }, "sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA=="],
 

@@ -6,9 +6,12 @@ import { Card } from "../../../components/card";
 
 export function RuleOfThumbPagination() {
   const location = useLocation();
-  // Filter out hidden guidelines for pagination
   const visibleGuidelines = GUIDELINES.filter((g) => !g.hidden);
-  const currentIndex = visibleGuidelines.findIndex((g) => g.href === location.pathname);
+  const pathname =
+    location.pathname.length > 1 && location.pathname.endsWith("/")
+      ? location.pathname.slice(0, -1)
+      : location.pathname;
+  const currentIndex = visibleGuidelines.findIndex((g) => g.href === pathname);
 
   if (currentIndex === -1) return null;
 

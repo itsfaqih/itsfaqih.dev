@@ -5,6 +5,8 @@ export type AnimationStatus = "idle" | "playing" | "paused" | "finished";
 type UseCssAnimationConfig = {
   duration: number;
   masterAnimationName: string;
+  autoplay?: boolean;
+  loop?: boolean;
 };
 
 function setAnimationTime(container: HTMLDivElement | null, timeMs: number) {
@@ -28,8 +30,13 @@ function playAnimations(container: HTMLDivElement | null) {
   }
 }
 
-export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimationConfig) {
-  const [status, setStatus] = useState<AnimationStatus>("idle");
+export function useCssAnimation({
+  duration,
+  masterAnimationName,
+  autoplay = false,
+  loop = false,
+}: UseCssAnimationConfig) {
+  const [status, setStatus] = useState<AnimationStatus>(() => (autoplay ? "playing" : "idle"));
   const [progress, setProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -42,30 +49,34 @@ export function useCssAnimation({ duration, masterAnimationName }: UseCssAnimati
   }, [status]);
 
   useEffect(() => {
+    if (status !== "playing") return;
+
     let frameId = 0;
-    const loop = () => {
+    const tick = () => {
       const container = containerRef.current;
-      if (status === "playing" && container) {
-        const animations = container.getAnimations({ subtree: true });
-        const master = animations.find(
-          (animation) => (animation as CSSAnimation).animationName === masterAnimationName,
+      if (container) {
+        const master = container.getAnimations({ subtree: true }).find(
+          (animation) => animation instanceof CSSAnimation && animation.animationName === masterAnimationName,
         );
 
         if (master) {
-          const currentTime = (master.currentTime as number) || 0;
-          setProgress((currentTime / duration) * 100);
-          if (currentTime >= duration) {
+          // Document-timeline CSS animations report milliseconds; Number also handles an unresolved null time.
+          const currentTime = Number(master.currentTime);
+          const progressTime = loop ? currentTime % duration : Math.min(currentTime, duration);
+          setProgress((progressTime / duration) * 100);
+          if (!loop && currentTime >= duration) {
             setStatus("finished");
             setProgress(100);
+            return;
           }
         }
       }
-      frameId = requestAnimationFrame(loop);
+      frameId = requestAnimationFrame(tick);
     };
 
-    loop();
+    tick();
     return () => cancelAnimationFrame(frameId);
-  }, [status, duration, masterAnimationName]);
+  }, [status, duration, masterAnimationName, loop]);
 
   const handleSeek = (value: number) => {
     setProgress(value);

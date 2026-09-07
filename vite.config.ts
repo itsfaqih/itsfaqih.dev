@@ -39,6 +39,11 @@ const config = defineConfig({
       cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
     }),
     tanstackStart({
+      server: {
+        build: {
+          inlineCss: true,
+        },
+      },
       // Generate complete HTML for every discoverable route at build time.
       // The client still hydrates for fast in-app navigation, but the first
       // response is static HTML rather than a JavaScript-only SPA shell.

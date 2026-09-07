@@ -28,19 +28,24 @@ export function useAnimationDemo() {
 export function AnimationDemo({
   duration,
   masterAnimationName,
+  autoplay = false,
+  loop = false,
   children,
   className,
 }: {
   duration: number;
   masterAnimationName: string;
+  autoplay?: boolean;
+  loop?: boolean;
   children: React.ReactNode;
   className?: string;
 }) {
-  const animationData = useCssAnimation({ duration, masterAnimationName });
+  const animationData = useCssAnimation({ duration, masterAnimationName, autoplay, loop });
 
   const animationStyle = {
     animationDuration: `${duration}ms`,
     ...ANIMATION_STYLE_DEFAULTS,
+    animationIterationCount: loop ? "infinite" : ANIMATION_STYLE_DEFAULTS.animationIterationCount,
     // Keep newly-created CSS animations in sync with React state.
     animationPlayState: animationData.status === "playing" ? "running" : "paused",
   };
