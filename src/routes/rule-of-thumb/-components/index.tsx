@@ -175,7 +175,7 @@ function ContentsRail() {
       Array.from(page.querySelectorAll("h2"), (element, index) => {
         // The section's key cap number, shown by rot.css.
         element.dataset.stage = String(index + 1);
-        return { element, text: element.textContent ?? "" };
+        return { element, text: element.textContent };
       }),
     );
     setBarHost(document.querySelector<HTMLElement>(".arc-bar"));

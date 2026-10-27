@@ -19,7 +19,7 @@ export function Card<T extends ElementType = "div">({
   hoverEffect = true,
   ...props
 }: CardProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof CardOwnProps>) {
-  const Component = as || "div";
+  const Component = as ?? "div";
 
   return (
     <Component

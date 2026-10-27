@@ -9,8 +9,6 @@ const THEME_CHANGE_EVENT = "theme-change";
 const getServerSnapshot = (): Theme => "dark";
 
 function readTheme(): Theme {
-  if (typeof window === "undefined") return getServerSnapshot();
-
   const saved = window.localStorage.getItem("theme");
   if (saved === "dark" || saved === "light") return saved;
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
@@ -23,8 +21,6 @@ function applyThemeClass(theme: Theme) {
 }
 
 function subscribe(onStoreChange: () => void) {
-  if (typeof window === "undefined") return () => undefined;
-
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
   mediaQuery.addEventListener("change", onStoreChange);
   window.addEventListener("storage", onStoreChange);

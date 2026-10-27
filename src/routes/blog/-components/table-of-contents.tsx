@@ -15,13 +15,10 @@ type Heading = {
 
 const EMPTY_HEADINGS: Heading[] = [];
 let cachedHeadings = EMPTY_HEADINGS;
-let cachedDocument: Document | undefined;
 let cachedElements: Element[] = [];
 let cachedSignature = "";
 
 function getHeadingsSnapshot(): Heading[] {
-  if (typeof document === "undefined") return EMPTY_HEADINGS;
-
   const elements: Element[] = [];
   const nextHeadings: Heading[] = [];
   let signature = "";
@@ -29,7 +26,7 @@ function getHeadingsSnapshot(): Heading[] {
   for (const element of document.querySelectorAll("h2, h3")) {
     if (!element.id) continue;
 
-    const text = element.textContent ?? "";
+    const text = element.textContent;
     const level = Number(element.tagName.substring(1));
     elements.push(element);
     nextHeadings.push({ id: element.id, text, level });
@@ -40,11 +37,10 @@ function getHeadingsSnapshot(): Heading[] {
     elements.length === cachedElements.length &&
     elements.every((element, index) => element === cachedElements[index]);
 
-  if (document === cachedDocument && signature === cachedSignature && hasSameElements) {
+  if (signature === cachedSignature && hasSameElements) {
     return cachedHeadings;
   }
 
-  cachedDocument = document;
   cachedElements = elements;
   cachedSignature = signature;
   cachedHeadings = nextHeadings;
@@ -56,15 +52,8 @@ function getServerHeadingsSnapshot() {
 }
 
 function subscribeToHeadings(onStoreChange: () => void) {
-  if (typeof document === "undefined" || typeof MutationObserver === "undefined") {
-    return () => {};
-  }
-
-  const root = document.documentElement;
-  if (!root) return () => {};
-
   const observer = new MutationObserver(onStoreChange);
-  observer.observe(root, {
+  observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
     characterData: true,
@@ -74,14 +63,6 @@ function subscribeToHeadings(onStoreChange: () => void) {
 }
 
 function observeHeadings(headings: Heading[], onActiveIdChange: (id: string) => void) {
-  const elements: Element[] = [];
-  for (const heading of headings) {
-    const element = document.getElementById(heading.id);
-    if (element) elements.push(element);
-  }
-
-  if (elements.length === 0) return;
-
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -93,16 +74,12 @@ function observeHeadings(headings: Heading[], onActiveIdChange: (id: string) => 
     { rootMargin: "-100px 0px -66%" },
   );
 
-  for (const element of elements) {
-    observer.observe(element);
+  for (const heading of headings) {
+    const element = document.getElementById(heading.id);
+    if (element) observer.observe(element);
   }
 
-  return () => {
-    for (const element of elements) {
-      observer.unobserve(element);
-    }
-    observer.disconnect();
-  };
+  return () => observer.disconnect();
 }
 
 export function TableOfContents({ className, onLinkClick }: TableOfContentsProps) {
@@ -111,14 +88,9 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
     getHeadingsSnapshot,
     getServerHeadingsSnapshot,
   );
-  const [activeId, setActiveId] = useState<string>("");
+  const [activeId, setActiveId] = useState("");
 
-  useEffect(() => {
-    const cleanup = observeHeadings(headings, setActiveId);
-    return () => {
-      cleanup?.();
-    };
-  }, [headings]);
+  useEffect(() => observeHeadings(headings, setActiveId), [headings]);
 
   if (headings.length === 0) return null;
 
