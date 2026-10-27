@@ -137,13 +137,16 @@
   0%,
   24% {
     transform: scale(1);
+    box-shadow: 0 3px 0 var(--go-shadow);
   }
   25% {
-    transform: scale(0.95);
+    transform: scale(0.97) translateY(2px);
+    box-shadow: 0 1px 0 var(--go-shadow);
   }
   30%,
   100% {
     transform: scale(1);
+    box-shadow: 0 3px 0 var(--go-shadow);
   }
 }
 
@@ -193,11 +196,11 @@
   }
   33%,
   70% {
-    width: 130px;
+    width: 146px;
   }
   75%,
   100% {
-    width: 115px;
+    width: 128px;
   }
 }
 

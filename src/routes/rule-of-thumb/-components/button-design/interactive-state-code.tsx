@@ -97,9 +97,6 @@ export function InteractiveStateCode() {
   )}
 </button>`;
 
-  const TAB_BASE = "interactive-state-code-tab";
-  const TAB_ACTIVE = "interactive-state-code-tab-active";
-  const LABEL_COLOR = "text-foreground";
 
   useEffect(() => {
     const targetLine = SCROLL_TARGET_LINES[activeState];
@@ -137,11 +134,11 @@ export function InteractiveStateCode() {
   }, [activeState]);
 
   return (
-    <div data-rule-of-thumb-card="true" className={cx("rounded-2xl squircle border border-border bg-card")}>
+    <div data-rule-of-thumb-card="true" className={cx("overflow-hidden")}>
       {/* State selector tabs */}
-      <div className={cx("p-4 border-b border-border bg-background")}>
+      <div className="rk-head">
         <div
-          className={cx("flex flex-wrap gap-2")}
+          className={cx("flex flex-wrap gap-1")}
           role="group"
           aria-label="Button state examples"
         >
@@ -154,11 +151,7 @@ export function InteractiveStateCode() {
                 type="button"
                 onClick={() => setActiveState(state)}
                 aria-pressed={isActive}
-                className={cx(
-                  "text-sm font-medium",
-                  TAB_BASE,
-                  isActive ? TAB_ACTIVE : "",
-                )}
+                className="rk-tab"
               >
                 {info.label}
               </button>
@@ -168,9 +161,9 @@ export function InteractiveStateCode() {
       </div>
 
       {/* Description */}
-      <div className={cx("px-4 py-3 border-b border-border bg-background")}>
+      <div className={cx("px-4 py-3 border-b border-border")}>
         <p className={cx("text-sm text-muted-foreground")}>
-          <span className={cx(`font-medium ${LABEL_COLOR}`)}>
+          <span className={cx("font-medium text-foreground")}>
             {STATE_INFO[activeState].label}:
           </span>{" "}
           {STATE_INFO[activeState].description}
@@ -192,8 +185,8 @@ export function InteractiveStateCode() {
                 code={code}
                 lang="tsx"
                 highlightLines={HIGHLIGHT_RANGES[activeState]}
-                highlightBackground="light-dark(#dbeafe, color-mix(in srgb, #60a5fa 30%, var(--diffs-bg)))"
-                highlightBorder="light-dark(#60a5fa, #60a5fa)"
+                highlightBackground="color-mix(in srgb, var(--c, #60a5fa) 16%, var(--diffs-bg))"
+                highlightBorder="var(--c, #60a5fa)"
               />
             </ScrollArea.Content>
           </ScrollArea.Viewport>
@@ -204,7 +197,7 @@ export function InteractiveStateCode() {
       </div>
 
       {/* Tips for the active state */}
-      <div className={cx("px-4 py-3 border-t border-border bg-background text-sm")}>
+      <div className="rk-foot">
         {activeState === "idle" && (
           <p className={cx("text-muted-foreground")}>
             <strong className={cx("text-foreground")}>💡 Tip:</strong> Base styles define the button's

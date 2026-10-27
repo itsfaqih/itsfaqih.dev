@@ -13,7 +13,7 @@ const QUICK_REFERENCE_ITEMS = [
 export function QuickReferenceSection() {
   return (
     <div className={cx("mb-16")}>
-      <h2 className={cx("text-2xl font-bold text-foreground text-center mb-8")}>Quick Reference</h2>
+      <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Quick Reference</h2>
       <div className={cx("flex justify-center")}>
         <QuickRefTable items={[...QUICK_REFERENCE_ITEMS]} />
       </div>

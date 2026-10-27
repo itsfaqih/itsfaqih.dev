@@ -71,11 +71,11 @@ export function ResponsiveDialog({
         />
         <Dialog.Popup
           className={cx(
-            "responsive-dialog-popup fixed left-[50%] top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-border bg-background p-6 shadow-lg opacity-0 scale-95 data-[state=open]:opacity-100 data-[state=open]:scale-100 rounded-xl outline-none",
+            "responsive-dialog-popup fixed left-[50%] top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rk-window p-6 opacity-0 scale-95 data-[state=open]:opacity-100 data-[state=open]:scale-100 outline-none",
           )}
         >
           <div className={cx("flex items-center justify-between mb-2")}>
-            <Dialog.Title className={cx("text-lg font-semibold text-foreground")}>
+            <Dialog.Title className={cx("rk-window-title text-lg font-semibold text-foreground")}>
               {title}
             </Dialog.Title>
             <Dialog.Close

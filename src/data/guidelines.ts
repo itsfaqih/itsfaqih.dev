@@ -6,6 +6,8 @@ export type Guideline = {
   href: string;
   comingSoon?: boolean;
   hidden?: boolean;
+  /** The article includes demos the reader can try. */
+  interactive?: boolean;
 }
 
 export const GUIDELINES: Guideline[] = [
@@ -15,6 +17,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Proximity Principle",
     description: "How code writings and files should be structured",
     href: "/rule-of-thumb/proximity-principle",
+    interactive: true,
   },
   {
     id: "typescript-code-writing",
@@ -30,6 +33,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Button Design",
     description: "States, hover, variants, and icon alignment",
     href: "/rule-of-thumb/button-design",
+    interactive: true,
   },
   {
     id: "table-design",
@@ -62,7 +66,7 @@ export const GUIDELINES: Guideline[] = [
     title: "Data Loading",
     description: "SSR, loaders, SWR, and error handling",
     href: "/rule-of-thumb/data-loading",
-    hidden: true,
+    interactive: true,
   },
   {
     id: "handling-timestamps",

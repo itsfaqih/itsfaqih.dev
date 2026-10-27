@@ -3,9 +3,8 @@ import {
   DatabaseIcon,
   HardDriveIcon,
   StackIcon,
-  WarningCircleIcon,
 } from "@phosphor-icons/react";
-import { BestPractice, SectionHeading, TabbedCodeExample } from "../index";
+import { BestPractice, SectionHeading, TabbedCodeExample, Verdict } from "../index";
 
 export function CachePersistenceSection() {
   return (
@@ -20,67 +19,63 @@ export function CachePersistenceSection() {
         />
 
         <div className={cx("grid sm:grid-cols-2 gap-4 mb-8")}>
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
-            <div className={cx("flex items-center gap-2 mb-3")}>
-              <WarningCircleIcon size={18} className={cx("text-negative-foreground")} />
-              <h3 className={cx("font-semibold text-negative-foreground")}>Don't Persist</h3>
+          <Verdict good={false} title="Don't Persist">
+            <div className="rk-pad-lg">
+              <p className={cx("text-sm text-muted-foreground mb-4")}>Data that must always be accurate:</p>
+              <ul className={cx("text-sm text-muted-foreground space-y-2")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Bank balance</strong> — Stale balance could
+                    cause overdrafts or confusion
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Stock prices</strong> — Users make decisions
+                    based on current prices
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Inventory count</strong> — Could lead to
+                    overselling
+                  </span>
+                </li>
+              </ul>
             </div>
-            <p className={cx("text-sm text-muted-foreground mb-4")}>Data that must always be accurate:</p>
-            <ul className={cx("text-sm text-muted-foreground space-y-2")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Bank balance</strong> — Stale balance could
-                  cause overdrafts or confusion
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Stock prices</strong> — Users make decisions
-                  based on current prices
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Inventory count</strong> — Could lead to
-                  overselling
-                </span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
 
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
-            <div className={cx("flex items-center gap-2 mb-3")}>
-              <HardDriveIcon size={18} className={cx("text-positive-foreground")} />
-              <h3 className={cx("font-semibold text-positive-foreground")}>OK to Persist</h3>
+          <Verdict good title="OK to Persist">
+            <div className="rk-pad-lg">
+              <p className={cx("text-sm text-muted-foreground mb-4")}>Historical or reference data:</p>
+              <ul className={cx("text-sm text-muted-foreground space-y-2")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Transaction history</strong> — Past records
+                    don't change
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>User preferences</strong> — Settings rarely
+                    change
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Static content</strong> — Blog posts,
+                    documentation
+                  </span>
+                </li>
+              </ul>
             </div>
-            <p className={cx("text-sm text-muted-foreground mb-4")}>Historical or reference data:</p>
-            <ul className={cx("text-sm text-muted-foreground space-y-2")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Transaction history</strong> — Past records
-                  don't change
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>User preferences</strong> — Settings rarely
-                  change
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Static content</strong> — Blog posts,
-                  documentation
-                </span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
         </div>
 
         <div className={cx("space-y-4")}>

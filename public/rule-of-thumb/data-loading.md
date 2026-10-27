@@ -36,7 +36,7 @@ Prevent flickering skeletons for fast responses.
 
 ## Error Handling
 
-Show errors inline, not as toasts. Make them recoverable.
+Show errors where users can act on them and make them recoverable.
 
 - **Inline Errors**: Place error messages where the data would have appeared.
 - **Retry Button**: Always offer a way to retry the failed request.

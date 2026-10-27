@@ -4,7 +4,6 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { Header } from "../components/header";
-import { GridBackground } from "../components/grid-background";
 import { CommandPalette } from "../components/command-palette";
 import { cn } from "../cn";
 
@@ -33,7 +32,8 @@ export const Route = createRootRoute({
         content:
           "Personal website of Faqih Muntashir, a full-stack engineer based in Yogyakarta, Indonesia.",
       },
-      { name: "theme-color", content: "#0a0a0f" },
+      { name: "theme-color", content: "#f5f5f8", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#0e0e13", media: "(prefers-color-scheme: dark)" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicons/favicon-black-white.svg" },
@@ -57,7 +57,7 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap",
       },
     ],
     scripts:
@@ -78,17 +78,31 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                var doc = document.documentElement;
+                doc.classList.add('js');
+                // A saved choice wins; otherwise follow the system.
+                var theme = 'dark';
                 try {
                   var saved = localStorage.getItem('theme');
-                  var support = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  var doc = document.documentElement;
-                  doc.classList.remove('light', 'dark');
-                  if (saved === 'dark' || (!saved && support)) {
-                    doc.classList.add('dark');
-                  } else {
-                    doc.classList.add('light');
-                  }
+                  if (saved === 'dark' || saved === 'light') theme = saved;
+                  else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
                 } catch (e) {}
+                doc.classList.remove('light', 'dark');
+                doc.classList.add(theme);
+                try {
+                  // The home intro plays once per session, only when the visit lands on home,
+                  // and never under reduced motion.
+                  if (
+                    location.pathname !== '/' ||
+                    sessionStorage.getItem('intro-seen') ||
+                    /[?&]nointro/.test(location.search) ||
+                    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                  ) {
+                    doc.classList.add('no-intro');
+                  }
+                } catch (e) {
+                  doc.classList.add('no-intro');
+                }
               })();
             `,
           }}
@@ -98,10 +112,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         className={cn(
           "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative site-shell",
           "bg-background text-foreground",
-          "transition-colors duration-300",
         )}
       >
-        <GridBackground />
         <Header />
         <CommandPalette />
         <main className={cx("relative z-10")}>{children}</main>

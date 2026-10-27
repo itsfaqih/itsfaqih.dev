@@ -1,7 +1,6 @@
 import { cx } from "@/stylex";
-import { PageContainer } from "../../components/page-container";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
-import { RuleOfThumbHero } from "./-components";
+import { RuleOfThumbHero, RulePage } from "./-components";
 import { TableActionsSection } from "./-table-design-actions-section";
 import { TableNumbersSection } from "./-table-design-numbers-section";
 import { TablePaginationSection } from "./-table-design-pagination-section";
@@ -9,7 +8,7 @@ import { TableStatesSection } from "./-table-design-states-section";
 
 export function TableDesign() {
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       <RuleOfThumbHero
         title="Table Design"
         description={
@@ -33,6 +32,6 @@ export function TableDesign() {
       <TableNumbersSection />
 
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

@@ -31,6 +31,7 @@ export function Button({
     <button
       ref={ref}
       disabled={isPending || disabled}
+      data-variant={variant ?? "neutral"}
       className={buttonClassNames({
         variant,
         className,

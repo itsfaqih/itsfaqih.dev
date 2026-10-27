@@ -1,4 +1,7 @@
 @import "./stylex-fallback.css";
+@import "./arcade.css";
+@import "./routes/-components/hero/hero-prints.css";
+@import "./rot.css";
 
 @property --navbar-surface-top {
   syntax: "<color>";
@@ -115,6 +118,26 @@ body.site-shell {
   background: transparent;
 }
 
+@media (max-width: 639px) {
+  .tabbed-code-example-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .tabbed-code-example-list {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .tabbed-code-example-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
 .header-spacer {
   height: 73px;
 }
@@ -132,41 +155,6 @@ body.site-shell {
 @media (max-width: 639px) {
   .page-container {
     padding-top: 0 !important;
-  }
-}
-
-.rule-of-thumb-feature-grid-section {
-  container-name: rule-of-thumb-feature-grid;
-  container-type: inline-size;
-}
-
-.rule-of-thumb-feature-grid {
-  box-sizing: border-box;
-}
-
-/* Shared edges are drawn twice, so keep them thin and low-contrast. */
-.rule-of-thumb-feature-grid > li::before {
-  border-top-width: 0.5px;
-  border-bottom-width: 0.5px;
-  border-color: color-mix(in srgb, var(--border) 70%, transparent);
-}
-
-.rule-of-thumb-feature-grid > li::after {
-  border-left-width: 0.5px;
-  border-right-width: 0.5px;
-  border-color: color-mix(in srgb, var(--border) 70%, transparent);
-}
-
-.rule-of-thumb-feature-grid > li:hover::before,
-.rule-of-thumb-feature-grid > li:hover::after {
-  border-color: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
-}
-
-@container rule-of-thumb-feature-grid (max-width: 40rem) {
-  .rule-of-thumb-feature-grid {
-    width: calc(100% + 3rem);
-    margin-inline: -1.5rem;
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -635,26 +623,6 @@ body.site-shell {
   }
 }
 
-.tree-children {
-  transition:
-    grid-template-rows 200ms var(--ease-out),
-    opacity 150ms var(--ease-out);
-}
-
-.tree-caret {
-  transition: transform 200ms var(--ease-out);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tree-children {
-    transition: opacity 150ms var(--ease-out);
-  }
-
-  .tree-caret {
-    transition: none;
-  }
-}
-
 .guideline-category-popup {
   transform-origin: var(--transform-origin, top center);
   transition:
@@ -748,8 +716,8 @@ body.site-shell {
 @layer base {
   :root {
     /* Shadcn-style semantic color tokens */
-    --background: oklch(0.98 0 0); /* #fafafa - slightly off-white */
-    --foreground: oklch(0.145 0 0); /* #18181b - zinc-950 */
+    --background: #f5f5f8; /* arcade light --bg */
+    --foreground: #111117; /* arcade light --text */
     
     --card: oklch(1 0 0 / 50%); /* translucent white */
     --card-foreground: oklch(0.145 0 0); /* zinc-950 */
@@ -792,13 +760,13 @@ body.site-shell {
   }
 
   .dark {
-    --background: oklch(0.145 0 0); /* #09090b - zinc-950 */
-    --foreground: oklch(0.985 0 0); /* #f4f4f5 - zinc-100 */
+    --background: #0e0e13; /* arcade --bg */
+    --foreground: #f4f4f8; /* arcade --text */
     
-    --card: oklch(0.205 0 0 / 40%); /* translucent zinc-900 */
+    --card: #17171f; /* arcade --panel */
     --card-foreground: oklch(0.985 0 0); /* zinc-100 */
     
-    --popover: oklch(0.269 0 0); /* zinc-800 */
+    --popover: #20202b; /* arcade --panel-2 */
     --popover-foreground: oklch(0.985 0 0); /* zinc-100 */
     
     --brand: oklch(0.556 0.182 254.604); /* blue-600 */
@@ -807,10 +775,10 @@ body.site-shell {
     --neutral: oklch(0.269 0 0 / 40%); /* translucent zinc-800 */
     --neutral-foreground: oklch(0.985 0 0); /* zinc-100 */
     
-    --muted: oklch(0.269 0 0); /* zinc-800 */
-    --muted-foreground: oklch(0.708 0 0); /* zinc-400 */
+    --muted: #20202b; /* arcade --panel-2 */
+    --muted-foreground: #a1a1b5; /* arcade --dim */
     
-    --accent: oklch(0.371 0 0); /* zinc-700 */
+    --accent: #2c2c3a; /* arcade --hair */
     --accent-foreground: oklch(0.985 0 0); /* zinc-100 */
     
     --destructive: oklch(0.577 0.245 27.325); /* red-600 */
@@ -822,9 +790,9 @@ body.site-shell {
     --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
     --positive-foreground: oklch(0.845 0.143 164.978); /* emerald-300 */
     
-    --border: oklch(1 0 0 / 10%); /* translucent white */
+    --border: #2c2c3a; /* arcade --hair */
     --input: oklch(1 0 0 / 15%); /* translucent white */
-    --ring: oklch(0.708 0.182 254.604); /* brand blue-400 */
+    --ring: #ffe14d; /* arcade --go */
     
     /* Legacy/custom variables for specific use cases */
     --header-bg: oklch(0.145 0 0 / 40%); /* translucent zinc-950 */
@@ -1042,8 +1010,9 @@ body.site-shell {
     opacity: 0.90;
   }
 
+  /* The grid background this band masked is gone; the page ground shows through. */
   .dark .page-container::before {
-    background: linear-gradient(90deg, transparent 0%, #09090B 0%, #09090B 100%, transparent 100%);
+    background: none;
   }
 }
 
@@ -1236,6 +1205,16 @@ body.site-shell {
   mask-size: 100% 100%;
 }
 
+/* The viewport's fade mask clips its own outline and paints over the root's, so the ring is an overlay. */
+.interactive-state-code-scroll-area:has(> .interactive-state-code-scroll-viewport:focus-visible)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 3px var(--focus);
+}
+
 .interactive-state-code-scroll-content {
   box-sizing: border-box;
   width: 100%;
@@ -1275,60 +1254,6 @@ body.site-shell {
 @media (prefers-reduced-motion: reduce) {
   .interactive-state-code-scrollbar {
     transition: none;
-  }
-}
-
-/* State selector tabs use independent status chips with one active treatment. */
-.interactive-state-code-tab {
-  display: inline-flex;
-  min-height: 2.375rem;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0.8125rem;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  background-color: var(--muted);
-  color: var(--muted-foreground);
-  cursor: pointer;
-  transition:
-    color 160ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    border-color 160ms var(--ease-out),
-    transform 160ms var(--ease-out);
-}
-
-.interactive-state-code-tab:hover {
-  background-color: color-mix(in srgb, var(--brand) 16%, var(--background));
-  border-color: color-mix(in srgb, var(--brand) 58%, transparent);
-  color: var(--brand);
-}
-
-.interactive-state-code-tab:active {
-  transform: scale(0.98);
-}
-
-.interactive-state-code-tab-active {
-  background-color: color-mix(in srgb, var(--brand) 16%, var(--background));
-  color: var(--brand);
-  border-color: color-mix(in srgb, var(--brand) 58%, transparent);
-}
-
-.dark .interactive-state-code-tab-active {
-  color: var(--ring);
-}
-
-.interactive-state-code-tab:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .interactive-state-code-tab {
-    transition: none;
-  }
-
-  .interactive-state-code-tab:active {
-    transform: none;
   }
 }
 
@@ -1432,16 +1357,6 @@ body.site-shell {
 
 .guideline-filter-remove:hover {
   color: var(--negative-foreground);
-}
-
-/* Demo overlays use a restrained semantic gray surface without opacity reduction. */
-.demo-overlay-surface {
-  background-color: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
-  background-image: none !important;
-}
-
-.dark .demo-overlay-surface {
-  background-color: color-mix(in srgb, var(--foreground) 18%, transparent) !important;
 }
 
 /* Dark mode keeps secondary surfaces quieter without removing their tint. */

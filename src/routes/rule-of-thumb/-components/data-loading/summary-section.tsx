@@ -65,8 +65,8 @@ export function DataLoadingSummary() {
             <div className={cx("flex items-start gap-3")}>
               <WarningCircleIcon size={18} className={cx("text-negative-foreground mt-0.5 shrink-0")} />
               <span>
-                <strong className={cx("text-foreground")}>Errors</strong> — Inline, not toast. Include
-                retry. Log to observability.
+                <strong className={cx("text-foreground")}>Errors</strong> — Show them inline. Include retry.
+                Log to observability.
               </span>
             </div>
             <div className={cx("flex items-start gap-3")}>

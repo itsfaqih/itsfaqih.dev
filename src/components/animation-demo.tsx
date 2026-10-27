@@ -2,7 +2,6 @@ import { cx } from "@/stylex";
 import { createContext, useContext } from "react";
 import { useCssAnimation } from "../hooks/use-css-animation";
 import { cn } from "@/cn";
-import { Button } from "./button";
 import { Card } from "./card";
 import { PlayIcon, PauseIcon, ArrowCounterClockwiseIcon } from "@phosphor-icons/react";
 import { Cursor } from "./cursor";
@@ -52,7 +51,7 @@ export function AnimationDemo({
 
   return (
     <AnimationDemoContext.Provider value={{ ...animationData, animationStyle }}>
-      <Card className={cn("rounded-2xl overflow-hidden h-full flex flex-col", className)}>
+      <Card className={cn("overflow-hidden h-full flex flex-col", className)} hoverEffect={false}>
         {children}
       </Card>
     </AnimationDemoContext.Provider>
@@ -71,7 +70,7 @@ export function AnimationStage({
   return (
     <div
       className={cn(
-        "relative p-8 flex flex-col items-center justify-center min-h-[400px] flex-1 overflow-hidden",
+        "rk-stage relative p-8 flex flex-col items-center justify-center min-h-[400px] flex-1 overflow-hidden",
         className,
       )}
     >
@@ -84,9 +83,9 @@ export function AnimationStage({
           onClick={restart}
           icon={
             status === "finished" ? (
-              <ArrowCounterClockwiseIcon size={24} className={cx("text-foreground")} />
+              <ArrowCounterClockwiseIcon size={26} weight="bold" />
             ) : (
-              <PlayIcon size={24} className={cx("fill-foreground text-foreground")} />
+              <PlayIcon size={26} weight="fill" />
             )
           }
           label={status === "finished" ? "Replay" : "Watch Demo"}
@@ -96,53 +95,33 @@ export function AnimationStage({
   );
 }
 
+// The cabinet's start button: the whole stage is clickable, the disc is the target.
 function DemoOverlay({
   onClick,
   icon,
   label,
-  circleClass = "bg-black/10 border-black/20 group-hover:bg-black/20",
-  textClass = "text-foreground",
 }: {
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
-  circleClass?: string;
-  textClass?: string;
 }) {
   return (
-    <div
-      className={cx("absolute inset-0 z-60 flex items-center justify-center demo-overlay-surface backdrop-blur-sm transition-all duration-500 pointer-events-auto")}
-      onClick={onClick}
-      role="presentation"
-    >
+    <div className="rk-press" onClick={onClick} role="presentation">
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
           onClick();
         }}
-        className={cx("flex flex-col items-center gap-2 group cursor-pointer transition-transform hover:scale-105 active:scale-95 demo-overlay-surface p-4 rounded-2xl backdrop-blur-sm")}
       >
-        <div
-          className={cx(`size-14 flex items-center justify-center rounded-full border backdrop-blur-md transition-colors ${circleClass}`)}
-        >
-          {icon}
-        </div>
-        <span className={cx(`text-sm font-medium ${textClass}`)}>{label}</span>
+        <span className="disc">{icon}</span>
+        {label}
       </button>
     </div>
   );
 }
 
-function AnimationSlider(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      type="range"
-      className={cx("flex-1 h-1.5 bg-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:transition-transform hover:[&::-webkit-slider-thumb]:scale-125")}
-      {...props}
-    />
-  );
-}
+
 
 type AnimationControlsProps = {
   title: string;
@@ -157,28 +136,35 @@ export function AnimationControls({ title, children }: AnimationControlsProps) {
   };
 
   return (
-    <div className={cx("border-t border-border p-6 pointer-events-auto")}>
-      <div className={cx("flex items-center justify-between mb-4")}>
-        <span className={cx("font-semibold text-foreground")}>{title}</span>
-        <Button onClick={togglePlay}>
+    <div className="rk-transport">
+      <div className="rk-transport-top">
+        <span>{title}</span>
+        <button type="button" className="btn soft sm" onClick={togglePlay}>
           {status === "playing" ? (
             <>
-              <PauseIcon size={14} /> Pause
+              <PauseIcon size={14} weight="fill" /> Pause
             </>
           ) : status === "finished" ? (
             <>
-              <ArrowCounterClockwiseIcon size={14} /> Replay
+              <ArrowCounterClockwiseIcon size={14} weight="bold" /> Replay
             </>
           ) : (
             <>
-              <PlayIcon size={14} /> Play
+              <PlayIcon size={14} weight="fill" /> Play
             </>
           )}
-        </Button>
+        </button>
       </div>
-      <div className={cx("flex items-center gap-3 mb-2")}>
-        <AnimationSlider min="0" max="100" value={progress} onChange={onSeek} />
-      </div>
+      <input
+        type="range"
+        className="rk-scrub"
+        aria-label={`Scrub ${title}`}
+        min="0"
+        max="100"
+        value={progress}
+        onChange={onSeek}
+        style={{ "--p": `${progress}%` }}
+      />
       {children}
     </div>
   );

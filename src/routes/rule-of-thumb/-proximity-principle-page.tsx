@@ -1,7 +1,6 @@
 import { cx } from "@/stylex";
-import { PageContainer } from "../../components/page-container";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
-import { RuleOfThumbHero } from "./-components";
+import { RuleOfThumbHero, RulePage } from "./-components";
 import { AbstractionSection } from "./-proximity-principle-abstraction-section";
 import { CorePrinciplesSection } from "./-proximity-principle-core-section";
 import { ExtractOnlyWhenReusedSection } from "./-proximity-principle-extract-section";
@@ -16,7 +15,7 @@ import { WhyThisMattersSection } from "./-proximity-principle-why-this-matters-s
 
 export function ProximityPrinciple() {
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       <RuleOfThumbHero
         title="The Proximity Principle"
         description={
@@ -45,6 +44,6 @@ export function ProximityPrinciple() {
       <WhyThisMattersSection />
 
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

@@ -51,7 +51,7 @@ export function ErrorDemo() {
       </div>
 
       <div className={cx("border-t border-border p-4 flex items-center justify-between")}>
-        <span className={cx("text-sm text-muted-foreground")}>✓ Error shown inline, not as toast</span>
+        <span className={cx("text-sm text-muted-foreground")}>✓ Error shown inline with a retry option</span>
         <button
           onClick={simulateError}
           disabled={state === "loading"}

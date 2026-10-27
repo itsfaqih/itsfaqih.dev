@@ -1,7 +1,6 @@
 import { cx } from "@/stylex";
-import { PageContainer } from "../../../../components/page-container";
 import { RuleOfThumbPagination } from "../rule-of-thumb-pagination";
-import { RuleOfThumbHero } from "../index";
+import { RuleOfThumbHero, RulePage } from "../index";
 import { InteractiveButtonDemo } from "./interactive-button-demo";
 import { InteractiveDisabledDemo } from "./interactive-disabled-demo";
 import { InteractiveStateCode } from "./interactive-state-code";
@@ -12,7 +11,7 @@ import { WhyButtonStatesMatter } from "./why-button-states-matter";
 
 export function ButtonDesignPage() {
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       <RuleOfThumbHero
         title="Button Design"
         description={
@@ -33,15 +32,15 @@ export function ButtonDesignPage() {
       <EssentialButtonStates />
 
       <div className={cx("mb-20")}>
-        <h2 className={cx("text-2xl font-bold text-foreground text-center mb-8")}>Disabled State UX</h2>
+        <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Disabled State UX</h2>
         <InteractiveDisabledDemo />
       </div>
 
       <div className={cx("mb-20")}>
-        <h2 className={cx("text-2xl font-bold text-foreground text-center mb-4")}>
+        <h2 className={cx("text-2xl font-bold text-foreground mb-4")}>
           Button States Implementation
         </h2>
-        <p className={cx("text-muted-foreground text-center mb-8 max-w-2xl mx-auto")}>
+        <p className={cx("text-muted-foreground mb-8 max-w-2xl")}>
           Click on each state to see which parts of the code handle it. A complete button should
           handle all five states in a single, unified component.
         </p>
@@ -52,6 +51,6 @@ export function ButtonDesignPage() {
       <ButtonBestPractices />
       <WhyButtonStatesMatter />
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

@@ -2,8 +2,7 @@ import { cx } from "@/stylex";
 import { createFileRoute } from "@tanstack/react-router";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { ShieldIcon, PackageIcon } from "@phosphor-icons/react";
-import { PageContainer } from "../../components/page-container";
-import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
+import { BestPractice, CodeExample, RuleOfThumbHero, RulePage, SectionHeading } from "./-components";
 
 export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
   component: TypeScriptGuidelines,
@@ -11,7 +10,7 @@ export const Route = createFileRoute("/rule-of-thumb/typescript-code-writing")({
 
 function TypeScriptGuidelines() {
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       <RuleOfThumbHero
         title="TypeScript Guidelines"
         description={
@@ -92,60 +91,62 @@ export function calculateTotal(items: Item[]) {
           />
         </div>
 
-        <CodeExample
-          title="Type vs Interface"
-          code={`// ✅ Use type for simple objects
-type User = {
-  id: string;
-  name: string;
-}
+        <div className={cx("space-y-4")}>
+          <CodeExample
+            title="Type vs Interface"
+            code={`// ✅ Use type for simple objects
+  type User = {
+    id: string;
+    name: string;
+  }
 
-// ❌ Avoid intersection for extension
-type Admin = User & {
-  permissions: string[];
-}
+  // ❌ Avoid intersection for extension
+  type Admin = User & {
+    permissions: string[];
+  }
 
-// ✅ Use interface for extension
-interface Admin extends User {
-  permissions: string[];
-}`}
-        />
+  // ✅ Use interface for extension
+  interface Admin extends User {
+    permissions: string[];
+  }`}
+          />
 
-        <CodeExample
-          title="Types vs Enums"
-          code={`// ❌ Avoid this
-enum UserRoleEnum {
-  Admin = "ADMIN",
-  Editor = "EDITOR",
-  Viewer = "VIEWER"
-}
+          <CodeExample
+            title="Types vs Enums"
+            code={`// ❌ Avoid this
+  enum UserRoleEnum {
+    Admin = "ADMIN",
+    Editor = "EDITOR",
+    Viewer = "VIEWER"
+  }
 
-// ✅ Do this
-type UserRole = "ADMIN" | "EDITOR" | "VIEWER";
-const UserRoleEnum = {
-  Admin: "ADMIN",
-  Editor: "EDITOR",
-  Viewer: "VIEWER"
-} as const`}
-          description="String literal unions are simpler and don't emit runtime code."
-        />
+  // ✅ Do this
+  type UserRole = "ADMIN" | "EDITOR" | "VIEWER";
+  const UserRoleEnum = {
+    Admin: "ADMIN",
+    Editor: "EDITOR",
+    Viewer: "VIEWER"
+  } as const`}
+            description="String literal unions are simpler and don't emit runtime code."
+          />
 
-        <CodeExample
-          title="Type Inference"
-          code={`// ❌ Avoid unnecessary explicit typing
-const x: number = 5; // it's a constant, it's not going to change to other types
-const items: string[] = ["a", "b", "c"];
+          <CodeExample
+            title="Type Inference"
+            code={`// ❌ Avoid unnecessary explicit typing
+  const x: number = 5; // it's a constant, it's not going to change to other types
+  const items: string[] = ["a", "b", "c"];
 
-// ✅ Do this - let TypeScript infer
-const y = 5; // inferred as number
-const items = ["a", "b", "c"]; // inferred as string[]
+  // ✅ Do this - let TypeScript infer
+  const y = 5; // inferred as number
+  const items = ["a", "b", "c"]; // inferred as string[]
 
-// ✅ Annotate when enforcing a contract
-function getUser(): User { // explicit return type documents intent
-  return { id: "1", name: "Alice" };
-}`}
-          description="Only add type annotations when they add value - for function signatures, public APIs, or to catch errors."
-        />
+  // ✅ Annotate when enforcing a contract
+  function getUser(): User { // explicit return type documents intent
+    return { id: "1", name: "Alice" };
+  }`}
+            description="Only add type annotations when they add value - for function signatures, public APIs, or to catch errors."
+          />
+        </div>
       </div>
 
       {/* ================================================================== */}
@@ -256,6 +257,6 @@ createUser({
       </div>
 
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

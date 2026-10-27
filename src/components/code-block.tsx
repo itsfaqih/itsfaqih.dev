@@ -1,6 +1,24 @@
+import { registerCustomCSSVariableTheme } from "@pierre/diffs";
 import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
 import { isValidElement, useMemo, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
 import { cn } from "../cn";
+
+// One syntax theme for both appearances: token colours are CSS variables, set on
+// .code-block in rot.css from the arcade palette, so they flip with the page theme.
+const ARCADE_THEME = "arcade";
+registerCustomCSSVariableTheme(ARCADE_THEME, {
+  foreground: "#f4f4f8",
+  background: "#17171f",
+  "token-comment": "#87879d",
+  "token-keyword": "#ff6ad5",
+  "token-string": "#7dff6a",
+  "token-string-expression": "#7dff6a",
+  "token-constant": "#ffe14d",
+  "token-function": "#4dd4ff",
+  "token-parameter": "#9d7bff",
+  "token-punctuation": "#a1a1b5",
+  "token-link": "#4dd4ff",
+});
 
 type CodeBlockProps = {
   code: string;
@@ -83,8 +101,8 @@ export function CodeBlock({
   const options = useMemo<FileOptions<undefined>>(
     () => ({
       theme: {
-        light: "github-light",
-        dark: "github-dark",
+        light: ARCADE_THEME,
+        dark: ARCADE_THEME,
       },
       themeType: "system",
       overflow: "scroll",
@@ -99,7 +117,7 @@ export function CodeBlock({
     "--diffs-font-family": string;
     "--diffs-header-font-family": string;
   } = {
-    "--diffs-font-family": "var(--font-mono)",
+    "--diffs-font-family": "var(--mono)",
     "--diffs-header-font-family": "var(--font-sans)",
     ...style,
   };

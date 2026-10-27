@@ -82,7 +82,7 @@ export function ScrollLockDemoContent() {
             ></div>
             <div
               className={cx(
-                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[240px] p-6 rounded-xl bg-background border border-border",
+                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[240px] p-6 rk-window",
               )}
               style={{
                 ...animationStyle,

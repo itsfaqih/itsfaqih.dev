@@ -17,7 +17,7 @@ export function MockDialog({
   return (
     <div
       className={cn(
-        "absolute left-1/2 top-1/2 z-20 outline-none p-6 rounded-xl squircle bg-background border border-border",
+        "rk-window absolute left-1/2 top-1/2 z-20 outline-none p-6",
         className || "w-full max-w-sm",
       )}
       style={{

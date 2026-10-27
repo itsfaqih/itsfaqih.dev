@@ -11,7 +11,7 @@ export function ErrorHandlingSection() {
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Error Handling"
-          description="Show errors inline, not as toasts. Make them recoverable."
+          description="Show errors where users can act on them. Make them recoverable."
         />
 
         <ErrorDemo />
@@ -20,7 +20,7 @@ export function ErrorHandlingSection() {
           <BestPractice
             emoji="🎯"
             title="Inline error states"
-            description="Show errors where the data was supposed to appear. Toasts get lost and overwhelm users with multiple failures."
+            description="Keep each error next to the data it belongs to, even when multiple requests fail."
           />
           <BestPractice
             emoji="🔄"
@@ -52,7 +52,7 @@ export function ErrorHandlingSection() {
   }, [error]);
 
   if (error) {
-    // Inline error, NOT toast
+    // Show an inline error state
     return (
       <div className={cx("error-state")}>
         <AlertCircle />
@@ -67,7 +67,7 @@ export function ErrorHandlingSection() {
 
   return <Profile data={data} />;
 }`}
-            description="Inline errors are contextual and don't overwhelm users like toasts."
+            description="Inline errors keep feedback contextual and actionable."
           />
         </div>
       </div>

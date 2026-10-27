@@ -1,6 +1,5 @@
 import { cx } from "@/stylex";
-import { ShieldCheckIcon, WarningCircleIcon } from "@phosphor-icons/react";
-import { BestPractice, SectionHeading, TabbedCodeExample } from "../index";
+import { BestPractice, SectionHeading, TabbedCodeExample, Verdict } from "../index";
 import { DataParsingDemo } from "./data-parsing-demo";
 
 export function DataParsingSection() {
@@ -18,71 +17,67 @@ export function DataParsingSection() {
         <DataParsingDemo />
 
         <div className={cx("mt-8 grid sm:grid-cols-2 gap-4 mb-8")}>
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
-            <div className={cx("flex items-center gap-2 mb-3")}>
-              <WarningCircleIcon size={18} className={cx("text-negative-foreground")} />
-              <h3 className={cx("font-semibold text-negative-foreground")}>Without Parsing</h3>
+          <Verdict good={false} title="Without Parsing">
+            <div className="rk-pad-lg">
+              <p className={cx("text-sm text-muted-foreground mb-4")}>What can go wrong:</p>
+              <ul className={cx("text-sm text-muted-foreground space-y-2")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Runtime crashes</strong> — Accessing{" "}
+                    <code className={cx("text-xs bg-background px-1 rounded")}>
+                      user.name.toUpperCase()
+                    </code>{" "}
+                    when name is undefined
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Type mismatches</strong> — Expecting number,
+                    getting string like{" "}
+                    <code className={cx("text-xs bg-background px-1 rounded")}>"42"</code>
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground")}>✗</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Silent failures</strong> — Missing fields that
+                    cause subtle bugs later
+                  </span>
+                </li>
+              </ul>
             </div>
-            <p className={cx("text-sm text-muted-foreground mb-4")}>What can go wrong:</p>
-            <ul className={cx("text-sm text-muted-foreground space-y-2")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Runtime crashes</strong> — Accessing{" "}
-                  <code className={cx("text-xs bg-background px-1 rounded")}>
-                    user.name.toUpperCase()
-                  </code>{" "}
-                  when name is undefined
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Type mismatches</strong> — Expecting number,
-                  getting string like{" "}
-                  <code className={cx("text-xs bg-background px-1 rounded")}>"42"</code>
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground")}>✗</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Silent failures</strong> — Missing fields that
-                  cause subtle bugs later
-                </span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
 
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
-            <div className={cx("flex items-center gap-2 mb-3")}>
-              <ShieldCheckIcon size={18} className={cx("text-positive-foreground")} />
-              <h3 className={cx("font-semibold text-positive-foreground")}>With Parsing</h3>
+          <Verdict good title="With Parsing">
+            <div className="rk-pad-lg">
+              <p className={cx("text-sm text-muted-foreground mb-4")}>Benefits:</p>
+              <ul className={cx("text-sm text-muted-foreground space-y-2")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Early error detection</strong> — Catch invalid
+                    data at the boundary
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Type safety</strong> — TypeScript knows the
+                    exact shape after parsing
+                  </span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground")}>✓</span>
+                  <span>
+                    <strong className={cx("text-foreground")}>Graceful handling</strong> — Use fallbacks or
+                    show meaningful errors
+                  </span>
+                </li>
+              </ul>
             </div>
-            <p className={cx("text-sm text-muted-foreground mb-4")}>Benefits:</p>
-            <ul className={cx("text-sm text-muted-foreground space-y-2")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Early error detection</strong> — Catch invalid
-                  data at the boundary
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Type safety</strong> — TypeScript knows the
-                  exact shape after parsing
-                </span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground")}>✓</span>
-                <span>
-                  <strong className={cx("text-foreground")}>Graceful handling</strong> — Use fallbacks or
-                  show meaningful errors
-                </span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
         </div>
 
         <div className={cx("space-y-4 mb-8")}>

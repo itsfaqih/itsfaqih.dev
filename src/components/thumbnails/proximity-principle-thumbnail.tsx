@@ -75,7 +75,7 @@ export function ProximityPrincipleThumbnail() {
               y1="-7"
               x2="7"
               y2="7"
-              stroke="#f87171"
+              stroke="var(--no, #ff5468)"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
@@ -84,7 +84,7 @@ export function ProximityPrincipleThumbnail() {
               y1="-7"
               x2="-7"
               y2="7"
-              stroke="#f87171"
+              stroke="var(--no, #ff5468)"
               strokeWidth="2.5"
               strokeLinecap="round"
             />
@@ -169,7 +169,7 @@ export function ProximityPrincipleThumbnail() {
             <path
               d="M-8 0 L-3 6 L 9 -6"
               fill="none"
-              stroke="#34d399"
+              stroke="var(--yes, #7dff6a)"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"

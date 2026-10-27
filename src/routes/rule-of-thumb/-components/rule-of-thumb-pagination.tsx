@@ -1,17 +1,14 @@
-import { cx } from "@/stylex";
-import { Link, useLocation } from "@tanstack/react-router";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { GUIDELINES } from "../../../data/guidelines";
-import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react";
-import { Card } from "../../../components/card";
+import type { Guideline } from "../../../data/guidelines";
+import { colorOf, ruleNumber, RuleThumb } from "../../-components/rule-art";
+import { useCurrentRule } from "./index";
 
 export function RuleOfThumbPagination() {
-  const location = useLocation();
+  const current = useCurrentRule();
   const visibleGuidelines = GUIDELINES.filter((g) => !g.hidden);
-  const pathname =
-    location.pathname.length > 1 && location.pathname.endsWith("/")
-      ? location.pathname.slice(0, -1)
-      : location.pathname;
-  const currentIndex = visibleGuidelines.findIndex((g) => g.href === pathname);
+  const currentIndex = current ? visibleGuidelines.indexOf(current) : -1;
 
   if (currentIndex === -1) return null;
 
@@ -19,42 +16,42 @@ export function RuleOfThumbPagination() {
   const nextGuideline = visibleGuidelines[currentIndex + 1];
 
   return (
-    <div className={cx("grid grid-cols-1 sm:grid-cols-2 gap-4 mt-16 pt-8 border-t border-border")}>
-      {/* Previous */}
-      {prevGuideline ? (
-        <Link to={prevGuideline.href} preload="intent" className={cx("group block h-full")}>
-          <Card className={cx("h-full p-6 flex flex-col items-start gap-2 group-hover:border-muted-foreground/50 transition-colors")}>
-            <div className={cx("flex items-center gap-2 text-sm text-muted-foreground mb-1")}>
-              <ArrowLeftIcon
-                size={16}
-                className={cx("group-hover:-translate-x-1 transition-transform")}
-              />
-              Previous View
-            </div>
-            <span className={cx("font-semibold text-foreground text-lg")}>{prevGuideline.title}</span>
-          </Card>
-        </Link>
-      ) : (
-        <div /> /* Spacer */
-      )}
-
-      {/* Next */}
+    <nav className="arc rot-pager" aria-label="More rules">
+      {prevGuideline ? <PagerCard rule={prevGuideline} direction="Previous" /> : <div />}
       {nextGuideline ? (
-        <Link to={nextGuideline.href} className={cx("group block h-full")}>
-          <Card className={cx("h-full p-6 flex flex-col items-end gap-2 group-hover:border-muted-foreground/50 transition-colors text-right")}>
-            <div className={cx("flex items-center gap-2 text-sm text-muted-foreground mb-1")}>
-              Next View
-              <ArrowRightIcon
-                size={16}
-                className={cx("group-hover:translate-x-1 transition-transform")}
-              />
-            </div>
-            <span className={cx("font-semibold text-foreground text-lg")}>{nextGuideline.title}</span>
-          </Card>
-        </Link>
+        <PagerCard rule={nextGuideline} direction="Next" />
       ) : (
-        <div /> /* Spacer */
+        <Link to="/rule-of-thumb" className="rot-card rot-all">
+          <span className="d">That's every rule so far</span>
+          <span className="t">Back to all rules →</span>
+        </Link>
       )}
-    </div>
+    </nav>
+  );
+}
+
+function PagerCard({ rule, direction }: { rule: Guideline; direction: "Previous" | "Next" }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      to={rule.href}
+      preload="intent"
+      className={direction === "Next" ? "rot-card next" : "rot-card"}
+      style={{ "--c": colorOf(rule.label) }}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+    >
+      <RuleThumb rule={rule} play={hovered} />
+      <span className="meta">
+        <span className="d">{direction === "Next" ? "Next rule →" : "← Previous rule"}</span>
+        <span className="n">
+          No.{ruleNumber(rule)} · {rule.label}
+        </span>
+        <span className="t">{rule.title}</span>
+      </span>
+    </Link>
   );
 }

@@ -17,12 +17,10 @@ export function InteractiveDemo() {
   return (
     <div
       data-rule-of-thumb-card="true"
-      className={cx(
-        "p-12 rounded-2xl squircle border border-border bg-card flex flex-col items-center justify-center gap-6 text-center",
-      )}
+      className={cx("rk-stage p-12 flex flex-col items-center justify-center gap-6 text-center")}
     >
       <div className={cx("max-w-md")}>
-        <h3 className={cx("text-2xl font-bold text-foreground mb-2")}>Try the Real Deal</h3>
+        <h3 className={cx("text-2xl font-bold mb-2")}>Try the Real Deal</h3>
         <p className={cx("text-muted-foreground")}>
           Experience clear focus trap, scroll locking, and accessible interactions.
         </p>
@@ -33,9 +31,9 @@ export function InteractiveDemo() {
         title="Interactive Dialog"
         description="This is a fully accessible modal dialog with scroll locking."
         trigger={
-          <Button onClick={() => setIsOpen(true)} className={cx("h-12 px-8 text-lg")}>
-            Open Interactive Dialog <CursorIcon size={18} />
-          </Button>
+          <button type="button" className="btn go" onClick={() => setIsOpen(true)}>
+            Open Interactive Dialog <CursorIcon size={18} weight="bold" />
+          </button>
         }
       >
         <div className={cx("space-y-4 pt-2")}>

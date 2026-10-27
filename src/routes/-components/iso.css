@@ -1,0 +1,74 @@
+/* Drawing rules from the Anatomy kit (scripts/hero-figures/kit, MIT, (c) 2026 Ryan),
+   repainted as cel-shaded arcade toys: flat painted tops, two hard shade bands mixed
+   toward ink, thick ink outlines and a hard offset drop shadow instead of a soft halo.
+   Every solid carries a data-tint from build.mjs; the moving part takes the slide hue. */
+.bench {
+  --anatomy-ink: #07070c;
+  --anatomy-shadow: #000;
+  --anatomy-shadow-opacity: 0.55;
+  --anatomy-body: #4b4fc4;
+  --anatomy-plate: #262636;
+  --anatomy-plate-2: var(--go);
+  --anatomy-white: #f3f0e4;
+  --anatomy-dark: #33333f;
+  --anatomy-glass: #3a3a4c;
+  --anatomy-lit: var(--c);
+  --anatomy-hi: var(--text);
+  --anatomy-mid: var(--dim);
+  --anatomy-lo: var(--mute);
+  --anatomy-faint: var(--hair);
+  --anatomy-weight: 1px;
+  --anatomy-edge: 1.6px;
+  --anatomy-mono: var(--mono);
+}
+.light .bench {
+  --anatomy-ink: #16161f;
+  --anatomy-shadow: var(--drop-ink);
+  --anatomy-shadow-opacity: 1;
+  --anatomy-body: #6d72ec;
+  --anatomy-plate: #e2e2ec;
+  --anatomy-white: #fffdf6;
+  --anatomy-dark: #4a4a58;
+  --anatomy-glass: #5a5a6c;
+}
+.iso-svg{display:block;width:100%;height:auto;overflow:visible}
+.iso-svg path,.iso-svg circle{vector-effect:non-scaling-stroke}
+.iso-solid{--t:var(--anatomy-body)}
+.iso-solid[data-tint="plate"]{--t:var(--anatomy-plate)}
+.iso-solid[data-tint="plate-2"]{--t:var(--anatomy-plate-2)}
+.iso-solid[data-tint="white"]{--t:var(--anatomy-white)}
+.iso-solid[data-tint="dark"]{--t:var(--anatomy-dark)}
+.iso-solid[data-tint="glass"]{--t:var(--anatomy-glass)}
+.iso-solid[data-tint="hero"],.iso-solid[data-lit]{--t:var(--anatomy-lit)}
+.iso-solid{--t-deep:color-mix(in oklab,var(--t) 52%,var(--anatomy-ink));--t-side:color-mix(in oklab,var(--t) 74%,var(--anatomy-ink))}
+.iso-fill{fill:var(--t-deep);stroke:none}
+.iso-shade,.iso-top{stroke:none}
+.iso-shade[data-shade="0"],.iso-shade[data-shade="1"]{fill:var(--t-deep)}
+.iso-shade[data-shade="2"],.iso-shade[data-shade="3"]{fill:var(--t-side)}
+.iso-top{fill:var(--t)}
+.iso-solid[data-seamless]>.iso-shade,.iso-solid[data-seamless]>.iso-top{stroke-width:.4;stroke-linejoin:round}
+.iso-solid[data-seamless]>.iso-shade[data-shade="0"],.iso-solid[data-seamless]>.iso-shade[data-shade="1"]{stroke:var(--t-deep)}
+.iso-solid[data-seamless]>.iso-shade[data-shade="2"],.iso-solid[data-seamless]>.iso-shade[data-shade="3"]{stroke:var(--t-side)}
+.iso-solid[data-seamless]>.iso-top{stroke:var(--t)}
+.iso-halo{fill:var(--anatomy-shadow);stroke:none;opacity:var(--anatomy-shadow-opacity);transform:translate(5px,6px)}
+.iso-line{fill:none;stroke:var(--anatomy-lo);stroke-width:var(--anatomy-weight);stroke-linecap:round;stroke-linejoin:round}
+.iso-line[data-tone="hi"]{stroke:var(--anatomy-hi)}
+.iso-line[data-tone="mid"]{stroke:var(--anatomy-mid)}
+.iso-line[data-tone="lo"]{stroke:var(--anatomy-lo)}
+.iso-line[data-tone="faint"]{stroke:var(--anatomy-faint)}
+.iso-line[data-tone="lit"]{stroke:var(--anatomy-lit)}
+.iso-solid>.iso-line{stroke:var(--anatomy-ink)}
+.iso-solid>.iso-edge{stroke-width:var(--anatomy-edge)}
+.iso-solid>.iso-crease,.iso-solid>.iso-bevel{opacity:.4}
+.iso-line[data-dotted]{stroke-dasharray:.01 3.5;stroke-width:1}
+.iso-line[data-dashed]{stroke-dasharray:3 3}
+.iso-line[data-flow]{stroke-dasharray:2 6}
+.iso-wire-end{fill:var(--bg);stroke:var(--anatomy-lo);stroke-width:var(--anatomy-weight)}
+.iso-wire[data-tone="hi"] .iso-wire-end{stroke:var(--anatomy-hi)}
+.iso-wire[data-tone="mid"] .iso-wire-end{stroke:var(--anatomy-mid)}
+.iso-wire[data-tone="faint"] .iso-wire-end{stroke:var(--anatomy-faint)}
+.iso-wire[data-tone="lit"] .iso-wire-end{stroke:var(--anatomy-lit)}
+.iso-dots circle{fill:var(--anatomy-ink);stroke:none;opacity:.7}
+.iso-face-text{fill:var(--anatomy-ink);font-family:var(--anatomy-mono);font-weight:700;letter-spacing:.04em}
+.bench-fig.on .iso-line[data-flow]{animation:iso-flow 1600ms linear infinite}
+@keyframes iso-flow{to{stroke-dashoffset:-32}}

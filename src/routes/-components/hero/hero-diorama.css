@@ -1,0 +1,370 @@
+/* Hero dioramas (hero-diorama.tsx, DIRECTION.md).
+   Blocks are CSS boxes on a 560 × 350 unit plate; one unit is --u. Overflow, opacity and
+   filter flatten a preserve-3d chain, so fades and blurs only ever sit on leaves: faces,
+   text and the chip. */
+
+.arc .dio {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 560px;
+
+  --top: #20202b;
+  --sk-s: var(--drop-ink);
+  --sk-side: #050508;
+  --hue-text: color-mix(in oklab, var(--c) 55%, white);
+  --shade: rgb(0 0 0 / 0.45);
+  --plate-top: color-mix(in oklab, var(--c) 10%, #17171f);
+  --plate-dot: color-mix(in oklab, var(--c) 12%, transparent);
+  --plate-skirt: color-mix(in oklab, var(--c) 30%, #07070c);
+  --rim: rgb(255 255 255 / 0.05);
+  --groove: rgb(0 0 0 / 0.4);
+}
+.light .arc .dio {
+  --top: #fff;
+  --sk-s: #c5c5d1;
+  --sk-side: #b4b4c2;
+  --hue-text: color-mix(in oklab, var(--c) 55%, black);
+  --shade: rgb(30 30 60 / 0.14);
+  --plate-top: color-mix(in oklab, var(--c) 7%, #fff);
+  --plate-dot: color-mix(in oklab, var(--c) 22%, transparent);
+  --plate-skirt: color-mix(in oklab, var(--c) 35%, #c5c5d1);
+  --rim: rgb(30 30 60 / 0.08);
+  --groove: rgb(30 30 60 / 0.12);
+}
+
+.arc .dio-view {
+  --u: calc(100cqw / 560);
+  perspective: calc(1500 * var(--u));
+  /* The tilted plate is shorter than 16:10 and its blocks stand up out of it. */
+  padding: calc(20 * var(--u)) 0 calc(8 * var(--u));
+  font: 500 calc(11 * var(--u)) / 1 var(--mono);
+  color: var(--text);
+}
+.arc .dio-plate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  transform-style: preserve-3d;
+}
+.arc .dio-scene,
+.arc .dio .mv {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.arc .dio .mv {
+  transform: var(--rest);
+}
+.arc .dio[data-play] .mv {
+  animation: var(--anim) var(--dur) linear both;
+}
+
+/* ---- Boxes: a top face lifted by --d and three skirts down to the floor ---- */
+.arc .dio .box {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  transform: translateZ(calc(var(--z) * var(--u)));
+  transform-style: preserve-3d;
+}
+/* Each block carries its own shadow, so it sinks and rises with the block. */
+.arc .dio .box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(4 * var(--u));
+  background: var(--shade);
+  filter: blur(calc(3 * var(--u)));
+  transform: translate3d(calc(3 * var(--u)), calc(5 * var(--u)), calc(0.3 * var(--u)));
+}
+.arc .dio .box.plate::before,
+.arc .dio .box.bit::before,
+.arc .dio .box.glass::before {
+  content: none;
+}
+.arc .dio .top {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--d) * var(--u)));
+  background: var(--top);
+  box-shadow: inset 0 0 0 calc(1 * var(--u)) var(--rim);
+  border-radius: calc(3 * var(--u));
+}
+.arc .dio .sk {
+  position: absolute;
+}
+.arc .dio .sk.s {
+  left: 0;
+  width: 100%;
+  top: calc(100% - var(--d) * var(--u));
+  height: calc(var(--d) * var(--u));
+  transform-origin: bottom;
+  transform: rotateX(-90deg);
+  background: var(--sk-s);
+}
+.arc .dio .sk.e,
+.arc .dio .sk.w {
+  top: 0;
+  height: 100%;
+  width: calc(var(--d) * var(--u));
+  background: var(--sk-side);
+}
+.arc .dio .sk.e {
+  left: calc(100% - var(--d) * var(--u));
+  transform-origin: right;
+  transform: rotateY(90deg);
+}
+.arc .dio .sk.w {
+  left: 0;
+  transform-origin: left;
+  transform: rotateY(-90deg);
+}
+
+.arc .dio .box.hue {
+  --top: var(--c);
+  --sk-s: color-mix(in oklab, var(--c) 62%, black);
+  --sk-side: color-mix(in oklab, var(--c) 50%, black);
+  --rim: transparent;
+  --hue-text: var(--on-accent);
+  color: var(--on-accent);
+}
+.arc .dio .box.ink {
+  --top: color-mix(in oklab, var(--c) 6%, #0b0b10);
+}
+.light .arc .dio .box.ink {
+  --top: color-mix(in oklab, var(--c) 8%, #f1f1f5);
+}
+.arc .dio .box.plate {
+  --top: var(--plate-top);
+  --sk-s: var(--plate-skirt);
+  --sk-side: color-mix(in oklab, var(--plate-skirt) 80%, black);
+  --rim: transparent;
+}
+.arc .dio .box.plate .top {
+  border-radius: 0;
+  background:
+    radial-gradient(circle, var(--plate-dot) calc(1 * var(--u)), transparent calc(1.4 * var(--u))) 0 0 /
+      calc(8 * var(--u)) calc(8 * var(--u)),
+    var(--plate-top);
+}
+.arc .dio .box.knob {
+  --top: #f4f4f8;
+  --sk-s: #a1a1b5;
+  --sk-side: #87879d;
+}
+.light .arc .dio .box.knob {
+  --top: #fff;
+  --sk-s: #a1a1b5;
+  --sk-side: #87879d;
+}
+.arc .dio .box.track .top {
+  border-radius: calc(16 * var(--u));
+}
+.arc .dio .box.knob .top {
+  border-radius: calc(13 * var(--u));
+}
+
+/* A face that lights in the slide hue when it is pressed or passes. */
+.arc .dio .lit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in oklab, var(--c) 26%, transparent);
+  box-shadow: inset 0 0 0 calc(1.5 * var(--u)) var(--c);
+}
+.arc .dio .track .lit {
+  background: var(--c);
+  box-shadow: none;
+}
+
+/* ---- Text on faces and on the plate ---- */
+.arc .dio .flat {
+  position: absolute;
+  white-space: nowrap;
+}
+.arc .dio-scene > .flat,
+.arc .dio-scene > .chip {
+  transform: translateZ(calc(0.5 * var(--u)));
+}
+.arc .dio .dim {
+  color: var(--dim);
+}
+.arc .dio .box.hue .dim {
+  color: inherit;
+  opacity: 0.7;
+}
+.arc .dio .ink {
+  color: var(--hue-text);
+}
+.arc .dio .lg {
+  font-size: calc(13 * var(--u));
+  color: var(--text);
+}
+.arc .dio .sm {
+  font-size: calc(9 * var(--u));
+}
+.arc .dio .big {
+  font: 700 calc(20 * var(--u)) / 1 var(--display);
+}
+.arc .dio .key-l {
+  font: 700 calc(12 * var(--u)) / 1 var(--display);
+}
+.arc .dio .key {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 700 calc(12 * var(--u)) / 1 var(--display);
+}
+.arc .dio .key.mono {
+  font: 600 calc(12 * var(--u)) / 1 var(--mono);
+}
+.arc .dio .front {
+  display: grid;
+  height: 100%;
+  align-items: center;
+  padding-left: calc(10 * var(--u));
+  font-size: calc(8 * var(--u));
+  color: var(--dim);
+}
+.arc .dio .word {
+  display: inline-block;
+  white-space: pre;
+}
+
+.arc .dio .groove {
+  width: calc(264 * var(--u));
+  height: calc(14 * var(--u));
+  border-radius: calc(7 * var(--u));
+  background: var(--groove);
+}
+.arc .dio .axis {
+  width: calc(216 * var(--u));
+  height: calc(1.5 * var(--u));
+  background: var(--hair);
+}
+/* The latency budget: a dashed glass volume the bars stand inside. */
+.arc .dio .box.glass {
+  --line: color-mix(in oklab, var(--c) 70%, transparent);
+  --top: color-mix(in oklab, var(--c) 6%, transparent);
+  --sk-s: color-mix(in oklab, var(--c) 5%, transparent);
+  --sk-side: color-mix(in oklab, var(--c) 4%, transparent);
+  --rim: transparent;
+}
+.arc .dio .box.glass :is(.top, .sk) {
+  border: calc(1.5 * var(--u)) dashed var(--line);
+  border-radius: 0;
+}
+
+/* ---- Bit ---- */
+.arc .dio .bit-shadow {
+  position: absolute;
+  left: calc(-2 * var(--u));
+  top: calc(2 * var(--u));
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
+  border-radius: calc(6 * var(--u));
+  background: var(--shade);
+  filter: blur(calc(3 * var(--u)));
+  transform: translateZ(calc(0.5 * var(--u)));
+}
+.arc .dio .bit .top {
+  border-radius: calc(5 * var(--u));
+}
+.arc .dio .eye {
+  position: absolute;
+  top: calc(9 * var(--u));
+  width: calc(3.5 * var(--u));
+  height: calc(9 * var(--u));
+  border-radius: calc(2 * var(--u));
+  background: #0e0e13;
+}
+.arc .dio .eye.l {
+  left: calc(9 * var(--u));
+}
+.arc .dio .eye.r {
+  right: calc(9 * var(--u));
+}
+
+/* ---- Beat chip: the thumbnails' chip, lying on the plate's top-right corner ---- */
+.arc .dio .chip {
+  position: absolute;
+  right: calc(24 * var(--u));
+  top: calc(20 * var(--u));
+  display: grid;
+  justify-items: end;
+}
+.arc .dio .chip b {
+  grid-area: 1 / 1;
+  padding: calc(5 * var(--u)) calc(8 * var(--u));
+  border-radius: calc(4 * var(--u));
+  background: var(--c);
+  color: var(--on-accent);
+  font: 700 calc(10 * var(--u)) / 1 var(--display);
+  letter-spacing: 0.04em;
+}
+
+/* ---- Beats: parts that appear at --at, or show from --at until --to ---- */
+.arc .dio .win {
+  opacity: 0;
+}
+.arc .dio[data-play] .in {
+  animation: dio-in 350ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--dur) * var(--at)) backwards;
+}
+.arc .dio[data-play] .win {
+  animation:
+    dio-in 350ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--dur) * var(--at)) both,
+    dio-out 150ms ease-in calc(var(--dur) * var(--to)) forwards;
+}
+.arc .dio[data-play] .swap.in {
+  animation-name: dio-swap;
+  animation-duration: 150ms;
+  animation-timing-function: ease-in-out;
+}
+.arc .dio[data-play] .swap.win {
+  animation-name: dio-swap, dio-out;
+  animation-duration: 150ms, 150ms;
+  animation-timing-function: ease-in-out, ease-in;
+}
+@keyframes dio-in {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+  }
+}
+@keyframes dio-swap {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    translate: 0 calc(8 * var(--u));
+  }
+}
+@keyframes dio-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* A new scene fades in on its leaves, which keeps the 3D intact. */
+.arc .dio[data-play] .dio-scene :is(.top, .sk, .bit-shadow) {
+  animation: dio-fade 320ms ease backwards;
+}
+@keyframes dio-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Hover or pause holds the scene where it is. */
+.arc .held .dio * {
+  animation-play-state: paused !important;
+}
+
+/* On a phone the turned plate reaches past its column; shrink it so its far corner stays on screen. */
+@media (max-width: 600px) {
+  .arc .dio {
+    width: 90%;
+  }
+}

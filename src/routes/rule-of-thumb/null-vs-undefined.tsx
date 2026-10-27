@@ -2,12 +2,12 @@ import { cx } from "@/stylex";
 import { createFileRoute } from "@tanstack/react-router";
 import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
 import { ProhibitIcon, QuestionIcon } from "@phosphor-icons/react";
-import { PageContainer } from "../../components/page-container";
 import {
   CodeComparison,
   CodeExample,
-  RuleOfThumbHero,
   QuickRefCard,
+  RuleOfThumbHero,
+  RulePage,
   SectionHeading,
 } from "./-components";
 
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/rule-of-thumb/null-vs-undefined")({
 
 function NullVsUndefined() {
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       {/* Hero Section */}
       <RuleOfThumbHero
         title="Null vs Undefined"
@@ -151,7 +151,7 @@ if (data.assigneeId === null) {
 
       {/* Quick Reference */}
       <div className={cx("mb-16")}>
-        <h2 className={cx("text-2xl font-bold text-foreground text-center mb-8")}>Quick Reference</h2>
+        <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Quick Reference</h2>
         <div className={cx("space-y-3")}>
           <QuickRefCard
             emoji="❓"
@@ -166,6 +166,6 @@ if (data.assigneeId === null) {
 
       {/* Footer */}
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

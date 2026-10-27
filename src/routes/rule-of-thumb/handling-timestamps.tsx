@@ -10,12 +10,9 @@ import {
   HardDrivesIcon,
   DesktopIcon,
   CalendarBlankIcon,
-  CheckIcon,
-  XIcon,
 } from "@phosphor-icons/react";
 
-import { BestPractice, CodeExample, RuleOfThumbHero, SectionHeading } from "./-components";
-import { PageContainer } from "../../components/page-container";
+import { BestPractice, CodeExample, RuleOfThumbHero, RulePage, SectionHeading, Verdict } from "./-components";
 
 export const Route = createFileRoute("/rule-of-thumb/handling-timestamps")({
   component: HandlingTimestamps,
@@ -28,7 +25,7 @@ function HandlingTimestamps() {
   const { demoUtcTime } = Route.useLoaderData();
 
   return (
-    <PageContainer maxWidth="3xl" className="rule-of-thumb-page">
+    <RulePage>
       <RuleOfThumbHero
         title="Handling Timestamps"
         description={
@@ -186,64 +183,60 @@ fetch('/api/records', {
       <div className={cx("mb-20")}>
         <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Do's and Don'ts</h2>
 
-        <div className={cx("grid sm:grid-cols-2 gap-4")}>
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-positive/30 bg-positive/10")}>
-            <div className={cx("flex items-center gap-2 mb-4")}>
-              <CheckIcon size={18} className={cx("text-positive-foreground")} />
-              <h3 className={cx("font-semibold text-positive-foreground")}>Do</h3>
+        <div className="rk-pair">
+          <Verdict good title="Do">
+            <div className="rk-pad-lg">
+              <ul className={cx("space-y-3 text-sm text-muted-foreground")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
+                  <span>Store all timestamps as UTC in the database</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
+                  <span>Return ISO 8601 strings from API (with Z suffix)</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
+                  <span>Let the frontend handle timezone conversion</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
+                  <span>Convert user date inputs to UTC before API calls</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
+                  <span>Use Intl.DateTimeFormat or date libraries for display</span>
+                </li>
+              </ul>
             </div>
-            <ul className={cx("space-y-3 text-sm text-muted-foreground")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
-                <span>Store all timestamps as UTC in the database</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
-                <span>Return ISO 8601 strings from API (with Z suffix)</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
-                <span>Let the frontend handle timezone conversion</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
-                <span>Convert user date inputs to UTC before API calls</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-positive-foreground mt-0.5")}>✓</span>
-                <span>Use Intl.DateTimeFormat or date libraries for display</span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
 
-          <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-negative/30 bg-negative/10")}>
-            <div className={cx("flex items-center gap-2 mb-4")}>
-              <XIcon size={18} className={cx("text-negative-foreground")} />
-              <h3 className={cx("font-semibold text-negative-foreground")}>Don't</h3>
+          <Verdict good={false} title="Don't">
+            <div className="rk-pad-lg">
+              <ul className={cx("space-y-3 text-sm text-muted-foreground")}>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
+                  <span>Store timestamps with timezone offsets in DB</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
+                  <span>Convert to user's timezone on the backend</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
+                  <span>Send dates without timezone info</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
+                  <span>Assume server timezone = user timezone</span>
+                </li>
+                <li className={cx("flex items-start gap-2")}>
+                  <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
+                  <span>Use string manipulation for date math</span>
+                </li>
+              </ul>
             </div>
-            <ul className={cx("space-y-3 text-sm text-muted-foreground")}>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
-                <span>Store timestamps with timezone offsets in DB</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
-                <span>Convert to user's timezone on the backend</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
-                <span>Send dates without timezone info</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
-                <span>Assume server timezone = user timezone</span>
-              </li>
-              <li className={cx("flex items-start gap-2")}>
-                <span className={cx("text-negative-foreground mt-0.5")}>✗</span>
-                <span>Use string manipulation for date math</span>
-              </li>
-            </ul>
-          </div>
+          </Verdict>
         </div>
       </div>
 
@@ -289,6 +282,6 @@ fetch('/api/records', {
       </div>
 
       <RuleOfThumbPagination />
-    </PageContainer>
+    </RulePage>
   );
 }

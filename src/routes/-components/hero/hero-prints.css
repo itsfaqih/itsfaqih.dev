@@ -1,0 +1,382 @@
+/* Hero prints (hero-prints.tsx, redesign/hero-variants/DIRECTION.md).
+   A 16:10 card of grained paper with one Riso-printed scene on a 320 × 200 viewBox.
+   Scene loops run on --T; keyframes that come from geometry are generated in the TSX. */
+
+.arc .hp {
+  width: 100%;
+  max-width: 560px;
+
+  --shade: rgb(0 0 0 / 0.45);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.light .arc .hp {
+  --shade: rgb(30 30 60 / 0.18);
+}
+
+.arc .hp-stage {
+  perspective: 900px;
+  /* Room for the drop shadow and the turned corners. */
+  padding: 12px 8px 20px;
+}
+.arc .hp-card {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  transform-style: preserve-3d;
+}
+.arc .hp-card > * {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+.arc .hp-paper {
+  border: 1px solid var(--hair);
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    var(--panel);
+  background-blend-mode: overlay, normal;
+}
+.arc .hp-drop {
+  transform: translateZ(-1px) translateY(10px);
+  background: var(--shade);
+  filter: blur(14px);
+  opacity: 0.7;
+}
+.arc .hp-card svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(30px);
+  clip-path: inset(0 round 14px);
+}
+
+/* ---- Inks ---- */
+.arc .hp svg *:not([transform]) {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* Parts that move along viewBox coordinates. */
+.arc .hp svg .vb {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.arc .hp .h {
+  fill: var(--c);
+}
+.arc .hp .i {
+  fill: var(--text);
+}
+.arc .hp .hs {
+  stroke: var(--c);
+  fill: none;
+}
+.arc .hp .is {
+  stroke: var(--text);
+  fill: none;
+}
+.arc .hp .mis {
+  mix-blend-mode: screen;
+}
+.light .arc .hp .mis {
+  mix-blend-mode: multiply;
+}
+.arc .hp .dot {
+  fill: var(--c);
+}
+.arc .hp .grid {
+  stroke: var(--c);
+  stroke-width: 0.6;
+  opacity: 0.26;
+  fill: none;
+}
+.arc .hp .ghost {
+  stroke-dasharray: 3 4;
+  stroke-width: 1.4;
+  opacity: 0.65;
+}
+
+/* ---- Interfaces and agents: scattered, turned shapes spring into place ---- */
+.arc .hp .settle {
+  animation: hp-settle var(--T) calc(var(--i, 0) * var(--gap, 120ms)) infinite backwards;
+}
+@keyframes hp-settle {
+  0%,
+  6% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg));
+    animation-timing-function: var(--spring);
+  }
+  24%,
+  80% {
+    transform: none;
+    animation-timing-function: var(--inout);
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg));
+  }
+}
+/* The ring draws once the last quarter is in. */
+.arc .hp .ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: hp-ring var(--T) infinite;
+}
+@keyframes hp-ring {
+  0%,
+  40% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+    animation-timing-function: var(--inout);
+  }
+  54%,
+  80% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  88%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+/* ---- Dev tools: the ink takes the straight line; the ghost walks the meander ---- */
+.arc .hp .cut-ball {
+  transform: translate(280px, 40px);
+  animation: hp-ball var(--T) infinite;
+}
+@keyframes hp-ball {
+  0% {
+    opacity: 0;
+    transform: translate(40px, 160px);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(40px, 160px);
+    animation-timing-function: var(--inout);
+  }
+  24%,
+  86% {
+    opacity: 1;
+    transform: translate(280px, 40px);
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: translate(280px, 40px);
+  }
+}
+.arc .hp .cut-hit {
+  animation: hp-hit var(--T) infinite;
+}
+@keyframes hp-hit {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scale(0.2);
+    animation-timing-function: var(--spring);
+  }
+  30%,
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+.arc .hp .cut-ghost {
+  opacity: 0;
+  animation: hp-ghost var(--T) linear infinite;
+}
+
+/* ---- Backends: ten beats a loop; jobs step through, the hue job retries ---- */
+.arc .hp .q-job {
+  opacity: 0;
+  animation: hp-job var(--T) calc(var(--T) * (var(--b) / 10 - 1)) linear infinite;
+}
+.arc .hp .q-retry {
+  opacity: 0;
+  animation: hp-retry var(--T) linear infinite;
+}
+.arc .hp .q-work {
+  animation: hp-work calc(var(--T) / 10) infinite;
+}
+@keyframes hp-work {
+  0%,
+  36% {
+    transform: scale(0.72);
+    animation-timing-function: var(--spring);
+  }
+  50% {
+    transform: scale(1);
+    animation-timing-function: var(--inout);
+  }
+  100% {
+    transform: scale(0.72);
+  }
+}
+.arc .hp .q-out {
+  opacity: 0;
+  animation: hp-out var(--T) infinite;
+}
+.arc .hp .q-out-retry {
+  opacity: 0;
+  animation: hp-out-retry var(--T) infinite;
+}
+@keyframes hp-out-retry {
+  0%,
+  94.4% {
+    opacity: 0;
+    transform: none;
+    animation-timing-function: var(--out);
+  }
+  95.2% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(34px);
+  }
+}
+/* The worker turns the hue job away on beat 4. */
+.arc .hp .q-x {
+  opacity: 0;
+  animation: hp-x var(--T) infinite;
+}
+@keyframes hp-x {
+  0%,
+  44% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-45deg);
+    animation-timing-function: var(--spring);
+  }
+  48%,
+  56% {
+    opacity: 1;
+    transform: none;
+  }
+  62%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* ---- Tests: the scan finds the shape that slipped, and it snaps back ---- */
+.arc .hp .snap-slip {
+  animation: hp-slip var(--T) infinite;
+}
+@keyframes hp-slip {
+  0%,
+  10% {
+    transform: none;
+    animation-timing-function: var(--inout);
+  }
+  18%,
+  58% {
+    transform: translate(12px, -14px) rotate(16deg);
+    animation-timing-function: var(--spring);
+  }
+  68%,
+  100% {
+    transform: none;
+  }
+}
+.arc .hp .snap-scan {
+  opacity: 0;
+  animation: hp-scan var(--T) infinite;
+}
+@keyframes hp-scan {
+  0%,
+  20% {
+    opacity: 0;
+    transform: none;
+    animation-timing-function: linear;
+  }
+  22% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(280px);
+  }
+  52%,
+  100% {
+    opacity: 0;
+    transform: translateX(280px);
+  }
+}
+.arc .hp .snap-neq {
+  opacity: 0;
+  animation: hp-neq var(--T) infinite;
+}
+@keyframes hp-neq {
+  0%,
+  14% {
+    opacity: 0;
+  }
+  20%,
+  62% {
+    opacity: 1;
+  }
+  68%,
+  100% {
+    opacity: 0;
+  }
+}
+.arc .hp .snap-reg {
+  opacity: 0;
+  animation: hp-reg var(--T) infinite;
+}
+@keyframes hp-reg {
+  0%,
+  44% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-45deg);
+    animation-timing-function: var(--spring);
+  }
+  52%,
+  58% {
+    opacity: 1;
+    transform: none;
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* Before the intro ends, and on hover or pause, the scene holds where it is. */
+.arc .hp:not([data-play]) svg *,
+.arc .held .hp svg * {
+  animation-play-state: paused !important;
+}
+
+/* Reduced motion: one still frame per scene, every part at rest. */
+@media (prefers-reduced-motion: reduce) {
+  .arc .hp svg * {
+    animation: none !important;
+  }
+  .arc .hp .ring {
+    stroke-dashoffset: 0;
+  }
+  .arc .hp .cut-ghost {
+    opacity: 1;
+    transform: translate(136px, 100px);
+  }
+  .arc .hp .cut-hit {
+    opacity: 1;
+  }
+  .arc .hp .q-job {
+    opacity: 1;
+    transform: translateX(var(--x));
+  }
+  .arc .hp .q-retry {
+    opacity: 1;
+    transform: translateX(54px);
+  }
+}

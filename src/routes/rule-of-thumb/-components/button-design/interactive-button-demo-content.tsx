@@ -68,6 +68,7 @@ export function InteractiveButtonDemoContent() {
 
         {/* The Button */}
         <div
+          data-variant="brand"
           className={cn(
             base,
             "cursor-default absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
@@ -79,13 +80,14 @@ export function InteractiveButtonDemoContent() {
             ...animationStyle,
             animationName:
               status !== "idle"
-                ? "button-demo-width, button-demo-container-scale, button-demo-border-success"
+                ? "button-demo-width, button-demo-container-scale"
                 : "none",
           }}
         >
           <div
-            className={cx("absolute inset-0 bg-black/10 pointer-events-none")}
+            className={cx("absolute inset-0 pointer-events-none")}
             style={{
+              background: "var(--go-hover)",
               ...animationStyle,
               animationName: status !== "idle" ? "button-demo-highlight" : "none",
               opacity: 0,
