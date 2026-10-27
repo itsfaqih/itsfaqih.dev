@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v3 Docs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=EB+Garamond:ital@1&family=Geist+Mono:wght@400&display=swap">
+<style>
+  :root { --bg: #fafafa; --ink: #171717; --ink-2: #525252; --ink-3: #8f8f8f; --hair: #e7e7e7; --ochre: #a8650f;
+    --sans: "Inter", system-ui, sans-serif; --serif: "EB Garamond", Georgia, serif; --mono: "Geist Mono", ui-monospace, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink-2); font: 400 14.5px/1.65 var(--sans); -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01"; }
+  a { color: var(--ink); text-decoration: underline; text-decoration-color: #cfcfcf; text-underline-offset: 3px; text-decoration-thickness: 1px; transition: text-decoration-color 150ms ease; }
+  a:hover { text-decoration-color: var(--ink); }
+  .layout { display: grid; grid-template-columns: 200px minmax(0, 560px) 1fr; gap: 56px; max-width: 1180px; margin: 0 auto; padding: 40px 40px 80px; }
+  aside { position: sticky; top: 40px; align-self: start; font-size: 12.5px; line-height: 1.9; }
+  .mark { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; color: var(--ink); font-weight: 500; font-size: 13px; }
+  .mark svg { color: var(--ochre); }
+  aside nav { display: flex; flex-direction: column; margin-bottom: 22px; }
+  aside nav a { text-decoration: none; color: var(--ink-3); } aside nav a:hover, aside nav a.on { color: var(--ink); }
+  aside .group { font-size: 11px; color: var(--ink-3); font-family: var(--mono); margin-bottom: 2px; }
+  main { padding-top: 2px; }
+  .bar { display: flex; justify-content: space-between; color: var(--ink-3); font-size: 13px; margin-bottom: 26px; }
+  .bar b { color: var(--ink); font-weight: 500; }
+  .pitch { font-size: 15.5px; color: var(--ink); margin: 0 0 24px; }
+  .pitch em { font-family: var(--serif); font-size: 18px; font-style: italic; }
+  .figs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 0 14px; padding: 0; list-style: none; }
+  .figs li a { display: grid; place-items: center; aspect-ratio: 1.15; background: #fff; border: 1px solid var(--hair); border-radius: 8px; text-decoration: none; overflow: hidden; }
+  .figs svg { transition: transform 200ms cubic-bezier(.22,.75,.2,1); }
+  .figs li a:hover svg { transform: scale(1.06); }
+  .meta { font: 400 12px var(--mono); color: var(--ink-3); display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+  .meta span + span::before { content: "/"; margin-right: 10px; color: #cfcfcf; }
+  p { margin: 0 0 14px; }
+  h2 { font-size: 14.5px; font-weight: 600; color: var(--ink); margin: 48px 0 12px; scroll-margin-top: 40px; }
+  h2 em { font-family: var(--serif); font-weight: 400; font-size: 17px; }
+  .rule-list { list-style: none; margin: 0; padding: 0; }
+  .rule-list li { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 10px 0; border-top: 1px solid var(--hair); }
+  .rule-list li:last-child { border-bottom: 1px solid var(--hair); }
+  .rule-list .k { color: var(--ink-3); font-size: 12.5px; }
+  .job { margin-bottom: 22px; }
+  .job .t { display: flex; justify-content: space-between; gap: 12px; color: var(--ink); }
+  .job .t span:last-child { font: 400 12px var(--mono); color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
+  .job .r { color: var(--ink-3); font-size: 13px; margin-bottom: 4px; }
+  .job ul { margin: 0; padding-left: 16px; } .job li { margin-bottom: 3px; } .job li::marker { color: #c4c4c4; }
+  .stack { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 13.5px; }
+  .stack dt { color: var(--ink); } .stack dd { margin: 0; }
+  .cta { margin-top: 48px; padding: 20px 22px; background: #fff; border: 1px solid var(--hair); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .cta p { margin: 0; color: var(--ink); }
+  .btn { display: inline-flex; height: 34px; align-items: center; padding: 0 14px; border-radius: 7px; background: var(--ink); color: #fff; text-decoration: none; font-size: 13px; font-weight: 500; transition: transform 150ms cubic-bezier(.25,.46,.45,.94), background-color 120ms ease; }
+  .btn:hover { background: #333; } .btn:active { transform: scale(0.97); }
+  .margin { position: sticky; top: 40px; align-self: start; font-size: 12px; color: var(--ink-3); line-height: 1.6; padding-top: 52px; max-width: 220px; }
+  .margin b { display: block; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+  .margin .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #3aa76d; margin-right: 6px; vertical-align: 1px; }
+  footer { margin-top: 60px; font: 400 12px var(--mono); color: var(--ink-3); }
+  @media (prefers-reduced-motion: no-preference) {
+    .figs li { animation: res 500ms cubic-bezier(.22,.75,.2,1) backwards; animation-delay: calc(40ms + var(--i) * 32ms); }
+    @keyframes res { from { opacity: 0; transform: translateY(6px); filter: blur(5px); } }
+  }
+  @media (max-width: 980px) { .layout { grid-template-columns: 1fr; gap: 24px; padding: 24px 20px 60px; } aside { position: static; } aside nav { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; } aside .chapters, aside .group { display: none; } .margin { position: static; padding-top: 0; max-width: none; } .figs { grid-template-columns: repeat(2, 1fr); } .rule-list li { grid-template-columns: 1fr; gap: 0; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="mark"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 15V5l6-3 6 3v10"/><path d="M3 9h12M9 2v13"/></svg>Faqih Muntashir</div>
+    <nav><a class="on" href="#">About</a><a href="#">Rule of Thumb</a><a href="mailto:itsfaqih@gmail.com">Contact</a></nav>
+    <div class="group">On this page</div>
+    <nav class="chapters"><a href="#rules">Rules I build by</a><a href="#work">Where I've worked</a><a href="#projects">Things I made</a><a href="#stack">Tools</a><a href="#contact">Working together</a></nav>
+  </aside>
+
+  <main>
+    <div class="bar"><span><b>Faqih Muntashir</b> · full-stack engineer</span><span><a href="https://github.com/itsfaqih">GitHub</a> · <a href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a></span></div>
+    <p class="pitch">I build web products end to end, and I write down <em>the small rules</em> that make them feel right.</p>
+    <ul class="figs">
+      <li style="--i:0"><a href="#" title="Proximity Principle"><svg width="78" height="56" viewBox="0 0 78 56" fill="none" stroke="#8f8f8f" stroke-width="1.2"><path d="M4 6h10l2 3h10v10H4z"/><path d="M10 19v26M10 32h12M10 45h12" stroke-dasharray="2 2"/><rect x="40" y="4" width="34" height="40" rx="2"/><rect x="44" y="12" width="12" height="12"/><rect x="58" y="12" width="12" height="12"/><rect x="44" y="27" width="12" height="12"/><rect x="58" y="27" width="12" height="12"/></svg></a></li>
+      <li style="--i:1"><a href="#" title="Button Design"><svg width="86" height="40" viewBox="0 0 86 40" fill="none"><rect x="6" y="8" width="74" height="24" rx="6" fill="#171717"/><text x="43" y="24" text-anchor="middle" font-family="Inter" font-size="10" fill="#fff">Continue</text></svg></a></li>
+      <li style="--i:2"><a href="#" title="Data Loading"><svg width="90" height="40" viewBox="0 0 90 40" fill="none" stroke="#8f8f8f" stroke-width="1.2"><circle cx="12" cy="20" r="8"/><path d="M22 20h12" stroke-dasharray="2 2"/><ellipse cx="45" cy="12" rx="9" ry="3"/><path d="M36 12v15c0 2 4 3 9 3s9-1 9-3V12"/><path d="M56 20h12" stroke-dasharray="2 2"/><rect x="70" y="8" width="16" height="24" rx="2"/></svg></a></li>
+      <li style="--i:3"><a href="#" title="Null vs Undefined"><svg width="80" height="44" viewBox="0 0 80 44" fill="none"><rect x="6" y="6" width="28" height="28" rx="4" stroke="#8f8f8f" stroke-dasharray="3 3"/><text x="20" y="25" text-anchor="middle" font-size="13" fill="#8f8f8f" font-family="Inter">?</text><rect x="46" y="6" width="28" height="28" rx="4" stroke="#171717"/><text x="60" y="23" text-anchor="middle" font-size="6.5" fill="#171717" font-family="Geist Mono">NULL</text></svg></a></li>
+    </ul>
+    <div class="meta"><span>4 guides, all with live demos</span><span>Yogyakarta, UTC+7</span><span>since 2020</span></div>
+
+    <p>Most of my work is what nobody notices when it's done right: a button that shows it's busy, a page that loads its data before it renders, an API that says <code>null</code> only when it means empty. I've spent 5+ years on that layer, across healthcare, SaaS, and internal tooling.</p>
+    <p>Right now I'm building healthcare software at <a href="https://evidence.care">EvidenceCare</a> for the US market. Before that I designed and built products at Vestis Labs, Jatis Mobile, and a startup studio I helped found.</p>
+
+    <h2 id="rules">Rules I build by</h2>
+    <ul class="rule-list">
+      <li><span class="k">Code writing</span><span><a href="#">Proximity Principle</a>: put code where it's used.</span></li>
+      <li><span class="k">UX design</span><span><a href="#">Button Design</a>: states, hover, variants, and icon alignment.</span></li>
+      <li><span class="k">Architecture</span><span><a href="#">Data Loading</a>: SSR, loaders, SWR, and error handling.</span></li>
+      <li><span class="k">Code writing</span><span><a href="#">Null vs Undefined</a>: the difference between empty and missing.</span></li>
+    </ul>
+
+    <h2 id="work">Where I've worked</h2>
+    <div class="job"><div class="t"><span>EvidenceCare</span><span>2024 – now</span></div><div class="r">Software Engineer</div><ul><li>Designed an MCP server and a linter. They cut development time for one component by 66%, and the project is projected to save about $15K a month.</li><li>Got deploys down from hours to minutes. Moved our tooling to tsx, Vite, Biome, Vitest, and Zod.</li><li>Built multi-tenancy on one RDS instance, and logging that is safe for PHI.</li></ul></div>
+    <div class="job"><div class="t"><span>Vestis Labs</span><span>2023 – 2024</span></div><div class="r">Full Stack Engineer</div><ul><li>Simplified more than 80% of the code structure by co-locating code and removing abstractions.</li><li>Rebuilt the image annotator on direct DOM rendering, with phone support.</li></ul></div>
+    <div class="job"><div class="t"><span>Jatis Mobile</span><span>2022 – 2023</span></div><div class="r">Full Stack Engineer</div><ul><li>Built a client-side chatbot in XState, so there are no server costs. Led 4 developers on the flow builder.</li></ul></div>
+    <div class="job"><div class="t"><span>Rapidev</span><span>2021 – 2022</span></div><div class="r">Founding Engineer, then Project Manager</div><ul><li>Cut dashboard load time by 80%. Managed a 10-person team across 3 startups.</li></ul></div>
+
+    <h2 id="projects">Things I made</h2>
+    <p><a href="https://schemata.ruine.app/">Schemata</a>, an ERD builder for developers. <a href="https://github.com/ruine-dev/ruine-ui-dashboard">ruine UI Dashboard</a>, an accessible admin template. <a href="https://github.com/itsfaqih/fama">Fama</a>, an open source portfolio template. Designs for <a href="#">PHPID Learning</a> and <a href="#">React Indonesia</a>.</p>
+
+    <h2 id="stack">Tools</h2>
+    <dl class="stack"><dt>Languages</dt><dd>TypeScript, PHP, HTML, CSS</dd><dt>Front end</dt><dd>React, TanStack, Effect, Base UI, XState, Tailwind</dd><dt>Back end</dt><dd>Node.js, Laravel, AdonisJS, PostgreSQL, Redis</dd><dt>Quality</dt><dd>Vitest, Playwright, MSW, Oxlint, Storybook</dd><dt>Infra</dt><dd>Docker, Vite, Bun, NGINX, AWS</dd></dl>
+
+    <div class="cta" id="contact"><p>Working on something that needs <em style="font-family:var(--serif);font-size:17px">this kind of care</em>?</p><a class="btn" href="mailto:itsfaqih@gmail.com">Email itsfaqih@gmail.com</a></div>
+    <footer>© 2026 · Indonesian (native), English (B2)</footer>
+  </main>
+
+  <div class="margin"><b>Now</b><span class="dot"></span>Open to conversations<br>Local time <span id="clock" style="font-family:var(--mono)">--:--</span> WIB<br><br><b>Elsewhere</b><a href="https://medium.com/@itsfaqih">Medium</a> · <a href="https://dribbble.com/itsfaqih">Dribbble</a></div>
+</div>
+<script>const c=document.getElementById('clock');const t=()=>c.textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(new Date());t();setInterval(t,15000);</script>
+</body>
+</html>

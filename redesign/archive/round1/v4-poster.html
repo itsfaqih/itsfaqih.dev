@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v4 Poster CV</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800;900&display=swap">
+<style>
+  :root { --bg: #f3f3f3; --ink: #0b0b0b; --ink-2: #4b4b4b; --ink-3: #8a8a8a; --hair: #dcdcdc; --font: "Inter Tight", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 13px/1.5 var(--font); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  .top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 20px 28px; font-size: 12px; position: relative; z-index: 2; }
+  .top span { color: var(--ink-3); } .top a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .name { font-weight: 900; font-size: 16vw; line-height: 0.8; letter-spacing: -0.065em; margin: 4vw 0 0 -0.06em; white-space: nowrap; text-transform: uppercase; }
+  .name span { display: block; }
+  .name span:last-child { margin-left: 8vw; }
+  .intro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 28px 72px; }
+  .intro p { margin: 0; font-size: 15px; line-height: 1.45; grid-column: 2 / span 2; max-width: 36em; color: var(--ink); }
+  .intro .cta { grid-column: 4; align-self: end; justify-self: start; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; background: var(--ink); color: var(--bg); border-radius: 999px; font-weight: 500; font-size: 13px; transition: transform 150ms cubic-bezier(.25,.46,.45,.94); }
+  .btn:active { transform: scale(0.97); }
+  .btn i { width: 7px; height: 7px; border-radius: 50%; background: #3fe07a; }
+  .label { font-size: 12px; color: var(--ink-3); padding: 0 28px 14px; display: flex; justify-content: space-between; }
+  h2 { font-size: 7vw; font-weight: 900; letter-spacing: -0.06em; line-height: 0.82; text-transform: uppercase; margin: 0 0 0 -0.04em; padding: 0 28px 24px 22px; }
+  .rows { border-top: 1px solid var(--ink); }
+  .row { position: relative; display: grid; grid-template-columns: 22% 10% 16% 1fr; gap: 20px; padding: 26px 28px; border-bottom: 1px solid var(--hair); isolation: isolate; }
+  .row::before { content: ""; position: absolute; inset: -10px 8%; z-index: -1; background: radial-gradient(40% 80% at 20% 50%, #ff3d9a, transparent 70%), radial-gradient(40% 90% at 55% 40%, #ffb02e, transparent 70%), radial-gradient(35% 80% at 85% 60%, #3fd0e8, transparent 70%); filter: blur(40px); opacity: 0; transition: opacity 300ms cubic-bezier(0,0,.2,1); pointer-events: none; }
+  @media (hover: hover) { .row:hover::before { opacity: 0.55; } }
+  .row .co { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; }
+  .row .co small { display: block; font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--ink-3); margin-top: 6px; }
+  .row .lbl { color: var(--ink-3); line-height: 1.9; font-size: 12px; } .row .val { font-weight: 600; line-height: 1.9; font-size: 12px; }
+  .row p { margin: 0; font-size: 13px; color: var(--ink-2); max-width: 60ch; }
+  .rot { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--ink); }
+  .rot a { padding: 22px 28px 28px; border-right: 1px solid var(--hair); min-height: 260px; display: flex; flex-direction: column; transition: background-color 150ms ease; }
+  .rot a:last-child { border-right: 0; }
+  .rot a:hover { background: #fff; }
+  .rot .n { font-size: 12px; color: var(--ink-3); }
+  .rot .fig { flex: 1; display: grid; place-items: center; padding: 18px 0; }
+  .rot h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.035em; margin: 0 0 2px; line-height: 1.05; }
+  .rot p { margin: 0; color: var(--ink-3); font-size: 12px; }
+  .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 32px 28px 72px; border-top: 1px solid var(--ink); }
+  .cols h4 { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); font-weight: 400; }
+  .cols ul { list-style: none; margin: 0; padding: 0; line-height: 1.9; } .cols a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  footer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 0 28px 24px; font-size: 12px; color: var(--ink-3); align-items: end; }
+  footer .mail { grid-column: 1 / span 3; font-size: 6vw; font-weight: 900; letter-spacing: -0.06em; color: var(--ink); line-height: 0.9; }
+  footer .mail:hover { text-decoration: underline; text-decoration-thickness: 0.06em; text-underline-offset: 0.08em; }
+  @media (prefers-reduced-motion: no-preference) {
+    .name span { animation: up 900ms cubic-bezier(.19,1,.22,1) backwards; } .name span:last-child { animation-delay: 80ms; }
+    @keyframes up { from { transform: translateY(30%); opacity: 0; } }
+  }
+  @media (max-width: 760px) {
+    .top { grid-template-columns: 1fr 1fr; padding: 16px; } .name { font-size: 17vw; } .name span:last-child { margin-left: 3vw; } .intro { grid-template-columns: 1fr; padding: 28px 16px 56px; } .intro p, .intro .cta { grid-column: 1; }
+    h2 { font-size: 14vw; padding-inline: 12px; } .label { padding-inline: 16px; }
+    .row { grid-template-columns: 1fr 1fr; padding: 20px 16px; } .row .co, .row p { grid-column: 1 / -1; }
+    .rot, .cols { grid-template-columns: 1fr 1fr; } .rot a { padding: 18px 16px; min-height: 210px; } .rot a:nth-child(2) { border-right: 0; } .rot a:nth-child(-n+2) { border-bottom: 1px solid var(--hair); }
+    .cols { padding: 28px 16px 56px; } footer { grid-template-columns: 1fr; padding: 0 16px 20px; } footer .mail { font-size: 9.5vw; grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+  <div class="top"><div>Faqih Muntashir<br><span>Full-stack engineer</span></div><div>Yogyakarta, Indonesia<br><span id="clock">--:--</span> <span>WIB</span></div><div><a href="#rot">Rule of Thumb</a><br><a href="#exp">Experience</a></div><div><a href="https://github.com/itsfaqih">GitHub</a>, <a href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a><br><a href="https://medium.com/@itsfaqih">Medium</a>, <a href="https://dribbble.com/itsfaqih">Dribbble</a></div></div>
+  <h1 class="name" aria-label="Faqih Muntashir"><span>Faqih</span><span>Muntashir</span></h1>
+  <div class="intro"><p>Five years of building web products across healthcare, SaaS, and internal tooling, from the database migration to the button's pressed state. Right now I'm building healthcare software at EvidenceCare for the US market.</p><a class="btn cta" href="mailto:itsfaqih@gmail.com"><i></i>Available for conversations</a></div>
+
+  <div class="label" id="exp"><span>(01) Experience</span><span>2020 – 2026</span></div>
+  <h2>Experience</h2>
+  <div class="rows">
+    <div class="row"><div class="co">EvidenceCare<small>Sep 2024 – Present</small></div><div class="lbl">Position<br>Location<br>Industry</div><div class="val">Software Engineer<br>Remote, US<br>Healthcare</div><p>Designed an MCP server and a linter: development time for one component fell 66%, with about $15K a month in projected savings. Took deploys from hours to minutes, cut Docker images by 30%, and moved our TypeScript tooling to tsx, Vite, Biome, Vitest, and Zod.</p></div>
+    <div class="row"><div class="co">Vestis Labs<small>Sep 2023 – Sep 2024</small></div><div class="lbl">Position<br>Location<br>Industry</div><div class="val">Full Stack Engineer<br>Remote<br>Digital identity</div><p>Simplified more than 80% of the code structure. Designed the data model for a drag-and-drop ID builder, and moved the image annotator to direct DOM rendering with phone support.</p></div>
+    <div class="row"><div class="co">Jatis Mobile<small>Sep 2022 – Aug 2023</small></div><div class="lbl">Position<br>Location<br>Industry</div><div class="val">Full Stack Engineer<br>Jakarta<br>Messaging</div><p>Started as a web designer. Built a client-side chatbot in XState with no server costs, designed and built a flow builder, and led 4 developers to ship it. Top performer, Q4 2022.</p></div>
+    <div class="row"><div class="co">Rapidev<small>Dec 2021 – Aug 2022</small></div><div class="lbl">Position<br>Location<br>Industry</div><div class="val">Founding Eng / PM<br>Yogyakarta<br>Startup studio</div><p>Cut dashboard load time by 80%, integrated Xendit and Midtrans, and managed a 10-person team across 3 startups.</p></div>
+  </div>
+
+  <div class="label" id="rot" style="padding-top:88px"><span>(02) Rule of Thumb</span><span>4 guides</span></div>
+  <h2>Opinions</h2>
+  <div class="rot">
+    <a href="#"><span class="n">Code writing</span><span class="fig"><svg width="110" height="70" viewBox="0 0 110 70" fill="none" stroke="#0b0b0b" stroke-width="1.4"><path d="M6 8h14l3 4h16v14H6z"/><path d="M14 26v36M14 44h18M14 62h18"/><rect x="60" y="6" width="44" height="54" rx="2"/><rect x="66" y="16" width="14" height="14"/><rect x="84" y="16" width="14" height="14"/><rect x="66" y="36" width="14" height="14"/><rect x="84" y="36" width="14" height="14"/></svg></span><h3>Proximity Principle</h3><p>Keep code where it's used</p></a>
+    <a href="#"><span class="n">UX design</span><span class="fig"><svg width="120" height="44" viewBox="0 0 120 44"><rect x="4" y="6" width="112" height="32" rx="16" fill="#0b0b0b"/><text x="60" y="27" text-anchor="middle" font-family="Inter Tight" font-weight="600" font-size="12" fill="#f3f3f3">Pressed · 0.97</text></svg></span><h3>Button Design</h3><p>Six states, none optional</p></a>
+    <a href="#"><span class="n">Architecture</span><span class="fig"><svg width="130" height="40" viewBox="0 0 130 40" fill="none" stroke="#0b0b0b" stroke-width="1.4"><circle cx="14" cy="20" r="10"/><path d="M28 20h18"/><ellipse cx="65" cy="10" rx="12" ry="4"/><path d="M53 10v20c0 2 5 4 12 4s12-2 12-4V10"/><path d="M84 20h18"/><rect x="106" y="6" width="20" height="28" rx="2"/></svg></span><h3>Data Loading</h3><p>SSR, loaders, SWR, errors</p></a>
+    <a href="#"><span class="n">Code writing</span><span class="fig"><svg width="110" height="50" viewBox="0 0 110 50" fill="none"><rect x="6" y="6" width="38" height="38" rx="4" stroke="#8a8a8a" stroke-dasharray="4 4"/><text x="25" y="32" text-anchor="middle" font-size="18" fill="#8a8a8a" font-family="Inter Tight">?</text><rect x="66" y="6" width="38" height="38" rx="4" stroke="#0b0b0b" stroke-width="1.4"/><text x="85" y="29" text-anchor="middle" font-size="9" font-weight="800" fill="#0b0b0b" font-family="Inter Tight">NULL</text></svg></span><h3>Null vs Undefined</h3><p>Empty versus missing</p></a>
+  </div>
+
+  <div class="cols">
+    <div><h4>Projects</h4><ul><li><a href="https://schemata.ruine.app/">Schemata ↗</a></li><li><a href="https://github.com/ruine-dev/ruine-ui-dashboard">ruine UI Dashboard ↗</a></li><li><a href="https://github.com/itsfaqih/fama">Fama ↗</a></li><li><a href="#">PHPID Learning ↗</a></li></ul></div>
+    <div><h4>Front end</h4><ul><li>TypeScript</li><li>React, TanStack</li><li>Effect, XState</li><li>Base UI, Tailwind</li></ul></div>
+    <div><h4>Back end</h4><ul><li>Node.js, Laravel</li><li>AdonisJS, tRPC</li><li>PostgreSQL, Redis</li><li>Docker, AWS</li></ul></div>
+    <div><h4>Languages</h4><ul><li>Indonesian (native)</li><li>English (B2)</li></ul></div>
+  </div>
+  <footer><a class="mail" href="mailto:itsfaqih@gmail.com">itsfaqih@gmail.com</a><span>© 2026</span></footer>
+<script>const c=document.getElementById('clock');const t=()=>c.textContent=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'}).format(new Date());t();setInterval(t,15000);</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v1 Caliper</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #eef0f3; --paper-2: #f6f7f9; --paper-3: #fff;
+    --ink: #101216; --ink-2: #3f434b; --ink-3: #676d78;
+    --rule: #c6cbd4; --rule-soft: #dde0e6;
+    --accent: #1f2de6; --measure: #e5484d;
+    --sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --ease-resolve: cubic-bezier(0.22, 0.75, 0.2, 1);
+    --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--paper); color: var(--ink-2); font: 400 17px/1.6 var(--sans); }
+  a { color: inherit; }
+  /* Vessa rails: dashed verticals 12px in from each edge */
+  body::before, body::after { content: ""; position: fixed; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--rule); pointer-events: none; z-index: 1; }
+  body::before { left: 12px; } body::after { right: 12px; }
+  .frame { max-width: 1120px; margin: 0 auto; border-inline: 1px dashed var(--rule); }
+  .pad { padding-inline: 48px; }
+  .rule { border-top: 1px dashed var(--rule); }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--paper) 85%, transparent); backdrop-filter: blur(12px); border-bottom: 1px dashed var(--rule); }
+  header .frame { display: flex; align-items: center; gap: 28px; height: 64px; border-inline-color: transparent; }
+  .wordmark { font-weight: 600; color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: -0.01em; }
+  nav { display: flex; gap: 22px; font-size: 15px; }
+  nav a { text-decoration: none; color: var(--ink-3); transition: color 120ms ease; }
+  nav a:hover { color: var(--ink); }
+  nav a[aria-current] { color: var(--ink); box-shadow: inset 0 -1px 0 var(--accent); }
+  .spacer { flex: 1; }
+  .icon-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 1px solid var(--rule-soft); border-radius: 6px; background: var(--paper-2); color: var(--ink-2); font: 500 13px var(--sans); cursor: pointer; transition: border-color 120ms ease, transform 150ms cubic-bezier(.25,.46,.45,.94); }
+  .icon-btn:hover { border-color: var(--rule); }
+  .icon-btn:active { transform: scale(0.97); }
+  .icon-btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  kbd { font: 500 11px var(--mono); padding: 1px 5px; border-radius: 3px; background: var(--paper); border: 1px solid var(--rule-soft); color: var(--ink-3); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 8px; font: 500 15px var(--sans); text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: transform 150ms cubic-bezier(.25,.46,.45,.94), background-color 120ms ease, border-color 120ms ease; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #1823c4; }
+  .btn-ghost { border-color: var(--rule); color: var(--ink); background: var(--paper-2); }
+  .btn-ghost:hover { border-color: var(--ink-3); }
+  .btn-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 6px; }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 7fr 1fr 4fr; padding-block: 96px 88px; cursor: crosshair; position: relative; }
+  .meta { font: 400 13px var(--mono); color: var(--ink-3); font-variant-numeric: tabular-nums; display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 28px; }
+  h1 { font-size: 64px; line-height: 0.98; letter-spacing: -0.035em; font-weight: 600; color: var(--ink); margin: 0 0 24px; }
+  .lead { font-size: 22px; line-height: 1.45; letter-spacing: -0.01em; max-width: 30em; margin: 0 0 36px; }
+  .lead em { font-style: normal; color: var(--ink); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .socials { display: flex; gap: 18px; margin-top: 28px; font-size: 15px; }
+  .socials a { color: var(--ink-3); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; transition: color 120ms ease, text-decoration-color 120ms ease; }
+  .socials a:hover { color: var(--ink); text-decoration-color: var(--accent); }
+  .legend { position: absolute; right: 48px; bottom: 24px; font: 400 12px var(--mono); color: var(--ink-3); }
+
+  /* Spec card with crop marks */
+  .spec { grid-column: 3; align-self: start; position: relative; background: var(--paper-2); padding: 22px 22px 18px; margin-top: 44px; }
+  .crop { position: absolute; width: 10px; height: 10px; border-color: var(--ink-3); border-style: solid; border-width: 0; transition: transform 200ms cubic-bezier(.23,1,.32,1), border-color 200ms ease; }
+  .crop.tl { top: -1px; left: -1px; border-top-width: 1px; border-left-width: 1px; }
+  .crop.tr { top: -1px; right: -1px; border-top-width: 1px; border-right-width: 1px; }
+  .crop.bl { bottom: -1px; left: -1px; border-bottom-width: 1px; border-left-width: 1px; }
+  .crop.br { bottom: -1px; right: -1px; border-bottom-width: 1px; border-right-width: 1px; }
+  .spec h2 { font: 500 13px var(--mono); color: var(--ink-3); margin: 0 0 12px; display: flex; justify-content: space-between; }
+  .spec h2 .live { color: var(--accent); }
+  .spec dl { margin: 0; display: grid; grid-template-columns: auto 1fr; font-size: 15px; }
+  .spec dt, .spec dd { padding: 9px 0; border-top: 1px solid var(--rule-soft); margin: 0; }
+  .spec dt { color: var(--ink-3); padding-right: 16px; }
+  .spec dd { color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Sections */
+  section { padding-block: 96px; }
+  .head { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: end; margin-bottom: 48px; }
+  h2.title { font-size: 30px; line-height: 1.1; letter-spacing: -0.025em; font-weight: 600; color: var(--ink); margin: 0; }
+  h2.title span { color: var(--accent); }
+  .aside { color: var(--ink-3); font-size: 15px; max-width: 34em; justify-self: end; margin: 0; }
+
+  /* Rule of thumb cells */
+  .rules { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px dashed var(--rule); border-left: 1px dashed var(--rule); margin-inline: -48px; }
+  .rule-card { border-right: 1px dashed var(--rule); border-bottom: 1px dashed var(--rule); padding: 32px 48px 36px; text-decoration: none; display: block; }
+  .well { position: relative; height: 200px; background: var(--paper-2); display: grid; place-items: center; margin-bottom: 22px; }
+  .well svg { transition: transform 200ms cubic-bezier(.23,1,.32,1); }
+  @media (hover: hover) { .rule-card:hover .well svg { transform: scale(1.02); }
+    .rule-card:hover .crop { border-color: var(--accent); }
+    .rule-card:hover .crop.tl { transform: translate(-4px,-4px); } .rule-card:hover .crop.tr { transform: translate(4px,-4px); }
+    .rule-card:hover .crop.bl { transform: translate(-4px,4px); } .rule-card:hover .crop.br { transform: translate(4px,4px); } }
+  .rule-card .kind { font: 400 13px var(--mono); color: var(--ink-3); }
+  .rule-card h3 { font-size: 22px; font-weight: 500; letter-spacing: -0.015em; color: var(--ink); margin: 4px 0 4px; }
+  .rule-card p { margin: 0; font-size: 15px; color: var(--ink-3); }
+
+  /* Experience rows */
+  .job { display: grid; grid-template-columns: 260px 1fr; gap: 40px; padding-block: 28px; border-top: 1px solid var(--rule-soft); }
+  .job:first-child { border-top: 0; padding-top: 0; }
+  .job .co { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+  .job .role { font-size: 15px; color: var(--ink-2); }
+  .job .when { font: 400 13px var(--mono); color: var(--ink-3); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .job ul { margin: 0; padding-left: 18px; max-width: 62ch; }
+  .job li { margin-bottom: 6px; }
+  .job li::marker { color: var(--rule); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .tags span { font: 400 12px var(--mono); color: var(--ink-3); padding: 2px 7px; border: 1px solid var(--rule-soft); border-radius: 4px; background: var(--paper-2); }
+
+  /* Projects + stack */
+  .projects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 48px; }
+  .project { padding-block: 20px; border-top: 1px solid var(--rule-soft); text-decoration: none; display: block; }
+  .project h3 { font-size: 17px; font-weight: 500; color: var(--ink); margin: 0 0 2px; display: flex; justify-content: space-between; gap: 12px; }
+  .project h3 small { font: 400 12px var(--mono); color: var(--ink-3); white-space: nowrap; }
+  .project p { margin: 0; font-size: 15px; color: var(--ink-3); }
+  .project:hover h3 { color: var(--accent); }
+  .stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 48px; margin: 0; }
+  .stack div { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding-block: 12px; border-top: 1px solid var(--rule-soft); font-size: 15px; }
+  .stack dt { color: var(--ink); font-weight: 500; } .stack dd { margin: 0; color: var(--ink-3); }
+
+  /* Close */
+  .close { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; padding-block: 72px; }
+  .close p { font-size: 30px; letter-spacing: -0.025em; font-weight: 600; color: var(--ink); margin: 0; max-width: 20em; line-height: 1.15; }
+  footer { font: 400 13px var(--mono); color: var(--ink-3); padding-block: 20px; display: flex; justify-content: space-between; }
+
+  /* Inspector overlay */
+  #inspector { position: fixed; inset: 0; pointer-events: none; z-index: 50; font: 400 10px/12px var(--mono); font-variant-numeric: tabular-nums; }
+  #inspector > * { position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 140ms ease; }
+  .cx { width: 100%; height: 1px; background: color-mix(in srgb, var(--accent) 40%, transparent); }
+  .cy { width: 1px; height: 100%; background: color-mix(in srgb, var(--accent) 40%, transparent); }
+  .chip { padding: 2px 5px; border-radius: 3px; background: var(--accent); color: #fff; white-space: nowrap; }
+  .tgt { outline: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  .frm { outline: 1px dashed color-mix(in srgb, var(--measure) 70%, transparent); }
+  .gap-v { border-left: 1px solid var(--measure); } .gap-h { border-top: 1px solid var(--measure); }
+  .gap-v b, .gap-h b { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-weight: 400; background: var(--measure); color: #fff; padding: 1px 4px; border-radius: 3px; }
+
+  /* Hero intro: blueprint boxes, then a blur-to-sharp resolve */
+  @media (prefers-reduced-motion: no-preference) {
+    .intro { position: relative; animation: resolve 500ms var(--ease-resolve) backwards; animation-delay: calc(180ms + var(--i) * 40ms); }
+    .intro::after { content: ""; position: absolute; inset: -6px; border: 1px dashed var(--rule); animation: plan 520ms ease forwards; animation-delay: calc(var(--i) * 40ms); opacity: 0; pointer-events: none; }
+    @keyframes resolve { from { opacity: 0; transform: translateY(8px); filter: blur(6px); } }
+    @keyframes plan { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+    .reveal.in { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 760px) {
+    .pad { padding-inline: 20px; }
+    body::before { left: 8px; } body::after { right: 8px; }
+    nav, .hide-sm, .legend { display: none; }
+    .hero { grid-template-columns: 1fr; padding-block: 48px; }
+    .spec { grid-column: 1; margin-top: 40px; }
+    h1 { font-size: 44px; } .lead { font-size: 19px; }
+    section { padding-block: 64px; }
+    .head, .rules, .projects, .stack, .job { grid-template-columns: 1fr; }
+    .aside { justify-self: start; }
+    .rules { margin-inline: -20px; } .rule-card { padding: 24px 20px 28px; }
+    .job { gap: 12px; } .stack div { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="frame pad">
+    <a class="wordmark" href="#">Faqih Muntashir</a>
+    <nav><a href="#work">Work</a><a href="#rules" aria-current="page">Rule of Thumb</a><a href="#projects">Projects</a></nav>
+    <span class="spacer"></span>
+    <button class="icon-btn hide-sm" id="inspect-toggle" aria-pressed="false" title="Measure any element on the page">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M1.5 11.5 11.5 1.5l3 3-10 10z"/><path d="M4 9l1.5 1.5M6 7l2 2M8 5l1.5 1.5M10 3l2 2"/></svg>
+      Inspect <kbd>I</kbd>
+    </button>
+    <button class="icon-btn hide-sm">Search <kbd>⌘K</kbd></button>
+    <a class="btn btn-primary btn-sm" href="mailto:itsfaqih@gmail.com">Email me</a>
+  </div>
+</header>
+
+<main class="frame">
+  <div class="hero pad" data-inspect-zone>
+    <div>
+      <p class="meta intro" style="--i:0"><span>Yogyakarta, Indonesia</span><span>UTC+7</span><span>5+ years shipping web products</span></p>
+      <h1 class="intro" style="--i:1">Faqih Muntashir</h1>
+      <p class="lead intro" style="--i:2">Full-stack engineer who sweats the details: <em>button states, data loading, and the null that should have been undefined.</em> I'm building healthcare software at EvidenceCare for the US market.</p>
+      <div class="actions intro" style="--i:3">
+        <a class="btn btn-primary" href="mailto:itsfaqih@gmail.com">Email me</a>
+        <button class="btn btn-ghost" id="copy">Copy itsfaqih@gmail.com</button>
+      </div>
+      <div class="socials intro" style="--i:4"><a href="https://github.com/itsfaqih">GitHub</a><a href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a><a href="https://medium.com/@itsfaqih">Medium</a><a href="https://dribbble.com/itsfaqih">Dribbble</a></div>
+    </div>
+    <aside class="spec intro" style="--i:3">
+      <i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+      <h2><span>now.json</span><span class="live">● live</span></h2>
+      <dl>
+        <dt>Role</dt><dd>Software Engineer</dd>
+        <dt>Company</dt><dd>EvidenceCare</dd>
+        <dt>Local time</dt><dd id="clock">--:--</dd>
+        <dt>Stack</dt><dd>TypeScript, React, Effect</dd>
+        <dt>Languages</dt><dd>Indonesian, English B2</dd>
+      </dl>
+    </aside>
+    <p class="legend">Point at anything here to measure it · press I to measure every page</p>
+  </div>
+
+  <section id="rules" class="rule pad">
+    <div class="head reveal">
+      <h2 class="title">Rules of thumb <span>I build by.</span></h2>
+      <p class="aside">Opinions with working demos. Each one started as a code review comment I got tired of writing.</p>
+    </div>
+    <div class="rules">
+      <a class="rule-card" href="#"><div class="well"><i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        <svg width="170" height="110" viewBox="0 0 170 110" fill="none" stroke="#676d78" stroke-width="1.5"><path d="M10 14h18l4 5h22v18H10z"/><path d="M20 37v40M20 57h24M20 77h24" stroke-dasharray="3 3"/><rect x="44" y="50" width="14" height="16" rx="2"/><rect x="44" y="70" width="14" height="16" rx="2"/><rect x="92" y="10" width="68" height="76" rx="3"/><path d="M92 22h68"/><rect x="100" y="30" width="24" height="20" rx="2"/><rect x="128" y="30" width="24" height="20" rx="2"/><rect x="100" y="56" width="24" height="20" rx="2"/><rect x="128" y="56" width="24" height="20" rx="2"/><path d="M118 98l6 6 12-12" stroke="#1f2de6" stroke-width="2"/></svg></div>
+        <span class="kind">Code writing</span><h3>Proximity Principle</h3><p>Put code where it is used, and move it only when a second caller shows up.</p></a>
+      <a class="rule-card" href="#"><div class="well"><i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        <svg width="200" height="90" viewBox="0 0 200 90" fill="none"><rect x="40" y="25" width="120" height="40" rx="8" fill="#1f2de6"/><text x="100" y="50" text-anchor="middle" font-family="Switzer" font-size="14" fill="#fff">Save changes</text><path d="M40 75v8M160 75v8M40 79h120" stroke="#e5484d"/><text x="100" y="88" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#e5484d">120</text><path d="M30 25h-6M30 65h-6M27 25v40" stroke="#e5484d"/><text x="14" y="48" font-family="Geist Mono" font-size="9" fill="#e5484d">40</text></svg></div>
+        <span class="kind">UX design</span><h3>Button Design</h3><p>Idle, hover, focus, press, pending, disabled: six states, and none of them optional.</p></a>
+      <a class="rule-card" href="#"><div class="well"><i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        <svg width="220" height="80" viewBox="0 0 220 80" fill="none" stroke="#676d78" stroke-width="1.5"><path d="M18 50a12 12 0 0 1 4-23 16 16 0 0 1 30 4 10 10 0 0 1 0 19z"/><path d="M62 40h22" stroke-dasharray="3 3"/><ellipse cx="110" cy="24" rx="18" ry="6"/><path d="M92 24v30c0 3 8 6 18 6s18-3 18-6V24"/><path d="M136 40h22" stroke-dasharray="3 3"/><rect x="166" y="18" width="44" height="44" rx="3"/><path d="M166 28h44"/><circle cx="172" cy="23" r="1.5" fill="#1f2de6" stroke="none"/></svg></div>
+        <span class="kind">Architecture</span><h3>Data Loading</h3><p>SSR, loaders, stale-while-revalidate, and errors that tell you what to do next.</p></a>
+      <a class="rule-card" href="#"><div class="well"><i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        <svg width="170" height="90" viewBox="0 0 170 90" fill="none"><rect x="20" y="15" width="52" height="52" rx="6" stroke="#676d78" stroke-dasharray="4 4" stroke-width="1.5"/><text x="46" y="50" text-anchor="middle" font-family="Switzer" font-size="26" fill="#676d78">?</text><text x="46" y="84" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#676d78">undefined</text><rect x="98" y="15" width="52" height="52" rx="6" stroke="#101216" stroke-width="1.5"/><rect x="108" y="33" width="32" height="16" rx="3" stroke="#1f2de6"/><text x="124" y="44" text-anchor="middle" font-family="Geist Mono" font-size="8" fill="#1f2de6">NULL</text><text x="124" y="84" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#101216">null</text></svg></div>
+        <span class="kind">Code writing</span><h3>Null vs Undefined</h3><p>Empty is a value. Missing is not. Your types should know the difference.</p></a>
+    </div>
+  </section>
+
+  <section id="work" class="rule pad">
+    <div class="head reveal">
+      <h2 class="title">Six teams, <span>one habit.</span></h2>
+      <p class="aside">I leave codebases faster and smaller than I found them. The numbers below are from the work, not estimates.</p>
+    </div>
+    <div class="jobs">
+      <div class="job"><div><div class="co">EvidenceCare</div><div class="role">Software Engineer</div><div class="when">Sep 2024 – now</div></div>
+        <div><ul><li>Designed an MCP server and a linter. The MCP cut development time for one component by 66%, and the project is projected to save about $15K per month.</li><li>Cut deployments from hours to minutes by reworking database migrations for fresh and existing environments.</li><li>Moved TypeScript codebases from ts-node to tsx, CRA to Vite, ESLint to Biome, Jest to Vitest, and Joi to Zod.</li><li>Built multi-tenancy on a single RDS instance and PHI-safe logging.</li></ul>
+        <div class="tags"><span>TypeScript</span><span>Docker</span><span>Vite</span><span>Vitest</span><span>Zod</span><span>PostgreSQL</span><span>Snowflake</span></div></div></div>
+      <div class="job"><div><div class="co">Vestis Labs</div><div class="role">Full Stack Engineer</div><div class="when">Sep 2023 – Sep 2024</div></div>
+        <div><ul><li>Simplified more than 80% of the code structure by co-locating code and removing abstractions.</li><li>Moved the image annotator from React rendering to direct DOM work and made it work on phones.</li><li>Designed the data model for a digital ID site and its drag-and-drop builder.</li></ul>
+        <div class="tags"><span>React</span><span>Next.js</span><span>TanStack Router</span><span>MongoDB</span></div></div></div>
+      <div class="job"><div><div class="co">Jatis Mobile</div><div class="role">Full Stack Engineer</div><div class="when">Sep 2022 – Aug 2023</div></div>
+        <div><ul><li>Built a client-side WhatsApp-style chatbot with XState, removing server-side chatbot costs.</li><li>Designed and built a chatbot flow builder with React Flow and AdonisJS, and led 4 developers to ship it.</li><li>Joined as a web designer. Named a top performer in Q4 2022.</li></ul>
+        <div class="tags"><span>React</span><span>XState</span><span>React Flow</span><span>AdonisJS</span><span>Figma</span></div></div></div>
+      <div class="job"><div><div class="co">Rapidev</div><div class="role">Founding Engineer, then Project Manager</div><div class="when">Dec 2021 – Aug 2022</div></div>
+        <div><ul><li>Cut dashboard load time by 80% by fixing N+1 queries and moving pagination to the server.</li><li>Integrated Xendit and Midtrans payments. Managed a 10-person team across 3 startups.</li></ul></div></div>
+      <div class="job"><div><div class="co">Mitra Integrasi Informatika</div><div class="role">Frontend Engineer</div><div class="when">Sep 2020 – Feb 2021</div></div>
+        <div><ul><li>JWT authentication across projects, code review, and admin dashboard UI in Figma.</li></ul></div></div>
+    </div>
+  </section>
+
+  <section id="projects" class="rule pad">
+    <div class="head reveal"><h2 class="title">Projects</h2><p class="aside">Side work, mostly tools for people who build interfaces.</p></div>
+    <div class="projects">
+      <a class="project" href="https://schemata.ruine.app/"><h3>Schemata <small>schemata.ruine.app</small></h3><p>An entity relationship diagram builder for developers, with drag and drop.</p></a>
+      <a class="project" href="https://github.com/ruine-dev/ruine-ui-dashboard"><h3>ruine UI Dashboard <small>github</small></h3><p>An accessible admin dashboard template, built with Astro.</p></a>
+      <a class="project" href="https://github.com/itsfaqih/fama"><h3>Fama <small>github</small></h3><p>An open source portfolio template.</p></a>
+      <a class="project" href="#"><h3>PHPID Learning <small>figma</small></h3><p>The learning platform design for Indonesia's PHP community, shipped to production.</p></a>
+    </div>
+    <h2 class="title" style="margin:72px 0 24px;font-size:22px">Tools I reach for</h2>
+    <dl class="stack">
+      <div><dt>Languages</dt><dd>TypeScript, PHP, HTML, CSS</dd></div>
+      <div><dt>Front end</dt><dd>React, TanStack, Effect, Base UI, Tailwind, XState</dd></div>
+      <div><dt>Back end and data</dt><dd>Node.js, Laravel, AdonisJS, PostgreSQL, Redis, tRPC</dd></div>
+      <div><dt>Quality</dt><dd>Vitest, Playwright, MSW, Oxlint, Storybook</dd></div>
+      <div><dt>Infrastructure</dt><dd>Docker, Vite, Bun, NGINX, AWS</dd></div>
+      <div><dt>AI tools</dt><dd>Claude Code, Codex, OpenRouter, OpenCode</dd></div>
+    </dl>
+  </section>
+
+  <div class="rule pad close">
+    <p>Have a product that needs this level of care?</p>
+    <a class="btn btn-primary" href="mailto:itsfaqih@gmail.com">Email me</a>
+  </div>
+  <footer class="rule pad"><span>© 2026 Faqih Muntashir</span><span>Built with TanStack Start</span></footer>
+</main>
+
+<div id="inspector" aria-hidden="true">
+  <div class="cx"></div><div class="cy"></div><div class="chip" data-x></div><div class="chip" data-y></div>
+  <div class="frm"></div><div class="gap-v"><b></b></div><div class="gap-h"><b></b></div><div class="gap-v"><b></b></div><div class="gap-h"><b></b></div>
+  <div class="tgt"></div><div class="chip" data-size></div>
+</div>
+
+<script>
+  // Live clock in Yogyakarta
+  const clock = document.getElementById('clock');
+  const tick = () => clock.textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date()) + ' WIB';
+  tick(); setInterval(tick, 15000);
+
+  // Copy email
+  const copy = document.getElementById('copy');
+  copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText('itsfaqih@gmail.com'); } catch {} copy.textContent = 'Copied'; setTimeout(() => copy.textContent = 'Copy itsfaqih@gmail.com', 1600); });
+
+  // Section reveals, once
+  const io = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Inspector: always on in the hero, everywhere when toggled
+  const root = document.getElementById('inspector');
+  const [cx, cy, chipX, chipY, frm, gT, gR, gB, gL, tgt, size] = root.children;
+  const toggle = document.getElementById('inspect-toggle');
+  let siteWide = false, pointer = null, raf = 0;
+  const setWide = (v) => { siteWide = v; toggle.setAttribute('aria-pressed', v); draw(); };
+  toggle.addEventListener('click', () => setWide(!siteWide));
+  addEventListener('keydown', (e) => { if (e.target.closest('input,textarea')) return; if (e.key.toLowerCase() === 'i' && !e.metaKey && !e.ctrlKey) setWide(!siteWide); if (e.key === 'Escape') setWide(false); });
+  const show = (el, v) => el.style.opacity = v ? 1 : 0;
+  const place = (el, l, t, w, h) => { el.style.transform = `translate(${l}px,${t}px)`; el.style.width = w + 'px'; el.style.height = h + 'px'; };
+  const big = (r) => r.width * r.height > innerWidth * innerHeight * 0.6;
+  function draw() {
+    raf = 0;
+    const all = [...root.children];
+    if (!pointer) return all.forEach(el => show(el, false));
+    const hit = document.elementFromPoint(pointer.x, pointer.y);
+    if (!siteWide && !hit?.closest('[data-inspect-zone]')) return all.forEach(el => show(el, false));
+    const { x, y } = pointer;
+    cx.style.transform = `translateY(${y}px)`; cy.style.transform = `translateX(${x}px)`;
+    chipX.style.transform = `translate(${x + 4}px, 4px)`; chipX.textContent = 'x ' + Math.round(x);
+    chipY.style.transform = `translate(4px, ${y + 4}px)`; chipY.textContent = 'y ' + Math.round(y + scrollY);
+    [cx, cy, chipX, chipY].forEach(el => show(el, true));
+    let el = hit instanceof SVGElement && !(hit instanceof SVGSVGElement) ? hit.ownerSVGElement : hit;
+    if (!el || ['HTML','BODY','MAIN'].includes(el.tagName) || big(el.getBoundingClientRect()) || el.closest('header')) { [tgt, size, frm, gT, gR, gB, gL].forEach(e => show(e, false)); return; }
+    const r = el.getBoundingClientRect();
+    place(tgt, r.left, r.top, r.width, r.height); show(tgt, true);
+    size.textContent = `${Math.round(r.width)} × ${Math.round(r.height)}`;
+    size.style.transform = `translate(${r.left + r.width / 2}px, ${r.bottom + 6}px) translateX(-50%)`; show(size, true);
+    let p = el.parentElement;
+    while (p && p.tagName !== 'MAIN') { const pr = p.getBoundingClientRect(); if (pr.width > r.width + 1 || pr.height > r.height + 1) break; p = p.parentElement; }
+    if (!p || p.tagName === 'MAIN' || big(p.getBoundingClientRect())) { [frm, gT, gR, gB, gL].forEach(e => show(e, false)); return; }
+    const o = p.getBoundingClientRect();
+    place(frm, o.left, o.top, o.width, o.height); show(frm, true);
+    const mx = r.left + r.width / 2, my = r.top + r.height / 2;
+    [[gT, mx, o.top, 0, r.top - o.top, r.top - o.top], [gR, r.right, my, o.right - r.right, 0, o.right - r.right], [gB, mx, r.bottom, 0, o.bottom - r.bottom, o.bottom - r.bottom], [gL, o.left, my, r.left - o.left, 0, r.left - o.left]]
+      .forEach(([g, l, t, w, h, len]) => { show(g, len >= 2); if (len >= 2) { place(g, l, t, w, h); g.firstChild.textContent = Math.round(len); } });
+  }
+  const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    addEventListener('pointermove', (e) => { pointer = { x: e.clientX, y: e.clientY }; schedule(); }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => { pointer = null; schedule(); });
+    addEventListener('scroll', schedule, { passive: true });
+  }
+</script>
+</body>
+</html>

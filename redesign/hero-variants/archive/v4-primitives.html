@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Primitives: dev tools, backends, tests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@500;600&family=Unbounded:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0e0e13; --panel: #17171f; --panel-2: #20202b; --hair: #2c2c3a;
+    --text: #f4f4f8; --dim: #a1a1b5; --go: #ffe14d;
+    --ux: #ff6ad5; --cw: #4dd4ff; --ar: #ffb02e; --ts: #7dff6a; --ax: #9d7bff;
+    --shade: rgb(0 0 0 / 0.45);
+    --display: "Unbounded", system-ui, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --inout: cubic-bezier(0.65, 0, 0.35, 1);
+    --fall: cubic-bezier(0.55, 0, 1, 0.45);
+    color-scheme: dark;
+  }
+  .light {
+    --bg: #f5f5f8; --panel: #ffffff; --panel-2: #ececf2; --hair: #d6d6df;
+    --text: #111117; --dim: #4b4b5b; --shade: rgb(30 30 60 / 0.18);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.55 "Geist", system-ui, sans-serif; }
+  .ctl { display: flex; gap: 8px; padding: 16px clamp(16px, 4vw, 48px) 0; max-width: 1240px; margin: 0 auto; }
+  .ctl button { font: 700 12px var(--display); padding: 9px 14px; border-radius: 10px; border: 0; cursor: pointer;
+    background: var(--panel-2); color: var(--text); box-shadow: 0 3px 0 var(--hair); }
+  .ctl button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--hair); }
+  main { padding: 0 clamp(16px, 4vw, 48px) 64px; max-width: 1240px; margin: 0 auto; }
+  section { padding-top: 32px; }
+  section h2 { margin: 0 0 16px; font: 800 clamp(18px, 2.4vw, 24px)/1.25 var(--display); }
+  section h2 b { color: var(--c); font-weight: 800; }
+  .light section h2 b { color: color-mix(in oklab, var(--c) 70%, black); }
+  .row { display: grid; gap: 24px 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+  figure { margin: 0; }
+  figcaption { margin-top: 9px; font: 500 12.5px var(--mono); color: var(--dim); }
+  figcaption b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 8px; border-radius: 6px;
+    background: var(--go); color: #111; font: 800 10px var(--display); }
+
+  .stage { perspective: 900px; }
+  .card { position: relative; aspect-ratio: 16 / 10; transform-style: preserve-3d; transform: rotateX(4deg) rotateY(-6deg); }
+  .card > * { position: absolute; inset: 0; border-radius: 14px; }
+  .card .paper { border: 1px solid var(--hair);
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      var(--panel);
+    background-blend-mode: overlay, normal; }
+  .card svg { width: 100%; height: 100%; transform: translateZ(30px); clip-path: inset(0 round 14px); display: block; overflow: hidden; }
+  .card .drop { transform: translateZ(-1px) translateY(10px); background: var(--shade); filter: blur(14px); opacity: .7; }
+  svg *:not([transform]) { transform-box: fill-box; transform-origin: center; }
+  /* Elements that turn or scale around a fixed point in the scene. */
+  .card .vb { transform-box: view-box; }
+  .paused .card * { animation-play-state: paused !important; }
+
+  .h { fill: var(--c); } .i { fill: var(--text); }
+  .hs { stroke: var(--c); fill: none; } .is { stroke: var(--text); fill: none; }
+  .mis { mix-blend-mode: screen; }
+  .light .mis { mix-blend-mode: multiply; }
+  .dot { fill: var(--c); }
+  .grid { stroke: var(--c); stroke-width: 0.6; opacity: 0.26; fill: none; }
+  .ghost { stroke-dasharray: 3 4; stroke-width: 1.4; opacity: .65; }
+
+  .settle { animation: settle 4.4s calc(var(--i, 0) * 120ms) infinite backwards; }
+  @keyframes settle {
+    0%, 6% { transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg)); animation-timing-function: var(--spring); }
+    24%, 80% { transform: none; animation-timing-function: var(--inout); }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg)); }
+  }
+
+  /* ---- Dev tools A: the shortcut. The ghost walks the long way; the ink takes the line. ---- */
+  .card .da-ball { transform: translate(280px, 40px); animation: da-ball 4.4s infinite; }
+  @keyframes da-ball {
+    0% { opacity: 0; transform: translate(40px, 160px); }
+    4% { opacity: 1; transform: translate(40px, 160px); animation-timing-function: var(--inout); }
+    24%, 86% { opacity: 1; transform: translate(280px, 40px); }
+    94%, 100% { opacity: 0; transform: translate(280px, 40px); }
+  }
+  .da-hit { animation: da-hit 4.4s infinite; }
+  @keyframes da-hit {
+    0%, 22% { opacity: 0; transform: scale(0.2); animation-timing-function: var(--spring); }
+    30%, 86% { opacity: 1; transform: none; }
+    94%, 100% { opacity: 0; transform: none; }
+  }
+  .card .da-ghost { opacity: 0; animation: da-ghost 4.4s linear infinite; }
+
+  /* ---- Dev tools B: the hourglass drains in a blink, then flips. ---- */
+  .card .db-glass { transform-origin: 160px 100px; animation: db-glass 4s infinite; }
+  @keyframes db-glass {
+    0%, 56% { transform: rotate(0deg); animation-timing-function: var(--spring); }
+    76%, 100% { transform: rotate(180deg); }
+  }
+  .card .db-top { transform-origin: 160px 96px; transform: scale(0.45); animation: db-top 4s infinite; }
+  @keyframes db-top {
+    0%, 10% { transform: scale(1); animation-timing-function: var(--inout); }
+    34%, 100% { transform: scale(0.001); }
+  }
+  .card .db-bot { transform-origin: 160px 170px; transform: scale(0.85); animation: db-bot 4s infinite; }
+  @keyframes db-bot {
+    0%, 10% { transform: scale(0.001); animation-timing-function: var(--inout); }
+    34%, 100% { transform: scale(1); }
+  }
+  .db-stream { animation: db-stream 4s infinite; }
+  @keyframes db-stream { 0%, 9% { opacity: 0; } 12%, 32% { opacity: 1; } 35%, 100% { opacity: 0; } }
+
+  /* ---- Dev tools C: one nudge and the whole row goes over. ---- */
+  .card .dc-bar { transform: rotate(90deg); animation: dc-bar 4.4s calc(var(--i) * 110ms) infinite backwards; }
+  @keyframes dc-bar {
+    0%, 18% { transform: none; opacity: 1; animation-timing-function: var(--fall); }
+    26% { transform: rotate(90deg); animation-timing-function: ease-out; }
+    28% { transform: rotate(84deg); animation-timing-function: ease-in; }
+    30%, 82% { transform: rotate(90deg); opacity: 1; }
+    90% { transform: rotate(90deg); opacity: 0; }
+    91%, 96% { transform: none; opacity: 0; }
+    100% { transform: none; opacity: 1; }
+  }
+  .dc-ball { animation: dc-ball 4.4s infinite; }
+  @keyframes dc-ball {
+    0% { opacity: 0; transform: translateX(-70px); }
+    3% { opacity: 1; transform: translateX(-70px); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    18%, 82% { opacity: 1; transform: none; }
+    90%, 100% { opacity: 0; transform: none; }
+  }
+
+  /* ---- Backends A: a pendulum that never drifts. ---- */
+  .card .ba-swing { transform-origin: 160px 22px; transform: rotate(-30deg);
+    animation: ba-swing 1.5s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate; }
+  @keyframes ba-swing { from { transform: rotate(-30deg); } to { transform: rotate(30deg); } }
+  .ba-tick { animation: ba-tick 1.5s infinite; }
+  @keyframes ba-tick { 0%, 38% { opacity: 0.25; } 50% { opacity: 1; } 62%, 100% { opacity: 0.25; } }
+
+  /* ---- Backends B: orbits in whole-number ratios, so the loop always lines up. ---- */
+  .card .bb-orb { transform-origin: 160px 100px; transform: rotate(var(--a)); animation: bb-orb var(--T) linear infinite; }
+  @keyframes bb-orb { from { transform: rotate(var(--a)); } to { transform: rotate(calc(var(--a) + 360deg)); } }
+
+  /* ---- Backends C: load keeps arriving and the beam stays level. ---- */
+  .bc-box { opacity: 0; animation: bc-box 3s var(--d) infinite; }
+  .bc-box.rest { opacity: 1; transform: translateX(80px); }
+  @keyframes bc-box {
+    0% { opacity: 0; transform: translateY(-130px); animation-timing-function: var(--fall); }
+    5% { opacity: 1; }
+    16% { transform: none; animation-timing-function: ease-out; }
+    19% { transform: translateY(-6px); animation-timing-function: ease-in; }
+    22% { transform: none; animation-timing-function: linear; }
+    72% { opacity: 1; transform: translateX(190px); animation-timing-function: var(--fall); }
+    86%, 100% { opacity: 0; transform: translate(236px, 110px) rotate(40deg); }
+  }
+
+  /* ---- Tests A: every block lands inside its outline; the plumb line agrees. ---- */
+  .ta-blk { animation: ta-blk 4.8s calc(var(--i) * 550ms) infinite backwards; }
+  @keyframes ta-blk {
+    0% { opacity: 0; transform: translateY(-190px); animation-timing-function: var(--fall); }
+    3% { opacity: 1; }
+    11% { transform: none; animation-timing-function: ease-out; }
+    13% { transform: translateY(-5px); animation-timing-function: ease-in; }
+    15%, 84% { opacity: 1; transform: none; }
+    92%, 100% { opacity: 0; transform: none; }
+  }
+  .ta-seal, .tb-reg { animation: pop 4.8s infinite; }
+  .tb-reg { animation-duration: 4.4s; animation-delay: calc(var(--i) * 60ms); }
+  @keyframes pop {
+    0%, 46% { opacity: 0; transform: scale(0.3) rotate(-45deg); animation-timing-function: var(--spring); }
+    56%, 84% { opacity: 1; transform: none; }
+    92%, 100% { opacity: 0; transform: none; }
+  }
+  .tb-reg { animation-name: pop-fit; }
+  @keyframes pop-fit {
+    0%, 22% { opacity: 0; transform: scale(0.3) rotate(-45deg); animation-timing-function: var(--spring); }
+    32%, 78% { opacity: 1; transform: none; }
+    88%, 100% { opacity: 0; transform: none; }
+  }
+
+  /* ---- Tests C: the sieve. Circles pass through, triangles get caught. ---- */
+  .tc-pass { opacity: 0; animation: tc-pass 4.4s var(--d) infinite backwards; }
+  @keyframes tc-pass {
+    0% { opacity: 0; transform: translateY(-110px); animation-timing-function: var(--fall); }
+    4% { opacity: 1; }
+    30% { opacity: 1; transform: translateY(150px); }
+    31%, 100% { opacity: 0; transform: translateY(150px); }
+  }
+  .tc-catch { animation: tc-catch 4.4s var(--d) infinite backwards; }
+  @keyframes tc-catch {
+    0% { opacity: 0; transform: translateY(-140px); animation-timing-function: var(--fall); }
+    4% { opacity: 1; }
+    17% { transform: none; animation-timing-function: ease-out; }
+    20% { transform: translateY(-6px); animation-timing-function: ease-in; }
+    23%, 78% { opacity: 1; transform: none; }
+    86%, 100% { opacity: 0; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card * { animation: none !important; }
+    .card .da-ghost { opacity: 1; transform: translate(136px, 100px); }
+    .card .db-stream { opacity: 1; }
+    .ta-seal, .tb-reg { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="ctl">
+  <button id="theme" type="button">Light</button>
+  <button id="pause" type="button">Pause</button>
+</div>
+<main id="root"></main>
+
+<script>
+const defs = (p) => `<defs>
+  <pattern id="${p}ht" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><circle class="dot" cx="2.5" cy="2.5" r="1.75"/></pattern>
+  <pattern id="${p}gr" width="16" height="16" patternUnits="userSpaceOnUse"><path class="grid" d="M16 0 H0 V16"/></pattern>
+</defs><rect width="320" height="200" fill="url(#${p}gr)"/>`;
+// One primitive printed in two inks: a misregistered halftone in the hue, then the top ink.
+const ink = (p, shape, top = "i") => {
+  const topG = top === "i" ? `<g class="i">${shape}</g>` : top === "h" ? `<g class="h mis">${shape}</g>` : `<g class="is" stroke-width="3">${shape}</g>`;
+  return `<g transform="translate(5 4)" fill="url(#${p}ht)" class="mis">${shape}</g>${topG}`;
+};
+// Registration mark, the printer's proof that two inks line up.
+const reg = (x, y, i) => `<g class="tb-reg" style="--i:${i}"><circle class="hs" stroke-width="1.6" cx="${x}" cy="${y}" r="7"/><path class="hs" stroke-width="1.6" d="M${x - 12} ${y} H${x + 12} M${x} ${y - 12} V${y + 12}"/></g>`;
+
+// The long way round: a meander from the start ring to the target square.
+const MEANDER = [[40, 160], [88, 160], [88, 40], [136, 40], [136, 160], [184, 160], [184, 40], [232, 40], [232, 160], [280, 160], [280, 40]];
+{
+  const len = MEANDER.slice(1).map(([x, y], k) => Math.hypot(x - MEANDER[k][0], y - MEANDER[k][1]));
+  const total = len.reduce((a, b) => a + b, 0);
+  let acc = 0;
+  const stops = MEANDER.map(([x, y], k) => {
+    if (k) acc += len[k - 1];
+    return `${((acc / total) * 92).toFixed(2)}% { opacity: 1; transform: translate(${x}px, ${y}px); }`;
+  });
+  const css = `@keyframes da-ghost { ${stops.join(" ")} 97%, 100% { opacity: 0; transform: translate(280px, 40px); } }`;
+  document.head.insertAdjacentHTML("beforeend", `<style>${css}</style>`);
+}
+
+const SCENES = [
+  {
+    c: "var(--ar)", phrase: "dev tools that ", hi: "save hours",
+    options: [
+      ["Shortcut", (p) => `${defs(p)}
+        <path class="is ghost" d="M${MEANDER.map((pt) => pt.join(" ")).join(" L")}"/>
+        ${ink(p, `<polygon points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5"/>`, "h")}
+        ${ink(p, `<circle cx="40" cy="160" r="14"/>`, "o")}
+        ${ink(p, `<rect x="264" y="24" width="32" height="32"/>`, "o")}
+        <rect class="h mis da-hit" x="268" y="28" width="24" height="24"/>
+        <g class="vb da-ghost"><circle class="is" stroke-width="1.6" stroke-dasharray="3 3" r="10"/></g>
+        <g class="vb da-ball">${ink(p, `<circle r="10"/>`)}</g>`],
+      ["Hourglass", (p) => `${defs(p)}
+        <g class="vb db-glass">
+          ${ink(p, `<rect x="104" y="12" width="112" height="10"/><rect x="104" y="178" width="112" height="10"/>`)}
+          <g class="vb db-top"><path fill="url(#${p}ht)" class="mis" transform="translate(4 3)" d="M122 30 H198 L160 96 Z"/><path class="h mis" d="M122 30 H198 L160 96 Z"/></g>
+          <g class="vb db-bot"><path fill="url(#${p}ht)" class="mis" transform="translate(4 3)" d="M122 170 H198 L160 104 Z"/><path class="h mis" d="M122 170 H198 L160 104 Z"/></g>
+          <rect class="h db-stream" x="158.5" y="96" width="3" height="74"/>
+          <path class="is" stroke-width="3" stroke-linejoin="round" d="M114 22 H206 L164 100 L206 178 H114 L156 100 Z"/>
+        </g>
+        ${ink(p, `<circle cx="262" cy="46" r="12"/>`, "h")}
+        <path class="is ghost" d="M40 188 H280"/>`],
+      ["One nudge", (p) => `${defs(p)}
+        <path class="is" stroke-width="3" d="M8 165.5 H312"/>
+        ${[30, 84, 138, 192, 246].map((x, i) => `<g class="vb dc-bar" style="--i:${i};transform-origin:${x + 10}px 164px">${ink(p, `<rect x="${x}" y="120" width="10" height="44"/>`, i % 2 ? "h" : "i")}</g>`).join("")}
+        <g class="dc-ball">${ink(p, `<circle cx="18" cy="152" r="12"/>`, "h")}</g>
+        <path class="is ghost" d="M300 150 V180 M292 172 L300 180 L308 172"/>`],
+    ],
+  },
+  {
+    c: "var(--ts)", phrase: "backends that ", hi: "run reliably",
+    options: [
+      ["Pendulum", (p) => `${defs(p)}
+        <path class="is ghost" d="M101 124.2 A118 118 0 0 0 219 124.2"/>
+        <circle class="is ghost" cx="101" cy="124.2" r="18"/><circle class="is ghost" cx="219" cy="124.2" r="18"/>
+        <rect class="h ba-tick" x="156" y="168" width="8" height="14"/>
+        ${ink(p, `<rect x="112" y="12" width="96" height="10"/>`)}
+        <g class="vb ba-swing">
+          <rect class="i" x="158.5" y="22" width="3" height="100"/>
+          ${ink(p, `<circle cx="160" cy="140" r="18"/>`, "h")}
+        </g>
+        <circle class="i" cx="160" cy="22" r="5"/>`],
+      ["Orbits", (p) => `${defs(p)}
+        ${[40, 66, 90].map((r) => `<circle class="is ghost" cx="160" cy="100" r="${r}"/>`).join("")}
+        ${ink(p, `<rect x="142" y="82" width="36" height="36"/>`)}
+        <g class="vb bb-orb" style="--T:2.4s;--a:20deg">${ink(p, `<circle cx="200" cy="100" r="8"/>`, "h")}</g>
+        <g class="vb bb-orb" style="--T:4.8s;--a:200deg">${ink(p, `<circle cx="226" cy="100" r="7"/>`)}</g>
+        <g class="vb bb-orb" style="--T:9.6s;--a:290deg">${ink(p, `<circle cx="250" cy="100" r="12"/>`, "h")}</g>`],
+      ["Steady beam", (p) => `${defs(p)}
+        <path class="is ghost" d="M10 137 H50 M270 137 H310"/>
+        ${ink(p, `<path d="M76 186 H104 L90 142 Z"/><path d="M216 186 H244 L230 142 Z"/>`)}
+        ${ink(p, `<rect x="50" y="132" width="220" height="10"/>`, "h")}
+        ${[0, 1, 2].map((k) => `<g class="bc-box" style="--d:${-k}s">${ink(p, `<rect x="58" y="110" width="22" height="22"/>`, k === 1 ? "h" : "i")}</g>`).join("")}`],
+    ],
+  },
+  {
+    c: "var(--ax)", phrase: "test suites you ", hi: "can trust",
+    options: [
+      ["Plumb tower", (p) => `${defs(p)}
+        ${[136, 102, 68, 34].map((y) => `<rect class="is ghost" x="143" y="${y}" width="34" height="34"/>`).join("")}
+        ${ink(p, `<rect x="84" y="170" width="152" height="8"/>`)}
+        ${[136, 102, 68, 34].map((y, i) => `<g class="ta-blk" style="--i:${i}">${ink(p, `<rect x="143" y="${y}" width="34" height="34"/>`, i % 2 ? "h" : "i")}</g>`).join("")}
+        <path class="hs" stroke-width="1.4" stroke-dasharray="2 3" d="M222 10 V136"/>
+        ${ink(p, `<path d="M214 136 H230 L222 154 Z"/>`, "h")}
+        <g class="ta-seal"><circle class="hs" stroke-width="2" cx="92" cy="54" r="16"/><path class="hs" stroke-width="2" d="M70 54 H114 M92 32 V76"/></g>`],
+      ["Exact fit", (p) => `${defs(p)}
+        ${ink(p, `<path d="M104 62 H140 L160 98 L180 62 H216 V162 H104 Z"/>`)}
+        <g class="settle" style="--dx:96px;--dy:-60px;--r:150deg">${ink(p, `<path d="M140 62 H180 L160 98 Z"/>`, "h")}</g>
+        ${reg(86, 44, 0)}${reg(234, 44, 1)}${reg(86, 180, 2)}${reg(234, 180, 3)}`],
+      ["Sieve", (p) => `${defs(p)}
+        <path class="is ghost" d="M20 188 H300"/>
+        ${[[96, "0s"], [206, "1s"]].map(([x, d]) => `<g class="tc-pass" style="--d:${d}">${ink(p, `<circle cx="${x}" cy="60" r="10"/>`)}</g>`).join("")}
+        ${[[156, "0.5s"], [252, "1.5s"]].map(([x, d]) => `<g class="tc-catch" style="--d:${d}">${ink(p, `<path d="M${x - 20} 100 H${x + 20} L${x} 66 Z"/>`, "h")}</g>`).join("")}
+        ${ink(p, `<rect x="30" y="100" width="52" height="10"/><rect x="110" y="100" width="82" height="10"/><rect x="220" y="100" width="70" height="10"/>`)}`],
+    ],
+  },
+];
+
+let uid = 0;
+document.getElementById("root").innerHTML = SCENES.map((s) => `
+  <section style="--c:${s.c}">
+    <h2>I build ${s.phrase}<b>${s.hi}</b>.</h2>
+    <div class="row">${s.options.map(([name, draw], k) => `
+      <figure>
+        <div class="stage"><div class="card"><div class="drop"></div><div class="paper"></div>
+          <svg viewBox="0 0 320 200" aria-hidden="true">${draw(`u${uid++}-`)}</svg></div></div>
+        <figcaption><b>${"ABC"[k]}</b>${name}</figcaption>
+      </figure>`).join("")}</div>
+  </section>`).join("");
+// Under reduced motion the beam holds one box mid-span.
+document.querySelectorAll(".bc-box").forEach((el, k) => { if (k % 3 === 0) el.classList.add("rest"); });
+
+const html = document.documentElement;
+const themeBtn = document.getElementById("theme");
+const setTheme = (light) => { html.classList.toggle("light", light); themeBtn.textContent = light ? "Dark" : "Light"; };
+setTheme(new URLSearchParams(location.search).get("theme") === "light");
+themeBtn.onclick = () => setTheme(!html.classList.contains("light"));
+let paused = false;
+const pauseBtn = document.getElementById("pause");
+pauseBtn.onclick = () => { paused = !paused; document.body.classList.toggle("paused", paused); pauseBtn.textContent = paused ? "Play" : "Pause"; };
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Every card turns toward the cursor, closing 12% of the gap each frame. */
+const REST = { x: 4, y: -6 };
+const cards = [...document.querySelectorAll(".card")].map((el) => ({ el, now: { ...REST }, to: { ...REST } }));
+if (!reduced) {
+  let frame = 0;
+  const clamp = (v) => Math.max(-1, Math.min(1, v));
+  const tick = () => {
+    let moving = false;
+    for (const c of cards) {
+      c.now.x += (c.to.x - c.now.x) * 0.12;
+      c.now.y += (c.to.y - c.now.y) * 0.12;
+      if (Math.abs(c.to.x - c.now.x) > 0.01 || Math.abs(c.to.y - c.now.y) > 0.01) moving = true;
+      c.el.style.transform = `rotateX(${c.now.x.toFixed(2)}deg) rotateY(${c.now.y.toFixed(2)}deg)`;
+    }
+    frame = moving ? requestAnimationFrame(tick) : 0;
+  };
+  addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    for (const c of cards) {
+      const r = c.el.parentElement.getBoundingClientRect();
+      const dx = clamp((e.clientX - (r.left + r.width / 2)) / (innerWidth / 2));
+      const dy = clamp((e.clientY - (r.top + r.height / 2)) / (innerHeight / 2));
+      c.to = { x: REST.x - dy * 10, y: REST.y + dx * 14 };
+    }
+    if (!frame) frame = requestAnimationFrame(tick);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v2 Blueprint (Briefing)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Sans+JP:wght@700;900&display=swap">
+<style>
+  :root {
+    --navy: #061a38; --navy-2: #0a2450; --navy-3: #0e2d60;
+    --line: rgb(140 180 255 / 0.10); --line-major: rgb(140 180 255 / 0.18);
+    --text: #e8f0ff; --text-2: #a9bbd9; --text-3: #6f86ad;
+    --sky: #7cc0ff; --red: #ff6b6f;
+    --sans: "Geist", system-ui, sans-serif; --mono: "Geist Mono", ui-monospace, monospace; --jp: "Noto Sans JP", sans-serif;
+    --cut: cubic-bezier(.83,0,.17,1); --out: cubic-bezier(.16,1,.3,1);
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; color: var(--text-2); font: 400 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; background: var(--navy); }
+  .grid-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image: radial-gradient(60% 50% at 30% 20%, rgb(40 90 180 / 0.35), transparent 70%), linear-gradient(var(--line-major) 1px, transparent 1px), linear-gradient(90deg, var(--line-major) 1px, transparent 1px), linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: auto, 120px 120px, 120px 120px, 24px 24px, 24px 24px; animation: pan 30s linear infinite; }
+  @keyframes pan { to { background-position: 0 0, 120px 120px, 120px 120px, 24px 24px, 24px 24px; } }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ---------- Intro: radar, briefing type, kanji slam, blinds ---------- */
+  #intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; cursor: pointer; }
+  #intro .blinds { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(8, 1fr); }
+  #intro .blinds i { background: #04122a; border-bottom: 1px solid var(--line-major); transform-origin: top; transition: transform 520ms var(--cut); transition-delay: calc(var(--i) * 45ms); }
+  #intro.out .blinds i { transform: scaleY(0); }
+  #intro .stage { position: relative; z-index: 1; text-align: center; transition: opacity 180ms ease; } #intro.out .stage { opacity: 0; }
+  #intro .radar { width: 300px; height: 300px; margin: 0 auto 18px; border-radius: 50%; border: 1px solid var(--line-major); position: relative; overflow: hidden;
+    background: radial-gradient(circle, transparent 0 32%, var(--line-major) 32% calc(32% + 1px), transparent calc(32% + 1px) 64%, var(--line-major) 64% calc(64% + 1px), transparent calc(64% + 1px)); }
+  #intro .radar::before { content: ""; position: absolute; inset: 0; background: conic-gradient(from 0deg, rgb(124 192 255 / 0.55), transparent 22%); animation: spin 1.4s linear infinite; }
+  #intro .radar b { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 12px var(--red); opacity: 0; }
+  #intro.play .radar b { animation: ping 900ms ease-out forwards; animation-delay: calc(400ms + var(--i) * 220ms); }
+  #intro .op { font: 900 clamp(56px, 10vw, 120px)/1 var(--jp); color: var(--text); opacity: 0; letter-spacing: 0.04em; }
+  #intro.play .op { animation: slam 240ms var(--out) 1000ms forwards; }
+  #intro .brief { font: 400 13px var(--mono); color: var(--sky); margin-top: 10px; min-height: 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes ping { 0% { opacity: 0; transform: scale(0.2); } 30% { opacity: 1; transform: scale(1.4); } 100% { opacity: 0.8; transform: none; } }
+  @keyframes slam { from { opacity: 0; transform: scale(1.6) translateY(-6px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+
+  header { display: flex; align-items: center; gap: 28px; height: 64px; font: 400 12px var(--mono); color: var(--text-3); border-bottom: 1px solid var(--line-major); }
+  header b { color: var(--text); font-weight: 500; }
+  header nav { display: flex; gap: 22px; } header nav a { transition: color 120ms ease; } header nav a:hover { color: var(--sky); }
+  header .sp { flex: 1; } .sheet-id { color: var(--sky); }
+  .rec-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--red); margin-right: 6px; animation: blink 1.2s steps(2) infinite; } @keyframes blink { 50% { opacity: 0.15; } }
+
+  .hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; padding: 80px 0 96px; align-items: center; }
+  .tag { font: 400 12px var(--mono); color: var(--sky); margin-bottom: 20px; }
+  h1 { font-size: 64px; line-height: 1; letter-spacing: -0.04em; font-weight: 600; color: var(--text); margin: 0 0 24px; }
+  h1 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; } h1 .w span { display: inline-block; }
+  .started h1 .w span { animation: up 640ms var(--cut) backwards; animation-delay: calc(var(--i) * 55ms); }
+  @keyframes up { from { transform: translateY(110%); } }
+  h1 em { font-style: normal; color: var(--sky); }
+  .lead { font-size: 19px; color: var(--text-2); max-width: 32em; margin: 0 0 32px; }
+  .btn { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 6px; font: 500 14px var(--sans); border: 1px solid transparent; cursor: pointer; transition: transform 150ms cubic-bezier(.25,.46,.45,.94), background-color 120ms ease, border-color 120ms ease; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--sky); color: #04122a; } .btn-primary:hover { background: #a3d3ff; }
+  .btn-primary::after { content: ""; position: absolute; inset: -1px; border-radius: 8px; border: 1px solid var(--sky); opacity: 0; }
+  @media (hover: hover) { .btn-primary:hover::after { animation: ring 900ms var(--out) infinite; } }
+  @keyframes ring { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(1.25, 1.6); } }
+  .btn-line { border-color: var(--line-major); color: var(--text); background: rgb(255 255 255 / 0.02); } .btn-line:hover { border-color: var(--text-3); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* Redlined card with radar behind */
+  .figure { position: relative; padding: 36px 40px 56px 56px; }
+  .sweep { position: absolute; left: 50%; top: 46%; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; overflow: hidden; z-index: -1;
+    background: radial-gradient(circle, transparent 0 33%, var(--line-major) 33% calc(33% + 1px), transparent calc(33% + 1px) 66%, var(--line-major) 66% calc(66% + 1px), transparent calc(66% + 1px) 99%, var(--line-major) 99%); }
+  .sweep::before { content: ""; position: absolute; inset: 0; background: conic-gradient(from 0deg, rgb(124 192 255 / 0.28), transparent 18%); animation: spin 6s linear infinite; }
+  .card { position: relative; background: var(--navy-3); border: 1px solid rgb(140 180 255 / 0.22); border-radius: 12px; padding: 24px; box-shadow: 0 30px 80px rgb(0 0 0 / 0.35); }
+  .card .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 10px 0; border-top: 1px solid var(--line-major); }
+  .card .row:first-of-type { border-top: 0; }
+  .card .row span:first-child { color: var(--text-3); } .card .row span:last-child { color: var(--text); text-align: right; }
+  .card h3 { margin: 0 0 14px; font-size: 15px; font-weight: 600; color: var(--text); display: flex; justify-content: space-between; }
+  .card h3 em { font: 400 11px var(--mono); color: var(--sky); font-style: normal; }
+  .dim { position: absolute; font: 400 10px var(--mono); color: var(--red); }
+  .dim.h { left: 56px; right: 40px; bottom: 26px; border-top: 1px solid var(--red); text-align: center; }
+  .dim.h::before, .dim.h::after { content: ""; position: absolute; top: -5px; height: 9px; border-left: 1px solid var(--red); } .dim.h::before { left: 0; } .dim.h::after { right: 0; }
+  .dim.h span, .dim.v span { background: var(--navy); padding: 0 4px; position: relative; top: -8px; }
+  .dim.v { top: 36px; bottom: 56px; left: 22px; border-left: 1px solid var(--red); display: flex; align-items: center; }
+  .dim.v span { top: 0; left: -14px; writing-mode: vertical-rl; transform: rotate(180deg); }
+  .pad-chip { position: absolute; font: 400 10px var(--mono); color: #fff; background: var(--red); padding: 1px 4px; border-radius: 3px; }
+  .started .draw { animation: draw 700ms var(--cut) backwards; animation-delay: calc(var(--i) * 90ms + 300ms); }
+  @keyframes draw { from { clip-path: inset(0 100% 0 0); } }
+
+  /* Ticker */
+  .ticker-wrap { overflow: hidden; border-block: 1px solid var(--line-major); background: rgb(4 18 42 / 0.6); }
+  .ticker { display: flex; width: max-content; animation: marquee 34s linear infinite; }
+  .ticker span { font: 900 54px/84px var(--jp); color: transparent; -webkit-text-stroke: 1px var(--text-3); padding-right: 40px; white-space: nowrap; }
+  .ticker span i { font: 500 14px var(--mono); font-style: normal; -webkit-text-stroke: 0; color: var(--sky); vertical-align: middle; margin-left: 16px; letter-spacing: 0.1em; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .paused, .paused * { animation-play-state: paused !important; }
+
+  section { padding: 88px 0; border-top: 1px solid var(--line-major); }
+  .sec-head { position: relative; display: flex; justify-content: space-between; align-items: end; margin-bottom: 36px; gap: 24px; }
+  .sec-head .k { position: absolute; right: 0; top: -56px; font: 900 72px/1 var(--jp); color: var(--text); opacity: 0.05; }
+  h2 { font-size: 34px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 600; color: var(--text); margin: 0; }
+  h2 small { display: block; font: 400 12px var(--mono); letter-spacing: 0; color: var(--red); margin-bottom: 8px; }
+  .sec-head p { margin: 0; font: 400 12px var(--mono); color: var(--text-3); }
+  [data-cut] .slide { opacity: 0; transform: translateX(-24px); } [data-cut].in .slide { opacity: 1; transform: none; transition: opacity 400ms ease, transform 600ms var(--cut); }
+  [data-cut].in .slide.d1 { transition-delay: 90ms; }
+
+  /* Mission register */
+  .reg { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .search { flex: 1 1 240px; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border: 1px solid var(--line-major); border-radius: 6px; background: rgb(4 18 42 / 0.6); font: 400 13px var(--mono); color: var(--text-3); }
+  .search:focus-within { border-color: var(--sky); }
+  .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--text); font: inherit; }
+  kbd { font: 400 11px var(--mono); padding: 0 6px; border: 1px solid var(--line-major); border-radius: 4px; color: var(--text-3); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+  .chips button { height: 30px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--line-major); background: transparent; color: var(--text-2); font: 400 12px var(--mono); cursor: pointer; transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, transform 150ms cubic-bezier(.25,.46,.45,.94); }
+  .chips button:active { transform: scale(0.97); }
+  .chips button b { font-weight: 500; color: var(--text-3); margin-left: 4px; }
+  .chips button[aria-pressed="true"] { background: var(--sky); border-color: var(--sky); color: #04122a; } .chips button[aria-pressed="true"] b { color: #04122a; }
+  .table { border-top: 1px solid var(--line-major); }
+  .thead, .tr { display: grid; grid-template-columns: 80px 1fr 130px 70px; gap: 14px; align-items: center; }
+  .thead { font: 400 11px var(--mono); color: var(--text-3); padding: 10px 12px; border-bottom: 1px solid var(--line-major); }
+  .tr { position: relative; padding: 13px 12px; border-bottom: 1px solid var(--line); overflow: hidden; transition: background-color 120ms ease; }
+  .tr::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--red); box-shadow: 0 0 12px var(--red); transform: translateX(-4px); opacity: 0; }
+  .tr:hover, .tr:focus-visible, .tr.on { background: rgb(124 192 255 / 0.06); outline: 0; }
+  .tr.on::after { opacity: 1; transform: none; transition: transform 200ms var(--out), opacity 100ms ease; }
+  .tr .code { font: 500 12px var(--mono); color: var(--sky); } .tr .t { color: var(--text); font-weight: 500; } .tr .c { font: 400 12px var(--mono); color: var(--text-3); }
+  .tr .s { font: 400 10px var(--mono); justify-self: end; padding: 1px 6px; border-radius: 3px; border: 1px solid var(--line-major); color: var(--text-3); } .tr .s.demo { color: var(--red); border-color: rgb(255 107 111 / 0.5); }
+  .dealt .tr { animation: in 360ms var(--out) backwards; animation-delay: calc(var(--i) * 24ms); }
+  @keyframes in { from { opacity: 0; clip-path: inset(0 100% 0 0); } }
+  .empty { padding: 32px 12px; font: 400 13px var(--mono); color: var(--text-3); }
+  .more { margin-top: 14px; }
+  .brief { position: sticky; top: 24px; border: 1px solid var(--line-major); border-radius: 12px; background: rgb(4 18 42 / 0.8); overflow: hidden; }
+  .brief .bh { display: flex; justify-content: space-between; padding: 12px 16px; font: 400 11px var(--mono); color: var(--text-3); border-bottom: 1px solid var(--line-major); }
+  .brief .bh b { color: var(--red); font-weight: 400; }
+  .brief .plate { height: 150px; position: relative; border-bottom: 1px solid var(--line-major); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 12px 12px; display: grid; place-items: center; overflow: hidden; }
+  .brief .plate span { font: 900 84px/1 var(--jp); color: transparent; -webkit-text-stroke: 1px var(--sky); opacity: 0.8; }
+  .brief .plate::after { content: ""; position: absolute; left: 0; right: 0; height: 40%; top: 0; transform: translateY(-100%); background: linear-gradient(transparent, rgb(124 192 255 / 0.18), transparent); animation: scan 2.4s linear infinite; }
+  @keyframes scan { to { transform: translateY(250%); } }
+  .brief .bb { padding: 16px; }
+  .brief h3 { margin: 0 0 12px; font-size: 22px; letter-spacing: -0.02em; color: var(--text); line-height: 1.15; min-height: 2.3em; }
+  .brief .obj { font: 400 11px var(--mono); color: var(--sky); margin-bottom: 4px; }
+  .brief p { margin: 0 0 16px; font: 400 13px/1.6 var(--mono); color: var(--text-2); min-height: 4.8em; }
+  .brief p::after { content: "▍"; color: var(--sky); animation: blink 1s steps(2) infinite; }
+  .brief .meta { display: flex; justify-content: space-between; font: 400 11px var(--mono); color: var(--text-3); border-top: 1px solid var(--line); padding-top: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font: 400 11px var(--mono); color: var(--text-3); padding: 0 16px 12px 0; border-bottom: 1px solid var(--line-major); font-weight: 400; }
+  td { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.co { color: var(--text); font-weight: 500; width: 200px; } td.role { width: 220px; } td.when { width: 170px; font: 400 12px var(--mono); color: var(--text-3); padding-top: 21px; }
+  td .num { color: var(--sky); font: 500 22px var(--mono); display: block; margin-bottom: 2px; }
+  tbody tr { opacity: 0; transform: translateY(10px); } tbody.in tr { opacity: 1; transform: none; transition: opacity 400ms ease, transform 500ms var(--out); } tbody.in tr:nth-child(2) { transition-delay: 70ms; } tbody.in tr:nth-child(3) { transition-delay: 140ms; } tbody.in tr:nth-child(4) { transition-delay: 210ms; } tbody.in tr:nth-child(5) { transition-delay: 280ms; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .list a { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .list a span:first-child { color: var(--text); transition: transform 200ms var(--out), color 120ms ease; } .list a span:last-child { font: 400 12px var(--mono); color: var(--text-3); }
+  .list a:hover span:first-child { color: var(--sky); transform: translateX(8px); }
+  .kv { margin: 0; } .kv div { display: grid; grid-template-columns: 140px 1fr; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .kv dt { font: 400 12px var(--mono); color: var(--text-3); padding-top: 2px; } .kv dd { margin: 0; color: var(--text-2); }
+  .end { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 72px 0; border-top: 1px solid var(--line-major); gap: 24px; flex-wrap: wrap; overflow: hidden; }
+  .end p { margin: 0; font-size: 34px; letter-spacing: -0.03em; color: var(--text); font-weight: 600; }
+  .end p small { display: block; font: 400 12px var(--mono); color: var(--red); letter-spacing: 0; margin-bottom: 8px; }
+  footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font: 400 11px var(--mono); color: var(--text-3); padding: 18px 0 28px; border-top: 1px solid var(--line-major); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-property: opacity, color, background-color, border-color !important; }
+    [data-cut] .slide, tbody tr { transform: none !important; }
+  }
+  @media (max-width: 900px) {
+    .wrap { padding: 0 20px; } header nav, .hide-sm { display: none; }
+    .hero, .grid2, .reg { grid-template-columns: 1fr; gap: 40px; } h1 { font-size: 42px; }
+    .figure { padding: 28px 8px 48px 40px; } .dim.h { left: 40px; right: 8px; } .dim.v { left: 12px; } .sweep { width: 380px; height: 380px; margin: -190px 0 0 -190px; }
+    .brief { display: none; } .thead { display: none; } .tr { grid-template-columns: 64px 1fr; } .tr .c, .tr .s { display: none; }
+    td.role, th.role, td.when, th.when { display: none; } td.co { width: 120px; }
+    .ticker span { font-size: 36px; line-height: 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg" data-loop></div>
+<div id="intro" aria-hidden="true">
+  <div class="blinds"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i></div>
+  <div class="stage">
+    <div class="radar"><b style="--i:0;left:62%;top:30%"></b><b style="--i:1;left:28%;top:58%"></b><b style="--i:2;left:70%;top:68%"></b></div>
+    <div class="op">作戦 〇一</div>
+    <div class="brief" id="intro-brief"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header><b>FM</b><span class="sheet-id">briefing 01 / home</span><nav><a href="#rules">mission-register</a><a href="#work">after-action</a><a href="#projects">projects</a></nav><span class="sp"></span><span class="hide-sm"><span class="rec-dot"></span>-7.80, 110.37 · <span id="clock">--:--</span> WIB</span></header>
+
+  <div class="hero">
+    <div>
+      <div class="tag">// operator: faqih muntashir · full-stack · yogyakarta</div>
+      <h1 id="h1">I draw the plan before I write the <em>code.</em></h1>
+      <p class="lead">I've spent 5+ years building web products in healthcare, SaaS, and internal tools. Right now I'm at EvidenceCare, building healthcare software for the US market.</p>
+      <div class="actions"><a class="btn btn-primary" href="mailto:itsfaqih@gmail.com">Email itsfaqih@gmail.com</a><a class="btn btn-line" href="https://github.com/itsfaqih">GitHub</a><a class="btn btn-line" href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a></div>
+    </div>
+    <div class="figure">
+      <div class="sweep" data-loop></div>
+      <div class="card draw" style="--i:0">
+        <span class="pad-chip" style="top:4px;left:50%;transform:translateX(-50%)">24</span>
+        <span class="pad-chip" style="left:4px;top:50%;transform:translateY(-50%)">24</span>
+        <h3>Now <em>● live</em></h3>
+        <div class="row"><span>Role</span><span>Software Engineer</span></div>
+        <div class="row"><span>Company</span><span>EvidenceCare</span></div>
+        <div class="row"><span>Since</span><span class="mono">2024-09</span></div>
+        <div class="row"><span>Stack</span><span>TypeScript · React · Effect</span></div>
+        <div class="row"><span>Speaks</span><span>Indonesian · English (B2)</span></div>
+      </div>
+      <div class="dim h draw" style="--i:2"><span>384</span></div>
+      <div class="dim v draw" style="--i:3"><span>268</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker-wrap" data-loop aria-hidden="true"><div class="ticker"><span>経験則<i>RULE OF THUMB</i></span><span>作戦<i>OPERATIONS</i></span><span>設計図<i>BLUEPRINT</i></span><span>経験則<i>RULE OF THUMB</i></span><span>作戦<i>OPERATIONS</i></span><span>設計図<i>BLUEPRINT</i></span><span>経験則<i>RULE OF THUMB</i></span><span>作戦<i>OPERATIONS</i></span><span>設計図<i>BLUEPRINT</i></span><span>経験則<i>RULE OF THUMB</i></span><span>作戦<i>OPERATIONS</i></span><span>設計図<i>BLUEPRINT</i></span></div></div>
+
+<div class="wrap">
+  <section id="rules" style="border-top:0">
+    <div class="sec-head" data-cut><span class="k">経験則</span><h2 class="slide"><small>■ mission register</small>Rule of Thumb</h2><p class="slide d1"><span id="total">0</span> on file · each with an objective</p></div>
+    <div class="reg">
+      <div>
+        <div class="tools"><label class="search">search<input id="q" type="search" placeholder="button, cache, focus…" aria-label="Search rules"><kbd>/</kbd></label></div>
+        <div class="chips" id="chips"></div>
+        <div class="table">
+          <div class="thead"><span>code</span><span>title</span><span>sector</span><span style="justify-self:end">type</span></div>
+          <div id="list"></div>
+          <div class="empty" id="empty" hidden>No mission matches "<q></q>".</div>
+        </div>
+        <button class="btn btn-line more" id="more">Show all</button>
+      </div>
+      <aside class="brief" aria-live="polite">
+        <div class="bh"><span><b>●</b> briefing</span><span id="b-code">—</span></div>
+        <div class="plate"><span id="b-jp">経</span></div>
+        <div class="bb"><h3 id="b-t">—</h3><div class="obj">OBJECTIVE</div><p id="b-s"></p><div class="meta"><span id="b-c"></span><span id="b-a"></span></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="sec-head" data-cut><span class="k">経歴</span><h2 class="slide"><small>■ after-action report</small>Experience</h2><p class="slide d1">2020 → now · 6 roles</p></div>
+    <table>
+      <thead><tr><th>company</th><th class="role">role</th><th class="when">period</th><th>measured outcome</th></tr></thead>
+      <tbody id="aar">
+        <tr><td class="co">EvidenceCare</td><td class="role">Software Engineer</td><td class="when">2024-09 → now</td><td><span class="num">−<span data-count="66">0</span>%</span>dev time per component from an MCP server and linter I designed. About $15K/month saved. Deploys went from hours to minutes, and Docker images got 30% smaller.</td></tr>
+        <tr><td class="co">Vestis Labs</td><td class="role">Full Stack Engineer</td><td class="when">2023-09 → 2024-09</td><td><span class="num"><span data-count="80">0</span>%+</span>of the code structure simplified by co-locating code. The image annotator moved to direct DOM rendering and now works on phones.</td></tr>
+        <tr><td class="co">Jatis Mobile</td><td class="role">Full Stack Engineer</td><td class="when">2022-09 → 2023-08</td><td><span class="num">$0</span>server cost for a client-side chatbot built with XState. Led 4 developers on a flow builder. Top performer, Q4 2022.</td></tr>
+        <tr><td class="co">Rapidev</td><td class="role">Founding Engineer · PM</td><td class="when">2021-12 → 2022-08</td><td><span class="num">−<span data-count="80">0</span>%</span>dashboard load time from fixing N+1 queries. Managed 10 people across 3 startups.</td></tr>
+        <tr><td class="co">Mitra Integrasi</td><td class="role">Frontend Engineer</td><td class="when">2020-09 → 2021-02</td><td>JWT auth, code review, and admin UI designed in Figma.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="projects" class="grid2">
+    <div data-cut><div class="sec-head"><h2 class="slide"><small>■ field units</small>Projects</h2></div>
+      <div class="list"><a href="https://schemata.ruine.app/"><span>Schemata, an ERD builder</span><span>react</span></a><a href="https://github.com/ruine-dev/ruine-ui-dashboard"><span>ruine UI Dashboard</span><span>astro</span></a><a href="https://github.com/itsfaqih/fama"><span>Fama portfolio template</span><span>react</span></a><a href="#"><span>PHPID Learning</span><span>figma</span></a><a href="#"><span>React Indonesia site</span><span>figma</span></a></div></div>
+    <div data-cut><div class="sec-head"><h2 class="slide"><small>■ equipment</small>Stack</h2></div>
+      <dl class="kv"><div><dt>lang</dt><dd>TypeScript, PHP, HTML, CSS</dd></div><div><dt>front</dt><dd>React, TanStack, Effect, Base UI, XState</dd></div><div><dt>back</dt><dd>Node.js, Laravel, AdonisJS, PostgreSQL, Redis</dd></div><div><dt>test</dt><dd>Vitest, Playwright, MSW, Storybook</dd></div><div><dt>infra</dt><dd>Docker, Vite, Bun, NGINX, AWS</dd></div></dl></div>
+  </section>
+
+  <div class="end" data-cut><p class="slide"><small>■ next mission</small>Got a spec that needs building?</p><a class="btn btn-primary slide d1" href="mailto:itsfaqih@gmail.com">Email me</a></div>
+  <footer><span>© 2026 Faqih Muntashir</span><span>drawn in TanStack Start</span></footer>
+</div>
+
+<script src="rules-data.js"></script>
+<script src="trailer.js"></script>
+<script>
+  const T = window.Trailer;
+  const PFX = { 'Code writing': 'CW', 'UX design': 'UX', 'Architecture': 'AR', 'Testing': 'TS', 'Accessibility': 'AX' };
+  const JP = { 'Code writing': '記', 'UX design': '体', 'Architecture': '設', 'Testing': '試', 'Accessibility': '利' };
+  const code = (r) => PFX[r.cat] + '-' + String(r.id).padStart(3, '0');
+  T.clock(document.getElementById('clock'));
+
+  // Split the headline into words for the staggered rise.
+  const h1 = document.getElementById('h1');
+  let wi = 0;
+  h1.innerHTML = h1.innerHTML.replace(/(<em>.*?<\/em>|[^\s<]+)/g, (w) => `<span class="w"><span style="--i:${wi++}">${w}</span></span>`);
+
+  const introBrief = document.getElementById('intro-brief');
+  if (!T.reduced) setTimeout(() => T.type(introBrief, 'OPERATOR: FAQIH MUNTASHIR · OBJECTIVE: SHIP IT', 60), 250);
+  T.intro(2000);
+  T.cuts();
+
+  const aar = document.getElementById('aar');
+  new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { aar.classList.add('in'); aar.querySelectorAll('[data-count]').forEach((n) => T.countUp(n, +n.dataset.count)); o.disconnect(); } }), { threshold: 0.3 }).observe(aar);
+
+  const list = document.getElementById('list');
+  const brief = (r) => {
+    if (!r) return;
+    document.getElementById('b-code').textContent = code(r);
+    document.getElementById('b-jp').textContent = JP[r.cat];
+    T.scramble(document.getElementById('b-t'), r.title, 340);
+    T.type(document.getElementById('b-s'), r.sum, 90);
+    document.getElementById('b-c').textContent = 'sector · ' + r.cat.toLowerCase();
+    document.getElementById('b-a').textContent = 'filed ' + r.added;
+  };
+  T.index({
+    list, search: document.getElementById('q'), chips: document.getElementById('chips'), more: document.getElementById('more'), count: document.getElementById('total'), empty: document.getElementById('empty'), pageSize: 12,
+    chip: (c, n, on) => `<button data-cat="${c}" aria-pressed="${on}">${c === 'All' ? 'all' : c.toLowerCase()}<b>${n}</b></button>`,
+    render: (r, i) => `<a class="tr${i === 0 ? ' on' : ''}" href="#" data-id="${r.id}" style="--i:${i}"><span class="code">${code(r)}</span><span class="t">${r.title}</span><span class="c">${r.cat.toLowerCase()}</span><span class="s${r.demo ? ' demo' : ''}">${r.demo ? 'DEMO' : 'BRIEF'}</span></a>`,
+    onRender: (items) => brief(items[0]),
+  });
+  const pick = (e) => { const a = e.target.closest('[data-id]'); if (!a || a.classList.contains('on')) return; list.querySelectorAll('.on').forEach((x) => x.classList.remove('on')); a.classList.add('on'); brief(RULES.find((r) => r.id === +a.dataset.id)); };
+  list.addEventListener('pointerover', pick); list.addEventListener('focusin', pick);
+</script>
+</body>
+</html>

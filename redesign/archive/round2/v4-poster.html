@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v4 Poster</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Inter+Tight:ital,wght@0,400;0,500;0,700;0,900;1,900&display=swap">
+<style>
+  :root {
+    --red: #e60012; --red-2: #b8000e; --ink: #0a0a0a; --paper: #ffffff; --grey: #8a8a8a;
+    --display: "Dela Gothic One", sans-serif; --sans: "Inter Tight", system-ui, sans-serif;
+    --cut: cubic-bezier(.83,0,.17,1); --out: cubic-bezier(.16,1,.3,1); --snap: cubic-bezier(.34,1.56,.64,1);
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 500 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 36px; }
+  .dots { background-image: radial-gradient(rgb(0 0 0 / 0.22) 1.4px, transparent 1.6px); background-size: 9px 9px; }
+
+  /* ---------- Intro: slab, slam, diagonal wipe ---------- */
+  #intro { position: fixed; inset: 0; z-index: 100; background: var(--red); overflow: hidden; cursor: pointer; display: grid; place-items: center; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transition: clip-path 620ms var(--cut); }
+  #intro.out { clip-path: polygon(100% 0, 100% 0, 100% 100%, 130% 100%); }
+  #intro .slab { position: absolute; left: -10%; right: -10%; top: 34%; height: 34%; background: var(--ink); transform: skewY(-8deg) translateX(-120%); }
+  #intro.play .slab { animation: slab 380ms var(--cut) 150ms forwards; }
+  @keyframes slab { to { transform: skewY(-8deg) translateX(0); } }
+  #intro .big { position: relative; font: 400 clamp(80px, 18vw, 240px)/1 var(--display); color: var(--paper); transform: rotate(-8deg); }
+  #intro .big span { display: inline-block; opacity: 0; }
+  #intro.play .big span { animation: slam 220ms var(--out) forwards; animation-delay: calc(520ms + var(--i) * 140ms); }
+  @keyframes slam { from { opacity: 0; transform: scale(2.6) rotate(10deg); } to { opacity: 1; transform: none; } }
+  #intro .stamp { position: absolute; left: 50%; top: 70%; transform: translateX(-50%) rotate(-8deg); background: var(--paper); color: var(--ink); font: 900 italic clamp(18px, 3vw, 34px)/1 var(--sans); padding: 10px 22px; opacity: 0; letter-spacing: 0.02em; }
+  #intro.play .stamp { animation: stamp 200ms var(--snap) 1150ms forwards; }
+  @keyframes stamp { from { opacity: 0; transform: translateX(-50%) rotate(-8deg) scale(1.8); } to { opacity: 1; transform: translateX(-50%) rotate(-8deg); } }
+  #intro .flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; }
+  #intro.play .flash { animation: flash 160ms linear 940ms; } @keyframes flash { 0%, 100% { opacity: 0; } 30% { opacity: 1; } }
+
+  header { position: relative; z-index: 2; display: flex; align-items: center; gap: 8px; height: 70px; }
+  .logo { font: 400 22px var(--display); margin-right: auto; }
+  .logo span { color: var(--red); }
+  .skew { position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0 16px; font: 900 italic 15px var(--sans); text-transform: uppercase; letter-spacing: 0.02em; isolation: isolate; }
+  .skew::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: skewX(-14deg) scaleX(0); transform-origin: left; transition: transform 220ms var(--cut); }
+  .skew:hover { color: var(--paper); } .skew:hover::before { transform: skewX(-14deg) scaleX(1); }
+  .skew.solid { color: var(--paper); } .skew.solid::before { background: var(--red); transform: skewX(-14deg); }
+  .skew.solid:hover::before { background: var(--ink); }
+  .skew:active { transform: scale(0.97); transition: transform 150ms ease; }
+
+  .hero { position: relative; overflow: hidden; padding: 30px 0 120px; }
+  .hero .bg { position: absolute; inset: 0; background: var(--red); clip-path: polygon(52% 0, 100% 0, 100% 100%, 34% 100%); }
+  .hero .bg::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgb(0 0 0 / 0.25) 1.4px, transparent 1.6px); background-size: 9px 9px; }
+  .hero .ghost { position: absolute; right: -2%; top: 8%; font: 400 300px/1 var(--display); color: var(--ink); opacity: 0.12; writing-mode: vertical-rl; animation: drift 24s linear infinite alternate; }
+  @keyframes drift { to { transform: translateY(-80px); } }
+  .hero .wrap { position: relative; }
+  .kicker { display: inline-block; max-width: 100%; background: var(--ink); color: var(--paper); font: 900 italic 14px var(--sans); text-transform: uppercase; padding: 6px 14px; transform: rotate(-3deg) skewX(-10deg); margin: 30px 0 18px; }
+  h1 { font: 400 clamp(64px, 12.5vw, 184px)/0.86 var(--display); margin: 0; letter-spacing: -0.02em; transform: rotate(-5deg); transform-origin: left; }
+  h1 .l { display: block; } h1 .l:nth-child(2) { margin-left: 0.5em; -webkit-text-stroke: 3px var(--ink); color: var(--paper); }
+  h1 .c { display: inline-block; }
+  .started h1 .c { animation: slam 260ms var(--out) backwards; animation-delay: calc(var(--i) * 45ms); }
+  .tagline { position: relative; margin: 54px 0 0 6%; max-width: 520px; background: var(--paper); border: 3px solid var(--ink); padding: 18px 22px; box-shadow: 10px 10px 0 var(--ink); transform: rotate(-2deg); }
+  .started .tagline { animation: card 420ms var(--snap) 500ms backwards; } @keyframes card { from { opacity: 0; transform: rotate(-12deg) translateX(-60px); } }
+  .tagline p { margin: 0 0 14px; font-size: 17px; }
+  .tagline .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tape-wrap { overflow: hidden; padding: 22px 0; margin: -40px 0 0; position: relative; z-index: 1; }
+  .tape { background: var(--ink); color: var(--paper); transform: rotate(-3deg); margin: 0 -40px; }
+  .tape .run { display: flex; width: max-content; animation: marquee 22s linear infinite; }
+  .tape span { font: 400 30px/64px var(--display); padding-right: 36px; white-space: nowrap; } .tape span b { font-weight: 400; color: var(--red); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .paused, .paused * { animation-play-state: paused !important; }
+
+  section { padding: 96px 0; position: relative; overflow-x: clip; }
+  .sh { display: flex; align-items: end; gap: 22px; margin-bottom: 40px; flex-wrap: wrap; }
+  .sh h2 { margin: 0; font: 400 clamp(44px, 6vw, 80px)/0.9 var(--display); letter-spacing: -0.02em; }
+  .sh .jp { font: 400 18px var(--display); background: var(--red); color: var(--paper); padding: 4px 10px; transform: rotate(-4deg); }
+  [data-cut] .slam-in { opacity: 0; transform: translateX(-80px) skewX(-12deg); } [data-cut].in .slam-in { opacity: 1; transform: none; transition: opacity 200ms ease, transform 420ms var(--snap); }
+
+  /* Rule index: huge count, slanted menu, star cut-in */
+  .menu { display: grid; grid-template-columns: 1fr 420px; gap: 40px; align-items: start; }
+  .count { display: flex; align-items: end; gap: 14px; margin-bottom: 20px; }
+  .count b { font: 400 140px/0.8 var(--display); color: var(--red); letter-spacing: -0.04em; font-weight: 400; }
+  .count span { font: 900 italic 16px/1.2 var(--sans); text-transform: uppercase; padding-bottom: 6px; }
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .search { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; border: 3px solid var(--ink); transform: skewX(-10deg); flex: 1 1 260px; background: var(--paper); }
+  .search > * { transform: skewX(10deg); }
+  .search:focus-within { box-shadow: 6px 6px 0 var(--red); }
+  .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 700 16px var(--sans); color: var(--ink); }
+  .search kbd { font: 700 12px var(--sans); border: 2px solid var(--ink); padding: 0 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 26px; }
+  .chips button { border: 0; background: none; cursor: pointer; color: var(--ink); }
+  .chips button b { font-weight: 900; color: var(--red); margin-left: 6px; font-style: normal; }
+  .chips button[aria-pressed="true"] { color: var(--paper); } .chips button[aria-pressed="true"]::before { transform: skewX(-14deg) scaleX(1); }
+  .chips button[aria-pressed="true"] b { color: var(--paper); }
+  #list { display: grid; gap: 6px; }
+  .opt { position: relative; display: grid; grid-template-columns: 64px 1fr auto; gap: 16px; align-items: center; padding: 10px 22px; color: var(--paper); isolation: isolate; transform: translateX(calc(var(--i) * -3px)); transition: opacity 160ms ease, transform 200ms var(--snap); }
+  .opt::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: skewX(-14deg); transition: background-color 120ms ease; }
+  .opt .n { font: 400 22px var(--display); color: var(--red); } .opt .t { font: 900 20px/1.15 var(--sans); letter-spacing: -0.01em; } .opt .c { font: 900 italic 12px var(--sans); text-transform: uppercase; opacity: 0.7; }
+  #list:hover .opt:not(.on), #list:focus-within .opt:not(.on) { opacity: 0.28; }
+  .opt.on { transform: translateX(18px) scale(1.02); } .opt.on::before { background: var(--red); } .opt.on .n { color: var(--paper); }
+  .opt:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+  .dealt .opt { animation: deal 300ms var(--snap) backwards; animation-delay: calc(var(--i) * 28ms); } @keyframes deal { from { opacity: 0; transform: translateX(-120px) skewX(-20deg); } }
+  .empty { font: 900 italic 18px var(--sans); padding: 20px 0; }
+  .more { margin-top: 22px; border: 0; background: none; cursor: pointer; }
+
+  .pick { position: sticky; top: 30px; height: 520px; }
+  .burst { position: absolute; inset: 0; background: var(--red); display: grid; place-items: center; }
+  .burst.hit { animation: burst 340ms var(--snap); } @keyframes burst { from { transform: scale(0.4) rotate(-30deg); } }
+  .burst span { font: 400 190px/1 var(--display); color: var(--ink); transform: rotate(-8deg); opacity: 0.85; }
+  .pick .card { position: absolute; left: 10%; right: 4%; bottom: 30px; background: var(--paper); border: 3px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); padding: 18px 20px; transform: rotate(-3deg); }
+  .pick .card.hit { animation: card 360ms var(--snap); }
+  .pick .card .no { font: 400 14px var(--display); color: var(--red); }
+  .pick .card h3 { margin: 2px 0 8px; font: 900 28px/1.05 var(--sans); letter-spacing: -0.02em; }
+  .pick .card p { margin: 0 0 12px; font-size: 15px; }
+  .pick .card .meta { display: flex; justify-content: space-between; font: 900 italic 12px var(--sans); text-transform: uppercase; }
+  .pick .card .meta b { color: var(--red); }
+
+  .exp { background: var(--ink); color: var(--paper); clip-path: polygon(0 6%, 100% 0, 100% 94%, 0 100%); padding: 140px 0; }
+  .exp .sh .jp { background: var(--paper); color: var(--ink); }
+  .row { display: grid; grid-template-columns: 220px 1fr 260px; gap: 28px; align-items: center; padding: 22px 0; border-top: 3px solid #2a2a2a; }
+  .row:nth-child(even) { transform: rotate(0.6deg); } .row:nth-child(odd) { transform: rotate(-0.6deg); }
+  .row h3 { margin: 0; font: 400 28px/1 var(--display); } .row h3 small { display: block; font: 900 italic 13px var(--sans); text-transform: uppercase; color: var(--grey); margin-top: 8px; }
+  .row p { margin: 0; color: #d8d8d8; max-width: 60ch; }
+  .row .big { font: 400 72px/0.9 var(--display); color: var(--red); text-align: right; letter-spacing: -0.03em; }
+  [data-cut] .row { opacity: 0; translate: -60px 0; } [data-cut].in .row { opacity: 1; translate: 0 0; transition: opacity 200ms ease, translate 460ms var(--snap); }
+  [data-cut].in .row:nth-child(2) { transition-delay: 80ms; } [data-cut].in .row:nth-child(3) { transition-delay: 160ms; } [data-cut].in .row:nth-child(4) { transition-delay: 240ms; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .plist a { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 3px solid var(--ink); font: 900 22px var(--sans); letter-spacing: -0.01em; transition: color 120ms ease, padding-left 200ms var(--snap); }
+  .plist a span:last-child { font: 900 italic 12px var(--sans); text-transform: uppercase; color: var(--grey); }
+  .plist a:hover { color: var(--red); padding-left: 14px; }
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack span { font: 900 15px var(--sans); padding: 6px 12px; border: 3px solid var(--ink); transform: rotate(var(--r)); transition: background-color 120ms ease, color 120ms ease; } .stack span:hover { background: var(--ink); color: var(--paper); }
+
+  .close { position: relative; overflow: hidden; background: var(--red); color: var(--paper); padding: 120px 0; }
+  .close .ghost { position: absolute; right: -40px; bottom: -80px; font: 400 360px/1 var(--display); color: var(--ink); opacity: 0.2; }
+  .close h2 { position: relative; font: 400 clamp(44px, 7vw, 104px)/0.92 var(--display); margin: 0 0 30px; transform: rotate(-3deg); max-width: 12ch; }
+  .close .skew::before { background: var(--ink); transform: skewX(-14deg); } .close .skew:hover::before { background: var(--paper); } .close .skew:hover { color: var(--ink); }
+  .close .skew { height: 58px; font-size: 20px; padding: 0 26px; }
+  footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font: 900 italic 13px var(--sans); text-transform: uppercase; padding: 22px 36px; background: var(--ink); color: var(--paper); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-property: opacity, color, background-color, border-color !important; }
+    [data-cut] .slam-in, [data-cut] .row { transform: none !important; translate: none !important; }
+    .opt.on { transform: none; }
+  }
+  @media (max-width: 960px) {
+    .wrap { padding: 0 18px; } header .skew:not(.solid) { display: none; }
+    .hero .bg { clip-path: polygon(70% 0, 100% 0, 100% 100%, 40% 100%); } .hero .ghost { font-size: 180px; }
+    h1 { font-size: 14vw; } h1 .l:nth-child(2) { margin-left: 0.2em; -webkit-text-stroke-width: 2px; } .tagline { margin-left: 0; }
+    .menu, .two { grid-template-columns: 1fr; } .pick { display: none; }
+    .opt, .opt.on { grid-template-columns: 48px 1fr; transform: none; } .opt .c { display: none; } .opt .t { font-size: 17px; }
+    .count b { font-size: 96px; }
+    .row { grid-template-columns: 1fr; gap: 8px; } .row .big { text-align: left; font-size: 56px; }
+    .close .ghost { font-size: 220px; }
+  }
+</style>
+</head>
+<body>
+<div id="intro" aria-hidden="true">
+  <div class="slab"></div>
+  <div class="big"><span style="--i:0">経</span><span style="--i:1">験</span><span style="--i:2">則</span></div>
+  <div class="stamp">FAQIH MUNTASHIR · 38 RULES</div>
+  <div class="flash"></div>
+</div>
+
+<div class="hero">
+  <div class="bg"></div>
+  <div class="ghost" aria-hidden="true">ファキ</div>
+  <div class="wrap">
+    <header><a class="logo" href="#">FAQIH<span>.</span></a><a class="skew" href="#rules">Rules</a><a class="skew" href="#work">Work</a><a class="skew" href="#projects">Projects</a><a class="skew solid" href="mailto:itsfaqih@gmail.com">Email me</a></header>
+    <div class="kicker">Full-stack engineer · Yogyakarta · <span id="clock">--:--</span> WIB</div>
+    <h1 id="h1"><span class="l">Faqih</span><span class="l">Muntashir</span></h1>
+    <div class="tagline"><p>I've spent 5+ years building web products in healthcare, SaaS, and internal tools. Right now I'm at EvidenceCare, building healthcare software for the US market.</p>
+      <div class="acts"><a class="skew solid" href="mailto:itsfaqih@gmail.com">itsfaqih@gmail.com</a><a class="skew" href="https://github.com/itsfaqih">GitHub</a><a class="skew" href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a></div></div>
+  </div>
+</div>
+
+<div class="tape-wrap" aria-hidden="true"><div class="tape" data-loop><div class="run"><span><b>経験則</b> RULE OF THUMB ／</span><span>SHIP IT <b>出撃</b> ／</span><span><b>経験則</b> RULE OF THUMB ／</span><span>SHIP IT <b>出撃</b> ／</span><span><b>経験則</b> RULE OF THUMB ／</span><span>SHIP IT <b>出撃</b> ／</span><span><b>経験則</b> RULE OF THUMB ／</span><span>SHIP IT <b>出撃</b> ／</span></div></div></div>
+
+<section id="rules">
+  <div class="wrap">
+    <div class="sh" data-cut><h2 class="slam-in">Rule of Thumb</h2><span class="jp slam-in">経験則</span></div>
+    <div class="menu">
+      <div>
+        <div class="count"><b id="total">0</b><span>rules on file.<br>Opinions earned in code review.</span></div>
+        <div class="tools"><label class="search"><input id="q" type="search" placeholder="Search rules" aria-label="Search rules"><kbd>/</kbd></label></div>
+        <div class="chips" id="chips"></div>
+        <div id="list"></div>
+        <div class="empty" id="empty" hidden>Nothing for "<q></q>". Yet.</div>
+        <button class="skew more" id="more">Show all</button>
+      </div>
+      <div class="pick" aria-live="polite">
+        <div class="burst" id="burst"><span id="p-jp">記</span></div>
+        <div class="card" id="p-card"><div class="no" id="p-no"></div><h3 id="p-t"></h3><p id="p-s"></p><div class="meta"><span id="p-c"></span><b id="p-d"></b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="exp" id="work">
+  <div class="wrap">
+    <div class="sh" data-cut><h2 class="slam-in">Work</h2><span class="jp slam-in">経歴</span></div>
+    <div data-cut>
+      <div class="row"><h3>EvidenceCare<small>Software Engineer · 2024 → now</small></h3><p>I designed an MCP server and a linter that cut dev time per component. That saves about $15K a month. Deploys went from hours to minutes.</p><div class="big">−<span data-count="66">0</span>%</div></div>
+      <div class="row"><h3>Vestis Labs<small>Full Stack · 2023 → 2024</small></h3><p>I simplified the code structure by co-locating code. The image annotator moved to direct DOM rendering and now works on phones.</p><div class="big"><span data-count="80">0</span>%+</div></div>
+      <div class="row"><h3>Jatis Mobile<small>Full Stack · 2022 → 2023</small></h3><p>I built a client-side chatbot with XState and led 4 developers on a flow builder. Top performer, Q4 2022.</p><div class="big">$0</div></div>
+      <div class="row"><h3>Rapidev<small>Founding Eng · 2021 → 2022</small></h3><p>I fixed N+1 queries to speed up dashboards and managed 10 people across 3 startups. Before that, frontend at Mitra Integrasi.</p><div class="big">−<span data-count="80">0</span>%</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="wrap two">
+    <div data-cut><div class="sh"><h2 class="slam-in">Projects</h2><span class="jp slam-in">作品</span></div>
+      <div class="plist"><a href="https://schemata.ruine.app/"><span>Schemata</span><span>ERD builder</span></a><a href="https://github.com/ruine-dev/ruine-ui-dashboard"><span>ruine UI Dashboard</span><span>Astro</span></a><a href="https://github.com/itsfaqih/fama"><span>Fama</span><span>Template</span></a><a href="#"><span>PHPID Learning</span><span>Design</span></a><a href="#"><span>React Indonesia</span><span>Design</span></a></div></div>
+    <div data-cut><div class="sh"><h2 class="slam-in">Stack</h2><span class="jp slam-in">道具</span></div>
+      <div class="stack" id="stack"></div></div>
+  </div>
+</section>
+
+<div class="close" data-cut>
+  <div class="ghost" aria-hidden="true">連絡</div>
+  <div class="wrap"><h2 class="slam-in">Have a product that needs this level of care?</h2><a class="skew solid slam-in" href="mailto:itsfaqih@gmail.com">itsfaqih@gmail.com →</a></div>
+</div>
+<footer><span>© 2026 Faqih Muntashir</span><span>Printed in TanStack Start</span></footer>
+
+<script src="rules-data.js"></script>
+<script src="trailer.js"></script>
+<script>
+  const T = window.Trailer;
+  const JP = { 'Code writing': '記', 'UX design': '体', 'Architecture': '設', 'Testing': '試', 'Accessibility': '利' };
+  T.clock(document.getElementById('clock'));
+  let ci = 0;
+  document.querySelectorAll('#h1 .l').forEach((l) => (l.innerHTML = [...l.textContent].map((c) => `<span class="c" style="--i:${ci++}">${c}</span>`).join('')));
+  document.getElementById('stack').innerHTML = 'TypeScript React TanStack Effect XState Base-UI Node.js Laravel PostgreSQL Redis Vitest Playwright Docker Figma'.split(' ').map((s, i) => `<span style="--r:${[-2, 1.5, -1, 2.5, 0][i % 5]}deg">${s.replace('-', ' ')}</span>`).join('');
+
+  // Starburst: 16 points, cut once with clip-path.
+  const pts = Array.from({ length: 32 }, (_, i) => { const a = (i / 32) * Math.PI * 2, r = i % 2 ? 36 : 50; return `${50 + Math.cos(a) * r}% ${50 + Math.sin(a) * r}%`; });
+  const burst = document.getElementById('burst'); burst.style.clipPath = `polygon(${pts.join(',')})`;
+
+  T.intro(1900);
+  T.cuts();
+  const exp = document.querySelector('#work [data-cut]:not(.sh)');
+  new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { exp.querySelectorAll('[data-count]').forEach((n) => T.countUp(n, +n.dataset.count)); o.disconnect(); } }), { threshold: 0.3 }).observe(exp);
+
+  const list = document.getElementById('list'), card = document.getElementById('p-card');
+  const hit = (el) => { el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); };
+  const show = (r) => {
+    if (!r) return;
+    document.getElementById('p-jp').textContent = JP[r.cat];
+    document.getElementById('p-no').textContent = 'No. ' + String(r.id).padStart(3, '0');
+    document.getElementById('p-t').textContent = r.title;
+    document.getElementById('p-s').textContent = r.sum;
+    document.getElementById('p-c').textContent = r.cat;
+    document.getElementById('p-d').textContent = r.demo ? 'Live demo' : r.added;
+    hit(burst); hit(card);
+  };
+  const total = document.getElementById('total');
+  let seen = false;
+  T.index({
+    list, search: document.getElementById('q'), chips: document.getElementById('chips'), more: document.getElementById('more'), empty: document.getElementById('empty'), pageSize: 10,
+    chip: (c, n, on) => `<button class="skew" data-cat="${c}" aria-pressed="${on}">${c === 'All' ? 'All' : c}<b>${n}</b></button>`,
+    render: (r, i) => `<a class="opt${i === 0 ? ' on' : ''}" href="#" data-id="${r.id}" style="--i:${Math.min(i, 9)}"><span class="n">${String(r.id).padStart(3, '0')}</span><span class="t">${r.title}</span><span class="c">${r.cat}</span></a>`,
+    onRender: (shown, items) => { show(shown[0]); total.dataset.n = items.length; if (seen) T.countUp(total, items.length, 400, 3); else total.textContent = String(items.length).padStart(3, '0'); },
+  });
+  // The big count rolls up the first time it is seen, then follows the filter.
+  new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { seen = true; T.countUp(total, +total.dataset.n, 900, 3); o.disconnect(); } })).observe(total);
+  const pick = (a) => { if (!a || a.classList.contains('on')) return; list.querySelectorAll('.on').forEach((x) => x.classList.remove('on')); a.classList.add('on'); show(RULES.find((r) => r.id === +a.dataset.id)); };
+  list.addEventListener('pointerover', (e) => pick(e.target.closest('[data-id]')));
+  list.addEventListener('focusin', (e) => pick(e.target.closest('[data-id]')));
+</script>
+</body>
+</html>

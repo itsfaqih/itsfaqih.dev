@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faqih Muntashir · v3 Codex</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #07071a; --win: #0d0d3a; --win-2: #14145a; --edge: #f2f2f2; --text: #f2f2f2; --dim: #9a9ac4; --mute: #5d5d8c;
+    --gold: #ffd34d; --hp: #5ef08a; --mp: #59b8ff; --red: #ff5a6a;
+    --px: "DotGothic16", monospace; --sans: "Inter", system-ui, sans-serif;
+    --cut: cubic-bezier(.83,0,.17,1); --out: cubic-bezier(.16,1,.3,1);
+  }
+  * { box-sizing: border-box; }
+  html { overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(1px 1px at 20% 30%, #fff8, transparent), radial-gradient(1px 1px at 70% 10%, #fff6, transparent), radial-gradient(1px 1px at 40% 80%, #fff5, transparent), radial-gradient(1px 1px at 85% 60%, #fff7, transparent), radial-gradient(1px 1px at 10% 70%, #fff4, transparent); background-size: 320px 320px; animation: twinkle 3s steps(3) infinite; }
+  @keyframes twinkle { 50% { opacity: 0.5; } }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 32px; }
+  .px { font-family: var(--px); letter-spacing: 0.02em; }
+
+  /* Classic RPG window: double edge, rounded, deep blue gradient */
+  .win { position: relative; background: linear-gradient(180deg, var(--win-2), var(--win)); border: 3px solid var(--edge); border-radius: 10px; box-shadow: 0 0 0 3px #000, inset 0 0 0 2px #000; padding: 20px 22px; }
+  .win-t { position: absolute; top: -14px; left: 16px; padding: 0 8px; background: var(--bg); font: 400 14px var(--px); color: var(--gold); }
+  [data-cut] .win, [data-cut].win { clip-path: inset(50% 0 50% 0); }
+  [data-cut].in .win, [data-cut].in.win { clip-path: inset(-20px -20px -20px -20px); transition: clip-path 420ms steps(6); }
+
+  /* ---------- Intro: title screen ---------- */
+  #intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; cursor: pointer; overflow: hidden; }
+  #intro .cells { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(10, 1fr); }
+  #intro .cells i { background: #000; transition: transform 160ms steps(2); transition-delay: var(--d); }
+  #intro.out .cells i { transform: scale(0); }
+  #intro .stage { position: relative; z-index: 1; text-align: center; transition: opacity 120ms steps(2); } #intro.out .stage { opacity: 0; }
+  #intro .jp { font: 400 clamp(44px, 9vw, 104px)/1.1 var(--px); color: var(--text); text-shadow: 4px 4px 0 var(--red), 8px 8px 0 #000; }
+  #intro .jp span { display: inline-block; opacity: 0; }
+  #intro.play .jp span { animation: drop 360ms steps(4) forwards; animation-delay: calc(200ms + var(--i) * 110ms); }
+  @keyframes drop { from { opacity: 1; transform: translateY(-80px); } to { opacity: 1; transform: none; } }
+  #intro .en { font: 400 18px var(--px); color: var(--gold); letter-spacing: 0.3em; margin-top: 12px; opacity: 0; }
+  #intro.play .en { animation: show 1ms 1000ms forwards; }
+  #intro .start { font: 400 16px var(--px); margin-top: 44px; opacity: 0; }
+  #intro.play .start { animation: show 1ms 1300ms forwards, blink 600ms steps(2) 1300ms infinite; }
+  @keyframes show { to { opacity: 1; } }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  header { display: flex; align-items: center; gap: 20px; height: 76px; font: 400 15px var(--px); }
+  header .lv { color: var(--gold); }
+  header nav { display: flex; gap: 6px; margin-left: auto; }
+  .mi { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 22px; border-radius: 4px; color: var(--text); font: 400 15px var(--px); background: none; border: 0; cursor: pointer; }
+  .mi::before { content: "▶"; position: absolute; left: 4px; font-size: 11px; color: var(--gold); opacity: 0; }
+  .mi:hover::before, .mi:focus-visible::before, .mi.on::before { opacity: 1; animation: nudge 500ms steps(2) infinite; }
+  .mi:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  @keyframes nudge { 50% { transform: translateX(3px); } }
+
+  .hero { display: grid; grid-template-columns: 1fr 380px; gap: 28px; padding: 40px 0 64px; align-items: start; }
+  h1 { font: 400 56px/1.12 var(--px); margin: 10px 0 0; }
+  h1 .gold { color: var(--gold); }
+  .started h1 .ln { display: block; animation: drop 420ms steps(5) backwards; } .started h1 .ln:nth-child(2) { animation-delay: 120ms; }
+  .dialog { margin-top: 28px; min-height: 160px; }
+  .dialog .who { font: 400 14px var(--px); color: var(--gold); margin-bottom: 6px; }
+  .dialog p { margin: 0; font: 400 18px/1.7 var(--px); color: var(--text); min-height: 3.4em; }
+  .dialog .next { position: absolute; right: 16px; bottom: 10px; color: var(--gold); animation: bob 700ms steps(2) infinite; }
+  @keyframes bob { 50% { transform: translateY(4px); } }
+  .choices { display: flex; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
+  .btn { position: relative; display: inline-flex; align-items: center; height: 46px; padding: 0 18px 0 30px; font: 400 16px var(--px); color: var(--text); background: var(--win); border: 3px solid var(--edge); border-radius: 8px; box-shadow: 0 0 0 2px #000; cursor: pointer; transition: transform 120ms steps(2), background-color 120ms ease; }
+  .btn::before { content: "▶"; position: absolute; left: 11px; font-size: 11px; color: var(--gold); opacity: 0.3; }
+  .btn:hover { background: var(--win-2); } .btn:hover::before, .btn:focus-visible::before { opacity: 1; animation: nudge 500ms steps(2) infinite; }
+  .btn:active { transform: translateY(2px); }
+  .btn.gold { background: var(--gold); color: #000; border-color: #fff; } .btn.gold::before { color: #000; opacity: 1; }
+
+  .status .name { display: flex; justify-content: space-between; font: 400 22px var(--px); }
+  .status .name em { font-style: normal; color: var(--gold); font-size: 15px; align-self: center; }
+  .status .cls { font: 400 14px var(--px); color: var(--dim); margin-bottom: 14px; }
+  .bar { display: grid; grid-template-columns: 34px 1fr 72px; gap: 10px; align-items: center; font: 400 14px var(--px); margin: 8px 0; }
+  .bar .track { height: 12px; border: 2px solid var(--edge); background: #000; padding: 1px; }
+  .bar .fill { height: 100%; width: var(--w); background: var(--c); transform-origin: left; }
+  .started .bar .fill { animation: fill 900ms steps(12) 300ms backwards; } @keyframes fill { from { transform: scaleX(0); } }
+  .bar span:last-child { text-align: right; color: var(--dim); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; margin-top: 14px; padding-top: 12px; border-top: 2px dashed var(--mute); font: 400 14px var(--px); }
+  .stats div { display: flex; justify-content: space-between; } .stats b { font-weight: 400; color: var(--gold); }
+
+  .ticker-wrap { overflow: hidden; border-block: 3px solid var(--edge); background: #000; }
+  .ticker { display: flex; width: max-content; animation: marquee 30s linear infinite; font: 400 22px/52px var(--px); }
+  .ticker span { padding-right: 48px; white-space: nowrap; } .ticker span b { font-weight: 400; color: var(--gold); margin-right: 12px; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .paused, .paused * { animation-play-state: paused !important; }
+
+  section { padding: 72px 0; }
+  h2 { font: 400 34px/1.2 var(--px); margin: 0; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  h2 small { font-size: 15px; color: var(--gold); }
+  .sh { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 30px; flex-wrap: wrap; }
+  .disc { font: 400 14px var(--px); color: var(--dim); min-width: 260px; }
+  .disc .track { height: 14px; border: 2px solid var(--edge); background: #000; padding: 1px; margin-top: 6px; display: grid; grid-template-columns: repeat(100, 1fr); gap: 1px; }
+  .disc .track i { background: #222255; } .disc .track i.got { background: var(--gold); }
+
+  .codex { display: grid; grid-template-columns: 200px 1fr 360px; gap: 22px; align-items: start; }
+  .tabs { display: grid; gap: 2px; }
+  .tabs .mi { justify-content: space-between; width: 100%; padding: 8px 10px 8px 24px; }
+  .tabs .mi b { font-weight: 400; color: var(--dim); }
+  .tabs .mi[aria-pressed="true"] { background: rgb(255 211 77 / 0.12); color: var(--gold); }
+  .tabs .mi[aria-pressed="true"]::before { opacity: 1; }
+  .search { display: flex; align-items: center; gap: 10px; font: 400 15px var(--px); color: var(--gold); margin-bottom: 12px; padding: 6px 10px; border-bottom: 2px dashed var(--mute); }
+  .search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--text); font: inherit; }
+  .search input::placeholder { color: var(--mute); }
+  .search kbd { font: inherit; font-size: 12px; color: var(--dim); border: 2px solid var(--mute); border-radius: 4px; padding: 0 6px; }
+  #list { display: grid; }
+  .ent { display: grid; grid-template-columns: 42px 1fr auto; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 7px 10px 7px 26px; }
+  .ent .no { color: var(--mute); } .ent .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ent .star { color: var(--gold); font-size: 13px; }
+  .ent.on { background: rgb(255 255 255 / 0.06); } .ent.on .no { color: var(--gold); }
+  .dealt .ent { animation: deal 200ms steps(3) backwards; animation-delay: calc(var(--i) * 22ms); } @keyframes deal { from { opacity: 0; transform: translateX(-12px); } }
+  .empty { font: 400 15px var(--px); color: var(--dim); padding: 14px 10px; }
+  .more { margin-top: 14px; }
+  .detail { position: sticky; top: 24px; }
+  .detail .art { height: 160px; display: grid; place-items: center; border: 2px dashed var(--mute); border-radius: 6px; margin-bottom: 14px; font: 400 96px/1 var(--px); color: var(--gold); text-shadow: 4px 4px 0 var(--red); overflow: hidden; }
+  .detail .art.pop span { display: inline-block; animation: pop 260ms steps(4); } @keyframes pop { from { transform: scale(0.3) rotate(-8deg); } }
+  .detail h3 { margin: 0 0 4px; font: 400 22px/1.3 var(--px); }
+  .detail .cat { font: 400 13px var(--px); color: var(--mp); margin-bottom: 10px; }
+  .detail p { margin: 0; font: 400 16px/1.7 var(--px); color: var(--text); min-height: 5.1em; }
+  .detail .meta { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 10px; border-top: 2px dashed var(--mute); font: 400 13px var(--px); color: var(--dim); }
+  .detail .meta b { font-weight: 400; color: var(--gold); }
+  .help { margin-top: 10px; font: 400 12px var(--px); color: var(--mute); text-align: center; }
+
+  .quests { display: grid; gap: 18px; }
+  .quest { display: grid; grid-template-columns: 1fr 180px; gap: 18px; align-items: center; }
+  .quest h3 { margin: 0; font: 400 22px var(--px); } .quest h3 span { color: var(--dim); font-size: 14px; margin-left: 10px; }
+  .quest p { margin: 6px 0 0; color: #cfd0ee; font-size: 15px; max-width: 62ch; }
+  .reward { text-align: right; font-family: var(--px); }
+  .reward small { display: block; font-size: 12px; color: var(--dim); }
+  .reward b { font-weight: 400; font-size: 34px; color: var(--hp); }
+  .stamp { position: absolute; right: 18px; top: -12px; font: 400 13px var(--px); color: var(--bg); background: var(--gold); padding: 0 8px; border-radius: 3px; transform: rotate(4deg); }
+  .in .stamp { animation: stamp 300ms steps(3) 300ms backwards; } @keyframes stamp { from { transform: scale(2.4) rotate(-12deg); opacity: 0; } }
+
+  .grid2 { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
+  .inv { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .inv .mi { justify-content: space-between; width: 100%; padding: 8px 10px 8px 24px; } .inv .mi span:last-child { color: var(--dim); font-size: 12px; }
+  .skills { display: grid; gap: 10px; font-size: 15px; }
+  .skills div { display: grid; grid-template-columns: 70px 1fr; gap: 10px; } .skills dt { font: 400 14px var(--px); color: var(--gold); } .skills dd { margin: 0; color: #cfd0ee; }
+  .end { margin: 24px 0 56px; }
+  .end p { margin: 0 0 18px; font: 400 26px/1.5 var(--px); }
+  footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font: 400 13px var(--px); color: var(--mute); padding-bottom: 32px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-property: opacity, color, background-color, border-color !important; }
+    [data-cut] .win, [data-cut].win { clip-path: none !important; }
+  }
+  @media (max-width: 960px) {
+    .wrap { padding: 0 18px; } header nav { display: none; }
+    .hero, .grid2, .codex { grid-template-columns: 1fr; } h1 { font-size: 38px; }
+    .detail, .help { display: none; } .tabs { grid-template-columns: 1fr 1fr; } .tabs .mi { font-size: 13px; }
+    .quest { grid-template-columns: 1fr; } .reward { text-align: left; } .inv { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="intro" aria-hidden="true">
+  <div class="cells" id="cells"></div>
+  <div class="stage">
+    <div class="jp" id="intro-jp"></div>
+    <div class="en">FAQIH'S CODEX OF RULES</div>
+    <div class="start">PRESS START</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header><span>FAQIH</span><span class="lv">LV 05</span><span style="color:var(--dim)">FULL-STACK · <span id="clock">--:--</span> WIB</span>
+    <nav><a class="mi" href="#rules">Codex</a><a class="mi" href="#work">Quests</a><a class="mi" href="#projects">Items</a><a class="mi" href="mailto:itsfaqih@gmail.com">Talk</a></nav></header>
+
+  <div class="hero">
+    <div>
+      <h1><span class="ln">I keep a codex of</span><span class="ln">every <span class="gold">rule</span> I've earned.</span></h1>
+      <div class="win dialog"><div class="who">FAQIH</div><p id="say"></p><span class="next">▼</span></div>
+      <div class="choices"><a class="btn gold" href="mailto:itsfaqih@gmail.com">Send a message</a><a class="btn" href="#rules">Open the codex</a><a class="btn" href="https://github.com/itsfaqih">GitHub</a></div>
+    </div>
+    <div class="win status">
+      <span class="win-t">STATUS</span>
+      <div class="name"><span>FAQIH</span><em>LV 05</em></div>
+      <div class="cls">Software Engineer · EvidenceCare</div>
+      <div class="bar"><span>HP</span><div class="track"><div class="fill" style="--w:92%;--c:var(--hp)"></div></div><span>920/999</span></div>
+      <div class="bar"><span>MP</span><div class="track"><div class="fill" style="--w:74%;--c:var(--mp)"></div></div><span>740/999</span></div>
+      <div class="bar"><span>EXP</span><div class="track"><div class="fill" style="--w:38%;--c:var(--gold)"></div></div><span>38 rules</span></div>
+      <div class="stats"><div>TypeScript<b>99</b></div><div>React<b>97</b></div><div>Effect<b>82</b></div><div>XState<b>88</b></div><div>Laravel<b>80</b></div><div>Figma<b>76</b></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker-wrap" data-loop aria-hidden="true"><div class="ticker"><span><b>経験則</b>RULE OF THUMB</span><span><b>★</b>NEW ENTRY ADDED</span><span><b>図鑑</b>CODEX</span><span><b>冒険</b>QUEST LOG</span><span><b>経験則</b>RULE OF THUMB</span><span><b>★</b>NEW ENTRY ADDED</span><span><b>図鑑</b>CODEX</span><span><b>冒険</b>QUEST LOG</span><span><b>経験則</b>RULE OF THUMB</span><span><b>★</b>NEW ENTRY ADDED</span><span><b>図鑑</b>CODEX</span><span><b>冒険</b>QUEST LOG</span></div></div>
+
+<div class="wrap">
+  <section id="rules">
+    <div class="sh"><h2>Rule of Thumb <small>経験則 · codex</small></h2>
+      <div class="disc"><span id="disc">38</span> / 100 discovered · <span id="total">0</span> shown<div class="track" id="disc-track"></div></div></div>
+    <div class="codex">
+      <div class="tabs" id="chips" aria-label="Filter by category"></div>
+      <div class="win" data-cut style="padding:14px 10px">
+        <label class="search"><span>?</span><input id="q" type="search" placeholder="search the codex" aria-label="Search rules"><kbd>/</kbd></label>
+        <div id="list"></div>
+        <div class="empty" id="empty" hidden>No entry for "<q></q>". Not discovered yet.</div>
+        <button class="btn more" id="more">Show all</button>
+      </div>
+      <div class="detail">
+        <div class="win" aria-live="polite"><span class="win-t" id="d-no">No.001</span>
+          <div class="art" id="d-art"><span>記</span></div>
+          <h3 id="d-t">—</h3><div class="cat" id="d-c"></div><p id="d-s"></p>
+          <div class="meta"><span id="d-a"></span><b id="d-demo"></b></div>
+        </div>
+        <div class="help">↑ ↓ move · / search · hover to inspect</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="sh"><h2>Quest log <small>冒険の記録</small></h2></div>
+    <div class="quests">
+      <div class="win quest" data-cut><span class="win-t">MAIN QUEST · 2024 → NOW</span><span class="stamp">IN PROGRESS</span><div><h3>EvidenceCare<span>Software Engineer</span></h3><p>I designed an MCP server and a linter that cut dev time per component. That saves about $15K a month. Deploys went from hours to minutes, and Docker images got 30% smaller.</p></div><div class="reward"><small>REWARD</small><b>−<span data-count="66">0</span>%</b></div></div>
+      <div class="win quest" data-cut><span class="win-t">2023 → 2024</span><span class="stamp">CLEAR</span><div><h3>Vestis Labs<span>Full Stack Engineer</span></h3><p>I co-located code and removed abstractions. The image annotator moved to direct DOM rendering, so it now works on phones.</p></div><div class="reward"><small>REWARD</small><b><span data-count="80">0</span>%+</b></div></div>
+      <div class="win quest" data-cut><span class="win-t">2022 → 2023</span><span class="stamp">CLEAR</span><div><h3>Jatis Mobile<span>Full Stack Engineer</span></h3><p>I built a chatbot client-side in XState and led 4 developers on a flow builder. Top performer, Q4 2022.</p></div><div class="reward"><small>REWARD</small><b>$0</b></div></div>
+      <div class="win quest" data-cut><span class="win-t">2020 → 2022 · SIDE QUESTS</span><span class="stamp">CLEAR</span><div><h3>Rapidev · Mitra Integrasi<span>Founding Engineer, Frontend</span></h3><p>I fixed N+1 queries so dashboards load 80% faster, and managed 10 people across 3 startups. Before that: JWT auth and admin UI designed in Figma.</p></div><div class="reward"><small>REWARD</small><b>−<span data-count="80">0</span>%</b></div></div>
+    </div>
+  </section>
+
+  <section id="projects" class="grid2">
+    <div class="win" data-cut><span class="win-t">ITEMS</span>
+      <div class="inv"><a class="mi" href="https://schemata.ruine.app/"><span>Schemata</span><span>×1</span></a><a class="mi" href="https://github.com/ruine-dev/ruine-ui-dashboard"><span>ruine UI</span><span>×1</span></a><a class="mi" href="https://github.com/itsfaqih/fama"><span>Fama</span><span>×1</span></a><a class="mi" href="#"><span>PHPID Learning</span><span>×1</span></a><a class="mi" href="#"><span>React Indonesia</span><span>×1</span></a><a class="mi" href="https://dribbble.com/itsfaqih"><span>Dribbble shots</span><span>×24</span></a></div></div>
+    <div class="win" data-cut><span class="win-t">SKILLS</span>
+      <dl class="skills" style="margin:0"><div><dt>LANG</dt><dd>TypeScript, PHP, HTML, CSS</dd></div><div><dt>FRONT</dt><dd>React, TanStack, Effect, Base UI, XState</dd></div><div><dt>BACK</dt><dd>Node.js, Laravel, AdonisJS, PostgreSQL, Redis</dd></div><div><dt>TEST</dt><dd>Vitest, Playwright, MSW, Storybook</dd></div><div><dt>INFRA</dt><dd>Docker, Vite, Bun, NGINX, AWS</dd></div></dl></div>
+  </section>
+
+  <div class="win end" data-cut><span class="win-t">FAQIH</span><p>Have a product that needs this level of care? Send a message?</p><div class="choices" style="margin:0"><a class="btn gold" href="mailto:itsfaqih@gmail.com">YES · itsfaqih@gmail.com</a><a class="btn" href="https://www.linkedin.com/in/itsfaqih">LinkedIn</a></div></div>
+  <footer><span>© 2026 FAQIH MUNTASHIR</span><span>SAVED IN TANSTACK START</span></footer>
+</div>
+
+<script src="rules-data.js"></script>
+<script src="trailer.js"></script>
+<script>
+  const T = window.Trailer;
+  const JP = { 'Code writing': '記', 'UX design': '体', 'Architecture': '設', 'Testing': '試', 'Accessibility': '利' };
+  const no = (r) => 'No.' + String(r.id).padStart(3, '0');
+  T.clock(document.getElementById('clock'));
+
+  // Title screen: letters drop in, then a pixel dissolve reveals the page.
+  document.getElementById('intro-jp').innerHTML = [...'ファキの経験則'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('');
+  document.getElementById('cells').innerHTML = Array.from({ length: 160 }, () => `<i style="--d:${(Math.random() * 480) | 0}ms"></i>`).join('');
+  T.intro(2000);
+  T.cuts();
+
+  const say = document.getElementById('say');
+  const line = "I've spent 5+ years building web products in healthcare, SaaS, and internal tools. Right now I'm at EvidenceCare, building healthcare software for the US market.";
+  const talk = () => T.type(say, line, 55);
+  if (document.documentElement.classList.contains('started')) talk(); else new MutationObserver((_, o) => { if (document.documentElement.classList.contains('started')) { o.disconnect(); setTimeout(talk, 300); } }).observe(document.documentElement, { attributes: true });
+
+  document.getElementById('disc-track').innerHTML = Array.from({ length: 100 }, (_, i) => `<i class="${i < RULES.length ? 'got' : ''}"></i>`).join('');
+  document.getElementById('disc').textContent = RULES.length;
+
+  document.querySelectorAll('.quest').forEach((q) => new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { q.querySelectorAll('[data-count]').forEach((n) => T.countUp(n, +n.dataset.count)); o.disconnect(); } }), { threshold: 0.4 }).observe(q));
+
+  const list = document.getElementById('list');
+  const art = document.getElementById('d-art');
+  const show = (r) => {
+    if (!r) return;
+    document.getElementById('d-no').textContent = no(r);
+    art.innerHTML = `<span>${JP[r.cat]}</span>`; art.classList.remove('pop'); void art.offsetWidth; art.classList.add('pop');
+    document.getElementById('d-t').textContent = r.title;
+    document.getElementById('d-c').textContent = r.cat.toUpperCase();
+    T.type(document.getElementById('d-s'), r.sum, 80);
+    document.getElementById('d-a').textContent = 'FOUND ' + r.added;
+    document.getElementById('d-demo').textContent = r.demo ? '★ LIVE DEMO' : '';
+  };
+  T.index({
+    list, search: document.getElementById('q'), chips: document.getElementById('chips'), more: document.getElementById('more'), count: document.getElementById('total'), empty: document.getElementById('empty'), pageSize: 12,
+    chip: (c, n, on) => `<button class="mi" data-cat="${c}" aria-pressed="${on}">${c === 'All' ? 'All' : c}<b>${n}</b></button>`,
+    render: (r, i) => `<a class="mi ent${i === 0 ? ' on' : ''}" href="#" data-id="${r.id}" style="--i:${i}"><span class="no">${String(r.id).padStart(3, '0')}</span><span class="t">${r.title}</span><span class="star">${r.demo ? '★' : ''}</span></a>`,
+    onRender: (items) => show(items[0]),
+  });
+  const pick = (a) => { if (!a || a.classList.contains('on')) return; list.querySelectorAll('.on').forEach((x) => x.classList.remove('on')); a.classList.add('on'); show(RULES.find((r) => r.id === +a.dataset.id)); };
+  list.addEventListener('pointerover', (e) => pick(e.target.closest('[data-id]')));
+  list.addEventListener('focusin', (e) => pick(e.target.closest('[data-id]')));
+  list.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const items = [...list.querySelectorAll('[data-id]')], i = items.indexOf(document.activeElement);
+    const next = items[Math.max(0, Math.min(items.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))];
+    if (next) { e.preventDefault(); next.focus(); }
+  });
+</script>
+</body>
+</html>
