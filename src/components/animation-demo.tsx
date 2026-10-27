@@ -44,7 +44,6 @@ export function AnimationDemo({
     animationDuration: `${duration}ms`,
     ...ANIMATION_STYLE_DEFAULTS,
     animationIterationCount: loop ? "infinite" : ANIMATION_STYLE_DEFAULTS.animationIterationCount,
-    // Keep newly-created CSS animations in sync with React state.
     animationPlayState: animationData.status === "playing" ? "running" : "paused",
   };
 
@@ -94,7 +93,6 @@ export function AnimationStage({
   );
 }
 
-// The cabinet's start button: the whole stage is clickable, the disc is the target.
 function DemoOverlay({
   onClick,
   icon,

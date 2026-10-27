@@ -6,7 +6,6 @@ type CursorProps = {
   size?: number;
 };
 
-/** A white fill with a black stroke keeps the cursor visible in light and dark modes. */
 export function Cursor({ className, size = 18 }: CursorProps) {
   return (
     <CursorIcon

@@ -144,7 +144,6 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
   );
 }
 
-/** The guideline whose article is on screen, if any. */
 export function useCurrentRule() {
   const pathname = useLocation({ select: (location) => location.pathname });
   const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
@@ -153,12 +152,6 @@ export function useCurrentRule() {
 
 type RailHeading = { element: HTMLHeadingElement; text: string };
 
-// One tick per section heading, fixed in the left margin on wide screens, plus the
-// checkpoint bar along the navbar's bottom edge: one segment per section, as wide as
-// the section is long, filling as the reading line passes through it. The headings
-// belong to each article, so both read them from the DOM. The rail renders into
-// <body> because the page container keeps a transform from its entrance animation,
-// which would pin a fixed child to the container.
 function ContentsRail() {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -172,7 +165,6 @@ function ContentsRail() {
     if (!page) return;
     setHeadings(
       Array.from(page.querySelectorAll("h2"), (element, index) => {
-        // The section's key cap number, shown by rot.css.
         element.dataset.stage = String(index + 1);
         return { element, text: element.textContent };
       }),
@@ -184,7 +176,6 @@ function ContentsRail() {
     const page = anchorRef.current?.closest(".rule-of-thumb-page");
     if (!page || headings.length === 0) return;
 
-    // A section runs from its heading to the next, and the last one ends at the pager.
     let spans: { start: number; end: number }[] = [];
     const measure = () => {
       const tops = headings.map(({ element }) => element.getBoundingClientRect().top + scrollY);
@@ -206,8 +197,6 @@ function ContentsRail() {
     const update = () => {
       frame = 0;
       const line = scrollY + innerHeight * 0.3;
-      // The bar maps the page's scroll onto the route, so the closing sections fill
-      // even when they all fit in the last screen.
       const route = { from: spans[0]?.start ?? 0, to: spans.at(-1)?.end ?? 0 };
       const scrollable = Math.max(1, document.documentElement.scrollHeight - innerHeight);
       const reached = route.from + (route.to - route.from) * Math.min(1, scrollY / scrollable);
@@ -283,13 +272,9 @@ function ContentsRail() {
   );
 }
 
-// The blocks that rise in as they first scroll into view. Prose stays put, and a block
-// inside another block arrives with its parent.
 const REVEALED =
   'h2, h2 + p, [data-rule-of-thumb-card="true"], .rk-feature, .code-block, .rk-steps > li';
 
-/** Plays each block's entrance once, when it first enters the viewport. Blocks that
- *  arrive in the same frame stagger; ones already scrolled past show at once. */
 function useArticleReveal(rootRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     const root = rootRef.current;
@@ -320,7 +305,6 @@ function useArticleReveal(rootRef: React.RefObject<HTMLElement | null>) {
   }, [rootRef]);
 }
 
-/** The article shell: the arcade kit's scope, tinted with the rule's topic hue. */
 export function RulePage({ children }: { children: React.ReactNode }) {
   const rule = useCurrentRule();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -357,7 +341,6 @@ type FeatureTile = {
   description: string;
 };
 
-/** The article's overview: one tile per principle, laid out like the index page's tiles. */
 export function FeatureTiles({
   items,
   columns,
@@ -410,7 +393,6 @@ type VerdictProps = {
   className?: string;
 };
 
-/** One side of a bad / good pair: a stamped header, the evidence, and why. */
 export function Verdict({ good, title, reason, children, className }: VerdictProps) {
   const Mark = good ? CheckIcon : XIcon;
   return (

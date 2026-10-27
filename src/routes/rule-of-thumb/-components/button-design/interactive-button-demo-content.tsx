@@ -12,7 +12,6 @@ import { getButtonClasses } from "../../../../components/button-styles";
 export function InteractiveButtonDemoContent() {
   const { status, animationStyle } = useAnimationDemo();
 
-  // Keep the animated surface in sync with the shared Brand button variant.
   const base = getButtonClasses({ variant: "brand" });
 
   return (

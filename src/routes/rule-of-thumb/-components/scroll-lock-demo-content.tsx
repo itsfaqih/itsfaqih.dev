@@ -65,7 +65,7 @@ export function ScrollLockDemoContent() {
               style={{
                 ...animationStyle,
                 animationName: status !== "idle" ? "demo-scroll-dialog" : "none",
-                opacity: 0, // default hidden until anim starts
+                opacity: 0,
               }}
             ></div>
             <div
