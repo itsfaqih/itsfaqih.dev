@@ -23,6 +23,7 @@ Use `npm run ...` for website scripts. Bun is used for dependency installation; 
 npm run lint
 npm run typecheck
 npm run test
+npm run test:visual
 npm run build
 ```
 
@@ -30,7 +31,9 @@ Oxlint runs the default rules plus all generic [anti-slop](https://github.com/dm
 
 Agent assets, the vendored plugin, and TanStack's generated route tree are excluded from application linting. Owned Storybook configuration remains checked. The vendored TypeScript source is included in typechecking. Effect rules are not enabled because the website has no direct Effect dependency.
 
-Vitest uses jsdom. The test command allows an empty suite, but regression tests should be added for behavior changed during maintenance.
+Vitest has two projects. `unit` runs `src/**/*.test.{ts,tsx}` in jsdom. The test command allows an empty suite, but regression tests should be added for behavior changed during maintenance.
+
+`visual` builds the site, serves the prerendered pages in `.output/public`, and screenshots every page with Playwright Chromium at desktop (1440px) and mobile (390px) widths in light and dark themes. Each screenshot is compared with its baseline in `tests/visual/__screenshots__/`. On a failure, the actual and diff images land in `tests/visual/__diff__/`. Pages are discovered from the build, so a new page fails the suite until its baselines exist, and a removed page fails it until its baselines are deleted. After an intended visual change, run `npm run test:visual:update`, review the changed PNGs, and commit them. Baselines are rendered on macOS; another OS renders fonts differently and needs its own baselines.
 
 ## Production
 
