@@ -81,7 +81,7 @@ export function CodeBlock({
     contents: code,
     lang: language,
   };
-  const options: FileOptions<undefined> = {
+  const options: FileOptions<undefined, undefined> = {
     theme: {
       light: ARCADE_THEME,
       dark: ARCADE_THEME,
