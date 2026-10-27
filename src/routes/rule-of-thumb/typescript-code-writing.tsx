@@ -26,9 +26,6 @@ function TypeScriptGuidelines() {
         markdownUrl="/rule-of-thumb/typescript-code-writing.md"
       />
 
-      {/* ================================================================== */}
-      {/* SECTION 1: Exports and Functions */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Exports & Functions"
@@ -64,9 +61,6 @@ export function calculateTotal(items: Item[]) {
         />
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 2: Type Definitions */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Type Definitions"
@@ -149,9 +143,6 @@ export function calculateTotal(items: Item[]) {
         </div>
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 3: Function Parameters */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Function Parameters"
@@ -193,9 +184,6 @@ createUser({
         </div>
       </div>
 
-      {/* ================================================================== */}
-      {/* SECTION 4: Strictness & Configuration */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Strictness & Config"

@@ -9,9 +9,6 @@ import { BestPractice, SectionHeading, TabbedCodeExample, Verdict } from "../ind
 export function CachePersistenceSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 7: Cache Persistence */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Cache Persistence"
@@ -101,11 +98,9 @@ export function CachePersistenceSection() {
           />
         </div>
 
-        {/* Persistence Methods */}
         <div className={cx("mt-12")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-6")}>Persistence Methods</h3>
           <div className={cx("grid gap-4")}>
-            {/* LocalStorage */}
             <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center")}>
@@ -126,7 +121,6 @@ export function CachePersistenceSection() {
               </div>
             </div>
 
-            {/* IndexedDB */}
             <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center")}>
@@ -147,7 +141,6 @@ export function CachePersistenceSection() {
               </div>
             </div>
 
-            {/* Embedded Database */}
             <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl border border-border bg-card")}>
               <div className={cx("flex items-center gap-3 mb-4")}>
                 <div className={cx("size-10 rounded-lg bg-positive/10 dark:bg-positive/20 flex items-center justify-center")}>
@@ -172,7 +165,6 @@ export function CachePersistenceSection() {
           </div>
         </div>
 
-        {/* Code examples for persistence */}
         <div className={cx("mt-8")}>
           <TabbedCodeExample
             title="Persistence Implementation"

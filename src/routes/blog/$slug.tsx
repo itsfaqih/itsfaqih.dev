@@ -43,7 +43,6 @@ function BlogPost() {
       <div className={cx("relative max-w-6xl mx-auto px-6 pt-8 sm:pt-24 pb-12 animate-fade-in")}>
         <div className={cx("grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12 items-start")}>
           <div>
-            {/* Back */}
             <Link
               to="/blog"
               preload="intent"
@@ -57,7 +56,6 @@ function BlogPost() {
             </Link>
 
             <article>
-              {/* Header */}
               <header className={cx("mb-8")}>
                 <div className={cx("flex flex-wrap items-center gap-4 mb-6")}>
                   {post.frontmatter.publishedAt && (
@@ -85,16 +83,13 @@ function BlogPost() {
                 )}
               </header>
 
-              {/* Divider */}
               <div className={cx("h-px bg-border mb-8")} />
 
-              {/* Content */}
               <div className={cx("prose prose-invert dark:prose-invert prose-zinc dark:prose-zinc max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-muted-foreground prose-code:text-foreground prose-pre:bg-card prose-pre:border prose-pre:border-border prose-headings:scroll-mt-24")}>
                 <Component components={{ pre: MarkdownCodeBlock }} />
               </div>
             </article>
 
-            {/* Footer */}
             <footer className={cx("mt-8 pt-6 border-t border-border")}>
               <div className={cx("flex flex-col sm:flex-row items-center justify-between gap-4")}>
                 <Link
@@ -114,14 +109,12 @@ function BlogPost() {
             </footer>
           </div>
 
-          {/* Table of Contents - Desktop */}
           <div className={cx("hidden lg:block sticky top-12")}>
             <TableOfContents />
           </div>
         </div>
       </div>
 
-      {/* Mobile TOC Drawer */}
       <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
         <Drawer.Trigger asChild>
           <button

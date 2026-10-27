@@ -7,7 +7,6 @@ import { Button } from "../../../../components/button";
 export function DestructiveActions() {
   return (
     <>
-{/* Destructive Actions */}
         <div className={cx("mb-12")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>Destructive Actions</h3>
 

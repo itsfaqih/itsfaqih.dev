@@ -28,7 +28,6 @@ export function FocusTrapDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake TAB Key */}
         <KeyboardKey animationName="demo-focus-tab-press">TAB</KeyboardKey>
 
         <MockBackdrop />

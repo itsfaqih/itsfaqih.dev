@@ -5,9 +5,6 @@ import { SkeletonDemo } from "./skeleton-demo";
 export function SpinDelaySection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 4: Spin Delay */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Spin Delay"

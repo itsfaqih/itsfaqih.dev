@@ -52,13 +52,11 @@ export function ButtonVariantMatrix() {
             {variants.map((row) => (
               <tr key={row.name} className={cx("group hover:bg-muted/30 transition-colors")}>
                 <td className={cx("p-4 font-medium text-foreground text-sm")}>{row.name}</td>
-                {/* Idle */}
                 <td className={cx("p-4")}>
                   <Button variant={row.id} className={cx("pointer-events-none")}>
                     Button
                   </Button>
                 </td>
-                {/* Hover */}
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
@@ -70,7 +68,6 @@ export function ButtonVariantMatrix() {
                     Button
                   </Button>
                 </td>
-                {/* Focus */}
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
@@ -82,7 +79,6 @@ export function ButtonVariantMatrix() {
                     Button
                   </Button>
                 </td>
-                {/* Active */}
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
@@ -96,7 +92,6 @@ export function ButtonVariantMatrix() {
                     Button
                   </Button>
                 </td>
-                {/* Disabled */}
                 <td className={cx("p-4")}>
                   <div className={cx("w-fit cursor-not-allowed")}>
                     <Button variant={row.id} disabled className={cx("pointer-events-none")}>
@@ -104,7 +99,6 @@ export function ButtonVariantMatrix() {
                     </Button>
                   </div>
                 </td>
-                {/* Pending */}
                 <td className={cx("p-4")}>
                   <div className={cx("w-fit cursor-wait")}>
                     <Button

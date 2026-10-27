@@ -197,7 +197,6 @@ export function AnimatedCursor({
       }}
     >
       <Cursor />
-      {/* Ripple */}
       <div
         className={cx("absolute top-0 left-0 size-8 rounded-full bg-foreground/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none")}
         style={{

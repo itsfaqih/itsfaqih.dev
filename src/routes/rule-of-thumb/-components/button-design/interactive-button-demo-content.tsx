@@ -19,7 +19,6 @@ export function InteractiveButtonDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake Cursor */}
         {status !== "idle" && (
           <div
             className={cx("absolute z-50 pointer-events-none")}
@@ -28,7 +27,6 @@ export function InteractiveButtonDemoContent() {
               animationName: "button-demo-cursor-move",
             }}
           >
-            {/* Default Pointer */}
             <div
               style={{
                 ...animationStyle,
@@ -38,7 +36,6 @@ export function InteractiveButtonDemoContent() {
               <Cursor />
             </div>
 
-            {/* Pending Spinner */}
             <div
               className={cx("absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2")}
               style={{
@@ -55,7 +52,6 @@ export function InteractiveButtonDemoContent() {
               />
             </div>
 
-            {/* Ripple */}
             <div
               className={cx("absolute top-0 left-0 size-8 rounded-full bg-black/50 dark:bg-white/50 -translate-x-1/2 -translate-y-1/2 pointer-events-none")}
               style={{
@@ -66,7 +62,6 @@ export function InteractiveButtonDemoContent() {
           </div>
         )}
 
-        {/* The Button */}
         <div
           data-variant="brand"
           className={cn(
@@ -94,7 +89,6 @@ export function InteractiveButtonDemoContent() {
             }}
           />
 
-          {/* Idle Content */}
           <div
             className={cx("relative z-1 flex items-center gap-2")}
             style={{
@@ -107,7 +101,6 @@ export function InteractiveButtonDemoContent() {
             Submit
           </div>
 
-          {/* Pending Content */}
           <div
             className={cx("relative z-1 flex items-center gap-2 justify-center")}
             style={{
@@ -122,7 +115,6 @@ export function InteractiveButtonDemoContent() {
             Processing...
           </div>
 
-          {/* Success Content */}
           <div
             className={cx("relative z-1 flex items-center gap-2 justify-center")}
             style={{

@@ -36,7 +36,6 @@ export function ResponsiveDialog({
             )}
           >
             <div className={cx("p-4 bg-background rounded-t-[10px] flex-1 overflow-auto")}>
-              {/* Handle */}
               <div
                 className={cx(
                   "mx-auto w-12 h-1.5 shrink-0 rounded-full bg-muted mb-8",

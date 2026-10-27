@@ -4,9 +4,6 @@ import { BestPractice, SectionHeading, TabbedCodeExample } from "../index";
 export function TriggerFetchingSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 2: Trigger Fetching Early */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Trigger Fetching Early"

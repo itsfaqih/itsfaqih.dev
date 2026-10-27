@@ -5,7 +5,6 @@ import { cx } from "@/stylex";
 export function WhyButtonStatesMatter() {
   return (
     <>
-{/* Why This Matters */}
       <div className={cx("mb-20")}>
         <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-linear-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/20")}>
           <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Why Button States Matter</h2>

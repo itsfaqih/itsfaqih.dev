@@ -16,7 +16,6 @@ export function AutoFocusFormDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* The Trigger Button */}
         <FakeButton
           className={cx("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2")}
           style={{
@@ -27,7 +26,6 @@ export function AutoFocusFormDemoContent() {
           Open Form
         </FakeButton>
 
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-cursor-move"
           rippleAnimationName="demo-cursor-ripple"

@@ -26,7 +26,6 @@ export function DataParsingDemo() {
         <h3 className={cx("font-semibold text-foreground mb-6")}>Safe Parsing with Fallbacks</h3>
 
         <div className={cx("space-y-6")}>
-          {/* Step 1: Raw Data */}
           <div className={cx("space-y-2")}>
             <div className={cx("flex items-center gap-2 text-sm text-muted-foreground")}>
               <span className={cx("size-5 rounded flex items-center justify-center bg-muted text-muted-foreground font-mono text-xs")}>
@@ -44,7 +43,6 @@ export function DataParsingDemo() {
             </div>
           </div>
 
-          {/* Step 2: Schema */}
           <div className={cx("space-y-2")}>
             <div className={cx("flex items-center gap-2 text-sm text-muted-foreground")}>
               <span className={cx("size-5 rounded flex items-center justify-center bg-muted text-muted-foreground font-mono text-xs")}>
@@ -55,7 +53,6 @@ export function DataParsingDemo() {
             <CodeBlock code={zodSchema} lang="typescript" />
           </div>
 
-          {/* Step 3: Result */}
           <div className={cx("space-y-2")}>
             <div className={cx("flex items-center gap-2 text-sm text-muted-foreground")}>
               <span className={cx("size-5 rounded flex items-center justify-center bg-muted text-muted-foreground font-mono text-xs")}>

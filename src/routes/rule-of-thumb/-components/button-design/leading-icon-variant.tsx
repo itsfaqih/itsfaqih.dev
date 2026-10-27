@@ -15,11 +15,9 @@ import { Button } from "../../../../components/button";
 export function LeadingIconVariant() {
   return (
     <>
-{/* Leading Icon Variant */}
         <div className={cx("mb-8")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>With Leading Icon</h3>
 
-          {/* Visual Demo */}
           <div data-rule-of-thumb-card="true" className={cx("mb-4 p-6 rounded-xl squircle border border-border bg-card")}>
             <div className={cx("flex flex-wrap items-center gap-4")}>
               <Button variant="tertiary-neutral" leadingIcon={<ArrowLeftIcon size={18} />}>
@@ -41,7 +39,6 @@ export function LeadingIconVariant() {
             <p className={cx("text-xs text-muted-foreground mt-3")}>Try hovering and clicking!</p>
           </div>
 
-          {/* When to Use */}
           <div data-rule-of-thumb-card="true" className={cx("mb-4 rounded-xl squircle border border-border bg-card p-5")}>
             <h4 className={cx("font-semibold text-foreground mb-4 text-sm")}>
               When to Use Leading Icons

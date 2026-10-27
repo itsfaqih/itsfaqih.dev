@@ -5,9 +5,6 @@ import { SWRDemo } from "./swr-demo";
 export function StaleWhileRevalidateSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 3: Stale-While-Revalidate */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Stale-While-Revalidate"

@@ -5,9 +5,6 @@ import { ErrorDemo } from "./error-demo";
 export function ErrorHandlingSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 5: Error Handling */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Error Handling"

@@ -18,7 +18,6 @@ export const Route = createFileRoute("/rule-of-thumb/null-vs-undefined")({
 function NullVsUndefined() {
   return (
     <RulePage>
-      {/* Hero Section */}
       <RuleOfThumbHero
         title="Null vs Undefined"
         description={
@@ -34,7 +33,6 @@ function NullVsUndefined() {
         markdownUrl="/rule-of-thumb/null-vs-undefined.md"
       />
 
-      {/* Concept Section */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="The Golden Rule"
@@ -70,7 +68,6 @@ function NullVsUndefined() {
         </div>
       </div>
 
-      {/* Undefined Example */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Undefined: No Value Provided"
@@ -93,7 +90,6 @@ welcomeUser("Alice"); // Logs: "Welcome, Alice!"`}
         />
       </div>
 
-      {/* Null Example */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Null: Intentional Empty Value"
@@ -118,7 +114,6 @@ const clearSelection = () => {
         />
       </div>
 
-      {/* Explicit vs Implicit */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Explicit vs Implicit"
@@ -149,7 +144,6 @@ if (data.assigneeId === null) {
         />
       </div>
 
-      {/* Quick Reference */}
       <div className={cx("mb-16")}>
         <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Quick Reference</h2>
         <div className={cx("space-y-3")}>
@@ -164,7 +158,6 @@ if (data.assigneeId === null) {
         </div>
       </div>
 
-      {/* Footer */}
       <RuleOfThumbPagination />
     </RulePage>
   );

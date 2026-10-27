@@ -16,14 +16,11 @@ import { Button } from "../../../../components/button";
 export function IconOnlyVariant() {
   return (
     <>
-{/* Icon Only Variant */}
         <div className={cx("mb-8")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>Icon Only</h3>
 
-          {/* Visual Demo */}
           <div data-rule-of-thumb-card="true" className={cx("mb-4 p-6 rounded-xl border border-border bg-card")}>
             <div className={cx("flex flex-wrap items-center gap-4")}>
-              {/* Square variants */}
               <div className={cx("flex flex-col items-center gap-2")}>
                 <SimpleTooltip content="Settings">
                   <Button variant="tertiary-neutral" className={cx("size-8.5 p-0")} aria-label="Settings">
@@ -54,7 +51,6 @@ export function IconOnlyVariant() {
             </p>
           </div>
 
-          {/* When to Use */}
           <div data-rule-of-thumb-card="true" className={cx("mb-4 rounded-xl border border-border bg-card p-5")}>
             <h4 className={cx("font-semibold text-foreground mb-4 text-sm")}>
               When to Use Icon-Only Buttons
@@ -97,7 +93,6 @@ export function IconOnlyVariant() {
             </div>
           </div>
 
-          {/* Accessibility Requirements */}
           <div data-rule-of-thumb-card="true" className={cx("mb-4 p-4 rounded-xl border button-destructive-callout")}>
             <h4 className={cx("font-semibold text-foreground mb-2 text-sm flex items-center gap-2")}>
               <span>⚠️</span> Required: Accessibility & Clarity

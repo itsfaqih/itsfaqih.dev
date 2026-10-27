@@ -13,19 +13,16 @@ export function ScrollLockDemoContent() {
   return (
     <>
       <AnimationStage className={cx("bg-background")}>
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-scroll-cursor"
           rippleAnimationName="demo-scroll-ripple"
         />
 
-        {/* The Page Content (Mock Browser) */}
         <div
           className={cx(
             "absolute inset-x-12 inset-y-8 bg-card rounded-lg shadow-sm border border-border overflow-hidden flex flex-col",
           )}
         >
-          {/* Mock Content Area */}
           <div className={cx("relative flex-1 p-8 space-y-6")}>
             <div className={cx("h-4 w-1/3 bg-card rounded animate-pulse")} />
             <div className={cx("space-y-3")}>
@@ -40,7 +37,6 @@ export function ScrollLockDemoContent() {
             </div>
           </div>
 
-          {/* The Trigger Button - Centered relative to the browser window (and thus the stage) */}
           <div
             className={cx(
               "absolute inset-0 flex items-center justify-center pointer-events-none z-0",
@@ -51,7 +47,6 @@ export function ScrollLockDemoContent() {
             </div>
           </div>
 
-          {/* Mock Scrollbar */}
           <div
             className={cx(
               "absolute right-0 top-0 bottom-0 w-3 border-l border-border bg-card p-0.5 transition-opacity",
@@ -64,14 +59,7 @@ export function ScrollLockDemoContent() {
             <div className={cx("w-full h-16 bg-muted rounded-full")} />
           </div>
 
-          {/* Backdrop & Dialog inside the "browser window" */}
-          {/* We use a custom backdrop here to constrain it to this 'browser' div instead of the full stage if we wanted,
-              but MockBackdrop uses absolute inset-0 which is relative to the nearest positioned ancestor.
-              AnimationStage has relative, but this 'browser' div also needs relative? 
-              Actually, let's just put MockBackdrop inside this div so it covers the "content".
-          */}
           <div className={cx("absolute inset-0 z-10 pointer-events-none")}>
-            {/* We need to selectively wrap them or style them to be hidden initially */}
             <div
               className={cx("absolute inset-0 bg-black/20 backdrop-blur-sm")}
               style={{

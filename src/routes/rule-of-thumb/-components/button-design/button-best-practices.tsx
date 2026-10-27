@@ -6,7 +6,6 @@ import { BestPractice } from "../index";
 export function ButtonBestPractices() {
   return (
     <>
-{/* Best Practices */}
       <div className={cx("mb-20")}>
         <h2 className={cx("text-2xl font-bold text-foreground mb-8")}>Best Practices</h2>
         <div className={cx("space-y-4")}>

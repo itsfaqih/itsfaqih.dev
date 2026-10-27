@@ -135,7 +135,6 @@ export function InteractiveStateCode() {
 
   return (
     <div data-rule-of-thumb-card="true" className={cx("overflow-hidden")}>
-      {/* State selector tabs */}
       <div className="rk-head">
         <div
           className={cx("flex flex-wrap gap-1")}
@@ -160,7 +159,6 @@ export function InteractiveStateCode() {
         </div>
       </div>
 
-      {/* Description */}
       <div className={cx("px-4 py-3 border-b border-border")}>
         <p className={cx("text-sm text-muted-foreground")}>
           <span className={cx("font-medium text-foreground")}>
@@ -170,7 +168,6 @@ export function InteractiveStateCode() {
         </p>
       </div>
 
-      {/* Code block with syntax highlighting and line highlighting */}
       <div className={cx("interactive-state-code-block text-sm")}>
         <ScrollArea.Root className={cx("interactive-state-code-scroll-area")}>
           <ScrollArea.Viewport
@@ -196,7 +193,6 @@ export function InteractiveStateCode() {
         </ScrollArea.Root>
       </div>
 
-      {/* Tips for the active state */}
       <div className="rk-foot">
         {activeState === "idle" && (
           <p className={cx("text-muted-foreground")}>

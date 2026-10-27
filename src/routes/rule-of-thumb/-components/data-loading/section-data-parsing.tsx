@@ -5,9 +5,6 @@ import { DataParsingDemo } from "./data-parsing-demo";
 export function DataParsingSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 8: Parsing Data from External Source */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Parsing Data from External Source"

@@ -5,9 +5,6 @@ import { BestPractice, SectionHeading } from "../index";
 export function RealtimeSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 6: Realtime Data */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="Realtime Data"

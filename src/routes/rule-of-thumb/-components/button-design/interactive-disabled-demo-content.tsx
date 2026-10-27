@@ -34,7 +34,6 @@ export function InteractiveDisabledDemoContent() {
         `}
       </style>
       <AnimationStage>
-        {/* Disabled Button - Centered */}
         <div className={cx("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2")}>
           <Button
             disabled
@@ -44,7 +43,6 @@ export function InteractiveDisabledDemoContent() {
           </Button>
         </div>
 
-        {/* Cursor Container - Origin at Center */}
         <div
           className={cx("absolute top-1/2 left-1/2 pointer-events-none z-50")}
           style={{
@@ -54,7 +52,6 @@ export function InteractiveDisabledDemoContent() {
             marginTop: "-2px",
           }}
         >
-          {/* Default Pointer */}
           <div
             className={cx("absolute top-0 left-0")}
             style={{
@@ -65,7 +62,6 @@ export function InteractiveDisabledDemoContent() {
             <Cursor size={24} />
           </div>
 
-          {/* Forbidden Cursor */}
           <div
             className={cx("absolute top-0 left-0")}
             style={{

@@ -16,16 +16,13 @@ export function DiscardConfirmDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-discard-cursor"
           rippleAnimationName="demo-discard-ripple"
         />
 
-        {/* Mock Dialog Backdrop */}
         <MockBackdrop animationName="demo-discard-main-dialog" />
 
-        {/* Main Dialog (Edit Profile) */}
         <MockDialog animationName="demo-discard-main-dialog">
           <div className={cx("flex items-center justify-between mb-2")}>
             <div className={cx("font-semibold text-foreground")}>Edit Profile</div>
@@ -63,8 +60,6 @@ export function DiscardConfirmDemoContent() {
           </div>
         </MockDialog>
 
-        {/* Confirmation Dialog (Discard Changes?) */}
-        {/* This dialog appears OVER the other one */}
         <MockDialog
           animationName="demo-discard-dialog-2"
           className={cx("w-full max-w-[280px]")}

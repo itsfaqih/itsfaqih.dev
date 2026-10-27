@@ -5,7 +5,6 @@ import { cx } from "@/stylex";
 export function OpticalAlignment() {
   return (
     <>
-{/* Why Optical Alignment Matters */}
         <div data-rule-of-thumb-card="true" className={cx("p-6 rounded-xl bg-amber-500/10 border border-amber-500/20")}>
           <h4 className={cx("font-semibold text-foreground mb-2 flex items-center gap-2")}>
             <span>👁️</span> Why Optical Alignment Matters

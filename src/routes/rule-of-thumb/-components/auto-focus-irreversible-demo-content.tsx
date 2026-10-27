@@ -15,7 +15,6 @@ export function AutoFocusIrreversibleDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Trigger Button */}
         <Button
           variant="destructive"
           className={cx(
@@ -29,7 +28,6 @@ export function AutoFocusIrreversibleDemoContent() {
           Delete Account
         </Button>
 
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-deletion-cursor"
           rippleAnimationName="demo-deletion-ripple"

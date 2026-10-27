@@ -6,9 +6,6 @@ import { SectionCard } from "./section-card";
 export function SSRVsSpaSection() {
   return (
     <>
-{/* ================================================================== */}
-      {/* SECTION 1: SSR vs SPA Decision */}
-      {/* ================================================================== */}
       <div className={cx("mb-20")}>
         <SectionHeading
           title="SSR vs SPA"

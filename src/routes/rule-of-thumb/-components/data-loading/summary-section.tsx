@@ -15,7 +15,6 @@ import {
 export function DataLoadingSummary() {
   return (
     <>
-{/* Summary */}
       <div className={cx("mb-20")}>
         <div data-rule-of-thumb-card="true" className={cx("p-8 rounded-2xl bg-card border border-border")}>
           <h2 className={cx("text-xl font-bold text-foreground mb-4")}>Quick Reference</h2>

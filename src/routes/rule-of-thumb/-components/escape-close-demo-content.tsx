@@ -12,7 +12,6 @@ export function EscapeCloseDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake ESC Key */}
         <KeyboardKey animationName="demo-esc-key">ESC</KeyboardKey>
 
         <MockBackdrop animationName="demo-esc-dialog" />

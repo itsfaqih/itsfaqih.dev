@@ -19,7 +19,6 @@ function BlogIndex() {
   return (
     <div className={cx("relative min-h-screen")}>
       <PageContainer maxWidth="3xl" className={cx("relative pb-12")}>
-        {/* Header */}
         <div className={cx("mb-8")}>
           <div className={cx("flex items-center gap-3 mb-4")}>
             <div className={cx("p-2.5 rounded-xl bg-card border border-border")}>
@@ -36,7 +35,6 @@ function BlogIndex() {
           </p>
         </div>
 
-        {/* Posts */}
         <div className={cx("space-y-4")}>
           {posts.length === 0 ? (
             <div className={cx("rounded-2xl p-12 bg-(--card-bg) border border-border text-center")}>
@@ -94,7 +92,6 @@ function BlogIndex() {
           )}
         </div>
 
-        {/* Back */}
         <div className={cx("mt-8 pt-6 border-t border-border")}>
           <Link
             to="/"

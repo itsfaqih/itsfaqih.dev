@@ -13,7 +13,6 @@ export function InfoDialogDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-info-cursor"
           rippleAnimationName="demo-info-ripple"

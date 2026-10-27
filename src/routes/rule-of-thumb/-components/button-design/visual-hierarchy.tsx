@@ -6,11 +6,9 @@ import { Button } from "../../../../components/button";
 export function VisualHierarchy() {
   return (
     <>
-{/* Visual Style Variants */}
         <div className={cx("mb-12")}>
           <h3 className={cx("text-lg font-semibold text-foreground mb-3")}>Visual Hierarchy</h3>
 
-          {/* Primary (Filled) */}
           <div className={cx("mb-6")}>
             <h4 className={cx("text-sm font-medium text-foreground mb-3 flex items-center gap-2")}>
               <span className={cx("size-2 rounded-full bg-brand")} />
@@ -30,7 +28,6 @@ export function VisualHierarchy() {
             </div>
           </div>
 
-          {/* Secondary (Tinted) */}
           <div className={cx("mb-6")}>
             <h4 className={cx("text-sm font-medium text-foreground mb-3 flex items-center gap-2")}>
               <span className={cx("size-2 rounded-full bg-brand/30")} />
@@ -50,7 +47,6 @@ export function VisualHierarchy() {
             </div>
           </div>
 
-          {/* Tertiary (Minimal) */}
           <div className={cx("mb-6")}>
             <h4 className={cx("text-sm font-medium text-foreground mb-3 flex items-center gap-2")}>
               <span className={cx("size-2 rounded-full border border-muted-foreground")} />
@@ -69,7 +65,6 @@ export function VisualHierarchy() {
             </div>
           </div>
 
-          {/* Summary Card */}
           <div data-rule-of-thumb-card="true" className={cx("p-4 rounded-xl bg-muted/30 border border-border")}>
             <h4 className={cx("font-semibold text-foreground mb-3 text-sm")}>Quick Reference</h4>
             <div className={cx("grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs")}>

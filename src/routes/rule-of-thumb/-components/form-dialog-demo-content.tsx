@@ -12,13 +12,11 @@ export function FormDialogDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-form-cursor"
           rippleAnimationName="demo-form-ripple"
         />
 
-        {/* Note: FormDialogDemo has a static backdrop (no animation name) */}
         <div
           className={cx("absolute inset-0 bg-white/20 dark:bg-black/40 backdrop-blur-sm z-10")}
         />

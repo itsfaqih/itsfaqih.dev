@@ -15,7 +15,6 @@ export function AutoFocusReversibleDemoContent() {
   return (
     <>
       <AnimationStage>
-        {/* Trigger Button */}
         <Button
           variant="destructive"
           className={cx(
@@ -29,7 +28,6 @@ export function AutoFocusReversibleDemoContent() {
           Archive Item
         </Button>
 
-        {/* Fake Cursor */}
         <AnimatedCursor
           moveAnimationName="demo-approval-cursor"
           rippleAnimationName="demo-approval-ripple"
