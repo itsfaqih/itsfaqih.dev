@@ -168,27 +168,6 @@
   }
 }
 
-@keyframes button-demo-border-success {
-  0%,
-  70% {
-    border-color: color-mix(in srgb, var(--brand), transparent 80%);
-    background-color: color-mix(in srgb, var(--brand), transparent 10%);
-    opacity: 1;
-  }
-  71%,
-  90% {
-    border-color: color-mix(in srgb, var(--brand), transparent 80%);
-    background-color: color-mix(in srgb, var(--brand), transparent 10%);
-    opacity: 1;
-  }
-  95%,
-  100% {
-    border-color: color-mix(in srgb, var(--brand), transparent 80%);
-    background-color: color-mix(in srgb, var(--brand), transparent 10%);
-    opacity: 1;
-  }
-}
-
 @keyframes button-demo-width {
   0%,
   29% {

@@ -258,11 +258,6 @@
   letter-spacing: -0.01em;
   color: var(--text);
 }
-.rk-head .rk-lang {
-  margin-left: auto;
-  font: 500 11px var(--display);
-  color: var(--mute);
-}
 .rk-foot {
   display: flex;
   align-items: flex-start;
