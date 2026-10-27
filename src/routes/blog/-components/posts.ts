@@ -1,7 +1,4 @@
 import type { BlogModule, BlogPost } from "../../../types/blog";
-import { Counter } from "../../../content/blog/counter";
-
-void Counter;
 
 const posts = import.meta.glob<BlogModule>("/src/content/blog/*.mdx", { eager: true });
 
