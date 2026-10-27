@@ -14,8 +14,6 @@ export const Route = createFileRoute("/")({
 
 const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);
 
-// One headline phrase per kind of work. Each has its own printed scene on the hero card,
-// and `ms` fits a whole number of the scene's `loops`, so a slide ends as its scene clears.
 const SLIDES = [
   { tab: "Interfaces", color: "var(--ux)", phrase: "interfaces that ", highlight: "feel right", ms: 8000, loops: 2 },
   { tab: "Agents", color: "var(--cw)", phrase: "agents that ", highlight: "finish the job", ms: 8800, loops: 2 },
@@ -145,19 +143,18 @@ const STACK = [
 const TICKER = ["INTERFACES", "AGENTIC SETUPS", "DEV TOOLS", "APIS", "HEALTHCARE SOFTWARE"];
 
 function Index() {
-  const [started, setStarted] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Entrances wait for the intro to hand off, so nothing plays under the shutter.
-  useCutIns(rootRef, started);
+  useCutIns(rootRef, introDone);
 
   return (
     <div ref={rootRef} className="arc arc-scan">
       <Backdrop />
-      <Intro onDone={setStarted} />
+      <Intro onDone={setIntroDone} />
 
       <div className="arc-wrap">
-        <Hero started={started} />
+        <Hero introDone={introDone} />
       </div>
 
       <div className="ticker-wrap" data-loop data-cut aria-hidden="true">
@@ -284,8 +281,8 @@ function Index() {
   );
 }
 
-// Intro: name slam, fast cuts through what I build, shutter split.
-function Intro({ onDone }: { onDone: (started: boolean) => void }) {
+const SKIP_GRACE_MS = 1200;
+function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [gone, setGone] = useState(false);
 
@@ -306,15 +303,12 @@ function Intro({ onDone }: { onDone: (started: boolean) => void }) {
       html.classList.add("no-intro");
       try {
         sessionStorage.setItem("intro-seen", "1");
-      } catch {
-        // Private mode: the intro will simply play again next visit.
-      }
+      } catch {}
       onDone(true);
       removeTimer = window.setTimeout(() => setGone(true), 700);
     };
-    // Ignore skips in the first 1.2s so a stray key does not cut the name card.
     const skip = () => {
-      if (performance.now() - openedAt > 1200) finish();
+      if (performance.now() - openedAt > SKIP_GRACE_MS) finish();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (["Escape", "Enter", " "].includes(event.key)) skip();
@@ -359,8 +353,7 @@ function Intro({ onDone }: { onDone: (started: boolean) => void }) {
   );
 }
 
-// Hero: rotating headline and the screen whose scene acts out each phrase.
-function Hero({ started }: { started: boolean }) {
+function Hero({ introDone }: { introDone: boolean }) {
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [slide, setSlide] = useState({ index: 0, run: 0 });
   const [pausedByUser, setPausedByUser] = useState<boolean | null>(null);
@@ -369,7 +362,6 @@ function Hero({ started }: { started: boolean }) {
   const runRef = useRef(0);
   const remainingRef = useRef(SLIDES[0]!.ms);
 
-  // Reduced motion starts paused; the visitor can still press play.
   const userPaused = pausedByUser ?? reduced;
   const held = userPaused || hovering;
   const current = SLIDES[slide.index]!;
@@ -380,16 +372,13 @@ function Hero({ started }: { started: boolean }) {
     setSlide({ index, run: runRef.current });
   };
 
-  // Deep link for screenshots: /?slide=2
   useEffect(() => {
     const requested = Number(new URLSearchParams(location.search).get("slide"));
     if (requested > 0 && requested < SLIDES.length) go(requested);
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
-  // Advance after the slide's remaining time. Holding (hover or pause) banks what is left.
   useEffect(() => {
-    if (!started || held) return;
+    if (!introDone || held) return;
     const run = slide.run;
     const armedAt = performance.now();
     const timer = setTimeout(() => go((slide.index + 1) % SLIDES.length), remainingRef.current);
@@ -400,7 +389,7 @@ function Hero({ started }: { started: boolean }) {
   });
 
   return (
-    <div className="hero" data-started={started ? "" : undefined}>
+    <div className="hero" data-started={introDone ? "" : undefined}>
       <div>
         <div className="tag">Full-stack engineer · Yogyakarta</div>
         <h1>
@@ -446,7 +435,7 @@ function Hero({ started }: { started: boolean }) {
         onPointerEnter={() => setHovering(true)}
         onPointerLeave={() => setHovering(false)}
       >
-        <HeroPrints index={slide.index} run={slide.run} playing={started} ms={current.ms} loops={current.loops} />
+        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} slideMs={current.ms} loopsPerSlide={current.loops} />
         <div className="bench-ctl">
           <div className="pips" role="group" aria-label="What I build">
             {SLIDES.map((item, index) => (
@@ -489,7 +478,6 @@ function ExperienceList() {
     setOpen(open === index ? -1 : index);
   };
 
-  // FLIP: rows slide to their new place; the stack pills leave one column and enter the other.
   useLayoutEffect(() => {
     const list = listRef.current;
     const before = beforeRef.current;
@@ -514,12 +502,11 @@ function ExperienceList() {
         duration: 380,
       });
     });
-    // Each pill rises and fades from where it was, then slides in from the left at its new place.
     after.pills.forEach((to, pill) => {
       const from = before.pills.get(pill);
       if (!from) return;
-      const dx = from.x - to.x;
-      const dy = from.y - to.y;
+      const dx = from.xInRow - to.xInRow;
+      const dy = from.yInRow - to.yInRow;
       if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
       pill.animate(
         [
@@ -583,19 +570,18 @@ function ExperienceList() {
 type Snapshot = {
   height: number;
   rows: Map<Element, number>;
-  pills: Map<Element, { x: number; y: number; order: number }>;
+  pills: Map<Element, { xInRow: number; yInRow: number; order: number }>;
 };
 
-// Row tops, and each pill's offset inside its row, so a pill's glide does not double the row's slide.
 function snapshotOf(list: HTMLElement): Snapshot {
   const rows = new Map<Element, number>();
-  const pills = new Map<Element, { x: number; y: number; order: number }>();
+  const pills = new Map<Element, { xInRow: number; yInRow: number; order: number }>();
   for (const row of list.querySelectorAll(".hs-row")) {
     const box = row.getBoundingClientRect();
     rows.set(row, box.top);
     row.querySelectorAll(".hs-stack li").forEach((pill, order) => {
       const at = pill.getBoundingClientRect();
-      pills.set(pill, { x: at.left - box.left, y: at.top - box.top, order });
+      pills.set(pill, { xInRow: at.left - box.left, yInRow: at.top - box.top, order });
     });
   }
   return { height: list.getBoundingClientRect().height, rows, pills };

@@ -1,21 +1,16 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef } from "react";
 
-/* Hero prints: one Riso-style primitive scene per slide (redesign/hero-variants, DIRECTION.md).
-   Every shape is printed in two inks: a misregistered halftone in the slide's hue, then a
-   top ink. Scenes loop on --T, which each slide sets so its loops fill the slide. */
+type TopInk = "solid" | "hue" | "outline";
 
-type Top = "i" | "h" | "o";
-
-// One primitive in two inks: the hue halftone nudged off register, then the top ink.
-function Ink({ p, top = "i", children }: { p: string; top?: Top; children: ReactNode }) {
+function Ink({ p, top = "solid", children }: { p: string; top?: TopInk; children: ReactNode }) {
   return (
     <>
       <g transform="translate(5 4)" fill={`url(#${p}ht)`} className="mis">
         {children}
       </g>
-      {top === "i" && <g className="i">{children}</g>}
-      {top === "h" && <g className="h mis">{children}</g>}
-      {top === "o" && (
+      {top === "solid" && <g className="i">{children}</g>}
+      {top === "hue" && <g className="h mis">{children}</g>}
+      {top === "outline" && (
         <g className="is" strokeWidth={3}>
           {children}
         </g>
@@ -46,8 +41,7 @@ function Paper({ p }: { p: string }) {
   );
 }
 
-// Registration mark: the printer's proof that two inks line up.
-function Reg({ x, y, className }: { x: number; y: number; className: string }) {
+function RegistrationMark({ x, y, className }: { x: number; y: number; className: string }) {
   return (
     <g className={className}>
       <circle className="hs" strokeWidth={1.8} cx={x} cy={y} r={8} />
@@ -65,7 +59,6 @@ const vars = (v: Record<string, string | number>): CSSProperties =>
 
 const pct = (n: number) => `${+n.toFixed(2)}%`;
 
-// The long way round: a meander from the start ring to the target square.
 const MEANDER = [
   [40, 160],
   [88, 160],
@@ -93,21 +86,22 @@ function meanderKeyframes() {
   return `@keyframes hp-ghost { ${stops.join(" ")} 97%, 100% { opacity: 0; transform: translate(280px, 40px); } }`;
 }
 
-/* The queue runs ten beats a loop. Slots sit at QX[1..4], the worker at QX[5]. Each job
-   steps one slot per beat and enters the worker on its fifth. The hue job is rejected on
-   beat 4, rides the retry arc back to slot 1, and passes on beat 9. */
-const QX = [-20, 54, 96, 138, 180, 262];
-const STEP = 4.5; // a step takes 45% of a 10%-long beat
+const QUEUE_Y = 124;
+const DOOR_X = -20;
+const SLOT_X = [54, 96, 138, 180] as const;
+const WORKER_X = 262;
+const QUEUE_X = [DOOR_X, ...SLOT_X, WORKER_X];
+const BEAT_PCT = 10;
+const STEP_PCT = 4.5;
 const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const INOUT = "cubic-bezier(0.65, 0, 0.35, 1)";
 const INK_JOBS = [1, 2, 3, 4, 6, 7, 8, 9];
 const INK_OUT_BEATS = [0, 1, 2, 3, 5, 6, 7, 8];
-// The retry arc, from the worker back over the queue to slot 1 (cy is 124).
 const ARC = [
-  [262, 124],
+  [WORKER_X, QUEUE_Y],
   [230, 40],
   [90, 40],
-  [54, 124],
+  [SLOT_X[0], QUEUE_Y],
 ] as const;
 
 function arcPoint(t: number) {
@@ -117,26 +111,25 @@ function arcPoint(t: number) {
   return { x: at(0), y: at(1) };
 }
 
-// A job's steps from QX[from] on, for a job that leaves the door on beat b. Step j starts
-// on beat b + j and carries the job from QX[j] to QX[j + 1]; the last goes into the worker.
-function steps(b: number, from: number) {
+function jobSteps(startBeat: number, fromStop: number) {
   const stops: string[] = [];
-  for (let j = from; j < 5; j++) {
-    const at = (b + j) * 10;
-    const into = j === 4 ? " scale(0.55)" : "";
+  for (let stop = fromStop; stop < QUEUE_X.length - 1; stop++) {
+    const at = (startBeat + stop) * BEAT_PCT;
+    const intoWorker = stop === SLOT_X.length;
     stops.push(
-      `${pct(at)} { opacity: 1; transform: translateX(${QX[j]}px); animation-timing-function: ${j === 4 ? INOUT : OUT}; }`,
+      `${pct(at)} { opacity: 1; transform: translateX(${QUEUE_X[stop]}px); animation-timing-function: ${intoWorker ? INOUT : OUT}; }`,
     );
-    stops.push(`${pct(at + STEP)} { opacity: 1; transform: translateX(${QX[j + 1]}px)${into}; }`);
+    stops.push(
+      `${pct(at + STEP_PCT)} { opacity: 1; transform: translateX(${QUEUE_X[stop + 1]}px)${intoWorker ? " scale(0.55)" : ""}; }`,
+    );
   }
   return stops;
 }
 
 function queueKeyframes() {
-  const door = `0% { opacity: 0; transform: translateX(${QX[0]}px); animation-timing-function: ${OUT}; }`;
+  const door = `0% { opacity: 0; transform: translateX(${DOOR_X}px); animation-timing-function: ${OUT}; }`;
   const gone = (at: number) =>
-    `${pct(at)}, 100% { opacity: 0; transform: translateX(${QX[5]}px) scale(0.55); }`;
-  // The hue job's way back: along the arc to slot 1, growing back to full size as it leaves.
+    `${pct(at)}, 100% { opacity: 0; transform: translateX(${WORKER_X}px) scale(0.55); }`;
   const arc: string[] = [];
   const n = 16;
   for (let k = 1; k < n; k++) {
@@ -145,23 +138,22 @@ function queueKeyframes() {
     const { x, y } = arcPoint(t);
     const scale = Math.min(1, 0.55 + s * 1.35);
     arc.push(
-      `${pct(45 + 9.5 * s)} { opacity: 1; transform: translate(${x.toFixed(1)}px, ${(y - 124).toFixed(1)}px) scale(${scale.toFixed(2)}); }`,
+      `${pct(45 + 9.5 * s)} { opacity: 1; transform: translate(${x.toFixed(1)}px, ${(y - QUEUE_Y).toFixed(1)}px) scale(${scale.toFixed(2)}); }`,
     );
   }
-  const ink = [door, ...steps(0, 0).slice(1), gone(48)];
+  const ink = [door, ...jobSteps(0, 0).slice(1), gone(48)];
   const hue = [
     door,
-    ...steps(0, 0).slice(1),
+    ...jobSteps(0, 0).slice(1),
     ...arc,
-    `54.5% { opacity: 1; transform: translateX(${QX[1]}px); }`,
-    ...steps(5, 1),
+    `54.5% { opacity: 1; transform: translateX(${SLOT_X[0]}px); }`,
+    ...jobSteps(5, 1),
     gone(97),
   ];
-  // A square leaves the worker on each beat that passed a job.
   const out = INK_OUT_BEATS.flatMap((b) => [
-    `${pct(b * 10 + 4.4)} { opacity: 0; transform: none; animation-timing-function: ${OUT}; }`,
-    `${pct(b * 10 + 5.2)} { opacity: 1; }`,
-    `${pct(b * 10 + 10)} { opacity: 0; transform: translateX(34px); }`,
+    `${pct(b * BEAT_PCT + 4.4)} { opacity: 0; transform: none; animation-timing-function: ${OUT}; }`,
+    `${pct(b * BEAT_PCT + 5.2)} { opacity: 1; }`,
+    `${pct((b + 1) * BEAT_PCT)} { opacity: 0; transform: translateX(34px); }`,
   ]);
   return [
     `@keyframes hp-job { ${ink.join(" ")} }`,
@@ -175,15 +167,14 @@ const KEYFRAMES = [meanderKeyframes(), queueKeyframes()].join("\n");
 type Scene = { label: string; body: (p: string) => ReactNode };
 
 const QUARTERS = [
-  ["M160 100 V30 A70 70 0 0 1 230 100 Z", "70px", "-56px", "40deg", "i"],
-  ["M160 100 H230 A70 70 0 0 1 160 170 Z", "84px", "48px", "-30deg", "h"],
-  ["M160 100 V170 A70 70 0 0 1 90 100 Z", "-72px", "52px", "50deg", "i"],
-  ["M160 100 H90 A70 70 0 0 1 160 30 Z", "-84px", "-50px", "-40deg", "h"],
+  ["M160 100 V30 A70 70 0 0 1 230 100 Z", "70px", "-56px", "40deg", "solid"],
+  ["M160 100 H230 A70 70 0 0 1 160 170 Z", "84px", "48px", "-30deg", "hue"],
+  ["M160 100 V170 A70 70 0 0 1 90 100 Z", "-72px", "52px", "50deg", "solid"],
+  ["M160 100 H90 A70 70 0 0 1 160 30 Z", "-84px", "-50px", "-40deg", "hue"],
 ] as const;
 
 const SCENES: Scene[] = [
   {
-    // Feel right: four tumbling primitives settle into one balanced composition.
     label: "Four tumbling shapes settle into one balanced composition",
     body: (p) => (
       <>
@@ -198,12 +189,12 @@ const SCENES: Scene[] = [
           </Ink>
         </g>
         <g className="settle" style={vars({ i: 2, dx: "64px", dy: "-90px", r: "70deg" })}>
-          <Ink p={p} top="o">
+          <Ink p={p} top="outline">
             <path d="M226 150 L266 150 L246 112 Z" />
           </Ink>
         </g>
         <g className="settle" style={vars({ i: 3, dx: "80px", dy: "58px" })}>
-          <Ink p={p} top="h">
+          <Ink p={p} top="hue">
             <circle cx="212" cy="68" r="34" />
           </Ink>
         </g>
@@ -211,7 +202,6 @@ const SCENES: Scene[] = [
     ),
   },
   {
-    // Finish the job: four quarters arrive one at a time and close into a whole disc.
     label: "Four quarters arrive one at a time and close into a whole circle",
     body: (p) => (
       <>
@@ -232,18 +222,17 @@ const SCENES: Scene[] = [
     ),
   },
   {
-    // Save hours: the ghost walks the long way; the ink takes the straight line.
     label: "A ball takes the straight line while its ghost walks the long way round",
     body: (p) => (
       <>
         <path className="is ghost" d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`} />
-        <Ink p={p} top="h">
+        <Ink p={p} top="hue">
           <polygon points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
         </Ink>
-        <Ink p={p} top="o">
+        <Ink p={p} top="outline">
           <circle cx="40" cy="160" r="14" />
         </Ink>
-        <Ink p={p} top="o">
+        <Ink p={p} top="outline">
           <rect x="264" y="24" width="32" height="32" />
         </Ink>
         <rect className="h mis cut-hit" x="268" y="28" width="24" height="24" />
@@ -259,11 +248,10 @@ const SCENES: Scene[] = [
     ),
   },
   {
-    // Run reliably: jobs step through the queue; one fails, loops back, and passes on retry.
     label: "Jobs step through a queue; one fails, loops back, and passes on retry",
     body: (p) => (
       <>
-        {QX.slice(1, 5).map((x) => (
+        {SLOT_X.map((x) => (
           <rect key={x} className="is ghost" x={x - 14} y="110" width="28" height="28" />
         ))}
         <path className="is ghost" d="M200 124 H226 M220 118 L226 124 L220 130" />
@@ -271,7 +259,7 @@ const SCENES: Scene[] = [
           className="hs ghost"
           d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
         />
-        <Ink p={p} top="o">
+        <Ink p={p} top="outline">
           <rect x="230" y="92" width="64" height="64" />
         </Ink>
         <rect className="h mis q-work" x="246" y="108" width="32" height="32" />
@@ -284,13 +272,13 @@ const SCENES: Scene[] = [
             style={vars({ b, x: `${[-40, -40, -40, -40, -40, 180, 138, 96][k]}px` })}
           >
             <Ink p={p}>
-              <circle cx="0" cy="124" r="11" />
+              <circle cx="0" cy={QUEUE_Y} r="11" />
             </Ink>
           </g>
         ))}
         <g className="q-retry">
-          <Ink p={p} top="h">
-            <circle cx="0" cy="124" r="11" />
+          <Ink p={p} top="hue">
+            <circle cx="0" cy={QUEUE_Y} r="11" />
           </Ink>
         </g>
         <path
@@ -304,7 +292,6 @@ const SCENES: Scene[] = [
     ),
   },
   {
-    // Can trust: the scan finds the shape that slipped from the snapshot, and it snaps back.
     label: "Two snapshots side by side; a scan catches the shape that slipped and it snaps back",
     body: (p) => {
       const comp = (x0: number, slip: boolean) => {
@@ -315,7 +302,7 @@ const SCENES: Scene[] = [
         );
         return (
           <>
-            <Ink p={p} top="h">
+            <Ink p={p} top="hue">
               <circle cx={x0 + 40} cy="74" r="18" />
             </Ink>
             {slip ? <g className="snap-slip">{square}</g> : square}
@@ -339,34 +326,35 @@ const SCENES: Scene[] = [
             d="M165 86 L155 112"
           />
           <rect className="h snap-scan" x="20" y="26" width="3" height="148" />
-          <Reg x={267} y={95} className="snap-reg" />
+          <RegistrationMark x={267} y={95} className="snap-reg" />
         </>
       );
     },
   },
 ];
 
-// Tilt in degrees: the card turns a little to the left, and the cursor turns it further.
-const REST = { x: 4, y: -6 };
-const REACH = { x: 6, y: 10 };
-const restTransform = `rotateX(${REST.x}deg) rotateY(${REST.y}deg)`;
+const REST_DEG = { x: 4, y: -6 };
+const REACH_DEG = { x: 6, y: 10 };
+const EASE_PER_FRAME = 0.12;
+const restTransform = `rotateX(${REST_DEG.x}deg) rotateY(${REST_DEG.y}deg)`;
 
-// Turn the card toward the cursor, closing 12% of the gap each frame.
 function useTiltToCursor() {
-  const ref = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const node = ref.current;
-    if (!node || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const stage = stageRef.current;
+    const card = cardRef.current;
+    if (!stage || !card || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const clamp = (value: number) => Math.min(1, Math.max(-1, value));
-    const target = { ...REST };
-    const now = { ...REST };
+    const target = { ...REST_DEG };
+    const now = { ...REST_DEG };
     let frame = 0;
 
     const tick = () => {
-      now.x += (target.x - now.x) * 0.12;
-      now.y += (target.y - now.y) * 0.12;
-      node.style.transform = `rotateX(${now.x.toFixed(2)}deg) rotateY(${now.y.toFixed(2)}deg)`;
+      now.x += (target.x - now.x) * EASE_PER_FRAME;
+      now.y += (target.y - now.y) * EASE_PER_FRAME;
+      card.style.transform = `rotateX(${now.x.toFixed(2)}deg) rotateY(${now.y.toFixed(2)}deg)`;
       const settled = Math.abs(target.x - now.x) < 0.01 && Math.abs(target.y - now.y) < 0.01;
       frame = settled ? 0 : requestAnimationFrame(tick);
     };
@@ -377,13 +365,12 @@ function useTiltToCursor() {
     };
     const onMove = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") return;
-      // Measured on the flat stage, not the turning card, so the edges never slip.
-      const box = (node.parentElement ?? node).getBoundingClientRect();
+      const box = stage.getBoundingClientRect();
       const dx = clamp((event.clientX - (box.left + box.width / 2)) / (innerWidth / 2));
       const dy = clamp((event.clientY - (box.top + box.height / 2)) / (innerHeight / 2));
-      aim(REST.x - dy * REACH.x, REST.y + dx * REACH.y);
+      aim(REST_DEG.x - dy * REACH_DEG.x, REST_DEG.y + dx * REACH_DEG.y);
     };
-    const onLeave = () => aim(REST.x, REST.y);
+    const onLeave = () => aim(REST_DEG.x, REST_DEG.y);
 
     addEventListener("pointermove", onMove);
     document.documentElement.addEventListener("pointerleave", onLeave);
@@ -394,42 +381,38 @@ function useTiltToCursor() {
     };
   }, []);
 
-  return ref;
+  return { stageRef, cardRef };
 }
 
 export function HeroPrints({
   index,
-  run,
+  restartKey,
   playing,
-  ms,
-  loops,
+  slideMs,
+  loopsPerSlide,
 }: {
   index: number;
-  /** Bumps when a slide restarts, so its scene plays from the top. */
-  run: number;
-  /** Play the scene. Otherwise it holds its first frame. */
+  restartKey: number;
   playing: boolean;
-  /** The slide's length. */
-  ms: number;
-  /** Whole loops of the scene that fill the slide. */
-  loops: number;
+  slideMs: number;
+  loopsPerSlide: number;
 }) {
   const p = useId().replace(/[^a-zA-Z0-9]/g, "");
-  const cardRef = useTiltToCursor();
+  const { stageRef, cardRef } = useTiltToCursor();
   const scene = SCENES[index]!;
   return (
     <div className="hp" data-play={playing ? "" : undefined}>
       <style>{KEYFRAMES}</style>
-      <div className="hp-stage">
+      <div ref={stageRef} className="hp-stage">
         <div ref={cardRef} className="hp-card" style={{ transform: restTransform }}>
           <div className="hp-drop" />
           <div className="hp-paper" />
           <svg
-            key={`${index}-${run}`}
+            key={`${index}-${restartKey}`}
             viewBox="0 0 320 200"
             role="img"
             aria-label={scene.label}
-            style={{ "--T": `${ms / loops}ms` }}
+            style={{ "--loop-duration": `${slideMs / loopsPerSlide}ms` }}
           >
             <Paper p={p} />
             {scene.body(p)}

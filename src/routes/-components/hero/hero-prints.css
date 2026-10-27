@@ -1,6 +1,6 @@
 /* Hero prints (hero-prints.tsx, redesign/hero-variants/DIRECTION.md).
    A 16:10 card of grained paper with one Riso-printed scene on a 320 × 200 viewBox.
-   Scene loops run on --T; keyframes that come from geometry are generated in the TSX. */
+   Scene loops run on --loop-duration; keyframes that come from geometry are generated in the TSX. */
 
 .arc .hp {
   width: 100%;
@@ -98,7 +98,7 @@
 
 /* ---- Interfaces and agents: scattered, turned shapes spring into place ---- */
 .arc .hp .settle {
-  animation: hp-settle var(--T) calc(var(--i, 0) * var(--gap, 120ms)) infinite backwards;
+  animation: hp-settle var(--loop-duration) calc(var(--i, 0) * var(--gap, 120ms)) infinite backwards;
 }
 @keyframes hp-settle {
   0%,
@@ -119,7 +119,7 @@
 .arc .hp .ring {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: hp-ring var(--T) infinite;
+  animation: hp-ring var(--loop-duration) infinite;
 }
 @keyframes hp-ring {
   0%,
@@ -143,7 +143,7 @@
 /* ---- Dev tools: the ink takes the straight line; the ghost walks the meander ---- */
 .arc .hp .cut-ball {
   transform: translate(280px, 40px);
-  animation: hp-ball var(--T) infinite;
+  animation: hp-ball var(--loop-duration) infinite;
 }
 @keyframes hp-ball {
   0% {
@@ -167,7 +167,7 @@
   }
 }
 .arc .hp .cut-hit {
-  animation: hp-hit var(--T) infinite;
+  animation: hp-hit var(--loop-duration) infinite;
 }
 @keyframes hp-hit {
   0%,
@@ -189,20 +189,20 @@
 }
 .arc .hp .cut-ghost {
   opacity: 0;
-  animation: hp-ghost var(--T) linear infinite;
+  animation: hp-ghost var(--loop-duration) linear infinite;
 }
 
 /* ---- Backends: ten beats a loop; jobs step through, the hue job retries ---- */
 .arc .hp .q-job {
   opacity: 0;
-  animation: hp-job var(--T) calc(var(--T) * (var(--b) / 10 - 1)) linear infinite;
+  animation: hp-job var(--loop-duration) calc(var(--loop-duration) * (var(--b) / 10 - 1)) linear infinite;
 }
 .arc .hp .q-retry {
   opacity: 0;
-  animation: hp-retry var(--T) linear infinite;
+  animation: hp-retry var(--loop-duration) linear infinite;
 }
 .arc .hp .q-work {
-  animation: hp-work calc(var(--T) / 10) infinite;
+  animation: hp-work calc(var(--loop-duration) / 10) infinite;
 }
 @keyframes hp-work {
   0%,
@@ -220,11 +220,11 @@
 }
 .arc .hp .q-out {
   opacity: 0;
-  animation: hp-out var(--T) infinite;
+  animation: hp-out var(--loop-duration) infinite;
 }
 .arc .hp .q-out-retry {
   opacity: 0;
-  animation: hp-out-retry var(--T) infinite;
+  animation: hp-out-retry var(--loop-duration) infinite;
 }
 @keyframes hp-out-retry {
   0%,
@@ -244,7 +244,7 @@
 /* The worker turns the hue job away on beat 4. */
 .arc .hp .q-x {
   opacity: 0;
-  animation: hp-x var(--T) infinite;
+  animation: hp-x var(--loop-duration) infinite;
 }
 @keyframes hp-x {
   0%,
@@ -267,7 +267,7 @@
 
 /* ---- Tests: the scan finds the shape that slipped, and it snaps back ---- */
 .arc .hp .snap-slip {
-  animation: hp-slip var(--T) infinite;
+  animation: hp-slip var(--loop-duration) infinite;
 }
 @keyframes hp-slip {
   0%,
@@ -287,7 +287,7 @@
 }
 .arc .hp .snap-scan {
   opacity: 0;
-  animation: hp-scan var(--T) infinite;
+  animation: hp-scan var(--loop-duration) infinite;
 }
 @keyframes hp-scan {
   0%,
@@ -311,7 +311,7 @@
 }
 .arc .hp .snap-neq {
   opacity: 0;
-  animation: hp-neq var(--T) infinite;
+  animation: hp-neq var(--loop-duration) infinite;
 }
 @keyframes hp-neq {
   0%,
@@ -329,7 +329,7 @@
 }
 .arc .hp .snap-reg {
   opacity: 0;
-  animation: hp-reg var(--T) infinite;
+  animation: hp-reg var(--loop-duration) infinite;
 }
 @keyframes hp-reg {
   0%,
