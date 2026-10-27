@@ -63,8 +63,6 @@ function Reg({ x, y, className }: { x: number; y: number; className: string }) {
 const vars = (v: Record<string, string | number>): CSSProperties =>
   Object.fromEntries(Object.entries(v).map(([k, value]) => [`--${k}`, value]));
 
-/* ---- Keyframes that come from geometry ---- */
-
 const pct = (n: number) => `${+n.toFixed(2)}%`;
 
 // The long way round: a meander from the start ring to the target square.
@@ -173,8 +171,6 @@ function queueKeyframes() {
 }
 
 const KEYFRAMES = [meanderKeyframes(), queueKeyframes()].join("\n");
-
-/* ---- Scenes ---- */
 
 type Scene = { label: string; body: (p: string) => ReactNode };
 
@@ -349,8 +345,6 @@ const SCENES: Scene[] = [
     },
   },
 ];
-
-/* ---- Tilt ---- */
 
 // Tilt in degrees: the card turns a little to the left, and the cursor turns it further.
 const REST = { x: 4, y: -6 };

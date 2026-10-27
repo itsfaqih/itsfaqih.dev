@@ -3,10 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { MagnifyingGlassIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
 
-// ============================================================================
-// Header Component
-// ============================================================================
-
 export function Header() {
   const { toggleTheme } = useTheme();
   const openCommandPalette = () => {

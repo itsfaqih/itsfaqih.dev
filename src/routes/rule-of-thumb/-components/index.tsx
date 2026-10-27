@@ -19,10 +19,6 @@ import { colorOf, ruleNumber, RuleThumb } from "../../-components/rule-art";
 import { cn } from "@/cn";
 import { PageContainer } from "../../../components/page-container";
 
-// ============================================================================
-// Opinion Hero
-// ============================================================================
-
 type GuidelineHeroProps = {
   title: string;
   description: React.ReactNode;
@@ -156,10 +152,6 @@ export function useCurrentRule() {
   return GUIDELINES.find((guideline) => guideline.href === path);
 }
 
-// ============================================================================
-// Contents Rail
-// ============================================================================
-
 type RailHeading = { element: HTMLHeadingElement; text: string };
 
 // One tick per section heading, fixed in the left margin on wide screens, plus the
@@ -292,10 +284,6 @@ function ContentsRail() {
   );
 }
 
-// ============================================================================
-// Rule Page
-// ============================================================================
-
 // The blocks that rise in as they first scroll into view. Prose stays put, and a block
 // inside another block arrives with its parent.
 const REVEALED =
@@ -350,10 +338,6 @@ export function RulePage({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ============================================================================
-// Section Heading
-// ============================================================================
-
 type SectionHeadingProps = {
   title: string;
   description: string;
@@ -367,10 +351,6 @@ export function SectionHeading({ title, description }: SectionHeadingProps) {
     </div>
   );
 }
-
-// ============================================================================
-// Feature Tiles
-// ============================================================================
 
 type FeatureTile = {
   icon: React.ElementType;
@@ -403,10 +383,6 @@ export function FeatureTiles({
   );
 }
 
-// ============================================================================
-// Best Practice Card
-// ============================================================================
-
 type BestPracticeProps = {
   emoji: string;
   title: string;
@@ -426,10 +402,6 @@ export function BestPractice({ emoji, title, description }: BestPracticeProps) {
     </Card>
   );
 }
-
-// ============================================================================
-// Verdict panels
-// ============================================================================
 
 type VerdictProps = {
   good: boolean;
@@ -464,10 +436,6 @@ export function Verdict({ good, title, reason, children, className }: VerdictPro
   );
 }
 
-// ============================================================================
-// Code Comparison
-// ============================================================================
-
 type CodeComparisonProps = {
   badTitle: string;
   badCode: string;
@@ -501,10 +469,6 @@ export function CodeComparison({
   );
 }
 
-// ============================================================================
-// Code Example (Single)
-// ============================================================================
-
 type CodeExampleProps = {
   title: string;
   code: string;
@@ -522,10 +486,6 @@ export function CodeExample({ title, code, description }: CodeExampleProps) {
     </Card>
   );
 }
-
-// ============================================================================
-// Tabbed Code Example
-// ============================================================================
 
 type TabbedCodeExampleTab = {
   label: string;
@@ -563,10 +523,6 @@ export function TabbedCodeExample({ title, tabs, description }: TabbedCodeExampl
   );
 }
 
-// ============================================================================
-// Quick Ref Table
-// ============================================================================
-
 type QuickRefItem = {
   scenario: string;
   action: string;
@@ -590,10 +546,6 @@ export function QuickRefTable({ items }: QuickRefTableProps) {
     </ol>
   );
 }
-
-// ============================================================================
-// Quick Ref Card (used by other pages)
-// ============================================================================
 
 type QuickRefCardProps = {
   emoji: string;

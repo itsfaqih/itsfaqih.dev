@@ -7,8 +7,6 @@ import { MockBackdrop } from "./mock-backdrop";
 import { MockDialog } from "./mock-dialog";
 
 export function EscapeCloseDemoContent() {
-  // useAnimationDemo context is used by child components (KeyboardKey, MockDialog, MockBackdrop)
-
   return (
     <>
       <AnimationStage>

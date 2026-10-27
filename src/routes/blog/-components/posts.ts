@@ -19,11 +19,9 @@ export function getAllPosts(): BlogPost[] {
         frontmatter: mod.frontmatter,
       };
     })
-    .sort((a, b) => {
-      // Sort by date (publishedAt) descending
-      return (
+    .sort(
+      (a, b) =>
         new Date(b.frontmatter.publishedAt).getTime() -
-        new Date(a.frontmatter.publishedAt).getTime()
-      );
-    });
+        new Date(a.frontmatter.publishedAt).getTime(),
+    );
 }

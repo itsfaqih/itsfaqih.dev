@@ -6,10 +6,7 @@ type CursorProps = {
   size?: number;
 };
 
-/**
- * A reusable cursor component with consistent styling across all demos.
- * Uses white fill and black stroke for visibility in both light and dark modes.
- */
+/** A white fill with a black stroke keeps the cursor visible in light and dark modes. */
 export function Cursor({ className, size = 18 }: CursorProps) {
   return (
     <CursorIcon

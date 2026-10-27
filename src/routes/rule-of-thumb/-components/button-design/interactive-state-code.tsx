@@ -58,7 +58,6 @@ export function InteractiveStateCode() {
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const codeContainerRef = useRef<HTMLDivElement>(null);
 
-  // The complete code as a single string for the code renderer
   const code = `// Complete button with all states
 <button
   disabled={isPending || isDisabled}

@@ -8,10 +8,6 @@ import { RuleSelect } from "./-components/rule-select";
 import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
 
-// ============================================================================
-// Route
-// ============================================================================
-
 export const Route = createFileRoute("/")({
   component: Index,
 });
@@ -147,10 +143,6 @@ const STACK = [
 ];
 
 const TICKER = ["INTERFACES", "AGENTIC SETUPS", "DEV TOOLS", "APIS", "HEALTHCARE SOFTWARE"];
-
-// ============================================================================
-// Page
-// ============================================================================
 
 function Index() {
   const [started, setStarted] = useState(false);
@@ -292,10 +284,7 @@ function Index() {
   );
 }
 
-// ============================================================================
-// Intro: name slam, fast cuts through what I build, shutter split
-// ============================================================================
-
+// Intro: name slam, fast cuts through what I build, shutter split.
 function Intro({ onDone }: { onDone: (started: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [gone, setGone] = useState(false);
@@ -370,10 +359,7 @@ function Intro({ onDone }: { onDone: (started: boolean) => void }) {
   );
 }
 
-// ============================================================================
-// Hero: rotating headline and the screen whose scene acts out each phrase
-// ============================================================================
-
+// Hero: rotating headline and the screen whose scene acts out each phrase.
 function Hero({ started }: { started: boolean }) {
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [slide, setSlide] = useState({ index: 0, run: 0 });
@@ -490,10 +476,6 @@ function Hero({ started }: { started: boolean }) {
     </div>
   );
 }
-
-// ============================================================================
-// Count up a number the first time it scrolls into view
-// ============================================================================
 
 function ExperienceList() {
   const [open, setOpen] = useState(0);

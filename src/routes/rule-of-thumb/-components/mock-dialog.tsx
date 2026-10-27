@@ -9,7 +9,7 @@ export function MockDialog({
   transform = "scale(1)",
 }: {
   children: ReactNode;
-  className?: string; // for sizing/width
+  className?: string;
   animationName?: string;
   transform?: string;
 }) {

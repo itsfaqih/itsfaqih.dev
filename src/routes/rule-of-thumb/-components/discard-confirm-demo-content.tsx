@@ -63,7 +63,7 @@ export function DiscardConfirmDemoContent() {
         <MockDialog
           animationName="demo-discard-dialog-2"
           className={cx("w-full max-w-[280px]")}
-          transform="scale(0.95)" /* Start slightly smaller/hidden logic handled by keyframes */
+          transform="scale(0.95)"
         >
           <div className={cx("font-semibold text-foreground mb-2")}>Discard Changes?</div>
           <div className={cx("text-sm text-muted-foreground mb-4")}>
