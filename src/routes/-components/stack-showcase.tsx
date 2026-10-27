@@ -83,7 +83,9 @@ export function StackShowcase({
     <section ref={sectionRef} id="stack" className="stack">
       <div className="sh2">
         <h2>
-          <small data-cut>Tools I use</small>
+          <small data-cut style={{ "--c": "var(--ar)" }}>
+            Tools I use
+          </small>
           <span data-cut>Stack</span>
         </h2>
       </div>

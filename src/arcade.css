@@ -163,6 +163,69 @@ html.cur-on .cursor-default {
   transition-timing-function: linear;
 }
 
+/* The page scrollbar (components/page-scrollbar.tsx): one bar in the hue of what sits mid-screen,
+   no track, shown while scrolling or within reach. With it on, the native bar is hidden. */
+html.sb-own {
+  scrollbar-width: none;
+}
+html.sb-own::-webkit-scrollbar {
+  display: none;
+}
+.page-scrollbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2147483646;
+  width: 24px;
+  pointer-events: none;
+  --sb-hue: var(--go);
+}
+.page-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  width: 6px;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--sb-hue) var(--ink-mix), #000);
+  opacity: 0;
+  cursor: var(--cursor-grab);
+  transition:
+    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease;
+}
+.page-scrollbar[data-gold] .page-scrollbar-thumb {
+  background-color: var(--go-ink);
+}
+.page-scrollbar[data-shown] {
+  pointer-events: auto;
+}
+.page-scrollbar[data-shown] .page-scrollbar-thumb {
+  opacity: 1;
+  transition-duration: 120ms, 160ms, 180ms;
+  transition-timing-function: ease-out, cubic-bezier(0.22, 1, 0.36, 1), ease;
+}
+.page-scrollbar[data-shown]:hover .page-scrollbar-thumb,
+.page-scrollbar[data-dragging] .page-scrollbar-thumb {
+  width: 10px;
+  border-radius: 5px;
+}
+.page-scrollbar[data-dragging] .page-scrollbar-thumb {
+  cursor: var(--cursor-grabbing);
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-scrollbar-thumb,
+  .page-scrollbar[data-shown] .page-scrollbar-thumb {
+    transition: background-color 180ms ease;
+  }
+}
+@media (forced-colors: active) {
+  .page-scrollbar-thumb {
+    background: CanvasText;
+  }
+}
+
 .arc {
   color: var(--dim);
   font: 400 16px/1.6 var(--sans);
@@ -214,6 +277,9 @@ html.cur-on .cursor-default {
 }
 /* The canvas draws the dots inside --hole; the grid skips them there. */
 .arc-backdrop i {
+  /* One cell taller, so sliding it up by a part of a cell never bares the bottom edge. */
+  height: calc(100% + 22px);
+  will-change: transform;
   background: radial-gradient(circle, var(--dot) 1.25px, transparent 1.75px) 0 0 / 22px 22px;
   mask: radial-gradient(
     circle at var(--mx, 0) var(--my, 0),
@@ -461,6 +527,25 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .btn.go:active {
   box-shadow: 0 2px 0 var(--go-shadow);
+}
+/* The hero's button wears the slide's hue. The hue eases slower than a hover would, so hover
+   moves to a brightness filter on its own quick timing. */
+.arc .btn.go[style*="--c"] {
+  --key: color-mix(in oklab, var(--c) 70%, #000);
+  background: var(--c);
+  box-shadow: 0 4px 0 var(--key);
+  transition:
+    transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-color 280ms ease,
+    box-shadow 280ms ease,
+    filter 120ms ease;
+}
+.arc .btn.go[style*="--c"]:hover {
+  background: var(--c);
+  filter: brightness(1.08);
+}
+.arc .btn.go[style*="--c"]:active {
+  box-shadow: 0 2px 0 var(--key);
 }
 .arc .btn.soft {
   background: var(--panel-2);
@@ -762,11 +847,14 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .ticker {
   display: flex;
   width: max-content;
-  animation: marquee 26s linear infinite;
+  /* Three sets per half (see TICKER_RUN) at the speed two sets once ran in 26s. */
+  animation: marquee 64s linear infinite;
 }
+/* Tiles butt edge to edge so the band reads as one striped bar. */
 .arc .ticker span {
   font: 900 22px/56px var(--display);
-  padding-right: 40px;
+  padding: 0 28px;
+  background: var(--c);
   white-space: nowrap;
 }
 @keyframes marquee {
@@ -803,6 +891,9 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   letter-spacing: 0;
   color: var(--go-ink);
   margin-bottom: 10px;
+}
+.arc h2 small[style*="--c"] {
+  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
 }
 /* The title is its own block so it can glitch apart from the eyebrow above it. */
 .arc h2 > span[data-cut] {
@@ -2441,9 +2532,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   box-shadow:
     var(--raise),
     0 5px 0 var(--go-shadow);
-}
-.arc .end h2 small {
-  color: color-mix(in oklab, var(--ux) var(--ink-mix), #000);
 }
 .arc footer {
   font-size: 13px;

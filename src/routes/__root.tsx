@@ -5,7 +5,9 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { Header } from "../components/header";
 import { CommandPalette } from "../components/command-palette";
+import { PageScrollbar } from "../components/page-scrollbar";
 import { PrintCursor } from "../components/print-cursor";
+import { SmoothScroll } from "../components/smooth-scroll";
 
 import appCss from "../styles.css?url";
 
@@ -118,6 +120,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <CommandPalette />
         <main className={cx("relative z-10")}>{children}</main>
         <PrintCursor />
+        <SmoothScroll />
+        <PageScrollbar />
         <TanStackDevtools
           config={{ position: "bottom-right" }}
           plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}

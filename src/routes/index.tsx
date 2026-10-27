@@ -255,7 +255,17 @@ function usesByTool(sources: { use: StackUse; stack: string[] }[]) {
   return uses;
 }
 
-const TICKER = ["INTERFACES", "AGENTIC SETUPS", "DEV TOOLS", "APIS", "HEALTHCARE SOFTWARE"];
+// Each word wears the hue of its "What I build" pip, so the band reads as that legend.
+const TICKER = [
+  { word: "INTERFACES", color: "var(--ux)" },
+  { word: "AGENTIC SETUPS", color: "var(--cw)" },
+  { word: "DEV TOOLS", color: "var(--ar)" },
+  { word: "APIS", color: "var(--ts)" },
+  { word: "TESTS", color: "var(--ax)" },
+];
+// The band slides by exactly half its width, so each half must outrun the widest screen or its
+// end shows. One set is about 1170px; three sets make a half wide enough for a 3500px screen.
+const TICKER_RUN = Array.from({ length: 6 }, () => TICKER).flat();
 
 function Index() {
   const [introDone, setIntroDone] = useState(false);
@@ -274,8 +284,10 @@ function Index() {
 
       <div className="ticker-wrap" data-loop data-cut aria-hidden="true">
         <div className="ticker">
-          {[...TICKER, ...TICKER].map((word, index) => (
-            <span key={index}>{word} ★</span>
+          {TICKER_RUN.map(({ word, color }, index) => (
+            <span key={index} style={{ "--c": color }}>
+              {word} ★
+            </span>
           ))}
         </div>
       </div>
@@ -284,7 +296,9 @@ function Index() {
         <section id="rules">
           <div className="sh2">
             <h2>
-              <small data-cut>Writing</small>
+              <small data-cut style={{ "--c": "var(--cw)" }}>
+                Writing
+              </small>
               <span data-cut>Rule of Thumb</span>
             </h2>
             <p data-cut>Opinions I've earned from my experience</p>
@@ -295,7 +309,9 @@ function Index() {
         <section id="work">
           <div className="sh2">
             <h2>
-              <small data-cut>Experience</small>
+              <small data-cut style={{ "--c": "var(--ux)" }}>
+                Experience
+              </small>
               <span data-cut>Where I've worked</span>
             </h2>
           </div>
@@ -307,7 +323,9 @@ function Index() {
         <section id="projects">
           <div className="sh2">
             <h2>
-              <small data-cut>Side projects</small>
+              <small data-cut style={{ "--c": "var(--ts)" }}>
+                Side projects
+              </small>
               <span data-cut>Projects</span>
             </h2>
           </div>
@@ -332,7 +350,9 @@ function Index() {
 
         <div className="end" data-cut>
           <h2>
-            <small data-cut>Contact</small>
+            <small data-cut style={{ "--c": "var(--ax)" }}>
+              Contact
+            </small>
             <span data-cut>Have a product that needs this level of care?</span>
           </h2>
           <div className="acts" data-cut style={{ marginTop: 24 }}>
@@ -520,7 +540,12 @@ function Hero({ introDone }: { introDone: boolean }) {
           .
         </p>
         <div className="acts">
-          <a className="btn go" href="mailto:itsfaqih@gmail.com" data-cut>
+          <a
+            className="btn go"
+            href="mailto:itsfaqih@gmail.com"
+            data-cut
+            style={{ "--c": current.color }}
+          >
             Email itsfaqih@gmail.com
           </a>
           <a className="btn soft" href="#rules" data-cut>
