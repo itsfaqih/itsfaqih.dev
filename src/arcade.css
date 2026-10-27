@@ -50,11 +50,11 @@
   --t-step: 40ms;
   --t-pop: 420ms;
   --t-panel: 560ms;
-  /* Pixel cursors from scripts/cursors.py. Each falls back to its system cursor. */
+  /* Pixel cursors from scripts/cursors.py, shown until the print cursor takes over. Each falls back to its system cursor. */
   --cursor: url("/cursors/arrow.svg") 0 0, auto;
-  --cursor-point: url("/cursors/point.svg") 8 0, pointer;
-  --cursor-grab: url("/cursors/grab.svg") 12 10, grab;
-  --cursor-grabbing: url("/cursors/grabbing.svg") 12 8, grabbing;
+  --cursor-point: url("/cursors/point.svg") 9 0, pointer;
+  --cursor-grab: url("/cursors/grab.svg") 13 14, grab;
+  --cursor-grabbing: url("/cursors/grabbing.svg") 12 10, grabbing;
   --t-bar: 200ms;
 }
 
@@ -94,6 +94,68 @@ html {
 }
 :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="color"], [type="file"]), textarea, [contenteditable]) {
   cursor: text;
+}
+
+/* The print cursor (components/print-cursor.tsx) draws the shape itself. Each token becomes a
+   blank image whose fragment names that shape, so it can read the cursor an element asks for. */
+html.cur-on {
+  --cursor: url("/cursors/none.svg#arrow") 0 0, none;
+  --cursor-point: url("/cursors/none.svg#point") 0 0, none;
+  --cursor-grab: url("/cursors/none.svg#grab") 0 0, none;
+  --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
+}
+html.cur-on .cursor-pointer {
+  cursor: var(--cursor-point);
+}
+html.cur-on .cursor-default {
+  cursor: var(--cursor);
+}
+.print-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  visibility: hidden;
+  --pc-hue: var(--go);
+}
+.print-cursor.on:not([data-mode="native"]) {
+  visibility: visible;
+}
+.print-cursor svg {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  width: 48px;
+  height: 48px;
+  overflow: visible;
+}
+.print-cursor :is(.pc-ink, .pc-fill, .pc-plate path) {
+  shape-rendering: crispEdges;
+}
+.print-cursor .pc-ink {
+  fill: var(--text);
+}
+.print-cursor .pc-fill {
+  fill: var(--bg);
+  transition: fill 180ms ease;
+}
+.print-cursor:not([data-mode="arrow"], [data-on-hue]) .pc-fill {
+  fill: var(--pc-hue);
+}
+.print-cursor circle {
+  fill: var(--pc-hue);
+  transition: fill 180ms ease;
+}
+.print-cursor .pc-body {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+  transition: transform 260ms var(--snap);
+}
+.print-cursor.down .pc-body {
+  transform: scale(0.88);
+  transition-duration: 15ms;
+  transition-timing-function: linear;
 }
 
 .arc {

@@ -5,6 +5,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { Header } from "../components/header";
 import { CommandPalette } from "../components/command-palette";
+import { PrintCursor } from "../components/print-cursor";
 
 import appCss from "../styles.css?url";
 
@@ -116,6 +117,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Header />
         <CommandPalette />
         <main className={cx("relative z-10")}>{children}</main>
+        <PrintCursor />
         <TanStackDevtools
           config={{ position: "bottom-right" }}
           plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}
