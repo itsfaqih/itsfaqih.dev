@@ -27,8 +27,6 @@ export function CommandPaletteView({
   goBack,
   copied,
 }: CommandPaletteViewProps) {
-  let runningIndex = 0;
-
   return (
     <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Portal>
@@ -81,22 +79,19 @@ export function CommandPaletteView({
               {flatItems.length === 0 ? (
                 <div className="cmdk-empty">No results for &quot;{inputValue}&quot;</div>
               ) : (
-                groups.map((group) => {
-                  const groupStartIndex = runningIndex;
-                  const groupEl = (
+                groups.map((group) => (
                     <div key={group.label} role="group" aria-label={group.label} className="cmdk-group">
                       <div role="presentation" className="cmdk-label">
                         {group.label}
                       </div>
-                      {group.items.map((item, itemIdx) => {
-                        const flatIdx = groupStartIndex + itemIdx;
-                        const isHighlighted = flatIdx === selectedIndex;
+                      {group.items.map((item) => {
+                        const flatIdx = flatItems.indexOf(item);
                         return (
                           <div
                             key={item.id}
                             id={`cmd-option-${item.id}`}
                             role="option"
-                            aria-selected={isHighlighted}
+                            aria-selected={flatIdx === selectedIndex}
                             onClick={item.action}
                             onPointerMove={() => setHighlightedIndex(flatIdx)}
                             className="cmdk-item"
@@ -119,10 +114,7 @@ export function CommandPaletteView({
                         );
                       })}
                     </div>
-                  );
-                  runningIndex += group.items.length;
-                  return groupEl;
-                })
+                  ))
               )}
             </div>
 

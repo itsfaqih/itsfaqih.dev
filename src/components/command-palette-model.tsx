@@ -36,14 +36,12 @@ export const LEVEL_LABELS: Record<NavigationLevel, string> = {
 function filterItem(item: CommandItem, query: string): boolean {
   if (!query.trim()) return true;
   const normalizedQuery = query.toLowerCase();
-  if (item.label.toLowerCase().includes(normalizedQuery)) return true;
-  if (item.description?.toLowerCase().includes(normalizedQuery)) return true;
-  if (item.keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedQuery))) return true;
-  return false;
+  return [item.label, item.description, ...(item.keywords ?? [])].some((text) =>
+    text?.toLowerCase().includes(normalizedQuery),
+  );
 }
 
 export function useCommandPalette() {
-
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [navigationLevel, setNavigationLevel] = useState<NavigationLevel>("root");
@@ -55,109 +53,96 @@ export function useCommandPalette() {
   const copiedResetTimerRef = useRef<number>(undefined);
   const navigate = useNavigate();
 
-
-  // Reset state when closing
-  const closeAndReset = () => {
-    setIsOpen(false);
-  };
-
-  // ── Command definitions ──────────────────────────────────────────────
-
   const rootCommands: CommandItem[] = [
-      {
-        id: "home",
-        label: "Home",
-        description: "Go to homepage",
-        icon: <HouseIcon size={18} />,
-        category: "navigation",
-        keywords: ["index", "main", "start"],
-        action: () => {
-          navigate({ to: "/" });
-          closeAndReset();
-        },
+    {
+      id: "home",
+      label: "Home",
+      description: "Go to homepage",
+      icon: <HouseIcon size={18} />,
+      category: "navigation",
+      keywords: ["index", "main", "start"],
+      action: () => {
+        navigate({ to: "/" });
+        setIsOpen(false);
       },
-      {
-        id: "rule-of-thumb",
-        label: "Rule of Thumb",
-        description: "Browse design and code guidelines",
-        icon: <BookOpenIcon size={18} />,
-        category: "navigation",
-        keywords: ["guidelines", "principles", "best practices"],
-        hasSubmenu: true,
-        action: () => {
-          setParentItemId("rule-of-thumb");
-          setNavigationLevel("rule-of-thumb");
-          setInputValue("");
-          setHighlightedIndex(0);
-        },
+    },
+    {
+      id: "rule-of-thumb",
+      label: "Rule of Thumb",
+      description: "Browse design and code guidelines",
+      icon: <BookOpenIcon size={18} />,
+      category: "navigation",
+      keywords: ["guidelines", "principles", "best practices"],
+      hasSubmenu: true,
+      action: () => {
+        setParentItemId("rule-of-thumb");
+        setNavigationLevel("rule-of-thumb");
+        setInputValue("");
+        setHighlightedIndex(0);
       },
-      {
-        id: "github",
-        label: "GitHub",
-        description: "Open GitHub profile in new tab",
-        icon: <GithubLogoIcon size={18} />,
-        category: "external",
-        keywords: ["code", "repository", "repo", "source"],
-        action: () => {
-          window.open("https://github.com/itsfaqih", "_blank", "noopener,noreferrer");
-          closeAndReset();
-        },
+    },
+    {
+      id: "github",
+      label: "GitHub",
+      description: "Open GitHub profile in new tab",
+      icon: <GithubLogoIcon size={18} />,
+      category: "external",
+      keywords: ["code", "repository", "repo", "source"],
+      action: () => {
+        window.open("https://github.com/itsfaqih", "_blank", "noopener,noreferrer");
+        setIsOpen(false);
       },
-      {
-        id: "linkedin",
-        label: "LinkedIn",
-        description: "Open LinkedIn profile in new tab",
-        icon: <LinkedinLogoIcon size={18} />,
-        category: "external",
-        keywords: ["profile", "professional", "connect", "network"],
-        action: () => {
-          window.open("https://linkedin.com/in/itsfaqih", "_blank", "noopener,noreferrer");
-          closeAndReset();
-        },
+    },
+    {
+      id: "linkedin",
+      label: "LinkedIn",
+      description: "Open LinkedIn profile in new tab",
+      icon: <LinkedinLogoIcon size={18} />,
+      category: "external",
+      keywords: ["profile", "professional", "connect", "network"],
+      action: () => {
+        window.open("https://linkedin.com/in/itsfaqih", "_blank", "noopener,noreferrer");
+        setIsOpen(false);
       },
-      {
-        id: "copy-email",
-        label: "Copy Email",
-        description: "Copy itsfaqih@gmail.com to clipboard",
-        icon: copied ? <CheckIcon size={18} /> : <EnvelopeIcon size={18} />,
-        category: "action",
-        keywords: ["email", "contact", "mail", "clipboard"],
-        action: async () => {
-          try {
-            await navigator.clipboard.writeText("itsfaqih@gmail.com");
-            setCopied(true);
-            copiedResetTimerRef.current = window.setTimeout(() => {
-              copiedResetTimerRef.current = undefined;
-              setCopied(false);
-              closeAndReset();
-            }, 1500);
-          } catch (error) {
-            console.warn("Could not copy the email address.", error);
-          }
-        },
+    },
+    {
+      id: "copy-email",
+      label: "Copy Email",
+      description: "Copy itsfaqih@gmail.com to clipboard",
+      icon: copied ? <CheckIcon size={18} /> : <EnvelopeIcon size={18} />,
+      category: "action",
+      keywords: ["email", "contact", "mail", "clipboard"],
+      action: async () => {
+        try {
+          await navigator.clipboard.writeText("itsfaqih@gmail.com");
+          setCopied(true);
+          copiedResetTimerRef.current = window.setTimeout(() => {
+            copiedResetTimerRef.current = undefined;
+            setCopied(false);
+            setIsOpen(false);
+          }, 1500);
+        } catch (error) {
+          console.warn("Could not copy the email address.", error);
+        }
       },
+    },
   ];
 
-
-  const ruleOfThumbCommands: CommandItem[] = (() => {
-    const commands: CommandItem[] = [
-      {
-        id: "rot-index",
-        label: "Index",
-        description: "View all rules of thumb",
-        icon: <BookOpenIcon size={18} />,
-        category: "navigation",
-        keywords: ["all", "list", "overview"],
-        action: () => {
-          navigate({ to: "/rule-of-thumb" });
-          closeAndReset();
-        },
+  const ruleOfThumbCommands: CommandItem[] = [
+    {
+      id: "rot-index",
+      label: "Index",
+      description: "View all rules of thumb",
+      icon: <BookOpenIcon size={18} />,
+      category: "navigation",
+      keywords: ["all", "list", "overview"],
+      action: () => {
+        navigate({ to: "/rule-of-thumb" });
+        setIsOpen(false);
       },
-    ];
-
-    for (const guideline of GUIDELINES) {
-      if (guideline.comingSoon || guideline.hidden) continue;
-      commands.push({
+    },
+    ...GUIDELINES.filter((guideline) => !guideline.comingSoon && !guideline.hidden).map(
+      (guideline): CommandItem => ({
         id: `rot-${guideline.id}`,
         label: guideline.title,
         description: `${guideline.label} • ${guideline.description}`,
@@ -166,127 +151,85 @@ export function useCommandPalette() {
         keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
         action: () => {
           navigate({ to: guideline.href });
-          closeAndReset();
+          setIsOpen(false);
         },
-      });
-    }
+      }),
+    ),
+  ];
 
-    return commands;
-  })();
-
-  // ── Derived data ─────────────────────────────────────────────────────
-
-  const currentCommands = (() => {
-    switch (navigationLevel) {
-      case "rule-of-thumb":
-        return ruleOfThumbCommands;
-      default:
-        return rootCommands;
-    }
-  })();
-
-  // Group and filter commands
-  const { groups, flatItems } = (() => {
-    const filtered = currentCommands.filter((cmd) => filterItem(cmd, inputValue));
-
-    const categoryMap: Record<CommandItem["category"], CommandItem[]> = {
-      navigation: [],
-      external: [],
-      action: [],
-    };
-    filtered.forEach((cmd) => categoryMap[cmd.category].push(cmd));
-
-    const groups: CommandGroup[] = [];
-    if (categoryMap.navigation.length > 0) {
-      groups.push({ label: LEVEL_LABELS[navigationLevel], items: categoryMap.navigation });
-    }
-    if (categoryMap.external.length > 0) {
-      groups.push({ label: "Links", items: categoryMap.external });
-    }
-    if (categoryMap.action.length > 0) {
-      groups.push({ label: "Actions", items: categoryMap.action });
-    }
-
-    // Flat list of all visible items for index-based navigation
-    const flatItems = groups.flatMap((g) => g.items);
-    return { groups, flatItems };
-  })();
+  const currentCommands = navigationLevel === "rule-of-thumb" ? ruleOfThumbCommands : rootCommands;
+  const filtered = currentCommands.filter((cmd) => filterItem(cmd, inputValue));
+  const inCategory = (category: CommandItem["category"]) =>
+    filtered.filter((cmd) => cmd.category === category);
+  const groups: CommandGroup[] = [
+    { label: LEVEL_LABELS[navigationLevel], items: inCategory("navigation") },
+    { label: "Links", items: inCategory("external") },
+    { label: "Actions", items: inCategory("action") },
+  ].filter((group) => group.items.length > 0);
+  const flatItems = groups.flatMap((group) => group.items);
 
   const selectedIndex =
     flatItems.length === 0 ? -1 : Math.min(Math.max(highlightedIndex, 0), flatItems.length - 1);
-
-  // ── Navigation helpers ───────────────────────────────────────────────
+  const highlightedItem = flatItems[selectedIndex];
 
   const goBack = () => {
     setNavigationLevel("root");
     setInputValue("");
+    // Navigation commands lead the root list, so the parent's place among them is its index.
+    const navItems = rootCommands.filter((cmd) => cmd.category === "navigation");
+    setHighlightedIndex(
+      Math.max(
+        navItems.findIndex((item) => item.id === parentItemId),
+        0,
+      ),
+    );
+  };
 
-    // Restore highlight to the parent menu item
-    if (parentItemId) {
-      // We need to compute the index in the root flat list.
-      // At root level, navigation items come first, so we can find the index directly.
-      const navItems = rootCommands.filter((cmd) => cmd.category === "navigation");
-      const parentIndex = navItems.findIndex((item) => item.id === parentItemId);
-      setHighlightedIndex(parentIndex >= 0 ? parentIndex : 0);
-    } else {
-      setHighlightedIndex(0);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const total = flatItems.length;
+
+    switch (e.key) {
+      case "ArrowDown": {
+        e.preventDefault();
+        if (total === 0) return;
+        setHighlightedIndex((prev) => (prev + 1) % total);
+        break;
+      }
+      case "ArrowUp": {
+        e.preventDefault();
+        if (total === 0) return;
+        setHighlightedIndex((prev) => (prev - 1 + total) % total);
+        break;
+      }
+      case "Enter": {
+        e.preventDefault();
+        highlightedItem?.action();
+        break;
+      }
+      case "ArrowRight": {
+        if (highlightedItem?.hasSubmenu) {
+          e.preventDefault();
+          highlightedItem.action();
+        }
+        break;
+      }
+      case "ArrowLeft":
+      case "Backspace": {
+        if (inputValue === "" && navigationLevel !== "root") {
+          e.preventDefault();
+          goBack();
+        }
+        break;
+      }
     }
   };
 
-  // ── Keyboard handling ────────────────────────────────────────────────
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      const total = flatItems.length;
-
-      switch (e.key) {
-        case "ArrowDown": {
-          e.preventDefault();
-          if (total === 0) return;
-          setHighlightedIndex((prev) => (prev + 1) % total);
-          break;
-        }
-        case "ArrowUp": {
-          e.preventDefault();
-          if (total === 0) return;
-          setHighlightedIndex((prev) => (prev - 1 + total) % total);
-          break;
-        }
-        case "Enter": {
-          e.preventDefault();
-          const item = flatItems[selectedIndex];
-          if (item) item.action();
-          break;
-        }
-        case "ArrowRight": {
-          const item = flatItems[selectedIndex];
-          if (item?.hasSubmenu) {
-            e.preventDefault();
-            item.action();
-          }
-          break;
-        }
-        case "ArrowLeft":
-        case "Backspace": {
-          if (inputValue === "" && navigationLevel !== "root") {
-            e.preventDefault();
-            goBack();
-          }
-          break;
-        }
-      }
-  };
-
-  // ── Scroll highlighted item into view ────────────────────────────────
-
   useEffect(() => {
-    if (selectedIndex < 0) return;
-    const item = flatItems[selectedIndex];
-    if (!item) return;
-    const el = document.getElementById(`cmd-option-${item.id}`);
-    el?.scrollIntoView({ block: "nearest" });
-  }, [selectedIndex, flatItems]);
-
-  // ── Global keyboard shortcut ─────────────────────────────────────────
+    if (!highlightedItem) return;
+    document
+      .getElementById(`cmd-option-${highlightedItem.id}`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [highlightedItem]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -299,39 +242,27 @@ export function useCommandPalette() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Reset on close
   useEffect(() => {
-    let resetTimer: number | undefined;
-    if (!isOpen) {
-      if (copiedResetTimerRef.current !== undefined) {
-        window.clearTimeout(copiedResetTimerRef.current);
-        copiedResetTimerRef.current = undefined;
-      }
-      setCopied(false);
-      resetTimer = window.setTimeout(() => {
-        setNavigationLevel("root");
-        setInputValue("");
-        setHighlightedIndex(0);
-      }, 150);
-    }
-    return () => {
-      if (resetTimer !== undefined) window.clearTimeout(resetTimer);
-    };
+    if (isOpen) return;
+    window.clearTimeout(copiedResetTimerRef.current);
+    copiedResetTimerRef.current = undefined;
+    setCopied(false);
+    const resetTimer = window.setTimeout(() => {
+      setNavigationLevel("root");
+      setInputValue("");
+      setHighlightedIndex(0);
+    }, 150);
+    return () => window.clearTimeout(resetTimer);
   }, [isOpen]);
 
-  // Auto-focus input when opening or changing level
   useEffect(() => {
     if (!isOpen) return;
     const frame = requestAnimationFrame(() => inputRef.current?.focus());
     return () => cancelAnimationFrame(frame);
   }, [isOpen, navigationLevel]);
 
-  // ── A11y IDs ─────────────────────────────────────────────────────────
-
   const listboxId = "cmd-listbox";
-  const highlightedItem = flatItems[selectedIndex];
   const activeDescendant = highlightedItem ? `cmd-option-${highlightedItem.id}` : undefined;
-
 
   return {
     isOpen,
