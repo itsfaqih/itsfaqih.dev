@@ -16,7 +16,6 @@ import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { GUIDELINES } from "../../../data/guidelines";
 import { colorOf, ruleNumber, RuleThumb } from "../../-components/rule-art";
-import { cn } from "@/cn";
 import { PageContainer } from "../../../components/page-container";
 
 type GuidelineHeroProps = {
@@ -96,7 +95,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
               <Menu.Portal>
                 <Menu.Positioner side="bottom" align="end" sideOffset={8} className={cx("z-50")}>
                   <Menu.Popup
-                    className={cn(
+                    className={cx(
                       "w-fit rounded-xl border border-border bg-popover backdrop-blur-xl p-1 shadow-lg z-50 flex flex-col outline-none origin-top",
                       "transition-[transform,opacity,scale] duration-150",
                       "data-starting-style:scale-95 data-starting-style:opacity-0",
@@ -415,7 +414,7 @@ type VerdictProps = {
 export function Verdict({ good, title, reason, children, className }: VerdictProps) {
   const Mark = good ? CheckIcon : XIcon;
   return (
-    <Card className={cn("rk-verdict", good && "good", className)} hoverEffect={false}>
+    <Card className={cx("rk-verdict", good && "good", className)} hoverEffect={false}>
       <div className="rk-head">
         <span className="rk-stamp" aria-hidden="true">
           <Mark size={14} weight="bold" />

@@ -1,6 +1,5 @@
 import "../../button-design.css";
 import { cx } from "@/stylex";
-import { cn } from "@/cn";
 import {
   AnimationStage,
   AnimationControls,
@@ -64,7 +63,7 @@ export function InteractiveButtonDemoContent() {
 
         <div
           data-variant="brand"
-          className={cn(
+          className={cx(
             base,
             "cursor-default absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
           )}

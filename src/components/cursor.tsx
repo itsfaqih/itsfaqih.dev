@@ -1,5 +1,5 @@
 import { CursorIcon } from "@phosphor-icons/react";
-import { cn } from "@/cn";
+import { cx } from "@/stylex";
 
 type CursorProps = {
   className?: string;
@@ -10,7 +10,7 @@ type CursorProps = {
 export function Cursor({ className, size = 18 }: CursorProps) {
   return (
     <CursorIcon
-      className={cn("text-white stroke-black stroke-6 rotate-20", className)}
+      className={cx("text-white stroke-black stroke-6 rotate-20", className)}
       weight="fill"
       size={size}
     />

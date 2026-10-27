@@ -5,7 +5,6 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 
 import { Header } from "../components/header";
 import { CommandPalette } from "../components/command-palette";
-import { cn } from "../cn";
 
 import appCss from "../styles.css?url";
 
@@ -109,7 +108,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body
-        className={cn(
+        className={cx(
           "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative site-shell",
           "bg-background text-foreground",
         )}

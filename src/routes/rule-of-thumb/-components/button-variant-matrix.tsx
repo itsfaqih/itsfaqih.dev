@@ -1,5 +1,4 @@
 import { cx } from "@/stylex";
-import { cn } from "@/cn";
 import { CircleNotchIcon } from "@phosphor-icons/react";
 import { Button } from "../../../components/button";
 
@@ -60,7 +59,7 @@ export function ButtonVariantMatrix() {
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
-                    className={cn(
+                    className={cx(
                       "pointer-events-none after:opacity-100",
                       row.id === "tertiary-neutral" && "button-tertiary-neutral-hover-state",
                     )}
@@ -71,7 +70,7 @@ export function ButtonVariantMatrix() {
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
-                    className={cn(
+                    className={cx(
                       "pointer-events-none ring-2 ring-offset-2 ring-offset-background",
                       row.id.includes("destructive") ? "ring-destructive" : "ring-ring",
                     )}
@@ -82,7 +81,7 @@ export function ButtonVariantMatrix() {
                 <td className={cx("p-4")}>
                   <Button
                     variant={row.id}
-                    className={cn(
+                    className={cx(
                       "pointer-events-none scale-95 after:opacity-100 before:opacity-10 before:scale-150 before:duration-0",
                       row.id === "tertiary-neutral" && "button-tertiary-neutral-pressing-state",
                       row.id === "tertiary-brand" && "button-tertiary-brand-pressing-state",

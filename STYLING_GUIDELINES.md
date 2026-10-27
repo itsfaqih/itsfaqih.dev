@@ -44,7 +44,7 @@ import { cx } from "@/stylex";
 <div className={cx("flex items-center gap-2", className)} />;
 ```
 
-`src/cn.ts` remains as a compatibility wrapper for components that already import `cn`. Do not add another class-merging dependency.
+Do not add another class-merging dependency.
 
 ### 3. Prefer Semantic Theme Variables
 

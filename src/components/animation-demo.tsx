@@ -1,7 +1,6 @@
 import { cx } from "@/stylex";
 import { createContext, useContext } from "react";
 import { useCssAnimation } from "../hooks/use-css-animation";
-import { cn } from "@/cn";
 import { Card } from "./card";
 import { PlayIcon, PauseIcon, ArrowCounterClockwiseIcon } from "@phosphor-icons/react";
 import { Cursor } from "./cursor";
@@ -51,7 +50,7 @@ export function AnimationDemo({
 
   return (
     <AnimationDemoContext.Provider value={{ ...animationData, animationStyle }}>
-      <Card className={cn("overflow-hidden h-full flex flex-col", className)} hoverEffect={false}>
+      <Card className={cx("overflow-hidden h-full flex flex-col", className)} hoverEffect={false}>
         {children}
       </Card>
     </AnimationDemoContext.Provider>
@@ -69,7 +68,7 @@ export function AnimationStage({
 
   return (
     <div
-      className={cn(
+      className={cx(
         "rk-stage relative p-8 flex flex-col items-center justify-center min-h-[400px] flex-1 overflow-hidden",
         className,
       )}
@@ -189,7 +188,7 @@ export function AnimatedCursor({
 
   return (
     <div
-      className={cn("absolute z-50 pointer-events-none", className)}
+      className={cx("absolute z-50 pointer-events-none", className)}
       style={{
         ...animationStyle,
         animationName: moveAnimationName,

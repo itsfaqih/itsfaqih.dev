@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@/cn";
+import { cx } from "@/stylex";
 import { useAnimationDemo } from "../../../components/animation-demo";
 
 export function MockDialog({
@@ -16,7 +16,7 @@ export function MockDialog({
   const { status, animationStyle } = useAnimationDemo();
   return (
     <div
-      className={cn(
+      className={cx(
         "rk-window absolute left-1/2 top-1/2 z-20 outline-none p-6",
         className || "w-full max-w-sm",
       )}

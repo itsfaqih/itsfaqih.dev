@@ -1,6 +1,5 @@
 import { cx } from "@/stylex";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { cn } from "../../../cn";
 
 type TableOfContentsProps = {
   className?: string;
@@ -95,7 +94,7 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
   if (headings.length === 0) return null;
 
   return (
-    <nav className={cn("space-y-2", className)}>
+    <nav className={cx("space-y-2", className)}>
       <p className={cx("font-medium text-sm text-foreground mb-4")}>On this page</p>
       <ul className={cx("text-base lg:text-sm [&:has(a:hover)_li:not(:hover)]:opacity-50")}>
         {headings.map((heading) => (
@@ -106,7 +105,7 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
           >
             <a
               href={`#${heading.id}`}
-              className={cn(
+              className={cx(
                 "block py-3 lg:py-1.5 transition-colors duration-1000 hover:duration-0 hover:text-foreground",
                 activeId === heading.id ? "text-foreground font-medium" : "text-muted-foreground",
               )}

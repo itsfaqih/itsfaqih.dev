@@ -4,7 +4,7 @@ import { ArrowsClockwiseIcon } from "@phosphor-icons/react";
 import { Button } from "../../../../components/button";
 
 export function SWRDemo() {
-  const [data, setData] = useState<string>("User count: 1,234");
+  const [data, setData] = useState("User count: 1,234");
   const [isRefetching, setIsRefetching] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("2 min ago");
 

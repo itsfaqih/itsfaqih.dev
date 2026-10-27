@@ -1,7 +1,7 @@
 import { registerCustomCSSVariableTheme } from "@pierre/diffs";
 import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
 import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
-import { cn } from "../cn";
+import { cx } from "@/stylex";
 
 // One syntax theme for both appearances: token colours are CSS variables, set on
 // .code-block in rot.css from the arcade palette, so they flip with the page theme.
@@ -117,7 +117,7 @@ export function CodeBlock({
     <File
       file={file}
       options={options}
-      className={cn("code-block", className)}
+      className={cx("code-block", className)}
       style={fileStyle}
     />
   );

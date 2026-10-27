@@ -1,7 +1,6 @@
 import { cx } from "@/stylex";
 import * as React from "react";
 import { Tooltip } from "@base-ui/react";
-import { cn } from "@/cn";
 
 type SimpleTooltipProps = {
   children: React.ReactElement;
@@ -25,7 +24,7 @@ export function SimpleTooltip({
         <Tooltip.Portal>
           <Tooltip.Positioner side={side} sideOffset={sideOffset}>
             <Tooltip.Popup
-              className={cn(
+              className={cx(
                 "z-50 rounded-md bg-background px-2.5 py-1 text-xs text-foreground backdrop-blur-md outline-none",
                 "data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:zoom-in-95",
                 "data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95",

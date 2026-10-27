@@ -1,5 +1,4 @@
 import { cx } from "@/stylex";
-import { cn } from "@/cn";
 import {
   AnimationControls,
   AnimationStage,
@@ -36,13 +35,13 @@ export function FocusTrapDemoContent() {
           <div className={cx("flex gap-2")}>
             <Button
               variant="tertiary-neutral"
-              className={cn("flex-1", focusedButton === "btn1" && focusRingClasses)}
+              className={cx("flex-1", focusedButton === "btn1" && focusRingClasses)}
             >
               Cancel
             </Button>
             <Button
               variant="brand"
-              className={cn("flex-1", focusedButton === "btn2" && focusRingClasses)}
+              className={cx("flex-1", focusedButton === "btn2" && focusRingClasses)}
             >
               Confirm
             </Button>
