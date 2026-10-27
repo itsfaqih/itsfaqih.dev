@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -28,10 +28,11 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
   const last = rules.length - 1;
   const [initial] = useState(() => Math.floor(last / 2));
   const [active, setActive] = useState(initial);
+  const [opening, setOpening] = useState<string | null>(null);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const stageRef = useRef<HTMLDivElement>(null);
   const slots = useRef<HTMLDivElement[]>([]);
-  const deck = useRef({ position: initial, velocity: 0, target: initial, frame: 0, justDragged: false });
+  const deck = useRef({ position: initial, velocity: 0, target: initial, frame: 0, wheelTimer: 0, justDragged: false });
   const grab = useRef<Grab | null>(null);
   const clamp = (index: number) => Math.max(0, Math.min(last, index));
 
@@ -136,32 +137,31 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
     goTo(target);
   };
 
-  // The wheel listener lives for the deck's lifetime, so a re-render mid-spring never cancels it.
-  const latest = useRef({ paint, goTo, cardUnit });
-  latest.current = { paint, goTo, cardUnit };
+  const onWheel = useEffectEvent((event: WheelEvent) => {
+    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    const state = deck.current;
+    cancelAnimationFrame(state.frame);
+    state.velocity = 0;
+    const moved = state.position + event.deltaX / cardUnit();
+    state.position = Math.max(-RUBBER, Math.min(last + RUBBER, moved));
+    paint();
+    clearTimeout(state.wheelTimer);
+    state.wheelTimer = window.setTimeout(() => goTo(Math.round(state.position)), WHEEL_SETTLE_MS);
+  });
+
+  // React's onWheel is passive, and stopping the page from scrolling sideways needs preventDefault.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
     const state = deck.current;
-    let timer = 0;
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
-      event.preventDefault();
-      cancelAnimationFrame(state.frame);
-      state.velocity = 0;
-      const moved = state.position + event.deltaX / latest.current.cardUnit();
-      state.position = Math.max(-RUBBER, Math.min(last + RUBBER, moved));
-      latest.current.paint();
-      clearTimeout(timer);
-      timer = window.setTimeout(() => latest.current.goTo(Math.round(state.position)), WHEEL_SETTLE_MS);
-    };
     stage.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       stage.removeEventListener("wheel", onWheel);
-      clearTimeout(timer);
+      clearTimeout(state.wheelTimer);
       cancelAnimationFrame(state.frame);
     };
-  }, [last]);
+  }, []);
 
   const rule = rules[active]!;
   return (
@@ -206,14 +206,12 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
               to={item.href}
               className="spread-card"
               data-cut
+              data-opening={opening === item.id ? "" : undefined}
               draggable={false}
               aria-current={index === active ? "true" : undefined}
               style={{ "--c": colorOf(item.label) }}
               viewTransition={reduced ? undefined : { types: [RULE_OPEN] }}
-              onClick={(event) => {
-                stageRef.current?.querySelector("[data-opening]")?.removeAttribute("data-opening");
-                event.currentTarget.dataset.opening = "";
-              }}
+              onClick={() => setOpening(item.id)}
               onFocus={(event) => {
                 if (event.currentTarget.matches(":focus-visible")) goTo(index);
               }}

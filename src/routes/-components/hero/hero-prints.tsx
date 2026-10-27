@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useEffectEvent, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   blend,
   circle,
@@ -548,8 +548,7 @@ const setFade = (layer: SVGGElement, fade: number) => layer.style.setProperty("-
     a half-faded layer. */
 function useSceneMorph(index: number, run: number) {
   const [stage, setStage] = useState<Stage>({ layers: [{ index, run }], phase: "still" });
-  const stageRef = useRef(stage);
-  stageRef.current = stage;
+  const currentStage = useEffectEvent(() => stage);
   const layerRefs = useRef(new Map<string, SVGGElement>());
   const morphRef = useRef<SVGGElement>(null);
   const drawnRef = useRef<Drawn[]>([]);
@@ -559,7 +558,7 @@ function useSceneMorph(index: number, run: number) {
   useLayoutEffect(() => paintRef.current(), [stage]);
 
   useEffect(() => {
-    const { layers, phase } = stageRef.current;
+    const { layers, phase } = currentStage();
     const scene = layers.at(-1)!;
     if (scene.index === index && scene.run === run) return;
     const next = { index, run };

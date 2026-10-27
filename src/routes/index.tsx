@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GUIDELINES } from "../data/guidelines";
 import { useMediaQuery } from "../hooks/use-media-query";
@@ -474,16 +474,17 @@ function Hero({ introDone }: { introDone: boolean }) {
     if (requested > 0 && requested < SLIDES.length) go(requested);
   }, []);
 
+  const advance = useEffectEvent(() => go((slide.index + 1) % SLIDES.length));
   useEffect(() => {
     if (!introDone || userPaused) return;
     const run = slide.run;
     const armedAt = performance.now();
-    const timer = setTimeout(() => go((slide.index + 1) % SLIDES.length), remainingRef.current);
+    const timer = setTimeout(advance, remainingRef.current);
     return () => {
       clearTimeout(timer);
       if (runRef.current === run) remainingRef.current -= performance.now() - armedAt;
     };
-  });
+  }, [introDone, userPaused, slide.run]);
 
   return (
     <div className="hero" data-started={introDone ? "" : undefined}>
