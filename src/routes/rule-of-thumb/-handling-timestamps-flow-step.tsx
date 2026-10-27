@@ -11,7 +11,7 @@ export function FlowStep({
   description: string;
 }) {
   return (
-    <div className={cx("flex items-start gap-4")}>
+    <div className={cx("flex items-start gap-4")} data-reveal>
       <div className={cx("size-10 rounded-lg bg-accent text-accent-foreground flex items-center justify-center shrink-0")}>
         <Icon size={20} className={cx("text-accent-foreground")} />
       </div>

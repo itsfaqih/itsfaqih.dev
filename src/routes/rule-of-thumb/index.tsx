@@ -20,11 +20,11 @@ function RuleOfThumbsIndex() {
       <Backdrop />
       <div className="arc-wrap">
         <div className="index-head">
-          <div className="tag">
+          <div className="tag" data-cut>
             {RULES.length} rules · {new Set(RULES.map((rule) => rule.label)).size} topics
           </div>
-          <h1>Rule of Thumb</h1>
-          <p>
+          <h1 data-cut>Rule of Thumb</h1>
+          <p data-cut>
             Opinions, guidelines, and patterns I've adopted for building web applications. Many come
             with demos you can try.
           </p>

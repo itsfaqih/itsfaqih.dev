@@ -31,7 +31,6 @@
   --hair-hover: #3a3a4c;
   --scan: rgb(0 0 0 / 0.18);
   --dot: #2e2e3c;
-  --dot-lit: var(--go);
   --lift: rgb(0 0 0 / 0.4);
   /* Game panels: a raised body (top highlight, bottom shade, hard drop) and sunken wells. */
   --bevel-hi: rgb(255 255 255 / 0.06);
@@ -51,6 +50,11 @@
   --t-step: 40ms;
   --t-pop: 420ms;
   --t-panel: 560ms;
+  /* Pixel cursors from scripts/cursors.py. Each falls back to its system cursor. */
+  --cursor: url("/cursors/arrow.svg") 0 0, auto;
+  --cursor-point: url("/cursors/point.svg") 8 0, pointer;
+  --cursor-grab: url("/cursors/grab.svg") 12 10, grab;
+  --cursor-grabbing: url("/cursors/grabbing.svg") 12 8, grabbing;
   --t-bar: 200ms;
 }
 
@@ -78,9 +82,18 @@
   --hair-hover: #b9b9c6;
   --scan: rgb(0 0 0 / 0.03);
   --dot: #cacad6;
-  --dot-lit: var(--go-ink);
   --lift: rgb(30 30 60 / 0.14);
   color-scheme: light;
+}
+
+html {
+  cursor: var(--cursor);
+}
+:where(a[href], button:not(:disabled), [role="button"], [role="tab"], [role="menuitem"], [role="option"], summary, label[for], select, .cursor-pointer) {
+  cursor: var(--cursor-point);
+}
+:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="color"], [type="file"]), textarea, [contenteditable]) {
+  cursor: text;
 }
 
 .arc {
@@ -117,26 +130,29 @@
   background: repeating-linear-gradient(transparent 0 2px, var(--scan) 2px 3px);
 }
 
-.arc-backdrop,
-.arc-backdrop i {
+.arc-backdrop {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(circle, var(--dot) 1.25px, transparent 1.75px) 0 0 / 22px 22px;
-}
-.arc-backdrop {
   /* Fade the grid toward the middle so it frames the content instead of sitting under copy. */
   mask: radial-gradient(ellipse 75% 65% at 50% 45%, rgb(0 0 0 / 0.45), #000);
 }
-.arc-backdrop i {
-  --dot: var(--dot-lit);
-  opacity: 0;
-  transition: opacity 400ms ease;
-  mask: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), #000, transparent);
+.arc-backdrop i,
+.arc-backdrop canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
-.arc-backdrop[data-lit] i {
-  opacity: 1;
+/* The canvas draws the dots inside --hole; the grid skips them there. */
+.arc-backdrop i {
+  background: radial-gradient(circle, var(--dot) 1.25px, transparent 1.75px) 0 0 / 22px 22px;
+  mask: radial-gradient(
+    circle at var(--mx, 0) var(--my, 0),
+    transparent var(--hole, 0px),
+    #000 var(--hole, 0px)
+  );
 }
 
 /* ---------- Header ---------- */
@@ -182,7 +198,7 @@
   border: 0;
   background: none;
   font: inherit;
-  cursor: pointer;
+  cursor: var(--cursor-point);
 }
 .arc-header .theme {
   margin-left: -16px;
@@ -228,6 +244,30 @@ html[data-theme-swap]::view-transition-new(root) {
     clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
   }
 }
+
+/* Opening a rule from a home page card: the card's thumbnail grows into the rule page's cover and
+   its title into the heading while the rest of the page crossfades. The names exist only during
+   that transition, so the theme switch still reveals the page as one picture. */
+html:active-view-transition-type(rule-open) .spread-card[data-opening] .thumb,
+html:active-view-transition-type(rule-open) .rot-hero .cover .thumb {
+  view-transition-name: rule-thumb;
+}
+html:active-view-transition-type(rule-open) .spread-card[data-opening] .t,
+html:active-view-transition-type(rule-open) .rot-hero h1 {
+  view-transition-name: rule-title;
+}
+::view-transition-group(rule-thumb),
+::view-transition-group(rule-title) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* The title rewraps at the larger size, so both pictures keep their own shape, pinned top left. */
+::view-transition-old(rule-title),
+::view-transition-new(rule-title) {
+  height: 100%;
+  object-fit: contain;
+  object-position: left top;
+}
 .arc-header .find kbd {
   font: 500 11px var(--display);
   border: 1px solid var(--hair);
@@ -246,7 +286,7 @@ html[data-theme-swap]::view-transition-new(root) {
   border-radius: 12px;
   font: 700 14px var(--display);
   border: 0;
-  cursor: pointer;
+  cursor: var(--cursor-point);
   transition:
     transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     background-color 120ms ease,
@@ -295,7 +335,7 @@ html[data-theme-swap]::view-transition-new(root) {
   position: fixed;
   inset: 0;
   z-index: 100;
-  cursor: pointer;
+  cursor: var(--cursor-point);
   display: grid;
   place-items: center;
 }
@@ -432,15 +472,6 @@ html[data-theme-swap]::view-transition-new(root) {
 .arc h1 .lead-in {
   display: block;
 }
-.arc .hero[data-started] h1 .lead-in {
-  animation: pop 420ms var(--snap) backwards;
-}
-@keyframes pop {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.6);
-  }
-}
 /* Every phrase sits in the same grid cell, so the headline keeps the height of the longest one. */
 .arc .rot {
   display: grid;
@@ -458,7 +489,8 @@ html[data-theme-swap]::view-transition-new(root) {
   visibility: visible;
   transition: opacity 120ms ease;
 }
-.arc .hero[data-started] .rot .ph.on {
+/* Later phrases slash in; the first arrives with the headline's glitch. */
+.arc .hero[data-started] .rot[data-cycled] .ph.on {
   animation: slash 520ms var(--cut);
 }
 @keyframes slash {
@@ -505,7 +537,10 @@ html[data-theme-swap]::view-transition-new(root) {
   gap: 12px;
   justify-items: center;
 }
+/* Above the tilted card, whose art may swing out past its edges. */
 .arc .bench-ctl {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -522,7 +557,7 @@ html[data-theme-swap]::view-transition-new(root) {
   padding: 0 4px;
   border: 0;
   background: none;
-  cursor: pointer;
+  cursor: var(--cursor-point);
 }
 .arc .pip i {
   display: block;
@@ -547,7 +582,7 @@ html[data-theme-swap]::view-transition-new(root) {
   transform-origin: left;
   animation: prog var(--ms) linear forwards;
 }
-.arc .held .pip i::after {
+.arc [data-held] .pip i::after {
   animation-play-state: paused !important;
 }
 @keyframes prog {
@@ -565,7 +600,7 @@ html[data-theme-swap]::view-transition-new(root) {
   background: var(--panel-2);
   color: var(--text);
   border-radius: 999px;
-  cursor: pointer;
+  cursor: var(--cursor-point);
   flex: none;
 }
 
@@ -620,20 +655,13 @@ html[data-theme-swap]::view-transition-new(root) {
   color: var(--go-ink);
   margin-bottom: 10px;
 }
+/* The title is its own block so it can glitch apart from the eyebrow above it. */
+.arc h2 > span[data-cut] {
+  display: block;
+}
 .arc .sh2 p {
   margin: 0;
   max-width: 34em;
-}
-.js .arc [data-cut] .pop-in {
-  opacity: 0;
-  transform: translateY(24px) scale(0.96);
-}
-.js .arc [data-cut].in .pop-in {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 300ms ease,
-    transform 500ms var(--snap);
 }
 
 /* ---------- Rule select grid ---------- */
@@ -791,7 +819,7 @@ html[data-theme-swap]::view-transition-new(root) {
   background: none;
   color: var(--dim);
   font: 500 12px var(--display);
-  cursor: pointer;
+  cursor: var(--cursor-point);
   transition:
     background-color 120ms ease,
     color 120ms ease,
@@ -858,8 +886,8 @@ html[data-theme-swap]::view-transition-new(root) {
   color: var(--text);
   letter-spacing: -0.02em;
 }
-.arc .tiles:hover .tile:not(.on),
-.arc .tiles:focus-within .tile:not(.on) {
+.arc .tiles:hover .tile:not([data-on]),
+.arc .tiles:focus-within .tile:not([data-on]) {
   opacity: 0.25;
 }
 .arc .tile,
@@ -867,7 +895,7 @@ html[data-theme-swap]::view-transition-new(root) {
 .arc .rot-card {
   --key: color-mix(in oklab, var(--c, var(--go)) var(--key-mix), #000);
 }
-.arc .tile.on {
+.arc .tile[data-on] {
   border-color: var(--c);
   transform: translateY(-4px);
   box-shadow:
@@ -876,7 +904,7 @@ html[data-theme-swap]::view-transition-new(root) {
     0 8px 0 var(--key);
   z-index: 1;
 }
-.arc .tile.on:active {
+.arc .tile[data-on]:active {
   transform: translateY(3px);
   box-shadow:
     inset 0 4px 0 var(--c),
@@ -888,9 +916,9 @@ html[data-theme-swap]::view-transition-new(root) {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
-.arc .tiles .tile {
-  animation: deal var(--t-pop) var(--snap) backwards;
-  animation-delay: calc(min(var(--i), 12) * var(--t-step));
+/* Filtered tiles deal instead of glitching, since a new filter deals a fresh hand. */
+.arc .tiles .tile[data-cut].in {
+  animation: deal var(--t-pop) var(--snap) calc(min(var(--cut-order, 0), 12) * var(--t-step)) backwards;
 }
 @keyframes deal {
   from {
@@ -902,8 +930,230 @@ html[data-theme-swap]::view-transition-new(root) {
   padding: 28px 0;
   font: 500 14px var(--display);
 }
-.arc .more {
-  margin-top: 16px;
+
+/* ---------- Rule spread (home) ----------
+   The cards share one grid cell and take their pose from --d, the card's offset from the centre
+   (rule-spread.tsx), and --ad, its distance. Per step from the centre a card moves 68% of its width
+   sideways, 10px down and 92px back, turns 13deg toward the centre, tilts 2.5deg, and fades 20%,
+   gone by the third step. The glow behind the deck takes the centred card's hue. */
+@property --glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+.arc .spread {
+  --glow: var(--c);
+  transition: --glow 600ms ease;
+}
+.arc .spread-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 20px 0 48px;
+  perspective: 1400px;
+  overflow-x: clip;
+  touch-action: pan-y;
+  cursor: var(--cursor-grab);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.arc .spread-stage[data-dragging] {
+  cursor: var(--cursor-grabbing);
+}
+.arc .spread-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 8%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent);
+  pointer-events: none;
+}
+.arc .spread-slot {
+  grid-area: 1 / 1;
+  display: grid;
+  width: min(300px, 66vw);
+  transform: translateX(calc(var(--d) * 68%)) translateY(calc(var(--ad) * 10px))
+    translateZ(calc(var(--ad) * -92px)) rotateY(calc(var(--d) * -13deg))
+    rotateZ(calc(var(--d) * 2.5deg));
+}
+.arc .spread-card {
+  --key: color-mix(in oklab, var(--c) var(--key-mix), #000);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px 16px;
+  border-radius: 22px;
+  background: var(--panel);
+  border: 2px solid var(--c);
+  box-shadow:
+    var(--raise),
+    0 6px 0 var(--key);
+  color: var(--text);
+  text-decoration: none;
+  -webkit-user-drag: none;
+  position: relative;
+  transition:
+    translate 100ms ease,
+    box-shadow 100ms ease;
+}
+/* Cards fade into the page under a cover of its colour rather than going see-through, so a card
+   behind never shows through the one in front. */
+.arc .spread-card::after {
+  content: "";
+  position: absolute;
+  inset: -3px -3px -9px;
+  border-radius: 24px;
+  background: var(--bg);
+  opacity: clamp(0, var(--ad) * 0.2 + max(0, var(--ad) - 2) * 0.4, 1);
+  pointer-events: none;
+}
+.arc .spread-card .n,
+.arc .spread-card .f {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+  font: 700 11px var(--display);
+  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
+}
+.arc .spread-card .f {
+  margin-top: auto;
+  font-weight: 500;
+  color: var(--mute);
+}
+.arc .spread-card .f span:last-child {
+  font-size: 15px;
+  line-height: 11px;
+  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
+  transition: translate 150ms var(--out);
+}
+.arc .spread-card .thumb {
+  border-radius: 14px;
+}
+.arc .spread-card .t {
+  padding: 0 2px;
+  font: 900 20px/1.1 var(--display);
+  letter-spacing: -0.03em;
+}
+/* A fixed two-line slot, so every card in the deck keeps one height. */
+.arc .spread-card .s {
+  height: 3em;
+  margin-top: -9px;
+  padding: 0 2px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--dim);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.arc .spread-stage:not([data-dragging]) .spread-card:active {
+  translate: 0 3px;
+  box-shadow:
+    var(--raise),
+    0 3px 0 var(--key);
+}
+.arc .spread-card:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .arc .spread-stage:not([data-dragging]) .spread-card:hover .f span:last-child {
+    translate: 2px -2px;
+  }
+}
+.arc .spread-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font: 700 12px var(--display);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.arc .spread-nav button {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 2px solid var(--hair);
+  background: var(--panel);
+  color: var(--text);
+  font: 700 16px var(--display);
+  box-shadow:
+    var(--raise),
+    0 3px 0 var(--drop-ink);
+  cursor: var(--cursor-point);
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+.arc .spread-nav button:hover:not(:disabled) {
+  border-color: var(--hair-hover);
+}
+.arc .spread-nav button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    var(--raise),
+    0 1px 0 var(--drop-ink);
+}
+.arc .spread-nav button:disabled {
+  opacity: 0.35;
+  cursor: var(--cursor);
+}
+.arc .spread-nav button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+/* The count's new digits slide in from the side it moved toward while the old ones leave. */
+.arc .slide-num {
+  display: inline-grid;
+  overflow: clip;
+  vertical-align: bottom;
+}
+.arc .slide-num > span {
+  grid-area: 1 / 1;
+}
+.arc .slide-num > .was {
+  animation: num-out 180ms var(--out) forwards;
+}
+.arc .slide-num > .was + span {
+  animation: num-in 220ms var(--out) backwards;
+}
+.arc .slide-num[data-dir="down"] {
+  --num-from: -100%;
+  --num-to: 100%;
+}
+@keyframes num-in {
+  from {
+    translate: 0 var(--num-from, 100%);
+    opacity: 0;
+  }
+}
+@keyframes num-out {
+  to {
+    translate: 0 var(--num-to, -100%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arc .slide-num {
+    --num-from: 0;
+    --num-to: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  /* Out to the screen edge, so the neighbours peek in from it instead of stopping at the gutter. */
+  .arc .spread-stage {
+    margin-inline: -18px;
+  }
+}
+/* Reduced motion: the deck jumps to the chosen card, and only the fade eases. */
+@media (prefers-reduced-motion: reduce) {
+  .arc .spread-card::after {
+    transition: opacity 200ms ease;
+  }
 }
 
 /* ---------- Rule thumbnails ----------
@@ -1564,7 +1814,7 @@ html[data-theme-swap]::view-transition-new(root) {
 .arc .hs-row:first-child {
   border-top: 0;
 }
-.arc .hs-row.on {
+.arc .hs-row[data-on] {
   grid-template-rows: auto 1fr;
   align-items: start;
   background: var(--panel-2);
@@ -1577,7 +1827,7 @@ html[data-theme-swap]::view-transition-new(root) {
 .arc .hs-stack {
   grid-area: 1 / 2;
 }
-.arc .hs-row.on .hs-stack {
+.arc .hs-row[data-on] .hs-stack {
   grid-area: 2 / 1;
   align-content: start;
 }
@@ -1587,7 +1837,7 @@ html[data-theme-swap]::view-transition-new(root) {
 .arc .hs-body:empty {
   display: none;
 }
-.arc .hs-row:not(.on):hover {
+.arc .hs-row:not([data-on]):hover {
   background: color-mix(in srgb, var(--panel-2) 55%, transparent);
 }
 .arc .hs-row:has(.hs-head:focus-visible) {
@@ -1606,12 +1856,12 @@ html[data-theme-swap]::view-transition-new(root) {
   color: inherit;
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  cursor: var(--cursor-point);
   outline: none;
 }
 /* A closed row is one big target; an open row only toggles from its head,
    so its achievements stay selectable. */
-.arc .hs-row:not(.on) .hs-head::after {
+.arc .hs-row:not([data-on]) .hs-head::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1647,7 +1897,7 @@ html[data-theme-swap]::view-transition-new(root) {
     transform 220ms var(--snap),
     border-color 120ms ease;
 }
-.arc .hs-row.on .hs-x {
+.arc .hs-row[data-on] .hs-x {
   border-color: var(--go-ink);
   transform: translateY(2px) rotate(-135deg);
 }
@@ -1671,6 +1921,8 @@ html[data-theme-swap]::view-transition-new(root) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 /* Tech marks: one colour, a touch dimmer than the label, lit on hover. */
 .arc .ti {
@@ -1681,17 +1933,19 @@ html[data-theme-swap]::view-transition-new(root) {
   color: var(--mute);
   transition: color 120ms ease;
 }
-.arc .hs-row:not(.on):hover .hs-stack .ti,
-.arc .hs-row.on .hs-stack .ti {
+.arc .hs-row:not([data-on]):hover .hs-stack .ti,
+.arc .hs-row[data-on] .hs-stack .ti {
   color: var(--dim);
 }
 /* On hover a badge lights up in its tool's own brand colour (set per theme in tech-icon.tsx). */
 .arc .hs-stack li,
-.arc .pups li {
+.arc .pups li,
+.arc .peek {
   --brand: var(--brand-dark, var(--go-ink));
 }
 .light .arc .hs-stack li,
-.light .arc .pups li {
+.light .arc .pups li,
+.light .arc .peek {
   --brand: var(--brand-light, var(--go-ink));
 }
 .arc .pups li:hover .ti,
@@ -1706,7 +1960,7 @@ html[data-theme-swap]::view-transition-new(root) {
   color: var(--dim);
   transition: border-color 120ms ease;
 }
-.arc .hs-row:not(.on):hover .hs-stack li {
+.arc .hs-row:not([data-on]):hover .hs-stack li {
   border-color: var(--hair-hover);
 }
 .arc .hs-stack li:hover {
@@ -1739,39 +1993,10 @@ html[data-theme-swap]::view-transition-new(root) {
     transform: translateY(6px);
   }
 }
-.js .arc [data-cut] .hs-row {
-  opacity: 0;
-}
-.js .arc [data-cut].in .hs-row {
-  animation: flick 420ms steps(1) backwards;
-  animation-delay: calc(var(--i) * 110ms);
-  opacity: 1;
-}
-@keyframes flick {
-  0% {
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  40% {
-    opacity: 0.2;
-  }
-  60%,
-  100% {
-    opacity: 1;
-  }
-}
-
 /* ---------- Projects and stack ---------- */
-.arc .two {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 24px;
-}
 .arc .stages {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 .arc .stg {
@@ -1821,6 +2046,9 @@ html[data-theme-swap]::view-transition-new(root) {
   margin: 0;
   font-size: 14px;
 }
+.arc .stack {
+  position: relative;
+}
 .arc .pups {
   display: flex;
   flex-wrap: wrap;
@@ -1840,9 +2068,125 @@ html[data-theme-swap]::view-transition-new(root) {
     border-color 120ms ease,
     transform 200ms var(--snap);
 }
-.arc .pups li:hover {
+.arc .pups li:hover,
+.arc .pups li:focus-visible {
   border-color: var(--brand);
   transform: translateY(-3px);
+}
+.arc .pups li:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.arc .pups li:focus-visible .ti {
+  color: var(--brand);
+}
+
+.arc .stack-filter {
+  margin-bottom: 20px;
+}
+.arc .stack-filter-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.arc .stack-filter-row h3 {
+  margin: 0;
+  padding-top: 8px;
+  font: 500 13px var(--display);
+  color: var(--mute);
+}
+.arc .stack-filter .chips {
+  margin-bottom: 8px;
+}
+.arc .pups-groups {
+  border-top: 2px solid var(--hair);
+}
+.arc .pups-group {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 18px 0;
+  border-bottom: 2px solid var(--hair);
+}
+.arc .pups-group h3 {
+  margin: 0;
+  padding-top: 10px;
+  font: 700 14px var(--display);
+  color: var(--text);
+}
+
+.arc .peek {
+  position: absolute;
+  z-index: 20;
+  width: 290px;
+  padding: 14px 16px 16px;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 2px solid var(--brand);
+  box-shadow:
+    var(--raise),
+    0 4px 0 var(--drop-ink);
+  pointer-events: none;
+  animation: peek-in 180ms var(--out);
+}
+.arc .peek[data-side="bottom"] {
+  transform-origin: top center;
+}
+.arc .peek[data-side="top"] {
+  transform-origin: bottom center;
+}
+.arc .peek header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  font: 700 15px var(--display);
+  color: var(--text);
+}
+.arc .peek header .ti {
+  color: var(--brand);
+}
+.arc .peek header small {
+  flex-basis: 100%;
+  font: 500 12px var(--display);
+  color: var(--mute);
+}
+.arc .peek h4 {
+  margin: 12px 0 6px;
+  font: 700 11px var(--display);
+  color: var(--mute);
+}
+.arc .peek ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.arc .peek li {
+  font-size: 13px;
+  line-height: 1.35;
+}
+.arc .peek li b {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+}
+.arc .peek li span {
+  color: var(--dim);
+}
+.arc .peek p {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--dim);
+}
+@keyframes peek-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 
 .arc .end {
@@ -1894,24 +2238,6 @@ html[data-theme-swap]::view-transition-new(root) {
   gap: 36px;
   align-items: center;
   margin-bottom: 72px;
-}
-.arc .rot-text > * {
-  animation: rot-in 380ms var(--snap) backwards;
-}
-.arc .rot-text > :nth-child(2) {
-  animation-delay: 60ms;
-}
-.arc .rot-text > :nth-child(3) {
-  animation-delay: 120ms;
-}
-.arc .rot-text > :nth-child(4) {
-  animation-delay: 180ms;
-}
-@keyframes rot-in {
-  from {
-    opacity: 0;
-    transform: translateX(-24px);
-  }
 }
 .arc .rot-crumb {
   display: flex;
@@ -1969,17 +2295,10 @@ html[data-theme-swap]::view-transition-new(root) {
     0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent),
     0 20px 50px var(--lift);
   transform: rotate(2deg);
-  animation: cover-in 420ms var(--snap) 120ms backwards;
 }
 .arc .cover .thumb {
   --loops: 2;
   border-radius: 12px;
-}
-@keyframes cover-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9) rotate(-4deg);
-  }
 }
 
 /* Article headings take the display face; sizes stay with each article. */
@@ -2020,7 +2339,7 @@ html[data-theme-swap]::view-transition-new(root) {
   background: none;
   color: var(--mute);
   font: 500 12px var(--display);
-  cursor: pointer;
+  cursor: var(--cursor-point);
 }
 .arc.rot-rail button:focus-visible {
   outline: 3px solid var(--focus);
@@ -2207,7 +2526,7 @@ html[data-theme-swap]::view-transition-new(root) {
     opacity 120ms ease,
     transform 200ms var(--snap);
 }
-.arc .tile.on::after,
+.arc .tile[data-on]::after,
 .arc .stg:focus-visible::after,
 .arc .rot-card:focus-visible::after {
   opacity: 1;
@@ -2229,14 +2548,8 @@ html[data-theme-swap]::view-transition-new(root) {
     animation: none !important;
     transition-property: opacity, color, background-color, border-color !important;
   }
-  .js .arc [data-cut] .pop-in {
-    transform: none !important;
-  }
-  .js .arc [data-cut] .hs-row {
-    opacity: 1;
-  }
-  .arc .tile.on,
-  .arc .tile.on:active,
+  .arc .tile[data-on],
+  .arc .tile[data-on]:active,
   .arc .tile::after,
   .arc .stg:hover,
   .arc .stg:focus-visible,
@@ -2270,8 +2583,24 @@ html[data-theme-swap]::view-transition-new(root) {
   .arc-header .btn.sm {
     padding: 0 12px;
   }
+  .arc .stages {
+    grid-template-columns: 1fr 1fr;
+  }
+  .arc .pups-group,
+  .arc .stack-filter-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .arc .stack-filter-row h3 {
+    padding-top: 0;
+  }
+  .arc .stack-filter-row > span:empty {
+    display: none;
+  }
+  .arc .pups-group h3 {
+    padding-top: 0;
+  }
   .arc .hero,
-  .arc .two,
   .arc .select {
     grid-template-columns: 1fr;
   }
@@ -2301,7 +2630,7 @@ html[data-theme-swap]::view-transition-new(root) {
   }
   .arc .hs-row .hs-head,
   .arc .hs-row .hs-stack,
-  .arc .hs-row.on .hs-stack,
+  .arc .hs-row[data-on] .hs-stack,
   .arc .hs-row .hs-body {
     grid-area: auto;
     padding-left: 0;
@@ -2400,7 +2729,7 @@ html[data-theme-swap]::view-transition-new(root) {
   background: none;
   color: var(--dim);
   font: inherit;
-  cursor: pointer;
+  cursor: var(--cursor-point);
   transition:
     background-color 120ms ease,
     color 120ms ease;
@@ -2463,7 +2792,7 @@ html[data-theme-swap]::view-transition-new(root) {
   padding: 8px 10px;
   border-radius: 12px;
   color: var(--mute);
-  cursor: pointer;
+  cursor: var(--cursor-point);
 }
 .cmdk-ico {
   flex: none;
@@ -2562,128 +2891,71 @@ html {
   border-bottom-color: var(--hair);
   box-shadow: 0 4px 0 color-mix(in srgb, var(--drop-ink) 60%, transparent);
 }
-/* The bar drops in once the page is ready: on home that is when the intro hands off. */
-.js.no-intro .arc-bar {
-  animation: bar-drop 400ms var(--out) backwards;
-}
-@keyframes bar-drop {
-  from {
-    transform: translateY(-100%);
-  }
-}
 
 /* ---------- Load-in ----------
-   Each [data-cut] block plays its entrance once, when it first enters the viewport; the
-   hero plays on start. Small pieces pop on --snap, panels rise on --out, labels blink on in
-   8-bit steps. Without JS everything sits at rest. */
-.js .arc .hero:not([data-started]) :is(.tag, .lead, .acts .btn, .bench),
-.js .arc [data-cut]:not(.in) :is(.tile, .stg, .pups li, .chips button, .search, .sel),
-.js .arc .end[data-cut]:not(.in),
-.js .arc .end[data-cut]:not(.in) ~ footer {
+   Pieces boot like a corrupted game frame: each cuts in as torn slices that jump sideways on a
+   pink and cyan split, drops out once, then locks clean, in hard steps with no easing. Every
+   [data-cut] plays once, when 30% of it is first on screen (useCutIns), and pieces that arrive in
+   the same frame stagger by --cut-order. A piece inside another waits for its container too.
+   Siblings alternate two slice patterns so a row never tears in unison. The pattern and delay
+   ride on --glitch and --glitch-at, which the shared shorthand cannot reset. The navbar plays once
+   the page is ready: on home that is when the intro hands off. Without JS everything sits at rest. */
+.js:not(.no-intro) .arc-bar .arc-header > *,
+.js .arc [data-cut]:not(.in),
+.js .arc [data-cut]:not(.in) [data-cut] {
   opacity: 0;
   animation: none;
 }
-.js .arc .ticker-wrap[data-cut]:not(.in) {
-  clip-path: inset(0 100% 0 0);
+
+.js.no-intro .arc-bar .arc-header > *,
+.arc.rot-rail ol,
+.arc [data-cut].in {
+  animation: var(--glitch, glitch-in) 560ms steps(1, end) var(--glitch-at, 0ms) backwards;
+}
+.arc [data-cut].in {
+  --glitch-at: calc(min(var(--cut-order, 0), 12) * var(--t-step));
+}
+.js.no-intro .arc-bar .arc-header > :nth-child(even),
+.arc [data-cut].in:nth-child(even) {
+  --glitch: glitch-in-alt;
 }
 
-.arc .hero[data-started] .tag {
-  animation: blink-in 360ms steps(1) backwards;
-}
-.arc .hero[data-started] .lead {
-  animation: rise var(--t-panel) var(--out) 140ms backwards;
-}
-.arc .hero[data-started] .acts .btn {
-  animation: pop-up var(--t-pop) var(--snap) 240ms backwards;
-}
-.arc .hero[data-started] .acts .btn + .btn {
-  animation-delay: 290ms;
-}
-.arc .hero[data-started] .bench {
-  animation: rise-in var(--t-panel) var(--out) 100ms backwards;
-}
+.js.no-intro .arc-bar .arc-header > :nth-child(2) { --glitch-at: 40ms; }
+.js.no-intro .arc-bar .arc-header > :nth-child(3) { --glitch-at: 80ms; }
+.js.no-intro .arc-bar .arc-header > :nth-child(4) { --glitch-at: 120ms; }
+.js.no-intro .arc-bar .arc-header > :nth-child(5) { --glitch-at: 160ms; }
+.js.no-intro .arc-bar .arc-header > :nth-child(6) { --glitch-at: 200ms; }
+.arc.rot-rail ol { --glitch-at: 240ms; }
 
-.arc .ticker-wrap[data-cut].in {
-  animation: wipe 640ms var(--cut) backwards;
-}
-.arc [data-cut].in h2 small {
-  animation: blink-in 360ms steps(1) 120ms backwards;
-}
-.arc [data-cut].in .sel {
-  animation: rise var(--t-panel) var(--out) backwards;
-}
-.arc [data-cut].in :is(.search, .chips button) {
-  animation: pop-up var(--t-pop) var(--snap) backwards;
-}
-.arc [data-cut].in .chips button:nth-child(1) { animation-delay: calc(2 * var(--t-step)); }
-.arc [data-cut].in .chips button:nth-child(2) { animation-delay: calc(3 * var(--t-step)); }
-.arc [data-cut].in .chips button:nth-child(3) { animation-delay: calc(4 * var(--t-step)); }
-.arc [data-cut].in .chips button:nth-child(4) { animation-delay: calc(5 * var(--t-step)); }
-.arc [data-cut].in .chips button:nth-child(n + 5) { animation-delay: calc(6 * var(--t-step)); }
-.arc [data-cut].in .stg {
-  animation: deal var(--t-pop) var(--snap) backwards;
-  animation-delay: calc(120ms + var(--i) * var(--t-step));
-}
-/* Power-up collect: each badge pops in flashing its own logo colour, then settles. */
-.arc [data-cut].in .pups li {
-  animation: collect 520ms var(--snap) backwards;
-  animation-delay: calc(120ms + var(--i) * 30ms);
-}
-.arc [data-cut].in .pups li .ti {
-  animation: collect-ink 520ms ease backwards;
-  animation-delay: calc(120ms + var(--i) * 30ms);
-}
-.arc .end[data-cut].in {
-  animation: rise-far var(--t-panel) var(--out) backwards;
-}
-.js .arc .end[data-cut].in .pop-in {
-  transition-delay: 180ms;
-}
-/* The footer sits at the very bottom, under the observer's inset, so it follows the contact
-   panel in instead of waiting on its own trigger. */
-.arc .end[data-cut].in ~ footer {
-  animation: rise 400ms var(--out) 300ms backwards;
-}
-
-@keyframes blink-in {
+/* Slices clip top and bottom only, with room at the sides for the colour split. */
+@keyframes glitch-in {
   0% { opacity: 0; }
-  25% { opacity: 1; }
-  50% { opacity: 0; }
-  75% { opacity: 1; }
+  8% { opacity: 1; clip-path: inset(14% -8px 56% -8px); translate: -12px 0; filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw)); }
+  18% { clip-path: inset(62% -8px 6% -8px); translate: 14px 0; filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw)); }
+  28% { opacity: 0; }
+  38% { opacity: 1; clip-path: inset(-8px -8px 48% -8px); translate: -6px 0; filter: drop-shadow(-3px 0 var(--ux)) drop-shadow(3px 0 var(--cw)); }
+  52% { clip-path: inset(36% -8px -8px -8px); translate: 7px 0; filter: drop-shadow(2px 0 var(--ux)) drop-shadow(-2px 0 var(--cw)); }
+  66% { clip-path: none; translate: -3px 0; filter: drop-shadow(-1px 0 var(--ux)) drop-shadow(1px 0 var(--cw)); }
+  82% { translate: 1px 0; filter: none; }
+  100% { opacity: 1; clip-path: none; translate: none; filter: none; }
+}
+@keyframes glitch-in-alt {
+  0% { opacity: 0; }
+  8% { opacity: 1; clip-path: inset(48% -8px 22% -8px); translate: 16px 0; filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw)); }
+  20% { clip-path: inset(4% -8px 70% -8px); translate: -10px 0; filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw)); }
+  32% { opacity: 0; }
+  42% { opacity: 1; clip-path: inset(28% -8px 12% -8px); translate: 8px 0; filter: drop-shadow(3px 0 var(--ux)) drop-shadow(-3px 0 var(--cw)); }
+  56% { clip-path: inset(-8px -8px 30% -8px); translate: -5px 0; filter: drop-shadow(-2px 0 var(--ux)) drop-shadow(2px 0 var(--cw)); }
+  70% { clip-path: none; translate: 2px 0; filter: drop-shadow(1px 0 var(--ux)) drop-shadow(-1px 0 var(--cw)); }
+  84% { translate: none; filter: none; }
+  100% { opacity: 1; clip-path: none; translate: none; filter: none; }
 }
 @keyframes rise {
   from { opacity: 0; transform: translateY(16px); }
 }
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(32px) scale(0.94); }
-}
-@keyframes rise-far {
-  from { opacity: 0; transform: translateY(40px); }
-}
-@keyframes pop-up {
-  from { opacity: 0; transform: scale(0.6); }
-}
 @keyframes wipe {
   from { clip-path: inset(0 100% 0 0); }
   to { clip-path: inset(0); }
-}
-@keyframes collect {
-  0% { opacity: 0; transform: scale(0.3); border-color: var(--brand); }
-  60% { opacity: 1; border-color: var(--brand); }
-}
-@keyframes collect-ink {
-  0%, 60% { color: var(--brand); }
-}
-
-/* Rule of Thumb index: the head plays like the home hero, the tiles deal in under it. */
-.arc .index-head .tag {
-  animation: blink-in 360ms steps(1) backwards;
-}
-.arc .index-head h1 {
-  animation: pop var(--t-pop) var(--snap) 60ms backwards;
-}
-.arc .index-head p {
-  animation: rise var(--t-panel) var(--out) 160ms backwards;
 }
 
 /* Three-line hero: "I build" / the phrase / the highlight. The phrase line never wraps, so
@@ -2707,25 +2979,13 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js.no-intro .arc-bar {
-    animation: none;
-  }
-  .arc .index-head :is(.tag, h1, p) {
+  .js.no-intro .arc-bar .arc-header > *,
+  .arc.rot-rail ol,
+  .arc [data-cut].in {
     animation: fade-in 240ms ease backwards !important;
   }
-  .arc .hero[data-started] :is(.tag, .lead, .acts .btn, .bench),
-  .arc [data-cut].in :is(.tile, .stg, .pups li, .chips button, .search, .sel, h2 small),
-  .arc .end[data-cut].in,
-  .arc .end[data-cut].in ~ footer,
-  .arc .ticker-wrap[data-cut].in {
-    animation: fade-in 240ms ease backwards !important;
-  }
-  .js .arc .ticker-wrap[data-cut]:not(.in) {
-    clip-path: none;
-    opacity: 0;
-  }
-  .arc [data-cut].in .pups li .ti {
-    animation: none !important;
+  .arc .peek {
+    animation: fade-in 120ms ease;
   }
 }
 @keyframes fade-in {

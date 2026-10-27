@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { GUIDELINES } from "../data/guidelines";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
-import { HeroPrints } from "./-components/hero/hero-prints";
-import { RuleSelect } from "./-components/rule-select";
+import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
+import { RuleSpread } from "./-components/rule-spread";
+import { StackShowcase, type StackGroup, type StackUse } from "./-components/stack-showcase";
 import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
 
@@ -15,11 +16,11 @@ export const Route = createFileRoute("/")({
 const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);
 
 const SLIDES = [
-  { tab: "Interfaces", color: "var(--ux)", phrase: "interfaces that ", highlight: "feel right", ms: 8000, loops: 2 },
-  { tab: "Agents", color: "var(--cw)", phrase: "agents that ", highlight: "finish the job", ms: 8800, loops: 2 },
-  { tab: "Dev tools", color: "var(--ar)", phrase: "dev tools that ", highlight: "save hours", ms: 8800, loops: 2 },
-  { tab: "Backends", color: "var(--ts)", phrase: "backends that ", highlight: "run reliably", ms: 7000, loops: 1 },
-  { tab: "Tests", color: "var(--ax)", phrase: "test suites you ", highlight: "can trust", ms: 9600, loops: 2 },
+  { tab: "Interfaces", color: "var(--ux)", phrase: "interfaces that ", highlight: "feel right" },
+  { tab: "Agents", color: "var(--cw)", phrase: "agents that ", highlight: "finish the job" },
+  { tab: "Dev tools", color: "var(--ar)", phrase: "dev tools that ", highlight: "save hours" },
+  { tab: "Backends", color: "var(--ts)", phrase: "backends that ", highlight: "run reliably" },
+  { tab: "Tests", color: "var(--ax)", phrase: "test suites you ", highlight: "can trust" },
 ];
 
 const EXPERIENCE = [
@@ -98,6 +99,7 @@ const PROJECTS = [
     summary: "ERD builder",
     href: "https://schemata.ruine.app/",
     color: "var(--cw)",
+    stack: ["React", "Tailwind CSS"],
   },
   {
     kind: "UI KIT",
@@ -105,6 +107,7 @@ const PROJECTS = [
     summary: "Dashboard kit",
     href: "https://github.com/ruine-dev/ruine-ui-dashboard",
     color: "var(--ux)",
+    stack: ["Astro", "Tailwind CSS"],
   },
   {
     kind: "TEMPLATE",
@@ -112,6 +115,7 @@ const PROJECTS = [
     summary: "Portfolio template",
     href: "https://github.com/itsfaqih/fama",
     color: "var(--ar)",
+    stack: ["React", "Framer", "Tailwind CSS"],
   },
   {
     kind: "DESIGN",
@@ -119,26 +123,137 @@ const PROJECTS = [
     summary: "Learning platform redesign",
     href: "https://www.figma.com/design/qNIg0A9h7PnrFdOVSBbMEH/PHPID-Online-Learning-Redesign?node-id=0-1&t=PcPvOnrKzLginYqa-1",
     color: "var(--ts)",
+    stack: ["Figma"],
   },
 ];
 
-const STACK = [
-  "TypeScript",
-  "React",
-  "TanStack",
-  "Effect",
-  "XState",
-  "Base UI",
-  "Node.js",
-  "Laravel",
-  "PostgreSQL",
-  "Redis",
-  "Vitest",
-  "Playwright",
-  "Docker",
-  "Figma",
-  "Claude Code",
+const OTHER_WORK = [
+  {
+    company: "Mitra Integrasi Informatika",
+    role: "Frontend Engineer",
+    years: "2020 → 2021",
+    stack: ["React", "TypeScript", "Figma"],
+  },
 ];
+
+const THIS_SITE = {
+  title: "itsfaqih.dev",
+  summary: "This site",
+  stack: [
+    "React",
+    "TypeScript",
+    "TanStack Start",
+    "TanStack Router",
+    "Base UI",
+    "Phosphor Icons",
+    "Vite",
+    "Vitest",
+    "Playwright",
+    "Storybook",
+    "Oxlint",
+    "Oxfmt",
+  ],
+};
+
+const STACK_GROUPS: StackGroup[] = [
+  { label: "Languages", tools: ["TypeScript", "PHP", "HTML", "CSS"] },
+  {
+    label: "Frameworks and libraries",
+    tools: [
+      "React",
+      "Vue",
+      "Next.js",
+      "Astro",
+      "React Router",
+      "TanStack Start",
+      "TanStack Router",
+      "TanStack Query",
+      "Effect",
+      "XState",
+      "Zustand",
+      "Redux",
+      "Zod",
+      "React Flow",
+      "Tailwind CSS",
+      "PostCSS",
+      "Base UI",
+      "Radix UI",
+      "Shadcn UI",
+      "Phosphor Icons",
+      "InertiaJS",
+    ],
+  },
+  { label: "Design", tools: ["Figma", "Framer"] },
+  {
+    label: "Backend and data",
+    tools: [
+      "Node.js",
+      "Express",
+      "Laravel",
+      "AdonisJS",
+      "tRPC",
+      "Prisma",
+      "Drizzle",
+      "WebSocket",
+      "Trigger.dev",
+      "PostgreSQL",
+      "MySQL",
+      "MariaDB",
+      "MongoDB",
+      "Redis",
+      "Snowflake",
+    ],
+  },
+  {
+    label: "Testing and quality",
+    tools: ["Vitest", "Jest", "Playwright", "MSW", "Storybook", "Biome", "Oxlint", "Oxfmt"],
+  },
+  {
+    label: "DevOps and infrastructure",
+    tools: [
+      "Docker",
+      "Git",
+      "Vite",
+      "Bun",
+      "NGINX",
+      "Apache",
+      "IIS",
+      "Amazon Route 53",
+      "Amazon CodeBuild",
+      "Amazon CodePipeline",
+      "Amazon ECR",
+      "Amazon WAF",
+      "Amazon S3",
+      "Amazon SES",
+      "Amazon SNS",
+    ],
+  },
+  { label: "Email and templating", tools: ["Mailjet", "Maizzle", "EJS"] },
+  {
+    label: "AI tools",
+    tools: ["Claude Code", "OpenAI Codex", "OpenCode", "OpenRouter", "Hermes"],
+  },
+];
+
+const STACK_SOURCES = [
+  ...[...EXPERIENCE, ...OTHER_WORK].map((job) => ({
+    use: { kind: "work" as const, name: job.company, detail: `${job.role} · ${job.years}` },
+    stack: job.stack,
+  })),
+  ...[...PROJECTS, THIS_SITE].map((project) => ({
+    use: { kind: "project" as const, name: project.title, detail: project.summary },
+    stack: project.stack,
+  })),
+];
+
+const STACK_PLACES = STACK_SOURCES.map((source) => source.use);
+const STACK_USES = usesByTool(STACK_SOURCES);
+
+function usesByTool(sources: { use: StackUse; stack: string[] }[]) {
+  const uses: Record<string, StackUse[]> = {};
+  sources.forEach(({ use, stack }) => stack.forEach((tool) => (uses[tool] ??= []).push(use)));
+  return uses;
+}
 
 const TICKER = ["INTERFACES", "AGENTIC SETUPS", "DEV TOOLS", "APIS", "HEALTHCARE SOFTWARE"];
 
@@ -167,77 +282,60 @@ function Index() {
 
       <div className="arc-wrap">
         <section id="rules">
-          <div className="sh2" data-cut>
-            <h2 className="pop-in">
-              <small>Writing</small>Rule of Thumb
+          <div className="sh2">
+            <h2>
+              <small data-cut>Writing</small>
+              <span data-cut>Rule of Thumb</span>
             </h2>
-            <p className="pop-in">
-              <b className="disp">{RULES.length}</b> rules so far. Opinions I've earned in code
-              review, many with demos you can try.{" "}
-              <Link to="/rule-of-thumb" className="disp">
-                See the index →
-              </Link>
-            </p>
+            <p data-cut>Opinions I've earned from my experience</p>
           </div>
-          <RuleSelect rules={RULES} pageSize={20} />
+          <RuleSpread rules={RULES} />
         </section>
 
         <section id="work">
-          <div className="sh2" data-cut>
-            <h2 className="pop-in">
-              <small>Experience</small>Where I've worked
+          <div className="sh2">
+            <h2>
+              <small data-cut>Experience</small>
+              <span data-cut>Where I've worked</span>
             </h2>
-            <p className="pop-in">Five-plus years across six roles. Open one for everything I shipped there.</p>
           </div>
           <ExperienceList />
         </section>
 
-        <section id="projects" className="two">
-          <div data-cut>
-            <div className="sh2">
-              <h2 className="pop-in">
-                <small>Side projects</small>Projects
-              </h2>
-            </div>
-            <div className="stages">
-              {PROJECTS.map((project, index) => (
-                <a
-                  key={project.title}
-                  className="stg"
-                  href={project.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ "--c": project.color, "--i": index }}
-                >
-                  <small>{project.kind}</small>
-                  <h3>{project.title}</h3>
-                  <p>{project.summary}</p>
-                </a>
-              ))}
-            </div>
+        <StackShowcase groups={STACK_GROUPS} places={STACK_PLACES} uses={STACK_USES} />
+
+        <section id="projects">
+          <div className="sh2">
+            <h2>
+              <small data-cut>Side projects</small>
+              <span data-cut>Projects</span>
+            </h2>
           </div>
-          <div data-cut>
-            <div className="sh2">
-              <h2 className="pop-in">
-                <small>Tools I use</small>Stack
-              </h2>
-            </div>
-            <ul className="pups">
-              {STACK.map((tool, index) => (
-                <li key={tool} style={{ ...techBrand(tool), "--i": index }}>
-                  <TechIcon name={tool} />
-                  {tool}
-                </li>
-              ))}
-            </ul>
+          <div className="stages">
+            {PROJECTS.map((project) => (
+              <a
+                key={project.title}
+                className="stg"
+                data-cut
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ "--c": project.color }}
+              >
+                <small>{project.kind}</small>
+                <h3>{project.title}</h3>
+                <p>{project.summary}</p>
+              </a>
+            ))}
           </div>
         </section>
 
         <div className="end" data-cut>
-          <h2 className="pop-in">
-            <small>Contact</small>Have a product that needs this level of care?
+          <h2>
+            <small data-cut>Contact</small>
+            <span data-cut>Have a product that needs this level of care?</span>
           </h2>
-          <div className="acts pop-in" style={{ marginTop: 24 }}>
+          <div className="acts" data-cut style={{ marginTop: 24 }}>
             <a className="btn go" href="mailto:itsfaqih@gmail.com">
               Email itsfaqih@gmail.com
             </a>
@@ -252,7 +350,7 @@ function Index() {
           </div>
         </div>
 
-        <footer>
+        <footer data-cut>
           <span>© 2026 Faqih Muntashir</span>
           <span>
             <a href="https://github.com/itsfaqih" target="_blank" rel="noopener noreferrer">
@@ -355,21 +453,20 @@ function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
 
 function Hero({ introDone }: { introDone: boolean }) {
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const [slide, setSlide] = useState({ index: 0, run: 0 });
+  const [slide, setSlide] = useState({ index: 0, run: 0, lead: 0 });
   const [pausedByUser, setPausedByUser] = useState<boolean | null>(null);
-  const [hovering, setHovering] = useState(false);
 
   const runRef = useRef(0);
-  const remainingRef = useRef(SLIDES[0]!.ms);
+  const remainingRef = useRef(SLIDE_MS);
 
   const userPaused = pausedByUser ?? reduced;
-  const held = userPaused || hovering;
   const current = SLIDES[slide.index]!;
 
   const go = (index: number) => {
     runRef.current += 1;
-    remainingRef.current = SLIDES[index]!.ms;
-    setSlide({ index, run: runRef.current });
+    const lead = reduced ? 0 : SCENE_LEAD_MS;
+    remainingRef.current = SLIDE_MS + lead;
+    setSlide({ index, run: runRef.current, lead });
   };
 
   useEffect(() => {
@@ -378,7 +475,7 @@ function Hero({ introDone }: { introDone: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (!introDone || held) return;
+    if (!introDone || userPaused) return;
     const run = slide.run;
     const armedAt = performance.now();
     const timer = setTimeout(() => go((slide.index + 1) % SLIDES.length), remainingRef.current);
@@ -391,10 +488,12 @@ function Hero({ introDone }: { introDone: boolean }) {
   return (
     <div className="hero" data-started={introDone ? "" : undefined}>
       <div>
-        <div className="tag">Full-stack engineer · Yogyakarta</div>
-        <h1>
+        <div className="tag" data-cut>
+          Full-stack engineer · Yogyakarta
+        </div>
+        <h1 data-cut>
           <span className="lead-in">I build</span>
-          <span className="rot">
+          <span className="rot" data-cycled={slide.run ? "" : undefined}>
             {SLIDES.map((item, index) => (
               <span
                 key={item.tab}
@@ -411,7 +510,7 @@ function Hero({ introDone }: { introDone: boolean }) {
             ))}
           </span>
         </h1>
-        <p className="lead">
+        <p className="lead" data-cut>
           I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
           lately the agent tooling around them. Right now I'm building healthcare software at{" "}
           <a href="https://evidence.care" target="_blank" rel="noopener noreferrer">
@@ -420,22 +519,22 @@ function Hero({ introDone }: { introDone: boolean }) {
           .
         </p>
         <div className="acts">
-          <a className="btn go" href="mailto:itsfaqih@gmail.com">
+          <a className="btn go" href="mailto:itsfaqih@gmail.com" data-cut>
             Email itsfaqih@gmail.com
           </a>
-          <a className="btn soft" href="#rules">
+          <a className="btn soft" href="#rules" data-cut>
             Read my rules
           </a>
         </div>
       </div>
 
       <div
-        className={held ? "bench held" : "bench"}
+        className="bench"
+        data-cut
+        data-held={userPaused ? "" : undefined}
         style={{ "--c": current.color }}
-        onPointerEnter={() => setHovering(true)}
-        onPointerLeave={() => setHovering(false)}
       >
-        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} slideMs={current.ms} loopsPerSlide={current.loops} />
+        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} />
         <div className="bench-ctl">
           <div className="pips" role="group" aria-label="What I build">
             {SLIDES.map((item, index) => (
@@ -445,7 +544,10 @@ function Hero({ introDone }: { introDone: boolean }) {
                 className="pip"
                 aria-label={item.tab}
                 aria-pressed={index === slide.index}
-                style={{ "--c": item.color, "--ms": `${item.ms}ms` }}
+                style={{
+                  "--c": item.color,
+                  "--ms": `${SLIDE_MS + (index === slide.index ? slide.lead : 0)}ms`,
+                }}
                 onClick={() => go(index)}
               >
                 <i key={index === slide.index ? slide.run : "idle"} />
@@ -521,12 +623,12 @@ function ExperienceList() {
   }, [open]);
 
   return (
-    <div ref={listRef} className="hs" data-cut>
+    <div ref={listRef} className="hs">
       {EXPERIENCE.map((job, index) => {
         const isOpen = open === index;
         const panelId = `job-${index}`;
         return (
-          <div key={job.company} className={isOpen ? "hs-row on" : "hs-row"} style={{ "--i": index }}>
+          <div key={job.company} className="hs-row" data-cut data-on={isOpen ? "" : undefined}>
             <button
               type="button"
               className="hs-head"

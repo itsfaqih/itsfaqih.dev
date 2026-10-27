@@ -80,6 +80,20 @@ export function ruleNumber(rule: Guideline) {
   return index === -1 ? null : String(index + 1).padStart(3, "0");
 }
 
+/** The view transition a home page card starts when it opens its rule: the card's thumbnail and
+ * title grow into the rule page's cover and heading (see `rule-open` in arcade.css). */
+export const RULE_OPEN = "rule-open";
+
+/** True while the page renders inside a card's `rule-open` transition, when the hero's cover and
+ * heading are already on screen as the morph's end state and must not play their cut-in. */
+export function isOpeningRule() {
+  try {
+    return document.documentElement.matches(`:active-view-transition-type(${RULE_OPEN})`);
+  } catch {
+    return false;
+  }
+}
+
 type RuleThumbProps = {
   rule: Guideline;
   /** Loop the rule's animation. Otherwise the thumbnail holds its still frame. */

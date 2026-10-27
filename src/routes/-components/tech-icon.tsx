@@ -1,72 +1,121 @@
-import { FlowArrowIcon, MaskHappyIcon } from "@phosphor-icons/react";
 import type { CSSProperties } from "react";
 import {
   siAdonisjs,
+  siApache,
+  siAstro,
   siBaseui,
   siBiome,
+  siBun,
   siClaudecode,
+  siCss,
   siDocker,
+  siDrizzle,
   siEffect,
+  siEjs,
   siExpress,
   siFigma,
+  siFramer,
+  siGit,
+  siHtml5,
+  siInertia,
+  siJest,
   siLaravel,
+  siMariadb,
+  siMockserviceworker,
   siMongodb,
   siMysql,
   siNextdotjs,
+  siNginx,
   siNodedotjs,
+  siOpencode,
+  siOpenrouter,
+  siOxc,
+  siPhosphoricons,
+  siPhp,
+  siPostcss,
   siPostgresql,
+  siPrisma,
+  siRadixui,
   siReact,
   siReactrouter,
   siRedis,
+  siRedux,
+  siShadcnui,
   siSnowflake,
+  siStorybook,
   siTailwindcss,
   siTanstack,
+  siTrpc,
   siTypescript,
   siVite,
   siVitest,
+  siVuedotjs,
   siXstate,
+  siXyflow,
   siZod,
-  type SimpleIcon,
 } from "simple-icons";
+import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
 const MARKS = {
   AdonisJS: siAdonisjs,
+  Apache: siApache,
+  Astro: siAstro,
   "Base UI": siBaseui,
   Biome: siBiome,
+  Bun: siBun,
   "Claude Code": siClaudecode,
+  CSS: siCss,
   Docker: siDocker,
+  Drizzle: siDrizzle,
   Effect: siEffect,
+  EJS: siEjs,
   Express: siExpress,
   Figma: siFigma,
+  Framer: siFramer,
+  Git: siGit,
+  HTML: siHtml5,
+  InertiaJS: siInertia,
+  Jest: siJest,
   Laravel: siLaravel,
+  MariaDB: siMariadb,
   MongoDB: siMongodb,
+  MSW: siMockserviceworker,
   MySQL: siMysql,
   "Next.js": siNextdotjs,
+  NGINX: siNginx,
   "Node.js": siNodedotjs,
+  OpenCode: siOpencode,
+  OpenRouter: siOpenrouter,
+  Oxfmt: siOxc,
+  Oxlint: siOxc,
+  "Phosphor Icons": siPhosphoricons,
+  PHP: siPhp,
+  PostCSS: siPostcss,
   PostgreSQL: siPostgresql,
-  React: siReact,
+  Prisma: siPrisma,
+  "Radix UI": siRadixui,
+  "React Flow": siXyflow,
   "React Router": siReactrouter,
+  React: siReact,
   Redis: siRedis,
+  Redux: siRedux,
+  "Shadcn UI": siShadcnui,
   Snowflake: siSnowflake,
+  Storybook: siStorybook,
   "Tailwind CSS": siTailwindcss,
-  TanStack: siTanstack,
+  "TanStack Query": siTanstack,
   "TanStack Router": siTanstack,
+  "TanStack Start": siTanstack,
+  TanStack: siTanstack,
+  tRPC: siTrpc,
   TypeScript: siTypescript,
   Vite: siVite,
   Vitest: siVitest,
+  Vue: siVuedotjs,
   XState: siXstate,
   Zod: siZod,
-} satisfies Record<string, SimpleIcon>;
-
-const STAND_INS = {
-  "React Flow": FlowArrowIcon,
-  Playwright: MaskHappyIcon,
-};
-
-const STAND_IN_HEX: Record<keyof typeof STAND_INS, string> = {
-  "React Flow": "FF0072",
-  Playwright: "2EAD33",
-};
+  ...EXTRA_MARKS,
+} satisfies Record<string, Mark>;
 
 const entryOf = <T,>(table: Record<string, T>, name: string) =>
   Object.entries(table).find(([key]) => key === name)?.[1];
@@ -112,20 +161,17 @@ function brandFor(hex: string, theme: keyof typeof PANEL) {
 }
 
 export function techBrand(name: string): CSSProperties | undefined {
-  const hex = entryOf(MARKS, name)?.hex ?? entryOf(STAND_IN_HEX, name);
+  const hex = entryOf(MARKS, name)?.hex;
   if (!hex) return undefined;
   return { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
 }
 
 export function TechIcon({ name }: { name: string }) {
-  const mark = entryOf(MARKS, name);
-  if (mark) {
-    return (
-      <svg className="ti" viewBox="0 0 24 24" aria-hidden="true">
-        <path d={mark.path} />
-      </svg>
-    );
-  }
-  const StandIn = entryOf(STAND_INS, name);
-  return StandIn ? <StandIn className="ti" weight="bold" aria-hidden="true" /> : null;
+  const mark: Mark | undefined = entryOf(MARKS, name);
+  if (!mark) return null;
+  return (
+    <svg className="ti" viewBox={mark.viewBox ?? "0 0 24 24"} aria-hidden="true">
+      <path d={mark.path} fillRule={mark.evenOdd ? "evenodd" : undefined} />
+    </svg>
+  );
 }

@@ -11,11 +11,12 @@ import {
   CopyIcon,
 } from "@phosphor-icons/react";
 import { CodeBlock } from "../../../components/code-block";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "@tanstack/react-router";
 import { GUIDELINES } from "../../../data/guidelines";
-import { colorOf, ruleNumber, RuleThumb } from "../../-components/rule-art";
+import { colorOf, isOpeningRule, ruleNumber, RuleThumb } from "../../-components/rule-art";
+import { isShownEnough, useCutIns, VISIBLE_STEPS } from "../../-components/use-cut-ins";
 import { PageContainer } from "../../../components/page-container";
 
 type GuidelineHeroProps = {
@@ -72,18 +73,29 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
   const rule = useCurrentRule();
   const number = rule ? ruleNumber(rule) : null;
 
+  const heroRef = useRef<HTMLElement>(null);
+  useCutIns(heroRef);
+  const [morphed] = useState(isOpeningRule);
+  // The router resets scroll only after the transition has pictured the new page, so a morph
+  // would aim at a hero still scrolled out of view. Arriving by morph, start at the top now.
+  useLayoutEffect(() => {
+    if (morphed) scrollTo({ top: 0, behavior: "instant" });
+  }, [morphed]);
+
   return (
-    <header className="arc rot-hero" style={{ "--c": rule ? colorOf(rule.label) : "var(--go)" }}>
+    <header ref={heroRef} className="arc rot-hero" style={{ "--c": rule ? colorOf(rule.label) : "var(--go)" }}>
       <div className="rot-text">
-        <div className="rot-crumb">
+        <div className="rot-crumb" data-cut>
           <Link to="/rule-of-thumb">← All rules</Link>
           {number && <span className="c">No.{number}</span>}
           <span className="c">{badge?.text ?? rule?.label}</span>
         </div>
-        <h1>{title}</h1>
-        <div className="rot-lead">{description}</div>
+        <h1 data-cut={morphed ? undefined : true}>{title}</h1>
+        <div className="rot-lead" data-cut>
+          {description}
+        </div>
         {markdownUrl && (
-          <div className="rot-actions">
+          <div className="rot-actions" data-cut>
             <a href={markdownUrl} target="_blank" rel="noopener noreferrer" className="btn soft sm">
               <MarkdownLogoIcon size={16} />
               View Markdown
@@ -135,7 +147,7 @@ export function RuleOfThumbHero({ title, description, badge, markdownUrl }: Guid
         )}
       </div>
       {rule && (
-        <div className="cover">
+        <div className="cover" data-cut={morphed ? undefined : true}>
           <RuleThumb rule={rule} play />
         </div>
       )}
@@ -273,7 +285,7 @@ function ContentsRail() {
 }
 
 const REVEALED =
-  'h2, h2 + p, [data-rule-of-thumb-card="true"], .rk-feature, .code-block, .rk-steps > li';
+  'h2, h3, h4, p, [data-rule-of-thumb-card="true"], [data-reveal], .rk-feature, .code-block, .rk-steps > li, .rot-pager';
 
 function useArticleReveal(rootRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
@@ -287,14 +299,14 @@ function useArticleReveal(rootRef: React.RefObject<HTMLElement | null>) {
         let step = 0;
         for (const entry of entries) {
           const passed = entry.boundingClientRect.bottom < 0;
-          if (!entry.isIntersecting && !passed) continue;
+          if (!isShownEnough(entry) && !passed) continue;
           if (!(entry.target instanceof HTMLElement)) continue;
           entry.target.style.setProperty("--rv", String(passed ? 0 : Math.min(step++, 4)));
           entry.target.classList.add("in");
           reveals.unobserve(entry.target);
         }
       },
-      { rootMargin: "0px 0px -10% 0px" },
+      { threshold: VISIBLE_STEPS },
     );
     for (const block of blocks) {
       if (block.classList.contains("in")) continue;

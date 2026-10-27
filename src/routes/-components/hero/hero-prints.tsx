@@ -1,4 +1,17 @@
-import { type CSSProperties, type ReactNode, useEffect, useId, useRef } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  blend,
+  circle,
+  collapsed,
+  dot,
+  moved,
+  type Outline,
+  polygon,
+  rect,
+  sector,
+  toPath,
+  traced,
+} from "./hero-morph";
 
 type TopInk = "solid" | "hue" | "outline";
 
@@ -32,15 +45,13 @@ function Paper({ p }: { p: string }) {
         >
           <circle className="dot" cx="2.5" cy="2.5" r="1.75" />
         </pattern>
-        <pattern id={`${p}gr`} width="16" height="16" patternUnits="userSpaceOnUse">
-          <path className="grid" d="M16 0 H0 V16" />
-        </pattern>
       </defs>
-      <rect width="320" height="200" fill={`url(#${p}gr)`} />
     </>
   );
 }
 
+/** The grid printed on the paper itself, below the lifted art, so a tilt shows the art
+    floating over it. */
 function RegistrationMark({ x, y, className }: { x: number; y: number; className: string }) {
   return (
     <g className={className}>
@@ -58,6 +69,11 @@ const vars = (v: Record<string, string | number>): CSSProperties =>
   Object.fromEntries(Object.entries(v).map(([k, value]) => [`--${k}`, value]));
 
 const pct = (n: number) => `${+n.toFixed(2)}%`;
+/** Every scene plays once over the same span, then rests on its last frame; Backends flows through the rest. */
+const SCENE_MS = 3200;
+const SCENE_REST_MS = 1000;
+export const SLIDE_MS = SCENE_MS + SCENE_REST_MS;
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
 const MEANDER = [
   [40, 160],
@@ -81,22 +97,19 @@ function meanderKeyframes() {
   let walked = 0;
   const stops = MEANDER.map(([x, y], k) => {
     if (k) walked += lengths[k - 1]!;
-    return `${pct((walked / total) * 92)} { opacity: 1; transform: translate(${x}px, ${y}px); }`;
+    return `${pct((walked / total) * 100)} { opacity: 1; transform: translate(${x}px, ${y}px); }`;
   });
-  return `@keyframes hp-ghost { ${stops.join(" ")} 97%, 100% { opacity: 0; transform: translate(280px, 40px); } }`;
+  return `@keyframes hp-ghost { ${stops.join(" ")} }`;
 }
 
 const QUEUE_Y = 124;
-const DOOR_X = -20;
 const SLOT_X = [54, 96, 138, 180] as const;
+const SLOT_GAP = SLOT_X[1] - SLOT_X[0];
 const WORKER_X = 262;
-const QUEUE_X = [DOOR_X, ...SLOT_X, WORKER_X];
-const BEAT_PCT = 10;
-const STEP_PCT = 4.5;
+const ABSORBED_SCALE = 0.55;
 const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const INOUT = "cubic-bezier(0.65, 0, 0.35, 1)";
-const INK_JOBS = [1, 2, 3, 4, 6, 7, 8, 9];
-const INK_OUT_BEATS = [0, 1, 2, 3, 5, 6, 7, 8];
+const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 const ARC = [
   [WORKER_X, QUEUE_Y],
   [230, 40],
@@ -111,54 +124,127 @@ function arcPoint(t: number) {
   return { x: at(0), y: at(1) };
 }
 
-function jobSteps(startBeat: number, fromStop: number) {
-  const stops: string[] = [];
-  for (let stop = fromStop; stop < QUEUE_X.length - 1; stop++) {
-    const at = (startBeat + stop) * BEAT_PCT;
-    const intoWorker = stop === SLOT_X.length;
+/* Backends: at each advance the head job enters the worker, the line steps up and a new job joins
+   the tail. The hue job fails, arcs back to the tail in place of a new job, works its way up again
+   and passes. The queue never rests, so it flows through the whole slide, and the last take finishes
+   as the next scene takes over. Times are in ms. */
+const BACKENDS_MS = SLIDE_MS;
+const MOVE_MS = 192;
+const ABSORB_MS = 128;
+const ARC_MS = 448;
+const PULSE_MS = 64;
+const SETTLE_MS = 256;
+const ADVANCE_COUNT = 9;
+const ADVANCE_EVERY_MS = (BACKENDS_MS - MOVE_MS - SETTLE_MS) / (ADVANCE_COUNT - 1);
+const ADVANCES = Array.from({ length: ADVANCE_COUNT }, (_, k) => k * ADVANCE_EVERY_MS);
+const HUE_REJECTED = 1;
+const HUE_RETURNS = 2;
+const HUE_PASSES = 6;
+const REJECT_MS = ADVANCES[HUE_RETURNS]!;
+const advancesFrom = (from: number, to?: number) => ADVANCES.slice(from, to);
+const intoWorkerAt = (advance: number) => ADVANCES[advance]! + MOVE_MS;
+const backendsPct = (ms: number) => pct((ms / BACKENDS_MS) * 100);
+
+/** Where a job is at one keyframe. */
+type JobStop = { at: number; x: number; y?: number; scale?: number; opacity?: number; ease?: string };
+
+const jobFrame = ({ at, x, y = 0, scale = 1, opacity = 1, ease }: JobStop) =>
+  `${backendsPct(at)} { opacity: ${opacity}; transform: translate(${+x.toFixed(1)}px, ${+y.toFixed(1)}px) scale(${scale});${ease ? ` animation-timing-function: ${ease};` : ""} }`;
+
+/** A job waiting at `fromSlot` from `since` steps up one slot at each of `steps`, the last into the worker if it reaches it. */
+function queued(fromSlot: number, steps: number[], since = 0): JobStop[] {
+  const stops: JobStop[] = [{ at: since, x: SLOT_X[fromSlot]! }];
+  steps.forEach((at, k) => {
+    const to = SLOT_X[fromSlot + k + 1] ?? WORKER_X;
+    const intoWorker = to === WORKER_X;
     stops.push(
-      `${pct(at)} { opacity: 1; transform: translateX(${QUEUE_X[stop]}px); animation-timing-function: ${intoWorker ? INOUT : OUT}; }`,
+      { at, x: SLOT_X[fromSlot + k]!, ease: INOUT },
+      { at: at + MOVE_MS, x: to, scale: intoWorker ? ABSORBED_SCALE : 1 },
     );
-    stops.push(
-      `${pct(at + STEP_PCT)} { opacity: 1; transform: translateX(${QUEUE_X[stop + 1]}px)${intoWorker ? " scale(0.55)" : ""}; }`,
-    );
-  }
+  });
   return stops;
 }
 
-function queueKeyframes() {
-  const door = `0% { opacity: 0; transform: translateX(${DOOR_X}px); animation-timing-function: ${OUT}; }`;
-  const gone = (at: number) =>
-    `${pct(at)}, 100% { opacity: 0; transform: translateX(${WORKER_X}px) scale(0.55); }`;
-  const arc: string[] = [];
-  const n = 16;
-  for (let k = 1; k < n; k++) {
-    const s = k / n;
-    const t = s < 0.5 ? 4 * s * s * s : 1 - (-2 * s + 2) ** 3 / 2;
-    const { x, y } = arcPoint(t);
-    const scale = Math.min(1, 0.55 + s * 1.35);
-    arc.push(
-      `${pct(45 + 9.5 * s)} { opacity: 1; transform: translate(${x.toFixed(1)}px, ${(y - QUEUE_Y).toFixed(1)}px) scale(${scale.toFixed(2)}); }`,
-    );
-  }
-  const ink = [door, ...jobSteps(0, 0).slice(1), gone(48)];
-  const hue = [
-    door,
-    ...jobSteps(0, 0).slice(1),
-    ...arc,
-    `54.5% { opacity: 1; transform: translateX(${SLOT_X[0]}px); }`,
-    ...jobSteps(5, 1),
-    gone(97),
-  ];
-  const out = INK_OUT_BEATS.flatMap((b) => [
-    `${pct(b * BEAT_PCT + 4.4)} { opacity: 0; transform: none; animation-timing-function: ${OUT}; }`,
-    `${pct(b * BEAT_PCT + 5.2)} { opacity: 1; }`,
-    `${pct((b + 1) * BEAT_PCT)} { opacity: 0; transform: translateX(34px); }`,
-  ]);
+/** A new job slides into the tail at the first of `steps`, then queues like the rest. */
+function joining(steps: number[]): JobStop[] {
+  const [first, ...rest] = steps;
   return [
-    `@keyframes hp-job { ${ink.join(" ")} }`,
-    `@keyframes hp-retry { ${hue.join(" ")} }`,
-    `@keyframes hp-out { 0% { opacity: 0; } ${out.join(" ")} 100% { opacity: 0; } }`,
+    { at: 0, x: SLOT_X[0] - SLOT_GAP, opacity: 0 },
+    { at: first!, x: SLOT_X[0] - SLOT_GAP, opacity: 0, ease: INOUT },
+    ...queued(0, rest, first! + MOVE_MS),
+  ];
+}
+
+const absorbed = (advance: number): JobStop[] =>
+  [intoWorkerAt(advance) + ABSORB_MS, BACKENDS_MS].map((at) => ({ at, x: WORKER_X, scale: ABSORBED_SCALE, opacity: 0 }));
+
+function arcBack(): JobStop[] {
+  const steps = 16;
+  return Array.from({ length: steps - 1 }, (_, k) => {
+    const s = (k + 1) / steps;
+    const { x, y } = arcPoint(easeInOut(s));
+    return { at: REJECT_MS + ARC_MS * s, x, y: y - QUEUE_Y, scale: +Math.min(1, ABSORBED_SCALE + s * 1.35).toFixed(2) };
+  });
+}
+
+/** A joiner takes the tail and four more advances to reach the worker. */
+const STEPS_TO_WORKER = SLOT_X.length + 1;
+const joiner = (advance: number) => {
+  const steps = advancesFrom(advance, advance + STEPS_TO_WORKER);
+  const done = advance + STEPS_TO_WORKER - 1;
+  return { top: "solid" as const, stops: [...joining(steps), ...(done < ADVANCE_COUNT ? absorbed(done) : [])] };
+};
+
+const JOBS: { top: TopInk; stops: JobStop[] }[] = [
+  { top: "solid", stops: [...queued(3, advancesFrom(0, 1)), ...absorbed(0)] },
+  { top: "solid", stops: [...queued(1, advancesFrom(0, 3)), ...absorbed(2)] },
+  { top: "solid", stops: [...queued(0, advancesFrom(0, 4)), ...absorbed(3)] },
+  {
+    top: "hue",
+    stops: [
+      ...queued(2, advancesFrom(0, HUE_REJECTED + 1)),
+      { at: REJECT_MS, x: WORKER_X, scale: ABSORBED_SCALE },
+      ...arcBack(),
+      ...queued(0, advancesFrom(HUE_RETURNS + 1, HUE_PASSES + 1), REJECT_MS + ARC_MS),
+      ...absorbed(HUE_PASSES),
+    ],
+  },
+  ...ADVANCES.map((_, advance) => advance)
+    .filter((advance) => advance !== HUE_RETURNS)
+    .map(joiner),
+];
+
+/** When the worker takes in each job, the hue job twice. */
+const WORKER_TAKES = ADVANCES.map((_, advance) => intoWorkerAt(advance));
+const HUE_TAKES = [HUE_REJECTED, HUE_PASSES].map(intoWorkerAt);
+const INK_DONE = WORKER_TAKES.filter((at) => !HUE_TAKES.includes(at));
+const REJECTED_AT = HUE_TAKES[0]!;
+
+function queueKeyframes() {
+  const heldToEnd = (stops: JobStop[]) =>
+    stops.at(-1)!.at < BACKENDS_MS ? [...stops, { ...stops.at(-1)!, at: BACKENDS_MS, ease: undefined }] : stops;
+  const jobs = JOBS.map(({ stops }, k) => `@keyframes hp-job-${k} { ${heldToEnd(stops).map(jobFrame).join(" ")} }`);
+  const work = WORKER_TAKES.flatMap((at) => [
+    `${backendsPct(at)} { transform: scale(0.72); animation-timing-function: ${SPRING}; }`,
+    `${backendsPct(at + PULSE_MS)} { transform: scale(1); animation-timing-function: ${INOUT}; }`,
+    `${backendsPct(at + SETTLE_MS)} { transform: scale(0.72); }`,
+  ]);
+  const emit = (at: number) => [
+    `${backendsPct(at)} { opacity: 0; transform: none; animation-timing-function: ${OUT}; }`,
+    `${backendsPct(at + PULSE_MS / 2)} { opacity: 1; }`,
+    `${backendsPct(at + SETTLE_MS)} { opacity: 0; transform: translateX(34px); }`,
+  ];
+  const x = [
+    `0%, ${backendsPct(REJECTED_AT + PULSE_MS / 2)} { opacity: 0; transform: scale(0.3) rotate(-45deg); animation-timing-function: ${SPRING}; }`,
+    `${backendsPct(REJECTED_AT + PULSE_MS * 2.5)}, ${backendsPct(REJECT_MS + PULSE_MS)} { opacity: 1; transform: none; }`,
+    `${backendsPct(REJECT_MS + PULSE_MS * 4)}, 100% { opacity: 0; transform: none; }`,
+  ];
+  return [
+    ...jobs,
+    `@keyframes hp-work { 0% { transform: scale(0.72); } ${work.join(" ")} 100% { transform: scale(0.72); } }`,
+    `@keyframes hp-out { 0% { opacity: 0; } ${INK_DONE.flatMap(emit).join(" ")} 100% { opacity: 0; } }`,
+    `@keyframes hp-out-retry { 0% { opacity: 0; } ${emit(HUE_TAKES[1]!).join(" ")} 100% { opacity: 0; } }`,
+    `@keyframes hp-x { ${x.join(" ")} }`,
   ].join("\n");
 }
 
@@ -166,49 +252,69 @@ const KEYFRAMES = [meanderKeyframes(), queueKeyframes()].join("\n");
 
 type Scene = { label: string; body: (p: string) => ReactNode };
 
-const QUARTERS = [
-  ["M160 100 V30 A70 70 0 0 1 230 100 Z", "70px", "-56px", "40deg", "solid"],
-  ["M160 100 H230 A70 70 0 0 1 160 170 Z", "84px", "48px", "-30deg", "hue"],
-  ["M160 100 V170 A70 70 0 0 1 90 100 Z", "-72px", "52px", "50deg", "solid"],
-  ["M160 100 H90 A70 70 0 0 1 160 30 Z", "-84px", "-50px", "-40deg", "hue"],
-] as const;
+type Piece = { outline: Outline; top: TopInk; dx: number; dy: number; r?: number };
+
+const TUMBLE: Piece[] = [
+  { outline: rect(96, 56, 84, 84), top: "solid", dx: -70, dy: -46, r: -38 },
+  { outline: rect(64, 150, 200, 16), top: "solid", dx: -40, dy: 44, r: 16 },
+  { outline: polygon([226, 150], [266, 150], [246, 112]), top: "outline", dx: 64, dy: -90, r: 70 },
+  { outline: circle(212, 68, 34), top: "hue", dx: 80, dy: 58 },
+];
+
+const QUARTERS: Piece[] = [
+  { outline: sector(160, 100, 70, -90, 0), top: "solid", dx: 70, dy: -56, r: 40 },
+  { outline: sector(160, 100, 70, 0, 90), top: "hue", dx: 84, dy: 48, r: -30 },
+  { outline: sector(160, 100, 70, 90, 180), top: "solid", dx: -72, dy: 52, r: 50 },
+  { outline: sector(160, 100, 70, 180, 270), top: "hue", dx: -84, dy: -50, r: -40 },
+];
+
+/** The quarters in token order: solids first, to pair with the tumbling solids. */
+const QUARTER_TOKENS = [0, 2, 3, 1];
+
+/** Each piece settles over `span` of the scene, `step` after the one before; the last lands
+    at `span + 3 × step`. */
+const settleVars = ({ dx, dy, r = 0 }: Piece, i: number, span: number, step: number) =>
+  vars({ i, dx: `${dx}px`, dy: `${dy}px`, r: `${r}deg`, span, step });
+
+/** Art that has stopped moving bobs gently from `at` ms into the scene; one `ms` is one way up or down.
+    Shapes that must stay lined up share one Float, and guides stay still on the paper beneath. */
+function Float({ at = 0, ms = 1600, children }: { at?: number; ms?: number; children: ReactNode }) {
+  return (
+    <g className="float" style={vars({ "float-at": `${at}ms`, "float-ms": `${ms}ms` })}>
+      {children}
+    </g>
+  );
+}
+
+const settledAt = (i: number, span: number, step: number) => (span + step * i) * SCENE_MS;
+const TUMBLE_FLOAT_MS = [1500, 1800, 1600, 1700];
+const DEV_TOOLS_HIT_AT = 0.3 * SCENE_MS;
 
 const SCENES: Scene[] = [
   {
     label: "Four tumbling shapes settle into one balanced composition",
     body: (p) => (
       <>
-        <g className="settle" style={vars({ i: 0, dx: "-70px", dy: "-46px", r: "-38deg" })}>
-          <Ink p={p}>
-            <rect x="96" y="56" width="84" height="84" />
-          </Ink>
-        </g>
-        <g className="settle" style={vars({ i: 1, dx: "-40px", dy: "44px", r: "16deg" })}>
-          <Ink p={p}>
-            <rect x="64" y="150" width="200" height="16" />
-          </Ink>
-        </g>
-        <g className="settle" style={vars({ i: 2, dx: "64px", dy: "-90px", r: "70deg" })}>
-          <Ink p={p} top="outline">
-            <path d="M226 150 L266 150 L246 112 Z" />
-          </Ink>
-        </g>
-        <g className="settle" style={vars({ i: 3, dx: "80px", dy: "58px" })}>
-          <Ink p={p} top="hue">
-            <circle cx="212" cy="68" r="34" />
-          </Ink>
-        </g>
+        {TUMBLE.map((piece, i) => (
+          <Float key={i} at={settledAt(i, 0.5, 1 / 6)} ms={TUMBLE_FLOAT_MS[i]}>
+            <g className="settle" style={settleVars(piece, i, 0.5, 1 / 6)}>
+              <Ink p={p} top={piece.top}>
+                <path data-token={i} d={toPath(piece.outline)} />
+              </Ink>
+            </g>
+          </Float>
+        ))}
       </>
     ),
   },
   {
     label: "Four quarters arrive one at a time and close into a whole circle",
     body: (p) => (
-      <>
-        {QUARTERS.map(([d, dx, dy, r, top], i) => (
-          <g key={d} className="settle" style={vars({ i, gap: "240ms", dx, dy, r })}>
-            <Ink p={p} top={top}>
-              <path d={d} />
+      <Float at={settledAt(0, 0.3, 0.18)}>
+        {QUARTERS.map((piece, i) => (
+          <g key={i} className="settle" style={settleVars(piece, i, 0.3, 0.18)}>
+            <Ink p={p} top={piece.top}>
+              <path data-token={QUARTER_TOKENS.indexOf(i)} d={toPath(piece.outline)} />
             </Ink>
           </g>
         ))}
@@ -218,7 +324,7 @@ const SCENES: Scene[] = [
           strokeWidth={3}
           d="M160 14 A86 86 0 1 1 159.99 14"
         />
-      </>
+      </Float>
     ),
   },
   {
@@ -226,31 +332,35 @@ const SCENES: Scene[] = [
     body: (p) => (
       <>
         <path className="is ghost" d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`} />
-        <Ink p={p} top="hue">
-          <polygon points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
-        </Ink>
-        <Ink p={p} top="outline">
-          <circle cx="40" cy="160" r="14" />
-        </Ink>
-        <Ink p={p} top="outline">
-          <rect x="264" y="24" width="32" height="32" />
-        </Ink>
-        <rect className="h mis cut-hit" x="268" y="28" width="24" height="24" />
+        <Float at={DEV_TOOLS_HIT_AT}>
+          <Ink p={p} top="hue">
+            <polygon data-token={1} points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
+          </Ink>
+          <Ink p={p} top="outline">
+            <circle data-token={3} cx="40" cy="160" r="14" />
+          </Ink>
+          <Ink p={p} top="outline">
+            <rect data-token={2} x="264" y="24" width="32" height="32" />
+          </Ink>
+          <rect className="h mis cut-hit" x="268" y="28" width="24" height="24" />
+        </Float>
         <g className="vb cut-ghost">
           <circle className="is" strokeWidth={1.6} strokeDasharray="3 3" r="10" />
         </g>
-        <g className="vb cut-ball">
-          <Ink p={p}>
-            <circle r="10" />
-          </Ink>
-        </g>
+        <Float at={DEV_TOOLS_HIT_AT}>
+          <g className="vb cut-ball">
+            <Ink p={p}>
+              <circle data-token={0} r="10" />
+            </Ink>
+          </g>
+        </Float>
       </>
     ),
   },
   {
-    label: "Jobs step through a queue; one fails, loops back, and passes on retry",
+    label: "A worker drains a queue of jobs; one fails, goes back in line, and passes on retry",
     body: (p) => (
-      <>
+      <g style={{ "--scene-duration": `${BACKENDS_MS}ms` }}>
         {SLOT_X.map((x) => (
           <rect key={x} className="is ghost" x={x - 14} y="110" width="28" height="28" />
         ))}
@@ -259,57 +369,53 @@ const SCENES: Scene[] = [
           className="hs ghost"
           d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
         />
-        <Ink p={p} top="outline">
-          <rect x="230" y="92" width="64" height="64" />
-        </Ink>
-        <rect className="h mis q-work" x="246" y="108" width="32" height="32" />
-        <rect className="i q-out" x="298" y="119" width="10" height="10" />
-        <rect className="h q-out-retry" x="298" y="119" width="10" height="10" />
-        {INK_JOBS.map((b, k) => (
-          <g
-            key={b}
-            className="q-job"
-            style={vars({ b, x: `${[-40, -40, -40, -40, -40, 180, 138, 96][k]}px` })}
-          >
-            <Ink p={p}>
-              <circle cx="0" cy={QUEUE_Y} r="11" />
+        <Float>
+          <Ink p={p} top="outline">
+            <rect data-token={2} x="230" y="92" width="64" height="64" />
+          </Ink>
+          <rect data-token={3} className="h mis q-work" x="246" y="108" width="32" height="32" />
+          <rect className="i q-out" x="298" y="119" width="10" height="10" />
+          <rect className="h q-out-retry" x="298" y="119" width="10" height="10" />
+        </Float>
+        {JOBS.map((job, k) => (
+          <g key={k} className="q-job" style={{ animationName: `hp-job-${k}` }}>
+            <Ink p={p} top={job.top}>
+              <circle data-token={k < 2 ? k : undefined} cx="0" cy={QUEUE_Y} r="11" />
             </Ink>
           </g>
         ))}
-        <g className="q-retry">
-          <Ink p={p} top="hue">
-            <circle cx="0" cy={QUEUE_Y} r="11" />
-          </Ink>
-        </g>
-        <path
-          className="is q-x"
-          strokeWidth={3.5}
-          strokeLinecap="round"
-          d="M252 114 L272 134 M272 114 L252 134"
-        />
+        <Float>
+          <path
+            className="is q-x"
+            strokeWidth={3.5}
+            strokeLinecap="round"
+            d="M252 114 L272 134 M272 114 L252 134"
+          />
+        </Float>
         <path className="is" strokeWidth={3} d="M16 165.5 H304" />
-      </>
+      </g>
     ),
   },
   {
-    label: "Two snapshots side by side; a scan catches the shape that slipped and it snaps back",
+    label: "Two snapshots side by side; a scan catches the shape that slipped and it snaps into place",
     body: (p) => {
       const comp = (x0: number, slip: boolean) => {
         const square = (
           <Ink p={p}>
-            <rect x={x0 + 62} y="92" width="34" height="34" />
+            <rect data-token={slip ? 1 : 0} x={x0 + 62} y="92" width="34" height="34" />
           </Ink>
         );
         return (
-          <>
+          <Float>
             <Ink p={p} top="hue">
-              <circle cx={x0 + 40} cy="74" r="18" />
+              <circle data-token={slip ? 3 : 2} cx={x0 + 40} cy="74" r="18" />
             </Ink>
             {slip ? <g className="snap-slip">{square}</g> : square}
             <Ink p={p}>
               <rect x={x0 + 16} y="146" width="92" height="8" />
             </Ink>
-          </>
+            {slip && <RegistrationMark x={267} y={95} className="snap-reg" />}
+          </Float>
         );
       };
       return (
@@ -326,12 +432,231 @@ const SCENES: Scene[] = [
             d="M165 86 L155 112"
           />
           <rect className="h snap-scan" x="20" y="26" width="3" height="148" />
-          <RegistrationMark x={267} y={95} className="snap-reg" />
         </>
       );
     },
   },
 ];
+
+/* Each scene's four main pieces as they stand on its first and last frame. A scene change
+   blends the old scene's last frame into the new one's first, token by token, and the new
+   scene starts its loop from there. */
+type Token = { outline: Outline; top: TopInk };
+type SceneTokens = { enter: Token[]; exit: Token[] };
+
+const scattered = (pieces: Piece[]) =>
+  pieces.map(({ outline, top, dx, dy, r }) => ({ outline: moved(outline, dx, dy, r), top }));
+const settled = (pieces: Piece[]) => pieces.map(({ outline, top }) => ({ outline, top }));
+const settling = (pieces: Piece[]): SceneTokens => ({ enter: scattered(pieces), exit: settled(pieces) });
+
+const DEV_TOOLS_TOKENS = (ball: Outline): Token[] => [
+  { outline: ball, top: "solid" },
+  { outline: polygon([37.8, 155.5], [277.8, 35.5], [282.2, 44.5], [42.2, 164.5]), top: "hue" },
+  { outline: rect(264, 24, 32, 32), top: "outline" },
+  { outline: circle(40, 160, 14), top: "outline" },
+];
+
+const WORKER: Token = { outline: rect(230, 92, 64, 64), top: "outline" };
+const WORK: Token = { outline: moved(rect(246, 108, 32, 32), 0, 0, 0, 0.72), top: "hue" };
+const SNAPSHOT_CIRCLES: Token[] = [
+  { outline: circle(60, 74, 18), top: "hue" },
+  { outline: circle(216, 74, 18), top: "hue" },
+];
+const SNAPSHOT_SQUARE: Token = { outline: rect(82, 92, 34, 34), top: "solid" };
+const SLIPPED = { dx: 12, dy: -14, r: 16 };
+
+const SCENE_TOKENS: SceneTokens[] = [
+  settling(TUMBLE),
+  settling(QUARTER_TOKENS.map((q) => QUARTERS[q]!)),
+  { enter: DEV_TOOLS_TOKENS(dot(40, 160)), exit: DEV_TOOLS_TOKENS(circle(280, 40, 10)) },
+  {
+    enter: [
+      { outline: circle(SLOT_X[3], QUEUE_Y, 11), top: "solid" },
+      { outline: circle(SLOT_X[1], QUEUE_Y, 11), top: "solid" },
+      WORKER,
+      WORK,
+    ],
+    exit: [
+      { outline: dot(WORKER_X, QUEUE_Y), top: "solid" },
+      { outline: dot(WORKER_X, QUEUE_Y), top: "solid" },
+      WORKER,
+      WORK,
+    ],
+  },
+  {
+    enter: [
+      SNAPSHOT_SQUARE,
+      { outline: moved(rect(238, 92, 34, 34), SLIPPED.dx, SLIPPED.dy, SLIPPED.r), top: "solid" },
+      ...SNAPSHOT_CIRCLES,
+    ],
+    exit: [SNAPSHOT_SQUARE, { outline: rect(238, 92, 34, 34), top: "solid" }, ...SNAPSHOT_CIRCLES],
+  },
+];
+
+const TOKEN_COUNT = 4;
+const TOPS: TopInk[] = ["solid", "hue", "outline"];
+const MORPH_MS = 1100;
+const FADE_MS = 180;
+const TOKEN_STAGGER_MS = 60;
+/** How long after a scene change the new scene starts. */
+export const SCENE_LEAD_MS = MORPH_MS - FADE_MS;
+/* easeInOut covers only the last 1.5% of the way in its final 15% of time. Cutting the curve there
+   lands every token on the scene's first frame still moving, so the scene picks up the motion. */
+const LANDING_T = 0.845;
+const landing = (u: number) => easeInOut(u * LANDING_T) / easeInOut(LANDING_T);
+
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+type Layer = { index: number; run: number };
+/** "leaving": the old scene fades out, frozen on the frame the tokens took over from.
+    "entering": the next scene fades in beneath the landing tokens. */
+type Stage = { layers: Layer[]; phase: "still" | "leaving" | "entering" };
+/** A token as drawn right now: its outline and how much of each top ink shows, in TOPS order. */
+type Drawn = { outline: Outline; inks: number[] };
+
+const inksOf = (top: TopInk) => TOPS.map((ink) => (ink === top ? 1 : 0));
+const drawnOf = (tokens: Token[]): Drawn[] =>
+  tokens.map(({ outline, top }) => ({ outline, inks: inksOf(top) }));
+/** False while the drawing or a group around it inside the scene is faded out. */
+function isShown(drawing: Element, scene: Element) {
+  let opacity = 1;
+  for (let at: Element | null = drawing; at && at !== scene; at = at.parentElement) {
+    opacity *= Number(getComputedStyle(at).opacity);
+  }
+  return opacity > 0.05;
+}
+
+/** Each token as the scene draws it this frame, mid-animation included, in viewBox units. A scene marks a
+    token's shape with data-token; the last match is the top ink, the first its halftone. */
+function drawnIn(scene: SVGGElement | undefined, tokens: Token[]): Drawn[] {
+  return tokens.map(({ outline, top }, k) => {
+    const drawing = scene && [...scene.querySelectorAll<SVGGeometryElement>(`[data-token="${k}"]`)].at(-1);
+    const toScene = scene?.getCTM();
+    const toScreen = drawing?.getCTM();
+    if (!drawing || !toScene || !toScreen) return { outline, inks: inksOf(top) };
+    const matrix = DOMMatrix.fromMatrix(toScene).inverse().multiply(DOMMatrix.fromMatrix(toScreen));
+    const drawn = traced(drawing, matrix);
+    return { outline: isShown(drawing, scene) ? drawn : collapsed(drawn), inks: inksOf(top) };
+  });
+}
+const fadeOf = (layer: SVGGElement | undefined) => Number(layer?.style.getPropertyValue("--fade") || 1);
+const setFade = (layer: SVGGElement, fade: number) => layer.style.setProperty("--fade", String(fade));
+
+/** Mounts scenes and drives the morph between them. A change that lands mid-morph starts the
+    next morph from the tokens as they are drawn, so frantic switching never jumps. The tokens
+    and every fade run on one frame loop, not CSS, so pausing the scene never strands
+    a half-faded layer. */
+function useSceneMorph(index: number, run: number) {
+  const [stage, setStage] = useState<Stage>({ layers: [{ index, run }], phase: "still" });
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
+  const layerRefs = useRef(new Map<string, SVGGElement>());
+  const morphRef = useRef<SVGGElement>(null);
+  const drawnRef = useRef<Drawn[]>([]);
+  const paintRef = useRef(() => {});
+
+  // A commit that mounts the morph or the next scene draws its first frame before the browser paints it.
+  useLayoutEffect(() => paintRef.current(), [stage]);
+
+  useEffect(() => {
+    const { layers, phase } = stageRef.current;
+    const scene = layers.at(-1)!;
+    if (scene.index === index && scene.run === run) return;
+    const next = { index, run };
+    const nextKey = layerKey(next);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStage({ layers: [next], phase: "still" });
+      return;
+    }
+
+    // Tokens swap between scene and morph in one frame; the rest of the art fades from wherever its fade has reached.
+    const leaving = layers.map((layer) => ({ layer, from: fadeOf(layerRefs.current.get(layerKey(layer))) }));
+    const from =
+      phase === "leaving"
+        ? drawnRef.current
+        : drawnIn(layerRefs.current.get(layerKey(scene)), SCENE_TOKENS[scene.index]!.exit);
+    const to = drawnOf(SCENE_TOKENS[index]!.enter);
+
+    const startedAt = performance.now();
+    let mounted = false;
+    let frame = 0;
+    const paint = (elapsed: number) => {
+      const fadeOut = 1 - clamp01(elapsed / FADE_MS);
+      const layer = morphRef.current;
+      if (layer) {
+        drawnRef.current = from.map((start, k) => {
+          const t = landing(clamp01((elapsed - k * TOKEN_STAGGER_MS) / (SCENE_LEAD_MS - k * TOKEN_STAGGER_MS)));
+          return {
+            outline: blend(start.outline, to[k]!.outline, t),
+            inks: start.inks.map((ink, i) => ink + (to[k]!.inks[i]! - ink) * t),
+          };
+        });
+        layer.querySelectorAll<SVGGElement>(":scope > g").forEach((group, k) => {
+          const { outline, inks } = drawnRef.current[k]!;
+          const d = toPath(outline);
+          group.querySelectorAll("path").forEach((path) => {
+            path.setAttribute("d", d);
+            const ink = TOPS.findIndex((top) => top === path.dataset.top);
+            if (ink >= 0) path.style.opacity = String(inks[ink]);
+          });
+        });
+      }
+      for (const { layer: leavingLayer, from: start } of leaving) {
+        const element = layerRefs.current.get(layerKey(leavingLayer));
+        if (element) setFade(element, start * fadeOut);
+      }
+      const entering = layerRefs.current.get(nextKey);
+      if (entering && mounted) setFade(entering, clamp01((elapsed - SCENE_LEAD_MS) / FADE_MS));
+    };
+    const tick = (now: number) => {
+      const elapsed = now - startedAt;
+      paint(elapsed);
+      if (!mounted && elapsed >= SCENE_LEAD_MS) {
+        mounted = true;
+        setStage({ layers: [next], phase: "entering" });
+      }
+      if (elapsed < MORPH_MS) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
+      paintRef.current = () => {};
+      layerRefs.current.get(nextKey)?.style.removeProperty("--fade");
+      setStage({ layers: [next], phase: "still" });
+    };
+    paintRef.current = () => paint(performance.now() - startedAt);
+    setStage({ layers, phase: "leaving" });
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [index, run]);
+
+  const refFor = (layer: Layer) => (element: SVGGElement | null) => {
+    if (element) layerRefs.current.set(layerKey(layer), element);
+    else layerRefs.current.delete(layerKey(layer));
+  };
+  return { stage, refFor, morphRef };
+}
+
+const layerKey = ({ index, run }: Layer) => `${index}-${run}`;
+
+function MorphTokens({ p }: { p: string }) {
+  return (
+    <>
+      {Array.from({ length: TOKEN_COUNT }, (_, k) => (
+        <g key={k}>
+          <path transform="translate(5 4)" fill={`url(#${p}ht)`} className="mis" />
+          {TOPS.map((top) => (
+            <path
+              key={top}
+              data-top={top}
+              className={top === "solid" ? "i" : top === "hue" ? "h mis" : "is"}
+              strokeWidth={top === "outline" ? 3 : undefined}
+            />
+          ))}
+        </g>
+      ))}
+    </>
+  );
+}
 
 const REST_DEG = { x: 4, y: -6 };
 const REACH_DEG = { x: 6, y: 10 };
@@ -388,34 +713,41 @@ export function HeroPrints({
   index,
   restartKey,
   playing,
-  slideMs,
-  loopsPerSlide,
 }: {
   index: number;
   restartKey: number;
   playing: boolean;
-  slideMs: number;
-  loopsPerSlide: number;
 }) {
   const p = useId().replace(/[^a-zA-Z0-9]/g, "");
   const { stageRef, cardRef } = useTiltToCursor();
-  const scene = SCENES[index]!;
+  const { stage, refFor, morphRef } = useSceneMorph(index, restartKey);
   return (
     <div className="hp" data-play={playing ? "" : undefined}>
       <style>{KEYFRAMES}</style>
       <div ref={stageRef} className="hp-stage">
         <div ref={cardRef} className="hp-card" style={{ transform: restTransform }}>
-          <div className="hp-drop" />
-          <div className="hp-paper" />
           <svg
-            key={`${index}-${restartKey}`}
             viewBox="0 0 320 200"
             role="img"
-            aria-label={scene.label}
-            style={{ "--loop-duration": `${slideMs / loopsPerSlide}ms` }}
+            aria-label={SCENES[index]!.label}
+            style={{ "--scene-duration": `${SCENE_MS}ms` }}
           >
             <Paper p={p} />
-            {scene.body(p)}
+            {stage.layers.map((layer) => (
+              <g
+                key={layerKey(layer)}
+                ref={refFor(layer)}
+                className="hp-layer"
+                data-leaving={stage.phase === "leaving" ? "" : undefined}
+              >
+                {SCENES[layer.index]!.body(p)}
+              </g>
+            ))}
+            {stage.phase === "leaving" && (
+              <g ref={morphRef}>
+                <MorphTokens p={p} />
+              </g>
+            )}
           </svg>
         </div>
       </div>

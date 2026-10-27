@@ -7,16 +7,9 @@ import { colorOf, ruleNumber, RuleThumb } from "./rule-art";
 // A searchable, filterable select grid for the Rule of Thumb index. Hovering or
 // focusing a tile shows it in the side panel; it holds up at 100+ rules.
 
-type RuleSelectProps = {
-  rules: Guideline[];
-  /** Show this many tiles until "Show all" is pressed. Omit to show every match. */
-  pageSize?: number;
-};
-
-export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
+export function RuleSelect({ rules }: { rules: Guideline[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
-  const [expanded, setExpanded] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -28,8 +21,7 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
       (!normalizedQuery ||
         `${rule.title} ${rule.description} ${rule.label}`.toLowerCase().includes(normalizedQuery)),
   );
-  const shown = expanded || !pageSize ? matches : matches.slice(0, pageSize);
-  const selected = shown.find((rule) => rule.id === selectedId) ?? shown[0];
+  const selected = matches.find((rule) => rule.id === selectedId) ?? matches[0];
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -44,16 +36,11 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
     return () => removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const pickCategory = (next: string) => {
-    setCategory(next);
-    setExpanded(false);
-  };
-
   return (
-    <div className="select" data-cut>
+    <div className="select">
       {/* The panel always holds its place, so filtering to nothing never shifts the grid. */}
       {selected ? (
-        <aside className="sel" aria-live="polite" style={{ "--c": colorOf(selected.label) }}>
+        <aside className="sel" data-cut aria-live="polite" style={{ "--c": colorOf(selected.label) }}>
           <div className="p">
             <span>No.{ruleNumber(selected)}</span>
             <span>{selected.label.toUpperCase()}</span>
@@ -76,7 +63,7 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
           </dl>
         </aside>
       ) : (
-        <aside className="sel sel-empty" aria-live="polite">
+        <aside className="sel sel-empty" data-cut aria-live="polite">
           <div className="p">
             <span>No.—</span>
             <span>NO MATCH</span>
@@ -98,7 +85,7 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
       )}
       <div>
         <div className="tools">
-          <label className="search">
+          <label className="search" data-cut>
             FIND
             <input
               ref={searchRef}
@@ -106,10 +93,7 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
               placeholder="button, cache, null…"
               aria-label="Search rules"
               value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setExpanded(false);
-              }}
+              onChange={(event) => setQuery(event.target.value)}
             />
             <kbd>/</kbd>
           </label>
@@ -119,9 +103,10 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
             <button
               key={name}
               type="button"
+              data-cut
               aria-pressed={category === name}
               style={{ "--c": colorOf(name) }}
-              onClick={() => pickCategory(name)}
+              onClick={() => setCategory(name)}
             >
               <i />
               {name}
@@ -132,14 +117,16 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
           ))}
         </div>
         {/* Keyed by the filter, so a new filter deals a fresh hand of tiles. */}
-        <div className="tiles" key={`${category}|${normalizedQuery}|${expanded}`}>
-          {shown.map((rule, index) => (
+        <div className="tiles" key={`${category}|${normalizedQuery}`}>
+          {matches.map((rule) => (
             <Link
               key={rule.id}
               to={rule.href}
               preload="intent"
-              className={rule === selected ? "tile on" : "tile"}
-              style={{ "--i": Math.min(index, 20), "--c": colorOf(rule.label) }}
+              className="tile"
+              data-cut
+              data-on={rule === selected ? "" : undefined}
+              style={{ "--c": colorOf(rule.label) }}
               onPointerEnter={() => setSelectedId(rule.id)}
               onFocus={() => setSelectedId(rule.id)}
             >
@@ -158,11 +145,6 @@ export function RuleSelect({ rules, pageSize }: RuleSelectProps) {
           <p className="empty">
             No rule matches “{query.trim()}”{category !== "All" ? ` in ${category}` : ""} yet.
           </p>
-        )}
-        {pageSize !== undefined && matches.length > pageSize && (
-          <button type="button" className="btn soft more" onClick={() => setExpanded(!expanded)}>
-            {expanded ? "Show fewer" : `Show all ${matches.length}`}
-          </button>
         )}
       </div>
     </div>
