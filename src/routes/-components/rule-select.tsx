@@ -1,18 +1,23 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
 
 // A searchable, filterable select grid for the Rule of Thumb index. Hovering or
-// focusing a tile shows it in the side panel; it holds up at 100+ rules.
+// focusing a tile shows it in the side panel; it holds up at 100+ rules. The tile under the
+// pointer or keyboard focus lights up and projects a beam onto the panel.
 
 export function RuleSelect({ rules }: { rules: Guideline[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [litId, setLitId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const openRule = useRuleOpen();
+  const selectRef = useRef<HTMLDivElement>(null);
+  const beamRef = useRef<HTMLDivElement>(null);
+  const litTile = useRef<HTMLElement>(null);
+  const { linkProps: openRule, panelProps } = useRuleOpen();
 
   const categories = [...new Set(rules.map((rule) => rule.label))];
   const normalizedQuery = query.trim().toLowerCase();
@@ -37,53 +42,106 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
     return () => removeEventListener("keydown", onKeyDown);
   }, []);
 
+  // The sticky panel moves against the grid as the page scrolls, so the beam re-aims with it.
+  useLayoutEffect(() => {
+    const select = selectRef.current;
+    const beam = beamRef.current;
+    const tile = litTile.current;
+    const panel = panelProps.ref.current;
+    if (!litId || !select || !beam || !tile || !panel?.checkVisibility()) return;
+    const aim = () => {
+      const box = select.getBoundingClientRect();
+      const from = tile.getBoundingClientRect();
+      const to = panel.getBoundingClientRect();
+      const corners = ({ left, top, right, bottom }: DOMRect): Point[] => {
+        const [x0, y0, x1, y1] = [left - box.left, top - box.top, right - box.left, bottom - box.top];
+        return [
+          [x0, y0],
+          [x1, y0],
+          [x1, y1],
+          [x0, y1],
+        ];
+      };
+      const lens: Point = [from.left + from.width / 2 - box.left, from.top + from.height / 2 - box.top];
+      const reach = Math.max(...corners(to).map(([x, y]) => Math.hypot(x - lens[0], y - lens[1])));
+      beam.style.clipPath = `polygon(${hull([...corners(from), ...corners(to)])
+        .map(([x, y]) => `${x}px ${y}px`)
+        .join(", ")})`;
+      beam.style.setProperty("--lens-x", `${lens[0]}px`);
+      beam.style.setProperty("--lens-y", `${lens[1]}px`);
+      beam.style.setProperty("--reach", `${reach}px`);
+    };
+    aim();
+    addEventListener("scroll", aim, { passive: true });
+    addEventListener("resize", aim);
+    return () => {
+      removeEventListener("scroll", aim);
+      removeEventListener("resize", aim);
+    };
+  }, [litId, panelProps.ref]);
+
+  const light = (rule: Guideline, tile: HTMLElement) => {
+    litTile.current = tile;
+    setLitId(rule.id);
+  };
+
   return (
-    <div className="select">
-      {/* The panel always holds its place, so filtering to nothing never shifts the grid. */}
-      {selected ? (
-        <aside className="sel" data-cut aria-live="polite" style={{ "--c": colorOf(selected.label) }}>
-          <div className="p">
-            <span>No.{ruleNumber(selected)}</span>
-            <span>{selected.label.toUpperCase()}</span>
-          </div>
-          <RuleThumb key={selected.id} rule={selected} play />
-          <h3>
-            <ScrambleText text={selected.title} />
-            <span className="sr-only">{selected.title}</span>
-          </h3>
-          <p>{selected.description}</p>
-          <dl>
-            <div>
-              <dt>DEMO</dt>
-              <dd>{selected.interactive ? "Interactive" : "Article only"}</dd>
+    <div ref={selectRef} className="select" data-lit={litId ? "" : undefined}>
+      {/* The panel always holds its place, so filtering to nothing never shifts the grid. It stays
+          one element across empty and filled, so React never rewrites the class the cut-in added. */}
+      <aside
+        {...panelProps}
+        className="sel"
+        data-cut
+        data-empty={selected ? undefined : ""}
+        aria-live="polite"
+        style={{ "--c": selected ? colorOf(selected.label) : undefined }}
+      >
+        {selected ? (
+          <>
+            <div className="p">
+              <span>No.{ruleNumber(selected)}</span>
+              <span>{selected.label.toUpperCase()}</span>
             </div>
-            <div>
-              <dt>TOPIC</dt>
-              <dd>{selected.label}</dd>
+            <RuleThumb key={selected.id} rule={selected} play />
+            <h3>
+              <ScrambleText text={selected.title} />
+              <span className="sr-only">{selected.title}</span>
+            </h3>
+            <p>{selected.description}</p>
+            <dl>
+              <div>
+                <dt>DEMO</dt>
+                <dd>{selected.interactive ? "Interactive" : "Article only"}</dd>
+              </div>
+              <div>
+                <dt>TOPIC</dt>
+                <dd>{selected.label}</dd>
+              </div>
+            </dl>
+          </>
+        ) : (
+          <>
+            <div className="p">
+              <span>No.—</span>
+              <span>NO MATCH</span>
             </div>
-          </dl>
-        </aside>
-      ) : (
-        <aside className="sel sel-empty" data-cut aria-live="polite">
-          <div className="p">
-            <span>No.—</span>
-            <span>NO MATCH</span>
-          </div>
-          <div className="thumb" aria-hidden="true" />
-          <h3>Nothing here yet</h3>
-          <p>Try another word, or pick a different topic.</p>
-          <dl>
-            <div>
-              <dt>DEMO</dt>
-              <dd>—</dd>
-            </div>
-            <div>
-              <dt>TOPIC</dt>
-              <dd>{category}</dd>
-            </div>
-          </dl>
-        </aside>
-      )}
+            <div className="thumb" aria-hidden="true" />
+            <h3>Nothing here yet</h3>
+            <p>Try another word, or pick a different topic.</p>
+            <dl>
+              <div>
+                <dt>DEMO</dt>
+                <dd>—</dd>
+              </div>
+              <div>
+                <dt>TOPIC</dt>
+                <dd>{category}</dd>
+              </div>
+            </dl>
+          </>
+        )}
+      </aside>
       <div>
         <div className="tools">
           <label className="search" data-cut>
@@ -118,7 +176,7 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
           ))}
         </div>
         {/* Keyed by the filter, so a new filter deals a fresh hand of tiles. */}
-        <div className="tiles" key={`${category}|${normalizedQuery}`}>
+        <div className="tiles" key={`${category}|${normalizedQuery}`} onPointerLeave={() => setLitId(null)}>
           {matches.map((rule) => (
             <Link
               key={rule.id}
@@ -127,9 +185,17 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
               className="tile"
               data-cut
               data-on={rule === selected ? "" : undefined}
+              data-lit={rule.id === litId ? "" : undefined}
               style={{ "--c": colorOf(rule.label) }}
-              onPointerEnter={() => setSelectedId(rule.id)}
-              onFocus={() => setSelectedId(rule.id)}
+              onPointerEnter={(event) => {
+                setSelectedId(rule.id);
+                if (event.pointerType !== "touch") light(rule, event.currentTarget);
+              }}
+              onFocus={(event) => {
+                setSelectedId(rule.id);
+                if (event.currentTarget.matches(":focus-visible")) light(rule, event.currentTarget);
+              }}
+              onBlur={() => setLitId((id) => (id === rule.id ? null : id))}
               {...openRule(rule)}
             >
               <RuleThumb rule={rule} play={rule === selected} />
@@ -149,8 +215,32 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
           </p>
         )}
       </div>
+      <div
+        ref={beamRef}
+        className="beam"
+        aria-hidden="true"
+        style={{ "--c": selected ? colorOf(selected.label) : undefined }}
+      />
     </div>
   );
+}
+
+type Point = [x: number, y: number];
+
+/** The convex hull of the points (Andrew's monotone chain): the outline of the light running from
+ * every point of the tile to every point of the panel. */
+function hull(points: Point[]) {
+  const sorted = [...points].sort(([ax, ay], [bx, by]) => ax - bx || ay - by);
+  const turn = ([ox, oy]: Point, [ax, ay]: Point, [bx, by]: Point) => (ax - ox) * (by - oy) - (ay - oy) * (bx - ox);
+  const chain = (list: Point[]) => {
+    const kept: Point[] = [];
+    for (const point of list) {
+      while (kept.length >= 2 && turn(kept.at(-2)!, kept.at(-1)!, point) <= 0) kept.pop();
+      kept.push(point);
+    }
+    return kept.slice(0, -1);
+  };
+  return [...chain(sorted), ...chain([...sorted].reverse())];
 }
 
 // Characters scramble, then settle left to right. Every character keeps its own cell, sized by

@@ -28,7 +28,7 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
   const last = rules.length - 1;
   const [initial] = useState(() => Math.floor(last / 2));
   const [active, setActive] = useState(initial);
-  const openRule = useRuleOpen();
+  const { linkProps: openRule } = useRuleOpen();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const stageRef = useRef<HTMLDivElement>(null);
   const slots = useRef<HTMLDivElement[]>([]);

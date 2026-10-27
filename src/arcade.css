@@ -55,6 +55,10 @@
   --cursor-point: url("/cursors/point.svg") 9 0, pointer;
   --cursor-grab: url("/cursors/grab.svg") 13 14, grab;
   --cursor-grabbing: url("/cursors/grabbing.svg") 12 10, grabbing;
+  /* The hero prints' halftone screen as a 25px tile: dots 7.9px apart on a grid turned
+     atan(1/3), the angle nearest their 18deg whose grid repeats in a square. Dark lightens the
+     hue under it, like the prints' screen blend; light darkens it, like their multiply. */
+  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23fff' fill-opacity='.4'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E") 0 0 / 25px 25px;
   --t-bar: 200ms;
 }
 
@@ -83,6 +87,7 @@
   --scan: rgb(0 0 0 / 0.03);
   --dot: #cacad6;
   --lift: rgb(30 30 60 / 0.14);
+  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23000' fill-opacity='.22'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E") 0 0 / 25px 25px;
   color-scheme: light;
 }
 
@@ -307,8 +312,9 @@ html[data-theme-swap]::view-transition-new(root) {
   }
 }
 
-/* Opening a rule from a card, in the home deck or the index tiles, dives into it. The page zooms
-   toward the card (useRuleOpen sets --open-x and --open-y to its centre) while the card's frame
+/* Opening a rule from a card dives into it: the home deck's card, or on the index the panel the
+   tile projects onto. The page zooms toward the card (useRuleOpen sets --open-x and --open-y to
+   its centre) while the card's frame
    swells past the screen edges, and its thumbnail and title fly on into the rule page's cover and
    heading. The names exist only during that transition, so the theme switch still reveals the
    page as one picture. */
@@ -320,6 +326,7 @@ html:active-view-transition-type(rule-open) .rot-hero .cover .thumb {
   view-transition-name: rule-thumb;
 }
 html:active-view-transition-type(rule-open) [data-opening] .t,
+html:active-view-transition-type(rule-open) [data-opening] > h3,
 html:active-view-transition-type(rule-open) .rot-hero h1 {
   view-transition-name: rule-title;
 }
@@ -808,6 +815,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 
 /* ---------- Rule select grid ---------- */
 .arc .select {
+  position: relative;
   display: grid;
   grid-template-columns: 340px 1fr;
   gap: 24px;
@@ -815,6 +823,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .sel {
   position: sticky;
+  z-index: 2;
   top: 92px;
   border-radius: 22px;
   padding: 20px;
@@ -824,7 +833,9 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     var(--raise),
     0 4px 0 var(--drop-ink);
   overflow: hidden;
-  transition: border-color 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 180ms ease;
 }
 .arc .sel .p {
   font: 700 12px var(--display);
@@ -879,12 +890,16 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   justify-content: center;
   color: var(--text);
 }
-.arc .sel-empty {
+.arc .sel[data-empty] {
   border-style: dashed;
 }
-.arc .sel-empty .p,
-.arc .sel-empty h3 {
+.arc .sel[data-empty] .p,
+.arc .sel[data-empty] h3 {
   color: var(--mute);
+}
+/* With no rule there is no topic hue, so the screen goes grey: switched on, projecting nothing. */
+.arc .sel[data-empty] .thumb {
+  --c: var(--mute);
 }
 .arc .sel dl {
   margin: 0;
@@ -958,7 +973,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   padding: 0 12px;
   border-radius: 999px;
   border: 2px solid var(--hair);
-  background: none;
+  /* Solid, so the backdrop's dots never show through. */
+  background: var(--panel);
   color: var(--dim);
   font: 500 12px var(--display);
   cursor: var(--cursor-point);
@@ -987,7 +1003,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .chips button[aria-pressed="true"] {
   border-color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
   color: var(--text);
-  background: color-mix(in srgb, var(--c) 14%, transparent);
+  background: color-mix(in srgb, var(--c) 14%, var(--panel));
 }
 .arc .tiles {
   display: grid;
@@ -1044,7 +1060,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     inset 0 4px 0 var(--c),
     var(--raise),
     0 8px 0 var(--key);
-  z-index: 1;
+  z-index: 2;
 }
 .arc .tile[data-on]:active {
   transform: translateY(3px);
@@ -1058,6 +1074,67 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
+/* A lit tile turns into the projector's lens: its face fills with its hue under the halftone
+   screen, and the beam (.beam) carries the light from it onto the panel, which shows what it
+   projects. */
+.arc .tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 14px;
+  pointer-events: none;
+  background: var(--halftone), var(--c);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.arc .tile[data-lit]::before {
+  opacity: 1;
+}
+/* The light is brightest at the lens and spreads thinner toward the panel. useLayoutEffect in
+   rule-select.tsx clips it to the hull of the tile and the panel and puts the lens at the tile's
+   centre. It shines over the dimmed tiles and under the lit one and the panel. */
+.arc .beam {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--halftone), var(--c);
+  mask: radial-gradient(
+    circle at var(--lens-x) var(--lens-y),
+    rgb(0 0 0 / 0.5),
+    rgb(0 0 0 / 0.12) var(--reach)
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.light .arc .beam {
+  mix-blend-mode: multiply;
+  mask: radial-gradient(
+    circle at var(--lens-x) var(--lens-y),
+    rgb(0 0 0 / 0.32),
+    rgb(0 0 0 / 0.06) var(--reach)
+  );
+}
+.arc .select[data-lit] .beam {
+  opacity: 1;
+  animation: beam-on 260ms steps(1) both;
+}
+/* The lamp catches with a stutter, once per hover of the grid, not per tile. */
+@keyframes beam-on {
+  0% { opacity: 0; }
+  20% { opacity: 0.85; }
+  40% { opacity: 0.25; }
+  60% { opacity: 1; }
+}
+.arc .select[data-lit] .sel {
+  box-shadow:
+    var(--raise),
+    0 4px 0 var(--drop-ink),
+    0 0 56px -12px color-mix(in srgb, var(--c) 55%, transparent);
+}
+
 /* Filtered tiles deal instead of glitching, since a new filter deals a fresh hand. */
 .arc .tiles .tile[data-cut].in {
   animation: deal var(--t-pop) var(--snap) calc(min(var(--cut-order, 0), 12) * var(--t-step)) backwards;
@@ -2265,13 +2342,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .stack-filter .chips {
   margin-bottom: 8px;
 }
-/* Solid like the badges they filter, so the backdrop's dots never show through. */
-.arc .stack-filter .chips button {
-  background: var(--panel);
-}
-.arc .stack-filter .chips button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--c) 14%, var(--panel));
-}
 .arc .pups-groups {
   border-top: 2px solid var(--hair);
 }
@@ -2786,7 +2856,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc .hero {
     gap: 28px;
   }
-  .arc .sel {
+  .arc .sel,
+  .arc .beam {
     display: none;
   }
   .arc .tiles {

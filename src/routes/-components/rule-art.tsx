@@ -1,4 +1,4 @@
-import { useState, type MouseEvent, type ReactNode } from "react";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { GUIDELINES } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -86,22 +86,29 @@ export function ruleNumber(rule: Guideline) {
  * arcade.css). */
 export const RULE_OPEN = "rule-open";
 
-/** Props for the links that open rules with the dive. The clicked card marks itself as the one
- * opening and records its centre, the point the page zooms toward. */
+/** Props for the links that open rules with the dive, and for the panel that previews the rule a
+ * link points at, where a page has one. The page dives into the panel while it is on screen, and
+ * into the clicked card otherwise. The card that opens is marked and its centre recorded, the point
+ * the page zooms toward. */
 export function useRuleOpen() {
-  const [opening, setOpening] = useState<string | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  const [opening, setOpening] = useState<{ rule: string; inPanel: boolean } | null>(null);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  return (rule: Guideline) => ({
-    "data-opening": opening === rule.id ? "" : undefined,
-    viewTransition: reduced ? undefined : { types: [RULE_OPEN] },
-    onClick: (event: MouseEvent<HTMLElement>) => {
-      const card = event.currentTarget.getBoundingClientRect();
-      const root = document.documentElement.style;
-      root.setProperty("--open-x", `${card.x + card.width / 2}px`);
-      root.setProperty("--open-y", `${card.y + card.height / 2}px`);
-      setOpening(rule.id);
-    },
-  });
+  return {
+    panelProps: { ref: panel, "data-opening": opening?.inPanel ? "" : undefined },
+    linkProps: (rule: Guideline) => ({
+      "data-opening": opening?.rule === rule.id && !opening.inPanel ? "" : undefined,
+      viewTransition: reduced ? undefined : { types: [RULE_OPEN] },
+      onClick: (event: MouseEvent<HTMLElement>) => {
+        const shown = panel.current?.checkVisibility() ? panel.current : null;
+        const card = (shown ?? event.currentTarget).getBoundingClientRect();
+        const root = document.documentElement.style;
+        root.setProperty("--open-x", `${card.x + card.width / 2}px`);
+        root.setProperty("--open-y", `${card.y + card.height / 2}px`);
+        setOpening({ rule: rule.id, inPanel: shown !== null });
+      },
+    }),
+  };
 }
 
 /** True while the page renders inside a card's `rule-open` transition, when the hero's cover and
