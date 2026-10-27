@@ -71,6 +71,9 @@ const STAND_IN_HEX: Record<keyof typeof STAND_INS, string> = {
   Playwright: "2EAD33",
 };
 
+const entryOf = <T,>(table: Record<string, T>, name: string) =>
+  Object.entries(table).find(([key]) => key === name)?.[1];
+
 type Rgb = { r: number; g: number; b: number };
 
 const toRgb = (hex: string): Rgb => ({
@@ -114,28 +117,20 @@ function brandFor(hex: string, theme: keyof typeof PANEL) {
 
 // The badge style that carries a tool's brand colour, read by its hover state in arcade.css.
 export function techBrand(name: string): CSSProperties | undefined {
-  const mark: SimpleIcon | undefined = Object.entries(MARKS).find(([key]) => key === name)?.[1];
-  const hex = mark?.hex ?? Object.entries(STAND_IN_HEX).find(([key]) => key === name)?.[1];
+  const hex = entryOf(MARKS, name)?.hex ?? entryOf(STAND_IN_HEX, name);
   if (!hex) return undefined;
-  // SAFETY: CSSProperties has no index signature for custom properties; these two are
-  // plain string values that React writes straight to the style attribute.
-  return { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") } as CSSProperties;
+  return { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
 }
 
 export function TechIcon({ name }: { name: string }) {
-  if (Object.hasOwn(MARKS, name)) {
-    // SAFETY: hasOwn just confirmed `name` is one of MARKS' own keys.
-    const mark = MARKS[name as keyof typeof MARKS];
+  const mark = entryOf(MARKS, name);
+  if (mark) {
     return (
       <svg className="ti" viewBox="0 0 24 24" aria-hidden="true">
         <path d={mark.path} />
       </svg>
     );
   }
-  if (Object.hasOwn(STAND_INS, name)) {
-    // SAFETY: hasOwn just confirmed `name` is one of STAND_INS' own keys.
-    const StandIn = STAND_INS[name as keyof typeof STAND_INS];
-    return <StandIn className="ti" weight="bold" aria-hidden="true" />;
-  }
-  return null;
+  const StandIn = entryOf(STAND_INS, name);
+  return StandIn ? <StandIn className="ti" weight="bold" aria-hidden="true" /> : null;
 }

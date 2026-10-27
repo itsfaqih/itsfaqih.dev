@@ -1,6 +1,6 @@
 import { registerCustomCSSVariableTheme } from "@pierre/diffs";
 import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
-import { isValidElement, useMemo, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
+import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
 import { cn } from "../cn";
 
 // One syntax theme for both appearances: token colours are CSS variables, set on
@@ -90,33 +90,24 @@ export function CodeBlock({
   highlightBorder,
 }: CodeBlockProps) {
   const language = normalizeLanguage(lang);
-  const file = useMemo<FileContents>(
-    () => ({
-      name: getFilename(language),
-      contents: code,
-      lang: language,
-    }),
-    [code, language],
-  );
-  const options = useMemo<FileOptions<undefined>>(
-    () => ({
-      theme: {
-        light: ARCADE_THEME,
-        dark: ARCADE_THEME,
-      },
-      themeType: "system",
-      overflow: "scroll",
-      disableLineNumbers: false,
-      disableFileHeader: true,
-      unsafeCSS: createHighlightStyles(highlightLines, highlightBackground, highlightBorder),
-    }),
-    [highlightBackground, highlightBorder, highlightLines],
-  );
+  const file: FileContents = {
+    name: getFilename(language),
+    contents: code,
+    lang: language,
+  };
+  const options: FileOptions<undefined> = {
+    theme: {
+      light: ARCADE_THEME,
+      dark: ARCADE_THEME,
+    },
+    themeType: "system",
+    overflow: "scroll",
+    disableLineNumbers: false,
+    disableFileHeader: true,
+    unsafeCSS: createHighlightStyles(highlightLines, highlightBackground, highlightBorder),
+  };
 
-  const fileStyle: CSSProperties & {
-    "--diffs-font-family": string;
-    "--diffs-header-font-family": string;
-  } = {
+  const fileStyle: CSSProperties = {
     "--diffs-font-family": "var(--mono)",
     "--diffs-header-font-family": "var(--font-sans)",
     ...style,

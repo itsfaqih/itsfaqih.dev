@@ -10,7 +10,6 @@ import babel from "@rolldown/plugin-babel";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import stylex from "@stylexjs/unplugin";
 
-
 const isCloudflareBuild =
   process.env.NITRO_PRESET?.includes("cloudflare") || process.env.CF_PAGES === "1";
 
@@ -33,7 +32,6 @@ const config = defineConfig({
         ? { commands: { preview: "node scripts/cloudflare-pages-preview.mjs" } }
         : undefined,
     ),
-
     stylex.vite({
       devMode: "css-only",
       cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
