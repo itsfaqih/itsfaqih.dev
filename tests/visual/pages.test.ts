@@ -116,7 +116,7 @@ async function capture(shot: Shot) {
         animations: "disabled",
         caret: "hide",
       });
-      if (previous?.equals(current)) return current;
+      if (previous && !mismatch(previous, current)) return current;
       previous = current;
     }
     throw new Error(`${shot.route} never settled into a stable screenshot`);
@@ -125,27 +125,17 @@ async function capture(shot: Shot) {
   }
 }
 
-function compare(name: string, actual: Buffer) {
-  const baseline = PNG.sync.read(readFileSync(path.join(baselineDir, name)));
-  const current = PNG.sync.read(actual);
-  if (baseline.width !== current.width || baseline.height !== current.height) {
-    writeDiff(name, actual);
-    return `size changed from ${baseline.width}x${baseline.height} to ${current.width}x${current.height}`;
+function mismatch(expected: Buffer, actual: Buffer) {
+  const before = PNG.sync.read(expected);
+  const after = PNG.sync.read(actual);
+  const { width, height } = before;
+  if (width !== after.width || height !== after.height) {
+    return { reason: `size changed from ${width}x${height} to ${after.width}x${after.height}` };
   }
-  const diff = new PNG({ width: baseline.width, height: baseline.height });
-  const changed = pixelmatch(
-    baseline.data,
-    current.data,
-    diff.data,
-    baseline.width,
-    baseline.height,
-    {
-      threshold: 0.1,
-    },
-  );
-  if (changed / (baseline.width * baseline.height) <= maxDiffRatio) return undefined;
-  writeDiff(name, actual, PNG.sync.write(diff));
-  return `${changed} pixels changed`;
+  const diff = new PNG({ width, height });
+  const changed = pixelmatch(before.data, after.data, diff.data, width, height, { threshold: 0.1 });
+  if (changed / (width * height) <= maxDiffRatio) return undefined;
+  return { reason: `${changed} pixels changed`, diff: PNG.sync.write(diff) };
 }
 
 function writeDiff(name: string, actual: Buffer, diff?: Buffer) {
@@ -162,7 +152,9 @@ describe.concurrent("pages match their baseline screenshots", () => {
       writeFileSync(path.join(baselineDir, name), actual);
       return;
     }
-    expect(compare(name, actual), `see ${diffDir}`).toBeUndefined();
+    const result = mismatch(readFileSync(path.join(baselineDir, name)), actual);
+    if (result) writeDiff(name, actual, result.diff);
+    expect(result?.reason, `see ${diffDir}`).toBeUndefined();
   });
 });
 
