@@ -29,8 +29,6 @@ import {
   type SimpleIcon,
 } from "simple-icons";
 
-// Brand marks from Simple Icons, drawn in one colour so they sit in the arcade pills
-// like any other glyph. Tools Simple Icons does not carry get a Phosphor stand-in.
 const MARKS = {
   AdonisJS: siAdonisjs,
   "Base UI": siBaseui,
@@ -65,7 +63,6 @@ const STAND_INS = {
   Playwright: MaskHappyIcon,
 };
 
-// Brand colours for the marks Simple Icons does not carry.
 const STAND_IN_HEX: Record<keyof typeof STAND_INS, string> = {
   "React Flow": "FF0072",
   Playwright: "2EAD33",
@@ -99,23 +96,21 @@ const contrast = (x: Rgb, y: Rgb) => {
 };
 
 const PANEL = { dark: toRgb("17171f"), light: toRgb("ffffff") };
+const GRAYSCALE_MAX_SPREAD = 40;
+const NON_TEXT_MIN_CONTRAST = 3;
 
-// The brand hue for one theme: black-and-white marks follow the text colour, and a hue
-// too close to the panel is pushed toward white (dark) or black (light) until the mark
-// clears 3:1, the non-text contrast floor.
 function brandFor(hex: string, theme: keyof typeof PANEL) {
   const rgb = toRgb(hex);
   const spread = Math.max(rgb.r, rgb.g, rgb.b) - Math.min(rgb.r, rgb.g, rgb.b);
-  if (spread < 40) return "var(--text)";
+  if (spread < GRAYSCALE_MAX_SPREAD) return "var(--text)";
   const toward = theme === "dark" ? 255 : 0;
   let mixed = rgb;
-  for (let t = 0; contrast(mixed, PANEL[theme]) < 3 && t <= 1; t += 0.05) {
+  for (let t = 0; contrast(mixed, PANEL[theme]) < NON_TEXT_MIN_CONTRAST && t <= 1; t += 0.05) {
     mixed = mix(rgb, toward, t);
   }
   return toHex(mixed);
 }
 
-// The badge style that carries a tool's brand colour, read by its hover state in arcade.css.
 export function techBrand(name: string): CSSProperties | undefined {
   const hex = entryOf(MARKS, name)?.hex ?? entryOf(STAND_IN_HEX, name);
   if (!hex) return undefined;

@@ -14,13 +14,16 @@ const BLOG_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+function requirePost(slug: string) {
+  const post = getPost(slug);
+  if (!post) throw notFound();
+  return post;
+}
+
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
   loader: async ({ params }) => {
-    const post = getPost(params.slug);
-    if (!post) {
-      throw notFound();
-    }
+    const post = requirePost(params.slug);
     return {
       frontmatter: post.frontmatter,
       slug: params.slug,
@@ -30,11 +33,7 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function BlogPost() {
   const { slug } = Route.useLoaderData();
-  const post = getPost(slug);
-  if (!post) {
-    // This should never happen since loader already validates
-    throw new Error(`Post not found: ${slug}`);
-  }
+  const post = requirePost(slug);
   const Component = post.default;
   const [isTocOpen, setIsTocOpen] = useState(false);
 

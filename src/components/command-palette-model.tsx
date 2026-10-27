@@ -41,6 +41,21 @@ function filterItem(item: CommandItem, query: string): boolean {
   );
 }
 
+function groupCommands(
+  commands: CommandItem[],
+  level: NavigationLevel,
+  query: string,
+): CommandGroup[] {
+  const filtered = commands.filter((cmd) => filterItem(cmd, query));
+  const inCategory = (category: CommandItem["category"]) =>
+    filtered.filter((cmd) => cmd.category === category);
+  return [
+    { label: LEVEL_LABELS[level], items: inCategory("navigation") },
+    { label: "Links", items: inCategory("external") },
+    { label: "Actions", items: inCategory("action") },
+  ].filter((group) => group.items.length > 0);
+}
+
 export function useCommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -158,14 +173,7 @@ export function useCommandPalette() {
   ];
 
   const currentCommands = navigationLevel === "rule-of-thumb" ? ruleOfThumbCommands : rootCommands;
-  const filtered = currentCommands.filter((cmd) => filterItem(cmd, inputValue));
-  const inCategory = (category: CommandItem["category"]) =>
-    filtered.filter((cmd) => cmd.category === category);
-  const groups: CommandGroup[] = [
-    { label: LEVEL_LABELS[navigationLevel], items: inCategory("navigation") },
-    { label: "Links", items: inCategory("external") },
-    { label: "Actions", items: inCategory("action") },
-  ].filter((group) => group.items.length > 0);
+  const groups = groupCommands(currentCommands, navigationLevel, inputValue);
   const flatItems = groups.flatMap((group) => group.items);
 
   const selectedIndex =
@@ -175,11 +183,10 @@ export function useCommandPalette() {
   const goBack = () => {
     setNavigationLevel("root");
     setInputValue("");
-    // Navigation commands lead the root list, so the parent's place among them is its index.
-    const navItems = rootCommands.filter((cmd) => cmd.category === "navigation");
+    const rootItems = groupCommands(rootCommands, "root", "").flatMap((group) => group.items);
     setHighlightedIndex(
       Math.max(
-        navItems.findIndex((item) => item.id === parentItemId),
+        rootItems.findIndex((item) => item.id === parentItemId),
         0,
       ),
     );

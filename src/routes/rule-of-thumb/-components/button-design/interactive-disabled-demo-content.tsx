@@ -8,6 +8,8 @@ import { Button } from "../../../../components/button";
 import { Cursor } from "../../../../components/cursor";
 import { ProhibitIcon } from "@phosphor-icons/react";
 
+const CURSOR_TIP_OFFSET = { marginLeft: "-6px", marginTop: "-2px" };
+
 export function InteractiveDisabledDemoContent() {
   const { status, animationStyle } = useAnimationDemo();
 
@@ -48,8 +50,7 @@ export function InteractiveDisabledDemoContent() {
           style={{
             ...animationStyle,
             animationName: status !== "idle" ? "disabled-demo-cursor-move" : "none",
-            marginLeft: "-6px", // Offset to center pointer tip visually
-            marginTop: "-2px",
+            ...CURSOR_TIP_OFFSET,
           }}
         >
           <div

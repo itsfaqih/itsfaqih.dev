@@ -3,22 +3,8 @@ import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
 import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
 import { cx } from "@/stylex";
 
-// One syntax theme for both appearances: token colours are CSS variables, set on
-// .code-block in rot.css from the arcade palette, so they flip with the page theme.
 const ARCADE_THEME = "arcade";
-registerCustomCSSVariableTheme(ARCADE_THEME, {
-  foreground: "#f4f4f8",
-  background: "#17171f",
-  "token-comment": "#87879d",
-  "token-keyword": "#ff6ad5",
-  "token-string": "#7dff6a",
-  "token-string-expression": "#7dff6a",
-  "token-constant": "#ffe14d",
-  "token-function": "#4dd4ff",
-  "token-parameter": "#9d7bff",
-  "token-punctuation": "#a1a1b5",
-  "token-link": "#4dd4ff",
-});
+registerCustomCSSVariableTheme(ARCADE_THEME, {});
 
 type CodeBlockProps = {
   code: string;

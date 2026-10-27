@@ -11,8 +11,6 @@ export function Header() {
     );
   };
 
-  // The bar is fixed; past the first few pixels of scroll it gains a solid panel so the page
-  // reads cleanly underneath it.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 8);
@@ -51,12 +49,15 @@ export function Header() {
             <MagnifyingGlassIcon size={16} weight="bold" />
             <kbd className="hide-sm">⌘K</kbd>
           </button>
-          {/* Both icons render; CSS shows the one for the theme the inline script set, so the
-              server markup never disagrees with the page. */}
-          <button type="button" className="find theme" onClick={(event) => {
+          <button
+            type="button"
+            className="find theme"
+            onClick={(event) => {
               const box = event.currentTarget.getBoundingClientRect();
               toggleTheme({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
-            }} aria-label="Switch theme">
+            }}
+            aria-label="Switch theme"
+          >
             <SunIcon className="to-light" size={16} weight="bold" />
             <MoonIcon className="to-dark" size={16} weight="bold" />
           </button>
@@ -69,7 +70,6 @@ export function Header() {
   );
 }
 
-// Kept separate so the 15-second tick re-renders only the clock.
 function JakartaClock() {
   const [time, setTime] = useState("--:--");
 

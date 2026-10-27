@@ -4,9 +4,7 @@ export type Theme = "light" | "dark";
 
 const THEME_CHANGE_EVENT = "theme-change";
 
-// The server cannot read the visitor's system preference. The inline script in
-// the root document applies the real preference before the page is painted.
-const getServerSnapshot = (): Theme => "dark";
+const getPlaceholderServerTheme = (): Theme => "dark";
 
 function readTheme(): Theme {
   const saved = window.localStorage.getItem("theme");
@@ -34,7 +32,7 @@ function subscribe(onStoreChange: () => void) {
 }
 
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, readTheme, getServerSnapshot);
+  const theme = useSyncExternalStore(subscribe, readTheme, getPlaceholderServerTheme);
 
   // Read the live value: the hydration pass renders the server snapshot, which must not
   // overwrite the class the inline script already set.
@@ -42,7 +40,6 @@ export function useTheme() {
     applyThemeClass(readTheme());
   }, [theme]);
 
-  // `origin` is the viewport point the new theme spreads out from, usually the toggle.
   const toggleTheme = (origin?: { x: number; y: number }) => {
     const nextTheme: Theme = theme === "light" ? "dark" : "light";
     const commit = () => {
@@ -59,7 +56,6 @@ export function useTheme() {
     }
     root.style.setProperty("--theme-x", `${origin.x}px`);
     root.style.setProperty("--theme-y", `${origin.y}px`);
-    // End the circle exactly at the farthest corner so the whole curve is spent on screen.
     const radius = Math.hypot(
       Math.max(origin.x, window.innerWidth - origin.x),
       Math.max(origin.y, window.innerHeight - origin.y),
