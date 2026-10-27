@@ -7,7 +7,7 @@ import {
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
 import { createRef } from "react";
 
-import { CommandPalette, CommandPaletteTrigger } from "../components/command-palette";
+import { CommandPalette } from "../components/command-palette";
 import { CommandPaletteView } from "../components/command-palette-view";
 import type { CommandPaletteModel } from "../components/command-palette-model";
 import { Showcase, tanstackRouterParameters } from "./story-support";
@@ -74,14 +74,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Trigger: Story = {
-  render: () => (
-    <Showcase>
-      <CommandPaletteTrigger />
-    </Showcase>
-  ),
-};
-
 export const View: Story = {
   render: () => (
     <Showcase style={{ minWidth: 520, padding: 0 }}>
@@ -97,10 +89,9 @@ export const InteractivePalette: Story = {
   render: () => (
     <Showcase style={{ minHeight: 180 }}>
       <p style={{ color: "var(--muted-foreground)", marginBottom: 16 }}>
-        Press the button to open the real command palette.
+        Press ⌘K to open the real command palette.
       </p>
       <CommandPalette />
-      <CommandPaletteTrigger />
     </Showcase>
   ),
 };

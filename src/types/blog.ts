@@ -1,6 +1,6 @@
 import type { MDXContent } from "mdx/types";
 
-export type BlogFrontmatter = {
+type BlogFrontmatter = {
   title: string;
   summary?: string;
   publishedAt: string;

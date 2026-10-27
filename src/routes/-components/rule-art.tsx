@@ -69,7 +69,7 @@ const CATEGORY_ICON = new Map<string, ReactNode>([
 ]);
 
 export const colorOf = (category: string) => CATEGORY_COLOR.get(category) ?? "var(--go)";
-export const iconOf = (category: string) =>
+const iconOf = (category: string) =>
   CATEGORY_ICON.get(category) ?? CATEGORY_ICON.get("Best Practices");
 
 const VISIBLE = GUIDELINES.filter((guideline) => !guideline.hidden);

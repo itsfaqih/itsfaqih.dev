@@ -10,7 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { GUIDELINES } from "../data/guidelines";
 
-export type CommandItem = {
+type CommandItem = {
   id: string;
   label: string;
   description?: string;
@@ -21,7 +21,7 @@ export type CommandItem = {
   hasSubmenu?: boolean;
 };
 
-export type CommandGroup = {
+type CommandGroup = {
   label: string;
   items: CommandItem[];
 };

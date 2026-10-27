@@ -1,7 +1,7 @@
 import { createRootRoute } from "@tanstack/react-router";
 import type { CSSProperties, ReactNode } from "react";
 
-export const StoryRootRoute = createRootRoute({
+const StoryRootRoute = createRootRoute({
   component: () => null,
 });
 
