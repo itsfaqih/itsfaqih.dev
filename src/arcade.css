@@ -59,8 +59,8 @@
 }
 
 /* Light: the same cabinet on paper. Panels go white, hairlines and hard shadows go grey,
-   and accents keep their fills but darken for text. Thumbnails and other screens stay
-   dark (see .arc .thumb). */
+   and accents keep their fills but darken for text. Thumbnails deepen their hues instead
+   (see .light .arc .thumb). */
 .light {
   --bg: #f5f5f8;
   --panel: #ffffff;
@@ -245,14 +245,19 @@ html[data-theme-swap]::view-transition-new(root) {
   }
 }
 
-/* Opening a rule from a home page card: the card's thumbnail grows into the rule page's cover and
-   its title into the heading while the rest of the page crossfades. The names exist only during
-   that transition, so the theme switch still reveals the page as one picture. */
-html:active-view-transition-type(rule-open) .spread-card[data-opening] .thumb,
+/* Opening a rule from a card, in the home deck or the index tiles, dives into it. The page zooms
+   toward the card (useRuleOpen sets --open-x and --open-y to its centre) while the card's frame
+   swells past the screen edges, and its thumbnail and title fly on into the rule page's cover and
+   heading. The names exist only during that transition, so the theme switch still reveals the
+   page as one picture. */
+html:active-view-transition-type(rule-open) [data-opening] {
+  view-transition-name: rule-card;
+}
+html:active-view-transition-type(rule-open) [data-opening] .thumb,
 html:active-view-transition-type(rule-open) .rot-hero .cover .thumb {
   view-transition-name: rule-thumb;
 }
-html:active-view-transition-type(rule-open) .spread-card[data-opening] .t,
+html:active-view-transition-type(rule-open) [data-opening] .t,
 html:active-view-transition-type(rule-open) .rot-hero h1 {
   view-transition-name: rule-title;
 }
@@ -267,6 +272,81 @@ html:active-view-transition-type(rule-open) .rot-hero h1 {
   height: 100%;
   object-fit: contain;
   object-position: left top;
+}
+html:active-view-transition-type(rule-open)::view-transition-old(root) {
+  transform-origin: var(--open-x, 50%) var(--open-y, 50%);
+  animation: rule-dive-root 620ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html:active-view-transition-type(rule-open)::view-transition-new(root) {
+  animation: vt-fade-in 300ms 220ms ease-out both;
+}
+::view-transition-old(rule-card) {
+  animation:
+    rule-dive-card 620ms cubic-bezier(0.32, 0.72, 0, 1) both,
+    vt-fade-out 260ms 240ms ease-out both;
+}
+@keyframes rule-dive-root {
+  to {
+    transform: scale(1.25);
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes rule-dive-card {
+  to {
+    transform: scale(4.5);
+    filter: blur(10px);
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Every other navigation fades through: the old page fades out, then the new one fades in. The
+   router starts it (PAGE_FADE in router.tsx); rule cards and the theme switch run their own. */
+html:active-view-transition-type(page-fade)::view-transition-old(root) {
+  animation: vt-fade-out 160ms ease-out both;
+}
+html:active-view-transition-type(page-fade)::view-transition-new(root) {
+  animation: vt-fade-in 240ms 120ms ease-out both;
+}
+
+/* Filtering the stack: badges the filter keeps glide to their new places and dropped ones fade.
+   The root stays live, so chips and hover states keep rendering while the badges move. */
+html:active-view-transition-type(stack-filter)::view-transition {
+  pointer-events: none;
+}
+html:active-view-transition-type(stack-filter)::view-transition-old(root) {
+  display: none;
+}
+html:active-view-transition-type(stack-filter)::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(.stack-move) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+::view-transition-old(.stack-out) {
+  animation: stack-out 160ms ease-out both;
+}
+@keyframes stack-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.stack-move),
+  ::view-transition-old(.stack-out) {
+    animation-duration: 0s;
+  }
 }
 .arc-header .find kbd {
   font: 500 11px var(--display);
@@ -1177,6 +1257,24 @@ html:active-view-transition-type(rule-open) .rot-hero h1 {
     inset 0 0 0 1px color-mix(in srgb, var(--c) 24%, transparent),
     inset 0 3px 0 rgb(0 0 0 / 0.35);
 }
+/* Light: the screens go to paper with the page. colorOf points --c at the topic hues, so deepening
+   them here keeps thin strokes and 9px labels legible on white, and labels darken further still. */
+.light .arc .thumb {
+  --cw: #0a9cd4;
+  --ux: #e0389f;
+  --ar: #e38a00;
+  --ts: #2aa816;
+  --ax: #7650ee;
+  --go: #c99a00;
+  --c-hi: color-mix(in oklab, var(--c) 62%, #000);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--c) 26%, transparent) 0.8px, transparent 1.2px)
+      0 0 / 8px 8px,
+    color-mix(in srgb, var(--c) 6%, #fff);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent),
+    inset 0 3px 0 rgb(30 30 60 / 0.06);
+}
 .arc .thumb .art {
   position: absolute;
   inset: 0;
@@ -1220,6 +1318,9 @@ html:active-view-transition-type(rule-open) .rot-hero h1 {
 }
 .arc .thumb .chip b:last-child {
   opacity: 1;
+}
+.light .arc .thumb .chip b {
+  background: rgb(255 255 255 / 0.85);
 }
 .arc .sel .thumb .chip,
 .arc .cover .thumb .chip {
@@ -1710,6 +1811,9 @@ html:active-view-transition-type(rule-open) .rot-hero h1 {
   stroke: var(--c);
   stroke-width: 1.5;
 }
+.light .arc .nu .nu-box rect {
+  fill: color-mix(in srgb, var(--c) 12%, #fff);
+}
 .arc .nu .nu-box text {
   font: 700 20px var(--display);
   fill: var(--c-hi);
@@ -2098,6 +2202,13 @@ html:active-view-transition-type(rule-open) .rot-hero h1 {
 }
 .arc .stack-filter .chips {
   margin-bottom: 8px;
+}
+/* Solid like the badges they filter, so the backdrop's dots never show through. */
+.arc .stack-filter .chips button {
+  background: var(--panel);
+}
+.arc .stack-filter .chips button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--c) 14%, var(--panel));
 }
 .arc .pups-groups {
   border-top: 2px solid var(--hair);

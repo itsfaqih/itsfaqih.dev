@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { colorOf, ruleNumber, RuleThumb } from "./rule-art";
+import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
 
 // A searchable, filterable select grid for the Rule of Thumb index. Hovering or
 // focusing a tile shows it in the side panel; it holds up at 100+ rules.
@@ -12,6 +12,7 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
   const [category, setCategory] = useState("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const openRule = useRuleOpen();
 
   const categories = [...new Set(rules.map((rule) => rule.label))];
   const normalizedQuery = query.trim().toLowerCase();
@@ -129,6 +130,7 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
               style={{ "--c": colorOf(rule.label) }}
               onPointerEnter={() => setSelectedId(rule.id)}
               onFocus={() => setSelectedId(rule.id)}
+              {...openRule(rule)}
             >
               <RuleThumb rule={rule} play={rule === selected} />
               <span className="n">

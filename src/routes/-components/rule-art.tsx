@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useState, type MouseEvent, type ReactNode } from "react";
 import { GUIDELINES } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
+import { useMediaQuery } from "../../hooks/use-media-query";
 
 // The Rule of Thumb visual system: one hue and glyph per topic, and a
 // thumbnail "screen" per rule that acts the rule out when it plays. Shared by
@@ -80,9 +81,28 @@ export function ruleNumber(rule: Guideline) {
   return index === -1 ? null : String(index + 1).padStart(3, "0");
 }
 
-/** The view transition a home page card starts when it opens its rule: the card's thumbnail and
- * title grow into the rule page's cover and heading (see `rule-open` in arcade.css). */
+/** The view transition a rule card starts when it opens its rule: the page dives into the card
+ * while its thumbnail and title grow into the rule page's cover and heading (see `rule-open` in
+ * arcade.css). */
 export const RULE_OPEN = "rule-open";
+
+/** Props for the links that open rules with the dive. The clicked card marks itself as the one
+ * opening and records its centre, the point the page zooms toward. */
+export function useRuleOpen() {
+  const [opening, setOpening] = useState<string | null>(null);
+  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  return (rule: Guideline) => ({
+    "data-opening": opening === rule.id ? "" : undefined,
+    viewTransition: reduced ? undefined : { types: [RULE_OPEN] },
+    onClick: (event: MouseEvent<HTMLElement>) => {
+      const card = event.currentTarget.getBoundingClientRect();
+      const root = document.documentElement.style;
+      root.setProperty("--open-x", `${card.x + card.width / 2}px`);
+      root.setProperty("--open-y", `${card.y + card.height / 2}px`);
+      setOpening(rule.id);
+    },
+  });
+}
 
 /** True while the page renders inside a card's `rule-open` transition, when the hero's cover and
  * heading are already on screen as the morph's end state and must not play their cut-in. */

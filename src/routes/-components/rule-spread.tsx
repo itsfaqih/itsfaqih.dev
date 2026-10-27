@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as React
 import { Link } from "@tanstack/react-router";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { colorOf, RULE_OPEN, ruleNumber, RuleThumb } from "./rule-art";
+import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
 
 // The home page's Rule of Thumb deck: cards fanned in 3D around the one in focus. Its whole state is
 // one number, the index at the centre, so a drag can rest between cards and a release springs on
@@ -28,7 +28,7 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
   const last = rules.length - 1;
   const [initial] = useState(() => Math.floor(last / 2));
   const [active, setActive] = useState(initial);
-  const [opening, setOpening] = useState<string | null>(null);
+  const openRule = useRuleOpen();
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const stageRef = useRef<HTMLDivElement>(null);
   const slots = useRef<HTMLDivElement[]>([]);
@@ -206,12 +206,10 @@ export function RuleSpread({ rules }: { rules: Guideline[] }) {
               to={item.href}
               className="spread-card"
               data-cut
-              data-opening={opening === item.id ? "" : undefined}
               draggable={false}
               aria-current={index === active ? "true" : undefined}
               style={{ "--c": colorOf(item.label) }}
-              viewTransition={reduced ? undefined : { types: [RULE_OPEN] }}
-              onClick={() => setOpening(item.id)}
+              {...openRule(item)}
               onFocus={(event) => {
                 if (event.currentTarget.matches(":focus-visible")) goTo(index);
               }}

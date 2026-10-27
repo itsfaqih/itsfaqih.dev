@@ -1,4 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
+import {
+  addTransitionType,
+  startTransition,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  ViewTransition,
+  type PointerEvent,
+  type RefObject,
+} from "react";
 import { TechIcon, techBrand } from "./tech-icon";
 
 export type StackGroup = { label: string; tools: string[] };
@@ -16,6 +26,7 @@ const CARD_GAP = 10;
 const CARD_TOP_MARGIN = 16;
 const CARD_HIDE_DELAY_MS = 80;
 const PEEK_ID = "stack-peek";
+const STACK_FILTER = "stack-filter";
 
 export function StackShowcase({
   groups,
@@ -46,8 +57,11 @@ export function StackShowcase({
   const fromMouse = (event: PointerEvent) => event.pointerType === "mouse";
 
   const pick = (name: string | null) => {
-    setUsedAt(name);
     setPeek(null);
+    startTransition(() => {
+      addTransitionType(STACK_FILTER);
+      setUsedAt(name);
+    });
   };
   const placesOf = (kind: StackUse["kind"]) =>
     places.filter((place) => place.kind === kind).map((place) => place.name);
@@ -116,28 +130,31 @@ export function StackShowcase({
 
       <div className="pups-groups">
         {shownGroups.map((group) => (
-          <div key={group.label} className="pups-group">
-            <h3 data-cut>{group.label}</h3>
-            <ul className="pups">
-              {group.tools.map((tool) => (
-                <li
-                  key={tool}
-                  data-cut
-                  tabIndex={0}
-                  aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
-                  style={techBrand(tool)}
-                  onPointerEnter={(event) => fromMouse(event) && show(tool, event.currentTarget)}
-                  onPointerLeave={(event) => fromMouse(event) && hide()}
-                  onFocus={(event) => show(tool, event.currentTarget)}
-                  onBlur={hide}
-                  onKeyDown={(event) => event.key === "Escape" && event.currentTarget.blur()}
-                >
-                  <TechIcon name={tool} />
-                  {tool}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ViewTransition key={group.label} {...FILTER_MOTION}>
+            <div className="pups-group">
+              <h3 data-cut>{group.label}</h3>
+              <ul className="pups">
+                {group.tools.map((tool) => (
+                  <ViewTransition key={tool} {...FILTER_MOTION}>
+                    <li
+                      data-cut
+                      tabIndex={0}
+                      aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
+                      style={techBrand(tool)}
+                      onPointerEnter={(event) => fromMouse(event) && show(tool, event.currentTarget)}
+                      onPointerLeave={(event) => fromMouse(event) && hide()}
+                      onFocus={(event) => show(tool, event.currentTarget)}
+                      onBlur={hide}
+                      onKeyDown={(event) => event.key === "Escape" && event.currentTarget.blur()}
+                    >
+                      <TechIcon name={tool} />
+                      {tool}
+                    </li>
+                  </ViewTransition>
+                ))}
+              </ul>
+            </div>
+          </ViewTransition>
         ))}
       </div>
 
@@ -162,6 +179,14 @@ export function StackShowcase({
     </section>
   );
 }
+
+/** Badges and groups the filter keeps glide to their new places, and the ones it drops fade out.
+ * Arrivals play their own cut-in, so they enter without a view transition. */
+const FILTER_MOTION = {
+  default: "none",
+  update: { [STACK_FILTER]: "stack-move", default: "none" },
+  exit: { [STACK_FILTER]: "stack-out", default: "none" },
+} as const;
 
 function UseList({ title, uses }: { title: string; uses: StackUse[] }) {
   return (
