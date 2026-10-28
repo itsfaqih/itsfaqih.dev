@@ -2,6 +2,7 @@ import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import {
   type Lesson,
   type Level,
+  onceOnScreen,
   OUT,
   reducedMotion,
   RuleLanding,
@@ -162,19 +163,13 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
     const held = play();
     for (const animation of held) animation.pause();
     let timer = 0;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        timer = window.setTimeout(() => {
-          for (const animation of held) animation.play();
-        }, 240);
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(root);
+    const stop = onceOnScreen(root, () => {
+      timer = window.setTimeout(() => {
+        for (const animation of held) animation.play();
+      }, 240);
+    });
     return () => {
-      observer.disconnect();
+      stop();
       clearTimeout(timer);
       for (const animation of held) animation.cancel();
     };
