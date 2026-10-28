@@ -125,6 +125,7 @@ for (let run = 0; run < Number(values.runs); run++) {
     const requests = new Map<string, Request>();
     let origin = 0;
     cdp.on("Network.requestWillBeSent", (event) => {
+      if (event.request.url.startsWith("data:")) return;
       if (!origin) origin = event.timestamp;
       requests.set(event.requestId, {
         url: event.request.url,
