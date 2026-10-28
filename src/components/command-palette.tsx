@@ -13,7 +13,7 @@ import {
   LinkedinLogoIcon,
   MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
-import { GUIDELINES } from "../data/guidelines";
+import { VISIBLE_GUIDELINES } from "../data/guidelines";
 
 type CommandItem = {
   id: string;
@@ -160,7 +160,7 @@ export function CommandPalette() {
         setIsOpen(false);
       },
     },
-    ...GUIDELINES.filter((guideline) => !guideline.comingSoon && !guideline.hidden).map(
+    ...VISIBLE_GUIDELINES.map(
       (guideline): CommandItem => ({
         id: `rot-${guideline.id}`,
         label: guideline.title,

@@ -7,7 +7,7 @@ import {
 import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { GUIDELINES } from "../data/guidelines";
+import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { CommandPalette } from "./command-palette";
 
 beforeEach(() => {
@@ -82,15 +82,14 @@ describe("CommandPalette", () => {
     const user = await openPalette();
 
     await user.keyboard("{ArrowDown}{ArrowRight}");
-    const visible = GUIDELINES.filter((guideline) => !guideline.comingSoon && !guideline.hidden);
     expect(groupNames()).toEqual(["Rule of Thumb"]);
     expect(optionNames("Rule of Thumb")).toEqual([
       "Index",
-      ...visible.map((guideline) => guideline.title),
+      ...VISIBLE_GUIDELINES.map((guideline) => guideline.title),
     ]);
 
     await user.keyboard("{ArrowDown}{Enter}");
-    await waitFor(() => expect(history.location.pathname).toBe(visible[0]?.href));
+    await waitFor(() => expect(history.location.pathname).toBe(VISIBLE_GUIDELINES[0]?.href));
 
     await user.keyboard("{Meta>}k{/Meta}");
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("combobox")));

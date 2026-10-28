@@ -4,6 +4,7 @@ import {
   colorOf,
   PUBLISHED_GUIDELINES,
   ruleNumber,
+  TOPICS,
   VISIBLE_GUIDELINES,
 } from "../../src/data/guidelines";
 import { OG_DIR, SITE_ORIGIN } from "../../src/seo";
@@ -121,14 +122,13 @@ function cardFor(page: BuiltPage): OgCard {
   }
 
   if (page.path === "/rule-of-thumb") {
-    const topics = [...new Set(VISIBLE_GUIDELINES.map((guideline) => guideline.label))];
     return {
       kind: "page",
       hue: "var(--go)",
-      eyebrow: `${VISIBLE_GUIDELINES.length} rules · ${topics.length} topics`,
+      eyebrow: `${VISIBLE_GUIDELINES.length} rules · ${TOPICS.length} topics`,
       title: "Rule of Thumb",
       lede: page.description,
-      footer: { kind: "topics", topics: topics.map((name) => ({ name, hue: colorOf(name) })) },
+      footer: { kind: "topics", topics: TOPICS.map((name) => ({ name, hue: colorOf(name) })) },
     };
   }
 
