@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { Resvg } from "@resvg/resvg-js";
 import satori, { type Font } from "satori";
-import { SLIDES, TICKER } from "../../src/data/home";
+import { SLIDES } from "../../src/data/home";
 
 const CARD_SIZE = { width: 1200, height: 630 } as const;
 
@@ -323,9 +323,9 @@ function HomeCard({ ink }: { ink: Ink }) {
         </div>
       </div>
       <div style={{ display: "flex", marginTop: 40, whiteSpace: "nowrap" }}>
-        {TICKER.map(({ word, color }) => (
+        {SLIDES.map(({ ticker, color }) => (
           <div
-            key={word}
+            key={ticker}
             style={{
               padding: "0 28px",
               lineHeight: "76px",
@@ -336,7 +336,7 @@ function HomeCard({ ink }: { ink: Ink }) {
               fontSize: 30,
             }}
           >
-            {word}
+            {ticker}
           </div>
         ))}
       </div>

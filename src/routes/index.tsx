@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
-import { SLIDES, TICKER } from "../data/home";
+import { SLIDES } from "../data/home";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
@@ -248,7 +248,7 @@ const STACK_SOURCES = [
 
 // The band slides by exactly half its width, so each half must outrun the widest screen or its
 // end shows. One set is about 1170px; three sets make a half wide enough for a 3500px screen.
-const TICKER_RUN = Array.from({ length: 6 }, () => TICKER).flat();
+const TICKER_RUN = Array.from({ length: 6 }, () => SLIDES).flat();
 
 function Index() {
   const [introDone, setIntroDone] = useState(false);
@@ -267,9 +267,9 @@ function Index() {
 
       <div className="ticker-wrap" data-loop data-cut aria-hidden="true">
         <div className="ticker">
-          {TICKER_RUN.map(({ word, color }, index) => (
+          {TICKER_RUN.map(({ ticker, color }, index) => (
             <span key={index} style={{ "--c": color }}>
-              {word} ★
+              {ticker} ★
             </span>
           ))}
         </div>
@@ -439,13 +439,13 @@ function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
       <div className="stage">
         <div className="name">FAQIH MUNTASHIR</div>
         <div className="slot">
-          {["INTERFACES", "AGENTS", "DEV TOOLS", "BACKENDS"].map((word, index, words) => (
+          {SLIDES.slice(0, 4).map(({ tab, color }, index, words) => (
             <span
-              key={word}
+              key={tab}
               className={index === words.length - 1 ? "cutw last" : "cutw"}
-              style={{ "--i": index, "--c": SLIDES[index]!.color }}
+              style={{ "--i": index, "--c": color }}
             >
-              {word}
+              {tab.toUpperCase()}
             </span>
           ))}
         </div>

@@ -41,5 +41,3 @@ export const SLIDES: {
     highlight: "can trust",
   },
 ];
-
-export const TICKER = SLIDES.map(({ ticker, color }) => ({ word: ticker, color }));
