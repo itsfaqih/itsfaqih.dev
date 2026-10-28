@@ -4,11 +4,18 @@ export const OG_DIR = "/og";
 
 const SITE_NAME = "Faqih Muntashir";
 
+export const LINKS = {
+  github: "https://github.com/itsfaqih",
+  linkedin: "https://www.linkedin.com/in/itsfaqih",
+  dribbble: "https://dribbble.com/itsfaqih",
+  email: "itsfaqih@gmail.com",
+};
+
 const AUTHOR = {
   name: "Faqih Muntashir",
   url: `${SITE_ORIGIN}/`,
   jobTitle: "Full-Stack Engineer",
-  sameAs: ["https://github.com/itsfaqih", "https://www.linkedin.com/in/itsfaqih"],
+  sameAs: [LINKS.github, LINKS.linkedin],
 };
 
 export type SharedPage = {

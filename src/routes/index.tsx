@@ -9,7 +9,7 @@ import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
-import { pageHead } from "../seo";
+import { LINKS, pageHead } from "../seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -337,12 +337,12 @@ function Index() {
             <span data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
           <div className="acts" data-cut style={{ marginTop: 24 }}>
-            <a className="btn go" href="mailto:itsfaqih@gmail.com">
-              Email itsfaqih@gmail.com
+            <a className="btn go" href={`mailto:${LINKS.email}`}>
+              {`Email ${LINKS.email}`}
             </a>
             <a
               className="btn soft"
-              href="https://www.linkedin.com/in/itsfaqih"
+              href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -354,19 +354,19 @@ function Index() {
         <footer data-cut>
           <span>© 2026 Faqih Muntashir</span>
           <span>
-            <a href="https://github.com/itsfaqih" target="_blank" rel="noopener noreferrer">
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer">
               GitHub
             </a>{" "}
             ·{" "}
             <a
-              href="https://www.linkedin.com/in/itsfaqih"
+              href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
             >
               LinkedIn
             </a>{" "}
             ·{" "}
-            <a href="https://dribbble.com/itsfaqih" target="_blank" rel="noopener noreferrer">
+            <a href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
               Dribbble
             </a>{" "}
             ·{" "}

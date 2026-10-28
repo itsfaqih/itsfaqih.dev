@@ -14,6 +14,7 @@ import {
   MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
+import { LINKS } from "../seo";
 
 type CommandItem = {
   id: string;
@@ -67,7 +68,6 @@ export function CommandPalette() {
   const [navigationLevel, setNavigationLevel] = useState<NavigationLevel>("root");
   const [inputValue, setInputValue] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [parentItemId, setParentItemId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const copiedResetTimerRef = useRef<number>(undefined);
   const navigate = useNavigate();
@@ -94,7 +94,6 @@ export function CommandPalette() {
       keywords: ["guidelines", "principles", "best practices"],
       hasSubmenu: true,
       action: () => {
-        setParentItemId("rule-of-thumb");
         setNavigationLevel("rule-of-thumb");
         setInputValue("");
         setHighlightedIndex(0);
@@ -108,7 +107,7 @@ export function CommandPalette() {
       category: "external",
       keywords: ["code", "repository", "repo", "source"],
       action: () => {
-        window.open("https://github.com/itsfaqih", "_blank", "noopener,noreferrer");
+        window.open(LINKS.github, "_blank", "noopener,noreferrer");
         setIsOpen(false);
       },
     },
@@ -120,23 +119,22 @@ export function CommandPalette() {
       category: "external",
       keywords: ["profile", "professional", "connect", "network"],
       action: () => {
-        window.open("https://linkedin.com/in/itsfaqih", "_blank", "noopener,noreferrer");
+        window.open(LINKS.linkedin, "_blank", "noopener,noreferrer");
         setIsOpen(false);
       },
     },
     {
       id: "copy-email",
       label: "Copy Email",
-      description: "Copy itsfaqih@gmail.com to clipboard",
+      description: `Copy ${LINKS.email} to clipboard`,
       icon: copied ? <CheckIcon size={18} /> : <EnvelopeIcon size={18} />,
       category: "action",
       keywords: ["email", "contact", "mail", "clipboard"],
       action: async () => {
         try {
-          await navigator.clipboard.writeText("itsfaqih@gmail.com");
+          await navigator.clipboard.writeText(LINKS.email);
           setCopied(true);
           copiedResetTimerRef.current = window.setTimeout(() => {
-            copiedResetTimerRef.current = undefined;
             setCopied(false);
             setIsOpen(false);
           }, 1500);
@@ -181,7 +179,7 @@ export function CommandPalette() {
   const flatItems = groups.flatMap((group) => group.items);
 
   const selectedIndex =
-    flatItems.length === 0 ? -1 : Math.min(Math.max(highlightedIndex, 0), flatItems.length - 1);
+    flatItems.length === 0 ? -1 : Math.min(highlightedIndex, flatItems.length - 1);
   const highlightedItem = flatItems[selectedIndex];
 
   const goBack = () => {
@@ -190,7 +188,7 @@ export function CommandPalette() {
     const rootItems = groupCommands(rootCommands, "root", "").flatMap((group) => group.items);
     setHighlightedIndex(
       Math.max(
-        rootItems.findIndex((item) => item.id === parentItemId),
+        rootItems.findIndex((item) => item.id === navigationLevel),
         0,
       ),
     );
@@ -256,7 +254,6 @@ export function CommandPalette() {
   useEffect(() => {
     if (isOpen) return;
     window.clearTimeout(copiedResetTimerRef.current);
-    copiedResetTimerRef.current = undefined;
     setCopied(false);
     const resetTimer = window.setTimeout(() => {
       setNavigationLevel("root");
