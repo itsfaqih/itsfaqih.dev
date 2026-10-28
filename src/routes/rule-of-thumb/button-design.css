@@ -1,196 +1,532 @@
-/**
- * Button Design Route Demo Animations
- * Used by button-design.tsx
- * Interactive demo animations for button design patterns
- * 
- * Note: These keyframes are in a regular CSS file (not module) so they remain
- * global and can be referenced by animation-name strings in JavaScript.
- */
+/* Button Design: the lesson panes hold real buttons. One key style serves every demo, and the
+   wrong side of each lesson takes away only the thing that lesson is about. */
 
-/* Global keyframes for button design demos */
-@keyframes button-demo-cursor-move {
-  0% {
-    left: 70%;
-    top: 80%;
-    transform: scale(1);
+.rule-page.button-design .bd-stage {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  min-height: 176px;
+  padding: 8px 0;
+}
+
+/* ---------- The key ---------- */
+.rule-page.button-design .bd-key {
+  /* Declared here, not on the page, so a red key's --c reaches its shadow and ink too. */
+  --key: color-mix(in oklab, var(--c) 60%, #000);
+  --ink: color-mix(in oklab, var(--c) var(--ink-mix), #000);
+  --face: var(--c);
+  --lit: color-mix(in oklab, var(--c) 82%, #fff);
+  position: relative;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 var(--pr, 20px) 0 var(--pl, 20px);
+  border: 0;
+  border-radius: 12px;
+  background: var(--face);
+  box-shadow: 0 4px 0 var(--key);
+  font: 700 14px var(--display);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--on-c);
+  cursor: var(--cursor);
+  transition:
+    transform 150ms var(--out),
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.rule-page.button-design .bd-key svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+.rule-page.button-design .bd-key.sm {
+  --pl: 16px;
+  --pr: 16px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.rule-page.button-design .bd-key.red {
+  --c: var(--no);
+}
+.rule-page.button-design .bd-key.tint {
+  --face: color-mix(in srgb, var(--c) 18%, transparent);
+  --lit: color-mix(in srgb, var(--c) 28%, transparent);
+  box-shadow: none;
+  color: var(--ink);
+}
+.rule-page.button-design .bd-key.text {
+  --face: transparent;
+  --lit: color-mix(in srgb, var(--text) 8%, transparent);
+  box-shadow: none;
+  color: var(--text);
+}
+.rule-page.button-design .bd-key.plain {
+  --face: var(--panel-2);
+  --lit: var(--soft-hover);
+  box-shadow: 0 4px 0 var(--drop-ink);
+  color: var(--text);
+}
+
+.rule-page.button-design .bd-key:not([aria-disabled="true"], :disabled):hover,
+.rule-page.button-design .bd-key[data-force="hover"] {
+  background: var(--lit);
+}
+.rule-page.button-design .bd-key:not([aria-disabled="true"], :disabled):active,
+.rule-page.button-design .bd-key[data-force="press"] {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 2px 0 var(--key);
+}
+.rule-page.button-design .bd-key:is(.tint, .text):not([aria-disabled="true"]):active,
+.rule-page.button-design .bd-key:is(.tint, .text)[data-force="press"] {
+  box-shadow: none;
+}
+.rule-page.button-design .bd-key.plain:not([aria-disabled="true"]):active {
+  box-shadow: 0 2px 0 var(--drop-ink);
+}
+.rule-page.button-design .bd-key:focus-visible,
+.rule-page.button-design .bd-key[data-force="focus"] {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* The wrong side of lesson 1: the same face, and nothing else. */
+.rule-page.button-design .bd-flat .bd-key {
+  transition: none;
+}
+.rule-page.button-design .bd-flat .bd-key:is(:hover, :active, :focus-visible, [data-force]) {
+  background: var(--face);
+  box-shadow: 0 4px 0 var(--key);
+  transform: none;
+  outline: none;
+}
+
+/* The state strip: four frozen copies of the key, one per state. */
+.rule-page.button-design .bd-specimens {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 14px;
+  padding: 14px 16px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel-2) 60%, transparent);
+}
+.rule-page.button-design .bd-specimens > span {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+.rule-page.button-design .bd-specimens .bd-key {
+  --pl: 12px;
+  --pr: 12px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 11px;
+  transition: none;
+}
+.rule-page.button-design .bd-specimens small,
+.rule-page.button-design .bd-note,
+.rule-page.button-design .bd-ruler b {
+  font: 600 11px var(--mono);
+  color: var(--mute);
+}
+
+/* ---------- Lesson 2: pending ---------- */
+.rule-page.button-design .bd-measure {
+  display: inline-grid;
+  gap: 10px;
+}
+.rule-page.button-design .bd-save {
+  display: inline-grid;
+}
+.rule-page.button-design .bd-save[data-phase="pending"][aria-disabled="true"] {
+  cursor: wait;
+}
+.rule-page.button-design .bd-lbl {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  translate: 0 -8px;
+  transition:
+    opacity 120ms ease,
+    translate 160ms var(--out);
+}
+.rule-page.button-design .bd-lbl[data-on] {
+  opacity: 1;
+  translate: none;
+  animation: bd-roll 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes bd-roll {
+  from {
+    opacity: 0;
+    translate: 0 9px;
   }
-  15% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
+}
+/* The careless button holds only the label it shows, so its width follows the words. */
+.rule-page.button-design .bd-save[data-jumpy] .bd-lbl:not([data-on]) {
+  display: none;
+}
+.rule-page.button-design .bd-save[data-jumpy] .bd-lbl {
+  animation: none;
+}
+.rule-page.button-design .bd-spin {
+  animation: bd-spin 700ms linear infinite;
+}
+@keyframes bd-spin {
+  to {
+    rotate: 1turn;
   }
-  25% {
-    left: 50%;
-    top: 50%;
-    transform: scale(0.9);
+}
+/* A dimension line as wide as the button, with its width under it. */
+.rule-page.button-design .bd-ruler {
+  position: relative;
+  height: 9px;
+  border-inline: 1.5px solid var(--mute);
+}
+.rule-page.button-design .bd-ruler::before {
+  content: "";
+  position: absolute;
+  inset: 4px 0 auto;
+  height: 1.5px;
+  background: var(--mute);
+}
+.rule-page.button-design .bd-ruler b {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  color: var(--text);
+}
+.rule-page.button-design .bd-save-stage .bd-note {
+  margin-top: 14px;
+}
+
+/* ---------- Lesson 3: disabled ---------- */
+.rule-page.button-design .bd-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  justify-items: stretch;
+  gap: 12px;
+  width: min(100%, 360px);
+  margin-inline: auto;
+}
+.rule-page.button-design .bd-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font: 600 12px var(--sans);
+  color: var(--dim);
+}
+.rule-page.button-design .bd-field input {
+  height: 38px;
+  min-width: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--hair);
+  border-radius: 10px;
+  background: var(--panel);
+  font: 500 14px var(--sans);
+  color: var(--text);
+}
+.rule-page.button-design .bd-field input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+.rule-page.button-design .bd-form .bd-key {
+  --pl: 16px;
+  --pr: 16px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.rule-page.button-design .bd-key[aria-disabled="true"]:not(.bd-save) {
+  --face: var(--panel-2);
+  box-shadow: 0 4px 0 var(--drop-ink);
+  color: var(--dim);
+  cursor: not-allowed;
+}
+.rule-page.button-design .bd-key.bd-faded:disabled {
+  opacity: 0.35;
+  cursor: var(--cursor-point);
+}
+
+/* A tooltip that rises in over the button on hover and keyboard focus. */
+.rule-page.button-design .bd-tip {
+  position: relative;
+  display: inline-grid;
+}
+.rule-page.button-design .bd-tip [role="tooltip"] {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--text);
+  font: 600 12px var(--sans);
+  white-space: nowrap;
+  color: var(--bg);
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% 4px;
+  transition:
+    opacity 150ms ease,
+    translate 200ms var(--out);
+}
+.rule-page.button-design .bd-tip [role="tooltip"]::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
+  border: 5px solid transparent;
+  border-top-color: var(--text);
+}
+.rule-page.button-design .bd-tip:is(:hover, :has(:focus-visible), [data-open]) [role="tooltip"] {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+/* ---------- Lesson 4: hierarchy ---------- */
+.rule-page.button-design .bd-card {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 380px);
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.rule-page.button-design .bd-card-title {
+  font: 700 15px var(--display);
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.rule-page.button-design .bd-card-sub {
+  font-size: 13px;
+  color: var(--mute);
+}
+.rule-page.button-design .bd-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.rule-page.button-design .bd-card .bd-row {
+  margin-top: 16px;
+}
+.rule-page.button-design .bd-squint-me > * {
+  transition: filter 200ms ease;
+}
+.rule-page.button-design
+  .lesson:has([data-toggle="squint"][aria-pressed="true"])
+  .bd-squint-me
+  > * {
+  filter: blur(5px);
+}
+
+.rule-page.button-design .bd-toggle {
+  margin-top: 4px;
+}
+.rule-page.button-design .bd-dot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--mute);
+  border-radius: 50%;
+  transition:
+    background-color var(--t-fb) ease,
+    border-color var(--t-fb) ease;
+}
+.rule-page.button-design .bd-toggle[aria-pressed="true"] .bd-dot {
+  border-color: var(--c-ink);
+  background: var(--c);
+}
+
+/* ---------- Lesson 5: destructive ---------- */
+.rule-page.button-design .bd-project {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%, 420px);
+  min-height: 80px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--hair);
+}
+.rule-page.button-design .bd-project[data-step="confirm"] {
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--no) 55%, transparent);
+}
+.rule-page.button-design .bd-project[data-step="deleted"] {
+  background: transparent;
+  box-shadow: 0 0 0 1.5px var(--hair) inset;
+}
+.rule-page.button-design .bd-project > * {
+  animation: bd-step 200ms var(--out);
+}
+@keyframes bd-step {
+  from {
+    opacity: 0;
+    translate: 0 4px;
   }
-  30% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
+}
+.rule-page.button-design .bd-project .bd-row {
+  margin-left: auto;
+}
+.rule-page.button-design .bd-project-copy {
+  display: grid;
+  gap: 2px;
+}
+.rule-page.button-design .bd-project-copy b {
+  font: 700 14px var(--display);
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.rule-page.button-design .bd-project-copy small {
+  font-size: 13px;
+  color: var(--mute);
+}
+.rule-page.button-design .bd-project[data-step="deleted"] b {
+  color: var(--no-ink);
+}
+
+/* ---------- Lesson 6: icons ---------- */
+.rule-page.button-design .bd-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+}
+.rule-page.button-design .bd-icons [data-pad="lead"] {
+  --pl: 12px;
+}
+.rule-page.button-design .bd-icons [data-pad="trail"] {
+  --pr: 12px;
+}
+/* The wrong side: even padding, and the icon set inline in the text, where it sits on the
+   baseline instead of the middle. */
+.rule-page.button-design .bd-even [data-pad] {
+  --pl: 16px;
+  --pr: 16px;
+  display: inline-block;
+  line-height: 38px;
+}
+.rule-page.button-design .bd-even [data-pad] svg {
+  display: inline;
+  vertical-align: baseline;
+}
+.rule-page.button-design .bd-even [data-pad="lead"] svg {
+  margin-right: 8px;
+}
+.rule-page.button-design .bd-even [data-pad="trail"] svg {
+  margin-left: 8px;
+}
+.rule-page.button-design .bd-key.bd-square {
+  --pl: 0px;
+  --pr: 0px;
+  width: 38px;
+}
+.rule-page.button-design .bd-key.bd-wide {
+  --pl: 18px;
+  --pr: 18px;
+}
+/* Show padding: the padding boxes fill with stripes. */
+.rule-page.button-design .bd-key[data-pad]::before,
+.rule-page.button-design .bd-key[data-pad]::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--focus) 55%, transparent) 0 2px,
+    transparent 2px 5px
+  );
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.rule-page.button-design .bd-key[data-pad]::before {
+  left: 0;
+  width: var(--pl);
+  border-radius: 10px 0 0 10px;
+}
+.rule-page.button-design .bd-key[data-pad]::after {
+  right: 0;
+  width: var(--pr);
+  border-radius: 0 10px 10px 0;
+}
+.rule-page.button-design
+  .lesson:has([data-toggle="pads"][aria-pressed="true"])
+  .bd-key[data-pad]::before,
+.rule-page.button-design
+  .lesson:has([data-toggle="pads"][aria-pressed="true"])
+  .bd-key[data-pad]::after {
+  opacity: 1;
+}
+
+/* Lesson panes keep one height, so the mobile tabs don't shift the page. */
+@media (max-width: 820px) {
+  .rule-page.button-design .bd-stage {
+    min-height: 200px;
   }
-  45% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
+}
+@media (max-width: 640px) {
+  .rule-page.button-design .bd-specimens {
+    gap: 6px;
+    padding-inline: 8px;
   }
-  55% {
-    left: 80%;
-    top: 30%;
-    transform: scale(1);
+  /* The three keys share the row; if they still can't, Publish takes the next row whole. */
+  .rule-page.button-design .bd-card {
+    padding: 14px;
   }
-  100% {
-    left: 80%;
-    top: 30%;
-    transform: scale(1);
+  .rule-page.button-design .bd-card .bd-row {
+    gap: 6px;
+  }
+  .rule-page.button-design .bd-card .bd-row > .bd-key {
+    --pl: 12px;
+    --pr: 12px;
+    flex: 1 0 auto;
+  }
+  .rule-page.button-design .bd-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rule-page.button-design .bd-form .bd-tip,
+  .rule-page.button-design .bd-form > .bd-key {
+    justify-self: start;
   }
 }
 
-@keyframes button-demo-cursor-ripple {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0);
+/* Reduced motion: labels and steps swap by opacity alone, and the spinner holds still. */
+@media (prefers-reduced-motion: reduce) {
+  .rule-page.button-design
+    .bd-key:not([aria-disabled="true"], :disabled):is(:active, [data-force]) {
+    transform: none;
   }
-  25% {
-    opacity: 0.5;
-    transform: scale(0);
+  .rule-page.button-design .bd-lbl,
+  .rule-page.button-design .bd-lbl[data-on] {
+    translate: none;
   }
-  31% {
-    opacity: 0;
-    transform: scale(2);
+  .rule-page.button-design .bd-tip [role="tooltip"] {
+    translate: -50% 0;
   }
-  32%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
+  .rule-page.button-design .bd-lbl[data-on],
+  .rule-page.button-design .bd-project > * {
+    animation: bd-fade 160ms ease;
   }
-}
-
-@keyframes button-demo-content-idle {
-  0%,
-  29% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  90% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  95%,
-  100% {
-    opacity: 0;
-    transform: translateY(10px);
+  .rule-page.button-design .bd-spin {
+    animation: none;
   }
 }
-
-@keyframes button-demo-content-loading {
-  0%,
-  29% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  71% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes button-demo-content-success {
-  0%,
-  70% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  71% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  95%,
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes button-demo-container-scale {
-  0%,
-  24% {
-    transform: scale(1);
-    box-shadow: 0 3px 0 var(--go-shadow);
-  }
-  25% {
-    transform: scale(0.97) translateY(2px);
-    box-shadow: 0 1px 0 var(--go-shadow);
-  }
-  30%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 3px 0 var(--go-shadow);
-  }
-}
-
-@keyframes button-demo-highlight {
-  0%,
-  9% {
+@keyframes bd-fade {
+  from {
     opacity: 0;
   }
-  10%,
-  24% {
-    opacity: 1;
-  }
-  25%,
-  30% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes button-demo-width {
-  0%,
-  29% {
-    width: 78px;
-  }
-  33%,
-  70% {
-    width: 146px;
-  }
-  75%,
-  100% {
-    width: 128px;
-  }
-}
-
-@keyframes button-demo-cursor-swap-default {
-  0%, 29% { opacity: 1; }
-  30%, 47% { opacity: 0; }
-  48%, 100% { opacity: 1; }
-}
-
-@keyframes button-demo-cursor-swap-spinner {
-  0%, 29% { opacity: 0; }
-  30%, 47% { opacity: 1; }
-  48%, 100% { opacity: 0; }
 }

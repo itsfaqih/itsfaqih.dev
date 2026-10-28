@@ -1,0 +1,386 @@
+/* Null vs Undefined. Every pane is code with the data each line gives on its right. In code,
+   null wears the thumbnail's solid box and undefined its dashed empty slot. */
+.rule-page.null-vs-undefined {
+  --str: color-mix(in oklab, var(--ar) var(--ink-mix), #000);
+}
+.rule-page.null-vs-undefined .sec-head p code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--panel-2);
+  font: 600 0.88em var(--mono);
+  color: var(--text);
+}
+
+/* ---------- Tokens ---------- */
+.rule-page.null-vs-undefined .t-kw {
+  color: var(--c-ink);
+}
+.rule-page.null-vs-undefined .t-str {
+  color: var(--str);
+}
+.rule-page.null-vs-undefined .t-com {
+  color: var(--mute);
+}
+.rule-page.null-vs-undefined :is(.t-nul, .t-und) {
+  padding: 0 3px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.rule-page.null-vs-undefined .t-nul {
+  background: color-mix(in srgb, var(--c) 20%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent);
+  color: var(--c-ink);
+}
+.rule-page.null-vs-undefined .t-und {
+  outline: 1px dashed var(--mute);
+  outline-offset: -1px;
+  color: var(--dim);
+}
+
+/* ---------- Code with its output ---------- */
+.rule-page.null-vs-undefined .nv-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-content: start;
+}
+.rule-page.null-vs-undefined .nv-code {
+  display: grid;
+  gap: 2px;
+  font: 12.5px/1.5 var(--mono);
+}
+.rule-page.null-vs-undefined .nv-ln {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  align-items: center;
+  min-height: 26px;
+  padding: 1px 8px;
+  border-radius: 6px;
+}
+.rule-page.null-vs-undefined .nv-ln > code {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+/* The line the lesson is about: red where it blurs the two, the rule's hue where it doesn't. */
+.rule-page.null-vs-undefined .pane[data-side="bad"] .nv-ln[data-hot] {
+  background: color-mix(in srgb, var(--no) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--no);
+}
+.rule-page.null-vs-undefined .pane[data-side="good"] .nv-ln[data-hot] {
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--c);
+}
+.rule-page.null-vs-undefined .nv-out {
+  max-width: 100%;
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 6px;
+  background: var(--panel-2);
+  font: 600 11.5px/1.6 var(--mono);
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+.rule-page.null-vs-undefined .nv-out::before {
+  content: "→ ";
+  color: var(--mute);
+}
+.rule-page.null-vs-undefined .nv-out[data-tone="no"] {
+  background: color-mix(in srgb, var(--no) 16%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.null-vs-undefined .nv-out[data-tone="yes"] {
+  background: color-mix(in srgb, var(--yes) 18%, transparent);
+  color: var(--yes-ink);
+}
+.rule-page.null-vs-undefined .nv-out :is(.t-nul, .t-und, .t-str) {
+  color: inherit;
+}
+
+/* ---------- The live save: form, wire, row ---------- */
+.rule-page.null-vs-undefined .nv-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.rule-page.null-vs-undefined .nv-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--raise);
+}
+.rule-page.null-vs-undefined .nv-label {
+  font: 700 12px var(--display);
+  color: var(--dim);
+}
+.rule-page.null-vs-undefined .nv-field {
+  display: flex;
+  flex: 1 1 160px;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+.rule-page.null-vs-undefined .nv-field input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border: 1.5px solid var(--hair);
+  border-radius: 10px;
+  background: var(--panel-2);
+  font: 600 14px var(--sans);
+  color: var(--text);
+  transition: border-color var(--t-fb) ease;
+}
+.rule-page.null-vs-undefined .nv-field input:focus-visible {
+  border-color: var(--c);
+  outline: 3px solid color-mix(in srgb, var(--c) 30%, transparent);
+  outline-offset: 0;
+}
+.rule-page.null-vs-undefined .nv-chip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  height: 34px;
+  padding: 0 4px 0 12px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  box-shadow: 0 2px 0 var(--drop-ink);
+  font: 600 14px var(--sans);
+  color: var(--text);
+}
+.rule-page.null-vs-undefined .nv-chip button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--dim);
+  cursor: var(--cursor-point);
+  transition:
+    background-color var(--t-fb) ease,
+    color var(--t-fb) ease,
+    transform var(--t-fb) var(--out);
+}
+.rule-page.null-vs-undefined .nv-chip button:hover {
+  background: color-mix(in srgb, var(--no) 18%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.null-vs-undefined .nv-chip button:active {
+  transform: scale(0.92);
+}
+.rule-page.null-vs-undefined .nv-chip button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+.rule-page.null-vs-undefined .nv-none {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border: 1.5px dashed var(--hair);
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--mute);
+}
+.rule-page.null-vs-undefined .nv-again {
+  margin-left: auto;
+}
+.rule-page.null-vs-undefined .nv-again:disabled {
+  opacity: 0.5;
+}
+
+.rule-page.null-vs-undefined .nv-wire {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1.5px dashed var(--hair);
+  border-radius: 10px;
+  font: 12px/1.5 var(--mono);
+}
+.rule-page.null-vs-undefined .nv-verb {
+  font-weight: 700;
+  color: var(--c-ink);
+}
+.rule-page.null-vs-undefined .nv-idle {
+  color: var(--mute);
+}
+.rule-page.null-vs-undefined .nv-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+/* One pixel of the request, dropped from the wire into the row. */
+.rule-page.null-vs-undefined .nv-packet {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  background: var(--c);
+  opacity: 0;
+}
+
+.rule-page.null-vs-undefined .nv-rec {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+.rule-page.null-vs-undefined .nv-cell {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  isolation: isolate;
+}
+.rule-page.null-vs-undefined .nv-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+}
+.rule-page.null-vs-undefined .nv-cell dt {
+  font: 600 11px var(--mono);
+  color: var(--mute);
+}
+.rule-page.null-vs-undefined .nv-cell dd {
+  min-height: 21px;
+  margin: 0;
+  font: 600 13px/1.6 var(--mono);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.rule-page.null-vs-undefined .nv-tag {
+  justify-self: start;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font: 700 10px var(--display);
+}
+.rule-page.null-vs-undefined .nv-cell:is([data-verdict="saved"], [data-verdict="kept"]) .nv-tag {
+  background: color-mix(in srgb, var(--yes) 18%, transparent);
+  color: var(--yes-ink);
+}
+.rule-page.null-vs-undefined .nv-cell:is([data-verdict="wiped"], [data-verdict="lost"]) .nv-tag {
+  background: color-mix(in srgb, var(--no) 16%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.null-vs-undefined .nv-cell:is([data-verdict="wiped"], [data-verdict="lost"]) dd {
+  color: var(--no-ink);
+}
+.rule-page.null-vs-undefined .nv-cell:is([data-verdict="wiped"], [data-verdict="lost"]) .t-nul {
+  background: color-mix(in srgb, var(--no) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--no) 70%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.null-vs-undefined .nv-cell[data-verdict="saved"]::after {
+  background: color-mix(in srgb, var(--yes) 22%, transparent);
+}
+.rule-page.null-vs-undefined .nv-cell:is([data-verdict="wiped"], [data-verdict="lost"])::after {
+  background: color-mix(in srgb, var(--no) 24%, transparent);
+}
+
+/* The request lands: the body types onto the wire, a pixel drops into the row, and each cell
+   settles with a tint that fades. Only a save someone ran plays it, never the first paint. */
+.rule-page.null-vs-undefined .nv-flow[data-ran][data-phase="done"] .nv-cell[data-verdict]::after {
+  animation: nv-flash 640ms var(--out) both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rule-page.null-vs-undefined .nv-flow[data-phase="sent"] .nv-body {
+    animation: nv-type 180ms var(--out) both;
+  }
+  .rule-page.null-vs-undefined .nv-flow[data-phase="sent"] .nv-packet {
+    animation: nv-drop 260ms var(--out) 180ms both;
+  }
+  .rule-page.null-vs-undefined .nv-flow[data-ran][data-phase="done"] .nv-cell dd {
+    animation: nv-land 240ms var(--out) both;
+    animation-delay: calc(var(--i) * 40ms);
+  }
+}
+@keyframes nv-flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes nv-type {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+@keyframes nv-drop {
+  from {
+    opacity: 1;
+    transform: translateY(-14px);
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes nv-land {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- The quiz board ---------- */
+.rule-page.null-vs-undefined .board code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rule-page.null-vs-undefined .nv-gap {
+  flex: none;
+  width: 3.2em;
+  height: 1.1em;
+  margin-left: 8px;
+  border-bottom: 2px solid color-mix(in srgb, var(--c) 55%, transparent);
+}
+.rule-page.null-vs-undefined .slot[data-off] .nv-gap {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .rule-page.null-vs-undefined .nv-code {
+    font-size: 12px;
+  }
+  .rule-page.null-vs-undefined .nv-ln {
+    padding-inline: 6px;
+  }
+  .rule-page.null-vs-undefined .nv-cell {
+    padding: 8px;
+  }
+}

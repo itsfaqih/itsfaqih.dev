@@ -1,699 +1,455 @@
-/**
- * Dialog Design Route Demo Animations
- * Used by dialog-design.tsx
- * Interactive demo animations for dialog design patterns
- * 
- * Note: These keyframes use :global() because the AnimationDemo component
- * dynamically references animation names as strings in JavaScript.
- * This is the Vite-recommended approach when animation names need to be
- * referenced programmatically rather than through CSS module classes.
- */
+/* Dialog Design: every pane holds a small window with its own page, scrim and dialog. All of it is
+   positioned inside the pane, so nothing covers the real page or locks its scroll. */
 
-/* Global keyframes - needed for dynamic animation-name references */
-@keyframes demo-cursor-move {
-  0%,
-  10% {
-    left: 65%;
-    top: 65%;
-    transform: scale(1);
-  }
-  25% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  30% {
-    left: 50%;
-    top: 50%;
-    transform: scale(0.9);
-  }
-  35% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  45% {
-    left: 50%;
-    top: 50%;
-  }
-  60%,
-  100% {
-    left: 65%;
-    top: 65%;
+.rule-page.dialog-design .dd-stage {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+/* ---------- The window ---------- */
+.rule-page.dialog-design .dd-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: 260px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  font: 500 13px/1.35 var(--sans);
+  color: var(--text);
+}
+/* The ring below marks focus, so the browser's own outline would draw it twice. */
+.rule-page.dialog-design .dd-screen :focus-visible {
+  outline: none;
+}
+.rule-page.dialog-design .dd-page {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  height: 100%;
+  padding: 14px;
+}
+.rule-page.dialog-design .dd-nav,
+.rule-page.dialog-design .dd-line,
+.rule-page.dialog-design .dd-project {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.rule-page.dialog-design .dd-logo {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--c);
+}
+.rule-page.dialog-design .dd-ghost {
+  display: block;
+  width: var(--w, 60%);
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+}
+.rule-page.dialog-design .dd-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+.rule-page.dialog-design .dd-line b {
+  font: 700 13px var(--display);
+}
+.rule-page.dialog-design .dd-line span {
+  font: 600 12px var(--mono);
+  color: var(--dim);
+}
+.rule-page.dialog-design .dd-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+/* Lesson 1 keeps its controls in the top and bottom strips, clear of the dialog, so focus that
+   slips behind it stays in view. */
+.rule-page.dialog-design .dd-checkout {
+  grid-template-rows: auto auto 1fr;
+}
+.rule-page.dialog-design .dd-checkout .dd-row {
+  align-self: end;
+  justify-content: flex-end;
+}
+.rule-page.dialog-design .dd-link {
+  justify-self: start;
+  /* A 24px hit area without moving the text. */
+  margin: -4px -6px;
+  padding: 6px;
+  border: 0;
+  background: none;
+  font: 600 12px var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--dim);
+  cursor: var(--cursor-point);
+}
+.rule-page.dialog-design .dd-pill {
+  height: 26px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  font: 700 12px var(--display);
+  color: var(--c-ink);
+  cursor: var(--cursor-point);
+}
+.rule-page.dialog-design .dd-mail {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 22px;
+}
+.rule-page.dialog-design .dd-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+}
+.rule-page.dialog-design .dd-tag {
+  flex: none;
+  width: 30px;
+  height: 14px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--c) 30%, transparent);
+}
+.rule-page.dialog-design .dd-proj-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.rule-page.dialog-design .dd-proj-copy b {
+  font: 700 13px var(--display);
+}
+.rule-page.dialog-design .dd-proj-copy small {
+  font: 600 11px var(--mono);
+  color: var(--mute);
+}
+.rule-page.dialog-design .dd-project[data-gone] {
+  background: color-mix(in srgb, var(--no) 14%, var(--panel-2));
+}
+.rule-page.dialog-design .dd-project[data-gone] b {
+  color: var(--no-ink);
+}
+.rule-page.dialog-design .dd-article {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+.rule-page.dialog-design .dd-article[data-locked] {
+  overflow-y: hidden;
+}
+.rule-page.dialog-design .dd-para {
+  display: grid;
+  gap: 7px;
+}
+.rule-page.dialog-design .dd-figure {
+  height: 64px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--c) 16%, var(--panel-2));
+}
+
+/* ---------- The scrim and the dialog ---------- */
+.rule-page.dialog-design .dd-scrim {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: rgb(6 6 10 / 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--out);
+}
+.rule-page.dialog-design .dd-screen[data-open] > .dd-scrim:not(.dd-top),
+.rule-page.dialog-design .dd-scrim.dd-top[data-on] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.rule-page.dialog-design .dd-scrim.dd-top {
+  z-index: 5;
+}
+:root.light .rule-page.dialog-design .dd-scrim {
+  background: rgb(20 20 30 / 0.32);
+}
+
+.rule-page.dialog-design .dd-dialog {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  gap: 10px;
+  width: min(300px, 100% - 24px);
+  height: fit-content;
+  margin: auto;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--hair),
+    0 14px 32px rgb(0 0 0 / 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(0.97);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease,
+    visibility 0s 140ms;
+}
+/* inherit, not visible: on a phone the hidden pane must keep its open dialog hidden too. */
+.rule-page.dialog-design .dd-dialog[data-open] {
+  opacity: 1;
+  visibility: inherit;
+  transform: none;
+  transition:
+    opacity 200ms var(--out),
+    transform 240ms var(--out),
+    visibility 0s;
+}
+.rule-page.dialog-design .dd-dialog.dd-top {
+  z-index: 6;
+  width: min(270px, 100% - 40px);
+}
+.rule-page.dialog-design .dd-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+}
+.rule-page.dialog-design .dd-title {
+  margin: 0;
+  font: 700 15px var(--display);
+}
+.rule-page.dialog-design .dd-body {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--dim);
+}
+.rule-page.dialog-design .dd-field {
+  display: grid;
+  gap: 5px;
+}
+.rule-page.dialog-design .dd-field > span:first-child {
+  font: 600 11.5px var(--sans);
+  color: var(--dim);
+}
+.rule-page.dialog-design .dd-in {
+  position: relative;
+  display: block;
+}
+.rule-page.dialog-design .dd-in input {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--bg);
+  font: 500 13px var(--sans);
+  color: var(--text);
+}
+.rule-page.dialog-design .dd-in input::placeholder {
+  color: var(--mute);
+}
+.rule-page.dialog-design .dd-acts {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.rule-page.dialog-design .dd-share {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.rule-page.dialog-design .dd-url {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--panel-2);
+  font: 600 12px/32px var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--dim);
+}
+
+/* ---------- Buttons inside the window ---------- */
+.rule-page.dialog-design .dd-btn {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--c);
+  font: 700 12px var(--display);
+  white-space: nowrap;
+  color: var(--on-c);
+  cursor: var(--cursor-point);
+}
+.rule-page.dialog-design .dd-btn.soft {
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--hair);
+  color: var(--text);
+}
+.rule-page.dialog-design .dd-card .dd-btn.soft {
+  background: var(--bg);
+}
+.rule-page.dialog-design .dd-btn.text {
+  background: transparent;
+  color: var(--text);
+}
+.rule-page.dialog-design .dd-btn.red {
+  --c: var(--no);
+}
+.rule-page.dialog-design .dd-btn.red.tint {
+  background: color-mix(in srgb, var(--no) 16%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.dialog-design .dd-x {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dim);
+  cursor: var(--cursor-point);
+}
+.rule-page.dialog-design .dd-x svg {
+  width: 14px;
+  height: 14px;
+}
+.rule-page.dialog-design :is(.dd-btn.text, .dd-x, .dd-btn.soft):hover {
+  background: var(--soft-hover);
+}
+
+/* ---------- The focus ring: where focus is in the window, popping onto each stop ---------- */
+.rule-page.dialog-design .dd-screen [data-stop] {
+  position: relative;
+}
+.rule-page.dialog-design .dd-screen [data-at]:not(input)::after,
+.rule-page.dialog-design .dd-in:has(> input[data-at])::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--focus);
+  border-radius: 12px;
+  pointer-events: none;
+  animation: dd-ring 220ms var(--out);
+}
+/* Focus behind the scrim: lift the control above the dim layer so you can see where it went. */
+.rule-page.dialog-design .dd-screen[data-open] .dd-page [data-at] {
+  z-index: 3;
+}
+.rule-page.dialog-design .dd-screen[data-open] .dd-page [data-at]::after {
+  border: 2px dashed var(--no);
+}
+@keyframes dd-ring {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
   }
 }
 
-@keyframes demo-dialog-cycle {
-  0%,
-  35% {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.95);
+/* ---------- The keys and the readout under the window ---------- */
+.rule-page.dialog-design .dd-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+}
+.rule-page.dialog-design .dd-keys {
+  display: flex;
+  gap: 6px;
+}
+.rule-page.dialog-design .dd-key {
+  min-width: 46px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--panel-2);
+  box-shadow: 0 3px 0 var(--drop-ink);
+  font: 700 12px var(--mono);
+  color: var(--text);
+  cursor: var(--cursor-point);
+  transition:
+    transform 120ms var(--out),
+    box-shadow 120ms var(--out);
+}
+.rule-page.dialog-design .dd-key:hover {
+  background: var(--soft-hover);
+}
+.rule-page.dialog-design .dd-key:active {
+  box-shadow: 0 1px 0 var(--drop-ink);
+  transform: translateY(2px);
+}
+.rule-page.dialog-design .dd-key:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.rule-page.dialog-design .dd-read {
+  flex: 1 1 140px;
+  font: 600 12px/1.4 var(--mono);
+  text-align: right;
+  color: var(--dim);
+}
+.rule-page.dialog-design .dd-read[data-tone="no"] {
+  color: var(--no-ink);
+}
+.rule-page.dialog-design .dd-read[data-tone="yes"] {
+  color: var(--yes-ink);
+}
+.rule-page.dialog-design .dd-speech {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  text-align: left;
+}
+.rule-page.dialog-design .dd-speech svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  translate: 0 2px;
+}
+
+@media (max-width: 640px) {
+  .rule-page.dialog-design .dd-dialog {
+    padding: 12px;
   }
-  38%,
-  100% {
-    opacity: 1;
-    pointer-events: auto;
-    transform: scale(1);
+  .rule-page.dialog-design .dd-page {
+    padding: 12px;
   }
 }
 
-@keyframes demo-button-press {
-  0%,
-  15% {
-    transform: scale(1);
-    --tw-gradient-from: rgba(107, 114, 128, 0.05);
-    --tw-gradient-to: rgba(107, 114, 128, 0);
-  }
-  20%,
-  25% {
-    transform: scale(1);
-    --tw-gradient-from: rgba(107, 114, 128, 0.1);
-    --tw-gradient-to: rgba(107, 114, 128, 0.05);
-    border-color: rgba(107, 114, 128, 0.2);
-  }
-  30% {
-    transform: scale(0.95);
-    --tw-gradient-from: rgba(107, 114, 128, 0.1);
-    --tw-gradient-to: rgba(107, 114, 128, 0.05);
-    border-color: rgba(107, 114, 128, 0.2);
-  }
-  35%,
-  45% {
-    transform: scale(1);
-    --tw-gradient-from: rgba(107, 114, 128, 0.1);
-    --tw-gradient-to: rgba(107, 114, 128, 0.05);
-    border-color: rgba(107, 114, 128, 0.2);
-  }
-  50%,
-  100% {
-    transform: scale(1);
-    --tw-gradient-from: rgba(107, 114, 128, 0.05);
-    --tw-gradient-to: rgba(107, 114, 128, 0);
-  }
-}
-
-@keyframes caret-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-/* Deletion Demo Animations */
-@keyframes demo-deletion-cursor {
-  0% {
-    left: 70%;
-    top: 80%;
-    transform: scale(1);
-  }
-  20% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  25% {
-    left: 50%;
-    top: 50%;
-    transform: scale(0.9);
-  }
-  28% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  45%,
-  100% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-deletion-dialog {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-  }
-  28%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-}
-
-@keyframes demo-deletion-trigger {
-  0%,
-  20% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.95);
-  }
-  30%,
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-deletion-ripple {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  25% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  31% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  32%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-/* Approval Demo Animations */
-@keyframes demo-approval-cursor {
-  0% {
-    left: 70%;
-    top: 80%;
-    transform: scale(1);
-  }
-  20% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  25% {
-    left: 50%;
-    top: 50%;
-    transform: scale(0.9);
-  }
-  28% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  45%,
-  100% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-approval-dialog {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-  }
-  28%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-}
-
-@keyframes demo-approval-trigger {
-  0%,
-  20% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(0.95);
-  }
-  30%,
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-approval-ripple {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  25% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  31% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  32%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-
-@keyframes demo-esc-key {
-  0%,
-  40% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-  45%,
-  55% {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 var(--key-shadow);
-  }
-  60%,
-  100% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-}
-
-@keyframes demo-esc-dialog {
-  0%,
-  44% {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-  45%,
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-  }
-}
-
-@keyframes demo-info-cursor {
-  0% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  25% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-  35% {
-    left: 80%;
-    top: 80%;
-    transform: scale(0.9);
-  }
-  40% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-  60% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  100% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-info-dialog {
-  0%,
-  35% {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-  40%,
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-  }
-}
-
-@keyframes demo-info-ripple {
-  0%,
-  35% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  35% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  45% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  46%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-@keyframes demo-cursor-ripple {
-  0%,
-  30% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  30% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  36% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  37%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-@keyframes demo-form-cursor {
-  0% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  25% {
-    left: 80%;
-    top: 20%;
-    transform: scale(1);
-  }
-  35% {
-    left: 80%;
-    top: 20%;
-    transform: scale(0.9);
-  }
-  40% {
-    left: 80%;
-    top: 20%;
-    transform: scale(1);
-  }
-  60% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  100% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-form-ripple {
-  0%,
-  35% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  35% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  45% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  46%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-@keyframes demo-form-dialog-pulse {
-  0%,
-  34% {
-    transform: scale(1);
-  }
-  35% {
-    transform: scale(1.02);
-  }
-  40% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.01);
-  }
-  50%,
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-discard-cursor {
-  0%,
-  45% {
-    left: 90%;
-    top: 90%;
-    transform: scale(1);
-  }
-  55% {
-    left: 58%;
-    top: 75%;
-    transform: scale(1);
-  }
-  58% {
-    left: 58%;
-    top: 75%;
-    transform: scale(0.9);
-  }
-  61% {
-    left: 58%;
-    top: 75%;
-    transform: scale(1);
-  }
-  80% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-  100% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-discard-ripple {
-  0%,
-  57% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  58% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  65% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  66%,
-  100% {
-    opacity: 0;
-    transform: scale(0);
-  }
-}
-
-@keyframes demo-discard-typing {
-  0% {
-    width: 0;
-    border-right-color: black;
-    animation-timing-function: step-end;
-  }
-  6% {
-    width: 0;
-    border-right-color: transparent;
-    animation-timing-function: step-end;
-  }
-  12% {
-    width: 0;
-    border-right-color: black;
-    animation-timing-function: step-end;
-  }
-  18% {
-    width: 0;
-    border-right-color: transparent;
-    animation-timing-function: step-end;
-  }
-  20% {
-    width: 0;
-    border-right-color: black;
-    animation-timing-function: steps(17, end);
-  }
-  40% {
-    width: 115px;
-    border-right-color: black;
-    animation-timing-function: step-end;
-  }
-  46% {
-    width: 115px;
-    border-right-color: transparent;
-    animation-timing-function: step-end;
-  }
-  52% {
-    width: 115px;
-    border-right-color: black;
-    animation-timing-function: step-end;
-  }
-  55%,
-  100% {
-    width: 115px;
-    border-right-color: transparent;
-  }
-}
-
-@keyframes demo-discard-dialog-2 {
-  0%,
-  59% {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.95);
-  }
-  62%,
-  100% {
-    opacity: 1;
-    pointer-events: auto;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-discard-main-dialog {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-focus-tab-press {
-  0%,
-  19% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-  20% {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 var(--key-shadow);
-  }
-  21%,
-  49% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-  50% {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 var(--key-shadow);
-  }
-  51%,
-  79% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-  80% {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 var(--key-shadow);
-  }
-  81%,
-  100% {
-    transform: translateY(0);
-    box-shadow: 0 4px 0 var(--key-shadow);
-  }
-}
-
-@keyframes demo-scroll-cursor {
-  0% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-  20% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  25% {
-    left: 50%;
-    top: 50%;
-    transform: scale(0.9);
-  }
-  30% {
-    left: 50%;
-    top: 50%;
-    transform: scale(1);
-  }
-  45%,
-  100% {
-    left: 80%;
-    top: 80%;
-    transform: scale(1);
-  }
-}
-
-@keyframes demo-scroll-ripple {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  25% {
-    opacity: 0.5;
-    transform: scale(0);
-  }
-  31% {
-    opacity: 0;
-    transform: scale(2);
-  }
-  32%,
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-
-@keyframes demo-scroll-dialog {
-  0%,
-  25% {
-    opacity: 0;
-    transform: scale(0.95);
-    pointer-events: none;
-  }
-  30%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: auto;
-  }
-}
-
-@keyframes demo-scroll-scrollbar {
-  0%,
-  29% {
-    opacity: 1;
-  }
-  30%,
-  100% {
-    opacity: 0;
+/* Reduced motion: dialogs fade, the ring appears, and keys don't move. */
+@media (prefers-reduced-motion: reduce) {
+  .rule-page.dialog-design .dd-dialog,
+  .rule-page.dialog-design .dd-dialog[data-open] {
+    transform: none;
+  }
+  .rule-page.dialog-design .dd-screen [data-at]::after,
+  .rule-page.dialog-design .dd-in:has(> input[data-at])::after {
+    animation: none;
+  }
+  .rule-page.dialog-design .dd-key:active {
+    transform: none;
   }
 }

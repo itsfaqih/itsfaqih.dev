@@ -1,0 +1,12 @@
+/* The suffix chips under "Global code, type folder". The extra class outranks the kit's
+   `.lesson :is(p, .tip) code` whichever stylesheet loads first. */
+.rule-page.proximity .suffixes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rule-page.proximity .lesson .suffixes code {
+  padding: 4px 8px;
+  font-size: 13px;
+  color: var(--c-ink);
+}

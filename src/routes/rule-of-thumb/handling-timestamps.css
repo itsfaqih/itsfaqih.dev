@@ -1,0 +1,279 @@
+/* Handling Timestamps. Every pane follows one moment to two readers, Rina in Jakarta and Sam in
+   New York. A wrong screen's hour hand is red, with a faint green hand where it should point. */
+.rule-page.handling-timestamps {
+  --str: color-mix(in oklab, var(--ar) var(--ink-mix), #000);
+}
+
+.rule-page.handling-timestamps .ts-view {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+/* Tabbed, the kit hides the caption, so the costs fall into the stretching track. Keep the
+   chips at the foot, where both tabs put them. */
+.rule-page.handling-timestamps .pane .costs {
+  align-content: end;
+}
+
+/* ---------- Requests and code ---------- */
+.rule-page.handling-timestamps .ts-wire {
+  display: grid;
+  gap: 2px;
+  font: 12.5px/1.5 var(--mono);
+}
+.rule-page.handling-timestamps .ts-ln {
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rule-page.handling-timestamps .ts-ln[data-note] {
+  color: var(--mute);
+}
+/* A value moves to the next line whole rather than split at "2026-01-". */
+.rule-page.handling-timestamps .ts-str {
+  display: inline-block;
+  max-width: 100%;
+  color: var(--str);
+}
+.rule-page.handling-timestamps .ts-ln[data-note] .ts-str {
+  color: inherit;
+}
+.rule-page.handling-timestamps .pane[data-side="bad"] .ts-ln[data-hot] {
+  background: color-mix(in srgb, var(--no) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--no);
+}
+.rule-page.handling-timestamps .pane[data-side="good"] .ts-ln[data-hot] {
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--c);
+}
+
+/* ---------- The readers ---------- */
+.rule-page.handling-timestamps .ts-readers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+.rule-page.handling-timestamps .ts-reader {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 2px 0 var(--drop-ink);
+}
+.rule-page.handling-timestamps .ts-read {
+  display: grid;
+  min-width: 0;
+}
+.rule-page.handling-timestamps .ts-who {
+  font: 700 11px var(--display);
+  color: var(--dim);
+}
+.rule-page.handling-timestamps .ts-time {
+  font: 700 20px/1.25 var(--mono);
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.rule-page.handling-timestamps .ts-date {
+  font-size: 13px;
+  color: var(--dim);
+}
+.rule-page.handling-timestamps .ts-should {
+  margin-top: 2px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--yes-ink);
+}
+.rule-page.handling-timestamps .ts-reader[data-off] .ts-time {
+  color: var(--no-ink);
+}
+
+/* A clock face with four ticks. The hands turn on their bottom end, at the centre. */
+.rule-page.handling-timestamps .ts-clock {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--code-bg);
+  box-shadow: inset 0 0 0 1.5px var(--hair);
+}
+.rule-page.handling-timestamps .ts-clock::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -3deg, var(--mute) 0 6deg, transparent 6deg 90deg);
+  mask: radial-gradient(circle, transparent 17px, #000 17.5px);
+}
+.rule-page.handling-timestamps .ts-clock::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 3px);
+  border-radius: 50%;
+  background: var(--text);
+}
+.rule-page.handling-timestamps .ts-hand {
+  position: absolute;
+  bottom: 50%;
+  left: calc(50% - 1.5px);
+  width: 3px;
+  height: 13px;
+  border-radius: 2px;
+  background: var(--text);
+  transform: rotate(var(--a));
+  transform-origin: 50% 100%;
+}
+.rule-page.handling-timestamps .ts-min {
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 19px;
+  background: var(--dim);
+}
+.rule-page.handling-timestamps .ts-reader[data-off] .ts-hour {
+  background: var(--no-ink);
+}
+.rule-page.handling-timestamps .ts-ghost {
+  background: var(--yes-ink);
+  opacity: 0.5;
+}
+
+/* ---------- Lesson 1: the orders table ---------- */
+.rule-page.handling-timestamps .ts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 12.5px/1.4 var(--mono);
+}
+.rule-page.handling-timestamps .ts-table th {
+  padding: 6px 8px;
+  border-bottom: 1.5px solid var(--hair);
+  font: 700 11px var(--display);
+  color: var(--dim);
+  text-align: left;
+}
+.rule-page.handling-timestamps .ts-table td {
+  padding: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--hair) 60%, transparent);
+  color: var(--text);
+}
+.rule-page.handling-timestamps .ts-table .ts-at {
+  white-space: nowrap;
+}
+.rule-page.handling-timestamps .pane[data-side="bad"] .ts-at {
+  color: var(--no-ink);
+}
+.rule-page.handling-timestamps .ts-sum {
+  font-size: 14px;
+  color: var(--dim);
+}
+
+/* ---------- Lessons 4 and 5: the forms ---------- */
+.rule-page.handling-timestamps .ts-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.rule-page.handling-timestamps .ts-form-head {
+  flex-basis: 100%;
+  font: 700 12px var(--display);
+  color: var(--dim);
+}
+.rule-page.handling-timestamps .ts-form input {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1.5px solid var(--hair);
+  border-radius: 10px;
+  background: var(--panel);
+  font: 600 14px var(--mono);
+  color: var(--text);
+  color-scheme: dark;
+  transition: border-color var(--t-fb) ease;
+}
+.light .rule-page.handling-timestamps .ts-form input {
+  color-scheme: light;
+}
+.rule-page.handling-timestamps .ts-form input:hover {
+  border-color: var(--hair-hover);
+}
+.rule-page.handling-timestamps .ts-form input:focus-visible {
+  border-color: var(--c-ink);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.rule-page.handling-timestamps .ts-orders {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  list-style: none;
+}
+.rule-page.handling-timestamps .ts-orders li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font: 12.5px/1.3 var(--mono);
+  color: var(--text);
+  transition:
+    opacity var(--t-fb) ease,
+    background-color var(--t-fb) ease;
+}
+.rule-page.handling-timestamps .ts-oid {
+  color: var(--mute);
+}
+.rule-page.handling-timestamps .ts-when {
+  display: grid;
+}
+.rule-page.handling-timestamps .ts-when small {
+  font-size: 11px;
+  color: var(--mute);
+}
+.rule-page.handling-timestamps .ts-fate {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font: 600 11px var(--mono);
+  white-space: nowrap;
+}
+.rule-page.handling-timestamps .ts-orders [data-fate="out"] {
+  opacity: 0.45;
+}
+.rule-page.handling-timestamps .ts-orders [data-fate="shown"] {
+  background: color-mix(in srgb, var(--c) 8%, transparent);
+}
+.rule-page.handling-timestamps [data-fate="shown"] .ts-fate {
+  background: color-mix(in srgb, var(--yes) 18%, transparent);
+  color: var(--yes-ink);
+}
+.rule-page.handling-timestamps .ts-orders :is([data-fate="missed"], [data-fate="extra"]) {
+  background: color-mix(in srgb, var(--no) 8%, transparent);
+  box-shadow: inset 2px 0 0 var(--no);
+}
+.rule-page.handling-timestamps :is([data-fate="missed"], [data-fate="extra"]) .ts-fate {
+  background: color-mix(in srgb, var(--no) 16%, transparent);
+  color: var(--no-ink);
+}
+.rule-page.handling-timestamps [data-fate="missed"] .ts-when {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--no) 60%, transparent);
+}
+
+@media (max-width: 640px) {
+  .rule-page.handling-timestamps :is(.ts-wire, .ts-table, .ts-orders li) {
+    font-size: 12px;
+  }
+  /* Side by side, "Sam · New York" wraps under a 48px clock; stacked, each reader gets a line. */
+  .rule-page.handling-timestamps .ts-readers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rule-page.handling-timestamps .ts-time {
+    font-size: 18px;
+  }
+}

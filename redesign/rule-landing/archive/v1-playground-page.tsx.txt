@@ -1,0 +1,921 @@
+import { Link } from "@tanstack/react-router";
+import { useLayoutEffect, useRef, useState } from "react";
+import { Backdrop } from "../-components/backdrop";
+import { colorOf, isOpeningRule, ruleNumber } from "../-components/rule-art";
+import { useCutIns } from "../-components/use-cut-ins";
+import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
+import { readMarkdown, useCurrentRule } from "./-components";
+import "./proximity-principle.css";
+
+const MARKDOWN_URL = "/rule-of-thumb/proximity-principle.md";
+
+const BAND = ["COLOCATE", "INLINE FIRST", "LOWEST COMMON ANCESTOR", "FEWER FILES"];
+// The band slides by half its width, so each half holds three sets to outrun a 3500px screen.
+const BAND_RUN = Array.from({ length: 6 }, () => BAND).flat();
+
+const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+export function ProximityPrinciple() {
+  const rule = useCurrentRule();
+  const rootRef = useRef<HTMLDivElement>(null);
+  useCutIns(rootRef);
+  const [morphed] = useState(isOpeningRule);
+  // Arriving by morph, start at the top now so the title flies into a hero that is on screen.
+  useLayoutEffect(() => {
+    if (morphed) scrollTo({ top: 0, behavior: "instant" });
+  }, [morphed]);
+  const line = morphed ? undefined : true;
+
+  return (
+    <div
+      ref={rootRef}
+      className="arc arc-scan prox"
+      style={{ "--c": rule ? colorOf(rule.label) : "var(--go)" }}
+    >
+      <Backdrop />
+      <header className="arc-wrap hero-grid">
+        <div className="hero-copy">
+          <div className="tag" data-cut>
+            <Link to="/rule-of-thumb">← All rules</Link>
+            {rule && <span className="c">No.{ruleNumber(rule)}</span>}
+            <span className="c">Code Writing</span>
+          </div>
+          <h1>
+            <span data-cut={line}>Keep code</span>
+            <span data-cut={line}>next to the code</span>
+            <span data-cut={line}>
+              that <span className="hl">uses it</span>.
+            </span>
+          </h1>
+          <p className="lead" data-cut>
+            The Proximity Principle in five small calls you make every week.{" "}
+            <b>Less jumping between files, more shipping.</b>
+          </p>
+          <div className="acts" data-cut>
+            <a className="btn go" href="#levels">
+              Play the five levels
+            </a>
+            <CopyMarkdown className="btn soft" />
+          </div>
+        </div>
+        <Bench />
+      </header>
+
+      <div className="ticker-wrap" data-loop data-cut aria-hidden="true">
+        <div className="ticker">
+          {BAND_RUN.map((word, index) => (
+            <span key={index}>{word} ★</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="arc-wrap">
+        <section className="sec" id="levels">
+          <div className="sec-head" data-cut>
+            <h2>Five levels, one habit</h2>
+            <p>
+              Each level is a call you make while writing a component. Play it, then keep the
+              sentence under the title.
+            </p>
+          </div>
+          <div className="levels">
+            <Level
+              n={1}
+              title="Inline first"
+              hint="Flip the switch and count what the extraction costs."
+              toy={<InlineSwitch />}
+            >
+              If code is used once, keep it where it's used. A separate file for one caller is an
+              extra import and an extra tab, for nothing.
+            </Level>
+            <Level n={2} title="Prefer fewer files" hint="Merge the folder." toy={<MergeFiles />}>
+              One component split into a folder of five files means five tabs to hold one idea. One
+              file with everything related beats a tree of imports.
+            </Level>
+            <Level
+              n={3}
+              title="Exception: state gets its own component"
+              hint="Type in the box under each setting and watch the render counts."
+              toy={<StateIsolation />}
+            >
+              Extract a child when it holds its own state, even if it's used once. Typing then
+              re-renders the input, not the whole page around it.
+            </Level>
+            <Level
+              n={4}
+              title="Shared? Lowest common ancestor"
+              hint={
+                <>
+                  Tick the files that call <code>useCart</code>.
+                </>
+              }
+              toy={<LowestCommonAncestor />}
+            >
+              Once a second file needs it, move the code only as far as the nearest folder both
+              callers share. The path then tells you who owns it.
+            </Level>
+            <Level
+              n={5}
+              title="Exception: global code gets a type folder"
+              hint="Drag the slider to add callers."
+              toy={<GlobalCode />}
+            >
+              A button belongs to no page. When something is used almost everywhere, give it a type
+              folder like <code>components/</code> or <code>schemas/</code>, and name files by type
+              so <span className="kbd">⌘P</span> still finds them.
+            </Level>
+          </div>
+        </section>
+
+        <section className="sec">
+          <div className="sec-head" data-cut>
+            <h2>Where does it go?</h2>
+            <p>The whole rule as a select screen. Pick your situation.</p>
+          </div>
+          <SelectScreen />
+        </section>
+
+        <section className="take">
+          <div className="take-copy" data-cut>
+            <h2>Take the rule with you</h2>
+            <p>
+              The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
+              agents will place files the same way.
+            </p>
+            <div className="acts">
+              <CopyMarkdown className="btn go" />
+              <a className="btn soft" href={MARKDOWN_URL} target="_blank" rel="noopener noreferrer">
+                View .md
+              </a>
+            </div>
+          </div>
+          <div data-cut>
+            <RuleOfThumbPagination />
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function CopyMarkdown({ className }: { className: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    try {
+      const text = await readMarkdown(MARKDOWN_URL);
+      if (text === null) return;
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  return (
+    <button type="button" className={className} onClick={handleCopy}>
+      {copied ? "Copied" : "Copy as Markdown"}
+    </button>
+  );
+}
+
+// ---------- The bench: drag formatPrice() toward its only caller ----------
+
+const BENCH = [
+  {
+    hops: 3,
+    files: 2,
+    imports: 1,
+    verdict: "FAR",
+    tone: "no",
+    where: "utils/",
+    say: "Three folders away. Every read is a jump out to utils/ and back.",
+  },
+  {
+    hops: 1,
+    files: 2,
+    imports: 1,
+    verdict: "NEAR",
+    tone: "",
+    where: "orders/",
+    say: "Same folder. Closer, but still a second file and an import for one caller.",
+  },
+  {
+    hops: 0,
+    files: 1,
+    imports: 0,
+    verdict: "INLINE",
+    tone: "yes",
+    where: "inline",
+    say: "Used once, so it lives in the file. Nothing to jump to.",
+  },
+] as const;
+const INLINE = BENCH.length - 1;
+
+type Box = { x: number; y: number; w: number; h: number };
+type BenchControls = {
+  seat: (slot: number, animate: boolean) => void;
+  place: (x: number, y: number) => void;
+  nearest: (x: number, y: number) => number;
+};
+
+function Bench() {
+  const benchRef = useRef<HTMLDivElement>(null);
+  const chipRef = useRef<HTMLButtonElement>(null);
+  const wireRef = useRef<SVGPathElement>(null);
+  const callRef = useRef<HTMLSpanElement>(null);
+  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const controls = useRef<BenchControls>(null);
+  const atRef = useRef(0);
+  const dragRef = useRef<{ left: number; top: number; moves: number } | null>(null);
+  const [at, setAt] = useState(0);
+  const [near, setNear] = useState<number | null>(null);
+  const state = BENCH[at] ?? BENCH[0];
+
+  useLayoutEffect(() => {
+    const bench = benchRef.current;
+    const chip = chipRef.current;
+    const wire = wireRef.current;
+    const call = callRef.current;
+    if (!bench || !chip || !wire || !call) return;
+
+    const box = (element: Element): Box => {
+      const outer = bench.getBoundingClientRect();
+      const inner = element.getBoundingClientRect();
+      return {
+        x: inner.left - outer.left,
+        y: inner.top - outer.top,
+        w: inner.width,
+        h: inner.height,
+      };
+    };
+    // The wire runs from the call site to the chip and hides once the chip has settled inline.
+    let frame = 0;
+    let settleAt = 0;
+    const drawWire = (settled: boolean) => {
+      const from = box(call);
+      const to = box(chip);
+      const x1 = from.x + from.w / 2;
+      const y1 = from.y;
+      const x2 = to.x + Math.min(to.w / 2, 40);
+      const y2 = to.y + (to.y > y1 ? 0 : to.h);
+      const bend = Math.max(40, Math.abs(y2 - y1) * 0.5);
+      wire.setAttribute("d", `M${x1},${y1} C${x1 + bend},${y1} ${x2 + bend},${y2} ${x2},${y2}`);
+      const hidden = settled && atRef.current === INLINE && !dragRef.current;
+      wire.style.opacity = hidden ? "0" : "1";
+    };
+    const follow = () => {
+      cancelAnimationFrame(frame);
+      const loop = () => {
+        const settled = performance.now() >= settleAt;
+        drawWire(settled);
+        if (!settled) frame = requestAnimationFrame(loop);
+      };
+      frame = requestAnimationFrame(loop);
+    };
+    const place = (x: number, y: number, travel = 0) => {
+      chip.style.transition = travel ? "transform var(--t-pop) var(--snap)" : "none";
+      chip.style.transform = `translate(${x}px, ${y}px)`;
+      settleAt = performance.now() + travel;
+      follow();
+    };
+    const seat = (slot: number, animate: boolean) => {
+      const target = slotRefs.current[slot];
+      if (!target) return;
+      const { x, y, w } = box(target);
+      chip.style.width = `${w}px`;
+      place(x, y, animate && !reducedMotion() ? 520 : 0);
+    };
+    const nearest = (x: number, y: number) => {
+      let best = 0;
+      let bestDistance = Infinity;
+      slotRefs.current.forEach((slot, index) => {
+        if (!slot) return;
+        const { x: sx, y: sy } = box(slot);
+        const distance = Math.hypot(sx - x, sy - y);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = index;
+        }
+      });
+      return best;
+    };
+    controls.current = { seat, place, nearest };
+
+    // Fonts and widths move the tree, so the chip takes its seat again whenever the bench resizes.
+    const resizes = new ResizeObserver(() => seat(atRef.current, false));
+    resizes.observe(bench);
+    return () => {
+      resizes.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  function moveTo(slot: number) {
+    atRef.current = slot;
+    setAt(slot);
+    setNear(null);
+    controls.current?.seat(slot, true);
+  }
+  const next = () => moveTo(at === INLINE ? 0 : at + 1);
+
+  return (
+    <div ref={benchRef} className="panel bench" data-cut>
+      <div className="toy-head">
+        <span>
+          Only <code>order-card.tsx</code> calls it.
+        </span>
+        <span className="kbd">drag</span>
+      </div>
+      <div className="tree">
+        <div className="tr d" style={{ "--l": 0 }}>
+          src/
+        </div>
+        <div className="tr d" style={{ "--l": 1 }}>
+          routes/
+        </div>
+        <div className="tr d" style={{ "--l": 2 }}>
+          orders/
+        </div>
+        <div className="tr caller" style={{ "--l": 3 }}>
+          <div className="file">
+            <div className="fname">order-card.tsx</div>
+            <div>
+              <span className="m">export function</span> OrderCard({"{ order }"}) {"{"}
+            </div>
+            <Slot index={2} near={near} slotRefs={slotRefs} />
+            <div>
+              {"\u00a0\u00a0"}
+              <span className="m">return</span> &lt;p&gt;{"{"}
+              <span ref={callRef} className="callsite">
+                formatPrice
+              </span>
+              (order.total){"}"}&lt;/p&gt;
+            </div>
+            <div>{"}"}</div>
+          </div>
+        </div>
+        <div className="tr" style={{ "--l": 3 }}>
+          <Slot index={1} near={near} slotRefs={slotRefs} />
+        </div>
+        <div className="tr d" style={{ "--l": 1 }}>
+          utils/
+        </div>
+        <div className="tr" style={{ "--l": 2 }}>
+          <Slot index={0} near={near} slotRefs={slotRefs} />
+        </div>
+      </div>
+      <svg className="wire" aria-hidden="true">
+        <path ref={wireRef} />
+      </svg>
+      <button
+        ref={chipRef}
+        type="button"
+        className="helper"
+        aria-label={`formatPrice helper, in ${state.where}. Press to move it one step closer.`}
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
+          event.preventDefault();
+          event.currentTarget.setPointerCapture(event.pointerId);
+          const bench = benchRef.current?.getBoundingClientRect();
+          const chip = event.currentTarget.getBoundingClientRect();
+          if (!bench) return;
+          dragRef.current = {
+            left: bench.left + event.clientX - chip.left,
+            top: bench.top + event.clientY - chip.top,
+            moves: 0,
+          };
+        }}
+        onPointerMove={(event) => {
+          const drag = dragRef.current;
+          if (!drag) return;
+          drag.moves++;
+          const x = event.clientX - drag.left;
+          const y = event.clientY - drag.top;
+          controls.current?.place(x, y);
+          setNear(controls.current?.nearest(x, y) ?? null);
+        }}
+        onPointerUp={(event) => {
+          const drag = dragRef.current;
+          dragRef.current = null;
+          if (!drag) return;
+          // A press without travel is a tap: one step closer.
+          if (drag.moves < 3) next();
+          else
+            moveTo(
+              controls.current?.nearest(event.clientX - drag.left, event.clientY - drag.top) ?? at,
+            );
+        }}
+        onPointerCancel={() => {
+          dragRef.current = null;
+          moveTo(at);
+        }}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          next();
+        }}
+      >
+        <span className="grip" aria-hidden="true" />
+        formatPrice()
+        <span className="where">{state.where}</span>
+      </button>
+      <p className="say" aria-live="polite">
+        {state.say}
+      </p>
+      <div className="readout">
+        <Stat label="Jumps to read it" value={state.hops} />
+        <Stat label="Files open" value={state.files} />
+        <Stat label="Import lines" value={state.imports} />
+        <span className={`chip ${state.tone}`}>{state.verdict}</span>
+      </div>
+      <div className="moves" role="group" aria-label="Where formatPrice lives">
+        {BENCH.map(({ where }, slot) => (
+          <button
+            key={where}
+            type="button"
+            className="btn soft sm"
+            aria-pressed={slot === at}
+            onClick={() => moveTo(slot)}
+          >
+            {where}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Slot({
+  index,
+  near,
+  slotRefs,
+}: {
+  index: number;
+  near: number | null;
+  slotRefs: React.RefObject<(HTMLDivElement | null)[]>;
+}) {
+  return (
+    <div
+      ref={(element) => {
+        slotRefs.current[index] = element;
+      }}
+      className="slot"
+      data-near={near === index ? "" : undefined}
+    />
+  );
+}
+
+/** A readout number that pops whenever it changes. */
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="stat">
+      <span>{label}</span>
+      <b key={value} className="pop">
+        {value}
+      </b>
+    </div>
+  );
+}
+
+// ---------- Levels ----------
+
+function Level({
+  n,
+  title,
+  hint,
+  toy,
+  children,
+}: {
+  n: number;
+  title: string;
+  hint: React.ReactNode;
+  toy: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <article className="panel level" data-cut>
+      <div className="copy">
+        <span className="lv">LV {n}</span>
+        <h3>{title}</h3>
+        <p>{children}</p>
+        <p className="hint">{hint}</p>
+      </div>
+      {toy}
+    </article>
+  );
+}
+
+function InlineSwitch() {
+  const [extracted, setExtracted] = useState(false);
+
+  return (
+    <div className="toy well">
+      <div className="switch-row">
+        <button
+          type="button"
+          role="switch"
+          className="switch"
+          aria-checked={extracted}
+          aria-label="Extract formatDate to utils"
+          onClick={() => setExtracted(!extracted)}
+        >
+          <i />
+        </button>
+        <span>
+          Extract <code>formatDate</code> to <code>utils/</code>
+        </span>
+      </div>
+      <div className="files">
+        <div className="fcard">
+          <b>user-profile.tsx</b>
+          {extracted ? (
+            <pre>
+              <span className="m">import</span> {"{ formatDate }"} <span className="m">from</span>{" "}
+              "../utils/format-date";
+              {"\n\n"}
+              <span className="m">function</span> UserProfile({"{ user }"}) {"{\n  "}
+              <span className="m">return</span> &lt;p&gt;Joined {"{formatDate(user.joinedAt)}"}
+              &lt;/p&gt;;{"\n}"}
+            </pre>
+          ) : (
+            <pre>
+              <span className="m">function</span> UserProfile({"{ user }"}) {"{\n  "}
+              <span className="m">const</span> joined = user.joinedAt.toLocaleDateString(
+              <span className="m">"en-US"</span>);{"\n  "}
+              <span className="m">return</span> &lt;p&gt;Joined {"{joined}"}&lt;/p&gt;;{"\n}"}
+            </pre>
+          )}
+        </div>
+        {extracted && (
+          <div className="fcard ext">
+            <b>utils/format-date.ts</b>
+            <pre>
+              <span className="m">export function</span> formatDate(date: Date) {"{\n  "}
+              <span className="m">return</span> date.toLocaleDateString(
+              <span className="m">"en-US"</span>);{"\n}"}
+            </pre>
+          </div>
+        )}
+      </div>
+      <div className="readout">
+        <Stat label="Files" value={extracted ? 2 : 1} />
+        <Stat label="Imports" value={extracted ? 1 : 0} />
+        <Stat label="Callers" value={1} />
+        <span className={`chip ${extracted ? "no" : "yes"}`}>
+          {extracted ? "OVER-ABSTRACTED" : "INLINE"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const SHEETS = [
+  { name: "UserProfile/UserProfile.tsx", lines: 31 },
+  { name: "UserProfile/styles.ts", lines: 12 },
+  { name: "UserProfile/types.ts", lines: 6 },
+  { name: "UserProfile/hooks.ts", lines: 9 },
+];
+
+function MergeFiles() {
+  const [merged, setMerged] = useState(false);
+
+  return (
+    <div className="toy well" data-on={merged ? "" : undefined}>
+      <div className="sheets">
+        <div className="sheet keep" style={{ "--i": 0 }}>
+          {merged ? "user-profile.tsx" : "UserProfile/index.tsx"}
+          <span className="ln">{merged ? "58 lines" : "re-export"}</span>
+        </div>
+        {SHEETS.map(({ name, lines }, index) => (
+          <div key={name} className="sheet" style={{ "--i": index + 1 }} aria-hidden={merged}>
+            {name}
+            <span className="ln">{lines} lines</span>
+          </div>
+        ))}
+        <p className="merged-note" aria-hidden={!merged}>
+          Same 58 lines. The types, styles and hook sit above the component that uses them.
+        </p>
+      </div>
+      <div className="readout">
+        <Stat label="Files" value={merged ? 1 : 5} />
+        <Stat label="Imports between them" value={merged ? 0 : 4} />
+        <button
+          type="button"
+          className="btn hue sm"
+          style={{ marginLeft: "auto" }}
+          onClick={() => setMerged(!merged)}
+        >
+          {merged ? "Split it back" : "Merge into one file"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type RenderCounts = { page: number; input: number; list: number };
+const FIRST_RENDER: RenderCounts = { page: 1, input: 1, list: 1 };
+
+function StateIsolation() {
+  const [inChild, setInChild] = useState(false);
+  const [counts, setCounts] = useState(FIRST_RENDER);
+  const [typed, setTyped] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function choose(child: boolean) {
+    setInChild(child);
+    setCounts(FIRST_RENDER);
+    setTyped(false);
+    inputRef.current?.focus({ preventScroll: true });
+  }
+  const hot = (key: keyof RenderCounts) => typed && (key === "input" || !inChild);
+  const renders = (key: keyof RenderCounts) => (
+    <span className="renders">
+      renders{" "}
+      <b key={counts[key]} className={hot(key) ? "hot pop" : undefined}>
+        {counts[key]}
+      </b>
+    </span>
+  );
+
+  return (
+    <div className="toy well">
+      <div className="seg" role="group" aria-label="Where the query state lives">
+        <button type="button" aria-pressed={!inChild} onClick={() => choose(false)}>
+          State in OrderPage
+        </button>
+        <button type="button" aria-pressed={inChild} onClick={() => choose(true)}>
+          State in SearchInput
+        </button>
+      </div>
+      <div className="comp">
+        <div className="ch">
+          OrderPage
+          {renders("page")}
+        </div>
+        <div className="comp">
+          <div className="ch">
+            SearchInput
+            <span className="st">
+              {inChild ? "useState lives here" : "useState lives in OrderPage"}
+            </span>
+            {renders("input")}
+          </div>
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Search orders"
+            aria-label="Search orders"
+            onChange={() => {
+              setTyped(true);
+              setCounts((last) =>
+                inChild
+                  ? { ...last, input: last.input + 1 }
+                  : { page: last.page + 1, input: last.input + 1, list: last.list + 1 },
+              );
+            }}
+          />
+        </div>
+        <div className="comp">
+          <div className="ch">
+            OrderList
+            {renders("list")}
+          </div>
+          <div className="rows">
+            <i />
+            <i />
+            <i style={{ width: "70%" }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const CART_TREE = [
+  { path: "routes", level: 0 },
+  { path: "routes/shop", level: 1 },
+  { path: "routes/shop/cart", level: 2 },
+  { path: "routes/shop/cart/cart-page.tsx", level: 3 },
+  { path: "routes/shop/cart/cart-summary.tsx", level: 3 },
+  { path: "routes/shop/checkout", level: 2 },
+  { path: "routes/shop/checkout/checkout-page.tsx", level: 3 },
+  { path: "routes/account", level: 1 },
+  { path: "routes/account/orders-page.tsx", level: 2 },
+];
+const isFile = (path: string) => path.endsWith(".tsx");
+const nameOf = (path: string) => path.split("/").pop() ?? path;
+
+/** Where use-cart.ts lives for these callers, and why. */
+function cartHome(callers: string[]) {
+  const [first, ...others] = callers;
+  if (!first) return { path: "routes", say: "Nobody calls it. Delete it." };
+  if (others.length === 0) {
+    return { path: first, say: `One caller, so it lives inside ${nameOf(first)}. Inline first.` };
+  }
+  const folders = callers.map((caller) => caller.split("/").slice(0, -1));
+  const shared: string[] = [];
+  for (const [index, part] of first.split("/").slice(0, -1).entries()) {
+    if (!folders.every((folder) => folder[index] === part)) break;
+    shared.push(part);
+  }
+  const path = shared.join("/");
+  return {
+    path,
+    say: `${callers.length} callers share ${path}/. So ${path}/use-cart.ts, and no higher.`,
+  };
+}
+
+function LowestCommonAncestor() {
+  const [callers, setCallers] = useState<string[]>([
+    "routes/shop/cart/cart-page.tsx",
+    "routes/shop/checkout/checkout-page.tsx",
+  ]);
+  const toyRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLSpanElement>(null);
+  const lastSpot = useRef<{ x: number; y: number }>(null);
+  const home = cartHome(CART_TREE.map(({ path }) => path).filter((path) => callers.includes(path)));
+
+  // The pill moves to a new row, so it flies from where it last sat to its new dock.
+  useLayoutEffect(() => {
+    const toy = toyRef.current?.getBoundingClientRect();
+    const pill = pillRef.current;
+    if (!toy || !pill) return;
+    const box = pill.getBoundingClientRect();
+    const spot = { x: box.left - toy.left, y: box.top - toy.top };
+    const last = lastSpot.current;
+    if (last && !reducedMotion()) {
+      pill.animate(
+        [
+          { transform: `translate(${last.x - spot.x}px, ${last.y - spot.y}px)` },
+          { transform: "none" },
+        ],
+        { duration: 420, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+      );
+    }
+    lastSpot.current = spot;
+  }, [home.path]);
+
+  function toggle(path: string) {
+    setCallers((last) =>
+      last.includes(path) ? last.filter((caller) => caller !== path) : [...last, path],
+    );
+  }
+
+  return (
+    <div ref={toyRef} className="toy well">
+      <div className="lca">
+        {CART_TREE.map(({ path, level }) => (
+          <div key={path} className={isFile(path) ? "r" : "r d"} style={{ "--l": level }}>
+            {isFile(path) ? (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={callers.includes(path)}
+                  onChange={() => toggle(path)}
+                />
+                <span>{nameOf(path)}</span>
+              </label>
+            ) : (
+              `${nameOf(path)}/`
+            )}
+            {home.path === path && (
+              <span ref={pillRef} className={callers.length === 0 ? "pill gone" : "pill"}>
+                use-cart.ts
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="say" aria-live="polite">
+        {home.say}
+      </p>
+    </div>
+  );
+}
+
+function buttonHome(pages: number) {
+  if (pages === 1) {
+    return {
+      path: "routes/settings/settings-page.tsx",
+      why: "One caller. Keep it inline in that page.",
+    };
+  }
+  if (pages <= 3) {
+    return {
+      path: "routes/button.tsx",
+      why: `${pages} pages under routes/. The lowest common ancestor holds it.`,
+    };
+  }
+  return {
+    path: "components/button.tsx",
+    why: `${pages} pages and counting. It belongs to no page, so it gets a type folder.`,
+  };
+}
+
+const PAGE_SLOTS = Array.from({ length: 12 }, (_, index) => index);
+
+function GlobalCode() {
+  const [pages, setPages] = useState(1);
+  const home = buttonHome(pages);
+
+  return (
+    <div className="toy well">
+      <div className="dest">
+        <span className="k">
+          Pages that import <code>Button</code>: <b>{pages}</b>
+        </span>
+      </div>
+      <input
+        className="range"
+        type="range"
+        min={1}
+        max={12}
+        value={pages}
+        aria-label="Pages that import Button"
+        onChange={(event) => setPages(Number(event.target.value))}
+      />
+      <div className="pages" aria-hidden="true">
+        {PAGE_SLOTS.map((index) => (
+          <i key={index} data-on={index < pages ? "" : undefined} />
+        ))}
+      </div>
+      <div className="dest">
+        <span className="k">It lives in</span>
+        <span key={home.path} className="v pop">
+          {home.path}
+        </span>
+        <span className="why">{home.why}</span>
+      </div>
+      <div className="suffixes">
+        <code>user.schema.ts</code>
+        <code>use-auth.hook.ts</code>
+        <code>dashboard.page.tsx</code>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Select screen ----------
+
+const SITUATIONS = [
+  { when: "Code used once", put: "Keep it inline", where: "order-card.tsx, right above the JSX" },
+  {
+    when: "Code is too long",
+    put: "A function in the same file",
+    where: "order-card.tsx → function PriceRow()",
+  },
+  {
+    when: "Reused in the same file",
+    put: "A function in the same file",
+    where: "order-card.tsx → const formatPrice",
+  },
+  {
+    when: "Reused across files",
+    put: "The lowest common ancestor",
+    where: "routes/shop/use-cart.ts",
+  },
+  {
+    when: "Used almost everywhere",
+    put: "A type folder",
+    where: "components/button.tsx · schemas/user.schema.ts",
+  },
+  {
+    when: "A child with its own state",
+    put: "Its own component, same file",
+    where: "order-page.tsx → function SearchInput()",
+  },
+] as const;
+
+function SelectScreen() {
+  const [picked, setPicked] = useState(0);
+  const { put, where } = SITUATIONS[picked] ?? SITUATIONS[0];
+
+  return (
+    <div className="select-screen" data-cut>
+      <div className="opts">
+        {SITUATIONS.map(({ when }, index) => (
+          <button
+            key={when}
+            type="button"
+            className="opt"
+            aria-pressed={index === picked}
+            onClick={() => setPicked(index)}
+            onPointerEnter={() => setPicked(index)}
+            onFocus={() => setPicked(index)}
+          >
+            {when}
+          </button>
+        ))}
+      </div>
+      <div className="panel ans" aria-live="polite">
+        <span className="k">Put it in</span>
+        <span key={put} className="v">
+          {put}
+        </span>
+        <code>{where}</code>
+      </div>
+    </div>
+  );
+}

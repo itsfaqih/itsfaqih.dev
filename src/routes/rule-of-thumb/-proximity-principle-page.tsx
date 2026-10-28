@@ -1,49 +1,501 @@
-import { cx } from "@/stylex";
-import { RuleOfThumbPagination } from "./-components/rule-of-thumb-pagination";
-import { RuleOfThumbHero, RulePage } from "./-components";
-import { AbstractionSection } from "./-proximity-principle-abstraction-section";
-import { CorePrinciplesSection } from "./-proximity-principle-core-section";
-import { ExtractOnlyWhenReusedSection } from "./-proximity-principle-extract-section";
-import { FileOrganizationSection } from "./-proximity-principle-file-organization-section";
-import { FileSuffixesSection } from "./-proximity-principle-file-suffixes-section";
-import { FrameworkRulesSection } from "./-proximity-principle-framework-rules-section";
-import { GlobalCodeSection } from "./-proximity-principle-global-code-section";
-import { LowestCommonAncestorSection } from "./-proximity-principle-lowest-common-ancestor-section";
-import { QuickReferenceSection } from "./-proximity-principle-quick-reference-section";
-import { StateIsolationSection } from "./-proximity-principle-state-section";
-import { WhyThisMattersSection } from "./-proximity-principle-why-this-matters-section";
+import { type Lesson, type Level, RuleLanding, Tree } from "./-components/rule-landing";
+import "./proximity-principle.css";
+
+// ---------- The lessons: each walks one piece of code from far to near ----------
+
+const LESSONS: Lesson[] = [
+  {
+    title: "Inline first",
+    body: (
+      <>
+        Code used once stays where it's used. A helper in <code>utils/</code> for a single caller is
+        one more file to open and one more import to keep, and nothing is shared.
+      </>
+    ),
+    bad: {
+      label: "In utils/",
+      costs: ["2 files", "1 import"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "routes/profile/", kind: "dir" },
+            { depth: 2, text: "user-profile.tsx", tag: "uses it" },
+            { depth: 1, text: "utils/", kind: "dir" },
+            { k: "fd", depth: 2, text: "format-date.ts", moved: true },
+          ]}
+        />
+      ),
+    },
+    good: {
+      label: "Inline",
+      costs: ["1 file", "0 imports"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "routes/profile/", kind: "dir" },
+            { depth: 2, text: "user-profile.tsx", tag: "uses it" },
+            { k: "fd", depth: 3, text: "function formatDate()", moved: true },
+          ]}
+        />
+      ),
+    },
+  },
+  {
+    title: "Prefer fewer files",
+    body: (
+      <>
+        One component, one file. Split its types, styles and hook into a folder and you open five
+        tabs to read one idea.
+      </>
+    ),
+    bad: {
+      label: "A folder",
+      costs: ["5 files", "4 imports"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "routes/profile/", kind: "dir" },
+            { depth: 1, text: "user-profile/", kind: "dir" },
+            { depth: 2, text: "index.tsx" },
+            { depth: 2, text: "user-profile.tsx" },
+            { k: "types", depth: 2, text: "types.ts", moved: true },
+            { k: "styles", depth: 2, text: "styles.ts", moved: true },
+            { k: "hook", depth: 2, text: "hooks.ts", moved: true },
+          ]}
+        />
+      ),
+    },
+    good: {
+      label: "One file",
+      costs: ["1 file", "0 imports"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "routes/profile/", kind: "dir" },
+            { depth: 1, text: "user-profile.tsx" },
+            { k: "types", depth: 2, text: "type Profile", moved: true },
+            { k: "styles", depth: 2, text: "const styles", moved: true },
+            { k: "hook", depth: 2, text: "function useProfile()", moved: true },
+          ]}
+        />
+      ),
+    },
+  },
+  {
+    title: "Own state, own component",
+    exception: true,
+    body: (
+      <>
+        The one reason to extract code that's used once: it has its own state. In a child, a
+        keystroke re-renders the child, not the page and its 500 rows.
+      </>
+    ),
+    bad: {
+      label: "In the page",
+      costs: ["501 renders per key"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "<OrderPage>", kind: "comp" },
+            { k: "state", depth: 1, text: "useState(query)", moved: true },
+            { depth: 1, text: "<input>", kind: "comp" },
+            { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
+          ]}
+        />
+      ),
+    },
+    good: {
+      label: "In a child",
+      costs: ["1 render per key"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "<OrderPage>", kind: "comp" },
+            { depth: 1, text: "<SearchInput>", kind: "comp" },
+            { k: "state", depth: 2, text: "useState(query)", moved: true },
+            { depth: 2, text: "<input>", kind: "comp" },
+            { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
+          ]}
+        />
+      ),
+    },
+  },
+  {
+    title: "Lowest common ancestor",
+    body: (
+      <>
+        When a second file needs it, move it up to the nearest folder both callers share. Its path
+        then says who owns it.
+      </>
+    ),
+    extra: (
+      <p className="tip">
+        Name folders for what they hold, like <code>routes/</code> or <code>controllers/</code>. Not{" "}
+        <code>features/</code>.
+      </p>
+    ),
+    bad: {
+      label: "In hooks/",
+      costs: ["2 hops each", "owner unclear"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "hooks/", kind: "dir" },
+            { k: "cart", depth: 2, text: "use-cart.ts", moved: true },
+            { depth: 1, text: "routes/shop/", kind: "dir" },
+            { depth: 2, text: "cart/summary.tsx", tag: "uses it" },
+            { depth: 2, text: "checkout/pay-button.tsx", tag: "uses it" },
+          ]}
+        />
+      ),
+    },
+    good: {
+      label: "In routes/shop/",
+      costs: ["1 hop each", "owner: shop"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "routes/shop/", kind: "dir" },
+            { k: "cart", depth: 2, text: "use-cart.ts", moved: true },
+            { depth: 2, text: "cart/summary.tsx", tag: "uses it" },
+            { depth: 2, text: "checkout/pay-button.tsx", tag: "uses it" },
+          ]}
+        />
+      ),
+    },
+  },
+  {
+    title: "Global code, type folder",
+    exception: true,
+    body: (
+      <>
+        Code used almost everywhere, like a button, belongs to no page. Give it a folder named for
+        its type, and a suffix so <kbd>⌘P</kbd> finds it.
+      </>
+    ),
+    extra: (
+      <p className="suffixes">
+        <code>user.schema.ts</code>
+        <code>use-auth.hook.ts</code>
+        <code>dashboard.page.tsx</code>
+      </p>
+    ),
+    bad: {
+      label: "In settings/",
+      costs: ["11 cross-imports"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "routes/", kind: "dir" },
+            { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
+            { k: "btn", depth: 3, text: "button.tsx", moved: true },
+            { depth: 2, text: "checkout/", kind: "dir", tag: "uses it" },
+            { depth: 2, text: "… 10 more pages", kind: "more", tag: "uses it" },
+          ]}
+        />
+      ),
+    },
+    good: {
+      label: "In components/",
+      costs: ["1 obvious home"],
+      view: (
+        <Tree
+          rows={[
+            { depth: 0, text: "src/", kind: "dir" },
+            { depth: 1, text: "components/", kind: "dir" },
+            { k: "btn", depth: 2, text: "button.tsx", moved: true },
+            { depth: 1, text: "routes/", kind: "dir" },
+            { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
+            { depth: 2, text: "checkout/", kind: "dir", tag: "uses it" },
+            { depth: 2, text: "… 10 more pages", kind: "more", tag: "uses it" },
+          ]}
+        />
+      ),
+    },
+  },
+];
+
+const CHEAT_SHEET = [
+  ["Code used once", "Keep it inline"],
+  ["Code too long", "Extract a function, same file"],
+  ["Reused in the same file", "Extract a function, same file"],
+  ["Reused across files", "The lowest common ancestor"],
+  ["Used almost everywhere", "A type folder, like components/"],
+  ["A child with its own state", "Its own component"],
+] as const;
+
+// ---------- The quiz levels ----------
+
+const LEVELS: Level[] = [
+  {
+    name: "One caller",
+    prompt: (
+      <>
+        <code>formatDate()</code> is called once, by <code>user-profile.tsx</code>. Where does it
+        live?
+      </>
+    ),
+    piece: "formatDate()",
+    answer: "inline",
+    rows: [
+      { depth: 0, text: "src/", kind: "dir" },
+      { depth: 1, text: "lib/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "lib",
+          label: "+ date.ts",
+          note: "A new file and an import for a single caller. lib/ is utils/ under another name.",
+          cost: ["+1 file", "+1 import"],
+        },
+      },
+      { depth: 1, text: "routes/profile/", kind: "dir" },
+      { depth: 2, text: "user-profile.tsx", kind: "file", tag: "uses it" },
+      {
+        depth: 3,
+        slot: {
+          id: "inline",
+          label: "↳ inline, above UserProfile()",
+          note: "Used once, so it stays where it's used. Nothing to import, nothing to open.",
+          cost: ["0 files", "0 imports"],
+        },
+      },
+      { depth: 1, text: "utils/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "utils",
+          label: "+ format-date.ts",
+          note: "Three folders from its only caller. Extract it when a second file needs it, not before.",
+          cost: ["+1 file", "+1 import", "3 hops"],
+        },
+      },
+    ],
+  },
+  {
+    name: "A component's own parts",
+    prompt: (
+      <>
+        <code>UserProfile</code> has its own types, styles and a hook. Nothing else uses them. Where
+        do they go?
+      </>
+    ),
+    piece: "types · styles · useProfile()",
+    answer: "file",
+    rows: [
+      { depth: 0, text: "src/", kind: "dir" },
+      { depth: 1, text: "routes/profile/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "folder",
+          label: "+ user-profile/ index, types, styles, hooks",
+          note: "Five files for one component: five tabs open to read one idea.",
+          cost: ["5 files", "4 imports"],
+        },
+      },
+      { depth: 2, text: "user-profile.tsx", kind: "file" },
+      {
+        depth: 3,
+        slot: {
+          id: "file",
+          label: "↳ inside user-profile.tsx",
+          note: "One file holds the whole component. Open it and everything is there.",
+          cost: ["1 file", "0 imports"],
+        },
+      },
+      {
+        depth: 1,
+        slot: {
+          id: "kinds",
+          label: "+ types/, styles/, hooks/",
+          note: "Sorted by kind, the component's parts now live in four folders.",
+          cost: ["4 folders", "3 imports"],
+        },
+      },
+    ],
+  },
+  {
+    name: "A search box",
+    prompt: (
+      <>
+        A search box keeps what you type in <code>useState</code>, and each keystroke re-renders
+        whatever owns that state. Where should it live?
+      </>
+    ),
+    piece: "useState(query)",
+    answer: "child",
+    rows: [
+      { depth: 0, text: "src/stores/", kind: "dir" },
+      {
+        depth: 1,
+        slot: {
+          id: "store",
+          label: "+ search-store.ts",
+          note: "A global store for one input's text: a new file, a subscription, and the state still far from its input.",
+          cost: ["+1 file", "global"],
+        },
+      },
+      { depth: 0, text: "<OrderPage>", kind: "comp" },
+      {
+        depth: 1,
+        slot: {
+          id: "page",
+          label: "↳ useState in OrderPage",
+          note: "Every keystroke re-renders OrderPage and the 500-row OrderList under it.",
+          cost: ["501 renders per key"],
+        },
+      },
+      { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
+      {
+        depth: 1,
+        slot: {
+          id: "child",
+          label: "+ new <SearchInput>",
+          note: "Only SearchInput re-renders as you type. Worth a component even though it's used once.",
+          cost: ["1 render per key"],
+        },
+      },
+    ],
+  },
+  {
+    name: "Two callers",
+    prompt: (
+      <>
+        <code>useCart()</code> is now called by <code>cart/summary.tsx</code> and{" "}
+        <code>checkout/pay-button.tsx</code>. Where does it move?
+      </>
+    ),
+    piece: "useCart()",
+    answer: "shop",
+    rows: [
+      { depth: 0, text: "src/", kind: "dir" },
+      { depth: 1, text: "routes/shop/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "shop",
+          label: "+ use-cart.ts",
+          note: "routes/shop/ is the nearest folder both callers share, so the path names its owner.",
+          cost: ["1 hop each", "owner: shop"],
+        },
+      },
+      { depth: 2, text: "cart/", kind: "dir" },
+      { depth: 3, text: "summary.tsx", kind: "file", tag: "uses it" },
+      {
+        depth: 3,
+        slot: {
+          id: "cart",
+          label: "+ use-cart.ts",
+          note: "checkout/ would reach into cart/ for it. Move it up to the folder both share.",
+          cost: ["checkout → cart"],
+        },
+      },
+      { depth: 2, text: "checkout/", kind: "dir" },
+      { depth: 3, text: "pay-button.tsx", kind: "file", tag: "uses it" },
+      { depth: 1, text: "hooks/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "hooks",
+          label: "+ use-cart.ts",
+          note: "hooks/ holds everything, so the path no longer says the shop owns it.",
+          cost: ["2 hops each", "owner unclear"],
+        },
+      },
+    ],
+  },
+  {
+    name: "Twelve callers",
+    prompt: (
+      <>
+        <code>button.tsx</code> is used by twelve pages, from settings to checkout. Where does it
+        go?
+      </>
+    ),
+    piece: "button.tsx",
+    answer: "components",
+    rows: [
+      { depth: 0, text: "src/", kind: "dir" },
+      {
+        depth: 1,
+        slot: {
+          id: "components",
+          label: "+ components/button.tsx",
+          note: "Used almost everywhere, so it gets a type folder. components/ says what it is, and ⌘P finds it.",
+          cost: ["12 callers", "1 obvious home"],
+        },
+      },
+      { depth: 1, text: "routes/", kind: "dir" },
+      {
+        depth: 2,
+        slot: {
+          id: "routes",
+          label: "+ button.tsx",
+          note: "routes/ is the lowest common ancestor, but a button belongs to no page.",
+          cost: ["sits among pages"],
+        },
+      },
+      { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
+      {
+        depth: 3,
+        slot: {
+          id: "settings",
+          label: "+ button.tsx",
+          note: "Its first caller doesn't own it. Eleven other pages would import from settings/.",
+          cost: ["11 cross-imports"],
+        },
+      },
+      { depth: 2, text: "… 11 more pages", kind: "more", tag: "uses it" },
+    ],
+  },
+];
 
 export function ProximityPrinciple() {
   return (
-    <RulePage>
-      <RuleOfThumbHero
-        title="The Proximity Principle"
-        description={
+    <RuleLanding
+      className="proximity"
+      claim="Keep code next to the code that uses it."
+      lead={
+        <>
+          Five placements, each with the wrong spot and the right one side by side in a real tree.
+          Then a mini quiz where you carry the code there yourself.
+        </>
+      }
+      coverTag="FAR → NEAR"
+      learn={{
+        title: "Near beats far",
+        intro: (
           <>
-            A visual guide to structuring code and files.
-            <br />
-            <span className={cx("text-foreground font-medium")}>Less jumping, more shipping.</span>
+            Put code as close as you can to where it's used, and move it only as far as its callers
+            need. Each example shows the same code twice: on the left where it tends to drift, on
+            the right where the rule puts it.
           </>
-        }
-        badge={{
-          text: "Code Writing",
-        }}
-        markdownUrl="/rule-of-thumb/proximity-principle.md"
-      />
-
-      <CorePrinciplesSection />
-      <AbstractionSection />
-      <StateIsolationSection />
-      <FileOrganizationSection />
-      <ExtractOnlyWhenReusedSection />
-      <LowestCommonAncestorSection />
-      <GlobalCodeSection />
-      <FrameworkRulesSection />
-      <FileSuffixesSection />
-      <QuickReferenceSection />
-      <WhyThisMattersSection />
-
-      <RuleOfThumbPagination />
-    </RulePage>
+        ),
+      }}
+      lessons={LESSONS}
+      tldr={CHEAT_SHEET}
+      quiz={{
+        intro: (
+          <>
+            Five pieces of code, five trees. Drag each piece to where it lives, or tap it and then
+            tap a spot. A wrong spot tells you what it would cost.
+          </>
+        ),
+        levels: LEVELS,
+        board: "tree",
+      }}
+      take={
+        <>
+          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
+          agents will place files the same way.
+        </>
+      }
+    />
   );
 }
