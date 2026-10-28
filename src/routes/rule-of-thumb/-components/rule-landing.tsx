@@ -387,6 +387,24 @@ const keyOf = (row: TreeRow) => (row.k === undefined ? row.text : row.k);
 const treeRows = (view: ReactNode) =>
   isValidElement<{ rows: TreeRow[] }>(view) && view.type === Tree ? view.props.rows.length : 0;
 
+/** Colours a line of code: a match of `token`'s nth capture group gets the class `t-<kinds[n]>`. */
+export function paint(source: string, token: RegExp, kinds: readonly string[]): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let at = 0;
+  for (const match of source.matchAll(token)) {
+    if (match.index > at) parts.push(source.slice(at, match.index));
+    const kind = kinds[match.slice(1).findIndex((group) => group !== undefined)];
+    parts.push(
+      <span key={match.index} className={`t-${kind}`}>
+        {match[0]}
+      </span>,
+    );
+    at = match.index + match[0].length;
+  }
+  if (at < source.length) parts.push(source.slice(at));
+  return parts;
+}
+
 function LessonCard({ lesson }: { lesson: Lesson }) {
   const cardRef = useRef<HTMLElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);

@@ -1,8 +1,9 @@
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   type Lesson,
   type Level,
   OUT,
+  paint,
   reducedMotion,
   RuleLanding,
   TABBED,
@@ -21,23 +22,6 @@ type Line = { c: string; hot?: boolean; note?: Note };
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(export|default|function|import|from|type|interface|extends|enum|const|let|return|as|true|false)\b|\b([A-Z][A-Za-z]*)\b|\b(\d+)\b/g;
 const KINDS = ["com", "str", "kw", "ty", "num"] as const;
-
-function paint(source: string): ReactNode[] {
-  const parts: ReactNode[] = [];
-  let at = 0;
-  for (const match of source.matchAll(TOKEN)) {
-    if (match.index > at) parts.push(source.slice(at, match.index));
-    const kind = KINDS[match.slice(1).findIndex((group) => group !== undefined)];
-    parts.push(
-      <span key={match.index} className={`t-${kind}`}>
-        {match[0]}
-      </span>,
-    );
-    at = match.index + match[0].length;
-  }
-  if (at < source.length) parts.push(source.slice(at));
-  return parts;
-}
 
 /** How long the check rests on each line. */
 const STEP = 110;
@@ -153,7 +137,7 @@ function Checked({ lines }: { lines: Line[] }) {
         {lines.map((line, index) => (
           <div key={index} className="ts-ln" data-hot={line.hot || undefined}>
             <code>
-              {line.c ? paint(line.c) : " "}
+              {line.c ? paint(line.c, TOKEN, KINDS) : " "}
               {line.note?.error && <i className="ts-sq" data-tone={line.note.tone} />}
             </code>
             {line.note && (
@@ -520,7 +504,7 @@ const TLDR = [
 
 // ---------- The quiz levels ----------
 
-const code = (text: string) => <code>{paint(text)}</code>;
+const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
@@ -528,7 +512,7 @@ const blank = (text: string) => (
   </>
 );
 /** A slot that shows what it holds now, until the piece takes its place. */
-const holds = (text: string) => <code className="ts-holds">{paint(text)}</code>;
+const holds = (text: string) => <code className="ts-holds">{paint(text, TOKEN, KINDS)}</code>;
 
 const LEVELS: Level[] = [
   {

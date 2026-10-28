@@ -2,6 +2,7 @@ import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import {
   type Lesson,
   type Level,
+  paint,
   reducedMotion,
   RuleLanding,
   TABBED,
@@ -14,39 +15,21 @@ type Tone = "no" | "yes";
 /** One line of code. `out` is the data the line produces, set on its right. */
 type Line = { c: string; out?: string; tone?: Tone; hot?: boolean };
 
+/** `null` gets the thumbnail's solid box and `undefined` its dashed empty slot. */
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(null)\b|\b(undefined)\b|\b(const|let|function|return|type|await|new)\b/g;
 const KINDS = ["com", "str", "nul", "und", "kw"] as const;
-
-/** Colours a line of TypeScript. `null` gets the thumbnail's solid box and `undefined` its
- * dashed empty slot. */
-function paint(source: string): ReactNode[] {
-  const parts: ReactNode[] = [];
-  let at = 0;
-  for (const match of source.matchAll(TOKEN)) {
-    if (match.index > at) parts.push(source.slice(at, match.index));
-    const kind = KINDS[match.slice(1).findIndex((group) => group !== undefined)];
-    parts.push(
-      <span key={match.index} className={`t-${kind}`}>
-        {match[0]}
-      </span>,
-    );
-    at = match.index + match[0].length;
-  }
-  if (at < source.length) parts.push(source.slice(at));
-  return parts;
-}
 
 function Code({ lines }: { lines: Line[] }) {
   return (
     <div className="nv-code">
       {lines.map((line, index) => (
         <div key={index} className="nv-ln" data-hot={line.hot || undefined}>
-          <code>{line.c ? paint(line.c) : " "}</code>
+          <code>{line.c ? paint(line.c, TOKEN, KINDS) : " "}</code>
           {line.out && (
             <span className="nv-out" data-tone={line.tone}>
               <span className="sr-only">gives </span>
-              {paint(line.out)}
+              {paint(line.out, TOKEN, KINDS)}
             </span>
           )}
         </div>
@@ -176,7 +159,7 @@ function Flow({ save, fields, before, body, intent, children }: FlowProps) {
         {phase === "idle" ? (
           <span className="nv-idle">not sent yet</span>
         ) : (
-          <code className="nv-body">{paint(JSON.stringify(body))}</code>
+          <code className="nv-body">{paint(JSON.stringify(body), TOKEN, KINDS)}</code>
         )}
         <i className="nv-packet" aria-hidden="true" />
       </div>
@@ -515,9 +498,9 @@ const TLDR = [
 
 // ---------- The quiz levels ----------
 
-const code = (text: string) => <code>{paint(text)}</code>;
+const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 /** A field waiting for its value. */
-const key = (text: string) => <code>{paint(text)}</code>;
+const key = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
