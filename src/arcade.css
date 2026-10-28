@@ -58,9 +58,10 @@
   --t-panel: 560ms;
   /* Pixel cursors from scripts/cursors.py, shown until the print cursor takes over. Each falls back to its system cursor. */
   --cursor: url("/cursors/arrow.svg") 0 0, auto;
-  --cursor-point: url("/cursors/point.svg") 9 0, pointer;
-  --cursor-grab: url("/cursors/grab.svg") 13 14, grab;
-  --cursor-grabbing: url("/cursors/grabbing.svg") 12 10, grabbing;
+  --cursor-point: url("/cursors/point.svg") 8 0, pointer;
+  --cursor-grab: url("/cursors/grab.svg") 12 14, grab;
+  --cursor-grabbing: url("/cursors/grabbing.svg") 12 8, grabbing;
+  --cursor-text: url("/cursors/text.svg") 7 13, text;
   /* The hero prints' halftone screen as a 25px tile: dots 7.9px apart on a grid turned
      atan(1/3), the angle nearest their 18deg whose grid repeats in a square. Dark lightens the
      hue under it, like the prints' screen blend; light darkens it, like their multiply. */
@@ -103,6 +104,11 @@
 html {
   cursor: var(--cursor);
 }
+/* Form controls take cursor: default from the browser's stylesheet rather than inheriting, which
+   would show the system arrow under the print cursor. The rules below re-point the active ones. */
+:where(button, input, select, textarea, label) {
+  cursor: var(--cursor);
+}
 /* Text on a hue: white once the hue under it (--c) is dark enough, near-black otherwise. Below
    OKLCH lightness 0.65 white reads better on these saturated hues. Set on every element because a
    custom property resolves var(--c) where it is declared, and --c changes from element to element. */
@@ -138,7 +144,7 @@ html {
   textarea,
   [contenteditable]
 ) {
-  cursor: text;
+  cursor: var(--cursor-text);
 }
 
 /* The print cursor (components/print-cursor.tsx) draws the shape itself. Each token becomes a
@@ -148,6 +154,7 @@ html.cur-on {
   --cursor-point: url("/cursors/none.svg#point") 0 0, none;
   --cursor-grab: url("/cursors/none.svg#grab") 0 0, none;
   --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
+  --cursor-text: url("/cursors/none.svg#text") 0 0, none;
 }
 html.cur-on .cursor-pointer {
   cursor: var(--cursor-point);

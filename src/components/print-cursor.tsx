@@ -21,57 +21,72 @@ const PIXEL_ART = {
     ],
   },
   point: {
-    hot: [4.5, 0],
+    hot: [4, 0],
     rows: [
-      "....KK.......",
-      "...KFFK......",
-      "...KFFK......",
-      "...KFFK......",
-      "...KFFKKK....",
-      "...KFFKFFKKK.",
-      "...KFFKFFKFFK",
-      "KK.KFFKFFKFFK",
-      "KFKKFFFFFFFFK",
-      "KFFKFFFFFFFFK",
-      ".KFFFFFFFFFFK",
-      "..KFFFFFFFFFK",
-      "..KFFFFFFFFK.",
-      "...KFFFFFFK..",
-      "...KKKKKKKK..",
+      "..KKKK......",
+      "..KFFK......",
+      "..KFFK......",
+      "..KFFKKKK...",
+      "..KFFKFFKKKK",
+      "KKKFFKFFKFFK",
+      "KFKFFFFFFFFK",
+      "KFFFFFFFFFFK",
+      "KFFFFFFFFFFK",
+      "KKFFFFFFFFFK",
+      ".KKFFFFFFFKK",
+      "..KFFFFFFFK.",
+      "..KKKKKKKKK.",
     ],
   },
   grab: {
-    hot: [6.5, 7],
+    hot: [6, 7],
     rows: [
-      "...KK.KK.KK.",
-      "..KFFKFFKFFK",
-      "..KFFKFFKFFK",
-      "..KFFKFFKFFK",
+      ".....KKKK...",
+      "..KKKKFFK...",
+      "..KFFKFFKKKK",
       "..KFFKFFKFFK",
       "..KFFKFFKFFK",
       "KKKFFKFFKFFK",
-      "KFFKFFFFFFFK",
-      "KFFFKFFFFFFK",
-      ".KFFFFFFFFFK",
-      ".KFFFFFFFFFK",
-      "..KFFFFFFFK.",
-      "...KFFFFFK..",
-      "...KKKKKKK..",
+      "KFKFFFFFFFFK",
+      "KFFFFFFFFFFK",
+      "KFFFFFFFFFFK",
+      "KKFFFFFFFFFK",
+      ".KKFFFFFFFFK",
+      "..KKFFFFFFKK",
+      "...KKKKKKKK.",
     ],
   },
   grabbing: {
-    hot: [6, 5],
+    hot: [6, 4],
     rows: [
-      "..KK.KK.KK..",
-      ".KFFKFFKFFK.",
-      ".KFFKFFKFFKK",
-      ".KFFKFFKFFKK",
-      "KKKKKKKKKFFK",
-      "KFFFFFFFKFFK",
+      "..KKKKKKKKKK",
+      "..KFFKFFKFFK",
+      "KKKFFFFFFFFK",
+      "KFKFFFFFFFFK",
       "KFFFFFFFFFFK",
       "KFFFFFFFFFFK",
-      ".KFFFFFFFFK.",
-      "..KKKKKKKK..",
+      "KKFFFFFFFFFK",
+      ".KKFFFFFFFFK",
+      "..KKFFFFFFKK",
+      "...KKKKKKKK.",
+    ],
+  },
+  text: {
+    hot: [3.5, 6.5],
+    rows: [
+      "KKKKKKK",
+      "KFFFFFK",
+      "KKKFKKK",
+      "..KFK..",
+      "..KFK..",
+      "..KFK..",
+      "..KFK..",
+      "..KFK..",
+      "..KFK..",
+      "..KFK..",
+      "KKKFKKK",
+      "KFFFFFK",
+      "KKKKKKK",
     ],
   },
 } as const;
@@ -98,6 +113,7 @@ const PATHS = {
   point: pathsOf(PIXEL_ART.point),
   grab: pathsOf(PIXEL_ART.grab),
   grabbing: pathsOf(PIXEL_ART.grabbing),
+  text: pathsOf(PIXEL_ART.text),
 } satisfies Record<Glyph, ReturnType<typeof pathsOf>>;
 
 const isGlyph = (name: string | undefined): name is Glyph => !!name && name in PIXEL_ART;
@@ -112,11 +128,26 @@ function modeOf(cursor: string): Mode {
   const marker = /none\.svg#(\w+)/.exec(cursor)?.[1];
   if (isGlyph(marker)) return marker;
   if (cursor === "pointer") return "point";
+  if (cursor === "text") return "text";
   if (cursor === "default" || cursor === "auto" || cursor === "none") return "arrow";
   return "native";
 }
 
-/** The site's cursor: a pixel arrow or hand in ink over a halftone plate printed out of register. */
+// The page inherits the arrow everywhere, so selectable text is found by hit-testing its line boxes.
+function overText(el: Element, x: number, y: number) {
+  if (getComputedStyle(el).userSelect === "none") return false;
+  const node =
+    document.caretPositionFromPoint?.(x, y)?.offsetNode ??
+    document.caretRangeFromPoint?.(x, y)?.startContainer;
+  if (node?.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) return false;
+  const range = document.createRange();
+  range.selectNodeContents(node);
+  return [...range.getClientRects()].some(
+    (r) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom,
+  );
+}
+
+/** The site's cursor: a pixel arrow, hand or I-beam in ink over a halftone plate printed out of register. */
 export function PrintCursor() {
   const root = useRef<HTMLDivElement>(null);
 
@@ -149,7 +180,8 @@ export function PrintCursor() {
     let frame = 0;
 
     function sync() {
-      const mode = target ? modeOf(getComputedStyle(target).cursor) : "arrow";
+      let mode = target ? modeOf(getComputedStyle(target).cursor) : "arrow";
+      if (mode === "arrow" && target && overText(target, x, y)) mode = "text";
       cur!.dataset.mode = mode;
       cur!.classList.toggle("down", down);
       if (mode !== "native" && mode !== glyph) {
