@@ -66,17 +66,37 @@ function prerenderedPagesFirst(): Plugin {
           file.endsWith(".html"),
         );
         if (!pages.length) throw new Error(`No prerendered pages in ${outDir} to rewrite`);
+        const sheets = new Map<string, string>(
+          await Promise.all(
+            (await readdir(path.join(outDir, "assets")))
+              .filter((file) => file.endsWith(".css"))
+              .map(
+                async (file) =>
+                  [
+                    `/assets/${file}`,
+                    (await readFile(path.join(outDir, "assets", file), "utf8")).trim(),
+                  ] as const,
+              ),
+          ),
+        );
         for (const page of pages) {
           const file = path.join(outDir, page);
           let html = await readFile(file, "utf8");
-          for (const [tag, href] of html.matchAll(
-            /<link rel="stylesheet" href="(\/assets\/[^"]+\.css)"[^>]*\/>/g,
-          )) {
-            const css = await inlineAssetsBeforeApp(
-              await readFile(path.join(outDir, href!), "utf8"),
-              outDir,
-            );
-            html = html.replace(tag, () => `<style>${css}</style>`);
+          const stylesheets = [
+            ...html.matchAll(/<link rel="stylesheet" href="(\/assets\/[^"]+\.css)"[^>]*\/>/g),
+          ];
+          const inlined = html.match(/<style data-tsr-inline-css="">([\s\S]*?)<\/style>/)?.[1];
+          // React and Vite's preload helper both adopt a matching <link> instead of fetching
+          // the sheet again on hydration, and a disabled one is never fetched.
+          const adopted = [
+            ...stylesheets.map(([tag]) => tag.replace(/\/>$/, ' disabled=""/>')),
+            ...[...sheets]
+              .filter(([, css]) => inlined && css && inlined.includes(css))
+              .map(([href]) => `<link rel="stylesheet" href="${href}" disabled=""/>`),
+          ].join("");
+          for (const [index, [tag, href]] of stylesheets.entries()) {
+            const css = await inlineAssetsBeforeApp(sheets.get(href!)!, outDir);
+            html = html.replace(tag, () => `${index === 0 ? adopted : ""}<style>${css}</style>`);
           }
           const preloads = [...html.matchAll(/<link rel="modulepreload" href="([^"]+)"[^>]*\/>/g)];
           const entry = html.match(/<script type="module" async="" src="([^"]+)"><\/script>/);
