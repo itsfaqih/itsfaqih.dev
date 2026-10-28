@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { reducedMotion } from "./use-media-query";
 
 type Theme = "light" | "dark";
 
@@ -49,7 +50,7 @@ export function useTheme() {
     };
 
     const root = window.document.documentElement;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion = reducedMotion();
     if (!origin || reduceMotion || !("startViewTransition" in window.document)) {
       commit();
       return;

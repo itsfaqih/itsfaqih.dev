@@ -21,11 +21,11 @@ import {
 import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import "./rule-landing.css";
+import { reducedMotion } from "../../../hooks/use-media-query";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-export const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 type Side = { label: string; view: ReactNode; costs: string[] };
 export type Lesson = {

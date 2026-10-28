@@ -19,3 +19,5 @@ export function useMediaQuery(query: string) {
     getServerSnapshot,
   );
 }
+
+export const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;

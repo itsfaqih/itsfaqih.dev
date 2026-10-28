@@ -11,11 +11,11 @@ import {
   useRef,
   useState,
 } from "react";
+import { reducedMotion } from "../../hooks/use-media-query";
 import {
   type Lesson,
   type Level,
   onceOnScreen,
-  reducedMotion,
   RuleLanding,
 } from "./-components/rule-landing";
 import "./dialog-design.css";

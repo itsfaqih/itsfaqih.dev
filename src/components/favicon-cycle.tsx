@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { reducedMotion } from "../hooks/use-media-query";
 
 const HUES = [
   ["#0a9cd4", "#4dd4ff"],
@@ -20,7 +21,7 @@ function faviconSvg([light, dark]: readonly [string, string]) {
 export function FaviconCycle() {
   useEffect(() => {
     const link = document.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]');
-    if (!link || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!link || reducedMotion()) return;
 
     const fallback = link.href;
     const frames = HUES.map((hue) => `data:image/svg+xml,${encodeURIComponent(faviconSvg(hue))}`);

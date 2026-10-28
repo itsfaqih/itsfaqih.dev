@@ -12,6 +12,7 @@ import {
   toPath,
   traced,
 } from "./hero-morph";
+import { reducedMotion } from "../../../hooks/use-media-query";
 
 type TopInk = "solid" | "hue" | "outline";
 
@@ -527,7 +528,7 @@ function useSceneMorph(index: number, run: number) {
     if (scene.index === index && scene.run === run) return;
     const next = { index, run };
     const nextKey = layerKey(next);
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion()) {
       setStage({ layers: [next], phase: "still" });
       return;
     }
@@ -632,7 +633,7 @@ function useTiltToCursor() {
   useEffect(() => {
     const stage = stageRef.current;
     const card = cardRef.current;
-    if (!stage || !card || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!stage || !card || reducedMotion()) return;
     const clamp = (value: number) => Math.min(1, Math.max(-1, value));
     const target = { ...REST_DEG };
     const now = { ...REST_DEG };

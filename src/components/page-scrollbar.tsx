@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { jumpTo } from "./smooth-scroll";
+import { reducedMotion } from "../hooks/use-media-query";
 
 const REVEAL_PX = 32;
 const LINGER_MS = 900;
@@ -93,7 +94,7 @@ export function PageScrollbar() {
       if (e.button !== 0 || e.target !== track) return;
       e.preventDefault();
       const direction = e.clientY < thumbTop ? -1 : 1;
-      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reduce = reducedMotion();
       scrollBy({
         top: direction * innerHeight * PAGE_SHARE,
         behavior: reduce ? "instant" : "smooth",

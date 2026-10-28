@@ -1,6 +1,7 @@
 import { useRouter } from "@tanstack/react-router";
 import Lenis from "lenis";
 import { useEffect } from "react";
+import { reducedMotion } from "../hooks/use-media-query";
 
 const GLIDE = 0.07;
 
@@ -15,7 +16,7 @@ export function SmoothScroll() {
   const router = useRouter();
 
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const lenis = new Lenis({
       lerp: GLIDE,
       autoRaf: true,

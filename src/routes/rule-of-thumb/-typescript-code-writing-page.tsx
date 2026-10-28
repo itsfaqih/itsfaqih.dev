@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { reducedMotion } from "../../hooks/use-media-query";
 import {
   type Lesson,
   type Level,
   onceOnScreen,
   OUT,
   paint,
-  reducedMotion,
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
