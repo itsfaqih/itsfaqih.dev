@@ -1,19 +1,13 @@
 import { registerCustomCSSVariableTheme } from "@pierre/diffs";
 import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
 import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
-import { cx } from "@/stylex";
 
 const ARCADE_THEME = "arcade";
 registerCustomCSSVariableTheme(ARCADE_THEME, {});
 
 type CodeBlockProps = {
   code: string;
-  lang?: string;
-  className?: string;
-  style?: CSSProperties;
-  highlightLines?: readonly number[];
-  highlightBackground?: string;
-  highlightBorder?: string;
+  lang: string;
 };
 
 const LANGUAGE_EXTENSIONS = new Map(Object.entries({
@@ -42,39 +36,7 @@ function getFilename(language: string) {
   return `example.${LANGUAGE_EXTENSIONS.get(language) ?? language}`;
 }
 
-function createHighlightStyles(
-  highlightLines: readonly number[] | undefined,
-  highlightBackground = "color-mix(in srgb, var(--diffs-bg) 86%, var(--diffs-mixer))",
-  highlightBorder = "var(--diffs-fg)",
-) {
-  const lines = [...new Set(highlightLines?.filter((line) => Number.isInteger(line) && line > 0) ?? [])];
-  if (lines.length === 0) return undefined;
-
-  const highlightedSelectors = lines.map((line) => `:host [data-line="${line}"]`).join(",\n");
-
-  return `
-    :host [data-line] {
-      opacity: 0.4;
-      transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
-    }
-
-    ${highlightedSelectors} {
-      opacity: 1;
-      background-color: ${highlightBackground};
-      box-shadow: inset 3px 0 ${highlightBorder};
-    }
-  `;
-}
-
-export function CodeBlock({
-  code,
-  lang = "tsx",
-  className,
-  style,
-  highlightLines,
-  highlightBackground,
-  highlightBorder,
-}: CodeBlockProps) {
+export function CodeBlock({ code, lang }: CodeBlockProps) {
   const language = normalizeLanguage(lang);
   const file: FileContents = {
     name: getFilename(language),
@@ -90,23 +52,14 @@ export function CodeBlock({
     overflow: "scroll",
     disableLineNumbers: false,
     disableFileHeader: true,
-    unsafeCSS: createHighlightStyles(highlightLines, highlightBackground, highlightBorder),
   };
 
   const fileStyle: CSSProperties = {
     "--diffs-font-family": "var(--mono)",
     "--diffs-header-font-family": "var(--font-sans)",
-    ...style,
   };
 
-  return (
-    <File
-      file={file}
-      options={options}
-      className={cx("code-block", className)}
-      style={fileStyle}
-    />
-  );
+  return <File file={file} options={options} className="code-block" style={fileStyle} />;
 }
 
 type MarkdownCodeChild =
