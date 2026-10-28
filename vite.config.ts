@@ -1,6 +1,8 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { Element, ElementContent, Root } from "hast";
 import { optimize } from "svgo";
+import { preloadFile } from "@pierre/diffs/ssr";
 import { defineConfig, runnerImport, type Plugin } from "vite";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
@@ -12,6 +14,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import babel from "@rolldown/plugin-babel";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import stylex from "@stylexjs/unplugin";
+import { CODE_OPTIONS, codeFile } from "./src/components/code-file.ts";
 import { PUBLISHED_GUIDELINES } from "./src/data/guidelines.ts";
 import { OG_DIR, SITE_ORIGIN } from "./src/seo.ts";
 
@@ -39,6 +42,43 @@ function roundIconPaths(): Plugin {
         });
       },
     },
+  };
+}
+
+function textOf(node: ElementContent): string {
+  if (node.type === "text") return node.value;
+  return node.type === "element" ? node.children.map(textOf).join("") : "";
+}
+
+function codeBlocks(node: Root | Element): [pre: Element, code: Element][] {
+  return node.children.flatMap((child) => {
+    if (child.type !== "element") return [];
+    const code =
+      child.tagName === "pre"
+        ? child.children.find(
+            (inner): inner is Element => inner.type === "element" && inner.tagName === "code",
+          )
+        : undefined;
+    return code ? [[child, code]] : codeBlocks(child);
+  });
+}
+
+function rehypeHighlightCode() {
+  return async (tree: Root) => {
+    await Promise.all(
+      codeBlocks(tree).map(async ([pre, code]) => {
+        const language = [code.properties.className ?? []]
+          .flat()
+          .map(String)
+          .find((name) => name.startsWith("language-"))
+          ?.slice("language-".length);
+        const { prerenderedHTML } = await preloadFile({
+          file: codeFile(textOf(code).replace(/\r?\n$/, ""), language ?? "text"),
+          options: CODE_OPTIONS,
+        });
+        pre.properties.dataPrerendered = prerenderedHTML;
+      }),
+    );
   };
 }
 
@@ -159,6 +199,8 @@ const markdownTwinCanonicals = Object.fromEntries(
   ]),
 );
 
+const remarkPlugins = [remarkFrontmatter, remarkMdxFrontmatter];
+
 const config = defineConfig({
   server: {
     port: 5173,
@@ -169,10 +211,16 @@ const config = defineConfig({
   },
   plugins: [
     roundIconPaths(),
-    mdx({
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-      rehypePlugins: [rehypeSlug],
-    }),
+    // The server renders highlighted code into the page; the client adopts it, so only the
+    // server bundle carries the highlighted HTML.
+    {
+      ...mdx({ remarkPlugins, rehypePlugins: [rehypeSlug] }),
+      applyToEnvironment: (environment) => environment.config.consumer === "client",
+    },
+    {
+      ...mdx({ remarkPlugins, rehypePlugins: [rehypeSlug, rehypeHighlightCode] }),
+      applyToEnvironment: (environment) => environment.config.consumer === "server",
+    },
     devtools(),
     nitro({
       routeRules: markdownTwinCanonicals,

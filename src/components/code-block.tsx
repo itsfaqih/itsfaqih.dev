@@ -1,57 +1,29 @@
-import { registerCustomCSSVariableTheme } from "@pierre/diffs";
-import { File, type FileContents, type FileOptions } from "@pierre/diffs/react";
+import { File } from "@pierre/diffs/react";
 import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
-
-const ARCADE_THEME = "arcade";
-registerCustomCSSVariableTheme(ARCADE_THEME, {});
+import { CODE_OPTIONS, codeFile } from "./code-file";
 
 type CodeBlockProps = {
   code: string;
   lang: string;
+  prerenderedHTML?: string;
 };
 
-const LANGUAGE_EXTENSIONS = new Map(Object.entries({
-  bash: "sh",
-  css: "css",
-  html: "html",
-  javascript: "js",
-  jsx: "jsx",
-  json: "json",
-  markdown: "md",
-  mdx: "mdx",
-  shell: "sh",
-  text: "txt",
-  ts: "ts",
-  tsx: "tsx",
-  typescript: "ts",
-  yaml: "yml",
-}));
-
-export function CodeBlock({ code, lang }: CodeBlockProps) {
-  const language = lang.trim().toLowerCase() || "text";
-  const file: FileContents = {
-    name: `example.${LANGUAGE_EXTENSIONS.get(language) ?? language}`,
-    contents: code,
-    lang: language,
-  };
-  const options: FileOptions<undefined, undefined> = {
-    theme: {
-      light: ARCADE_THEME,
-      dark: ARCADE_THEME,
-    },
-    themeType: "system",
-    overflow: "scroll",
-    disableLineNumbers: false,
-    disableFileHeader: true,
-  };
-
+export function CodeBlock({ code, lang, prerenderedHTML }: CodeBlockProps) {
   const fileStyle: CSSProperties = {
     "--lines": code.split("\n").length,
     "--diffs-font-family": "var(--mono)",
     "--diffs-header-font-family": "var(--font-sans)",
   };
 
-  return <File file={file} options={options} className="code-block" style={fileStyle} />;
+  return (
+    <File
+      file={codeFile(code, lang)}
+      options={CODE_OPTIONS}
+      prerenderedHTML={prerenderedHTML}
+      className="code-block"
+      style={fileStyle}
+    />
+  );
 }
 
 type MarkdownCodeChild =
@@ -82,6 +54,7 @@ function readText(node: MarkdownCodeChild): string {
 
 type MarkdownCodeBlockProps = Omit<ComponentPropsWithoutRef<"pre">, "children"> & {
   children?: MarkdownCodeChild;
+  "data-prerendered"?: string;
 };
 
 export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
@@ -95,5 +68,5 @@ export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
     "text";
   const code = readText(codeProps?.children ?? props.children).replace(/\r?\n$/, "");
 
-  return <CodeBlock code={code} lang={language} />;
+  return <CodeBlock code={code} lang={language} prerenderedHTML={props["data-prerendered"]} />;
 }
