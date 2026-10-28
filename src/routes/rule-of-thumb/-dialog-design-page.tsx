@@ -388,7 +388,7 @@ function EscapeDemo({ sealed }: { sealed: boolean }) {
   }
 
   function refuse(what: string) {
-    setIgnored((count) => count + 1);
+    setIgnored(ignored + 1);
     setSaid(`${what} ignored, ${ignored + 1}×`);
   }
 
