@@ -6,7 +6,7 @@ type ClassSelection = {
   readonly [className: string]: boolean | null | undefined;
 };
 
-export type ClassValue = string | false | null | undefined | readonly ClassValue[] | ClassSelection;
+type ClassValue = string | false | null | undefined | readonly ClassValue[] | ClassSelection;
 
 const compiledUtilities = new Map(Object.entries(utilityStyles));
 

@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 
-export type Theme = "light" | "dark";
+type Theme = "light" | "dark";
 
 const THEME_CHANGE_EVENT = "theme-change";
 
@@ -67,5 +67,5 @@ export function useTheme() {
       .finished.finally(() => delete root.dataset.themeSwap);
   };
 
-  return { theme, toggleTheme };
+  return { toggleTheme };
 }

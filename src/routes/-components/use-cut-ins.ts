@@ -3,11 +3,11 @@ import { useEffect, type RefObject } from "react";
 const VISIBLE_SHARE = 0.3;
 const SCREEN_CAP = 0.75;
 /** Ratios to recheck at, fine enough to catch a tall element reaching its cap. */
-export const VISIBLE_STEPS = Array.from({ length: 11 }, (_, index) => (index * VISIBLE_SHARE) / 10);
+const VISIBLE_STEPS = Array.from({ length: 11 }, (_, index) => (index * VISIBLE_SHARE) / 10);
 
 /** 30% of the element is on screen. An element so tall that 30% of it would overflow three
  * quarters of the screen triggers once it fills those three quarters instead. */
-export function isShownEnough(entry: IntersectionObserverEntry) {
+function isShownEnough(entry: IntersectionObserverEntry) {
   const screen = entry.rootBounds?.height ?? innerHeight;
   const fillsCap = entry.intersectionRect.height >= screen * SCREEN_CAP;
   return entry.isIntersecting && (entry.intersectionRatio >= VISIBLE_SHARE || fillsCap);

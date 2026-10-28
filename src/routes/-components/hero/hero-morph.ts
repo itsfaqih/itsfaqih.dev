@@ -2,10 +2,10 @@
    number of points, clockwise from the point nearest twelve o'clock, so any two outlines
    blend point by point without twisting. */
 
-export type Pt = readonly [number, number];
+type Pt = readonly [number, number];
 export type Outline = Pt[];
 
-export const OUTLINE_POINTS = 64;
+const OUTLINE_POINTS = 64;
 
 const centroid = (pts: readonly Pt[]): Pt => [
   pts.reduce((sum, [x]) => sum + x, 0) / pts.length,
