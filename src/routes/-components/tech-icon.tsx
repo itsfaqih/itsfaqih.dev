@@ -106,7 +106,6 @@ const MARKS = new Map<string, Mark>(Object.entries({
   "TanStack Query": siTanstack,
   "TanStack Router": siTanstack,
   "TanStack Start": siTanstack,
-  TanStack: siTanstack,
   tRPC: siTrpc,
   TypeScript: siTypescript,
   Vite: siVite,
@@ -157,10 +156,16 @@ function brandFor(hex: string, theme: keyof typeof PANEL) {
   return toHex(mixed);
 }
 
-export function techBrand(name: string): CSSProperties | undefined {
-  const hex = MARKS.get(name)?.hex;
-  if (!hex) return undefined;
-  return { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
+const BRANDS = new Map<string, CSSProperties>(
+  [...MARKS].flatMap(([name, { hex }]) =>
+    hex
+      ? [[name, { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") }]]
+      : [],
+  ),
+);
+
+export function techBrand(name: string) {
+  return BRANDS.get(name);
 }
 
 export function TechIcon({ name }: { name: string }) {
