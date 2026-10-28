@@ -120,3 +120,28 @@ export const GUIDELINES: Guideline[] = [
     coverTag: "IMPLICIT → EXPLICIT",
   },
 ];
+
+/** Each topic's hue, the arcade token its rules wear on the site and on their share cards. */
+const CATEGORY_COLOR = new Map([
+  ["Code Writing", "var(--cw)"],
+  ["UX Design", "var(--ux)"],
+  ["Architecture", "var(--ar)"],
+  ["Best Practices", "var(--ts)"],
+  ["Accessibility", "var(--ax)"],
+]);
+
+export const colorOf = (category: string) => CATEGORY_COLOR.get(category) ?? "var(--go)";
+
+/** The rules with a page. */
+export const PUBLISHED_GUIDELINES = GUIDELINES.filter(
+  (guideline): guideline is PublishedGuideline => !guideline.comingSoon,
+);
+
+/** The rules the index lists, in shelf order. */
+export const VISIBLE_GUIDELINES = GUIDELINES.filter((guideline) => !guideline.hidden);
+
+/** "001" for the first listed rule. Unlisted rules have no number. */
+export function ruleNumber(rule: Guideline) {
+  const index = VISIBLE_GUIDELINES.indexOf(rule);
+  return index === -1 ? null : String(index + 1).padStart(3, "0");
+}

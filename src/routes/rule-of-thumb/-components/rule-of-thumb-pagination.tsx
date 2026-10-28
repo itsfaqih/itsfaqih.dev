@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { GUIDELINES } from "../../../data/guidelines";
+import { colorOf, ruleNumber, VISIBLE_GUIDELINES } from "../../../data/guidelines";
 import type { Guideline } from "../../../data/guidelines";
-import { colorOf, ruleNumber, RuleThumb } from "../../-components/rule-art";
+import { RuleThumb } from "../../-components/rule-art";
 import { useCurrentRule } from "./index";
 
 export function RuleOfThumbPagination() {
   const current = useCurrentRule();
-  const visibleGuidelines = GUIDELINES.filter((g) => !g.hidden);
-  const currentIndex = current ? visibleGuidelines.indexOf(current) : -1;
+  const currentIndex = current ? VISIBLE_GUIDELINES.indexOf(current) : -1;
 
   if (currentIndex === -1) return null;
 
-  const prevGuideline = visibleGuidelines[currentIndex - 1];
-  const nextGuideline = visibleGuidelines[currentIndex + 1];
+  const prevGuideline = VISIBLE_GUIDELINES[currentIndex - 1];
+  const nextGuideline = VISIBLE_GUIDELINES[currentIndex + 1];
 
   return (
     <nav className="arc rot-pager" aria-label="More rules">

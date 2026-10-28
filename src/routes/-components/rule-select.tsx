@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import Fuse from "fuse.js";
+import { colorOf, ruleNumber } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
+import { RuleThumb, useRuleOpen } from "./rule-art";
 
 // A searchable, filterable select grid for the Rule of Thumb index. Hovering or
 // focusing a tile shows it in the side panel; it holds up at 100+ rules. The tile under the

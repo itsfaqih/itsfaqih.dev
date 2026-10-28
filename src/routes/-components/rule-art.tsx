@@ -1,19 +1,11 @@
 import { useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { GUIDELINES } from "../../data/guidelines";
+import { colorOf } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 
 // The Rule of Thumb visual system: one hue and glyph per topic, and a
 // thumbnail "screen" per rule that acts the rule out when it plays. Shared by
 // the home page, the index, and every article.
-
-const CATEGORY_COLOR = new Map([
-  ["Code Writing", "var(--cw)"],
-  ["UX Design", "var(--ux)"],
-  ["Architecture", "var(--ar)"],
-  ["Best Practices", "var(--ts)"],
-  ["Accessibility", "var(--ax)"],
-]);
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -69,17 +61,8 @@ const CATEGORY_ICON = new Map<string, ReactNode>([
   ],
 ]);
 
-export const colorOf = (category: string) => CATEGORY_COLOR.get(category) ?? "var(--go)";
 const iconOf = (category: string) =>
   CATEGORY_ICON.get(category) ?? CATEGORY_ICON.get("Best Practices");
-
-const VISIBLE = GUIDELINES.filter((guideline) => !guideline.hidden);
-
-/** "001" for the first published rule. Unpublished rules have no number. */
-export function ruleNumber(rule: Guideline) {
-  const index = VISIBLE.indexOf(rule);
-  return index === -1 ? null : String(index + 1).padStart(3, "0");
-}
 
 /** The view transition a rule card starts when it opens its rule: the page dives into the card
  * while its thumbnail and title grow into the rule page's cover and heading (see `rule-open` in

@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { GUIDELINES } from "../data/guidelines";
+import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { SLIDES, TICKER } from "../data/home";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
@@ -22,8 +22,6 @@ export const Route = createFileRoute("/")({
       type: "website",
     }),
 });
-
-const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);
 
 const EXPERIENCE = [
   {
@@ -297,7 +295,7 @@ function Index() {
             </h2>
             <p data-cut>Opinions I've earned from my experience</p>
           </div>
-          <RuleSpread rules={RULES} />
+          <RuleSpread rules={VISIBLE_GUIDELINES} />
         </section>
 
         <section id="work">

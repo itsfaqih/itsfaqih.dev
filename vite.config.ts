@@ -1,7 +1,7 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { optimize } from "svgo";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, runnerImport, type Plugin } from "vite";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
@@ -12,6 +12,8 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import babel from "@rolldown/plugin-babel";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import stylex from "@stylexjs/unplugin";
+import { PUBLISHED_GUIDELINES } from "./src/data/guidelines.ts";
+import { OG_DIR, SITE_ORIGIN } from "./src/seo.ts";
 
 const isCloudflareBuild =
   process.env.NITRO_PRESET?.includes("cloudflare") || process.env.CF_PAGES === "1";
@@ -111,6 +113,32 @@ function prerenderedPagesFirst(): Plugin {
   };
 }
 
+function shareAssets(): Plugin {
+  return {
+    name: "share-assets",
+    apply: "build",
+    enforce: "post",
+    buildApp: {
+      order: "post",
+      async handler(builder) {
+        // A module runner rather than import(): the config bundler would hoist Satori into the
+        // config that `vite dev` loads, and it leaves import.meta.url undefined in card.tsx.
+        const { module } = await runnerImport<typeof import("./scripts/og/share-assets.ts")>(
+          path.join(import.meta.dirname, "scripts/og/share-assets.ts"),
+        );
+        await module.writeShareAssets(builder.environments.client!.config.build.outDir);
+      },
+    },
+  };
+}
+
+const markdownTwinCanonicals = Object.fromEntries(
+  PUBLISHED_GUIDELINES.map((rule) => [
+    `${rule.href}.md`,
+    { headers: { Link: `<${SITE_ORIGIN}${rule.href}>; rel="canonical"` } },
+  ]),
+);
+
 const config = defineConfig({
   server: {
     port: 5173,
@@ -126,11 +154,14 @@ const config = defineConfig({
       rehypePlugins: [rehypeSlug],
     }),
     devtools(),
-    nitro(
-      isCloudflareBuild
-        ? { commands: { preview: "node scripts/cloudflare-pages-preview.mjs" } }
-        : undefined,
-    ),
+    nitro({
+      routeRules: markdownTwinCanonicals,
+      ...(isCloudflareBuild && {
+        commands: { preview: "node scripts/cloudflare-pages-preview.mjs" },
+        // shareAssets() writes these after Nitro lists its static files, so the worker would 404 them.
+        cloudflare: { pages: { routes: { exclude: [`${OG_DIR}/*`, "/sitemap.xml"] } } },
+      }),
+    }),
     stylex.vite({
       devMode: "css-only",
       cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
@@ -154,6 +185,7 @@ const config = defineConfig({
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
     prerenderedPagesFirst(),
+    shareAssets(),
   ],
 });
 

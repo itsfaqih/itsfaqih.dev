@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
-import { GUIDELINES } from "../../data/guidelines";
+import { VISIBLE_GUIDELINES as RULES } from "../../data/guidelines";
 import { Backdrop } from "../-components/backdrop";
 import { RuleSelect } from "../-components/rule-select";
 import { useCutIns } from "../-components/use-cut-ins";
@@ -19,8 +19,6 @@ export const Route = createFileRoute("/rule-of-thumb/")({
       type: "website",
     }),
 });
-
-const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);
 
 function RuleOfThumbsIndex() {
   const rootRef = useRef<HTMLDivElement>(null);

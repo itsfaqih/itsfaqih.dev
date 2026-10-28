@@ -12,8 +12,9 @@ import {
   useState,
 } from "react";
 import { compactBox, IslandActivity } from "../../../components/header";
+import { colorOf, ruleNumber } from "../../../data/guidelines";
 import type { PublishedGuideline } from "../../../data/guidelines";
-import { colorOf, isOpeningRule, ruleNumber, RuleThumb } from "../../-components/rule-art";
+import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import { RuleOfThumbPagination } from "./rule-of-thumb-pagination";
 import { readMarkdown, useCurrentRule } from "./index";
 import "./rule-landing.css";

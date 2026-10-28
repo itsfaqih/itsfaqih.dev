@@ -1,5 +1,8 @@
 export const SITE_ORIGIN = "https://itsfaqih.dev";
 
+/** Where the build writes each page's share card. */
+export const OG_DIR = "/og";
+
 const SITE_NAME = "Faqih Muntashir";
 
 export const BLOG_DESCRIPTION =
@@ -35,7 +38,7 @@ export type SharedPage = {
 /** The `head()` of a route: its title, description, canonical, share card, and structured data. */
 export function pageHead(page: SharedPage) {
   const url = SITE_ORIGIN + page.path;
-  const image = `${SITE_ORIGIN}/og${page.path === "/" ? "/home" : page.path}.png`;
+  const image = `${SITE_ORIGIN}${OG_DIR}${page.path === "/" ? "/home" : page.path}.png`;
 
   const meta = [
     { title: page.title },

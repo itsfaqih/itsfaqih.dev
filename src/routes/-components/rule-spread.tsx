@@ -1,8 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
+import { colorOf, ruleNumber } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
+import { RuleThumb, useRuleOpen } from "./rule-art";
 
 // The home page's Rule of Thumb deck: cards fanned in 3D around the one in focus. Its whole state is
 // one number, the index at the centre, so a drag can rest between cards and a release springs on
