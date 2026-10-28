@@ -110,7 +110,7 @@ const ENTRIES: Entry[] = [
   },
 ];
 
-export const GUIDELINES: Guideline[] = ENTRIES.map((entry) => ({
+const GUIDELINES: Guideline[] = ENTRIES.map((entry) => ({
   ...entry,
   href: `/rule-of-thumb/${entry.id}`,
 }));
