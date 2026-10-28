@@ -232,9 +232,12 @@ html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   animation: rule-page-in 560ms var(--out) both;
   animation-delay: calc(var(--i, 0) * 60ms + 200ms);
 }
+/* Not quite 0: Chrome skips a text paint at opacity 0 for LCP, and a fade runs on the compositor
+   without painting again, so a fully transparent start leaves the lead out of LCP until some
+   unrelated repaint seconds later. */
 @keyframes rule-page-in {
   from {
-    opacity: 0;
+    opacity: 0.01;
     translate: 0 12px;
   }
 }
