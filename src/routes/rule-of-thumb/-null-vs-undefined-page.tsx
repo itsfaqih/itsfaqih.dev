@@ -53,14 +53,14 @@ type Verdict = "saved" | "kept" | "wiped" | "lost";
 /** What the server receives. Like JSON.stringify, it drops every key set to undefined. */
 function arrived(body: Body): Row {
   const row: Row = {};
-  for (const [key, value] of Object.entries(body)) {
-    if (value !== undefined && isField(key)) row[key] = value;
+  for (const field of FIELDS) {
+    const value = body[field];
+    if (value !== undefined) row[field] = value;
   }
   return row;
 }
 
 const FIELDS: readonly Field[] = ["title", "assignee", "due", "reviewer"];
-const isField = (key: string): key is Field => FIELDS.some((field) => field === key);
 
 /** A field the user meant to change either landed or got lost; any other field was either kept
  * or wiped by the request. */
@@ -494,8 +494,6 @@ const TLDR = [
 // ---------- The quiz levels ----------
 
 const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
-/** A field waiting for its value. */
-const key = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
@@ -519,7 +517,7 @@ const LEVELS: Level[] = [
       { depth: 1, text: code('title: "Ship v2",') },
       {
         depth: 1,
-        lead: key("assignee:"),
+        lead: code("assignee:"),
         slot: {
           id: "assignee",
           label: blank("assignee:"),
@@ -529,7 +527,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("due:"),
+        lead: code("due:"),
         slot: {
           id: "due",
           label: blank("due:"),
@@ -539,7 +537,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("notes:"),
+        lead: code("notes:"),
         slot: {
           id: "notes",
           label: blank("notes:"),
@@ -564,7 +562,7 @@ const LEVELS: Level[] = [
       { depth: 0, text: code("const changes = {") },
       {
         depth: 1,
-        lead: key("title:"),
+        lead: code("title:"),
         slot: {
           id: "title",
           label: blank("title:"),
@@ -574,7 +572,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("reviewer:"),
+        lead: code("reviewer:"),
         slot: {
           id: "reviewer",
           label: blank("reviewer:"),
@@ -584,7 +582,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("due:"),
+        lead: code("due:"),
         slot: {
           id: "due",
           label: blank("due:"),
@@ -611,7 +609,7 @@ const LEVELS: Level[] = [
       { depth: 1, text: code('["ana@x.io", { id: 7 }],') },
       {
         depth: 1,
-        lead: key('["bo@x.io",'),
+        lead: code('["bo@x.io",'),
         slot: {
           id: "bo",
           label: blank('["bo@x.io",'),
@@ -621,7 +619,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key('["cy@x.io",'),
+        lead: code('["cy@x.io",'),
         slot: {
           id: "cy",
           label: blank('["cy@x.io",'),
@@ -646,7 +644,7 @@ const LEVELS: Level[] = [
       { depth: 0, text: code("type NewTask = {") },
       {
         depth: 1,
-        lead: key("title: string"),
+        lead: code("title: string"),
         slot: {
           id: "title",
           label: blank("title: string"),
@@ -656,7 +654,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("assignee: User"),
+        lead: code("assignee: User"),
         slot: {
           id: "assignee",
           label: blank("assignee: User"),
@@ -666,7 +664,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key("color?: string"),
+        lead: code("color?: string"),
         slot: {
           id: "color",
           label: blank("color?: string"),
@@ -693,7 +691,7 @@ const LEVELS: Level[] = [
       { depth: 1, text: code('"name": "Bo",') },
       {
         depth: 1,
-        lead: key('"manager":'),
+        lead: code('"manager":'),
         slot: {
           id: "manager",
           label: blank('"manager":'),
@@ -703,7 +701,7 @@ const LEVELS: Level[] = [
       },
       {
         depth: 1,
-        lead: key('"phone":'),
+        lead: code('"phone":'),
         slot: {
           id: "phone",
           label: blank('"phone":'),
