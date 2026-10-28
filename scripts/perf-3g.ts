@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium, type Page } from "playwright";
-import { builtRoutes } from "../tests/visual/serve-build";
+import { builtRoutes } from "../tests/visual/serve-build.ts";
 
 const { values } = parseArgs({
   options: {
