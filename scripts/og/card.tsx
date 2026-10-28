@@ -5,8 +5,7 @@ import { SLIDES, TICKER } from "../../src/data/home";
 
 const CARD_SIZE = { width: 1200, height: 630 } as const;
 
-/** A colour as the site writes it, a hex or an arcade token such as "var(--ux)". */
-type Hue = string;
+type Hue = `#${string}` | `var(--${string})`;
 
 type Footer =
   | { kind: "domain" }
@@ -19,7 +18,6 @@ export type OgCard =
 
 const FONTS_DIR = new URL("./fonts/", import.meta.url);
 
-/** Every scripts/og/fonts/<family-slug>-<weight>.ttf that scripts/fonts.py wrote. */
 async function loadFonts(): Promise<Font[]> {
   const files = (await readdir(FONTS_DIR)).filter((file) => file.endsWith(".ttf"));
   return Promise.all(
@@ -69,8 +67,7 @@ export async function renderCard(card: OgCard): Promise<Buffer> {
     go: hex("var(--go)"),
     onAccent: hex("var(--on-accent)"),
     live: hex("var(--ts)"),
-    // Brighter than the site's --dot so the grid survives the shrink to a feed thumbnail.
-    dots: "#2a2a36",
+    thumbnailDots: "#2a2a36",
     hex,
   };
   const svg = await satori(
@@ -82,7 +79,7 @@ export async function renderCard(card: OgCard): Promise<Buffer> {
 }
 
 type Ink = Record<
-  "ground" | "hair" | "text" | "dim" | "go" | "onAccent" | "live" | "dots",
+  "ground" | "hair" | "text" | "dim" | "go" | "onAccent" | "live" | "thumbnailDots",
   string
 > & {
   hex: (hue: Hue) => string;
@@ -102,7 +99,7 @@ function Frame({ ink, hue, children }: { ink: Ink; hue: string; children: React.
         display: "flex",
         flexDirection: "column",
         backgroundColor: ink.ground,
-        backgroundImage: `radial-gradient(circle at 3px 3px, ${ink.dots} 2px, transparent 0)`,
+        backgroundImage: `radial-gradient(circle at 3px 3px, ${ink.thumbnailDots} 2px, transparent 0)`,
         backgroundSize: "28px 28px",
         color: ink.text,
         fontFamily: "Geist",
@@ -176,7 +173,6 @@ function Chip({
   );
 }
 
-/** Drawn, because the subset fonts have no U+2192. */
 function Arrow({ color }: { color: string }) {
   return (
     <svg width="40" height="24" viewBox="0 0 40 24">

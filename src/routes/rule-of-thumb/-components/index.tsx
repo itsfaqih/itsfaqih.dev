@@ -19,7 +19,7 @@ export function ruleHead(id: string) {
   if (!rule) throw new Error(`No published rule "${id}"`);
   return pageHead({
     path: rule.href,
-    title: rule.pageTitle,
+    title: rule.headTitle,
     description: `${rule.claim} ${rule.description}${rule.interactive ? ", with live demos" : ""}.`,
     type: "article",
     headline: rule.title,

@@ -12,7 +12,7 @@ from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parent.parent
 FAMILIES = {"Geist": (400, 700), "Geist Mono": (400, 600), "Unbounded": (500, 900)}
-# Satori draws the Open Graph cards and reads only static fonts.
+# Satori draws a variable font only at its default instance.
 OG_WEIGHTS = {"Geist": (400, 500), "Geist Mono": (500,), "Unbounded": (700, 900)}
 CORE = [*range(0x20, 0x7F), *map(ord, " ©·×–—‘’“”…−")]
 # Google only sends a woff2 to a browser it recognises.

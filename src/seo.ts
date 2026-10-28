@@ -1,6 +1,5 @@
 export const SITE_ORIGIN = "https://itsfaqih.dev";
 
-/** Where the build writes each page's share card. */
 export const OG_DIR = "/og";
 
 const SITE_NAME = "Faqih Muntashir";
@@ -35,7 +34,6 @@ export type SharedPage = {
     }
 );
 
-/** The `head()` of a route: its title, description, canonical, share card, and structured data. */
 export function pageHead(page: SharedPage) {
   const url = SITE_ORIGIN + page.path;
   const image = `${SITE_ORIGIN}${OG_DIR}${page.path === "/" ? "/home" : page.path}.png`;
@@ -87,7 +85,6 @@ function structuredData(page: SharedPage, url: string, image: string) {
       url,
       mainEntityOfPage: url,
       author: { "@type": "Person", name: AUTHOR.name, url: AUTHOR.url },
-      // Left out of the JSON when unknown.
       datePublished: page.publishedAt,
     };
   }

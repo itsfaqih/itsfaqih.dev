@@ -9,22 +9,18 @@ import {
 import { OG_DIR, SITE_ORIGIN } from "../../src/seo";
 import { renderCard, type OgCard } from "./card";
 
-/** What a prerendered page's final head says about sharing it. */
 type BuiltPage = {
-  /** "/" or a path without a trailing slash, from where the page sits in the build. */
   path: string;
   canonical: string;
   noindex: boolean;
   description: string;
   image: URL;
   publishedTime?: string;
-  /** The JSON-LD headline, which only articles carry. */
   headline?: string;
 };
 
 const OG_IMAGE_BASE = `${SITE_ORIGIN}${OG_DIR}/`;
 
-/** Draws every page's share card and writes the sitemap, from the heads the build prerendered. */
 export async function writeShareAssets(outDir: string) {
   const files = (await readdir(outDir, { recursive: true })).filter(
     (file) => path.basename(file) === "index.html",
@@ -91,7 +87,9 @@ function readPage(file: string, html: string): BuiltPage {
 }
 
 function attributes(tag: string) {
-  return new Map([...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, decode(v!)]));
+  return new Map(
+    [...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, unescapeReactAttribute(v!)]),
+  );
 }
 
 const ENTITIES = new Map([
@@ -102,13 +100,10 @@ const ENTITIES = new Map([
   ["&#x27;", "'"],
 ]);
 
-/** Undoes the escaping React applies to attribute values. */
-function decode(text: string) {
+function unescapeReactAttribute(text: string) {
   return text.replace(/&(?:amp|lt|gt|quot|#x27);/g, (entity) => ENTITIES.get(entity)!);
 }
 
-/** The card each kind of page shares. A page none of these fit stops the build, so a new route
- * gets a card on purpose rather than a stand-in. */
 function cardFor(page: BuiltPage): OgCard {
   if (page.path === "/") return { kind: "home" };
 
