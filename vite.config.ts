@@ -17,6 +17,17 @@ const isCloudflareBuild =
 
 const REST_AFTER_MS = 3500;
 
+async function inlineAssetsBeforeApp(css: string, outDir: string) {
+  for (const [url, asset] of css.matchAll(
+    /url\((\/(?:fonts\/[^)]+-inline\.woff2|cursors\/[^)#]+\.svg))\)/g,
+  )) {
+    const data = (await readFile(path.join(outDir, asset!))).toString("base64");
+    const mime = asset!.endsWith(".svg") ? "image/svg+xml" : "font/woff2";
+    css = css.replace(url, `url(data:${mime};base64,${data})`);
+  }
+  return css;
+}
+
 function prerenderedPagesFirst(): Plugin {
   return {
     name: "prerendered-pages-first",
@@ -36,7 +47,10 @@ function prerenderedPagesFirst(): Plugin {
           for (const [tag, href] of html.matchAll(
             /<link rel="stylesheet" href="(\/assets\/[^"]+\.css)"[^>]*\/>/g,
           )) {
-            const css = await readFile(path.join(outDir, href!), "utf8");
+            const css = await inlineAssetsBeforeApp(
+              await readFile(path.join(outDir, href!), "utf8"),
+              outDir,
+            );
             html = html.replace(tag, () => `<style>${css}</style>`);
           }
           const preloads = [...html.matchAll(/<link rel="modulepreload" href="([^"]+)"[^>]*\/>/g)];

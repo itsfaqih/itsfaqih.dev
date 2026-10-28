@@ -48,12 +48,6 @@ export const Route = createRootRoute({
       ...(process.env.NODE_ENV === "development"
         ? [{ rel: "stylesheet", href: "/virtual:stylex.css" }]
         : []),
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap",
-      },
     ],
     scripts:
       process.env.NODE_ENV === "development"
