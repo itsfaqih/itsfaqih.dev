@@ -948,14 +948,13 @@ function useTitleFit(titleRef: RefObject<HTMLElement | null>) {
     const title = titleRef.current;
     const column = title?.parentElement;
     if (!title || !column) return;
-    function fit() {
-      if (!title || !column) return;
+    const fit = () => {
       title.style.removeProperty("--fit");
       const width = title.scrollWidth;
       if (width <= column.clientWidth) return;
       const size = parseFloat(getComputedStyle(title).fontSize);
       title.style.setProperty("--fit", `${Math.floor((size * column.clientWidth) / width)}px`);
-    }
+    };
     fit();
     const resize = new ResizeObserver(fit);
     resize.observe(column);
@@ -982,14 +981,13 @@ function useTitleDock(
     const flies = CSS.supports("animation-timeline: scroll()") && !reducedMotion();
     let land = Infinity;
 
-    function dock() {
+    const dock = () => {
       const docked = scrollY >= land;
-      root?.toggleAttribute("data-docked", docked);
-      label?.toggleAttribute("data-swap", docked);
-    }
+      root.toggleAttribute("data-docked", docked);
+      label.toggleAttribute("data-swap", docked);
+    };
 
-    function measure() {
-      if (!root || !title || !slot) return;
+    const measure = () => {
       // Where the heading sits with no flight applied, in page coordinates.
       title.style.animation = "none";
       const from = title.getBoundingClientRect();
@@ -1004,7 +1002,7 @@ function useTitleDock(
       root.style.setProperty("--dock-k", scale.toFixed(4));
       land = flies ? end * 0.96 : from.bottom + scrollY - to.bottom;
       dock();
-    }
+    };
 
     measure();
     const resize = new ResizeObserver(measure);
