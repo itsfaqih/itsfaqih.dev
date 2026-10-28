@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GUIDELINES } from "../data/guidelines";
+import { SLIDES, TICKER } from "../data/home";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
@@ -23,14 +24,6 @@ export const Route = createFileRoute("/")({
 });
 
 const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);
-
-const SLIDES = [
-  { tab: "Interfaces", color: "var(--ux)", phrase: "interfaces that ", highlight: "feel right" },
-  { tab: "Agents", color: "var(--cw)", phrase: "agents that ", highlight: "finish the job" },
-  { tab: "Dev tools", color: "var(--ar)", phrase: "dev tools that ", highlight: "save hours" },
-  { tab: "Backends", color: "var(--ts)", phrase: "backends that ", highlight: "run reliably" },
-  { tab: "Tests", color: "var(--ax)", phrase: "test suites you ", highlight: "can trust" },
-];
 
 const EXPERIENCE = [
   {
@@ -264,14 +257,6 @@ function usesByTool(sources: { use: StackUse; stack: string[] }[]) {
   return uses;
 }
 
-// Each word wears the hue of its "What I build" pip, so the band reads as that legend.
-const TICKER = [
-  { word: "INTERFACES", color: "var(--ux)" },
-  { word: "AGENTIC SETUPS", color: "var(--cw)" },
-  { word: "DEV TOOLS", color: "var(--ar)" },
-  { word: "APIS", color: "var(--ts)" },
-  { word: "TESTS", color: "var(--ax)" },
-];
 // The band slides by exactly half its width, so each half must outrun the widest screen or its
 // end shows. One set is about 1170px; three sets make a half wide enough for a 3500px screen.
 const TICKER_RUN = Array.from({ length: 6 }, () => TICKER).flat();
@@ -533,8 +518,7 @@ function Hero({ introDone }: { introDone: boolean }) {
               >
                 <span className="l2">{item.phrase}</span>
                 <span className="l3">
-                  <span className="hl">{item.highlight}</span>
-                  .
+                  <span className="hl">{item.highlight}</span>.
                 </span>
               </span>
             ))}
@@ -721,4 +705,3 @@ function snapshotOf(list: HTMLElement): Snapshot {
   }
   return { height: list.getBoundingClientRect().height, rows, pills };
 }
-
