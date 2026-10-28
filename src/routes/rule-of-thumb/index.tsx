@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
-import { VISIBLE_GUIDELINES as RULES } from "../../data/guidelines";
+import { TOPICS, VISIBLE_GUIDELINES as RULES } from "../../data/guidelines";
 import { Backdrop } from "../-components/backdrop";
 import { RuleSelect } from "../-components/rule-select";
 import { useCutIns } from "../-components/use-cut-ins";
@@ -30,7 +30,7 @@ function RuleOfThumbsIndex() {
       <div className="arc-wrap">
         <div className="index-head">
           <div className="tag" data-cut>
-            {RULES.length} rules · {new Set(RULES.map((rule) => rule.label)).size} topics
+            {RULES.length} rules · {TOPICS.length} topics
           </div>
           <h1 data-cut>Rule of Thumb</h1>
           <p data-cut>{LEDE}</p>

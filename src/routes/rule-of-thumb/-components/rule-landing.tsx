@@ -18,7 +18,7 @@ import {
   ruleNumber,
   VISIBLE_GUIDELINES,
 } from "../../../data/guidelines";
-import type { Guideline, PublishedGuideline } from "../../../data/guidelines";
+import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import "./rule-landing.css";
 
@@ -119,7 +119,7 @@ function Landing({
   const { levels } = quiz;
   const [results, setResults] = useState<Results>(() => levels.map(() => null));
 
-  const markdownUrl = `/rule-of-thumb/${rule.id}.md`;
+  const markdownUrl = `${rule.href}.md`;
   const words = rule.title.split(" ");
   const last = words.pop();
   const head = words.join(" ");
@@ -274,7 +274,13 @@ function Landing({
   );
 }
 
-function PagerCard({ rule, direction }: { rule: Guideline; direction: "Previous" | "Next" }) {
+function PagerCard({
+  rule,
+  direction,
+}: {
+  rule: PublishedGuideline;
+  direction: "Previous" | "Next";
+}) {
   const [hovered, setHovered] = useState(false);
 
   return (

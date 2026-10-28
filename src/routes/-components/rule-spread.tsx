@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { colorOf, ruleNumber } from "../../data/guidelines";
-import type { Guideline } from "../../data/guidelines";
+import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 
@@ -25,7 +25,7 @@ const WHEEL_SETTLE_MS = 120;
 
 type Grab = { x: number; position: number; unit: number; samples: { x: number; t: number }[]; dragging: boolean };
 
-export function RuleSpread({ rules }: { rules: Guideline[] }) {
+export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
   const last = rules.length - 1;
   const [initial] = useState(() => Math.floor(last / 2));
   const [active, setActive] = useState(initial);

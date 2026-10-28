@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import Fuse from "fuse.js";
-import { colorOf, ruleNumber } from "../../data/guidelines";
-import type { Guideline } from "../../data/guidelines";
+import { colorOf, ruleNumber, TOPICS } from "../../data/guidelines";
+import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 
@@ -10,7 +10,7 @@ import { RuleThumb, useRuleOpen } from "./rule-art";
 // focusing a tile shows it in the side panel; it holds up at 100+ rules. The tile under the
 // pointer or keyboard focus lights up and projects a beam onto the panel.
 
-export function RuleSelect({ rules }: { rules: Guideline[] }) {
+export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -21,7 +21,6 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
   const litTile = useRef<HTMLElement>(null);
   const { linkProps: openRule, panelProps } = useRuleOpen();
 
-  const categories = [...new Set(rules.map((rule) => rule.label))];
   const normalizedQuery = query.trim().toLowerCase();
   // Typos and partial words still find a rule; the best matches come first, titles weighing most.
   const fuse = useMemo(
@@ -94,7 +93,7 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
     };
   }, [litId, panelProps.ref]);
 
-  const light = (rule: Guideline, tile: HTMLElement) => {
+  const light = (rule: PublishedGuideline, tile: HTMLElement) => {
     litTile.current = tile;
     setLitId(rule.id);
   };
@@ -164,7 +163,7 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
           </label>
         </div>
         <div className="chips" role="group" aria-label="Filter by topic">
-          {["All", ...categories].map((name) => (
+          {["All", ...TOPICS].map((name) => (
             <button
               key={name}
               type="button"
