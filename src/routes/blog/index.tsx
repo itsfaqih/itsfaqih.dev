@@ -7,11 +7,7 @@ import { pageHead } from "../../seo";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
-  loader: () => {
-    return {
-      posts: getAllPosts(),
-    };
-  },
+  loader: () => ({ posts: getAllPosts() }),
   head: () =>
     pageHead({
       path: "/blog",

@@ -23,7 +23,7 @@ function requirePost(slug: string) {
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogPost,
-  loader: async ({ params }) => {
+  loader: ({ params }) => {
     const post = requirePost(params.slug);
     return {
       frontmatter: post.frontmatter,

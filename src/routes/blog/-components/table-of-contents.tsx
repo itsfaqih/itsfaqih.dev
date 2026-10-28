@@ -2,7 +2,6 @@ import { cx } from "@/stylex";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 type TableOfContentsProps = {
-  className?: string;
   onLinkClick?: () => void;
 };
 
@@ -81,7 +80,7 @@ function observeHeadings(headings: Heading[], onActiveIdChange: (id: string) => 
   return () => observer.disconnect();
 }
 
-export function TableOfContents({ className, onLinkClick }: TableOfContentsProps) {
+export function TableOfContents({ onLinkClick }: TableOfContentsProps) {
   const headings = useSyncExternalStore(
     subscribeToHeadings,
     getHeadingsSnapshot,
@@ -94,7 +93,7 @@ export function TableOfContents({ className, onLinkClick }: TableOfContentsProps
   if (headings.length === 0) return null;
 
   return (
-    <nav className={cx("space-y-2", className)}>
+    <nav className={cx("space-y-2")}>
       <p className={cx("font-medium text-sm text-foreground mb-4")}>On this page</p>
       <ul className={cx("text-base lg:text-sm [&:has(a:hover)_li:not(:hover)]:opacity-50")}>
         {headings.map((heading) => (
