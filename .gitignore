@@ -16,3 +16,15 @@ todos.json
 storybook-static
 
 tests/visual/__diff__
+.vitest/
+
+# Agent and editor files, design prototypes, and screenshots stay local
+/.agent/
+/.audit/
+/.gemini/
+/.hermes.md
+/.vscode/
+/plans/
+/redesign/
+/shots/
+/*.png

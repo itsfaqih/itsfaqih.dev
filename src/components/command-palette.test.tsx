@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { CommandPalette } from "./command-palette";
 
@@ -21,7 +21,10 @@ let history: ReturnType<typeof createMemoryHistory>;
 async function openPalette() {
   const user = userEvent.setup();
   history = createMemoryHistory({ initialEntries: ["/blog"] });
-  const router = createRouter({ routeTree: createRootRoute({ component: CommandPalette }), history });
+  const router = createRouter({
+    routeTree: createRootRoute({ component: CommandPalette }),
+    history,
+  });
   await act(() => router.load());
   render(<RouterProvider router={router} />);
   await user.keyboard("{Meta>}k{/Meta}");

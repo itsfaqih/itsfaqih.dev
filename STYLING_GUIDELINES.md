@@ -94,10 +94,10 @@ When a state depends on a third-party component's data attribute or on a parent 
 After styling changes, run:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build
+vp run typecheck
+vp run lint
+vp run test
+vp build
 ```
 
 The StyleX Vite plugin must be active in `vite.config.ts`, and production builds must contain the extracted StyleX CSS asset.

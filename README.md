@@ -5,40 +5,40 @@ Personal website built with React, TanStack Start, Vite, and StyleX. It includes
 ## Development
 
 ```bash
-bun install
-npm run dev
+vp install
+vp dev
 ```
 
 Vite is configured for `http://127.0.0.1:5173`. If that port belongs to another project, use a separate port rather than stopping its server:
 
 ```bash
-npm run dev -- --port 5174 --strictPort
+vp dev --port 5174 --strictPort
 ```
 
-Use `npm run ...` for website scripts. Bun is used for dependency installation; both `bun.lock` and `package-lock.json` are tracked. After dependency changes, synchronize the npm lockfile with `npm install --package-lock-only --ignore-scripts` for Cloudflare's npm installation step.
+The project uses [Vite+](https://viteplus.dev) with pnpm behind it. `package.json` pins pnpm in `packageManager` and Node in `devEngines.runtime`; `vp` downloads both on first use. Add and remove dependencies with `vp add` and `vp remove`, and run other scripts with `vp run ...`. `pnpm-workspace.yaml` holds the Vite+ catalog and the packages allowed to run install scripts.
 
 ## Checks
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
-npm run test:visual
-npm run build
+vp run lint
+vp run typecheck
+vp run test
+vp run test:visual
+vp build
 ```
 
-Oxlint runs the default rules plus all generic [anti-slop](https://github.com/dmmulroy/anti-slop) rules at error severity. Configuration lives in `.oxlintrc.json`; the vendored plugin, license, upstream revision, and local compatibility note live in `tools/oxlint/anti-slop/`. Keep `oxlint` and `@oxlint/plugins` pinned to the same version when upgrading.
+Oxlint runs the default rules plus all generic [anti-slop](https://github.com/dmmulroy/anti-slop) rules at error severity. Lint and format configuration lives in the `lint` and `fmt` blocks of `vite.config.ts`; Vite+ bundles Oxlint and Oxfmt. The vendored plugin, license, upstream revision, and local compatibility note live in `tools/oxlint/anti-slop/`, which the formatter skips so it stays byte-for-byte with upstream. `vp run typecheck` runs [tsrs](https://github.com/oxc-project/tsrs), a Rust port of the TypeScript 7 checker.
 
 Agent assets, the vendored plugin, and TanStack's generated route tree are excluded from application linting. Owned Storybook configuration remains checked. The vendored TypeScript source is included in typechecking. Effect rules are not enabled because the website has no direct Effect dependency.
 
 Vitest has two projects. `unit` runs `src/**/*.test.{ts,tsx}` in jsdom. The test command allows an empty suite, but regression tests should be added for behavior changed during maintenance.
 
-`visual` builds the site, serves the prerendered pages in `.output/public`, and screenshots every page with Playwright Chromium at desktop (1440px) and mobile (390px) widths in light and dark themes. Each screenshot is compared with its baseline in `tests/visual/__screenshots__/`. On a failure, the actual and diff images land in `tests/visual/__diff__/`. Pages are discovered from the build, so a new page fails the suite until its baselines exist, and a removed page fails it until its baselines are deleted. After an intended visual change, run `npm run test:visual:update`, review the changed PNGs, and commit them. Baselines are rendered on macOS; another OS renders fonts differently and needs its own baselines.
+`visual` builds the site, serves the prerendered pages in `.output/public`, and screenshots every page with Playwright Chromium at desktop (1440px) and mobile (390px) widths in light and dark themes. Each screenshot is compared with its baseline in `tests/visual/__screenshots__/`. On a failure, the actual and diff images land in `tests/visual/__diff__/`. Pages are discovered from the build, so a new page fails the suite until its baselines exist, and a removed page fails it until its baselines are deleted. After an intended visual change, run `vp run test:visual:update`, review the changed PNGs, and commit them. Baselines are rendered on macOS; another OS renders fonts differently and needs its own baselines.
 
 ## Production
 
 ```bash
-npm run build
+vp build
 ```
 
 TanStack Start prerenders discoverable routes as complete HTML in `.output/public`. React hydrates those pages for client-side navigation and interactions; static hosting does not need a runtime server. The Cloudflare preview command uses `scripts/cloudflare-pages-preview.mjs` when the Cloudflare build environment is detected.
@@ -46,8 +46,8 @@ TanStack Start prerenders discoverable routes as complete HTML in `.output/publi
 ## Storybook
 
 ```bash
-npm run storybook
-npm run build-storybook
+vp run storybook
+vp run build-storybook
 ```
 
 Stories live in `src/stories` and use the same global theme and StyleX fallback styles as the website. The explicit `*.stories.tsx` glob keeps route MDX files in the TanStack Start pipeline.
@@ -63,4 +63,4 @@ Stories live in `src/stories` and use the same global theme and StyleX fallback 
 - `src/stylex-utilities.ts`, `src/stylex.ts`, and `src/stylex-fallback.css`: compiled utility bridge and fallback styles.
 - `src/routeTree.gen.ts`: generated by TanStack; do not edit by hand.
 
-See `CODE_STRUCTURE.md`, `STYLING_GUIDELINES.md`, and `.hermes.md` for repository conventions. The interactive article demos are site content, not disposable starter examples.
+See `CODE_STRUCTURE.md` and `STYLING_GUIDELINES.md` for repository conventions. The interactive article demos are site content, not disposable starter examples.

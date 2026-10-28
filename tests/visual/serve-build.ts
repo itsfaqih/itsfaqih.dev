@@ -2,7 +2,7 @@ import { createReadStream, existsSync, readdirSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
-import type { TestProject } from "vitest/node";
+import type { TestProject } from "vite-plus/test/node";
 
 const root = path.resolve(import.meta.dirname, "../../.output/public");
 

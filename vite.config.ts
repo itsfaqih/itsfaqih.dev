@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Element, ElementContent, Root } from "hast";
 import { optimize } from "svgo";
 import { preloadFile } from "@pierre/diffs/ssr";
-import { defineConfig, runnerImport, type Plugin } from "vite";
+import { defineConfig, runnerImport, type Plugin, lazyPlugins } from "vite-plus";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
@@ -241,6 +241,55 @@ const markdownTwinCanonicals = Object.fromEntries(
 const remarkPlugins = [remarkFrontmatter, remarkMdxFrontmatter];
 
 const config = defineConfig({
+  fmt: {
+    ignorePatterns: ["tools/oxlint/anti-slop/**"],
+  },
+  lint: {
+    ignorePatterns: [
+      ".agent/**",
+      ".agents/**",
+      ".claude/**",
+      ".codex/**",
+      ".continue/**",
+      ".cursor/**",
+      ".gemini/**",
+      ".hermes/**",
+      ".opencode/**",
+      ".pi/**",
+      ".roo/**",
+      ".windsurf/**",
+      "tools/oxlint/anti-slop/**",
+      "src/routeTree.gen.ts",
+    ],
+    jsPlugins: [
+      {
+        name: "anti-slop",
+        specifier: "./tools/oxlint/anti-slop/index.ts",
+      },
+      {
+        name: "vite-plus",
+        specifier: "vite-plus/oxlint-plugin",
+      },
+    ],
+    rules: {
+      "anti-slop/no-chained-type-assertions": "error",
+      "anti-slop/no-conditional-empty-object-spread": "error",
+      "anti-slop/no-known-value-widening": "error",
+      "anti-slop/no-module-mocking": "error",
+      "anti-slop/no-object-parameters": "error",
+      "anti-slop/no-reflect-apply": "error",
+      "anti-slop/no-reflect-get": "error",
+      "anti-slop/no-runtime-typeof": "error",
+      "anti-slop/no-shape-in-symbol-names": "error",
+      "anti-slop/no-unknown-parameters": "error",
+      "anti-slop/no-unknown-returns": "error",
+      "anti-slop/no-unknown-type-aliases": "error",
+      "anti-slop/no-unsafe-dictionary-type": "error",
+      "anti-slop/no-widen-then-assert": "error",
+      "anti-slop/require-safety-comment-for-type-assertion": "error",
+      "vite-plus/prefer-vite-plus-imports": "error",
+    },
+  },
   server: {
     port: 5173,
     host: "127.0.0.1",
@@ -248,7 +297,7 @@ const config = defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  plugins: [
+  plugins: lazyPlugins(() => [
     roundIconPaths(),
     // The server renders highlighted code into the page; the client adopts it, so only the
     // server bundle carries the highlighted HTML.
@@ -298,7 +347,7 @@ const config = defineConfig({
     prerenderedPagesFirst(),
     shareAssets(),
     servePrerenderedPagesStatically(),
-  ],
+  ]),
 });
 
 export default config;

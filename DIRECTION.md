@@ -2,6 +2,8 @@
 
 The site follows the v5 "arcade" direction (`redesign/v5-playground.html`, built into `src/arcade.css`). This file covers the Rule of Thumb pass: the index, the article pages, and a thumbnail for every rule. The earlier light direction is archived in `redesign/archive/DIRECTION-v0-light.md`.
 
+The `redesign/` prototypes and `shots/` captures this file cites are no longer in the working tree; read them from commit `47d3d62`, for example `git show 47d3d62:redesign/v5-playground.html`.
+
 ## Brief
 
 **Who arrives.** There are two groups:

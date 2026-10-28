@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { pageHead, type SharedPage } from "./seo";
 
 const home: SharedPage = {

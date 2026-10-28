@@ -3,7 +3,7 @@ import path from "node:path";
 import pixelmatch from "pixelmatch";
 import { chromium, type Browser } from "playwright";
 import { PNG } from "pngjs";
-import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 
 type Shot = {
   route: string;
