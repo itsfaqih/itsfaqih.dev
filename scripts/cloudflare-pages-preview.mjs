@@ -9,10 +9,7 @@ const args = process.argv.slice(2).map((arg) => {
 });
 
 const wrangler = resolve(
-  process.cwd(),
-  process.platform === "win32"
-    ? "node_modules/.bin/wrangler.cmd"
-    : "node_modules/.bin/wrangler",
+  process.platform === "win32" ? "node_modules/.bin/wrangler.cmd" : "node_modules/.bin/wrangler",
 );
 
 if (!existsSync(wrangler)) {
@@ -23,8 +20,6 @@ if (!existsSync(wrangler)) {
 }
 
 const child = spawn(wrangler, ["--cwd", "./", "pages", "dev", ...args], {
-  cwd: process.cwd(),
-  env: process.env,
   stdio: "inherit",
 });
 
