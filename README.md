@@ -15,7 +15,7 @@ Vite is configured for `http://127.0.0.1:5173`. If that port belongs to another 
 vp dev --port 5174 --strictPort
 ```
 
-The project uses [Vite+](https://viteplus.dev) with pnpm behind it. `package.json` pins pnpm in `packageManager` and Node in `devEngines.runtime`; `vp` downloads both on first use. Add and remove dependencies with `vp add` and `vp remove`, and run other scripts with `vp run ...`. `pnpm-workspace.yaml` holds the Vite+ catalog and the packages allowed to run install scripts.
+The project uses [Vite+](https://viteplus.dev) with pnpm behind it. `package.json` pins pnpm in `packageManager` and `.node-version` pins Node; `vp` downloads both on first use. Cloudflare Pages reads `.node-version` but not `packageManager`, so its project settings set `PNPM_VERSION=12.16.1`. Add and remove dependencies with `vp add` and `vp remove`, and run other scripts with `vp run ...`. `pnpm-workspace.yaml` holds the Vite+ catalog and the packages allowed to run install scripts.
 
 ## Checks
 

@@ -70,12 +70,5 @@
     "vitest": "catalog:",
     "wrangler": "4.153.0"
   },
-  "packageManager": "pnpm@12.16.1",
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "24.18.0",
-      "onFail": "download"
-    }
-  }
+  "packageManager": "pnpm@12.16.1"
 }
