@@ -4,8 +4,6 @@ import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
 
-// ---------- The live activity a page lends the island ----------
-
 let activityHost: HTMLElement | null = null;
 let activityCount = 0;
 const listeners = new Set<() => void>();
@@ -15,7 +13,6 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Shows its children in the island once the page scrolls, in place of the brand. */
 export function IslandActivity({ children }: { children: ReactNode }) {
   const host = useSyncExternalStore(
     subscribe,
@@ -33,9 +30,6 @@ export function IslandActivity({ children }: { children: ReactNode }) {
   return host ? createPortal(children, host) : null;
 }
 
-/** Where an element inside the island's activity will sit on screen once the island is compact.
- * Summed from the parts' natural widths, so it holds while the island is still full, mid-resize,
- * or scaling in. Everything in the island is centred on its height. */
 export function compactBox(element: HTMLElement) {
   const island = element.closest<HTMLElement>(".island");
   const bar = island?.parentElement;
@@ -62,17 +56,13 @@ export function compactBox(element: HTMLElement) {
   );
 }
 
-// ---------- The island ----------
-
 type SegProps = {
   on: boolean;
-  /** When the part shows in the compact island: with no activity, with one, or always. */
   compact?: "idle" | "live" | "always";
   className?: string;
   children: ReactNode;
 };
 
-/** One part of the island. Off, it folds to no width and leaves the tab order. */
 function Seg({ on, compact, className, children }: SegProps) {
   return (
     <div
@@ -113,7 +103,6 @@ export function Header() {
     return () => removeEventListener("scroll", update);
   }, []);
 
-  // Open, the island folds back on a scroll past a small nudge, Escape, or a press outside it.
   useEffect(() => {
     if (!open) return;
     const from = scrollY;

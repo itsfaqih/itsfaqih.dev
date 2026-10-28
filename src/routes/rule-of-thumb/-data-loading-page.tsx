@@ -10,8 +10,6 @@ import "./data-loading.css";
 
 type Step = readonly [at: number, run: () => void];
 
-/** Plays a timed script of state changes. Starting a new one cancels the old, and so does
- * unmounting, so a demo never lands a late reply on a fresh run. */
 function useScript() {
   const timers = useRef<number[]>([]);
   const stop = () => {
@@ -34,8 +32,6 @@ function Controls({ children }: { children: ReactNode }) {
 }
 
 const money = (value: number) => `$${value.toLocaleString("en-US")}`;
-
-// ---------- 1. Start fetching early: a request waterfall that fills in ----------
 
 type Bar = { label: string; from: number; to: number; kind: "code" | "render" | "req" | "defer" };
 type Waterfall = { bars: Bar[]; paint: number };
@@ -62,8 +58,6 @@ const EARLY: Waterfall = {
   paint: 520,
 };
 
-/** "still" is the finished chart, as the server renders it. "armed" hides the bars until the
- * chart is on screen, then each run sweeps them in. */
 type Sweep = { state: "still" } | { state: "armed" } | { state: "run"; n: number };
 
 function WaterfallView({ bars, paint }: Waterfall) {
@@ -145,8 +139,6 @@ function WaterfallView({ bars, paint }: Waterfall) {
   );
 }
 
-// ---------- 2. Keep stale data on screen while it refetches ----------
-
 const REVENUE = [48210, 49875, 47930, 51402];
 
 type Refetch = { at: number; fetching: boolean; fresh: boolean };
@@ -201,8 +193,6 @@ function RevenueCard({ swr }: { swr: boolean }) {
     </div>
   );
 }
-
-// ---------- 3. Wait 200ms before showing the skeleton ----------
 
 const MAIL = [
   ["Rina", "Invoice #2041 is paid"],
@@ -295,8 +285,6 @@ function InboxView({ delay }: { delay: boolean }) {
   );
 }
 
-// ---------- 4. Show the error where the data was, with a retry ----------
-
 const TEAM = [
   ["Ana", "Design"],
   ["Budi", "Engineering"],
@@ -377,8 +365,6 @@ function TeamView({ inline }: { inline: boolean }) {
   );
 }
 
-// ---------- 5. Parse external data where it arrives ----------
-
 const RESPONSE = '{ "id": 1, "name": "Alice" }';
 
 type Profile = { id: number; name: string; city: string };
@@ -387,7 +373,6 @@ type Outcome = { ok: true; user: Profile } | { ok: false; error: string };
 const describe = (cause: unknown) =>
   cause instanceof Error ? `${cause.name}: ${cause.message}` : "Error: unknown";
 
-/** What `await res.json()` hands you: `any`, which TypeScript lets you call a Profile. */
 function trustJson(body: string): Outcome {
   try {
     const user: Profile = JSON.parse(body);
@@ -397,10 +382,8 @@ function trustJson(body: string): Outcome {
   }
 }
 
-/** The response as the API really sends it: city may be missing. */
 type ProfileResponse = { id: number; name: string; city?: string };
 
-/** The schema in the pane: city falls back to "Unknown". */
 const parseProfile = (response: ProfileResponse): Profile => ({
   ...response,
   city: response.city ?? "Unknown",
@@ -477,8 +460,6 @@ function ParseView({ parse }: { parse: boolean }) {
     </div>
   );
 }
-
-// ---------- 6. Persist what can't mislead, and date it ----------
 
 const SPENT = { label: "Laptop", amount: -1830 };
 const HISTORY = [
@@ -563,8 +544,6 @@ function WalletView({ careful }: { careful: boolean }) {
     </div>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -709,8 +688,6 @@ const TLDR = [
   ["Updates within a second", "A WebSocket. Every 30s or slower: polling"],
   ["Anything from an API", "Parse it where it arrives"],
 ] as const;
-
-// ---------- The quiz: each level is a request timeline ----------
 
 const at = (ms: string, text: string) => (
   <>

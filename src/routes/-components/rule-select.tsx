@@ -6,10 +6,6 @@ import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 
-// A searchable, filterable select grid for the Rule of Thumb index. Hovering or
-// focusing a tile shows it in the side panel; it holds up at 100+ rules. The tile under the
-// pointer or keyboard focus lights up and projects a beam onto the panel.
-
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -22,7 +18,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const { linkProps: openRule, panelProps } = useRuleOpen();
 
   const normalizedQuery = query.trim().toLowerCase();
-  // Typos and partial words still find a rule; the best matches come first, titles weighing most.
   const fuse = useMemo(
     () =>
       new Fuse(rules, {
@@ -39,7 +34,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const matches = (normalizedQuery ? fuse.search(normalizedQuery).map(({ item }) => item) : rules).filter(
     (rule) => category === "All" || rule.label === category,
   );
-  // Only a hovered or focused tile fills the panel; otherwise it waits in its empty state.
   const selected = matches.find((rule) => rule.id === selectedId);
 
   useEffect(() => {
@@ -55,7 +49,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
     return () => removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // The sticky panel moves against the grid as the page scrolls, so the beam re-aims with it.
   useLayoutEffect(() => {
     const select = selectRef.current;
     const beam = beamRef.current;
@@ -100,8 +93,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
 
   return (
     <div ref={selectRef} className="select" data-lit={litId ? "" : undefined}>
-      {/* The panel always holds its place, so filtering to nothing never shifts the grid. It stays
-          one element across empty and filled, so React never rewrites the class the cut-in added. */}
       <aside
         {...panelProps}
         className="sel"
@@ -180,7 +171,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
             </button>
           ))}
         </div>
-        {/* Keyed by the filter, so a new filter deals a fresh hand of tiles. */}
         <div className="tiles" key={`${category}|${normalizedQuery}`} onPointerLeave={() => {
             setLitId(null);
             if (!selectRef.current?.querySelector(".tile:focus-visible")) setSelectedId(null);
@@ -239,8 +229,6 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
 
 type Point = [x: number, y: number];
 
-/** The convex hull of the points (Andrew's monotone chain): the outline of the light running from
- * every point of the tile to every point of the panel. */
 function hull(points: Point[]) {
   const sorted = [...points].sort(([ax, ay], [bx, by]) => ax - bx || ay - by);
   const turn = ([ox, oy]: Point, [ax, ay]: Point, [bx, by]: Point) => (ax - ox) * (by - oy) - (ay - oy) * (bx - ox);
@@ -255,14 +243,10 @@ function hull(points: Point[]) {
   return [...chain(sorted), ...chain([...sorted].reverse())];
 }
 
-// Characters scramble, then settle left to right. Every character keeps its own cell, sized by
-// the real letter, so the scramble has exactly the title's length and wraps where the title wraps.
 const GLYPHS = "ABCDEFGHJKLMNPQRSTUVXYZ0123456789#%<>";
 const NARROW = "il1!|:;.,'";
 const IS_NARROW = /[iljtfrI1.,:;'!|()-]/;
 
-// A narrow letter gets a narrow glyph and capitals stay capitals, so a glyph stays close to
-// the width of the cell it fills.
 function glyphLike(char: string) {
   if (IS_NARROW.test(char)) return NARROW[Math.floor(Math.random() * NARROW.length)]!;
   const glyph = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]!;
@@ -292,7 +276,6 @@ function ScrambleText({ text }: { text: string }) {
     return () => cancelAnimationFrame(frame);
   }, [text, reduced]);
 
-  // Words stay unbroken and spaces stay real, so line breaks match the settled title.
   let at = 0;
   return (
     <span className="scramble" aria-hidden="true">
@@ -305,7 +288,6 @@ function ScrambleText({ text }: { text: string }) {
             <span className="scramble-word">
               {Array.from(word, (char, c) => {
                 const index = from + c;
-                // Settled letters keep their cell too, so the title never re-kerns mid-scramble.
                 const live = index >= settled ? glyphs[index] : undefined;
                 return (
                   <span key={c} className="scramble-cell" data-glyph={live}>

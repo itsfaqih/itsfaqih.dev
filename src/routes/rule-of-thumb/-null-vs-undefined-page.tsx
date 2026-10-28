@@ -10,13 +10,9 @@ import {
 } from "./-components/rule-landing";
 import "./null-vs-undefined.css";
 
-// ---------- Code, with what each line gives beside it ----------
-
 type Tone = "no" | "yes";
-/** One line of code. `out` is the data the line produces, set on its right. */
 type Line = { c: string; out?: string; tone?: Tone; hot?: boolean };
 
-/** `null` gets the thumbnail's solid box and `undefined` its dashed empty slot. */
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(null)\b|\b(undefined)\b|\b(const|let|function|return|type|await|new)\b/g;
 const KINDS = ["com", "str", "nul", "und", "kw"] as const;
@@ -39,18 +35,13 @@ function Code({ lines }: { lines: Line[] }) {
   );
 }
 
-// ---------- The live saves: a form, the request it sends, the row it lands on ----------
-
 type Way = "bad" | "good";
 type Field = "title" | "assignee" | "due" | "reviewer";
-/** A task row on the server. */
 type Row = Partial<Record<Field, string | null>>;
-/** What the client hands to the request. */
 type Body = Partial<Record<Field, string | null | undefined>>;
 type Phase = "idle" | "sent" | "done";
 type Verdict = "saved" | "kept" | "wiped" | "lost";
 
-/** What the server receives. Like JSON.stringify, it drops every key set to undefined. */
 function arrived(body: Body): Row {
   const row: Row = {};
   for (const field of FIELDS) {
@@ -62,8 +53,6 @@ function arrived(body: Body): Row {
 
 const FIELDS: readonly Field[] = ["title", "assignee", "due", "reviewer"];
 
-/** A field the user meant to change either landed or got lost; any other field was either kept
- * or wiped by the request. */
 function verdictOf(field: Field, before: Row, after: Row, intent: Row): Verdict {
   if (field in intent) return after[field] === intent[field] ? "saved" : "lost";
   return after[field] === before[field] ? "kept" : "wiped";
@@ -71,8 +60,6 @@ function verdictOf(field: Field, before: Row, after: Row, intent: Row): Verdict 
 
 const SEND_MS = 460;
 
-/** The save starts done, so a glance shows the outcome. A lesson still below the fold rewinds
- * to before and saves once it is on screen. */
 function useSave() {
   const ref = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("done");
@@ -91,7 +78,6 @@ function useSave() {
     timer.current = window.setTimeout(() => setPhase("done"), SEND_MS);
   }
 
-  // Behind the kit's tabs, which already play their own move, the save stays done.
   useLayoutEffect(() => {
     const flow = ref.current;
     if (
@@ -177,7 +163,6 @@ function Flow({ save, fields, before, body, intent, children }: FlowProps) {
 
 const CLEAR_BEFORE: Row = { title: "Ship v2", reviewer: "Rina" };
 
-/** Lesson 3: the user removes the reviewer, and the change saves on the spot. */
 function ClearDemo({ way }: { way: Way }) {
   const save = useSave();
   const cleared = save.phase !== "idle";
@@ -225,7 +210,6 @@ function ClearDemo({ way }: { way: Way }) {
 
 const RENAME_BEFORE: Row = { title: "Ship v1", assignee: "Rina", due: "Nov 3" };
 
-/** Lesson 4: the user renames the task and saves. The title is a real input. */
 function RenameDemo({ way }: { way: Way }) {
   const save = useSave();
   const [title, setTitle] = useState("Ship v2");
@@ -280,8 +264,6 @@ function RenameDemo({ way }: { way: Way }) {
     </div>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -490,8 +472,6 @@ const TLDR = [
   ["A field every caller must decide", "T | null, not ?:"],
   ["A lookup that found nothing", "Return null"],
 ] as const;
-
-// ---------- The quiz levels ----------
 
 const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (

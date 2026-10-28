@@ -15,8 +15,6 @@ import {
 } from "./-components/rule-landing";
 import "./button-design.css";
 
-// ---------- Lesson 1: every state gets a look ----------
-
 const STATES = ["idle", "hover", "press", "focus"] as const;
 
 function StatesDemo({ careful }: { careful: boolean }) {
@@ -39,8 +37,6 @@ function StatesDemo({ careful }: { careful: boolean }) {
   );
 }
 
-// ---------- Lesson 2: the width holds while it works ----------
-
 type Phase = "idle" | "pending" | "done";
 type Save = { phase: Phase; sent: number };
 
@@ -53,9 +49,6 @@ const LABELS: readonly { phase: Phase; text: string }[] = [
   { phase: "done", text: "Saved" },
 ];
 
-/** The careful button stacks its three labels in one cell and refuses clicks until it's idle
- * again. The careless one shows only the current label, so its width follows the text, and every
- * click sends again. */
 function SaveDemo({ careful }: { careful: boolean }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -89,7 +82,6 @@ function SaveDemo({ careful }: { careful: boolean }) {
     );
   }
 
-  // The signature: once on screen, each button presses itself and walks through its states.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || reducedMotion()) return;
@@ -146,12 +138,9 @@ function SaveDemo({ careful }: { careful: boolean }) {
   );
 }
 
-// ---------- Lesson 3: a disabled button says why ----------
-
 function DisabledDemo({ careful }: { careful: boolean }) {
   const [title, setTitle] = useState("");
   const [published, setPublished] = useState(false);
-  // A tap gives no hover, so pressing the blocked button opens the tip for touch readers.
   const [nudged, setNudged] = useState(false);
   const tipId = useId();
   const ready = title.trim() !== "";
@@ -218,8 +207,6 @@ function DisabledDemo({ careful }: { careful: boolean }) {
   );
 }
 
-// ---------- Lesson 4: one filled button per screen ----------
-
 function HierarchyDemo({ careful }: { careful: boolean }) {
   return (
     <div className="bd-stage bd-squint-me">
@@ -242,7 +229,6 @@ function HierarchyDemo({ careful }: { careful: boolean }) {
   );
 }
 
-/** A switch in a lesson's copy that changes how that lesson's panes are drawn (see the CSS). */
 function LessonToggle({ label, name }: { label: string; name: string }) {
   const [on, setOn] = useState(false);
   return (
@@ -259,8 +245,6 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
   );
 }
 
-// ---------- Lesson 5: a destructive action has a guard ----------
-
 type Step = "idle" | "confirm" | "deleted";
 
 function DeleteDemo({ careful }: { careful: boolean }) {
@@ -273,8 +257,6 @@ function DeleteDemo({ careful }: { careful: boolean }) {
     setStep(next);
   }
 
-  // Focus follows the step: Cancel is the safe answer in the confirm, and after a reset the
-  // trigger comes back where it was.
   useEffect(() => {
     if (!moved.current) return;
     rootRef.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
@@ -339,8 +321,6 @@ function DeleteDemo({ careful }: { careful: boolean }) {
   );
 }
 
-// ---------- Lesson 6: optical padding for icons ----------
-
 function IconsDemo({ careful }: { careful: boolean }) {
   const tipId = useId();
   return (
@@ -375,8 +355,6 @@ function IconsDemo({ careful }: { careful: boolean }) {
     </div>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -509,8 +487,6 @@ const CHEAT_SHEET = [
   ["An icon beside the label", "4px less padding on the icon's side"],
   ["An icon with no label", "Square, with an aria-label and a tooltip"],
 ] as const;
-
-// ---------- The quiz levels ----------
 
 const LEVELS: Level[] = [
   {

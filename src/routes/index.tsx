@@ -246,8 +246,6 @@ const STACK_SOURCES = [
   })),
 ];
 
-// The band slides by exactly half its width, so each half must outrun the widest screen or its
-// end shows. One set is about 1170px; three sets make a half wide enough for a 3500px screen.
 const TICKER_RUN = Array.from({ length: 6 }, () => SLIDES).flat();
 
 function Index() {

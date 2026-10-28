@@ -20,18 +20,12 @@ import {
 } from "./-components/rule-landing";
 import "./dialog-design.css";
 
-// ---------- The small window every demo opens its dialog in ----------
-
-/** Focus inside one demo window. Its stops are the elements marked `data-stop`, in DOM order and
- * skipping inert ones, which is the order Tab walks them in. The ring sits on `at`. */
 function useWindowFocus() {
   const ref = useRef<HTMLDivElement>(null);
   const atRef = useRef<string | null>(null);
   const pending = useRef(false);
-  // A fresh object each move, so moving to the same stop still renders and focuses it.
   const [focus, setFocus] = useState<{ at: string | null }>({ at: null });
 
-  // Real focus waits for the commit: a dialog that has just opened is inert until then.
   useLayoutEffect(() => {
     if (!pending.current) return;
     pending.current = false;
@@ -42,14 +36,12 @@ function useWindowFocus() {
     return ref.current?.querySelector<HTMLElement>(`[data-stop="${stop}"]`) ?? null;
   }
 
-  /** Moves the ring, and real focus with it when the reader did the moving. */
   function move(stop: string | null, real: boolean) {
     atRef.current = stop;
     pending.current = real;
     setFocus({ at: stop });
   }
 
-  /** The stop Tab would reach next. With `within`, Tab wraps inside it. */
   function next(within: HTMLElement | null, back: boolean) {
     const stops = [...(ref.current?.querySelectorAll<HTMLElement>("[data-stop]") ?? [])].filter(
       (element) => !element.closest("[inert]") && (!within || within.contains(element)),
@@ -93,8 +85,6 @@ type ScreenProps = {
   onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 };
 
-/** A page, a scrim and its dialogs, all inside the pane. Nothing here covers or locks the real
- * page. */
 function Screen({ focus, open, page, children, onScrim, onKeyDown }: ScreenProps) {
   return (
     <div
@@ -117,9 +107,7 @@ type DialogProps = {
   body?: ReactNode;
   children: ReactNode;
   close?: ReactNode;
-  /** A plain div with no role and no name, the way lesson 6's wrong side ships. */
   bare?: boolean;
-  /** Open under a second dialog that has taken over. */
   held?: boolean;
   top?: boolean;
   ref?: Ref<HTMLDivElement>;
@@ -171,8 +159,6 @@ function CloseX({ focus, onClose }: CloseProps) {
   );
 }
 
-/** A key under the window that does what the real key does, for readers without a keyboard. It
- * keeps focus where it was, so Enter and Tab act on the window, not on the key. */
 function Key({ children, onPress }: { children: ReactNode; onPress: () => void }) {
   return (
     <button
@@ -208,8 +194,6 @@ function Stage({ stageRef, keys, read, tone, children }: StageProps) {
   );
 }
 
-// ---------- Lesson 1: focus stays inside (the signature) ----------
-
 const PROFILE_STOPS = new Map([
   ["trigger", "Edit profile"],
   ["pay", "Pay now"],
@@ -221,7 +205,6 @@ const PROFILE_STOPS = new Map([
 const IN_PROFILE = ["name", "cancel", "save"];
 const WALK_START = 500;
 const WALK_STEP = 600;
-// Seven presses: the left lap ends back on the page, the right one is still inside.
 const WALK_PRESSES = 7;
 
 function FocusDemo({ sealed }: { sealed: boolean }) {
@@ -233,13 +216,11 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
 
   function show(real: boolean) {
     setOpen(true);
-    // The careless dialog leaves focus on the button that opened it, behind the scrim.
     focus.move(sealed ? "name" : "trigger", real);
   }
 
   function hide() {
     setOpen(false);
-    // The careless one never moves focus. If it was in the dialog, it falls to <body>.
     const stays = focus.at !== null && !IN_PROFILE.includes(focus.at) ? focus.at : null;
     focus.move(sealed ? "trigger" : stays, true);
   }
@@ -248,7 +229,6 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
     focus.move(focus.next(sealed && open ? dialogRef.current : null, back), real);
   }
 
-  // The signature: once on screen, both dialogs open and Tab presses itself.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || reducedMotion()) return;
@@ -269,7 +249,6 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
       stop();
       for (const timer of timers) clearTimeout(timer);
     };
-    // Runs once: show and tab only touch refs and state setters.
   }, []);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -368,8 +347,6 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
   );
 }
 
-// ---------- Lesson 2: Escape closes it ----------
-
 function EscapeDemo({ sealed }: { sealed: boolean }) {
   const focus = useWindowFocus();
   const [open, setOpen] = useState(false);
@@ -447,8 +424,6 @@ function EscapeDemo({ sealed }: { sealed: boolean }) {
     </Stage>
   );
 }
-
-// ---------- Lesson 3: focus lands on the safe answer ----------
 
 type ConfirmPhase = "idle" | "open" | "deleted";
 
@@ -551,8 +526,6 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
     </Stage>
   );
 }
-
-// ---------- Lesson 4: a typed draft survives a stray click ----------
 
 const DRAFT = "Checkout fails on Safari 17 when a coupon is set";
 
@@ -749,8 +722,6 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
   );
 }
 
-// ---------- Lesson 5: the page behind holds still ----------
-
 function ScrollDemo({ sealed }: { sealed: boolean }) {
   const focus = useWindowFocus();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -778,7 +749,6 @@ function ScrollDemo({ sealed }: { sealed: boolean }) {
     if (open) setMoved(Math.abs(Math.round(page.scrollTop - base.current)));
   }
 
-  // On a real page the wheel over a scrim still reaches the body. Locked, it goes nowhere.
   useEffect(() => {
     const screen = focus.ref.current;
     if (!screen || !open) return;
@@ -846,9 +816,6 @@ function ScrollDemo({ sealed }: { sealed: boolean }) {
   );
 }
 
-// ---------- Lesson 6: a screen reader hears what opened ----------
-
-/** What a screen reader says as focus enters, built from the same attributes it reads. */
 function announce(dialog: HTMLElement, target: HTMLElement) {
   const textOf = (ids: string | null) =>
     (ids ?? "")
@@ -879,7 +846,6 @@ function NameDemo({ sealed }: { sealed: boolean }) {
     const dialog = dialogRef.current;
     const target = focus.at ? focus.find(focus.at) : null;
     setSpeech(open && dialog && target && dialog.contains(target) ? announce(dialog, target) : "");
-    // focus.find only reads the window's DOM.
   }, [open, focus.at]);
 
   function show() {
@@ -964,8 +930,6 @@ function NameDemo({ sealed }: { sealed: boolean }) {
     </Stage>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -1103,8 +1067,6 @@ const CHEAT_SHEET = [
   ["The markup", 'role="dialog", aria-modal, labelled by its title'],
   ["On a phone", "A bottom sheet that swipes down to close"],
 ] as const;
-
-// ---------- The quiz levels ----------
 
 const LEVELS: Level[] = [
   {

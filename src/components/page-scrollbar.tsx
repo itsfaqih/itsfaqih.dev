@@ -2,20 +2,11 @@ import { useEffect, useRef } from "react";
 
 import { jumpTo } from "./smooth-scroll";
 
-// How close to the window's right edge the pointer has to come to reveal the bar.
 const REVEAL_PX = 32;
-// How long the bar stays after the last scroll or reach.
 const LINGER_MS = 900;
 const MIN_THUMB_PX = 40;
-// Pressing the track pages this share of the viewport, so a line of context carries over.
 const PAGE_SHARE = 0.9;
 
-/**
- * The page scrollbar: one bar in the hue of whatever sits in the middle of the viewport. It shows
- * while the page scrolls, while a mouse is near the right edge, and while it is dragged. The page
- * keeps its native scrolling, so keyboard and find-in-page work as before; this replaces only the
- * drawn bar, and only for a mouse.
- */
 export function PageScrollbar() {
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);

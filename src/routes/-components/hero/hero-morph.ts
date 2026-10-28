@@ -1,7 +1,3 @@
-/* Outline geometry for the morph between hero scenes. Every outline is resampled to the same
-   number of points, clockwise from the point nearest twelve o'clock, so any two outlines
-   blend point by point without twisting. */
-
 type Pt = readonly [number, number];
 export type Outline = Pt[];
 
@@ -63,7 +59,6 @@ export const polygon = (...vertices: Pt[]) => resample(vertices);
 export const sector = (cx: number, cy: number, r: number, fromDeg: number, toDeg: number) =>
   resample([[cx, cy], ...arcPoints(cx, cy, r, fromDeg, toDeg, 24)]);
 
-/** The outline shrunk to a point at its centre, for a token whose drawing is hidden. */
 export const collapsed = (outline: Outline): Outline => {
   const [x, y] = centroid(outline);
   return dot(x, y);
@@ -71,8 +66,6 @@ export const collapsed = (outline: Outline): Outline => {
 
 export const dot = (x: number, y: number): Outline => Array.from({ length: OUTLINE_POINTS }, () => [x, y]);
 
-/** Applies a CSS `translate(dx, dy) rotate(deg)` turned about the outline's own centre, the
-    way the scenes' fill-box transforms do. */
 export function moved(outline: Outline, dx: number, dy: number, deg = 0, scale = 1): Outline {
   const xs = outline.map(([x]) => x);
   const ys = outline.map(([, y]) => y);
@@ -86,7 +79,6 @@ export function moved(outline: Outline, dx: number, dy: number, deg = 0, scale =
   });
 }
 
-/** Traces a drawing the browser has rendered, carried through `matrix` into the outline's space. */
 export function traced(drawing: SVGGeometryElement, matrix: DOMMatrixReadOnly): Outline {
   const length = drawing.getTotalLength();
   const samples = OUTLINE_POINTS * 4;

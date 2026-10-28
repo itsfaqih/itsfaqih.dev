@@ -48,8 +48,6 @@ function Paper({ p }: { p: string }) {
   );
 }
 
-/** The grid printed on the paper itself, below the lifted art, so a tilt shows the art
-    floating over it. */
 function RegistrationMark({ x, y, className }: { x: number; y: number; className: string }) {
   return (
     <g className={className}>
@@ -67,7 +65,6 @@ const vars = (v: Record<string, string | number>): CSSProperties =>
   Object.fromEntries(Object.entries(v).map(([k, value]) => [`--${k}`, value]));
 
 const pct = (n: number) => `${+n.toFixed(2)}%`;
-/** Every scene plays once over the same span, then rests on its last frame; Backends flows through the rest. */
 const SCENE_MS = 3200;
 const SCENE_REST_MS = 1000;
 export const SLIDE_MS = SCENE_MS + SCENE_REST_MS;
@@ -122,10 +119,6 @@ function arcPoint(t: number) {
   return { x: at(0), y: at(1) };
 }
 
-/* Backends: at each advance the head job enters the worker, the line steps up and a new job joins
-   the tail. The hue job fails, arcs back to the tail in place of a new job, works its way up again
-   and passes. The queue never rests, so it flows through the whole slide, and the last take finishes
-   as the next scene takes over. Times are in ms. */
 const BACKENDS_MS = SLIDE_MS;
 const MOVE_MS = 192;
 const ABSORB_MS = 128;
@@ -143,13 +136,11 @@ const advancesFrom = (from: number, to?: number) => ADVANCES.slice(from, to);
 const intoWorkerAt = (advance: number) => ADVANCES[advance]! + MOVE_MS;
 const backendsPct = (ms: number) => pct((ms / BACKENDS_MS) * 100);
 
-/** Where a job is at one keyframe. */
 type JobStop = { at: number; x: number; y?: number; scale?: number; opacity?: number; ease?: string };
 
 const jobFrame = ({ at, x, y = 0, scale = 1, opacity = 1, ease }: JobStop) =>
   `${backendsPct(at)} { opacity: ${opacity}; transform: translate(${+x.toFixed(1)}px, ${+y.toFixed(1)}px) scale(${scale});${ease ? ` animation-timing-function: ${ease};` : ""} }`;
 
-/** A job waiting at `fromSlot` from `since` steps up one slot at each of `steps`, the last into the worker if it reaches it. */
 function queued(fromSlot: number, steps: number[], since = 0): JobStop[] {
   const stops: JobStop[] = [{ at: since, x: SLOT_X[fromSlot]! }];
   steps.forEach((at, k) => {
@@ -163,7 +154,6 @@ function queued(fromSlot: number, steps: number[], since = 0): JobStop[] {
   return stops;
 }
 
-/** A new job slides into the tail at the first of `steps`, then queues like the rest. */
 function joining(steps: number[]): JobStop[] {
   const [first, ...rest] = steps;
   return [
@@ -185,7 +175,6 @@ function arcBack(): JobStop[] {
   });
 }
 
-/** A joiner takes the tail and four more advances to reach the worker. */
 const STEPS_TO_WORKER = SLOT_X.length + 1;
 const joiner = (advance: number) => {
   const steps = advancesFrom(advance, advance + STEPS_TO_WORKER);
@@ -212,7 +201,6 @@ const JOBS: { top: TopInk; stops: JobStop[] }[] = [
     .map(joiner),
 ];
 
-/** When the worker takes in each job, the hue job twice. */
 const WORKER_TAKES = ADVANCES.map((_, advance) => intoWorkerAt(advance));
 const HUE_TAKES = [HUE_REJECTED, HUE_PASSES].map(intoWorkerAt);
 const INK_DONE = WORKER_TAKES.filter((at) => !HUE_TAKES.includes(at));
@@ -266,16 +254,11 @@ const QUARTERS: Piece[] = [
   { outline: sector(160, 100, 70, 180, 270), top: "hue", dx: -84, dy: -50, r: -40 },
 ];
 
-/** The quarters in token order: solids first, to pair with the tumbling solids. */
 const QUARTER_TOKENS = [0, 2, 3, 1];
 
-/** Each piece settles over `span` of the scene, `step` after the one before; the last lands
-    at `span + 3 × step`. */
 const settleVars = ({ dx, dy, r = 0 }: Piece, i: number, span: number, step: number) =>
   vars({ i, dx: `${dx}px`, dy: `${dy}px`, r: `${r}deg`, span, step });
 
-/** Art that has stopped moving bobs gently from `at` ms into the scene; one `ms` is one way up or down.
-    Shapes that must stay lined up share one Float, and guides stay still on the paper beneath. */
 function Float({ at = 0, ms = 1600, children }: { at?: number; ms?: number; children: ReactNode }) {
   return (
     <g className="float" style={vars({ "float-at": `${at}ms`, "float-ms": `${ms}ms` })}>
@@ -436,9 +419,6 @@ const SCENES: Scene[] = [
   },
 ];
 
-/* Each scene's four main pieces as they stand on its first and last frame. A scene change
-   blends the old scene's last frame into the new one's first, token by token, and the new
-   scene starts its loop from there. */
 type Token = { outline: Outline; top: TopInk };
 type SceneTokens = { enter: Token[]; exit: Token[] };
 
@@ -496,26 +476,19 @@ const TOPS: TopInk[] = ["solid", "hue", "outline"];
 const MORPH_MS = 1100;
 const FADE_MS = 180;
 const TOKEN_STAGGER_MS = 60;
-/** How long after a scene change the new scene starts. */
 export const SCENE_LEAD_MS = MORPH_MS - FADE_MS;
-/* easeInOut covers only the last 1.5% of the way in its final 15% of time. Cutting the curve there
-   lands every token on the scene's first frame still moving, so the scene picks up the motion. */
 const LANDING_T = 0.845;
 const landing = (u: number) => easeInOut(u * LANDING_T) / easeInOut(LANDING_T);
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 type Layer = { index: number; run: number };
-/** "leaving": the old scene fades out, frozen on the frame the tokens took over from.
-    "entering": the next scene fades in beneath the landing tokens. */
 type Stage = { layers: Layer[]; phase: "still" | "leaving" | "entering" };
-/** A token as drawn right now: its outline and how much of each top ink shows, in TOPS order. */
 type Drawn = { outline: Outline; inks: number[] };
 
 const inksOf = (top: TopInk) => TOPS.map((ink) => (ink === top ? 1 : 0));
 const drawnOf = (tokens: Token[]): Drawn[] =>
   tokens.map(({ outline, top }) => ({ outline, inks: inksOf(top) }));
-/** False while the drawing or a group around it inside the scene is faded out. */
 function isShown(drawing: Element, scene: Element) {
   let opacity = 1;
   for (let at: Element | null = drawing; at && at !== scene; at = at.parentElement) {
@@ -524,8 +497,6 @@ function isShown(drawing: Element, scene: Element) {
   return opacity > 0.05;
 }
 
-/** Each token as the scene draws it this frame, mid-animation included, in viewBox units. A scene marks a
-    token's shape with data-token; the last match is the top ink, the first its halftone. */
 function drawnIn(scene: SVGGElement | undefined, tokens: Token[]): Drawn[] {
   return tokens.map(({ outline, top }, k) => {
     const drawing = scene && [...scene.querySelectorAll<SVGGeometryElement>(`[data-token="${k}"]`)].at(-1);
@@ -540,10 +511,6 @@ function drawnIn(scene: SVGGElement | undefined, tokens: Token[]): Drawn[] {
 const fadeOf = (layer: SVGGElement | undefined) => Number(layer?.style.getPropertyValue("--fade") || 1);
 const setFade = (layer: SVGGElement, fade: number) => layer.style.setProperty("--fade", String(fade));
 
-/** Mounts scenes and drives the morph between them. A change that lands mid-morph starts the
-    next morph from the tokens as they are drawn, so frantic switching never jumps. The tokens
-    and every fade run on one frame loop, not CSS, so pausing the scene never strands
-    a half-faded layer. */
 function useSceneMorph(index: number, run: number) {
   const [stage, setStage] = useState<Stage>({ layers: [{ index, run }], phase: "still" });
   const currentStage = useEffectEvent(() => stage);
@@ -552,7 +519,6 @@ function useSceneMorph(index: number, run: number) {
   const drawnRef = useRef<Drawn[]>([]);
   const paintRef = useRef(() => {});
 
-  // A commit that mounts the morph or the next scene draws its first frame before the browser paints it.
   useLayoutEffect(() => paintRef.current(), [stage]);
 
   useEffect(() => {
@@ -566,7 +532,6 @@ function useSceneMorph(index: number, run: number) {
       return;
     }
 
-    // Tokens swap between scene and morph in one frame; the rest of the art fades from wherever its fade has reached.
     const leaving = layers.map((layer) => ({ layer, from: fadeOf(layerRefs.current.get(layerKey(layer))) }));
     const from =
       phase === "leaving"

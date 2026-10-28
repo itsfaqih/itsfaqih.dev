@@ -10,20 +10,14 @@ import {
 } from "./-components/rule-landing";
 import "./handling-timestamps.css";
 
-// ---------- Time: one moment, read on clocks in different zones ----------
-
 type Person = { who: string; city: string; tz: string };
 const RINA: Person = { who: "Rina", city: "Jakarta", tz: "Asia/Jakarta" };
 const SAM: Person = { who: "Sam", city: "New York", tz: "America/New_York" };
 const HOUR = 3_600_000;
-/** Jakarta has no daylight saving, so its offset is fixed. */
 const JAKARTA = 7 * HOUR;
 
-/** A wall-clock reading, kept as the UTC milliseconds that carry the same digits. Two readings
- * subtract to the hours between them, and a UTC reading is the instant itself. */
 type Wall = number;
 
-/** The md's own example. */
 const MOMENT = Date.parse("2026-01-10T06:00:00.000Z");
 
 const PARTS = new Map<string, Intl.DateTimeFormat>();
@@ -72,14 +66,10 @@ const shortDay = (wall: Wall) => {
   const at = new Date(wall);
   return `${MONTHS[at.getUTCMonth()]} ${at.getUTCDate()}`;
 };
-/** "2026-01-10T06:00:00": the digits with no zone. */
 const digits = (wall: Wall) => new Date(wall).toISOString().slice(0, 19);
 const utcIso = (instant: number) => new Date(instant).toISOString();
 const hhmm = (wall: Wall) => new Date(wall).toISOString().slice(11, 16);
 
-// ---------- The readers: the same moment on two people's screens ----------
-
-/** What one person's screen shows, beside what it should show. */
 type Reading = { person: Person; shown: Wall; truth: Wall };
 
 const readAt = (person: Person, shown: number, truth: number): Reading => ({
@@ -100,8 +90,6 @@ function offBy(reading: Reading) {
   return `${Math.abs(hours)} h ${hours < 0 ? "early" : "late"}`;
 }
 
-/** Turns each hand from where it pointed at `from` to where it points now. The hour hand turns
- * the long way a clock would, so a later zone swings clockwise and an earlier one back. */
 function swing(root: HTMLElement, from: Wall[], to: Wall[], duration: number, step: number) {
   return [...root.querySelectorAll<HTMLElement>(".ts-reader")].flatMap((card, index) => {
     const start = from[index];
@@ -132,8 +120,6 @@ function swing(root: HTMLElement, from: Wall[], to: Wall[], duration: number, st
   });
 }
 
-/** Two people's screens. The hands start at the moment's UTC reading and swing to what each
- * screen shows once the pair comes on screen; behind the phone tabs, each time its pane shows. */
 function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
   const ref = useRef<HTMLDivElement>(null);
   const shown = readings.map((reading) => reading.shown);
@@ -175,7 +161,6 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
     };
   }, []);
 
-  // A new input moves the hands from where they were.
   useLayoutEffect(() => {
     const root = ref.current;
     const before = last.current;
@@ -220,8 +205,6 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
   );
 }
 
-// ---------- Code and requests ----------
-
 type Line = { c: ReactNode; hot?: boolean; note?: boolean };
 
 function Wire({ lines }: { lines: Line[] }) {
@@ -244,8 +227,6 @@ function Wire({ lines }: { lines: Line[] }) {
 const str = (text: string) => <span className="ts-str">"{text}"</span>;
 
 type Way = "bad" | "good";
-
-// ---------- Lesson 1: the rows two people write in the same second ----------
 
 function OrdersTable({ way }: { way: Way }) {
   const rows = [
@@ -292,18 +273,14 @@ function OrdersTable({ way }: { way: Way }) {
   );
 }
 
-// ---------- Lesson 4: Rina's reminder, as a real form ----------
-
 const parseWall = (date: string, time: string) => Date.parse(`${date}T${time}:00Z`);
 
 function ReminderDemo({ way }: { way: Way }) {
   const [date, setDate] = useState("2026-01-01");
   const [time, setTime] = useState("07:00");
   const typed = parseWall(date, time);
-  // What Rina typed, read on her own clock in Jakarta.
   const wall = Number.isNaN(typed) ? parseWall("2026-01-01", "07:00") : typed;
   const meant = wall - JAKARTA;
-  // With no zone on the string, the server reads her digits as UTC.
   const stored = way === "bad" ? wall : meant;
   const id = `ts-${way}`;
   return (
@@ -351,9 +328,6 @@ function ReminderDemo({ way }: { way: Way }) {
   );
 }
 
-// ---------- Lesson 5: Rina's orders on one day ----------
-
-/** Minutes after the start of Rina's chosen day, on her clock. */
 const ORDER_TIMES = [-30, 135, 400, 1270, 1640];
 const DAY = 24 * HOUR;
 
@@ -369,7 +343,6 @@ function FilterDemo({ way }: { way: Way }) {
   const [date, setDate] = useState("2026-01-10");
   const typed = parseWall(date, "00:00");
   const start = Number.isNaN(typed) ? parseWall("2026-01-10", "00:00") : typed;
-  // Bad: "2026-01-10T00:00:00" goes out with no zone and is read as UTC midnight.
   const from = way === "bad" ? start : start - JAKARTA;
   const orders = ORDER_TIMES.map((minutes, index) => {
     const wall = start + minutes * 60_000;
@@ -423,16 +396,12 @@ function FilterDemo({ way }: { way: Way }) {
   );
 }
 
-// ---------- The lessons ----------
-
 const RIGHT = [readAt(RINA, MOMENT, MOMENT), readAt(SAM, MOMENT, MOMENT)];
-/** What each browser does with "2026-01-10T06:00:00": reads the digits as its own clock. */
 const NO_Z = [RINA, SAM].map((person) => ({
   person,
   shown: wallOf(MOMENT, "UTC"),
   truth: wallOf(MOMENT, person.tz),
 }));
-/** What the New York server prints, shown as is on both screens. */
 const SERVER_WALL = wallOf(MOMENT, SAM.tz);
 const SERVER_TIME = [RINA, SAM].map((person) => ({
   person,
@@ -601,8 +570,6 @@ const TLDR = [
   ["Filtering by a date", "The user's day as a UTC range"],
   ["Date math", "On Date values, never on the string"],
 ] as const;
-
-// ---------- The quiz levels: the path one timestamp takes ----------
 
 const code = (text: string) => <code>{text}</code>;
 

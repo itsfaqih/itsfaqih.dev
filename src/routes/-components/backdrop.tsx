@@ -1,32 +1,18 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-// A dot matrix behind the page that scrolls with it. Near the pointer the dots wake up in the
-// site's topic colours and lean toward it, like an LED board pulled by a magnet. The CSS grid holds
-// every other dot; the canvas redraws only the circle around the pointer, and the grid leaves a
-// hole there to match. A click knocks the magnet back and sends a ring through every dot on
-// screen, and for that the canvas takes over the whole grid. The layer itself stays fixed and
-// only slides the grid by the part of a cell the page has scrolled, so scrolling is a transform.
-// Touch screens get the grid without the pointer field.
-
 const CELL = 22;
 const RADIUS = 220;
-/** At most a dot moves this share of its distance to the pointer, so rings never cross. */
 const PULL = 0.5;
 const PALETTE = ["--cw", "--ux", "--ar", "--ts", "--ax", "--go"];
-/** Per second, how fast the field catches up with the pointer and how fast it fades in or out. */
 const FOLLOW = 14;
 const FADE = 7;
-/** A click sends a ring this far out over this long; its crest is about BAND thick and moves
-    dots up to AMP px. */
 const RIPPLE_REACH = 560;
 const RIPPLE_MS = 1100;
 const RIPPLE_BAND = 40;
 const RIPPLE_AMP = 6;
-/** At the click the magnet's pull swings to -(SHOCK - 1) of itself, recovering over ~3 SHOCK_MS. */
 const SHOCK = 1.8;
 const SHOCK_MS = 140;
-/** Clicking faster than the rings fade drops the oldest past this many. */
 const MAX_RIPPLES = 4;
 
 export function Backdrop() {
@@ -43,14 +29,12 @@ export function Backdrop() {
   );
 }
 
-/** The backdrop's ref. It runs the pointer field from mount until React calls the returned cleanup. */
 function followPointer(element: HTMLDivElement) {
   const grid = element.querySelector("i");
   const canvas = element.querySelector("canvas");
   const context = canvas?.getContext("2d");
   if (!grid) return;
 
-  // How far the page sits past the last whole cell, and how many whole rows it has scrolled.
   let shift = 0;
   let scrolledRows = 0;
   let redraw = () => {};
@@ -69,8 +53,6 @@ function followPointer(element: HTMLDivElement) {
 
   let base = "";
   let colours: string[] = [];
-  // Light mode darkens each hue a little less than accent text does: enough to read on a pale
-  // ground, little enough to stay a colour.
   const readColours = () => {
     const resolve = (value: string) => {
       canvas.style.color = value;
@@ -91,13 +73,11 @@ function followPointer(element: HTMLDivElement) {
   const field = { x: 0, y: 0 };
   let strength = 0;
   let lit = false;
-  // Pinned to the page, so a ring keeps its place if the page scrolls under it.
   let ripples: { x: number; pageY: number; start: number }[] = [];
   let frame = 0;
   let then = 0;
 
   const colourOf = (column: number, row: number) => {
-    // Hashed on the page row, so each dot keeps its colour as it scrolls past.
     const pageRow = row + scrolledRows;
     return colours[((column * 7 + pageRow * 13) ^ (column * pageRow)) % colours.length]!;
   };
@@ -105,10 +85,7 @@ function followPointer(element: HTMLDivElement) {
     ripples = ripples.filter((ripple) => now - ripple.start < RIPPLE_MS);
     context.setTransform(scale, 0, 0, scale, 0, 0);
     context.clearRect(0, 0, innerWidth, innerHeight);
-    // While a ring is out every dot on screen can move, so the canvas draws the whole grid and
-    // the CSS grid hides behind a hole wider than the screen.
     const rippling = ripples.length > 0;
-    // A click briefly turns the magnet's pull into a push, then the pull comes back.
     const shock = Math.max(0, ...ripples.map((ripple) => Math.exp(-(now - ripple.start) / SHOCK_MS)));
     const pull = still.matches ? 0 : PULL * strength * (1 - SHOCK * shock);
     const waves = ripples.map((ripple) => {
@@ -143,8 +120,6 @@ function followPointer(element: HTMLDivElement) {
           const crest = Math.exp(-(offset ** 2));
           glow = Math.max(glow, crest * wave.energy);
           if (fromOrigin < 0.5) continue;
-          // The derivative of the crest's bell: dots behind the front are pushed out and dots
-          // ahead of it pulled back, so they bunch into a ring that travels. 2.33 makes its peak 1.
           const push = -offset * crest * 2.33 * RIPPLE_AMP * wave.energy;
           dotX += (dx / fromOrigin) * push;
           dotY += (dy / fromOrigin) * push;
@@ -163,7 +138,6 @@ function followPointer(element: HTMLDivElement) {
       }
     }
     element.style.setProperty("--mx", `${field.x}px`);
-    // The grid is slid up by shift, so its hole sits that much lower in its own box.
     element.style.setProperty("--my", `${field.y + shift}px`);
     const hole = rippling ? Math.hypot(innerWidth, innerHeight) * 2 : strength > 0 ? RADIUS : 0;
     element.style.setProperty("--hole", `${hole}px`);
@@ -231,7 +205,6 @@ function followPointer(element: HTMLDivElement) {
   };
   addEventListener("resize", onResize);
   addEventListener("pointermove", move, { passive: true });
-  // Capture, so controls that stop pointerdown from bubbling still ripple.
   addEventListener("pointerdown", press, { capture: true, passive: true });
   document.documentElement.addEventListener("pointerleave", leave);
   return () => {

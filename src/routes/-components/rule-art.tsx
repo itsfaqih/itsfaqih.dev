@@ -3,10 +3,6 @@ import { colorOf } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 
-// The Rule of Thumb visual system: one hue and glyph per topic, and a
-// thumbnail "screen" per rule that acts the rule out when it plays. Shared by
-// the home page, the index, and every article.
-
 function Icon({ children }: { children: ReactNode }) {
   return (
     <svg
@@ -64,15 +60,8 @@ const CATEGORY_ICON = new Map<string, ReactNode>([
 const iconOf = (category: string) =>
   CATEGORY_ICON.get(category) ?? CATEGORY_ICON.get("Best Practices");
 
-/** The view transition a rule card starts when it opens its rule: the page dives into the card
- * while its thumbnail and title grow into the rule page's cover and heading (see `rule-open` in
- * arcade.css). */
 const RULE_OPEN = "rule-open";
 
-/** Props for the links that open rules with the dive, and for the panel that previews the rule a
- * link points at, where a page has one. The page dives into the panel while it is on screen, and
- * into the clicked card otherwise. The card that opens is marked and its centre recorded, the point
- * the page zooms toward. */
 export function useRuleOpen() {
   const panel = useRef<HTMLElement>(null);
   const [opening, setOpening] = useState<{ rule: string; inPanel: boolean } | null>(null);
@@ -94,8 +83,6 @@ export function useRuleOpen() {
   };
 }
 
-/** True while the page renders inside a card's `rule-open` transition, when the hero's cover and
- * heading are already on screen as the morph's end state and must not play their cut-in. */
 export function isOpeningRule() {
   try {
     return document.documentElement.matches(`:active-view-transition-type(${RULE_OPEN})`);
@@ -106,13 +93,9 @@ export function isOpeningRule() {
 
 type RuleThumbProps = {
   rule: Guideline;
-  /** Loop the rule's animation. Otherwise the thumbnail holds its still frame. */
   play?: boolean;
 };
 
-// Each art piece's still frame is its default style, and every keyframe loop
-// ends on that frame, so stopping mid-loop or reduced motion lands on the
-// same picture.
 export function RuleThumb({ rule, play = false }: RuleThumbProps) {
   return (
     <div
@@ -138,7 +121,6 @@ function Chip({ beats }: { beats: string[] }) {
   );
 }
 
-// A styles file walks from shared/ to the component that uses it.
 function ProximityArt() {
   return (
     <div className="art px">
@@ -169,7 +151,6 @@ function ProximityArt() {
   );
 }
 
-// One button walks through idle, hover, press, pending and done.
 function ButtonArt() {
   return (
     <div className="art bt">
@@ -208,7 +189,6 @@ function ButtonArt() {
   );
 }
 
-// Cached rows show at once, then revalidate in place.
 function DataLoadingArt() {
   const rows = [
     { y: 34, width: 50, value: "$12" },
@@ -241,7 +221,6 @@ function DataLoadingArt() {
   );
 }
 
-// undefined leaves the slot empty; null puts an empty box in it.
 function NullArt() {
   return (
     <div className="art nu">

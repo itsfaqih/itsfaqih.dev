@@ -11,26 +11,18 @@ import {
 } from "./-components/rule-landing";
 import "./typescript-code-writing.css";
 
-// ---------- TypeScript, with what tsc says beside each line ----------
-
 type Tone = "no" | "yes";
-/** What the compiler, or the runtime, says about one line. Only an `error` counts toward the
- * pane's tsc total and gets a squiggle. */
 type Note = { text: string; tone?: Tone; error?: true };
-/** `hot` marks the line the lesson is about. */
 type Line = { c: string; hot?: boolean; note?: Note };
 
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(export|default|function|import|from|type|interface|extends|enum|const|let|return|as|true|false)\b|\b([A-Z][A-Za-z]*)\b|\b(\d+)\b/g;
 const KINDS = ["com", "str", "kw", "ty", "num"] as const;
 
-/** How long the check rests on each line. */
 const STEP = 110;
 
 type Phase = "idle" | "run" | "done";
 
-/** A pane of TypeScript that tsc reads top to bottom. It renders checked, so a glance shows the
- * verdict; a lesson still below the fold hides its notes and runs the check once it is on screen. */
 function Checked({ lines }: { lines: Line[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("done");
@@ -43,7 +35,6 @@ function Checked({ lines }: { lines: Line[] }) {
     setPhase(reducedMotion() ? "done" : "run");
   }
 
-  // Behind the kit's tabs, which play their own move, the check stays done.
   useLayoutEffect(() => {
     const view = ref.current;
     if (
@@ -66,7 +57,6 @@ function Checked({ lines }: { lines: Line[] }) {
     };
   }, []);
 
-  // The cursor steps down the lines; each note lands as the cursor reaches its line.
   useLayoutEffect(() => {
     const view = ref.current;
     if (!view || runs === 0) return;
@@ -164,8 +154,6 @@ function Checked({ lines }: { lines: Line[] }) {
     </div>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -497,8 +485,6 @@ const TLDR = [
   ["A new tsconfig", "strict, noUncheckedIndexedAccess, verbatimModuleSyntax, ESM"],
 ] as const;
 
-// ---------- The quiz levels ----------
-
 const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (
   <>
@@ -506,7 +492,6 @@ const blank = (text: string) => (
     <span className="ts-gap" aria-hidden="true" />
   </>
 );
-/** A slot that shows what it holds now, until the piece takes its place. */
 const holds = (text: string) => <code className="ts-holds">{paint(text, TOKEN, KINDS)}</code>;
 
 const LEVELS: Level[] = [

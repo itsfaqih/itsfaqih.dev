@@ -20,10 +20,6 @@ import {
 import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
 import "./table-design.css";
 
-// ---------- Shared demo state ----------
-// Both panes of a lesson, and the switch in its copy, read one store, so the two tables always
-// show the same situation.
-
 type Store<T> = {
   get: () => T;
   update: (next: (now: T) => T) => void;
@@ -69,13 +65,10 @@ function Th({ children, className }: { children: ReactNode; className?: string }
   );
 }
 
-// ---------- Lesson 1: numbers line up on the right ----------
-
 type Ticker = { values: number[]; step: number; hot: number | null };
 
 const ACCOUNTS = ["Acme", "Globex", "Initech", "Umbrella", "Hooli"];
 const MRR = [12500, 8750.5, 340, 95200, 1111.11];
-/** One loop of live changes. It ends where it began, so the ticker can run forever. */
 const TICKS: readonly (readonly [row: number, value: number])[] = [
   [1, 8811.25],
   [3, 95320],
@@ -103,8 +96,6 @@ const tick = (now: Ticker): Ticker => {
   };
 };
 
-/** Each digit rides its own reel, keyed from the right so a digit keeps its reel as values
- * change. Tabular figures make every reel the same width, so nothing beside it moves. */
 function Reels({ text }: { text: string }) {
   const chars = [...text];
   return (
@@ -171,8 +162,6 @@ function NumbersDemo({ careful }: { careful: boolean }) {
   );
 }
 
-/** Runs the ticker while its lesson is on screen. Live figures get a pause; under reduced
- * motion they start paused on a still frame. */
 function LiveSwitch() {
   const { ticker } = useDemos();
   const ref = useRef<HTMLButtonElement>(null);
@@ -219,11 +208,8 @@ function LiveSwitch() {
   );
 }
 
-// ---------- Lesson 2: every state gets a next step ----------
-
 type Roster = {
   phase: "loading" | "error" | "ready";
-  /** A Retry's load finishes on its own; a load picked from the switch holds still. */
   settles: boolean;
   users: readonly Person[];
   query: string;
@@ -425,8 +411,6 @@ function StatesDemo({ careful }: { careful: boolean }) {
   );
 }
 
-// ---------- Lesson 3: actions in a fixed last column ----------
-
 const CREW: readonly Person[] = [
   { name: "Ana Li", role: "Admin" },
   { name: "Bob Smith", role: "Editor" },
@@ -558,8 +542,6 @@ function IconButton({
     </span>
   );
 }
-
-// ---------- Lesson 4: no pager for one page ----------
 
 type Filter = "all" | "admin" | "owner";
 
@@ -695,8 +677,6 @@ function Pager({
   );
 }
 
-// ---------- Lesson 5: the page lives in the URL ----------
-
 const URL_PER_PAGE = 3;
 const URL_PAGES = Math.ceil(STAFF.length / URL_PER_PAGE);
 
@@ -774,8 +754,6 @@ function UrlDemo({ careful }: { careful: boolean }) {
     </div>
   );
 }
-
-// ---------- The lessons ----------
 
 const LESSONS: Lesson[] = [
   {
@@ -890,8 +868,6 @@ const CHEAT_SHEET = [
   ["One page, or none", "No pager"],
   ["The current page", "In the URL, as ?page=2"],
 ] as const;
-
-// ---------- The quiz levels ----------
 
 const LEVELS: Level[] = [
   {

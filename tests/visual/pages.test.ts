@@ -20,7 +20,6 @@ const baselineDir = path.join(import.meta.dirname, "__screenshots__");
 const diffDir = path.join(import.meta.dirname, "__diff__");
 const update = process.env.UPDATE_VISUAL === "1";
 
-// Antialiasing noise stays well under this; a moved or restyled element does not.
 const maxDiffRatio = 0.0005;
 
 const buildRoot = inject("buildRoot");
@@ -65,7 +64,6 @@ async function capture(shot: Shot) {
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    // Not every animation honors reduced motion, so jump all of them to their end state.
     const style = document.createElement("style");
     style.textContent = `*, *::before, *::after {
       animation-duration: 0s !important;
@@ -85,8 +83,6 @@ async function capture(shot: Shot) {
     });
     await page.evaluate(async () => {
       await document.fonts.ready;
-      // Scroll reveals ([data-rv] on rule pages, [data-cut] on home) observe with a negative root
-      // margin, so step by half a viewport and wait until every block in the band has revealed.
       const unrevealedInView = () =>
         Array.from(document.querySelectorAll("[data-rv]:not(.in), [data-cut]:not(.in)")).some(
           (block) => {

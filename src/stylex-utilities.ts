@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
 
-/** Static utility styles compiled from the former utility classes. */
 export const utilityStyles = stylex.create({
   "-ml-px": {
     "marginLeft": "-1px"

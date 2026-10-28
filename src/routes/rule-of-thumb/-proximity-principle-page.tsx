@@ -1,8 +1,6 @@
 import { type Lesson, type Level, RuleLanding, Tree } from "./-components/rule-landing";
 import "./proximity-principle.css";
 
-// ---------- The lessons: each walks one piece of code from far to near ----------
-
 const LESSONS: Lesson[] = [
   {
     title: "Inline first",
@@ -228,8 +226,6 @@ const CHEAT_SHEET = [
   ["Used almost everywhere", "A type folder, like components/"],
   ["A child with its own state", "Its own component"],
 ] as const;
-
-// ---------- The quiz levels ----------
 
 const LEVELS: Level[] = [
   {

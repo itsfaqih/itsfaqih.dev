@@ -5,19 +5,11 @@ import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 
-// The home page's Rule of Thumb deck: cards fanned in 3D around the one in focus. Its whole state is
-// one number, the index at the centre, so a drag can rest between cards and a release springs on
-// from wherever the cards are. CSS turns each card's offset from that number into its pose.
-
-/** Card widths a drag travels per card, the same spacing the spread uses (see .spread-slot). */
 const STEP = 0.68;
-/** Past either end, the deck follows the pointer at this fraction of the overshoot. */
 const RUBBER = 0.35;
 const STIFFNESS = 140;
 const DAMPING = 2 * Math.sqrt(STIFFNESS) * 0.82;
-/** A release projects this far ahead along its velocity before picking the nearest card. */
 const PROJECT_S = 0.12;
-/** A drag this long always moves at least one card, however slowly it was let go. */
 const FLICK_PX = 30;
 const DRAG_START_PX = 6;
 const HIDDEN_AT = 2.95;
@@ -44,7 +36,6 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
       slot.style.setProperty("--d", offset.toFixed(4));
       slot.style.setProperty("--ad", Math.abs(offset).toFixed(4));
       slot.style.zIndex = String(10 - Math.round(Math.abs(offset)));
-      // Three steps out the card has faded away; hidden, it stops catching clicks and focus.
       slot.style.visibility = Math.abs(offset) > HIDDEN_AT ? "hidden" : "";
     });
     setActive(clamp(Math.round(position)));
@@ -248,7 +239,6 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
   );
 }
 
-/** A two-digit count whose digits slide in the direction it moved: up when it grows. */
 function SlideNumber({ value }: { value: number }) {
   const [shown, setShown] = useState({ value, previous: value });
   if (shown.value !== value) setShown({ value, previous: shown.value });

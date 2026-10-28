@@ -27,9 +27,6 @@ const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 export const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------- The data a rule page supplies ----------
-
-/** One way to do it: what it looks like and what it costs. */
 type Side = { label: string; view: ReactNode; costs: string[] };
 export type Lesson = {
   title: string;
@@ -40,12 +37,9 @@ export type Lesson = {
   good: Side;
 };
 
-/** Rows with the same key in both layouts glide between their places. A row whose text is not a
- * string has no key of its own, so it needs `k`. */
 type TreeRow = {
   depth: number;
   kind?: "dir" | "comp" | "more";
-  /** The piece of code the lesson is about. */
   moved?: boolean;
   tag?: string;
 } & ({ k: string; text: ReactNode } | { k?: undefined; text: string });
@@ -53,7 +47,6 @@ type TreeRow = {
 type Slot = { id: string; label: ReactNode; note: string; cost: string[] };
 type BoardRow =
   | { depth: number; text: ReactNode; kind?: string; tag?: string }
-  /** `lead` sits before the slot and stays once the piece is seated, like a key before its value. */
   | { depth: number; slot: Slot; lead?: ReactNode };
 export type Level = {
   name: string;
@@ -72,15 +65,11 @@ type RuleLandingProps = {
   quiz: { intro: ReactNode; levels: Level[]; board: string };
   /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
   take: string;
-  /** A hook for the page's own CSS. */
   className?: string;
 };
 
-/** Stars per level: 1 to 3 once cleared, null while open. */
 type Results = (number | null)[];
 
-/** A rule's landing: the title screen with its cover, lessons that set the wrong way beside the
- * right one, a TL;DR, a mini quiz, and the rule as Markdown to take away. */
 export function RuleLanding(props: RuleLandingProps) {
   const pathname = useLocation({ select: (location) => location.pathname });
   const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
@@ -103,13 +92,11 @@ function Landing({
   const rootRef = useRef<HTMLDivElement>(null);
   useReveal(rootRef);
   const [morphed] = useState(isOpeningRule);
-  // Arriving by morph, start at the top now so the title and cover fly into a hero on screen.
   useLayoutEffect(() => {
     if (morphed) scrollTo({ top: 0, behavior: "instant" });
   }, [morphed]);
 
   const titleRef = useRef<HTMLHeadingElement>(null);
-  // State, not a ref: the slot mounts in the island a commit after the page does.
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useTitleFit(titleRef);
   useTitleDock(rootRef, titleRef, slot);
@@ -306,12 +293,8 @@ function PagerCard({
   );
 }
 
-// ---------- The cover: the card's thumbnail, grown and tilted beside the title ----------
-
 type CoverProps = { rule: PublishedGuideline; entering: boolean };
 
-/** Rests at a tilt and leans a few degrees toward the pointer. The thumbnail inside is the one the
- * card flies in during the `rule-open` morph. */
 function Cover({ rule, entering }: CoverProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -349,16 +332,12 @@ function Cover({ rule, entering }: CoverProps) {
   );
 }
 
-// ---------- One lesson: the wrong way beside the right one ----------
-
 type SideKey = "bad" | "good";
 const SIDES: readonly SideKey[] = ["bad", "good"];
 const MARK = { bad: "✕", good: "✓" } as const;
 
-/** Below this width the two layouts share one pane, behind tabs. */
 export const TABBED = "(max-width: 820px)";
 
-/** A file tree. Rows that share a key across the two panes glide between them. */
 export function Tree({ rows }: { rows: TreeRow[] }) {
   return (
     <ul className="tree">
@@ -383,7 +362,6 @@ export function Tree({ rows }: { rows: TreeRow[] }) {
 
 const keyOf = (row: TreeRow) => (row.k === undefined ? row.text : row.k);
 
-/** Only trees size the tabbed pane; any other view keeps its own height. */
 const treeRows = (view: ReactNode) =>
   isValidElement<{ rows: TreeRow[] }>(view) && view.type === Tree ? view.props.rows.length : 0;
 
@@ -411,9 +389,6 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
   const placed = useRef(new Map<string, { x: number; y: number }>());
   const touched = useRef(false);
   const rewound = useRef(false);
-  // Wide screens show both layouts side by side. Behind tabs, the server renders the rule's
-  // answer; the client rewinds unseen lessons to bad and plays the walk home once each comes on
-  // screen.
   const [side, setSide] = useState<SideKey>("good");
 
   useLayoutEffect(() => {
@@ -439,14 +414,11 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
     };
   }, []);
 
-  // FLIP between the tabs: rows that exist on both sides glide from where they were in the other
-  // pane; new rows fade in after them.
   useLayoutEffect(() => {
     const pane = demoRef.current?.querySelector<HTMLElement>(`[data-side="${side}"]`);
     if (!pane) return;
     const origin = pane.getBoundingClientRect();
     const before = placed.current;
-    // The rewind to bad happens off screen, so it jumps.
     const animate =
       before.size > 0 &&
       !reducedMotion() &&
@@ -528,8 +500,6 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
   );
 }
 
-// ---------- Quiz progress ----------
-
 function Stars({ stars }: { stars: number | null }) {
   if (stars === null) return null;
   return (
@@ -547,7 +517,6 @@ const starTotal = (results: Results) =>
   results.reduce<number>((sum, stars) => sum + (stars ?? 0), 0);
 const clearedCount = (results: Results) => results.filter((stars) => stars !== null).length;
 
-/** The levels hang off a rail whose fill reaches the last level of the cleared run from LV1. */
 function Rail({ results, children }: { results: Results; children: ReactNode }) {
   const railRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLElement>(null);
@@ -564,7 +533,6 @@ function Rail({ results, children }: { results: Results; children: ReactNode }) 
       const track = fill.parentElement ?? rail;
       const top = track.getBoundingClientRect().top;
       const height = track.offsetHeight || 1;
-      // Down to the centre of the last cleared node.
       const y =
         reached === results.length
           ? height
@@ -588,8 +556,6 @@ function Rail({ results, children }: { results: Results; children: ReactNode }) 
     </div>
   );
 }
-
-// ---------- One level: carry the piece to where it lives ----------
 
 type LevelProps = {
   n: number;
@@ -645,7 +611,6 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
     flyHome(piece.style.transform);
   }
 
-  // The piece flies from wherever it was let go into its seat in the tree.
   useLayoutEffect(() => {
     const from = flipFrom.current;
     const seat = seatRef.current;
@@ -703,7 +668,6 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
       setDragging(true);
       setPicked(false);
     }
-    // Lean into the direction of travel, up to 8 degrees.
     const dt = Math.max(event.timeStamp - drag.lastT, 1);
     const lean = reducedMotion()
       ? 0
@@ -736,7 +700,6 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
     dragRef.current = null;
   }
 
-  // The keyboard path: Enter picks the piece up, focus moves to the first spot, Enter drops it.
   useEffect(() => {
     if (!picked) return;
     const first = slotRefs.current.values().next().value;
@@ -880,11 +843,8 @@ function Burst() {
   );
 }
 
-// ---------- The crumb row and the island's live activity ----------
-
 type ShareData = { title: string; text: string };
 
-/** Opens the system share sheet where there is one, and copies the link everywhere else. */
 function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: boolean }) {
   const [copied, setCopied] = useState(false);
 
@@ -936,9 +896,6 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   );
 }
 
-/** The heading grows with the viewport, but a word can't wrap, so a long one ("Timestamps") would
- * run out of its column and under the cover. This caps the size, as --fit, where the longest word
- * just fits. Size and width scale together, so one measure at any size gives the cap. */
 function useTitleFit(titleRef: RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
     const title = titleRef.current;
@@ -959,11 +916,6 @@ function useTitleFit(titleRef: RefObject<HTMLElement | null>) {
   }, [titleRef]);
 }
 
-/** Scrolling flies the heading up into the island, shrinking it to the island's title. The
- * flight is a scroll-driven animation in the CSS; this measures where it starts and where the
- * island's title will sit once the island is compact, and as it lands swaps the island's label
- * from the page's tags to that title. Where the flight can't run, the swap waits until the
- * heading has scrolled under the island. */
 function useTitleDock(
   rootRef: RefObject<HTMLElement | null>,
   titleRef: RefObject<HTMLElement | null>,
@@ -984,11 +936,9 @@ function useTitleDock(
     };
 
     const measure = () => {
-      // Where the heading sits with no flight applied, in page coordinates.
       title.style.animation = "none";
       const from = title.getBoundingClientRect();
       title.style.removeProperty("animation");
-      // The island is fixed, so its title keeps one place on screen however far the page scrolls.
       const to = compactBox(slot);
       const end = Math.max(1, from.top + scrollY + from.height / 2 - (to.top + to.height / 2));
       const scale =
@@ -1006,7 +956,6 @@ function useTitleDock(
     resize.observe(label);
     const bar = slot.closest(".arc-bar");
     if (bar) resize.observe(bar);
-    // The island boots in with a scale and its parts with a glitch; measure again once they settle.
     bar?.addEventListener("animationend", measure);
     void document.fonts.ready.then(measure);
     addEventListener("scroll", dock, { passive: true });
@@ -1054,8 +1003,6 @@ export function onceOnScreen(element: Element, show: () => void) {
   return () => observer.disconnect();
 }
 
-/** Each [data-rev] element rises in once as it enters the screen. Those already on screen when
- * the page mounts are shown at once, so nothing that was painted disappears. */
 function useReveal(rootRef: RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
     const root = rootRef.current;

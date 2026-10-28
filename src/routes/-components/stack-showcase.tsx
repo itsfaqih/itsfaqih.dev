@@ -182,8 +182,6 @@ export function StackShowcase({
   );
 }
 
-/** Badges and groups the filter keeps glide to their new places, and the ones it drops fade out.
- * Arrivals play their own cut-in, so they enter without a view transition. */
 const FILTER_MOTION = {
   default: "none",
   update: { [STACK_FILTER]: "stack-move", default: "none" },
@@ -206,7 +204,6 @@ function UseList({ title, uses }: { title: string; uses: StackUse[] }) {
   );
 }
 
-/** Puts the card above its badge, or below it when the sticky header would cover it. */
 function usePlaceCard(
   sectionRef: RefObject<HTMLElement | null>,
   cardRef: RefObject<HTMLElement | null>,

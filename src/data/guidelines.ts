@@ -4,7 +4,6 @@ type GuidelineBase = {
   title: string;
   description: string;
   hidden?: boolean;
-  /** The article includes demos the reader can try. */
   interactive?: boolean;
 };
 
