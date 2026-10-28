@@ -11,10 +11,9 @@ import { renderCard, type OgCard } from "./card";
 
 type BuiltPage = {
   path: string;
-  canonical: string;
   noindex: boolean;
   description: string;
-  image: URL;
+  imagePath: string;
   publishedTime?: string;
   headline?: string;
 };
@@ -31,7 +30,7 @@ export async function writeShareAssets(outDir: string) {
   await Promise.all(
     pages.map(async (page) => {
       const card = cardFor(page);
-      const file = path.join(outDir, page.image.pathname);
+      const file = path.join(outDir, page.imagePath);
       await mkdir(path.dirname(file), { recursive: true });
       await writeFile(file, await renderCard(card));
     }),
@@ -74,13 +73,11 @@ function readPage(file: string, html: string): BuiltPage {
   const jsonLd = head.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   // SAFETY: structuredData() in src/seo.ts writes this JSON, with a string headline on articles.
   const schema = (jsonLd ? JSON.parse(jsonLd) : undefined) as { headline?: string } | undefined;
-  required("og:title", meta.get("og:title"));
   return {
     path: pagePath,
-    canonical,
     noindex: /\bnoindex\b/.test(meta.get("robots") ?? ""),
     description: required("og:description", meta.get("og:description")),
-    image: new URL(image),
+    imagePath: new URL(image).pathname,
     publishedTime: meta.get("article:published_time"),
     headline: schema?.headline,
   };
@@ -174,7 +171,7 @@ function cardFor(page: BuiltPage): OgCard {
 function sitemap(pages: BuiltPage[]) {
   const urls = pages
     .filter((page) => !page.noindex)
-    .map((page) => page.canonical)
+    .map((page) => SITE_ORIGIN + page.path)
     .sort();
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
