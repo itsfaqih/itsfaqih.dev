@@ -4,75 +4,6 @@
 @import "./arcade.css";
 @import "./routes/-components/hero/hero-prints.css";
 
-@property --navbar-surface-top {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(255, 255, 255, 0.60);
-}
-
-@property --navbar-surface-bottom {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(255, 255, 255, 0.54);
-}
-
-@property --navbar-surface-highlight {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: rgba(255, 255, 255, 0.52);
-}
-
-@property --navbar-surface-blur {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 2px;
-}
-
-@property --navbar-surface-saturation {
-  syntax: "<percentage>";
-  inherits: true;
-  initial-value: 125%;
-}
-
-@property --navbar-border-strength {
-  syntax: "<percentage>";
-  inherits: true;
-  initial-value: 5%;
-}
-
-:root {
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-
-  --animate-fade-in: fade-in 0.4s ease-out forwards;
-  --animate-ripple: ripple 0.6s ease-out forwards;
-
-  --navbar-surface-top: rgba(255, 255, 255, 0.60);
-  --navbar-surface-bottom: rgba(255, 255, 255, 0.54);
-  --navbar-surface-highlight: rgba(255, 255, 255, 0.52);
-  --navbar-surface-blur: 2px;
-  --navbar-surface-saturation: 125%;
-  --navbar-border-strength: 5%;
-  transition:
-    --navbar-surface-top 320ms var(--ease-out),
-    --navbar-surface-bottom 320ms var(--ease-out),
-    --navbar-surface-highlight 320ms var(--ease-out),
-    --navbar-surface-blur 320ms var(--ease-out),
-    --navbar-surface-saturation 320ms var(--ease-out),
-    --navbar-border-strength 320ms var(--ease-out);
-}
-
-.dark {
-  --navbar-surface-top: rgba(12, 12, 18, 0.60);
-  --navbar-surface-bottom: rgba(12, 12, 18, 0.54);
-  --navbar-surface-highlight: rgba(255, 255, 255, 0.14);
-  --navbar-surface-blur: 2px;
-  --navbar-surface-saturation: 125%;
-  --navbar-border-strength: 5%;
-}
-
 html,
 body.site-shell {
   overflow-x: clip !important;
@@ -133,12 +64,6 @@ body.site-shell {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    transition: none;
-  }
-}
-
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -150,32 +75,18 @@ body.site-shell {
   }
 }
 
-@keyframes ripple {
-  from {
-    transform: scale(0);
-    opacity: 0.3;
-  }
-  to {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-
 @layer base {
   :root {
     --background: #f5f5f8;
     --foreground: #111117;
     
     --card: oklch(1 0 0 / 50%);
-    --card-foreground: oklch(0.145 0 0);
     
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
     
     --brand: oklch(0.556 0.182 254.604);
     --brand-foreground: oklch(0.985 0 0);
     
-    --neutral: oklch(0.97 0 0 / 50%);
     --neutral-foreground: oklch(0.145 0 0);
     
     --muted: oklch(0.97 0 0);
@@ -194,10 +105,7 @@ body.site-shell {
     --positive-foreground: oklch(0.596 0.145 163.225);
     
     --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
     --ring: oklch(0.556 0.182 254.604);
-    
-    --key-shadow: oklch(0 0 0);
     
     --radius: 0.75rem;
   }
@@ -207,15 +115,12 @@ body.site-shell {
     --foreground: #f4f4f8;
     
     --card: #17171f;
-    --card-foreground: oklch(0.985 0 0);
     
     --popover: #20202b;
-    --popover-foreground: oklch(0.985 0 0);
     
     --brand: oklch(0.556 0.182 254.604);
     --brand-foreground: oklch(0.985 0 0);
     
-    --neutral: oklch(0.269 0 0 / 40%);
     --neutral-foreground: oklch(0.985 0 0);
     
     --muted: #20202b;
@@ -234,10 +139,7 @@ body.site-shell {
     --positive-foreground: oklch(0.845 0.143 164.978);
     
     --border: #2c2c3a;
-    --input: oklch(1 0 0 / 15%);
     --ring: #ffe14d;
-    
-    --key-shadow: oklch(0.708 0 0);
   }
 }
 

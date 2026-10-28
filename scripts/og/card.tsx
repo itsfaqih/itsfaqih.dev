@@ -39,10 +39,11 @@ async function loadFonts(): Promise<Font[]> {
 }
 
 async function loadTokens() {
-  const css = await readFile(new URL("../../src/arcade.css", import.meta.url), "utf8");
-  const root = css.match(/:root\s*\{([^}]*)\}/)![1]!;
+  const source = await readFile(new URL("../../src/theme.stylex.ts", import.meta.url), "utf8");
+  const palette = source.match(/palette = stylex\.defineVars\(\{([\s\S]*?)\n\}\);/)?.[1];
+  if (!palette) throw new Error("src/theme.stylex.ts has no `palette = stylex.defineVars({…});` block.");
   return new Map(
-    [...root.matchAll(/--([\w-]+):\s*(#[0-9a-f]{3,8});/gi)].map(([, k, v]) => [k!, v!]),
+    [...palette.matchAll(/"--([\w-]+)":\s*"(#[0-9a-f]{3,8})"/gi)].map(([, k, v]) => [k!, v!]),
   );
 }
 
@@ -58,7 +59,7 @@ export async function renderCard(card: OgCard): Promise<Buffer> {
     const token = hue.match(/^var\(--([\w-]+)\)$/)?.[1];
     if (!token) return hue;
     const value = tokens.get(token);
-    if (!value) throw new Error(`src/arcade.css has no --${token} hex for the share card`);
+    if (!value) throw new Error(`src/theme.stylex.ts has no --${token} hex for the share card`);
     return value;
   };
   const ink = {

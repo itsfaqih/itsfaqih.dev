@@ -9,6 +9,7 @@ import { PageScrollbar } from "../components/page-scrollbar";
 import { FaviconCycle } from "../components/favicon-cycle";
 import { PrintCursor } from "../components/print-cursor";
 import { SmoothScroll } from "../components/smooth-scroll";
+import { THEME_CLASSES } from "../theme";
 
 import appCss from "../styles.css?url";
 
@@ -71,8 +72,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   if (saved === 'dark' || saved === 'light') theme = saved;
                   else if (window.matchMedia('(prefers-color-scheme: light)').matches) theme = 'light';
                 } catch (e) {}
-                doc.classList.remove('light', 'dark');
-                doc.classList.add(theme);
+                var themes = ${JSON.stringify(THEME_CLASSES)};
+                doc.classList.remove(...themes.light, ...themes.dark);
+                doc.classList.add(...themes[theme]);
                 try {
                   // The home intro plays once per session, only when the visit lands on home,
                   // and never under reduced motion.

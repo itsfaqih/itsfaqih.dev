@@ -1,7 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { THEME_CLASSES, type Theme } from "../theme";
 import { reducedMotion } from "./use-media-query";
-
-type Theme = "light" | "dark";
 
 const THEME_CHANGE_EVENT = "theme-change";
 
@@ -15,8 +14,8 @@ function readTheme(): Theme {
 
 function applyThemeClass(theme: Theme) {
   const root = window.document.documentElement;
-  root.classList.remove("light", "dark");
-  root.classList.add(theme);
+  root.classList.remove(...THEME_CLASSES.light, ...THEME_CLASSES.dark);
+  root.classList.add(...THEME_CLASSES[theme]);
 }
 
 function subscribe(onStoreChange: () => void) {
