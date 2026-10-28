@@ -17,19 +17,21 @@ export type OgCard =
   | { kind: "page"; hue: Hue; eyebrow: string; title: string; lede: string; footer: Footer };
 
 const FONTS_DIR = new URL("./fonts/", import.meta.url);
+const WEIGHTS: Font["weight"][] = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
 async function loadFonts(): Promise<Font[]> {
   const files = (await readdir(FONTS_DIR)).filter((file) => file.endsWith(".ttf"));
   return Promise.all(
     files.map(async (file) => {
-      const [, slug, weight] = file.match(/^(.+)-(\d+)\.ttf$/)!;
+      const [, slug, digits] = file.match(/^(.+)-(\d+)\.ttf$/)!;
+      const weight = WEIGHTS.find((candidate) => candidate === Number(digits));
+      if (!weight) throw new Error(`${file} names a weight Satori cannot draw.`);
       return {
         name: slug!
           .split("-")
           .map((word) => word[0]!.toUpperCase() + word.slice(1))
           .join(" "),
-        // SAFETY: fonts.py names each file after a weight from OG_WEIGHTS, all multiples of 100.
-        weight: Number(weight) as Font["weight"],
+        weight,
         data: await readFile(new URL(file, FONTS_DIR)),
       };
     }),
