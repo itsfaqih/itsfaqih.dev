@@ -1320,14 +1320,12 @@ export function DialogDesign() {
   return (
     <RuleLanding
       className="dialog-design"
-      claim="A dialog holds focus, lets Escape out, and keeps what you typed."
       lead={
         <>
           Six dialogs, each built the leaky way and the sealed way, side by side and live. Open
           them, press Tab, press Escape. Then a mini quiz where you put each piece where it belongs.
         </>
       }
-      coverTag="LEAKY → SEALED"
       learn={{
         title: "Hold focus, let go cleanly",
         intro: (

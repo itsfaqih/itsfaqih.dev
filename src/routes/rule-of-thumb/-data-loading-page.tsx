@@ -945,14 +945,12 @@ export function DataLoading() {
   return (
     <RuleLanding
       className="data-loading"
-      claim="Fetch early, show what you have, and never blank the screen."
       lead={
         <>
           Six loading moments, each running the wrong way and the right way side by side. Then a
           mini quiz where you place each one on a request timeline.
         </>
       }
-      coverTag="BLANK → INSTANT"
       learn={{
         title: "Fast first paint, smooth updates",
         intro: (

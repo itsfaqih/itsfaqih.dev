@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { getAllPosts } from "./-components/posts";
 import { PageContainer } from "../../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
+import { BLOG_DESCRIPTION, pageHead } from "../../seo";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
@@ -11,6 +12,13 @@ export const Route = createFileRoute("/blog/")({
       posts: getAllPosts(),
     };
   },
+  head: () =>
+    pageHead({
+      path: "/blog",
+      title: "Blog · Faqih Muntashir",
+      description: BLOG_DESCRIPTION,
+      type: "website",
+    }),
 });
 
 function BlogIndex() {

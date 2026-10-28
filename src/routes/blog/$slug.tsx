@@ -6,6 +6,7 @@ import { MarkdownCodeBlock } from "@/components/code-block";
 import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "vaul";
 import { TableOfContents } from "./-components/table-of-contents";
+import { BLOG_DESCRIPTION, pageHead } from "../../seo";
 
 const BLOG_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -29,6 +30,18 @@ export const Route = createFileRoute("/blog/$slug")({
       slug: params.slug,
     };
   },
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          path: `/blog/${loaderData.slug}`,
+          title: `${loaderData.frontmatter.title} · Faqih Muntashir`,
+          description: loaderData.frontmatter.summary ?? BLOG_DESCRIPTION,
+          type: "article",
+          headline: loaderData.frontmatter.title,
+          schema: "BlogPosting",
+          publishedAt: new Date(loaderData.frontmatter.publishedAt).toISOString().slice(0, 10),
+        })
+      : {},
 });
 
 function BlogPost() {

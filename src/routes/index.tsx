@@ -8,9 +8,18 @@ import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup, type StackUse } from "./-components/stack-showcase";
 import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
+import { pageHead } from "../seo";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () =>
+    pageHead({
+      path: "/",
+      title: "Faqih Muntashir · Full-Stack Engineer in Yogyakarta",
+      description:
+        "Full-stack engineer in Yogyakarta with 5+ years on web products: frontends, backends, and agent tooling. Now building healthcare software at EvidenceCare.",
+      type: "website",
+    }),
 });
 
 const RULES = GUIDELINES.filter((guideline) => !guideline.hidden);

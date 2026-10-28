@@ -708,14 +708,12 @@ export function TypeScriptCodeWriting() {
   return (
     <RuleLanding
       className="typescript-code-writing"
-      claim="Write types precise enough that the compiler catches a mistake where you made it."
       lead={
         <>
           Six habits, each with the loose code beside the precise one and what tsc says about every
           line. Then a mini quiz where you put each piece where it belongs.
         </>
       }
-      coverTag="LOOSE → STRICT"
       learn={{
         title: "Let the compiler catch it",
         intro: (

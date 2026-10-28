@@ -31,12 +31,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Faqih Muntashir - Full Stack Engineer" },
-      {
-        name: "description",
-        content:
-          "Personal website of Faqih Muntashir, a full-stack engineer based in Yogyakarta, Indonesia.",
-      },
+      { title: "Faqih Muntashir" },
       { name: "theme-color", content: "#f5f5f8", media: "(prefers-color-scheme: light)" },
       { name: "theme-color", content: "#0e0e13", media: "(prefers-color-scheme: dark)" },
     ],

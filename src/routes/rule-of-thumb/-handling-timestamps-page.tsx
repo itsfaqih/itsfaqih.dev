@@ -787,7 +787,6 @@ export function HandlingTimestamps() {
   return (
     <RuleLanding
       className="handling-timestamps"
-      claim="Store and send UTC. Turn it local only on the reader's screen."
       lead={
         <>
           Five steps a timestamp takes, each with the wrong way and the right one side by side,
@@ -795,7 +794,6 @@ export function HandlingTimestamps() {
           flow yourself.
         </>
       }
-      coverTag="LOCAL → UTC"
       learn={{
         title: "One moment, two clocks",
         intro: (

@@ -460,14 +460,12 @@ export function ProximityPrinciple() {
   return (
     <RuleLanding
       className="proximity"
-      claim="Keep code next to the code that uses it."
       lead={
         <>
           Five placements, each with the wrong spot and the right one side by side in a real tree.
           Then a mini quiz where you carry the code there yourself.
         </>
       }
-      coverTag="FAR → NEAR"
       learn={{
         title: "Near beats far",
         intro: (

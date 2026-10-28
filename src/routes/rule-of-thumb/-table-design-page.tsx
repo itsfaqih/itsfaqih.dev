@@ -1124,14 +1124,12 @@ export function TableDesign() {
     <DemosContext value={demos}>
       <RuleLanding
         className="table-design"
-        claim="Line up what people compare, and never leave a table blank."
         lead={
           <>
             Five tables, each built the usual way and the careful way side by side, and every one of
             them works. Then a mini quiz where you put each piece where it belongs.
           </>
         }
-        coverTag="RAGGED → ALIGNED"
         learn={{
           title: "Tables get scanned, not read",
           intro: (

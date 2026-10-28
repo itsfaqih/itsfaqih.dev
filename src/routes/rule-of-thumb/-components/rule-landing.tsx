@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 import { compactBox, IslandActivity } from "../../../components/header";
-import type { Guideline } from "../../../data/guidelines";
+import type { PublishedGuideline } from "../../../data/guidelines";
 import { colorOf, isOpeningRule, ruleNumber, RuleThumb } from "../../-components/rule-art";
 import { RuleOfThumbPagination } from "./rule-of-thumb-pagination";
 import { readMarkdown, useCurrentRule } from "./index";
@@ -60,9 +60,7 @@ export type Level = {
 };
 
 type RuleLandingProps = {
-  claim: string;
   lead: ReactNode;
-  coverTag: string;
   learn: { title: string; intro: ReactNode };
   lessons: Lesson[];
   tldr: readonly (readonly [string, string])[];
@@ -95,16 +93,14 @@ export function RuleLanding(props: RuleLandingProps) {
 
 function Landing({
   rule,
-  claim,
   lead,
-  coverTag,
   learn,
   lessons,
   tldr,
   quiz,
   take = TAKE,
   className,
-}: RuleLandingProps & { rule: Guideline }) {
+}: RuleLandingProps & { rule: PublishedGuideline }) {
   const rootRef = useRef<HTMLDivElement>(null);
   useReveal(rootRef);
   const [morphed] = useState(isOpeningRule);
@@ -128,7 +124,7 @@ function Landing({
   const words = rule.title.split(" ");
   const last = words.pop();
   const head = words.join(" ");
-  const share = { title: rule.title, text: claim };
+  const share = { title: rule.title, text: rule.claim };
 
   return (
     <div
@@ -177,13 +173,13 @@ function Landing({
             </span>
           </h1>
           <p className="claim in" style={{ "--i": 1 }}>
-            {claim}
+            {rule.claim}
           </p>
           <p className="lead in" style={{ "--i": 2 }}>
             {lead}
           </p>
         </div>
-        <Cover rule={rule} tag={coverTag} entering={!morphed} />
+        <Cover rule={rule} entering={!morphed} />
       </header>
 
       <div className="arc-wrap">
@@ -263,11 +259,11 @@ function Landing({
 
 // ---------- The cover: the card's thumbnail, grown and tilted beside the title ----------
 
-type CoverProps = { rule: Guideline; tag: string; entering: boolean };
+type CoverProps = { rule: PublishedGuideline; entering: boolean };
 
 /** Rests at a tilt and leans a few degrees toward the pointer. The thumbnail inside is the one the
  * card flies in during the `rule-open` morph. */
-function Cover({ rule, tag, entering }: CoverProps) {
+function Cover({ rule, entering }: CoverProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   function lean(event: PointerEvent<HTMLDivElement>) {
@@ -297,7 +293,7 @@ function Cover({ rule, tag, entering }: CoverProps) {
         <RuleThumb rule={rule} play />
         <div className="cover-foot" aria-hidden="true">
           <span>{rule.id}.md</span>
-          <span>{tag}</span>
+          <span>{rule.coverTag}</span>
         </div>
       </div>
     </div>

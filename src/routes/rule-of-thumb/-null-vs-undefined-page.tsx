@@ -739,14 +739,12 @@ export function NullVsUndefined() {
   return (
     <RuleLanding
       className="null-vs-undefined"
-      claim="Use undefined for a value nobody gave, and null for one emptied on purpose."
       lead={
         <>
           Six cases, each with the code that blurs the two beside the code that keeps them apart,
           and the data each line produces. Then a mini quiz where you put each nothing in its place.
         </>
       }
-      coverTag="IMPLICIT → EXPLICIT"
       learn={{
         title: "Missing is not empty",
         intro: (

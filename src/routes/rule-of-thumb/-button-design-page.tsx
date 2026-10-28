@@ -730,14 +730,12 @@ export function ButtonDesign() {
   return (
     <RuleLanding
       className="button-design"
-      claim="A button shows what it does and what it's doing."
       lead={
         <>
           Six buttons, each built the quick way and the careful way, side by side and live. Hover
           them, press them, tab to them. Then a mini quiz where you put each piece where it belongs.
         </>
       }
-      coverTag="SILENT → TACTILE"
       learn={{
         title: "Every press gets an answer",
         intro: (
