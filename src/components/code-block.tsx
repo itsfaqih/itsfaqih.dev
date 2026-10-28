@@ -27,19 +27,10 @@ const LANGUAGE_EXTENSIONS = new Map(Object.entries({
   yaml: "yml",
 }));
 
-function normalizeLanguage(language: string) {
-  const normalized = language.trim().toLowerCase();
-  return normalized || "text";
-}
-
-function getFilename(language: string) {
-  return `example.${LANGUAGE_EXTENSIONS.get(language) ?? language}`;
-}
-
 export function CodeBlock({ code, lang }: CodeBlockProps) {
-  const language = normalizeLanguage(lang);
+  const language = lang.trim().toLowerCase() || "text";
   const file: FileContents = {
-    name: getFilename(language),
+    name: `example.${LANGUAGE_EXTENSIONS.get(language) ?? language}`,
     contents: code,
     lang: language,
   };
@@ -102,7 +93,7 @@ export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
     className.match(/(?:^|\s)language-([^\s]+)/)?.[1] ??
     "text";
   const rawCode = readText(codeProps?.children ?? props.children);
-  const code = rawCode.endsWith(String.fromCharCode(13, 10))
+  const code = rawCode.endsWith("\r\n")
     ? rawCode.slice(0, -2)
     : rawCode.endsWith("\n")
       ? rawCode.slice(0, -1)
