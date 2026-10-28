@@ -13,13 +13,13 @@ const { values } = parseArgs({
   },
 });
 
-// DevTools' "3G" preset (formerly "Slow 3G"): 500 kbit/s * 0.8 each way, 400 ms * 5 latency.
 await fetch(values.base).catch(() => {
   throw new Error(
     `Nothing serves ${values.base}. Start a production preview: vp run build && vp run preview --port 4317`,
   );
 });
 
+// DevTools' "3G" preset (formerly "Slow 3G"): 500 kbit/s * 0.8 each way, 400 ms * 5 latency.
 const profile = { throughput: ((500 * 1000) / 8) * 0.8, latency: 400 * 5 };
 
 const routes = values.route ?? builtRoutes();
@@ -54,7 +54,6 @@ type Request = {
   failed?: string;
 };
 
-if (values.out) mkdirSync(values.out, { recursive: true });
 async function waitForNetworkQuiet(
   page: Page,
   requests: Map<string, Request>,
@@ -69,6 +68,7 @@ async function waitForNetworkQuiet(
   }
 }
 
+if (values.out) mkdirSync(values.out, { recursive: true });
 const browser = await chromium.launch({ channel: "chrome" });
 const results: Record<
   string,
@@ -157,7 +157,7 @@ for (let run = 0; run < Number(values.runs); run++) {
     const list = [...requests.values()];
     const bytes = list.reduce((sum, r) => sum + (r.bytes ?? 0), 0);
     const failed = list.filter((r) => r.failed || (r.status ?? 200) >= 400);
-    if (failed.length) errors.push(...failed.map((r) => `${r.status ?? r.failed} ${r.url}`));
+    errors.push(...failed.map((r) => `${r.status ?? r.failed} ${r.url}`));
 
     (results[route] ??= []).push({
       load,
