@@ -1,5 +1,6 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { optimize } from "svgo";
 import { defineConfig, type Plugin } from "vite";
 import mdx from "@mdx-js/rollup";
 import remarkFrontmatter from "remark-frontmatter";
@@ -16,6 +17,28 @@ const isCloudflareBuild =
   process.env.NITRO_PRESET?.includes("cloudflare") || process.env.CF_PAGES === "1";
 
 const REST_AFTER_MS = 3500;
+const DECIMALS_VISIBLE_AT_17PX = 1;
+
+function roundIconPaths(): Plugin {
+  return {
+    name: "round-icon-paths",
+    apply: "build",
+    enforce: "pre",
+    transform: {
+      filter: { id: /simple-icons\/index\.mjs$|tech-marks\.ts$/ },
+      handler(code) {
+        return code.replace(/\bpath:\s*"([^"]+)"/g, (_, d: string) => {
+          const svg = optimize(`<svg xmlns="http://www.w3.org/2000/svg"><path d="${d}"/></svg>`, {
+            plugins: [
+              { name: "convertPathData", params: { floatPrecision: DECIMALS_VISIBLE_AT_17PX } },
+            ],
+          }).data;
+          return `path: "${svg.match(/ d="([^"]+)"/)![1]}"`;
+        });
+      },
+    },
+  };
+}
 
 async function inlineAssetsBeforeApp(css: string, outDir: string) {
   for (const [url, asset] of css.matchAll(
@@ -97,6 +120,7 @@ const config = defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
+    roundIconPaths(),
     mdx({
       remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
       rehypePlugins: [rehypeSlug],
