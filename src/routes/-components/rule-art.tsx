@@ -161,23 +161,23 @@ function ProximityArt() {
   return (
     <div className="art px">
       <svg viewBox="0 0 160 100">
-        <rect className="px-box" x="14" y="24" width="108" height="46" rx="6" />
-        <text className="dim" x="14" y="17">
+        <rect className="px-box" x="14" y="21" width="108" height="46" rx="6" />
+        <text className="dim" x="14" y="15">
           src/
         </text>
-        <text className="hi" x="22" y="37">
+        <text className="hi" x="22" y="33">
           OrderCard/
         </text>
-        <text x="32" y="52">
+        <text x="32" y="47">
           OrderCard.tsx
         </text>
-        <text className="dim" x="22" y="84">
+        <text className="dim" x="22" y="77">
           shared/
         </text>
-        <line className="px-link" x1="27" y1="55" x2="27" y2="95" />
+        <line className="px-link" x1="27" y1="50" x2="27" y2="89" />
         <g className="px-file">
-          <rect x="30" y="58" width="56" height="12" rx="3" />
-          <text x="34" y="67">
+          <rect x="30" y="52" width="56" height="12" rx="3" />
+          <text x="34" y="61">
             styles.ts
           </text>
         </g>

@@ -30,6 +30,12 @@
   --soft-hover: #2a2a38;
   --hair-hover: #3a3a4c;
   --scan: rgb(0 0 0 / 0.18);
+  /* Text that sits straight on the dot field gets a patch of page colour under it (see .arc .sh2). */
+  --veil: color-mix(in srgb, var(--bg) 72%, transparent);
+  --veil-edge: 0 0 24px 12px var(--veil);
+  /* Small text has thin strokes the dots break up easily, so its veil is denser and reaches further. */
+  --veil-dense: color-mix(in srgb, var(--bg) 90%, transparent);
+  --veil-dense-edge: 0 0 28px 18px var(--veil-dense);
   --dot: #2e2e3c;
   --lift: rgb(0 0 0 / 0.4);
   /* Game panels: a raised body (top highlight, bottom shade, hard drop) and sunken wells. */
@@ -58,7 +64,8 @@
   /* The hero prints' halftone screen as a 25px tile: dots 7.9px apart on a grid turned
      atan(1/3), the angle nearest their 18deg whose grid repeats in a square. Dark lightens the
      hue under it, like the prints' screen blend; light darkens it, like their multiply. */
-  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23fff' fill-opacity='.4'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E") 0 0 / 25px 25px;
+  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23fff' fill-opacity='.4'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E")
+    0 0 / 25px 25px;
   --t-bar: 200ms;
 }
 
@@ -73,31 +80,64 @@
   --text: #111117;
   --dim: #4b4b5b;
   --mute: #67677a;
-  --ink-mix: 55%;
+  /* As bright as the green can go and still hold 4.5:1 on white. */
+  --ink-mix: 62%;
   /* Yellow darkened toward black turns olive; light mode takes a gold of its own. */
-  --go-ink: #8b5f00;
+  --go-ink: #9a6a00;
   --drop-ink: #c5c5d1;
   --bevel-hi: rgb(255 255 255 / 0.9);
   --bevel-lo: rgb(30 30 60 / 0.07);
   --raise: inset 0 2px 0 var(--bevel-hi), inset 0 -3px 0 var(--bevel-lo);
   --sink: inset 0 2px 0 var(--bevel-lo);
-  --key-mix: 72%;
+  --key-mix: 80%;
   --soft-hover: #e2e2ea;
   --hair-hover: #b9b9c6;
   --scan: rgb(0 0 0 / 0.03);
   --dot: #cacad6;
   --lift: rgb(30 30 60 / 0.14);
-  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23000' fill-opacity='.22'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E") 0 0 / 25px 25px;
+  --halftone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23000' fill-opacity='.22'%3E%3Ccircle cx='0' cy='0' r='2.5'/%3E%3Ccircle cx='25' cy='0' r='2.5'/%3E%3Ccircle cx='0' cy='25' r='2.5'/%3E%3Ccircle cx='25' cy='25' r='2.5'/%3E%3Ccircle cx='7.5' cy='2.5' r='2.5'/%3E%3Ccircle cx='15' cy='5' r='2.5'/%3E%3Ccircle cx='22.5' cy='7.5' r='2.5'/%3E%3Ccircle cx='5' cy='10' r='2.5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.5'/%3E%3Ccircle cx='20' cy='15' r='2.5'/%3E%3Ccircle cx='2.5' cy='17.5' r='2.5'/%3E%3Ccircle cx='10' cy='20' r='2.5'/%3E%3Ccircle cx='17.5' cy='22.5' r='2.5'/%3E%3C/svg%3E")
+    0 0 / 25px 25px;
   color-scheme: light;
 }
 
 html {
   cursor: var(--cursor);
 }
-:where(a[href], button:not(:disabled), [role="button"], [role="tab"], [role="menuitem"], [role="option"], summary, label[for], select, .cursor-pointer) {
+/* Text on a hue: white once the hue under it (--c) is dark enough, near-black otherwise. Below
+   OKLCH lightness 0.65 white reads better on these saturated hues. Set on every element because a
+   custom property resolves var(--c) where it is declared, and --c changes from element to element. */
+*,
+::before,
+::after {
+  --on-c: oklch(from var(--c, var(--go)) clamp(0.16, (0.65 - l) * 1000, 1) 0 0);
+}
+:where(
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  summary,
+  label[for],
+  select,
+  .cursor-pointer
+) {
   cursor: var(--cursor-point);
 }
-:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="color"], [type="file"]), textarea, [contenteditable]) {
+:where(
+  input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="range"],
+    [type="button"],
+    [type="submit"],
+    [type="color"],
+    [type="file"]
+  ),
+  textarea,
+  [contenteditable]
+) {
   cursor: text;
 }
 
@@ -288,31 +328,109 @@ html.sb-own::-webkit-scrollbar {
   );
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header: the island ----------
+   A black capsule that floats over every page. At the top it holds the whole nav; once the
+   page scrolls it folds to the brand, or to the live activity a page lends it (IslandActivity),
+   beside search and the theme switch, and a menu button unfolds it again. Each part folds its own column from
+   1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the parts
+   blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
+   over the dark one, so it is always the one shape that stands apart from the page. */
+:root {
+  /* A sampled spring (damping 0.72), about 4% past and back. */
+  --spring: linear(
+    0, 0.034, 0.12, 0.234, 0.359, 0.484, 0.601, 0.705, 0.793, 0.865, 0.922, 0.965, 0.996, 1.017,
+    1.03, 1.036, 1.038, 1.037, 1.034, 1.03, 1.025, 1.02, 1.016, 1.012, 1.008, 1.005, 1.003, 1.001,
+    1, 0.999, 0.999, 0.999, 0.999
+  );
+  --t-island: 560ms;
+}
 .arc-header {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 24px;
-  height: 72px;
+  height: 48px;
+  max-width: 100%;
+  padding: 0 10px;
+  border-radius: 999px;
   font: 500 13px var(--display);
+  pointer-events: auto;
+  background: #0a0a0c;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 10px 28px -12px rgb(0 0 0 / 0.55);
+  /* The island's own ground, so everything inside reads light on black. */
+  --text: #fff;
+  --dim: rgb(255 255 255 / 0.66);
+  --mute: rgb(255 255 255 / 0.46);
+  --hair: rgb(255 255 255 / 0.18);
+  --panel-2: rgb(255 255 255 / 0.1);
+  --focus: var(--go);
+  color: var(--text);
+}
+.dark .arc-header {
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.06),
+    0 10px 28px -12px rgb(0 0 0 / 0.7);
+  --text: #0a0a0c;
+  --dim: rgb(10 10 12 / 0.68);
+  --mute: rgb(10 10 12 / 0.5);
+  --hair: rgb(10 10 12 / 0.16);
+  --panel-2: rgb(10 10 12 / 0.07);
+  --focus: color-mix(in oklab, var(--go) 45%, #000);
+}
+.island .seg {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns var(--t-island) var(--spring);
+}
+.island .seg[data-on] {
+  grid-template-columns: 1fr;
+}
+/* Clips sideways only, so the button's press and the focus ring keep their height. */
+.island .clip {
+  min-width: 0;
+  overflow-x: clip;
+}
+.island .row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  padding: 0 4px;
+  opacity: 0;
+  filter: blur(4px);
+  transition:
+    opacity 120ms ease,
+    filter 120ms ease;
+}
+.island .seg[data-on] .row {
+  opacity: 1;
+  filter: none;
+  transition:
+    opacity 240ms var(--out) 40ms,
+    filter 260ms var(--out) 40ms;
 }
 .arc-header .brand {
+  padding: 0 8px 0 12px;
   font-weight: 900;
   color: var(--text);
 }
 .arc-header .where {
+  padding: 0 8px;
   color: var(--mute);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .arc-header nav {
   display: flex;
-  gap: 4px;
-  margin-left: auto;
+  gap: 2px;
 }
 .arc-header nav a,
 .arc-header .find {
   white-space: nowrap;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--dim);
   transition:
     background-color 120ms ease,
@@ -324,6 +442,11 @@ html.sb-own::-webkit-scrollbar {
   background: var(--panel-2);
   color: var(--text);
 }
+.arc-header a:focus-visible,
+.arc-header button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
 .arc-header .find {
   display: inline-flex;
   align-items: center;
@@ -333,31 +456,185 @@ html.sb-own::-webkit-scrollbar {
   font: inherit;
   cursor: var(--cursor-point);
 }
-.arc-header .theme {
-  margin-left: -16px;
-}
 .arc-header .btn {
   flex: none;
   white-space: nowrap;
 }
+.arc-header .btn.sm {
+  height: 36px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+.arc-header .connect .row {
+  padding-left: 8px;
+}
 /* Both icons share one cell; the outgoing one turns away as the incoming one turns in. */
-.arc-header .find.theme {
+.arc-header .find.theme,
+.arc-header .find.menu {
   display: inline-grid;
   place-items: center;
 }
-.arc-header .theme svg {
+.arc-header .find.menu {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+.arc-header .theme svg,
+.arc-header .menu svg {
   grid-area: 1 / 1;
   transition:
     opacity 200ms var(--out),
     transform 200ms var(--out);
 }
-.light .arc-header .theme .to-light {
+.light .arc-header .theme .to-light,
+.arc-header .menu[aria-expanded="true"] .to-open {
   opacity: 0;
   transform: rotate(90deg) scale(0.6);
 }
-.dark .arc-header .theme .to-dark {
+.dark .arc-header .theme .to-dark,
+.arc-header .menu[aria-expanded="false"] .to-close {
   opacity: 0;
   transform: rotate(-90deg) scale(0.6);
+}
+
+/* Live activity: a back link, a label that trades the page's tags for its title, and actions. */
+.island .act-in {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.island .act-back,
+.island .act-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--dim);
+  font: inherit;
+  white-space: nowrap;
+  cursor: var(--cursor-point);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+.island .act-back:hover,
+.island .act-btn:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.island .act-label {
+  display: grid;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.island .act-label > * {
+  grid-area: 1 / 1;
+  align-self: center;
+  transition:
+    opacity 200ms var(--out),
+    filter 200ms var(--out),
+    translate 200ms var(--out);
+}
+.island .act-label .tags {
+  display: flex;
+  gap: 8px;
+  color: var(--mute);
+}
+.island .act-label .title {
+  font-weight: 900;
+  font-size: 0.875rem;
+  opacity: 0;
+  filter: blur(2px);
+  translate: 0 6px;
+}
+.island .act-label[data-swap] .tags {
+  opacity: 0;
+  filter: blur(2px);
+  translate: 0 -6px;
+}
+.island .act-label[data-swap] .title {
+  opacity: 1;
+  filter: none;
+  translate: 0 0;
+}
+/* Phones: the parts pack tighter, and the back link keeps its name for screen readers and shows
+   only the arrow. */
+@media (max-width: 640px) {
+  .island .row {
+    padding: 0 2px;
+  }
+  .arc-header .brand {
+    padding: 0 6px 0 10px;
+  }
+  .island .act-back {
+    padding: 0;
+  }
+  .island .act-txt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* Narrow phones: the whole nav only just fits, and the open menu has no room for the brand as
+   well as the close button. */
+@media (max-width: 480px) {
+  .arc-header {
+    padding: 0 6px;
+  }
+  .island .row {
+    padding: 0;
+  }
+  .arc-header .brand {
+    padding: 0 4px 0 10px;
+  }
+  .arc-header nav a,
+  .arc-header .find {
+    padding: 8px 7px;
+  }
+  .arc-header .btn.sm {
+    padding: 0 12px;
+  }
+  .arc-header .connect .row {
+    padding-left: 4px;
+  }
+  /* The compact island holds the activity beside search, theme and menu; these two keep it
+     inside the screen. The bar prefix outranks the 960px rule further down. */
+  .arc-bar .arc-header .find {
+    padding: 8px 6px;
+  }
+  /* A long rule title would push the island past the screen: the label takes what is left after
+     the back link, Share, the tools, the menu and the island's padding, and ends in an ellipsis.
+     compactBox reads the capped width, so the title still docks onto it. */
+  .island .act-label {
+    max-width: calc(100vw - 206px);
+    padding: 0 4px;
+  }
+  .island .act-label > * {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .arc-bar[data-open] .island .home {
+    grid-template-columns: 0fr;
+  }
+  .arc-bar[data-open] .island .home .row {
+    opacity: 0;
+    filter: blur(4px);
+    visibility: hidden;
+    transition:
+      opacity 120ms ease,
+      filter 120ms ease,
+      visibility 0s 120ms;
+  }
 }
 
 /* Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
@@ -533,6 +810,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .btn.go[style*="--c"] {
   --key: color-mix(in oklab, var(--c) 70%, #000);
   background: var(--c);
+  color: var(--on-c);
   box-shadow: 0 4px 0 var(--key);
   transition:
     transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -559,6 +837,72 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   height: 38px;
   padding: 0 14px;
   font-size: 12px;
+}
+
+/* The hero's scroll cue: a mouse whose wheel rolls down, rests, and rolls again. It sits on the
+   button row at button height. The loop rides on the wheel, since [data-cut] owns the link's
+   animation. */
+.arc .scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  margin-left: 12px;
+  padding: 0 6px;
+  border-radius: 12px;
+  font: 700 14px var(--display);
+  color: var(--dim);
+  text-decoration: none;
+  cursor: var(--cursor-point);
+  transition: color 120ms ease;
+}
+.arc .scroll-cue:hover {
+  color: var(--text);
+}
+.arc .scroll-cue:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.arc .scroll-cue .mouse {
+  position: relative;
+  flex: none;
+  width: 22px;
+  height: 34px;
+  border: 2px solid currentColor;
+  border-radius: 11px;
+}
+.arc .scroll-cue .wheel {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 4px;
+  height: 7px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--go-ink);
+  animation: scroll-wheel 1.8s infinite;
+}
+@keyframes scroll-wheel {
+  0% {
+    opacity: 0;
+    transform: translateY(-3px);
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  15% {
+    opacity: 1;
+    transform: none;
+    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arc .scroll-cue .wheel {
+    animation: none;
+  }
 }
 
 /* ---------- Intro: name slam, fast cuts through what I build, shutter split ---------- */
@@ -678,7 +1022,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   grid-template-columns: 1fr 1.05fr;
   gap: 48px;
   align-items: center;
-  padding: 48px 0 80px;
+  padding: 38px 0 80px;
 }
 .arc .tag {
   display: inline-flex;
@@ -737,7 +1081,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 .arc .hl {
-  color: var(--on-accent);
+  color: var(--on-c);
   background: var(--c);
   padding: 0 0.12em;
   border-radius: 0.12em;
@@ -849,6 +1193,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   width: max-content;
   /* Three sets per half (see TICKER_RUN) at the speed two sets once ran in 26s. */
   animation: marquee 64s linear infinite;
+  user-select: none;
+  -webkit-user-select: none;
 }
 /* Tiles butt edge to edge so the band reads as one striped bar. */
 .arc .ticker span {
@@ -870,6 +1216,35 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 /* ---------- Sections ---------- */
 .arc section {
   padding: 88px 0;
+}
+/* Copy that sits straight on the dot field, with no card under it, rests on a veil: a soft patch
+   of page colour whose edge feathers out into the dots, so they never run through the words. */
+.arc .hero > :first-child,
+.arc .sh2 > *,
+.arc .spread-nav > span,
+.arc .stack-filter-row h3,
+.arc .pups-group h3,
+.arc footer > span,
+.arc .index-head > * {
+  background: var(--veil);
+  box-shadow: var(--veil-edge);
+  border-radius: 16px;
+}
+.arc .index-head > *,
+.arc .sh2 h2 > small {
+  width: fit-content;
+}
+.arc .hero .tag,
+.arc .sh2 h2 > small,
+.arc .sh2 > p,
+.arc .spread-nav > span,
+.arc .stack-filter-row h3,
+.arc .pups-group h3,
+.arc footer > span,
+.arc .index-head > .tag {
+  background: var(--veil-dense);
+  box-shadow: var(--veil-dense-edge);
+  border-radius: 12px;
 }
 .arc .sh2 {
   display: flex;
@@ -1214,10 +1589,18 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 /* The lamp catches with a stutter, once per hover of the grid, not per tile. */
 @keyframes beam-on {
-  0% { opacity: 0; }
-  20% { opacity: 0.85; }
-  40% { opacity: 0.25; }
-  60% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  40% {
+    opacity: 0.25;
+  }
+  60% {
+    opacity: 1;
+  }
 }
 .arc .select[data-lit] .sel {
   box-shadow:
@@ -1228,7 +1611,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 
 /* Filtered tiles deal instead of glitching, since a new filter deals a fresh hand. */
 .arc .tiles .tile[data-cut].in {
-  animation: deal var(--t-pop) var(--snap) calc(min(var(--cut-order, 0), 12) * var(--t-step)) backwards;
+  animation: deal var(--t-pop) var(--snap) calc(min(var(--cut-order, 0), 12) * var(--t-step))
+    backwards;
 }
 @keyframes deal {
   from {
@@ -1237,7 +1621,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 .arc .empty {
-  padding: 28px 0;
+  margin: 0;
+  padding: 0;
   font: 500 14px var(--display);
 }
 
@@ -1274,7 +1659,11 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   content: "";
   position: absolute;
   inset: 0 8%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent);
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--glow) 18%, transparent),
+    transparent
+  );
   pointer-events: none;
 }
 .arc .spread-slot {
@@ -1468,11 +1857,12 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 
 /* ---------- Rule thumbnails ----------
    Each rule's art holds a still frame by default. Under [data-play] it loops
-   through the rule in four or five beats, and every loop ends on the still
-   frame. Only transform and opacity animate. */
+   forever through the rule in a few beats: it moves out of the still frame and
+   glides back into it, so 100% meets 0% without a cut. Anything that has to
+   jump does it while invisible. Only transform and opacity animate. */
 .arc .thumb {
-  --dur: 3.2s;
-  --loops: infinite;
+  --dur: 4.4s;
+  --io: cubic-bezier(0.645, 0.045, 0.355, 1);
   --c-hi: color-mix(in srgb, var(--c) 55%, white);
   --c-dim: color-mix(in srgb, var(--c) 40%, transparent);
   position: relative;
@@ -1496,7 +1886,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   --ts: #2aa816;
   --ax: #7650ee;
   --go: #c99a00;
-  --c-hi: color-mix(in oklab, var(--c) 62%, #000);
+  --c-hi: color-mix(in oklab, var(--c) 68%, #000);
   background:
     radial-gradient(circle, color-mix(in srgb, var(--c) 26%, transparent) 0.8px, transparent 1.2px)
       0 0 / 8px 8px,
@@ -1558,11 +1948,14 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .thumb[data-play] * {
   animation-duration: var(--dur);
-  animation-timing-function: var(--out);
-  animation-iteration-count: var(--loops);
+  animation-timing-function: var(--io);
+  animation-iteration-count: infinite;
 }
 
-/* Proximity: styles.ts walks from shared/ into OrderCard/. */
+/* Proximity: styles.ts walks out to shared/ and back home into OrderCard/. */
+.arc .px {
+  --dur: 4.4s;
+}
 .arc .px .px-box {
   fill: color-mix(in srgb, var(--c) 8%, transparent);
   stroke: var(--c);
@@ -1573,13 +1966,13 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   stroke-width: 1.2;
   stroke-dasharray: 2 2;
   transform-origin: top;
-  transform: scaleY(0.225);
+  transform: scaleY(0.205);
 }
 .arc .px .px-file rect {
   fill: var(--c);
 }
 .arc .px .px-file text {
-  fill: #0e0e13;
+  fill: var(--on-c);
   font-weight: 600;
 }
 .arc .thumb[data-play] .px-box {
@@ -1599,57 +1992,81 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 @keyframes px-box {
   0%,
-  55% {
+  14% {
+    opacity: 1;
+  }
+  30%,
+  62% {
     opacity: 0;
   }
-  66%,
+  78%,
   100% {
     opacity: 1;
   }
 }
 @keyframes px-link {
   0%,
-  18% {
+  14% {
+    transform: scaleY(0.205);
+  }
+  36%,
+  58% {
     transform: scaleY(1);
   }
-  55%,
+  80%,
   100% {
-    transform: scaleY(0.225);
+    transform: scaleY(0.205);
   }
 }
 @keyframes px-file {
   0%,
-  18% {
-    transform: translateY(26px);
+  14% {
+    transform: none;
   }
-  55%,
+  36%,
+  58% {
+    transform: translateY(31px);
+  }
+  80%,
   100% {
     transform: none;
   }
 }
-/* Two-beat chips: the first label until 55%, the second after. */
+/* Two-beat chips: the second label at rest, crossfading to the first and back. */
 @keyframes beat-a {
   0%,
-  54% {
+  22% {
+    opacity: 0;
+  }
+  28%,
+  64% {
     opacity: 1;
   }
-  55%,
+  70%,
   100% {
     opacity: 0;
   }
 }
 @keyframes beat-b {
   0%,
-  54% {
+  22% {
+    opacity: 1;
+  }
+  28%,
+  64% {
     opacity: 0;
   }
-  55%,
+  70%,
   100% {
     opacity: 1;
   }
 }
 
-/* Button: idle 0-14%, hover 14-28%, press 28-38%, pending 38-70%, done 70-100%. */
+/* Button: done 0-8%, eases back to idle 8-16%, hover 22-34%, press 38-44%, pending 46-74%,
+   done again 74-100%. */
+.arc .bt {
+  --dur: 5.2s;
+}
 .arc .bt .bt-btn {
   transform-origin: center;
 }
@@ -1662,7 +2079,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .bt text {
   font: 700 10px var(--display);
-  fill: #0e0e13;
+  fill: var(--on-c);
   text-anchor: middle;
 }
 .arc .bt .bt-l1,
@@ -1674,7 +2091,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .bt .bt-spin {
   fill: none;
-  stroke: #0e0e13;
+  stroke: var(--on-c);
   stroke-width: 2;
   stroke-dasharray: 20 12;
   transform-origin: center;
@@ -1743,183 +2160,222 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 @keyframes bt-press {
   0%,
-  28% {
+  38% {
     transform: none;
   }
-  32% {
+  41% {
     transform: scale(0.92);
   }
-  38%,
+  44%,
   100% {
     transform: none;
   }
 }
 @keyframes bt-hover {
   0%,
-  14% {
+  28% {
     opacity: 0;
   }
-  18%,
-  68% {
+  34%,
+  74% {
     opacity: 0.22;
   }
-  76%,
+  80%,
   100% {
     opacity: 0;
   }
 }
 @keyframes bt-l1 {
   0%,
-  37% {
+  8% {
+    opacity: 0;
+  }
+  14%,
+  46% {
     opacity: 1;
   }
-  40%,
+  50%,
   100% {
     opacity: 0;
   }
 }
 @keyframes bt-l2 {
   0%,
-  37% {
+  46% {
     opacity: 0;
   }
-  40%,
-  68% {
+  50%,
+  74% {
     opacity: 1;
   }
-  71%,
+  78%,
   100% {
     opacity: 0;
   }
 }
 @keyframes bt-l3 {
   0%,
-  69% {
+  8% {
+    opacity: 1;
+  }
+  14%,
+  74% {
     opacity: 0;
   }
-  72%,
+  78%,
   100% {
     opacity: 1;
   }
 }
 @keyframes bt-cursor {
-  0% {
+  0%,
+  16% {
     opacity: 0;
     transform: translate(34px, 30px);
   }
-  6% {
+  22% {
     opacity: 1;
     transform: translate(34px, 30px);
   }
-  16%,
-  70% {
+  32%,
+  74% {
     opacity: 1;
     transform: none;
   }
-  80%,
+  86%,
   100% {
     opacity: 0;
-    transform: none;
+    transform: translate(34px, 30px);
   }
 }
 @keyframes bt-p2 {
   0%,
-  13% {
-    opacity: 0.2;
+  8% {
+    opacity: 1;
   }
   14%,
+  28% {
+    opacity: 0.2;
+  }
+  31%,
   100% {
     opacity: 1;
   }
 }
 @keyframes bt-p3 {
   0%,
-  27% {
+  8% {
+    opacity: 1;
+  }
+  14%,
+  37% {
     opacity: 0.2;
   }
-  28%,
+  40%,
   100% {
     opacity: 1;
   }
 }
 @keyframes bt-p4 {
   0%,
-  37% {
+  8% {
+    opacity: 1;
+  }
+  14%,
+  46% {
     opacity: 0.2;
   }
-  38%,
+  49%,
   100% {
     opacity: 1;
   }
 }
 @keyframes bt-p5 {
   0%,
-  69% {
+  8% {
+    opacity: 1;
+  }
+  14%,
+  74% {
     opacity: 0.2;
   }
-  70%,
+  77%,
   100% {
     opacity: 1;
   }
 }
 @keyframes bt-c1 {
   0%,
-  13% {
-    opacity: 1;
+  10% {
+    opacity: 0;
   }
   14%,
+  28% {
+    opacity: 1;
+  }
+  31%,
   100% {
     opacity: 0;
   }
 }
 @keyframes bt-c2 {
   0%,
-  13%,
-  28%,
-  100% {
+  28% {
     opacity: 0;
   }
-  14%,
-  27% {
+  31%,
+  37% {
     opacity: 1;
+  }
+  40%,
+  100% {
+    opacity: 0;
   }
 }
 @keyframes bt-c3 {
   0%,
-  27%,
-  38%,
-  100% {
+  37% {
     opacity: 0;
   }
-  28%,
-  37% {
+  40%,
+  45% {
     opacity: 1;
+  }
+  48%,
+  100% {
+    opacity: 0;
   }
 }
 @keyframes bt-c4 {
   0%,
-  37%,
-  70%,
-  100% {
+  45% {
     opacity: 0;
   }
-  38%,
-  69% {
+  48%,
+  73% {
     opacity: 1;
+  }
+  76%,
+  100% {
+    opacity: 0;
   }
 }
 @keyframes bt-c5 {
   0%,
-  69% {
+  10% {
+    opacity: 1;
+  }
+  14%,
+  73% {
     opacity: 0;
   }
-  70%,
+  76%,
   100% {
     opacity: 1;
   }
 }
 
-/* Data loading: cached rows show at once, a revalidate sweep, then fresh. */
+/* Data loading: fresh rows go stale, a revalidate sweep runs, and they come back fresh. */
 .arc .dl .dl-card {
   fill: color-mix(in srgb, var(--c) 6%, transparent);
   stroke: var(--c-dim);
@@ -1966,65 +2422,82 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 @keyframes dl-rows {
   0%,
-  50% {
+  16% {
+    opacity: 1;
+  }
+  28%,
+  60% {
     opacity: 0.45;
   }
-  60%,
+  70%,
   100% {
     opacity: 1;
   }
 }
 @keyframes dl-new {
   0%,
-  52% {
+  16% {
+    opacity: 1;
+  }
+  26%,
+  62% {
     opacity: 0;
   }
-  56%,
+  68%,
   100% {
     opacity: 1;
   }
 }
 @keyframes dl-old {
   0%,
-  52% {
+  16% {
+    opacity: 0;
+  }
+  26%,
+  62% {
     opacity: 1;
   }
-  54%,
+  68%,
   100% {
     opacity: 0;
   }
 }
 @keyframes dl-flash {
   0%,
-  52% {
+  62% {
     opacity: 0;
   }
-  57% {
+  67% {
     opacity: 0.3;
   }
-  80%,
+  84%,
   100% {
     opacity: 0;
   }
 }
 @keyframes dl-sweep {
   0%,
-  10% {
+  30% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  34% {
     opacity: 1;
     transform: scaleX(0);
   }
-  50% {
+  62% {
     opacity: 1;
     transform: none;
   }
-  58%,
+  70%,
   100% {
     opacity: 0;
     transform: none;
   }
 }
 
-/* Null vs undefined: a null box drops into its slot; undefined stays empty. */
+/* Null vs undefined: the null box lifts out of its slot and drops back in; undefined stays
+   empty. */
 .arc .nu .nu-slot {
   fill: none;
   stroke: var(--c-dim);
@@ -2056,7 +2529,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   animation-name: nu-box;
 }
 .arc .thumb[data-play] .nu-q {
-  animation: blink 1s steps(2) infinite;
+  animation: nu-q 1.4s ease-in-out infinite alternate;
 }
 .arc .thumb[data-play] .nu .chip .b1 {
   animation-name: nu-c1;
@@ -2066,38 +2539,54 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 @keyframes nu-box {
   0%,
-  16% {
+  36% {
+    opacity: 1;
+    transform: none;
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  58% {
     opacity: 0;
     transform: translateY(-64px);
     animation-timing-function: var(--snap);
   }
-  17% {
-    opacity: 1;
-    transform: translateY(-64px);
-    animation-timing-function: var(--snap);
-  }
-  36%,
+  76%,
   100% {
     opacity: 1;
     transform: none;
   }
 }
+@keyframes nu-q {
+  to {
+    opacity: 0.35;
+  }
+}
 @keyframes nu-c1 {
   0%,
-  33% {
+  40% {
+    opacity: 0;
+  }
+  44%,
+  62% {
     opacity: 1;
   }
-  34%,
+  66%,
   100% {
     opacity: 0;
   }
 }
 @keyframes nu-c2 {
   0%,
-  33% {
+  40% {
+    opacity: 1;
+  }
+  44%,
+  62% {
     opacity: 0;
   }
-  34%,
+  66%,
   100% {
     opacity: 1;
   }
@@ -2115,7 +2604,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   filter: drop-shadow(0 0 14px color-mix(in srgb, var(--c) 55%, transparent));
 }
 .arc .thumb[data-play] .gl svg {
-  animation: gl-float var(--dur) ease-in-out var(--loops);
+  animation: gl-float var(--dur) ease-in-out infinite;
 }
 @keyframes gl-float {
   50% {
@@ -2173,6 +2662,17 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 .arc .hs-row:not([data-on]):hover {
   background: color-mix(in srgb, var(--panel-2) 55%, transparent);
+}
+/* On paper the open row is the white sheet and the closed rows sit back in the page tone, so the
+   row being read has the most contrast. */
+.light .arc .hs-row {
+  background: var(--bg);
+}
+.light .arc .hs-row:not([data-on]):hover {
+  background: color-mix(in srgb, var(--panel-2) 55%, var(--bg));
+}
+.light .arc .hs-row[data-on] {
+  background: var(--panel);
 }
 .arc .hs-row:has(.hs-head:focus-visible) {
   outline: 2px solid var(--focus);
@@ -2628,7 +3128,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   transform: rotate(2deg);
 }
 .arc .cover .thumb {
-  --loops: 2;
   border-radius: 12px;
 }
 
@@ -2901,15 +3400,9 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc .hide-sm {
     display: none;
   }
-  .arc-header {
-    gap: 8px;
-  }
   .arc-header nav a,
   .arc-header .find {
-    padding: 8px 6px;
-  }
-  .arc-header .theme {
-    margin-left: -6px;
+    padding: 8px;
   }
   .arc-header .btn.sm {
     padding: 0 12px;
@@ -2978,9 +3471,9 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-/* Narrow phones: the hero's email button sits right below, so the header drops its copy. */
+/* Narrow phones: the hero's contact button sits right below, so the island drops its copy. */
 @media (max-width: 380px) {
-  .arc-header .btn {
+  .arc-header .connect {
     display: none;
   }
 }
@@ -3200,8 +3693,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 
 /* ---------- Fixed header bar ----------
-   The bar stays at the top of every page. It is clear over the top of the page and gains a
-   solid panel, a hairline and a hard drop once the page scrolls under it. */
+   A clear strip at the top of every page that only centres the island; presses pass through
+   it everywhere but the island itself. */
 body.site-shell {
   padding-top: 72px;
 }
@@ -3210,18 +3703,39 @@ html {
 }
 .arc-bar {
   position: fixed;
-  inset: 0 0 auto;
+  inset: 12px 0 auto;
   z-index: 50;
-  border-bottom: 2px solid transparent;
-  transition:
-    background-color var(--t-bar) ease,
-    border-color var(--t-bar) ease,
-    box-shadow var(--t-bar) ease;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+  pointer-events: none;
 }
-.arc-bar[data-scrolled] {
-  background: var(--bg);
-  border-bottom-color: var(--hair);
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--drop-ink) 60%, transparent);
+/* The island drops in on the page's first frame, a touch small, and settles on the spring. */
+.js.no-intro .arc-bar .island {
+  animation: island-in var(--t-island) var(--spring) backwards;
+}
+@keyframes island-in {
+  from {
+    opacity: 0;
+    scale: 0.82;
+  }
+}
+.js:not(.no-intro) .arc-bar .island {
+  opacity: 0;
+}
+/* Reduced motion: the island snaps to its new size and its parts only fade. */
+@media (prefers-reduced-motion: reduce) {
+  .island .seg {
+    transition: none;
+  }
+  .island .row,
+  .island .act-label > * {
+    filter: none !important;
+    translate: none !important;
+  }
+  .js.no-intro .arc-bar .island {
+    animation: fade-in 240ms ease backwards;
+  }
 }
 
 /* ---------- Load-in ----------
@@ -3252,42 +3766,129 @@ html {
   --glitch: glitch-in-alt;
 }
 
-.js.no-intro .arc-bar .arc-header > :nth-child(2) { --glitch-at: 40ms; }
-.js.no-intro .arc-bar .arc-header > :nth-child(3) { --glitch-at: 80ms; }
-.js.no-intro .arc-bar .arc-header > :nth-child(4) { --glitch-at: 120ms; }
-.js.no-intro .arc-bar .arc-header > :nth-child(5) { --glitch-at: 160ms; }
-.js.no-intro .arc-bar .arc-header > :nth-child(6) { --glitch-at: 200ms; }
-.arc.rot-rail ol { --glitch-at: 240ms; }
+.js.no-intro .arc-bar .arc-header > :nth-child(2) {
+  --glitch-at: 40ms;
+}
+.js.no-intro .arc-bar .arc-header > :nth-child(3) {
+  --glitch-at: 80ms;
+}
+.js.no-intro .arc-bar .arc-header > :nth-child(4) {
+  --glitch-at: 120ms;
+}
+.js.no-intro .arc-bar .arc-header > :nth-child(5) {
+  --glitch-at: 160ms;
+}
+.js.no-intro .arc-bar .arc-header > :nth-child(6) {
+  --glitch-at: 200ms;
+}
+.arc.rot-rail ol {
+  --glitch-at: 240ms;
+}
 
 /* Slices clip top and bottom only, with room at the sides for the colour split. */
 @keyframes glitch-in {
-  0% { opacity: 0; }
-  8% { opacity: 1; clip-path: inset(14% -8px 56% -8px); translate: -12px 0; filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw)); }
-  18% { clip-path: inset(62% -8px 6% -8px); translate: 14px 0; filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw)); }
-  28% { opacity: 0; }
-  38% { opacity: 1; clip-path: inset(-8px -8px 48% -8px); translate: -6px 0; filter: drop-shadow(-3px 0 var(--ux)) drop-shadow(3px 0 var(--cw)); }
-  52% { clip-path: inset(36% -8px -8px -8px); translate: 7px 0; filter: drop-shadow(2px 0 var(--ux)) drop-shadow(-2px 0 var(--cw)); }
-  66% { clip-path: none; translate: -3px 0; filter: drop-shadow(-1px 0 var(--ux)) drop-shadow(1px 0 var(--cw)); }
-  82% { translate: 1px 0; filter: none; }
-  100% { opacity: 1; clip-path: none; translate: none; filter: none; }
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+    clip-path: inset(14% -8px 56% -8px);
+    translate: -12px 0;
+    filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw));
+  }
+  18% {
+    clip-path: inset(62% -8px 6% -8px);
+    translate: 14px 0;
+    filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw));
+  }
+  28% {
+    opacity: 0;
+  }
+  38% {
+    opacity: 1;
+    clip-path: inset(-8px -8px 48% -8px);
+    translate: -6px 0;
+    filter: drop-shadow(-3px 0 var(--ux)) drop-shadow(3px 0 var(--cw));
+  }
+  52% {
+    clip-path: inset(36% -8px -8px -8px);
+    translate: 7px 0;
+    filter: drop-shadow(2px 0 var(--ux)) drop-shadow(-2px 0 var(--cw));
+  }
+  66% {
+    clip-path: none;
+    translate: -3px 0;
+    filter: drop-shadow(-1px 0 var(--ux)) drop-shadow(1px 0 var(--cw));
+  }
+  82% {
+    translate: 1px 0;
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    clip-path: none;
+    translate: none;
+    filter: none;
+  }
 }
 @keyframes glitch-in-alt {
-  0% { opacity: 0; }
-  8% { opacity: 1; clip-path: inset(48% -8px 22% -8px); translate: 16px 0; filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw)); }
-  20% { clip-path: inset(4% -8px 70% -8px); translate: -10px 0; filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw)); }
-  32% { opacity: 0; }
-  42% { opacity: 1; clip-path: inset(28% -8px 12% -8px); translate: 8px 0; filter: drop-shadow(3px 0 var(--ux)) drop-shadow(-3px 0 var(--cw)); }
-  56% { clip-path: inset(-8px -8px 30% -8px); translate: -5px 0; filter: drop-shadow(-2px 0 var(--ux)) drop-shadow(2px 0 var(--cw)); }
-  70% { clip-path: none; translate: 2px 0; filter: drop-shadow(1px 0 var(--ux)) drop-shadow(-1px 0 var(--cw)); }
-  84% { translate: none; filter: none; }
-  100% { opacity: 1; clip-path: none; translate: none; filter: none; }
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+    clip-path: inset(48% -8px 22% -8px);
+    translate: 16px 0;
+    filter: drop-shadow(5px 0 var(--ux)) drop-shadow(-5px 0 var(--cw));
+  }
+  20% {
+    clip-path: inset(4% -8px 70% -8px);
+    translate: -10px 0;
+    filter: drop-shadow(-4px 0 var(--ux)) drop-shadow(4px 0 var(--cw));
+  }
+  32% {
+    opacity: 0;
+  }
+  42% {
+    opacity: 1;
+    clip-path: inset(28% -8px 12% -8px);
+    translate: 8px 0;
+    filter: drop-shadow(3px 0 var(--ux)) drop-shadow(-3px 0 var(--cw));
+  }
+  56% {
+    clip-path: inset(-8px -8px 30% -8px);
+    translate: -5px 0;
+    filter: drop-shadow(-2px 0 var(--ux)) drop-shadow(2px 0 var(--cw));
+  }
+  70% {
+    clip-path: none;
+    translate: 2px 0;
+    filter: drop-shadow(1px 0 var(--ux)) drop-shadow(-1px 0 var(--cw));
+  }
+  84% {
+    translate: none;
+    filter: none;
+  }
+  100% {
+    opacity: 1;
+    clip-path: none;
+    translate: none;
+    filter: none;
+  }
 }
 @keyframes rise {
-  from { opacity: 0; transform: translateY(16px); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 }
 @keyframes wipe {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0); }
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
 }
 
 /* Three-line hero: "I build" / the phrase / the highlight. The phrase line never wraps, so
@@ -3321,5 +3922,7 @@ html {
   }
 }
 @keyframes fade-in {
-  from { opacity: 0; }
+  from {
+    opacity: 0;
+  }
 }

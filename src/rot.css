@@ -4,6 +4,12 @@
    Unbounded for labels. Verdicts get their own pair of hues so a bad/good card
    never reads as a topic colour. */
 
+/* The article column rests on the veil (see arcade.css), so its copy never sits on the dot field. */
+.rot-page {
+  background: var(--veil);
+  box-shadow: var(--veil-edge);
+  border-radius: 24px;
+}
 .rot-page {
   --no: #ff5468;
   --yes: #7dff6a;
@@ -130,7 +136,7 @@
   height: 38px;
   border-radius: 11px;
   background: var(--c);
-  color: var(--on-accent);
+  color: var(--on-c);
   font: 900 16px/1 var(--display);
   letter-spacing: 0;
   box-shadow:
@@ -870,15 +876,15 @@ button.rk-tree-row {
   }
 }
 
-/* ---------- Checkpoint bar: the navbar's bottom edge as the article's route ---------- */
+/* ---------- Checkpoint bar: the article's route along the island's bottom edge ---------- */
 .arc.rot-xp {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
+  left: 22px;
+  right: 22px;
+  bottom: 4px;
   display: flex;
   gap: 3px;
-  height: 4px;
+  height: 3px;
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--t-bar) ease;
@@ -891,6 +897,7 @@ button.rk-tree-row {
   flex: 1 1 0;
   min-width: 8px;
   overflow: hidden;
+  border-radius: 2px;
   background: color-mix(in srgb, var(--c) 16%, var(--hair));
 }
 .arc.rot-xp b {

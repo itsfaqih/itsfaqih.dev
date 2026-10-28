@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import Fuse from "fuse.js";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { colorOf, ruleNumber, RuleThumb, useRuleOpen } from "./rule-art";
@@ -21,13 +22,25 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
 
   const categories = [...new Set(rules.map((rule) => rule.label))];
   const normalizedQuery = query.trim().toLowerCase();
-  const matches = rules.filter(
-    (rule) =>
-      (category === "All" || rule.label === category) &&
-      (!normalizedQuery ||
-        `${rule.title} ${rule.description} ${rule.label}`.toLowerCase().includes(normalizedQuery)),
+  // Typos and partial words still find a rule; the best matches come first, titles weighing most.
+  const fuse = useMemo(
+    () =>
+      new Fuse(rules, {
+        keys: [
+          { name: "title", weight: 3 },
+          { name: "label", weight: 1.5 },
+          { name: "description", weight: 1 },
+        ],
+        threshold: 0.4,
+        ignoreLocation: true,
+      }),
+    [rules],
   );
-  const selected = matches.find((rule) => rule.id === selectedId) ?? matches[0];
+  const matches = (normalizedQuery ? fuse.search(normalizedQuery).map(({ item }) => item) : rules).filter(
+    (rule) => category === "All" || rule.label === category,
+  );
+  // Only a hovered or focused tile fills the panel; otherwise it waits in its empty state.
+  const selected = matches.find((rule) => rule.id === selectedId);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -111,10 +124,6 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
             <p>{selected.description}</p>
             <dl>
               <div>
-                <dt>DEMO</dt>
-                <dd>{selected.interactive ? "Interactive" : "Article only"}</dd>
-              </div>
-              <div>
                 <dt>TOPIC</dt>
                 <dd>{selected.label}</dd>
               </div>
@@ -124,16 +133,12 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
           <>
             <div className="p">
               <span>No.—</span>
-              <span>NO MATCH</span>
+              <span>STANDBY</span>
             </div>
             <div className="thumb" aria-hidden="true" />
-            <h3>Nothing here yet</h3>
-            <p>Try another word, or pick a different topic.</p>
+            <h3>Pick a rule</h3>
+            <p>Hover or focus a tile to preview it here.</p>
             <dl>
-              <div>
-                <dt>DEMO</dt>
-                <dd>—</dd>
-              </div>
               <div>
                 <dt>TOPIC</dt>
                 <dd>{category}</dd>
@@ -176,7 +181,11 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
           ))}
         </div>
         {/* Keyed by the filter, so a new filter deals a fresh hand of tiles. */}
-        <div className="tiles" key={`${category}|${normalizedQuery}`} onPointerLeave={() => setLitId(null)}>
+        <div className="tiles" key={`${category}|${normalizedQuery}`} onPointerLeave={() => {
+            setLitId(null);
+            if (!selectRef.current?.querySelector(".tile:focus-visible")) setSelectedId(null);
+          }}
+        >
           {matches.map((rule) => (
             <Link
               key={rule.id}
@@ -195,7 +204,10 @@ export function RuleSelect({ rules }: { rules: Guideline[] }) {
                 setSelectedId(rule.id);
                 if (event.currentTarget.matches(":focus-visible")) light(rule, event.currentTarget);
               }}
-              onBlur={() => setLitId((id) => (id === rule.id ? null : id))}
+              onBlur={() => {
+                setLitId((id) => (id === rule.id ? null : id));
+                setSelectedId((id) => (id === rule.id ? null : id));
+              }}
               {...openRule(rule)}
             >
               <RuleThumb rule={rule} play={rule === selected} />

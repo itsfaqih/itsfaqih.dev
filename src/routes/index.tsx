@@ -348,12 +348,12 @@ function Index() {
           </div>
         </section>
 
-        <div className="end" data-cut>
+        <div id="contact" className="end" data-cut>
           <h2>
             <small data-cut style={{ "--c": "var(--ax)" }}>
               Contact
             </small>
-            <span data-cut>Have a product that needs this level of care?</span>
+            <span data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
           <div className="acts" data-cut style={{ marginTop: 24 }}>
             <a className="btn go" href="mailto:itsfaqih@gmail.com">
@@ -540,16 +540,14 @@ function Hero({ introDone }: { introDone: boolean }) {
           .
         </p>
         <div className="acts">
-          <a
-            className="btn go"
-            href="mailto:itsfaqih@gmail.com"
-            data-cut
-            style={{ "--c": current.color }}
-          >
-            Email itsfaqih@gmail.com
+          <a className="btn go" href="#contact" data-cut style={{ "--c": current.color }}>
+            Connect with me
           </a>
-          <a className="btn soft" href="#rules" data-cut>
-            Read my rules
+          <a className="scroll-cue" href="#rules" data-cut>
+            <span className="mouse" aria-hidden="true">
+              <span className="wheel" />
+            </span>
+            Scroll down
           </a>
         </div>
       </div>

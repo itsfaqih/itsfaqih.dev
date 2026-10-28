@@ -1,7 +1,92 @@
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
-import { MagnifyingGlassIcon, MoonIcon, SunIcon } from "@phosphor-icons/react";
+import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
+
+// ---------- The live activity a page lends the island ----------
+
+let activityHost: HTMLElement | null = null;
+let activityCount = 0;
+const listeners = new Set<() => void>();
+const emit = () => listeners.forEach((listener) => listener());
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** Shows its children in the island once the page scrolls, in place of the brand. */
+export function IslandActivity({ children }: { children: ReactNode }) {
+  const host = useSyncExternalStore(
+    subscribe,
+    () => activityHost,
+    () => null,
+  );
+  useEffect(() => {
+    activityCount += 1;
+    emit();
+    return () => {
+      activityCount -= 1;
+      emit();
+    };
+  }, []);
+  return host ? createPortal(children, host) : null;
+}
+
+/** Where an element inside the island's activity will sit on screen once the island is compact.
+ * Summed from the parts' natural widths, so it holds while the island is still full, mid-resize,
+ * or scaling in. Everything in the island is centred on its height. */
+export function compactBox(element: HTMLElement) {
+  const island = element.closest<HTMLElement>(".island");
+  const bar = island?.parentElement;
+  const row = element.closest<HTMLElement>(".row");
+  if (!island || !bar || !row) return element.getBoundingClientRect();
+  const pad = parseFloat(getComputedStyle(island).paddingLeft);
+  let width = pad * 2;
+  let before = 0;
+  for (const seg of island.querySelectorAll<HTMLElement>(
+    ':scope > [data-compact="live"], :scope > [data-compact="always"]',
+  )) {
+    if (seg.contains(row)) before = width - pad * 2;
+    width += seg.querySelector<HTMLElement>(".row")?.offsetWidth ?? 0;
+  }
+  // Not offsetLeft: a folded row is blurred, which makes it the offsetParent in some browsers.
+  const scale = island.getBoundingClientRect().width / island.offsetWidth || 1;
+  const inRow = (element.getBoundingClientRect().left - row.getBoundingClientRect().left) / scale;
+  const barBox = bar.getBoundingClientRect();
+  return new DOMRect(
+    barBox.left + (barBox.width - width) / 2 + pad + before + inRow,
+    barBox.top + (island.offsetHeight - element.offsetHeight) / 2,
+    element.offsetWidth,
+    element.offsetHeight,
+  );
+}
+
+// ---------- The island ----------
+
+type SegProps = {
+  on: boolean;
+  /** When the part shows in the compact island: with no activity, with one, or always. */
+  compact?: "idle" | "live" | "always";
+  className?: string;
+  children: ReactNode;
+};
+
+/** One part of the island. Off, it folds to no width and leaves the tab order. */
+function Seg({ on, compact, className, children }: SegProps) {
+  return (
+    <div
+      className={className ? `seg ${className}` : "seg"}
+      data-on={on || undefined}
+      data-compact={compact}
+      inert={!on}
+    >
+      <div className="clip">
+        <div className="row">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 export function Header() {
   const { toggleTheme } = useTheme();
@@ -11,7 +96,16 @@ export function Header() {
     );
   };
 
+  const islandRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const live = useSyncExternalStore(
+    subscribe,
+    () => activityCount > 0,
+    () => false,
+  );
+
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
@@ -19,16 +113,73 @@ export function Header() {
     return () => removeEventListener("scroll", update);
   }, []);
 
+  // Open, the island folds back on a scroll past a small nudge, Escape, or a press outside it.
+  useEffect(() => {
+    if (!open) return;
+    const from = scrollY;
+    const onScroll = () => {
+      if (Math.abs(scrollY - from) > 24) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    };
+    const onPress = (event: PointerEvent) => {
+      if (event.target instanceof Node && !islandRef.current?.contains(event.target))
+        setOpen(false);
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPress);
+    return () => {
+      removeEventListener("scroll", onScroll);
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPress);
+    };
+  }, [open]);
+
+  const compact = scrolled && !open;
+  const full = !compact;
+
   return (
-    <div className="arc arc-bar" data-scrolled={scrolled ? "" : undefined}>
-      <div className="arc-wrap">
-        <header className="arc-header">
+    <div
+      className="arc arc-bar"
+      data-scrolled={scrolled ? "" : undefined}
+      data-mode={compact ? "compact" : "full"}
+      data-open={open || undefined}
+    >
+      <header
+        ref={islandRef}
+        className="arc-header island"
+        onClick={(event) => {
+          if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
+        }}
+      >
+        <Seg on={full || !live} compact="idle" className="home">
           <Link to="/" className="brand" aria-label="Faqih Muntashir, home">
             FAQIH
           </Link>
-          <span className="where hide-sm">
+        </Seg>
+        <Seg on={full} className="hide-sm">
+          <span className="where">
             Yogyakarta · <JakartaClock />
           </span>
+        </Seg>
+        <Seg on={compact && live} compact="live" className="activity">
+          <div
+            className="act"
+            ref={(node) => {
+              activityHost = node;
+              emit();
+              return () => {
+                activityHost = null;
+                emit();
+              };
+            }}
+          />
+        </Seg>
+        <Seg on={full}>
           <nav aria-label="Main">
             <Link to="/rule-of-thumb" activeProps={{ "aria-current": "page" }}>
               Rule of Thumb
@@ -40,6 +191,8 @@ export function Header() {
               Projects
             </Link>
           </nav>
+        </Seg>
+        <Seg on compact="always" className="tools">
           <button
             type="button"
             className="find"
@@ -61,11 +214,26 @@ export function Header() {
             <SunIcon className="to-light" size={16} weight="bold" />
             <MoonIcon className="to-dark" size={16} weight="bold" />
           </button>
-          <a className="btn go sm" href="mailto:itsfaqih@gmail.com">
-            Email me
-          </a>
-        </header>
-      </div>
+        </Seg>
+        <Seg on={full} className="connect">
+          <Link to="/" hash="contact" className="btn go sm">
+            Connect
+          </Link>
+        </Seg>
+        <Seg on={scrolled} compact="always">
+          <button
+            ref={toggleRef}
+            type="button"
+            className="find menu"
+            aria-expanded={open}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <ListIcon className="to-open" size={16} weight="bold" />
+            <XIcon className="to-close" size={16} weight="bold" />
+          </button>
+        </Seg>
+      </header>
     </div>
   );
 }

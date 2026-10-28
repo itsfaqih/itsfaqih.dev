@@ -13,6 +13,12 @@ export function jumpTo(top: number) {
   else scrollTo({ top, behavior: "instant" });
 }
 
+/** Glides to an element, stopping where its scroll-margin and the page's scroll-padding say. Jumps under reduced motion. */
+export function glideTo(target: HTMLElement) {
+  if (active) active.scrollTo(target);
+  else target.scrollIntoView({ block: "start", behavior: "instant" });
+}
+
 /** Wheel scrolling on every page glides to a stop instead of stepping. Touch keeps native momentum. */
 export function SmoothScroll() {
   const router = useRouter();
