@@ -34,19 +34,17 @@ function Ink({ p, top = "solid", children }: { p: string; top?: TopInk; children
 
 function Paper({ p }: { p: string }) {
   return (
-    <>
-      <defs>
-        <pattern
-          id={`${p}ht`}
-          width="5"
-          height="5"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(18)"
-        >
-          <circle className="dot" cx="2.5" cy="2.5" r="1.75" />
-        </pattern>
-      </defs>
-    </>
+    <defs>
+      <pattern
+        id={`${p}ht`}
+        width="5"
+        height="5"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(18)"
+      >
+        <circle className="dot" cx="2.5" cy="2.5" r="1.75" />
+      </pattern>
+    </defs>
   );
 }
 

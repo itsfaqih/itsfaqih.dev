@@ -595,20 +595,15 @@ function ExperienceList() {
     const glide: KeyframeAnimationOptions = {
       easing: "cubic-bezier(0.16, 1, 0.3, 1)",
       fill: "backwards",
+      duration: 380,
     };
     if (before.height !== after.height) {
-      list.animate([{ height: `${before.height}px` }, { height: `${after.height}px` }], {
-        ...glide,
-        duration: 380,
-      });
+      list.animate([{ height: `${before.height}px` }, { height: `${after.height}px` }], glide);
     }
     after.rows.forEach((to, row) => {
       const from = before.rows.get(row);
       if (from === undefined || Math.abs(from - to) < 0.5) return;
-      row.animate([{ transform: `translateY(${from - to}px)` }, { transform: "none" }], {
-        ...glide,
-        duration: 380,
-      });
+      row.animate([{ transform: `translateY(${from - to}px)` }, { transform: "none" }], glide);
     });
     after.pills.forEach((to, pill) => {
       const from = before.pills.get(pill);

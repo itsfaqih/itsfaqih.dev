@@ -6,8 +6,8 @@ import { routeTree } from "./routeTree.gen";
  * (see `page-fade` in arcade.css). Hash and search changes stay on the page, so they skip it. */
 const PAGE_FADE = "page-fade";
 
-export const getRouter = () => {
-  const router = createRouter({
+export const getRouter = () =>
+  createRouter({
     routeTree,
     context: {},
 
@@ -16,6 +16,3 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     defaultViewTransition: { types: ({ pathChanged }) => (pathChanged ? [PAGE_FADE] : false) },
   });
-
-  return router;
-};
