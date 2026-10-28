@@ -1,9 +1,3 @@
-/* Hero prints (hero-prints.tsx, redesign/hero-variants/DIRECTION.md).
-   One Riso-printed scene on a 320 × 200 viewBox, shapes only, on a 16:10 stage.
-   Every scene plays once over --scene-duration and holds its last frame, the arranged state.
-   Keyframes that come from geometry are generated in the TSX. */
-
-/* The slide's colour, eased here so shapes mounted mid-handover take the in-between value too. */
 @property --hue {
   syntax: "<color>";
   inherits: true;
@@ -36,16 +30,13 @@
   display: block;
   width: 100%;
   height: 100%;
-  /* Pieces flying in or settling past the edge stay whole. */
   overflow: visible;
 }
 
-/* ---- Inks ---- */
 .arc .hp svg *:not([transform]) {
   transform-box: fill-box;
   transform-origin: center;
 }
-/* Parts that move along viewBox coordinates. */
 .arc .hp svg .vb {
   transform-box: view-box;
   transform-origin: 0 0;
@@ -79,7 +70,6 @@
   opacity: 0.65;
 }
 
-/* ---- Interfaces and agents: scattered, turned pieces spring into place ---- */
 .arc .hp .settle {
   animation: hp-settle calc(var(--scene-duration) * var(--span)) var(--spring)
     calc(var(--scene-duration) * var(--step) * var(--i)) both;
@@ -89,8 +79,6 @@
     transform: translate(var(--dx), var(--dy)) rotate(var(--r, 0deg));
   }
 }
-/* The ring starts drawing as the last quarter reaches its place (the spring gets there
-   about a third of the way through its span, then only eases out its overshoot). */
 .arc .hp .ring {
   stroke-dasharray: 1;
   animation: hp-ring var(--scene-duration) both;
@@ -106,7 +94,6 @@
   }
 }
 
-/* ---- Dev tools: the ink takes the straight line; the ghost walks the meander ---- */
 .arc .hp .cut-ball {
   transform: translate(280px, 40px);
   animation: hp-ball var(--scene-duration) both;
@@ -147,7 +134,6 @@
   animation: hp-ghost var(--scene-duration) linear both;
 }
 
-/* ---- Backends: the worker drains the queue (timeline in the TSX) ---- */
 .arc .hp .q-job {
   opacity: 0;
   animation-duration: var(--scene-duration);
@@ -166,13 +152,11 @@
   opacity: 0;
   animation: hp-out-retry var(--scene-duration) both;
 }
-/* The worker turns the hue job away. */
 .arc .hp .q-x {
   opacity: 0;
   animation: hp-x var(--scene-duration) both;
 }
 
-/* ---- Idle art floats (Float in the TSX) ---- */
 .arc .hp .float {
   animation: hp-float var(--float-ms) var(--inout) var(--float-at) infinite alternate both;
 }
@@ -182,7 +166,6 @@
   }
 }
 
-/* ---- Tests: the scan finds the shape that slipped, and it snaps into place ---- */
 .arc .hp .snap-slip {
   animation: hp-slip var(--scene-duration) both;
 }
@@ -257,8 +240,6 @@
   }
 }
 
-/* While scenes hand over, a layer's art fades through --fade. Its tokens never fade: two copies of
-   one shape crossfading dim where they overlap, so they swap with the morph in one frame. */
 .arc .hp .hp-layer * {
   fill-opacity: var(--fade, 1);
   stroke-opacity: var(--fade, 1);
@@ -271,14 +252,12 @@
   visibility: hidden;
 }
 
-/* Before the intro ends, while paused, and while a scene hands over to the morph, it holds where it is. */
 .arc .hp:not([data-play]) svg *,
 .arc [data-held] .hp svg *,
 .arc .hp [data-leaving] * {
   animation-play-state: paused !important;
 }
 
-/* Reduced motion: each scene shows its last frame, everything arranged. */
 @media (prefers-reduced-motion: reduce) {
   .arc .hp svg * {
     animation: none !important;

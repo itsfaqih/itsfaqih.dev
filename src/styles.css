@@ -74,7 +74,6 @@
   --navbar-border-strength: 5%;
 }
 
-/* Keep mobile clipping from reserving a visible scrollbar gutter. */
 html,
 body.site-shell {
   overflow-x: clip !important;
@@ -113,7 +112,6 @@ body.site-shell {
   color-scheme: dark;
 }
 
-/* Embedded code belongs to the surrounding card; do not draw a second card. */
 [data-rule-of-thumb-card="true"] .code-block {
   border: 0;
   border-radius: 0;
@@ -179,7 +177,6 @@ body.site-shell {
   }
 }
 
-/* Dialog animations */
 @keyframes dialog-in {
   from {
     opacity: 0;
@@ -213,89 +210,84 @@ body.site-shell {
 
 @layer base {
   :root {
-    /* Shadcn-style semantic color tokens */
-    --background: #f5f5f8; /* arcade light --bg */
-    --foreground: #111117; /* arcade light --text */
+    --background: #f5f5f8;
+    --foreground: #111117;
     
-    --card: oklch(1 0 0 / 50%); /* translucent white */
-    --card-foreground: oklch(0.145 0 0); /* zinc-950 */
+    --card: oklch(1 0 0 / 50%);
+    --card-foreground: oklch(0.145 0 0);
     
-    --popover: oklch(1 0 0); /* white */
-    --popover-foreground: oklch(0.145 0 0); /* zinc-950 */
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
     
-    --brand: oklch(0.556 0.182 254.604); /* blue-600 */
-    --brand-foreground: oklch(0.985 0 0); /* near white */
+    --brand: oklch(0.556 0.182 254.604);
+    --brand-foreground: oklch(0.985 0 0);
     
-    --neutral: oklch(0.97 0 0 / 50%); /* translucent light gray */
-    --neutral-foreground: oklch(0.145 0 0); /* zinc-950 */
+    --neutral: oklch(0.97 0 0 / 50%);
+    --neutral-foreground: oklch(0.145 0 0);
     
-    --muted: oklch(0.97 0 0); /* zinc-100 */
-    --muted-foreground: oklch(0.556 0 0); /* zinc-500 */
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
     
-    --accent: oklch(0.97 0 0); /* zinc-100 */
-    --accent-foreground: oklch(0.145 0 0); /* zinc-950 */
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.145 0 0);
     
-    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
-    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.985 0 0);
     
-    --negative: oklch(0.637 0.237 25.331); /* red-500 */
-    --negative-foreground: oklch(0.577 0.245 27.325); /* red-600 */
+    --negative: oklch(0.637 0.237 25.331);
+    --negative-foreground: oklch(0.577 0.245 27.325);
     
-    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
-    --positive-foreground: oklch(0.596 0.145 163.225); /* emerald-600 */
+    --positive: oklch(0.696 0.17 162.48);
+    --positive-foreground: oklch(0.596 0.145 163.225);
     
-    --border: oklch(0.922 0 0); /* zinc-200 */
-    --input: oklch(0.922 0 0); /* zinc-200 */
-    --ring: oklch(0.556 0.182 254.604); /* brand blue-600 */
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.556 0.182 254.604);
     
-    /* Legacy/custom variables for specific use cases */
-    --key-shadow: oklch(0 0 0); /* black */
+    --key-shadow: oklch(0 0 0);
     
-    /* Border radius */
-    --radius: 0.75rem; /* 12px */
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: #0e0e13; /* arcade --bg */
-    --foreground: #f4f4f8; /* arcade --text */
+    --background: #0e0e13;
+    --foreground: #f4f4f8;
     
-    --card: #17171f; /* arcade --panel */
-    --card-foreground: oklch(0.985 0 0); /* zinc-100 */
+    --card: #17171f;
+    --card-foreground: oklch(0.985 0 0);
     
-    --popover: #20202b; /* arcade --panel-2 */
-    --popover-foreground: oklch(0.985 0 0); /* zinc-100 */
+    --popover: #20202b;
+    --popover-foreground: oklch(0.985 0 0);
     
-    --brand: oklch(0.556 0.182 254.604); /* blue-600 */
-    --brand-foreground: oklch(0.985 0 0); /* near white */
+    --brand: oklch(0.556 0.182 254.604);
+    --brand-foreground: oklch(0.985 0 0);
     
-    --neutral: oklch(0.269 0 0 / 40%); /* translucent zinc-800 */
-    --neutral-foreground: oklch(0.985 0 0); /* zinc-100 */
+    --neutral: oklch(0.269 0 0 / 40%);
+    --neutral-foreground: oklch(0.985 0 0);
     
-    --muted: #20202b; /* arcade --panel-2 */
-    --muted-foreground: #a1a1b5; /* arcade --dim */
+    --muted: #20202b;
+    --muted-foreground: #a1a1b5;
     
-    --accent: #2c2c3a; /* arcade --hair */
-    --accent-foreground: oklch(0.985 0 0); /* zinc-100 */
+    --accent: #2c2c3a;
+    --accent-foreground: oklch(0.985 0 0);
     
-    --destructive: oklch(0.577 0.245 27.325); /* red-600 */
-    --destructive-foreground: oklch(0.985 0 0); /* near white */
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.985 0 0);
     
-    --negative: oklch(0.637 0.237 25.331); /* red-500 */
-    --negative-foreground: oklch(0.808 0.114 19.571); /* red-300 */
+    --negative: oklch(0.637 0.237 25.331);
+    --negative-foreground: oklch(0.808 0.114 19.571);
     
-    --positive: oklch(0.696 0.17 162.48); /* emerald-500 */
-    --positive-foreground: oklch(0.845 0.143 164.978); /* emerald-300 */
+    --positive: oklch(0.696 0.17 162.48);
+    --positive-foreground: oklch(0.845 0.143 164.978);
     
-    --border: #2c2c3a; /* arcade --hair */
-    --input: oklch(1 0 0 / 15%); /* translucent white */
-    --ring: #ffe14d; /* arcade --go */
+    --border: #2c2c3a;
+    --input: oklch(1 0 0 / 15%);
+    --ring: #ffe14d;
     
-    /* Legacy/custom variables for specific use cases */
-    --key-shadow: oklch(0.708 0 0); /* slate-400 */
+    --key-shadow: oklch(0.708 0 0);
   }
 }
 
-/* Experimental squircle support */
 .squircle {
   corner-shape: squircle;
 }
@@ -304,21 +296,17 @@ body.site-shell {
   0% {
     opacity: 0;
   }
-  /* Fade in */
   10% {
     opacity: 0.8;
   }
-  /* Hold visible for a shorter time */
   35% {
     opacity: 0.8;
   }
-  /* Fade out */
   50%, 100% {
     opacity: 0;
   }
 }
 
-/* Final mobile main-content background tuning for every PageContainer. */
 @media (max-width: 639px) {
   .page-container {
     position: relative;
@@ -337,21 +325,16 @@ body.site-shell {
     opacity: 0.90;
   }
 
-  /* The grid background this band masked is gone; the page ground shows through. */
   .dark .page-container::before {
     background: none;
   }
 }
 
-/* Let rule-of-thumb cards use the full mobile viewport while keeping text padded. */
 .rule-of-thumb-page {
   container-name: rule-of-thumb-page;
   container-type: inline-size;
 }
 
-/* Let the matrix size to its content instead of stretching seven columns to
- * the viewport. Cap the scroll viewport at the screen when the content is
- * wider than it, so the page itself never gains horizontal overflow. */
 .button-variant-matrix-scroll {
   box-sizing: border-box;
   width: max-content;
@@ -381,7 +364,6 @@ body.site-shell {
   }
 }
 
-/* Keep the code surface visible while letting the complete example scroll. */
 .interactive-state-code-block {
   position: sticky;
   top: 5rem;
@@ -473,7 +455,6 @@ body.site-shell {
   }
 }
 
-/* Keep tertiary button hover and pressing surfaces explicit; these are not StyleX utilities. */
 .button-tertiary-neutral-hover-surface {
   background-color: transparent !important;
 }
@@ -555,7 +536,6 @@ body.site-shell {
   background-color: color-mix(in srgb, var(--destructive) 24%, transparent);
 }
 
-/* Red callouts need a visible dark-mode surface without dimming their copy. */
 .button-destructive-callout {
   background-color: color-mix(in srgb, var(--destructive) 10%, var(--background)) !important;
   border-color: color-mix(in srgb, var(--destructive) 36%, var(--border)) !important;
@@ -571,7 +551,6 @@ body.site-shell {
   color: color-mix(in srgb, var(--negative-foreground) 80%, var(--foreground)) !important;
 }
 
-/* Dark mode keeps secondary surfaces quieter without removing their tint. */
 .dark .button-secondary-brand-surface {
   background-color: oklch(0.18 0 0) !important;
   border-color: color-mix(in srgb, var(--brand) 45%, transparent) !important;
@@ -600,13 +579,11 @@ body.site-shell {
   );
 }
 
-/* Brighter dark-mode brand text keeps secondary and tertiary labels readable. */
 .dark .button-secondary-brand-surface,
 .dark .button-tertiary-brand-hover-surface {
-  color: oklch(0.708 0.182 254.604) !important; /* blue-400 */
+  color: oklch(0.708 0.182 254.604) !important;
 }
 
-/* Disabled buttons keep the former tertiary-neutral hover surface without fading their content. */
 .button-disabled-state:disabled {
   background-color: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
   background-image: none !important;

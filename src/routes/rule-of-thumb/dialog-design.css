@@ -1,13 +1,9 @@
-/* Dialog Design: every pane holds a small window with its own page, scrim and dialog. All of it is
-   positioned inside the pane, so nothing covers the real page or locks its scroll. */
-
 .rule-page.dialog-design .dd-stage {
   display: grid;
   gap: 12px;
   align-content: start;
 }
 
-/* ---------- The window ---------- */
 .rule-page.dialog-design .dd-screen {
   position: relative;
   isolation: isolate;
@@ -19,7 +15,6 @@
   font: 500 13px/1.35 var(--sans);
   color: var(--text);
 }
-/* The ring below marks focus, so the browser's own outline would draw it twice. */
 .rule-page.dialog-design .dd-screen :focus-visible {
   outline: none;
 }
@@ -71,8 +66,6 @@
   flex-wrap: wrap;
   gap: 8px;
 }
-/* Lesson 1 keeps its controls in the top and bottom strips, clear of the dialog, so focus that
-   slips behind it stays in view. */
 .rule-page.dialog-design .dd-checkout {
   grid-template-rows: auto auto 1fr;
 }
@@ -82,7 +75,6 @@
 }
 .rule-page.dialog-design .dd-link {
   justify-self: start;
-  /* A 24px hit area without moving the text. */
   margin: -4px -6px;
   padding: 6px;
   border: 0;
@@ -161,7 +153,6 @@
   background: color-mix(in srgb, var(--c) 16%, var(--panel-2));
 }
 
-/* ---------- The scrim and the dialog ---------- */
 .rule-page.dialog-design .dd-scrim {
   position: absolute;
   z-index: 2;
@@ -286,7 +277,6 @@
   color: var(--dim);
 }
 
-/* ---------- Buttons inside the window ---------- */
 .rule-page.dialog-design .dd-btn {
   flex: none;
   height: 32px;
@@ -338,7 +328,6 @@
   background: var(--soft-hover);
 }
 
-/* ---------- The focus ring: where focus is in the window, popping onto each stop ---------- */
 .rule-page.dialog-design .dd-screen [data-stop] {
   position: relative;
 }
@@ -352,7 +341,6 @@
   pointer-events: none;
   animation: dd-ring 220ms var(--out);
 }
-/* Focus behind the scrim: lift the control above the dim layer so you can see where it went. */
 .rule-page.dialog-design .dd-screen[data-open] .dd-page [data-at] {
   z-index: 3;
 }
@@ -366,7 +354,6 @@
   }
 }
 
-/* ---------- The keys and the readout under the window ---------- */
 .rule-page.dialog-design .dd-bar {
   display: flex;
   flex-wrap: wrap;
@@ -439,7 +426,6 @@
   }
 }
 
-/* Reduced motion: dialogs fade, the ring appears, and keys don't move. */
 @media (prefers-reduced-motion: reduce) {
   .rule-page.dialog-design .dd-dialog,
   .rule-page.dialog-design .dd-dialog[data-open] {

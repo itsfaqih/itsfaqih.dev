@@ -1,10 +1,3 @@
-/* Rule of Thumb article kit: the arcade look for everything below an article's hero.
-   Scoped to .rot-page, which RulePage sets along with the rule's hue in --c.
-   Shapes follow the index page: 2px hairlines, 16px panels, hard bottom shadows,
-   Unbounded for labels. Verdicts get their own pair of hues so a bad/good card
-   never reads as a topic colour. */
-
-/* The article column rests on the veil (see arcade.css), so its copy never sits on the dot field. */
 .rot-page {
   background: var(--veil);
   box-shadow: var(--veil-edge);
@@ -13,14 +6,11 @@
 .rot-page {
   --no: #ff5468;
   --yes: #7dff6a;
-  /* Verdict hues as text: unchanged in dark, darkened in light. */
   --no-ink: color-mix(in oklab, var(--no) var(--ink-mix), #000);
   --yes-ink: color-mix(in oklab, var(--yes) var(--ink-mix), #000);
   --drop: 0 4px 0 var(--drop-ink);
   color: var(--dim);
 
-  /* The site's UI tokens, re-pointed at the arcade palette so every demo
-     (buttons, inputs, mock dialogs, tables) picks up the same colours. */
   --brand: var(--go);
   --brand-foreground: var(--on-accent);
   --destructive: var(--no);
@@ -44,7 +34,6 @@
   --popover-foreground: var(--text);
 }
 
-/* Demo buttons: the arcade's chunky key with a hard bottom edge. */
 .rot-page [data-variant] {
   border-radius: 10px;
   font-family: var(--display);
@@ -78,19 +67,16 @@
   box-shadow: 0 1px 0 var(--no-shadow);
 }
 
-/* The global dark theme pins secondary/tertiary brand labels to blue; follow the remap. */
 .rot-page .button-secondary-brand-surface,
 .rot-page .button-tertiary-brand-hover-surface {
   color: var(--go-ink) !important;
 }
 
-/* Red labels on a light ground need the darkened red. */
 .rot-page [data-variant="secondary-destructive"],
 .rot-page [data-variant="tertiary-destructive"] {
   color: var(--no-ink);
 }
 
-/* Warning callouts: a tinted panel, not a red slab. */
 .rot-page .button-destructive-callout {
   border: 2px solid color-mix(in srgb, var(--no) 42%, var(--hair)) !important;
   border-radius: 16px;
@@ -98,7 +84,6 @@
   box-shadow: var(--drop);
 }
 
-/* Mock windows inside demo stages. */
 .rk-window {
   border: 2px solid var(--hair);
   border-radius: 16px;
@@ -117,9 +102,6 @@
   white-space: nowrap;
 }
 
-/* ---------- Prose ---------- */
-/* Section headings are checkpoints on one route: a numbered key cap (data-stage, set by
-   the contents rail), the title, and a dotted track running to the column's edge. */
 .rot-page h2 {
   display: flex;
   align-items: center;
@@ -199,11 +181,9 @@
   background: var(--c);
 }
 
-/* ---------- Panels ---------- */
 .rot-page [data-rule-of-thumb-card="true"] {
   border: 2px solid var(--hair);
   border-radius: 16px;
-  /* A faint wash of the topic hue along the top edge, like the index tiles. */
   background: linear-gradient(color-mix(in srgb, var(--c) 4%, var(--panel)), var(--panel) 96px);
   box-shadow: var(--raise), var(--drop);
   backdrop-filter: none;
@@ -216,8 +196,6 @@
   --diffs-light-bg: var(--panel);
   --diffs-dark-bg: var(--panel);
 }
-/* Syntax colours for the "arcade" code theme (see code-block.tsx): the palette's hues,
-   darkened by --ink-mix on light so each token keeps its contrast on white. */
 .code-block {
   --code-ink: var(--ink-mix);
   --diffs-foreground: var(--text);
@@ -250,7 +228,6 @@
   text-align: left;
 }
 
-/* Header strip and footnote shared by every panel. */
 .rk-head {
   display: flex;
   align-items: center;
@@ -282,7 +259,6 @@
   padding: 12px 8px;
 }
 
-/* ---------- Verdict: a pair of bad / good panels ---------- */
 .rk-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -335,7 +311,6 @@
   color: var(--v-ink);
 }
 
-/* ---------- Tabs: the index page's chips ---------- */
 .rk-tabs {
   display: flex;
   gap: 4px;
@@ -377,7 +352,6 @@
   outline-offset: 2px;
 }
 
-/* ---------- Tip rows: an icon slot, a title, a line of reasoning ---------- */
 .rk-tip {
   display: grid;
   grid-template-columns: 44px 1fr;
@@ -420,7 +394,6 @@
   font-weight: 700;
 }
 
-/* ---------- Quick reference: numbered stops on a track ---------- */
 .rk-steps {
   margin: 0;
   padding: 0;
@@ -470,7 +443,6 @@
   font-weight: 600;
 }
 
-/* ---------- File tree ---------- */
 .rk-tree {
   font: 500 13px/1 var(--mono);
 }
@@ -537,7 +509,6 @@ button.rk-tree-row {
   color: color-mix(in srgb, var(--v-ink) 45%, var(--text));
 }
 
-/* ---------- Demo cabinet: stage, overlay, transport ---------- */
 .rk-stage {
   background-color: var(--bg);
   background-image: radial-gradient(color-mix(in srgb, var(--hair) 70%, var(--mute)) 1px, transparent 1.3px);
@@ -658,7 +629,6 @@ button.rk-tree-row {
   outline-offset: 4px;
 }
 
-/* Arcade buttons inside an article (the shared .btn is scoped to .arc). */
 .rot-page .btn {
   position: relative;
   display: inline-flex;
@@ -729,7 +699,6 @@ button.rk-tree-row {
     border-radius: 9px;
     font-size: 14px;
   }
-  /* Titles wrap at this width, which would squeeze the track into a stub. */
   .rot-page h2::after {
     display: none;
   }
@@ -742,7 +711,6 @@ button.rk-tree-row {
   }
 }
 
-/* ---------- Feature tiles: the article's overview ---------- */
 .rk-features {
   --cols: 3;
   display: grid;
@@ -818,7 +786,6 @@ button.rk-tree-row {
   letter-spacing: -0.02em;
 }
 
-/* Copy Markdown -> Copied!: both states share one cell, so the menu item keeps its width. */
 .rot-swap {
   display: inline-grid;
 }
@@ -845,7 +812,6 @@ button.rk-tree-row {
   }
 }
 
-/* Code inside a chip or key is the label itself, not an inline code pill. */
 .rot-page :is(.rk-tab, .btn) > code:not([class]) {
   padding: 0;
   border: 0;
@@ -854,9 +820,6 @@ button.rk-tree-row {
   color: inherit;
 }
 
-/* ---------- Reveal: each block rises in once, the first time it scrolls into view ----------
-   RulePage tags the blocks with [data-rv] and adds .in on entry; --rv is the block's place
-   in its arrival batch. Without JS nothing is tagged, so everything sits at rest. */
 .js .rot-page [data-rv]:not(.in) {
   opacity: 0;
 }
@@ -876,7 +839,6 @@ button.rk-tree-row {
   }
 }
 
-/* ---------- Checkpoint bar: the article's route along the island's bottom edge ---------- */
 .arc.rot-xp {
   position: absolute;
   left: 22px;
@@ -926,14 +888,10 @@ button.rk-tree-row {
     animation: none;
   }
 }
-/* The key cap's number comes from the contents rail; until then it stays out of sight. */
 .rot-page h2:not([data-stage])::before {
   opacity: 0;
 }
 
-/* ---------- Default interaction states ----------
-   Zero-specificity and in the base layer, below the Tailwind utilities layer and
-   every component rule above, so only elements with no state of their own use them. */
 @layer base {
   :where(.rot-page button:not(:disabled, [aria-disabled="true"])) {
     transition: transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);

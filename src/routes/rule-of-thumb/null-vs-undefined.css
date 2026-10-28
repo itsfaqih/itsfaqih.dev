@@ -1,5 +1,3 @@
-/* Null vs Undefined. Every pane is code with the data each line gives on its right. In code,
-   null wears the thumbnail's solid box and undefined its dashed empty slot. */
 .rule-page.null-vs-undefined {
   --str: color-mix(in oklab, var(--ar) var(--ink-mix), #000);
 }
@@ -11,7 +9,6 @@
   color: var(--text);
 }
 
-/* ---------- Tokens ---------- */
 .rule-page.null-vs-undefined .t-kw {
   color: var(--c-ink);
 }
@@ -37,7 +34,6 @@
   color: var(--dim);
 }
 
-/* ---------- Code with its output ---------- */
 .rule-page.null-vs-undefined .nv-view {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -65,7 +61,6 @@
   overflow-wrap: anywhere;
   color: var(--text);
 }
-/* The line the lesson is about: red where it blurs the two, the rule's hue where it doesn't. */
 .rule-page.null-vs-undefined .pane[data-side="bad"] .nv-ln[data-hot] {
   background: color-mix(in srgb, var(--no) 10%, transparent);
   box-shadow: inset 2px 0 0 var(--no);
@@ -100,7 +95,6 @@
   color: inherit;
 }
 
-/* ---------- The live save: form, wire, row ---------- */
 .rule-page.null-vs-undefined .nv-flow {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -225,7 +219,6 @@
   overflow-wrap: anywhere;
   color: var(--text);
 }
-/* One pixel of the request, dropped from the wire into the row. */
 .rule-page.null-vs-undefined .nv-packet {
   position: absolute;
   bottom: -4px;
@@ -305,8 +298,6 @@
   background: color-mix(in srgb, var(--no) 24%, transparent);
 }
 
-/* The request lands: the body types onto the wire, a pixel drops into the row, and each cell
-   settles with a tint that fades. Only a save someone ran plays it, never the first paint. */
 .rule-page.null-vs-undefined .nv-flow[data-ran][data-phase="done"] .nv-cell[data-verdict]::after {
   animation: nv-flash 640ms var(--out) both;
   animation-delay: calc(var(--i) * 40ms);
@@ -357,7 +348,6 @@
   }
 }
 
-/* ---------- The quiz board ---------- */
 .rule-page.null-vs-undefined .board code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

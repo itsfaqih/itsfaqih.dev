@@ -1,14 +1,8 @@
-/* Table Design: every lesson pane holds a small app card with a working table in it. The wrong
-   side keeps the same data and drops only the thing its lesson is about. */
-
 .rule-page.table-design {
   --row: 40px;
   --td-line: color-mix(in srgb, var(--hair) 70%, transparent);
 }
 
-/* ---------- The card and its table ---------- */
-/* Tables keep their own height; the shorter side's chips sit level with the taller side's.
-   Under 820px the kit hides the caption, which moves the chips into the stretching row. */
 .rule-page.table-design .pane .costs {
   align-self: end;
 }
@@ -73,11 +67,9 @@
   width: 52%;
 }
 
-/* ---------- Lesson 1: the live money column ---------- */
 .rule-page.table-design .td-ragged td:last-child {
   font-variant-numeric: proportional-nums;
 }
-/* The changed cell tints, under its text, and fades. */
 .rule-page.table-design .td-flash {
   position: absolute;
   inset: 0;
@@ -146,7 +138,6 @@
   }
 }
 
-/* ---------- Switches in the lesson copy ---------- */
 .rule-page.table-design .td-seg {
   display: inline-flex;
   flex-wrap: wrap;
@@ -179,7 +170,6 @@
   color: var(--on-c);
 }
 
-/* ---------- Lesson 2: states ---------- */
 .rule-page.table-design .td-bar {
   display: flex;
   gap: 8px;
@@ -229,7 +219,6 @@
 .rule-page.table-design .td-table tbody tr:hover td.td-blank {
   background: none;
 }
-/* The careful table's blank fills the body of four rows, so no state moves the card. */
 .rule-page.table-design .td-said {
   display: grid;
   gap: 4px;
@@ -286,7 +275,6 @@
   }
 }
 
-/* ---------- Buttons ---------- */
 .rule-page.table-design .td-btn {
   display: inline-flex;
   gap: 6px;
@@ -341,7 +329,6 @@
   outline-offset: 2px;
 }
 
-/* ---------- Lesson 3: actions ---------- */
 .rule-page.table-design .td-table td.td-num:has(.td-icons) {
   overflow: visible;
 }
@@ -459,7 +446,6 @@
   background: var(--panel-2);
 }
 
-/* ---------- Lessons 4 and 5: the pager and the address bar ---------- */
 .rule-page.table-design .td-pager {
   display: flex;
   gap: 8px;
@@ -544,7 +530,6 @@
 }
 
 @media (max-width: 640px) {
-  /* Five states never fit one row on a phone, so they sit in an even grid, not a ragged wrap. */
   .rule-page.table-design .td-seg {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -560,7 +545,6 @@
   }
 }
 
-/* Under reduced motion the digits swap in place and nothing spins or pulses. */
 @media (prefers-reduced-motion: reduce) {
   .rule-page.table-design .td-strip {
     transition: none;
