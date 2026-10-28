@@ -56,7 +56,7 @@ import {
 } from "simple-icons";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
-const MARKS = {
+const MARKS = new Map<string, Mark>(Object.entries({
   AdonisJS: siAdonisjs,
   Apache: siApache,
   Astro: siAstro,
@@ -115,10 +115,7 @@ const MARKS = {
   XState: siXstate,
   Zod: siZod,
   ...EXTRA_MARKS,
-} satisfies Record<string, Mark>;
-
-const entryOf = <T,>(table: Record<string, T>, name: string) =>
-  Object.entries(table).find(([key]) => key === name)?.[1];
+}));
 
 type Rgb = { r: number; g: number; b: number };
 
@@ -161,13 +158,13 @@ function brandFor(hex: string, theme: keyof typeof PANEL) {
 }
 
 export function techBrand(name: string): CSSProperties | undefined {
-  const hex = entryOf(MARKS, name)?.hex;
+  const hex = MARKS.get(name)?.hex;
   if (!hex) return undefined;
   return { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
 }
 
 export function TechIcon({ name }: { name: string }) {
-  const mark: Mark | undefined = entryOf(MARKS, name);
+  const mark = MARKS.get(name);
   if (!mark) return null;
   return (
     <svg className="ti" viewBox={mark.viewBox ?? "0 0 24 24"} aria-hidden="true">
