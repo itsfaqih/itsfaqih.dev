@@ -185,15 +185,12 @@ html.cur-on .cursor-default {
 .print-cursor :is(.pc-ink, .pc-fill, .pc-plate path) {
   shape-rendering: crispEdges;
 }
+/* Every glyph is solid: black on light, white on dark, edged in the page colour. */
 .print-cursor .pc-ink {
-  fill: var(--text);
+  fill: var(--bg);
 }
 .print-cursor .pc-fill {
-  fill: var(--bg);
-  transition: fill 180ms ease;
-}
-.print-cursor:not([data-mode="arrow"], [data-on-hue]) .pc-fill {
-  fill: var(--pc-hue);
+  fill: var(--text);
 }
 .print-cursor circle {
   fill: var(--pc-hue);

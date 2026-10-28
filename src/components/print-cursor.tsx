@@ -191,11 +191,8 @@ export function PrintCursor() {
         parts.fill.setAttribute("d", PATHS[mode].fill);
       }
       const host = target?.closest<HTMLElement>("[style*='--c']");
-      const style = host && getComputedStyle(host);
-      const hue = style?.getPropertyValue("--c").trim();
+      const hue = host && getComputedStyle(host).getPropertyValue("--c").trim();
       cur!.style.setProperty("--pc-hue", hue || "var(--go)");
-      // A hand filled with the hue of the thing under it would read only as an outline.
-      cur!.toggleAttribute("data-on-hue", !!hue && style!.backgroundColor === hue);
     }
 
     function tick() {
