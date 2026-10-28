@@ -322,7 +322,9 @@ const config = defineConfig({
     }),
     stylex.vite({
       devMode: "css-only",
-      cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
+      // The sheet built from src/styles.css, which every page links. Without a match StyleX appends
+      // to whichever CSS asset comes first, which may load on one route only.
+      cssInjectionTarget: (filepath) => /(?:^|\/)styles-[\w-]+\.css$/.test(filepath),
     }),
     tanstackStart({
       server: {
