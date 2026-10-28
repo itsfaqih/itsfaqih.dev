@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { Element, ElementContent, Root } from "hast";
 import { optimize } from "svgo";
@@ -173,6 +173,45 @@ function prerenderedPagesFirst(): Plugin {
   };
 }
 
+// Nitro writes _routes.json before TanStack Start prerenders, so the pages would reach the Worker.
+// Pages redirects /blog to /blog/ when it serves blog/index.html, and serves blog.html at /blog.
+function servePrerenderedPagesStatically(): Plugin {
+  return {
+    name: "serve-prerendered-pages-statically",
+    apply: () => isCloudflareBuild,
+    enforce: "post",
+    buildApp: {
+      order: "post",
+      async handler(builder) {
+        const outDir = builder.environments.client!.config.build.outDir;
+        const routesFile = path.join(outDir, "_routes.json");
+        const routes: { include: string[]; exclude: string[] } = JSON.parse(
+          await readFile(routesFile, "utf8"),
+        );
+        const pages = (await readdir(outDir, { recursive: true })).filter(
+          (file) => file.endsWith(".html") && !file.startsWith("_worker.js"),
+        );
+        for (const page of pages.filter((file) => file.endsWith("/index.html"))) {
+          await rename(
+            path.join(outDir, page),
+            path.join(outDir, page.replace(/\/index\.html$/, ".html")),
+          );
+        }
+        routes.exclude = [
+          ...new Set([
+            ...routes.exclude,
+            ...pages.map((file) => `/${file.replace(/(?:^|\/)index\.html$/, "")}`),
+          ]),
+        ];
+        if (routes.include.length + routes.exclude.length > 100) {
+          throw new Error(`${routesFile} exceeds Cloudflare's 100 rules`);
+        }
+        await writeFile(routesFile, JSON.stringify(routes, undefined, 2));
+      },
+    },
+  };
+}
+
 function shareAssets(): Plugin {
   return {
     name: "share-assets",
@@ -227,7 +266,9 @@ const config = defineConfig({
       ...(isCloudflareBuild && {
         commands: { preview: "node scripts/cloudflare-pages-preview.mjs" },
         // shareAssets() writes these after Nitro lists its static files, so the worker would 404 them.
-        cloudflare: { pages: { routes: { exclude: [`${OG_DIR}/*`, "/sitemap.xml"] } } },
+        cloudflare: {
+          pages: { routes: { exclude: ["/assets/*", `${OG_DIR}/*`, "/sitemap.xml"] } },
+        },
       }),
     }),
     stylex.vite({
@@ -245,6 +286,8 @@ const config = defineConfig({
         autoStaticPathsDiscovery: true,
         autoSubfolderIndex: true,
         crawlLinks: true,
+        // The Markdown twins are public files, and the crawler requests them with a trailing slash.
+        filter: ({ path }) => !path.endsWith(".md"),
         failOnError: true,
         retryCount: 2,
         retryDelay: 1000,
@@ -254,6 +297,7 @@ const config = defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     prerenderedPagesFirst(),
     shareAssets(),
+    servePrerenderedPagesStatically(),
   ],
 });
 
