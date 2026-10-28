@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium, type Page } from "playwright";
@@ -22,23 +22,18 @@ await fetch(values.base).catch(() => {
 
 const profile = { throughput: ((500 * 1000) / 8) * 0.8, latency: 400 * 5 };
 
-const rules = [
-  "proximity-principle",
-  "button-design",
-  "data-loading",
-  "null-vs-undefined",
-  "typescript-code-writing",
-  "table-design",
-  "dialog-design",
-  "handling-timestamps",
-];
-const routes = values.route ?? [
-  "/",
-  "/blog",
-  "/blog/hello-world",
-  "/rule-of-thumb",
-  ...rules.map((rule) => `/rule-of-thumb/${rule}`),
-];
+const routes = values.route ?? builtRoutes();
+
+function builtRoutes() {
+  const buildRoot = path.join(import.meta.dirname, "../.output/public");
+  if (!existsSync(buildRoot)) {
+    throw new Error(`No build at ${buildRoot}. Run vp run build, or pass --route.`);
+  }
+  return readdirSync(buildRoot, { recursive: true, encoding: "utf8" })
+    .filter((file) => path.basename(file) === "index.html")
+    .map((file) => `/${path.dirname(file)}`.replace(/\/\.$/, "/"))
+    .sort();
+}
 
 declare global {
   interface Window {
