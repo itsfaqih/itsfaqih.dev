@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readdirSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
@@ -27,10 +27,18 @@ function resolveFile(urlPath: string) {
   return existsSync(index) ? index : undefined;
 }
 
-export default async function setup(project: TestProject) {
+export function builtRoutes() {
   if (!existsSync(path.join(root, "index.html"))) {
-    throw new Error(`No build at ${root}. Run \`vite build\` before the visual tests.`);
+    throw new Error(`No build at ${root}. Run vp run build first.`);
   }
+  return readdirSync(root, { recursive: true, encoding: "utf8" })
+    .filter((file) => path.basename(file) === "index.html")
+    .map((file) => `/${path.dirname(file)}`.replace(/\/\.$/, "/"))
+    .sort();
+}
+
+export default async function setup(project: TestProject) {
+  const routes = builtRoutes();
 
   const server = createServer((req, res) => {
     const file = resolveFile(new URL(req.url ?? "/", "http://localhost").pathname);
@@ -48,7 +56,7 @@ export default async function setup(project: TestProject) {
   const { port } = server.address() as AddressInfo;
 
   project.provide("baseURL", `http://127.0.0.1:${port}`);
-  project.provide("buildRoot", root);
+  project.provide("routes", routes);
 
   return () => new Promise<void>((resolve) => server.close(() => resolve()));
 }
@@ -56,6 +64,6 @@ export default async function setup(project: TestProject) {
 declare module "vitest" {
   export interface ProvidedContext {
     baseURL: string;
-    buildRoot: string;
+    routes: string[];
   }
 }

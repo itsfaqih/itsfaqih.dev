@@ -22,11 +22,7 @@ const update = process.env.UPDATE_VISUAL === "1";
 
 const maxDiffRatio = 0.0005;
 
-const buildRoot = inject("buildRoot");
-const routes = readdirSync(buildRoot, { recursive: true, encoding: "utf8" })
-  .filter((file) => path.basename(file) === "index.html")
-  .map((file) => `/${path.dirname(file)}`.replace(/\/\.$/, "/"))
-  .sort();
+const routes = inject("routes");
 
 const shots: Shot[] = routes.flatMap((route) =>
   (["desktop", "mobile"] as const).flatMap((viewport) =>
