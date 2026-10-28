@@ -12,7 +12,7 @@ import {
 import { TechIcon, techBrand } from "./tech-icon";
 
 export type StackGroup = { label: string; tools: string[] };
-export type StackUse = { kind: "work" | "project"; name: string; detail: string };
+type StackUse = { kind: "work" | "project"; name: string; detail: string };
 
 type Peek = { tool: string; anchor: HTMLElement };
 
@@ -30,12 +30,10 @@ const STACK_FILTER = "stack-filter";
 
 export function StackShowcase({
   groups,
-  places,
-  uses,
+  sources,
 }: {
   groups: StackGroup[];
-  places: StackUse[];
-  uses: Record<string, StackUse[]>;
+  sources: { use: StackUse; stack: string[] }[];
 }) {
   const [peek, setPeek] = useState<Peek | null>(null);
   const [usedAt, setUsedAt] = useState<string | null>(null);
@@ -64,8 +62,10 @@ export function StackShowcase({
     });
   };
   const placesOf = (kind: StackUse["kind"]) =>
-    places.filter((place) => place.kind === kind).map((place) => place.name);
-  const isUsedAt = (tool: string, name: string) => (uses[tool] ?? []).some((use) => use.name === name);
+    sources.filter(({ use }) => use.kind === kind).map(({ use }) => use.name);
+  const usesOf = (tool: string) =>
+    sources.filter(({ stack }) => stack.includes(tool)).map(({ use }) => use);
+  const isUsedAt = (tool: string, name: string) => usesOf(tool).some((use) => use.name === name);
   const allTools = groups.flatMap((group) => group.tools);
   const shownGroups = groups
     .map((group) => ({
@@ -75,7 +75,7 @@ export function StackShowcase({
     .filter((group) => group.tools.length > 0);
 
   const groupOf = (tool: string) => groups.find((group) => group.tools.includes(tool))?.label;
-  const peekUses = peek ? (uses[peek.tool] ?? []) : [];
+  const peekUses = peek ? usesOf(peek.tool) : [];
   const work = peekUses.filter((use) => use.kind === "work");
   const projects = peekUses.filter((use) => use.kind === "project");
 

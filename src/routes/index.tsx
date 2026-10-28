@@ -6,7 +6,7 @@ import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
 import { RuleSpread } from "./-components/rule-spread";
-import { StackShowcase, type StackGroup, type StackUse } from "./-components/stack-showcase";
+import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
 import { pageHead } from "../seo";
@@ -246,15 +246,6 @@ const STACK_SOURCES = [
   })),
 ];
 
-const STACK_PLACES = STACK_SOURCES.map((source) => source.use);
-const STACK_USES = usesByTool(STACK_SOURCES);
-
-function usesByTool(sources: { use: StackUse; stack: string[] }[]) {
-  const uses: Record<string, StackUse[]> = {};
-  sources.forEach(({ use, stack }) => stack.forEach((tool) => (uses[tool] ??= []).push(use)));
-  return uses;
-}
-
 // The band slides by exactly half its width, so each half must outrun the widest screen or its
 // end shows. One set is about 1170px; three sets make a half wide enough for a 3500px screen.
 const TICKER_RUN = Array.from({ length: 6 }, () => TICKER).flat();
@@ -310,7 +301,7 @@ function Index() {
           <ExperienceList />
         </section>
 
-        <StackShowcase groups={STACK_GROUPS} places={STACK_PLACES} uses={STACK_USES} />
+        <StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />
 
         <section id="projects">
           <div className="sh2">
