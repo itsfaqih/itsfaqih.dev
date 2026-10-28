@@ -272,7 +272,7 @@ function PageCard({
 }
 
 function HomeCard({ ink }: { ink: Ink }) {
-  const [slide] = SLIDES;
+  const slide = SLIDES[0]!;
   return (
     <Frame ink={ink} hue={ink.go}>
       <div
@@ -303,17 +303,17 @@ function HomeCard({ ink }: { ink: Ink }) {
           }}
         >
           <div>I build</div>
-          <div>{slide!.phrase.trim()}</div>
+          <div>{slide.phrase.trim()}</div>
           <div style={{ display: "flex", alignItems: "flex-end" }}>
             <div
               style={{
-                backgroundColor: ink.hex(slide!.color),
+                backgroundColor: ink.hex(slide.color),
                 color: ink.onAccent,
                 padding: "0 10px 6px",
                 marginLeft: -10,
               }}
             >
-              {slide!.highlight}
+              {slide.highlight}
             </div>
             <div>.</div>
           </div>
