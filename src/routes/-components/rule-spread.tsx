@@ -229,7 +229,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           ←
         </button>
         <span>
-          <SlideNumber value={active + 1} /> / {String(rules.length).padStart(2, "0")}
+          <SlideNumber value={active + 1} /> / {pad(rules.length)}
         </span>
         <button type="button" aria-label="Next rule" disabled={active === last} onClick={() => goTo(active + 1)}>
           →
@@ -239,10 +239,11 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
   );
 }
 
+const pad = (number: number) => String(number).padStart(2, "0");
+
 function SlideNumber({ value }: { value: number }) {
   const [shown, setShown] = useState({ value, previous: value });
   if (shown.value !== value) setShown({ value, previous: shown.value });
-  const pad = (number: number) => String(number).padStart(2, "0");
   return (
     <span className="slide-num" data-dir={shown.value < shown.previous ? "down" : "up"}>
       {shown.previous !== shown.value && (

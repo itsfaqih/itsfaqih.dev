@@ -92,12 +92,7 @@ export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
     codeProps?.["data-language"] ??
     className.match(/(?:^|\s)language-([^\s]+)/)?.[1] ??
     "text";
-  const rawCode = readText(codeProps?.children ?? props.children);
-  const code = rawCode.endsWith("\r\n")
-    ? rawCode.slice(0, -2)
-    : rawCode.endsWith("\n")
-      ? rawCode.slice(0, -1)
-      : rawCode;
+  const code = readText(codeProps?.children ?? props.children).replace(/\r?\n$/, "");
 
   return <CodeBlock code={code} lang={language} />;
 }

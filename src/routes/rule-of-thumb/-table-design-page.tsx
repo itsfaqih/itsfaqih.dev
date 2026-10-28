@@ -17,7 +17,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
+import { reducedMotion } from "../../hooks/use-media-query";
+import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
 import "./table-design.css";
 
 type Store<T> = {
@@ -556,11 +557,6 @@ const STAFF: readonly Person[] = [
   { name: "Hiro Tanaka", role: "Editor" },
   { name: "Ivy Chen", role: "Viewer" },
 ];
-const FILTERS: readonly (readonly [Filter, string])[] = [
-  ["all", "All 9"],
-  ["admin", "Admins 3"],
-  ["owner", "Owners 0"],
-];
 const PER_PAGE = 4;
 
 const FILTERED: Record<Filter, readonly Person[]> = {
@@ -568,6 +564,11 @@ const FILTERED: Record<Filter, readonly Person[]> = {
   admin: STAFF.filter((person) => person.role === "Admin"),
   owner: [],
 };
+const FILTERS: readonly (readonly [Filter, string])[] = [
+  ["all", `All ${FILTERED.all.length}`],
+  ["admin", `Admins ${FILTERED.admin.length}`],
+  ["owner", `Owners ${FILTERED.owner.length}`],
+];
 
 function FilterSwitch() {
   const { filter } = useDemos();
