@@ -1,12 +1,12 @@
 import { cx } from "@/stylex";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { getPost } from "./-components/posts";
+import { BLOG_DESCRIPTION, getPost } from "./-components/posts";
 import { MarkdownCodeBlock } from "@/components/code-block";
 import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "vaul";
 import { TableOfContents } from "./-components/table-of-contents";
-import { BLOG_DESCRIPTION, pageHead } from "../../seo";
+import { pageHead } from "../../seo";
 
 const BLOG_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   year: "numeric",

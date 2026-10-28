@@ -1,9 +1,9 @@
 import { cx } from "@/stylex";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getAllPosts } from "./-components/posts";
+import { BLOG_DESCRIPTION, getAllPosts } from "./-components/posts";
 import { PageContainer } from "../../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
-import { BLOG_DESCRIPTION, pageHead } from "../../seo";
+import { pageHead } from "../../seo";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,

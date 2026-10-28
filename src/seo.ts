@@ -4,9 +4,6 @@ export const OG_DIR = "/og";
 
 const SITE_NAME = "Faqih Muntashir";
 
-export const BLOG_DESCRIPTION =
-  "Notes and tutorials on web development by Faqih Muntashir, a full-stack engineer in Yogyakarta.";
-
 const AUTHOR = {
   name: "Faqih Muntashir",
   url: `${SITE_ORIGIN}/`,
