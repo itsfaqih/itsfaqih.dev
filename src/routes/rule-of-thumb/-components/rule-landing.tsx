@@ -27,7 +27,7 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
 // ---------- The data a rule page supplies ----------
 
 /** One way to do it: what it looks like and what it costs. */
-export type Side = { label: string; view: ReactNode; costs: string[] };
+type Side = { label: string; view: ReactNode; costs: string[] };
 export type Lesson = {
   title: string;
   exception?: boolean;
@@ -39,7 +39,7 @@ export type Lesson = {
 
 /** Rows with the same key in both layouts glide between their places. A row whose text is not a
  * string has no key of its own, so it needs `k`. */
-export type TreeRow = {
+type TreeRow = {
   depth: number;
   kind?: "dir" | "comp" | "more";
   /** The piece of code the lesson is about. */
@@ -47,8 +47,8 @@ export type TreeRow = {
   tag?: string;
 } & ({ k: string; text: ReactNode } | { k?: undefined; text: string });
 
-export type Slot = { id: string; label: ReactNode; note: string; cost: string[] };
-export type BoardRow =
+type Slot = { id: string; label: ReactNode; note: string; cost: string[] };
+type BoardRow =
   | { depth: number; text: ReactNode; kind?: string; tag?: string }
   /** `lead` sits before the slot and stays once the piece is seated, like a key before its value. */
   | { depth: number; slot: Slot; lead?: ReactNode };

@@ -270,7 +270,7 @@ function glyphLike(char: string) {
   return char === char.toLowerCase() ? glyph.toLowerCase() : glyph;
 }
 
-function ScrambleText({ text, ms = 300 }: { text: string; ms?: number }) {
+function ScrambleText({ text }: { text: string }) {
   const [settled, setSettled] = useState(text.length);
   const [glyphs, setGlyphs] = useState<string[]>([]);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -283,7 +283,7 @@ function ScrambleText({ text, ms = 300 }: { text: string; ms?: number }) {
     const start = performance.now();
     let frame = 0;
     const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / ms);
+      const progress = Math.min(1, (now - start) / 300);
       setSettled(Math.floor(progress * text.length));
       setGlyphs(Array.from(text, glyphLike));
       if (progress < 1) frame = requestAnimationFrame(tick);
@@ -291,7 +291,7 @@ function ScrambleText({ text, ms = 300 }: { text: string; ms?: number }) {
     setSettled(0);
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [text, ms, reduced]);
+  }, [text, reduced]);
 
   // Words stay unbroken and spaces stay real, so line breaks match the settled title.
   let at = 0;

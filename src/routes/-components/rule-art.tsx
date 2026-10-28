@@ -67,7 +67,7 @@ const iconOf = (category: string) =>
 /** The view transition a rule card starts when it opens its rule: the page dives into the card
  * while its thumbnail and title grow into the rule page's cover and heading (see `rule-open` in
  * arcade.css). */
-export const RULE_OPEN = "rule-open";
+const RULE_OPEN = "rule-open";
 
 /** Props for the links that open rules with the dive, and for the panel that previews the rule a
  * link points at, where a page has one. The page dives into the panel while it is on screen, and
@@ -108,16 +108,15 @@ type RuleThumbProps = {
   rule: Guideline;
   /** Loop the rule's animation. Otherwise the thumbnail holds its still frame. */
   play?: boolean;
-  className?: string;
 };
 
 // Each art piece's still frame is its default style, and every keyframe loop
 // ends on that frame, so stopping mid-loop or reduced motion lands on the
 // same picture.
-export function RuleThumb({ rule, play = false, className }: RuleThumbProps) {
+export function RuleThumb({ rule, play = false }: RuleThumbProps) {
   return (
     <div
-      className={className ? `thumb ${className}` : "thumb"}
+      className="thumb"
       style={{ "--c": colorOf(rule.label) }}
       data-play={play || undefined}
       aria-hidden="true"
