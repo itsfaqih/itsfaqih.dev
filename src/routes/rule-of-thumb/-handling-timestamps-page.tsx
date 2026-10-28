@@ -1,11 +1,13 @@
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  OUT,
+  reducedMotion,
+  RuleLanding,
+  TABBED,
+} from "./-components/rule-landing";
 import "./handling-timestamps.css";
-
-const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-/** Below this width the kit stacks the panes behind tabs. Matches TABBED in the kit. */
-const TABBED = "(max-width: 820px)";
 
 // ---------- Time: one moment, read on clocks in different zones ----------
 

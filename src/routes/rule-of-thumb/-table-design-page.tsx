@@ -17,10 +17,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
 import "./table-design.css";
-
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Shared demo state ----------
 // Both panes of a lesson, and the switch in its copy, read one store, so the two tables always

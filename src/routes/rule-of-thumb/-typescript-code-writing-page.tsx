@@ -1,9 +1,13 @@
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  OUT,
+  reducedMotion,
+  RuleLanding,
+  TABBED,
+} from "./-components/rule-landing";
 import "./typescript-code-writing.css";
-
-const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- TypeScript, with what tsc says beside each line ----------
 
@@ -35,8 +39,6 @@ function paint(source: string): ReactNode[] {
   return parts;
 }
 
-/** Below this width the kit stacks the panes behind tabs, which plays its own move. */
-const TABBED = "(max-width: 820px)";
 /** How long the check rests on each line. */
 const STEP = 110;
 
@@ -56,6 +58,7 @@ function Checked({ lines }: { lines: Line[] }) {
     setPhase(reducedMotion() ? "done" : "run");
   }
 
+  // Behind the kit's tabs, which play their own move, the check stays done.
   useLayoutEffect(() => {
     const view = ref.current;
     if (

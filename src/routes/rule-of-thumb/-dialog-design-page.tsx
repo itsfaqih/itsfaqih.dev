@@ -11,10 +11,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
 import "./dialog-design.css";
-
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- The small window every demo opens its dialog in ----------
 

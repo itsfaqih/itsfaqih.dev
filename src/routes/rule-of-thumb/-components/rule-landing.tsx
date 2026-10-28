@@ -22,10 +22,10 @@ import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import "./rule-landing.css";
 
-const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
+export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+export const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- The data a rule page supplies ----------
 
@@ -356,7 +356,7 @@ const SIDES: readonly SideKey[] = ["bad", "good"];
 const MARK = { bad: "✕", good: "✓" } as const;
 
 /** Below this width the two layouts share one pane, behind tabs. */
-const TABBED = "(max-width: 820px)";
+export const TABBED = "(max-width: 820px)";
 
 /** A file tree. Rows that share a key across the two panes glide between them. */
 export function Tree({ rows }: { rows: TreeRow[] }) {

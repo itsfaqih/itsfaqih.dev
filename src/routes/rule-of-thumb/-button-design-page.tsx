@@ -6,10 +6,8 @@ import {
   PlusIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
 import "./button-design.css";
-
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Lesson 1: every state gets a look ----------
 

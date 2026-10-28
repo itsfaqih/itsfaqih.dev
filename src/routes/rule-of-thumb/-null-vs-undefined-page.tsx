@@ -1,8 +1,12 @@
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  reducedMotion,
+  RuleLanding,
+  TABBED,
+} from "./-components/rule-landing";
 import "./null-vs-undefined.css";
-
-const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- Code, with what each line gives beside it ----------
 
@@ -81,8 +85,6 @@ function verdictOf(field: Field, before: Row, after: Row, intent: Row): Verdict 
   return after[field] === before[field] ? "kept" : "wiped";
 }
 
-/** Below this width the kit stacks the panes behind tabs, which already plays its own move. */
-const TABBED = "(max-width: 820px)";
 const SEND_MS = 460;
 
 /** The save starts done, so a glance shows the outcome. A lesson still below the fold rewinds
@@ -105,6 +107,7 @@ function useSave() {
     timer.current = window.setTimeout(() => setPhase("done"), SEND_MS);
   }
 
+  // Behind the kit's tabs, which already play their own move, the save stays done.
   useLayoutEffect(() => {
     const flow = ref.current;
     if (
