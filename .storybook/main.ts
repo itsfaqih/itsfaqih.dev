@@ -10,7 +10,7 @@ const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
   framework: "@storybook/tanstack-react",
-  viteFinal: async (viteConfig) =>
+  viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {
       resolve: {
         alias: {
