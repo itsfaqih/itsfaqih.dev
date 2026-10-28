@@ -46,6 +46,7 @@ export function CodeBlock({ code, lang }: CodeBlockProps) {
   };
 
   const fileStyle: CSSProperties = {
+    "--lines": code.split("\n").length,
     "--diffs-font-family": "var(--mono)",
     "--diffs-header-font-family": "var(--font-sans)",
   };
