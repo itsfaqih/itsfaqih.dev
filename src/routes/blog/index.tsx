@@ -1,6 +1,6 @@
 import { cx } from "@/stylex";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BLOG_DESCRIPTION, getAllPosts } from "./-components/posts";
+import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts } from "./-components/posts";
 import { PageContainer } from "../../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
 import { pageHead } from "../../seo";
@@ -60,11 +60,7 @@ function BlogIndex() {
                           <div className={cx("flex items-center gap-2 mb-3")}>
                             <CalendarBlankIcon size={14} className={cx("text-muted-foreground")} />
                             <time className={cx("text-sm text-muted-foreground")}>
-                              {new Date(post.frontmatter.publishedAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
+                              {BLOG_DATE_FORMATTER.format(new Date(post.frontmatter.publishedAt))}
                             </time>
                           </div>
                         )}

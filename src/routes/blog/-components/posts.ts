@@ -1,5 +1,12 @@
 import type { MDXContent } from "mdx/types";
 
+export const BLOG_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
 export const BLOG_DESCRIPTION =
   "Notes and tutorials on web development by Faqih Muntashir, a full-stack engineer in Yogyakarta.";
 
