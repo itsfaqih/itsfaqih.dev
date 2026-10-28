@@ -36,33 +36,33 @@ export function PageScrollbar() {
 
     const travel = () => Math.max(1, html.scrollHeight - innerHeight);
 
-    function layout() {
+    const layout = () => {
       frame = 0;
       const overflows = html.scrollHeight > innerHeight + 1;
-      track!.toggleAttribute("hidden", !overflows);
+      track.toggleAttribute("hidden", !overflows);
       if (!overflows) return;
       thumbHeight = Math.max(MIN_THUMB_PX, (innerHeight * innerHeight) / html.scrollHeight);
       thumbTop = (scrollY / travel()) * (innerHeight - thumbHeight);
-      thumb!.style.height = `${thumbHeight}px`;
-      thumb!.style.transform = `translateY(${thumbTop}px)`;
+      thumb.style.height = `${thumbHeight}px`;
+      thumb.style.transform = `translateY(${thumbTop}px)`;
 
       const middle = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
       const host = middle?.closest<HTMLElement>("[style*='--c']");
       const hue = host && getComputedStyle(host).getPropertyValue("--c").trim();
       const gold = getComputedStyle(html).getPropertyValue("--go").trim();
-      track!.style.setProperty("--sb-hue", hue && hue !== gold ? hue : "var(--go)");
-      track!.toggleAttribute("data-gold", !hue || hue === gold);
-    }
+      track.style.setProperty("--sb-hue", hue && hue !== gold ? hue : "var(--go)");
+      track.toggleAttribute("data-gold", !hue || hue === gold);
+    };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(layout);
     };
 
-    function show() {
-      track!.dataset.shown = "";
+    const show = () => {
+      track.dataset.shown = "";
       clearTimeout(hideTimer);
       if (near || drag) return;
-      hideTimer = window.setTimeout(() => delete track!.dataset.shown, LINGER_MS);
-    }
+      hideTimer = window.setTimeout(() => delete track.dataset.shown, LINGER_MS);
+    };
 
     const onScroll = () => {
       schedule();
