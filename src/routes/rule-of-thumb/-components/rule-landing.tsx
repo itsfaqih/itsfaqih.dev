@@ -428,19 +428,13 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
     rewound.current = true;
     setSide("bad");
     let timer = 0;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        timer = window.setTimeout(() => {
-          if (!touched.current) setSide("good");
-        }, 700);
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(card);
+    const stop = onceOnScreen(card, () => {
+      timer = window.setTimeout(() => {
+        if (!touched.current) setSide("good");
+      }, 700);
+    });
     return () => {
-      observer.disconnect();
+      stop();
       clearTimeout(timer);
     };
   }, []);
@@ -1051,6 +1045,19 @@ function CopyMarkdown({ url }: { url: string }) {
       {copied ? "Copied" : "Copy as Markdown"}
     </button>
   );
+}
+
+export function onceOnScreen(element: Element, show: () => void) {
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return;
+      observer.disconnect();
+      show();
+    },
+    { threshold: 0.6 },
+  );
+  observer.observe(element);
+  return () => observer.disconnect();
 }
 
 /** Each [data-rev] element rises in once as it enters the screen. Those already on screen when

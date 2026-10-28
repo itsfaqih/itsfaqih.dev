@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import {
   type Lesson,
   type Level,
+  onceOnScreen,
   OUT,
   paint,
   reducedMotion,
@@ -54,19 +55,13 @@ function Checked({ lines }: { lines: Line[] }) {
       return;
     setPhase("idle");
     let wait = 0;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        wait = window.setTimeout(() => {
-          if (!touched.current) run();
-        }, 300);
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(view);
+    const stop = onceOnScreen(view, () => {
+      wait = window.setTimeout(() => {
+        if (!touched.current) run();
+      }, 300);
+    });
     return () => {
-      observer.disconnect();
+      stop();
       clearTimeout(wait);
     };
   }, []);

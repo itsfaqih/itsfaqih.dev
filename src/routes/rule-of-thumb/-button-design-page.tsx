@@ -6,7 +6,13 @@ import {
   PlusIcon,
 } from "@phosphor-icons/react";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  onceOnScreen,
+  reducedMotion,
+  RuleLanding,
+} from "./-components/rule-landing";
 import "./button-design.css";
 
 // ---------- Lesson 1: every state gets a look ----------
@@ -88,23 +94,17 @@ function SaveDemo({ careful }: { careful: boolean }) {
     const stage = stageRef.current;
     if (!stage || reducedMotion()) return;
     const timers: number[] = [];
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        timers.push(
-          window.setTimeout(() => setPressing(true), 500),
-          window.setTimeout(() => {
-            setPressing(false);
-            setSave((now) => (now.sent === 0 ? { phase: "pending", sent: 1 } : now));
-          }, 660),
-        );
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(stage);
+    const stop = onceOnScreen(stage, () => {
+      timers.push(
+        window.setTimeout(() => setPressing(true), 500),
+        window.setTimeout(() => {
+          setPressing(false);
+          setSave((now) => (now.sent === 0 ? { phase: "pending", sent: 1 } : now));
+        }, 660),
+      );
+    });
     return () => {
-      observer.disconnect();
+      stop();
       for (const timer of timers) clearTimeout(timer);
     };
   }, []);

@@ -1,5 +1,11 @@
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  onceOnScreen,
+  reducedMotion,
+  RuleLanding,
+} from "./-components/rule-landing";
 import "./data-loading.css";
 
 type Step = readonly [at: number, run: () => void];
@@ -68,16 +74,7 @@ function WaterfallView({ bars, paint }: Waterfall) {
     const chart = ref.current;
     if (!chart || reducedMotion()) return;
     setSweep({ state: "armed" });
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        setSweep({ state: "run", n: 1 });
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(chart);
-    return () => observer.disconnect();
+    return onceOnScreen(chart, () => setSweep({ state: "run", n: 1 }));
   }, []);
 
   const pct = (ms: number) => `${(ms / AXIS) * 100}%`;

@@ -11,7 +11,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { type Lesson, type Level, reducedMotion, RuleLanding } from "./-components/rule-landing";
+import {
+  type Lesson,
+  type Level,
+  onceOnScreen,
+  reducedMotion,
+  RuleLanding,
+} from "./-components/rule-landing";
 import "./dialog-design.css";
 
 // ---------- The small window every demo opens its dialog in ----------
@@ -253,20 +259,14 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
           if (!touched.current) step();
         }, at),
       );
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        later(WALK_START, () => show(false));
-        for (let press = 1; press <= WALK_PRESSES; press++) {
-          later(WALK_START + press * WALK_STEP, () => tab(false));
-        }
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(stage);
+    const stop = onceOnScreen(stage, () => {
+      later(WALK_START, () => show(false));
+      for (let press = 1; press <= WALK_PRESSES; press++) {
+        later(WALK_START + press * WALK_STEP, () => tab(false));
+      }
+    });
     return () => {
-      observer.disconnect();
+      stop();
       for (const timer of timers) clearTimeout(timer);
     };
     // Runs once: show and tab only touch refs and state setters.

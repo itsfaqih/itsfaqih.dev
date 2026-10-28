@@ -2,6 +2,7 @@ import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import {
   type Lesson,
   type Level,
+  onceOnScreen,
   paint,
   reducedMotion,
   RuleLanding,
@@ -102,19 +103,13 @@ function useSave() {
       return;
     setPhase("idle");
     let wait = 0;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        wait = window.setTimeout(() => {
-          if (!touched.current) send();
-        }, 500);
-      },
-      { threshold: 0.6 },
-    );
-    observer.observe(flow);
+    const stop = onceOnScreen(flow, () => {
+      wait = window.setTimeout(() => {
+        if (!touched.current) send();
+      }, 500);
+    });
     return () => {
-      observer.disconnect();
+      stop();
       clearTimeout(wait);
       clearTimeout(timer.current);
     };
