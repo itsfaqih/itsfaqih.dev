@@ -3754,8 +3754,8 @@ html {
    ride on --glitch and --glitch-at, which the shared shorthand cannot reset. The navbar plays once
    the page is ready: on home that is when the intro hands off. Without JS everything sits at rest. */
 .js:not(.no-intro) .arc-bar .arc-header > *,
-.js .arc [data-cut]:not(.in),
-.js .arc [data-cut]:not(.in) [data-cut] {
+.js .arc [data-cut]:not(.in, [data-rest]),
+.js .arc [data-cut]:not(.in, [data-rest]) [data-cut] {
   opacity: 0;
   animation: none;
 }
@@ -3927,6 +3927,9 @@ html {
   .arc .peek {
     animation: fade-in 120ms ease;
   }
+}
+.arc [data-cut][data-rest] {
+  animation: none !important;
 }
 @keyframes fade-in {
   from {
