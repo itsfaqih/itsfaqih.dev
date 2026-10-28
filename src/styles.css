@@ -3,7 +3,6 @@
 @import "./stylex-fallback.css";
 @import "./arcade.css";
 @import "./routes/-components/hero/hero-prints.css";
-@import "./rot.css";
 
 @property --navbar-surface-top {
   syntax: "<color>";
@@ -107,16 +106,21 @@ body.site-shell {
   --diffs-header-font-family: var(--font-sans);
   --diffs-light-bg: var(--card);
   --diffs-dark-bg: var(--card);
+  --diffs-foreground: var(--text);
+  --diffs-background: var(--panel);
+  --diffs-token-comment: var(--mute);
+  --diffs-token-keyword: color-mix(in oklab, var(--ux) var(--ink-mix), #000);
+  --diffs-token-string: color-mix(in oklab, var(--ts) var(--ink-mix), #000);
+  --diffs-token-string-expression: color-mix(in oklab, var(--ts) var(--ink-mix), #000);
+  --diffs-token-constant: var(--go-ink);
+  --diffs-token-function: color-mix(in oklab, var(--cw) var(--ink-mix), #000);
+  --diffs-token-parameter: color-mix(in oklab, var(--ax) var(--ink-mix), #000);
+  --diffs-token-punctuation: var(--dim);
+  --diffs-token-link: color-mix(in oklab, var(--cw) var(--ink-mix), #000);
 }
 
 .dark .code-block {
   color-scheme: dark;
-}
-
-[data-rule-of-thumb-card="true"] .code-block {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
 }
 
 .page-container {
@@ -132,27 +136,6 @@ body.site-shell {
 @media (prefers-reduced-motion: reduce) {
   :root {
     transition: none;
-  }
-}
-
-.responsive-dialog-backdrop {
-  transition: opacity 200ms var(--ease-out);
-}
-
-.responsive-dialog-popup {
-  transition:
-    scale 200ms var(--ease-out),
-    opacity 200ms var(--ease-out);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .responsive-dialog-backdrop {
-    transition-duration: 150ms;
-  }
-
-  .responsive-dialog-popup {
-    transition: opacity 200ms var(--ease-out);
-    scale: 1;
   }
 }
 
@@ -174,37 +157,6 @@ body.site-shell {
   }
   to {
     transform: scale(1);
-    opacity: 0;
-  }
-}
-
-@keyframes dialog-in {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-8px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes dialog-out {
-  from {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-8px) scale(0.96);
-  }
-}
-
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
     opacity: 0;
   }
 }
@@ -289,25 +241,6 @@ body.site-shell {
   }
 }
 
-.squircle {
-  corner-shape: squircle;
-}
-
-@keyframes grid-box-fade {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  35% {
-    opacity: 0.8;
-  }
-  50%, 100% {
-    opacity: 0;
-  }
-}
-
 @media (max-width: 639px) {
   .page-container {
     position: relative;
@@ -331,273 +264,3 @@ body.site-shell {
   }
 }
 
-.rule-of-thumb-page {
-  container-name: rule-of-thumb-page;
-  container-type: inline-size;
-}
-
-.button-variant-matrix-scroll {
-  box-sizing: border-box;
-  width: max-content;
-  max-width: 100vw;
-  margin-inline: calc(50% - 50vw);
-  transform: translateX(calc(50vw - 50%));
-  scrollbar-color: color-mix(in srgb, var(--foreground) 28%, transparent) transparent;
-  scrollbar-width: thin;
-}
-
-.button-variant-matrix-table {
-  width: max-content;
-}
-
-@media (min-width: 640px) {
-  .page-container.rule-of-thumb-page {
-    padding-top: 32px !important;
-  }
-}
-
-@container rule-of-thumb-page (max-width: 40rem) {
-  .rule-of-thumb-page [data-rule-of-thumb-card="true"] {
-    width: 100vw !important;
-    max-width: none !important;
-    margin-inline: calc(50% - 50vw);
-    border-radius: 0 !important;
-  }
-}
-
-.interactive-state-code-block {
-  position: sticky;
-  top: 5rem;
-  z-index: 20;
-}
-
-.interactive-state-code-scroll-area {
-  width: 100%;
-  height: min(20rem, calc(100dvh - 10rem));
-  min-height: 16rem;
-  background-color: var(--background);
-}
-
-.interactive-state-code-scroll-viewport {
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  outline: none;
-  --interactive-state-code-fade-size: 2.25rem;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    black min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-start)),
-    black calc(100% - min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-end, var(--interactive-state-code-fade-size)))),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    black min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-start)),
-    black calc(100% - min(var(--interactive-state-code-fade-size), var(--scroll-area-overflow-y-end, var(--interactive-state-code-fade-size)))),
-    transparent 100%
-  );
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-}
-
-/* The viewport's fade mask clips its own outline and paints over the root's, so the ring is an overlay. */
-.interactive-state-code-scroll-area:has(> .interactive-state-code-scroll-viewport:focus-visible)::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  box-shadow: inset 0 0 0 3px var(--focus);
-}
-
-.interactive-state-code-scroll-content {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 100%;
-  padding: 0;
-}
-
-.interactive-state-code-scrollbar {
-  display: flex;
-  justify-content: center;
-  width: 0.75rem;
-  margin: 0.25rem;
-  padding: 0.25rem 0.125rem;
-  border-radius: 9999px;
-  background-color: color-mix(in srgb, var(--foreground) 5%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 150ms var(--ease-out);
-}
-
-.interactive-state-code-scrollbar[data-hovering],
-.interactive-state-code-scrollbar[data-scrolling] {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.interactive-state-code-scrollbar[data-scrolling] {
-  transition-duration: 0ms;
-}
-
-.interactive-state-code-scroll-thumb {
-  width: 100%;
-  border-radius: 9999px;
-  background-color: color-mix(in srgb, var(--foreground) 32%, transparent);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .interactive-state-code-scrollbar {
-    transition: none;
-  }
-}
-
-.button-tertiary-neutral-hover-surface {
-  background-color: transparent !important;
-}
-
-.button-tertiary-neutral-hover-surface:hover,
-.button-tertiary-neutral-hover-state {
-  background-color: color-mix(in srgb, var(--foreground) 1%, var(--background)) !important;
-}
-
-.dark .button-tertiary-neutral-hover-surface:hover,
-.dark .button-tertiary-neutral-hover-state {
-  background-color: color-mix(in srgb, var(--foreground) 8%, var(--background)) !important;
-}
-
-.button-tertiary-neutral-pressing-state {
-  background-color: color-mix(in srgb, var(--foreground) 5%, var(--background)) !important;
-}
-
-.dark .button-tertiary-neutral-pressing-state {
-  background-color: color-mix(in srgb, var(--foreground) 10%, var(--background)) !important;
-}
-
-.button-tertiary-neutral-hover-surface::after {
-  background-color: transparent;
-}
-
-.dark .button-tertiary-neutral-hover-surface {
-  color: var(--foreground) !important;
-}
-
-.button-tertiary-neutral-hover-surface:active::after,
-.button-tertiary-neutral-pressing-state::after {
-  background-color: color-mix(in srgb, var(--foreground) 6%, transparent);
-}
-
-.dark .button-tertiary-neutral-hover-surface:active::after,
-.dark .button-tertiary-neutral-pressing-state::after {
-  background-color: color-mix(in srgb, var(--foreground) 36%, transparent);
-}
-
-.button-tertiary-neutral-hover-surface:active::before,
-.button-tertiary-neutral-pressing-state::before {
-  opacity: 0.06 !important;
-}
-
-.button-tertiary-brand-hover-surface::after {
-  background-color: color-mix(in srgb, var(--brand) 12%, transparent);
-}
-
-.button-tertiary-brand-hover-surface:active::after,
-.button-tertiary-brand-pressing-state::after {
-  background-color: color-mix(in srgb, var(--brand) 16%, transparent);
-}
-
-.button-tertiary-destructive-hover-surface::after {
-  background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
-}
-
-.button-tertiary-destructive-hover-surface:active::after,
-.button-tertiary-destructive-pressing-state::after {
-  background-color: color-mix(in srgb, var(--destructive) 16%, transparent);
-}
-
-.dark .button-tertiary-brand-hover-surface::after {
-  background-color: color-mix(in srgb, var(--brand) 18%, transparent);
-}
-
-.dark .button-tertiary-brand-hover-surface:active::after,
-.dark .button-tertiary-brand-pressing-state::after {
-  background-color: color-mix(in srgb, var(--brand) 24%, transparent);
-}
-
-.dark .button-tertiary-destructive-hover-surface::after {
-  background-color: color-mix(in srgb, var(--destructive) 18%, transparent);
-}
-
-.dark .button-tertiary-destructive-hover-surface:active::after,
-.dark .button-tertiary-destructive-pressing-state::after {
-  background-color: color-mix(in srgb, var(--destructive) 24%, transparent);
-}
-
-.button-destructive-callout {
-  background-color: color-mix(in srgb, var(--destructive) 10%, var(--background)) !important;
-  border-color: color-mix(in srgb, var(--destructive) 36%, var(--border)) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .button-destructive-callout {
-  background-color: color-mix(in srgb, var(--destructive) 24%, var(--background)) !important;
-  border-color: color-mix(in srgb, var(--destructive) 52%, transparent) !important;
-}
-
-.button-destructive-callout-code {
-  color: color-mix(in srgb, var(--negative-foreground) 80%, var(--foreground)) !important;
-}
-
-.dark .button-secondary-brand-surface {
-  background-color: oklch(0.18 0 0) !important;
-  border-color: color-mix(in srgb, var(--brand) 45%, transparent) !important;
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--brand) 16%, transparent),
-    color-mix(in srgb, var(--brand) 8%, transparent)
-  );
-}
-
-.dark .button-secondary-neutral-surface {
-  background-color: oklch(0.18 0 0) !important;
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--foreground) 10%, transparent),
-    color-mix(in srgb, var(--foreground) 5%, transparent)
-  );
-}
-
-.dark .button-secondary-destructive-surface {
-  background-color: oklch(0.18 0 0) !important;
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--destructive) 10%, transparent),
-    color-mix(in srgb, var(--destructive) 5%, transparent)
-  );
-}
-
-.dark .button-secondary-brand-surface,
-.dark .button-tertiary-brand-hover-surface {
-  color: oklch(0.708 0.182 254.604) !important;
-}
-
-.button-disabled-state:disabled {
-  background-color: color-mix(in srgb, var(--foreground) 8%, transparent) !important;
-  background-image: none !important;
-  border-color: transparent !important;
-  color: var(--muted-foreground) !important;
-  opacity: 1 !important;
-}
-
-.dark .button-disabled-state:disabled {
-  background-color: color-mix(in srgb, var(--foreground) 32%, transparent) !important;
-}
-
-.button-disabled-state:disabled::before,
-.button-disabled-state:disabled::after {
-  opacity: 0 !important;
-}
