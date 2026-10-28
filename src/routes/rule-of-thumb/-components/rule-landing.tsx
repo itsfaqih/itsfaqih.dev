@@ -618,11 +618,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
   const flipFrom = useRef<{ rect: DOMRect; rot: number } | null>(null);
 
   const cleared = placed !== null;
-  const said = placed
-    ? slots.find((slot) => slot.id === placed)
-    : miss
-      ? slots.find((slot) => slot.id === miss.id)
-      : undefined;
+  const said = slots.find((slot) => slot.id === (placed ?? miss?.id));
 
   function flyHome(transform: string) {
     const piece = pieceRef.current;
