@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, CheckIcon, ShareNetworkIcon } from "@phosphor-icons/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import {
   isValidElement,
   type KeyboardEvent,
@@ -12,11 +12,14 @@ import {
   useState,
 } from "react";
 import { compactBox, IslandActivity } from "../../../components/header";
-import { colorOf, ruleNumber } from "../../../data/guidelines";
-import type { PublishedGuideline } from "../../../data/guidelines";
+import {
+  colorOf,
+  PUBLISHED_GUIDELINES,
+  ruleNumber,
+  VISIBLE_GUIDELINES,
+} from "../../../data/guidelines";
+import type { Guideline, PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
-import { RuleOfThumbPagination } from "./rule-of-thumb-pagination";
-import { useCurrentRule } from "./index";
 import "./rule-landing.css";
 
 const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -79,7 +82,9 @@ type Results = (number | null)[];
 /** A rule's landing: the title screen with its cover, lessons that set the wrong way beside the
  * right one, a TL;DR, a mini quiz, and the rule as Markdown to take away. */
 export function RuleLanding(props: RuleLandingProps) {
-  const current = useCurrentRule();
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const current = PUBLISHED_GUIDELINES.find((guideline) => guideline.href === path);
   // Pinned at mount: while the next route loads, the location already names the next rule.
   const [rule] = useState(current);
   return rule ? <Landing rule={rule} {...props} /> : null;
@@ -119,6 +124,9 @@ function Landing({
   const last = words.pop();
   const head = words.join(" ");
   const share = { title: rule.title, text: rule.claim };
+  const at = VISIBLE_GUIDELINES.indexOf(rule);
+  const prev = VISIBLE_GUIDELINES[at - 1];
+  const next = VISIBLE_GUIDELINES[at + 1];
 
   return (
     <div
@@ -246,11 +254,49 @@ function Landing({
             </div>
           </div>
           <div data-rev>
-            <RuleOfThumbPagination />
+            {at !== -1 && (
+              <nav className="arc rot-pager" aria-label="More rules">
+                {prev ? <PagerCard rule={prev} direction="Previous" /> : <div />}
+                {next ? (
+                  <PagerCard rule={next} direction="Next" />
+                ) : (
+                  <Link to="/rule-of-thumb" className="rot-card rot-all">
+                    <span className="d">That's every rule so far</span>
+                    <span className="t">Back to all rules →</span>
+                  </Link>
+                )}
+              </nav>
+            )}
           </div>
         </section>
       </div>
     </div>
+  );
+}
+
+function PagerCard({ rule, direction }: { rule: Guideline; direction: "Previous" | "Next" }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      to={rule.href}
+      preload="intent"
+      className={direction === "Next" ? "rot-card next" : "rot-card"}
+      style={{ "--c": colorOf(rule.label) }}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+    >
+      <RuleThumb rule={rule} play={hovered} />
+      <span className="meta">
+        <span className="d">{direction === "Next" ? "Next rule →" : "← Previous rule"}</span>
+        <span className="n">
+          No.{ruleNumber(rule)} · {rule.label}
+        </span>
+        <span className="t">{rule.title}</span>
+      </span>
+    </Link>
   );
 }
 

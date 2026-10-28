@@ -1,12 +1,5 @@
-import { useLocation } from "@tanstack/react-router";
 import { PUBLISHED_GUIDELINES } from "../../../data/guidelines";
 import { pageHead } from "../../../seo";
-
-export function useCurrentRule() {
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-  return PUBLISHED_GUIDELINES.find((guideline) => guideline.href === path);
-}
 
 export function ruleHead(id: string) {
   const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
