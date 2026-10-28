@@ -973,12 +973,7 @@ export function DataLoading() {
         levels: LEVELS,
         board: "timeline",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will load data the same way.
-        </>
-      }
+      take="load data the same way"
     />
   );
 }

@@ -1348,12 +1348,7 @@ export function DialogDesign() {
         levels: LEVELS,
         board: "screen",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will build dialogs the same way.
-        </>
-      }
+      take="build dialogs the same way"
     />
   );
 }

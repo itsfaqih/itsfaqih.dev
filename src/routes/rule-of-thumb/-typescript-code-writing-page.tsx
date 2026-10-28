@@ -736,12 +736,7 @@ export function TypeScriptCodeWriting() {
         levels: LEVELS,
         board: "code",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will write the precise form too.
-        </>
-      }
+      take="write the precise form too"
     />
   );
 }

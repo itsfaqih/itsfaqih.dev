@@ -1152,12 +1152,7 @@ export function TableDesign() {
           levels: LEVELS,
           board: "table",
         }}
-        take={
-          <>
-            The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-            agents will build tables the same way.
-          </>
-        }
+        take="build tables the same way"
       />
     </DemosContext>
   );

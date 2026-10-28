@@ -488,12 +488,7 @@ export function ProximityPrinciple() {
         levels: LEVELS,
         board: "tree",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will place files the same way.
-        </>
-      }
+      take="place files the same way"
     />
   );
 }

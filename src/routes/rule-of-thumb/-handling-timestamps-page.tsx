@@ -817,12 +817,7 @@ export function HandlingTimestamps() {
         levels: LEVELS,
         board: "flow",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will store, send and show time the same way.
-        </>
-      }
+      take="store, send and show time the same way"
     />
   );
 }

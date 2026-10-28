@@ -16,7 +16,7 @@ import { colorOf, ruleNumber } from "../../../data/guidelines";
 import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import { RuleOfThumbPagination } from "./rule-of-thumb-pagination";
-import { readMarkdown, useCurrentRule } from "./index";
+import { useCurrentRule } from "./index";
 import "./rule-landing.css";
 
 const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -66,19 +66,12 @@ type RuleLandingProps = {
   lessons: Lesson[];
   tldr: readonly (readonly [string, string])[];
   /** `board` names what the pieces go into, as in "Drag the piece into the tree". */
-  quiz: { intro: ReactNode; levels: Level[]; board?: string };
-  /** The "Take the rule with you" paragraph. */
-  take?: ReactNode;
+  quiz: { intro: ReactNode; levels: Level[]; board: string };
+  /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
+  take: string;
   /** A hook for the page's own CSS. */
   className?: string;
 };
-
-const TAKE = (
-  <>
-    The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your agents will
-    follow it too.
-  </>
-);
 
 /** Stars per level: 1 to 3 once cleared, null while open. */
 type Results = (number | null)[];
@@ -99,7 +92,7 @@ function Landing({
   lessons,
   tldr,
   quiz,
-  take = TAKE,
+  take,
   className,
 }: RuleLandingProps & { rule: PublishedGuideline }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -228,7 +221,7 @@ function Landing({
                 key={index}
                 n={index + 1}
                 level={level}
-                board={quiz.board ?? "board"}
+                board={quiz.board}
                 stars={results[index] ?? null}
                 onClear={(stars) =>
                   setResults((list) => list.map((value, at) => (at === index ? stars : value)))
@@ -241,9 +234,12 @@ function Landing({
         <section className="take">
           <div className="take-copy" data-rev>
             <h2>Take the rule with you</h2>
-            <p>{take}</p>
+            <p>
+              The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code>
+              {` and your agents will ${take}.`}
+            </p>
             <div className="acts">
-              <CopyMarkdown url={markdownUrl} className="btn go" />
+              <CopyMarkdown url={markdownUrl} />
               <a className="btn soft" href={markdownUrl} target="_blank" rel="noopener noreferrer">
                 View .md
               </a>
@@ -965,14 +961,14 @@ function useTitleDock(
   }, [rootRef, titleRef, slot]);
 }
 
-function CopyMarkdown({ url, className }: { url: string; className: string }) {
+function CopyMarkdown({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     try {
-      const text = await readMarkdown(url);
-      if (text === null) return;
-      await navigator.clipboard.writeText(text);
+      const response = await fetch(url);
+      if (!response.ok) return;
+      await navigator.clipboard.writeText(await response.text());
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch (e) {
@@ -981,7 +977,7 @@ function CopyMarkdown({ url, className }: { url: string; className: string }) {
   }
 
   return (
-    <button type="button" className={className} onClick={handleCopy}>
+    <button type="button" className="btn go" onClick={handleCopy}>
       {copied ? "Copied" : "Copy as Markdown"}
     </button>
   );

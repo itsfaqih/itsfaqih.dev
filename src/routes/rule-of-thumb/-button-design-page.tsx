@@ -758,12 +758,7 @@ export function ButtonDesign() {
         levels: LEVELS,
         board: "layout",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will build buttons the same way.
-        </>
-      }
+      take="build buttons the same way"
     />
   );
 }

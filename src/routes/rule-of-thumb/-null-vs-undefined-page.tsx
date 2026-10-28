@@ -767,12 +767,7 @@ export function NullVsUndefined() {
         levels: LEVELS,
         board: "code",
       }}
-      take={
-        <>
-          The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code> and your
-          agents will keep missing and empty apart too.
-        </>
-      }
+      take="keep missing and empty apart too"
     />
   );
 }
