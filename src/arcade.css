@@ -1,9 +1,8 @@
-/* Arcade theme: the home page and the Rule of Thumb index.
-   Selector-heavy motion (parent states, staggered keyframes) lives here because
-   StyleX cannot express it as atomic rules. Everything is scoped under .arc. */
+/* The global rules that remain, each where StyleX cannot reach: html and the classes scripts set
+   on it, view-transition pseudo-elements, @property registrations, and the reduced-motion blanket.
+   Each rule says why it is global. Everything else styles itself with StyleX. */
 
-/* The theme class (theme.ts) carries the palette; color-scheme is a real property, so the
-   html class the inline script sets has to switch it. */
+/* Global: color-scheme on html follows the theme class the inline script sets there. */
 :root {
   color-scheme: dark;
 }
@@ -12,15 +11,18 @@
   color-scheme: light;
 }
 
+/* Global: the page-wide cursor default, kept with the element defaults below that build on it. */
 html {
   cursor: var(--cursor);
 }
-/* Form controls take cursor: default from the browser's stylesheet rather than inheriting, which
+/* Global: element defaults for every control on the page, below any class (zero specificity).
+   Form controls take cursor: default from the browser's stylesheet rather than inheriting, which
    would show the system arrow under the print cursor. The rules below re-point the active ones. */
 :where(button, input, select, textarea, label) {
   cursor: var(--cursor);
 }
-/* Text on a hue: white once the hue under it (--c) is dark enough, near-black otherwise. Below
+/* Global: a custom property every element and pseudo-element must declare for itself.
+   Text on a hue: white once the hue under it (--c) is dark enough, near-black otherwise. Below
    OKLCH lightness 0.65 white reads better on these saturated hues. Set on every element because a
    custom property resolves var(--c) where it is declared, and --c changes from element to element. */
 *,
@@ -28,6 +30,7 @@ html {
 ::after {
   --on-c: oklch(from var(--c, var(--go)) clamp(0.16, (0.65 - l) * 1000, 1) 0 0);
 }
+/* Global: zero-specificity cursor defaults for every interactive element, as above. */
 :where(
   a[href],
   button:not(:disabled),
@@ -41,6 +44,7 @@ html {
 ) {
   cursor: var(--cursor-point);
 }
+/* Global: zero-specificity cursor defaults for every text field, as above. */
 :where(
   input:not(
     [type="checkbox"],
@@ -57,7 +61,8 @@ html {
   cursor: var(--cursor-text);
 }
 
-/* print-cursor.tsx sets html.cur-on and draws the shape itself, so every element's cursor token
+/* Global: keys on a class a script sets on html.
+   print-cursor.tsx sets html.cur-on and draws the shape itself, so every element's cursor token
    becomes a blank image whose fragment names that shape, for the cursor to read back. */
 html.cur-on {
   --cursor: url("/cursors/none.svg#arrow") 0 0, none;
@@ -66,16 +71,19 @@ html.cur-on {
   --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
   --cursor-text: url("/cursors/none.svg#text") 0 0, none;
 }
-/* page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
+/* Global: keys on a class a script sets on html.
+   page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
 html.sb-own {
   scrollbar-width: none;
 }
-/* The native bar is a pseudo-element of html. */
+/* Global: the native bar is a pseudo-element of html. */
 html.sb-own::-webkit-scrollbar {
   display: none;
 }
 
-/* Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
+/* Global (to the end of the stack-filter block): view transitions are pseudo-elements of html,
+   keyed on its attributes and transition types, which StyleX cannot target.
+   Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
 html[data-theme-swap]::view-transition-old(root),
 html[data-theme-swap]::view-transition-new(root) {
   animation: none;
@@ -197,23 +205,23 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-/* ---------- Rule spread (home) ----------
-   The deck styles itself (rule-spread.tsx). @property registrations stay global: --glow must be a
-   registered <color> so the glow behind the deck eases between hues. */
+/* Global: @property has no StyleX form. --glow must be a registered <color> so the glow behind
+   the home deck (rule-spread.tsx) eases between hues. */
 @property --glow {
   syntax: "<color>";
   inherits: true;
   initial-value: transparent;
 }
-/* The hero prints style themselves (hero-prints.tsx); --hue is registered for the same reason, so the
-   prints' ink eases to the next slide's colour. */
+/* Global: @property, as above. --hue is registered so the hero prints' ink (hero-prints.tsx)
+   eases to the next slide's colour. */
 @property --hue {
   syntax: "<color>";
   inherits: true;
   initial-value: transparent;
 }
 
-/* ---------- Reduced motion and narrow screens ---------- */
+/* Global: reaches every element and pseudo-element under an .arc root, including ones that set
+   their own motion, which a class on the root alone cannot. */
 @media (prefers-reduced-motion: reduce) {
   .arc *,
   .arc *::before,

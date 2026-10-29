@@ -1,8 +1,14 @@
+/* The only global CSS. Components style themselves with StyleX; what is left here is what StyleX
+   cannot express, each rule with its reason. */
+/* Global: @font-face has no StyleX form. */
 @import "./fonts.css";
+/* Global: Lenis styles its own markup and the html classes it sets. */
 @import "lenis/dist/lenis.css";
+/* Global: html-level rules, view transitions and the reduced-motion blanket. */
 @import "./arcade.css";
 
-/* Tailwind's preflight, which every page was laid out against. Layered so that any unlayered rule wins. */
+/* Global: Tailwind's preflight, the element defaults every page was laid out against, which no
+   class can reach. Layered so that any unlayered rule wins. */
 @layer base {
   *,
   ::after,
@@ -222,18 +228,4 @@
   [hidden]:where(:not([hidden="until-found"])) {
     display: none !important;
   }
-}
-
-html,
-body.site-shell {
-  overflow-x: clip !important;
-}
-
-/* Diffs resolves its system theme from the rendered body color scheme. */
-body.site-shell {
-  color-scheme: light;
-}
-
-.dark body.site-shell {
-  color-scheme: dark;
 }

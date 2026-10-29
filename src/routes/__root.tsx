@@ -89,7 +89,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body className={`site-shell ${stylex.props(styles.body).className}`}>
+      <body {...stylex.props(styles.body)}>
         <Header />
         <CommandPalette />
         <main {...stylex.props(styles.main)}>{children}</main>
@@ -134,6 +134,7 @@ const styles = stylex.create({
     scrollBehavior: "smooth",
     // Anchored sections land below the fixed header bar.
     scrollPaddingTop: "88px",
+    overflowX: "clip !important",
   },
   body: {
     position: "relative",
@@ -144,6 +145,9 @@ const styles = stylex.create({
     MozOsxFontSmoothing: "grayscale",
     color: palette["--text"],
     backgroundColor: palette["--bg"],
+    overflowX: "clip !important",
+    // Diffs resolves its system theme from the rendered body colour scheme.
+    colorScheme: { default: "light", ":is(.dark *)": "dark" },
   },
   main: {
     position: "relative",
