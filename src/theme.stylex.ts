@@ -74,7 +74,6 @@ export const motion = stylex.defineVars({
   "--t-step": "40ms",
   "--t-pop": "420ms",
   "--t-panel": "560ms",
-  "--t-bar": "200ms",
 });
 
 /** The blog's transitions. */
