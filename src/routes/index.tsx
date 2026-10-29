@@ -6,6 +6,7 @@ import { SLIDES } from "../data/home";
 import { Backdrop } from "./-components/backdrop";
 import { ExperienceList, type Job } from "./-components/experience-list";
 import { Hero } from "./-components/hero/hero";
+import { heroType } from "./-components/hero-type";
 import { Intro } from "./-components/intro";
 import { reticle } from "./-components/reticle";
 import { RuleSpread } from "./-components/rule-spread";
@@ -339,7 +340,7 @@ function Index() {
             </small>
             <span data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
-          <div className="acts" data-cut style={{ marginTop: 24 }}>
+          <div {...stylex.props(heroType.acts)} data-cut style={{ marginTop: 24 }}>
             <a className="btn go" href={`mailto:${LINKS.email}`}>
               {`Email ${LINKS.email}`}
             </a>

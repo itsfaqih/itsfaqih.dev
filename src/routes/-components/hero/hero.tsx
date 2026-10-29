@@ -3,6 +3,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { SLIDES } from "../../../data/home";
 import { useMediaQuery } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
+import { heroType } from "../hero-type";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
 
 // The home hero: the headline cycles through what I build, and the bench beside it shows each in
@@ -45,10 +46,10 @@ export function Hero({ introDone }: { introDone: boolean }) {
   return (
     <div className={`hero ${stylex.props(styles.root).className}`}>
       <div>
-        <div className="tag" data-cut>
+        <div className={`tag ${stylex.props(heroType.tag).className}`} data-cut>
           Full-stack engineer · Yogyakarta
         </div>
-        <h1 data-cut {...stylex.props(styles.title)}>
+        <h1 data-cut {...stylex.props(heroType.title, styles.title)}>
           <span {...stylex.props(styles.line)}>I build</span>
           <span {...stylex.props(styles.phrases)}>
             {SLIDES.map((item, index) => {
@@ -62,14 +63,14 @@ export function Hero({ introDone }: { introDone: boolean }) {
                 >
                   <span {...stylex.props(styles.line, styles.nowrap)}>{item.phrase}</span>
                   <span {...stylex.props(styles.line)}>
-                    <span className="hl">{item.highlight}</span>.
+                    <span {...stylex.props(heroType.hl)}>{item.highlight}</span>.
                   </span>
                 </span>
               );
             })}
           </span>
         </h1>
-        <p className="lead" data-cut>
+        <p {...stylex.props(heroType.lead)} data-cut>
           I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
           lately the agent tooling around them. Right now I'm building healthcare software at{" "}
           <a {...stylex.props(styles.leadLink)} href="https://evidence.care" target="_blank" rel="noopener noreferrer">
@@ -77,7 +78,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
           </a>
           .
         </p>
-        <div className="acts">
+        <div {...stylex.props(heroType.acts)}>
           <a
             className={`btn go ${stylex.props(styles.go).className}`}
             href="#contact"

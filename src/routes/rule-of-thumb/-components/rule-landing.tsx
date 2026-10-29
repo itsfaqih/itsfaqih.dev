@@ -22,6 +22,7 @@ import {
   VISIBLE_GUIDELINES,
 } from "../../../data/guidelines";
 import type { PublishedGuideline } from "../../../data/guidelines";
+import { heroType } from "../../-components/hero-type";
 import { reticle } from "../../-components/reticle";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import { reducedMotion } from "../../../hooks/use-media-query";
@@ -140,7 +141,7 @@ function Landing({
               {...stylex.props(styles.labelPart, styles.title)}
             >
               {head && `${head} `}
-              <span className="hl">{last}</span>
+              <span {...stylex.props(heroType.hl)}>{last}</span>
             </span>
           </span>
           <ShareButton data={share} inIsland />
@@ -150,7 +151,7 @@ function Landing({
         <div {...stylex.props(shell.heroCopy)}>
           <div {...stylex.props(shell.crumbRow)}>
             <nav
-              className={`tag ${stylex.props(shell.crumb, shell.in, shell.first).className}`}
+              {...stylex.props(heroType.tag, shell.crumb, shell.in, shell.first)}
               aria-label="Breadcrumb"
             >
               <Link to="/rule-of-thumb" {...stylex.props(shell.crumbLink)}>
@@ -161,18 +162,18 @@ function Landing({
             </nav>
             <ShareButton data={share} />
           </div>
-          <h1 ref={titleRef} {...stylex.props(shell.title)}>
+          <h1 ref={titleRef} {...stylex.props(heroType.title, shell.title)}>
             {head && (
               <>
                 <span {...stylex.props(shell.titleLine)}>{head}</span>{" "}
               </>
             )}
             <span {...stylex.props(shell.titleLine)}>
-              <span className={`hl ${stylex.props(shell.titleMark).className}`}>{last}</span>
+              <span {...stylex.props(heroType.hl, shell.titleMark)}>{last}</span>
             </span>
           </h1>
           <p {...stylex.props(shell.claim, shell.in, shell.second)}>{rule.claim}</p>
-          <p className={`lead ${stylex.props(shell.lead, shell.in, shell.third).className}`}>
+          <p {...stylex.props(heroType.lead, shell.lead, shell.in, shell.third)}>
             {lead}
           </p>
         </div>
@@ -256,7 +257,7 @@ function Landing({
                 {` and your agents will ${take}.`}
               </p>
             </Tone>
-            <div className={`acts ${stylex.props(takeKit.acts).className}`}>
+            <div {...stylex.props(heroType.acts, takeKit.acts)}>
               <CopyMarkdown url={markdownUrl} />
               <a className="btn soft" href={markdownUrl} target="_blank" rel="noopener noreferrer">
                 View .md
@@ -1351,7 +1352,6 @@ const shell = stylex.create({
     color: palette["--text"],
     textWrap: "pretty",
   },
-  // .arc .lead keeps its margin, as it always outranked the page's reset.
   lead: {
     maxWidth: "34em",
     fontSize: "18px",

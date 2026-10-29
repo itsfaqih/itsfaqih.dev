@@ -305,55 +305,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   font-size: 12px;
 }
 
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-/* ---------- Hero ---------- */
-.arc .tag {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  font: 500 12px var(--display);
-  color: var(--go-ink);
-  margin-bottom: 18px;
-}
-.arc .tag::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ts);
-  box-shadow: 0 0 10px var(--ts);
-  animation: blink 1.2s steps(2) infinite;
-}
-.arc h1 {
-  font: 900 52px/1.02 var(--display);
-  letter-spacing: -0.04em;
-  color: var(--text);
-  margin: 0 0 22px;
-}
-.arc .hl {
-  color: var(--on-c);
-  background: var(--c);
-  padding: 0 0.12em;
-  border-radius: 0.12em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-.arc .lead {
-  font-size: 18px;
-  max-width: 31em;
-  margin: 0 0 30px;
-}
-.arc .acts {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
 /* useCutIns pauses a [data-loop] while it is off screen. The ticker band is also a [data-cut] piece,
    so its pause stays a class rule that the load-in's reduced-motion and rest rules still outrank. */
 .arc .paused {
@@ -455,9 +406,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 @media (max-width: 960px) {
   .arc-wrap {
     padding: 0 18px;
-  }
-  .arc h1 {
-    font-size: 36px;
   }
   .arc h2 {
     font-size: 34px;
