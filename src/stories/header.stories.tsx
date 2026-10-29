@@ -20,7 +20,7 @@ export const Default: Story = {
   render: () => (
     <div style={{ minHeight: 220 }}>
       <Header />
-      <main style={{ padding: "48px 24px", textAlign: "center" }}>
+      <main style={{ padding: "120px 24px 48px", textAlign: "center" }}>
         <p style={{ color: "var(--muted-foreground)" }}>
           The header combines navigation, social links, search, and theme controls.
         </p>
