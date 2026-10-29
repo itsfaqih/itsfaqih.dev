@@ -826,58 +826,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 
 /* ---------- Projects and stack ---------- */
-.arc .stages {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.arc .stg {
-  position: relative;
-  border-radius: 16px;
-  padding: 16px;
-  background: var(--panel);
-  border: 2px solid var(--hair);
-  box-shadow:
-    var(--raise),
-    0 4px 0 var(--drop-ink);
-  transition:
-    transform 220ms var(--snap),
-    box-shadow 220ms var(--snap),
-    border-color 120ms ease;
-}
-.arc .stg:hover,
-.arc .stg:focus-visible {
-  transform: translateY(-4px) rotate(-1deg);
-  border-color: var(--c);
-  box-shadow:
-    var(--raise),
-    0 8px 0 var(--key);
-}
-.arc .stg:active {
-  transform: translateY(3px);
-  border-color: var(--c);
-  box-shadow:
-    var(--raise),
-    0 1px 0 var(--key);
-  transition-duration: 100ms;
-}
-.arc .stg:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-.arc .stg small {
-  font: 700 11px var(--display);
-  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-}
-.arc .stg h3 {
-  margin: 4px 0 2px;
-  font: 700 17px var(--display);
-  color: var(--text);
-}
-.arc .stg p {
-  margin: 0;
-  font-size: 14px;
-}
 .arc .stack {
   position: relative;
 }
@@ -1015,29 +963,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-.arc .end {
-  margin: 24px 0 48px;
-  border-radius: 28px;
-  padding: 48px;
-  background: var(--panel);
-  border: 2px solid var(--go);
-  box-shadow:
-    var(--raise),
-    0 5px 0 var(--go-shadow);
-}
-.arc footer {
-  font-size: 13px;
-  color: var(--mute);
-  padding-bottom: 32px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.arc footer a:hover {
-  color: var(--text);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .arc *,
   .arc *::before,
@@ -1046,19 +971,11 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     animation: none !important;
     transition-property: opacity, color, background-color, border-color !important;
   }
-  .arc .stg:hover,
-  .arc .stg:focus-visible,
-  .arc .stg:active {
-    transform: none;
-  }
 }
 
 @media (max-width: 960px) {
   .arc-wrap {
     padding: 0 18px;
-  }
-  .arc .stages {
-    grid-template-columns: 1fr 1fr;
   }
   .arc .pups-group,
   .arc .stack-filter-row {
@@ -1091,9 +1008,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
   .arc section {
     padding: 64px 0;
-  }
-  .arc .end {
-    padding: 28px;
   }
 }
 

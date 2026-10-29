@@ -12,6 +12,7 @@ import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { useCutIns } from "./-components/use-cut-ins";
 import { LINKS, pageHead } from "../seo";
+import { fonts, motion, palette } from "../theme.stylex";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -312,26 +313,26 @@ function Index() {
               <span data-cut>Projects</span>
             </h2>
           </div>
-          <div className="stages">
+          <div {...stylex.props(styles.projects)}>
             {PROJECTS.map((project) => (
               <a
                 key={project.title}
-                className={`stg ${stylex.props(reticle.card, reticle.aim).className}`}
+                {...stylex.props(reticle.card, reticle.aim, styles.project)}
                 data-cut
                 href={project.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ "--c": project.color }}
               >
-                <small>{project.kind}</small>
-                <h3>{project.title}</h3>
-                <p>{project.summary}</p>
+                <small {...stylex.props(styles.projectKind)}>{project.kind}</small>
+                <h3 {...stylex.props(styles.projectTitle)}>{project.title}</h3>
+                <p {...stylex.props(styles.projectSummary)}>{project.summary}</p>
               </a>
             ))}
           </div>
         </section>
 
-        <div id="contact" className="end" data-cut>
+        <div id="contact" {...stylex.props(styles.contact)} data-cut>
           <h2>
             <small data-cut style={{ "--c": "var(--ax)" }}>
               Contact
@@ -353,14 +354,15 @@ function Index() {
           </div>
         </div>
 
-        <footer data-cut>
+        <footer {...stylex.props(styles.footer)} data-cut>
           <span>© 2026 Faqih Muntashir</span>
           <span>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer">
+            <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
               GitHub
             </a>{" "}
             ·{" "}
             <a
+              {...stylex.props(styles.footerLink)}
               href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
@@ -368,11 +370,11 @@ function Index() {
               LinkedIn
             </a>{" "}
             ·{" "}
-            <a href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
+            <a {...stylex.props(styles.footerLink)} href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
               Dribbble
             </a>{" "}
             ·{" "}
-            <a href="https://medium.com/@itsfaqih" target="_blank" rel="noopener noreferrer">
+            <a {...stylex.props(styles.footerLink)} href="https://medium.com/@itsfaqih" target="_blank" rel="noopener noreferrer">
               Medium
             </a>
           </span>
@@ -573,3 +575,89 @@ function Hero({ introDone }: { introDone: boolean }) {
     </div>
   );
 }
+
+const STACKED = "@media (max-width: 960px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const LIFT = "translateY(-4px) rotate(-1deg)";
+
+const styles = stylex.create({
+  projects: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(4, 1fr)", [STACKED]: "1fr 1fr" },
+    gap: "10px",
+  },
+  // A [data-cut] piece: hover, focus and press key on pseudo-classes, so its class list never
+  // changes. It tilts up off its key, and sinks onto it while pressed.
+  project: {
+    position: "relative",
+    borderRadius: "16px",
+    padding: "16px",
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": "var(--c)",
+      ":focus-visible": "var(--c)",
+      ":active": "var(--c)",
+    },
+    boxShadow: {
+      default: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+      ":hover": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":focus-visible": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":active": `${palette["--raise"]}, 0 1px 0 var(--key)`,
+    },
+    transform: {
+      default: null,
+      ":hover": { default: LIFT, [REDUCE]: "none" },
+      ":focus-visible": { default: LIFT, [REDUCE]: "none" },
+      ":active": { default: "translateY(3px)", [REDUCE]: "none" },
+    },
+    outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-visible": "3px" },
+    transitionProperty: "transform, box-shadow, border-color",
+    transitionDuration: { default: "220ms, 220ms, 120ms", ":active": "100ms" },
+    transitionTimingFunction: `${motion["--snap"]}, ${motion["--snap"]}, ease`,
+    transitionDelay: "0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal",
+  },
+  projectKind: {
+    font: `700 11px ${fonts["--display"]}`,
+    color: `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
+  },
+  projectTitle: {
+    marginTop: "4px",
+    marginInline: 0,
+    marginBottom: "2px",
+    font: `700 17px ${fonts["--display"]}`,
+    color: palette["--text"],
+  },
+  projectSummary: {
+    margin: 0,
+    fontSize: "14px",
+  },
+  contact: {
+    marginTop: "24px",
+    marginInline: 0,
+    marginBottom: "48px",
+    borderRadius: "28px",
+    padding: { default: "48px", [STACKED]: "28px" },
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: palette["--go"],
+    boxShadow: `${palette["--raise"]}, 0 5px 0 ${palette["--go-shadow"]}`,
+  },
+  footer: {
+    fontSize: "13px",
+    color: palette["--mute"],
+    paddingBottom: "32px",
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
+    flexWrap: "wrap",
+  },
+  footerLink: {
+    color: { default: null, ":hover": palette["--text"] },
+  },
+});
