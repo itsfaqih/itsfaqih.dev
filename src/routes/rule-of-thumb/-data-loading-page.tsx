@@ -1,12 +1,738 @@
+import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
-import {
-  type Lesson,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-} from "./-components/rule-landing";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
 import "./data-loading.css";
+
+const PHONE = "@media (max-width: 640px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
+const turn = stylex.keyframes({
+  to: { transform: "rotate(1turn)" },
+});
+const fresh = stylex.keyframes({
+  from: { opacity: 0.25, transform: "translateY(4px)" },
+});
+const sweep = stylex.keyframes({
+  to: { transform: "translate(calc(100% + 12px))" },
+});
+const mark = stylex.keyframes({
+  from: { opacity: 0, transform: "translateY(6px)" },
+});
+const pulse = stylex.keyframes({
+  to: { opacity: 0.45 },
+});
+const toast = stylex.keyframes({
+  "0%": { opacity: 0, transform: "translateY(10px)" },
+  "8%, 86%": { opacity: 1, transform: "none" },
+  "100%": { opacity: 0, transform: "none" },
+});
+const fade = stylex.keyframes({
+  from: { opacity: 0 },
+});
+const jump = stylex.keyframes({
+  "from, 40%": { color: "var(--no-ink)" },
+});
+const toastFade = stylex.keyframes({
+  "0%, 100%": { opacity: 0 },
+  "8%, 86%": { opacity: 1 },
+});
+
+const styles = stylex.create({
+  stores: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+  },
+  store: {
+    paddingBlock: "4px",
+    paddingInline: "8px",
+    fontSize: "13px",
+    color: "var(--c-ink)",
+  },
+  view: {
+    display: "grid",
+    gridTemplateRows: "1fr auto",
+    gap: "14px",
+    minWidth: 0,
+  },
+  ctl: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "10px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: "12px",
+    borderTopWidth: "1.5px",
+    borderTopStyle: "dashed",
+    borderTopColor: palette["--hair"],
+  },
+  ctlButton: {
+    opacity: { default: null, ":disabled": 0.55 },
+    cursor: { default: null, ":disabled": cursors["--cursor"] },
+  },
+  note: {
+    display: "inline-flex",
+    flexWrap: "wrap",
+    rowGap: "4px",
+    columnGap: "6px",
+    alignItems: "center",
+    fontSize: "13px",
+    color: palette["--mute"],
+  },
+  pair: {
+    display: "flex",
+    gap: "8px",
+  },
+  card: {
+    position: "relative",
+    display: "grid",
+    gap: "12px",
+    alignContent: "start",
+    paddingTop: { default: "14px", [PHONE]: "12px" },
+    paddingInline: { default: "16px", [PHONE]: "12px" },
+    paddingBottom: { default: "16px", [PHONE]: "14px" },
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    overflow: "hidden",
+  },
+  head: {
+    display: "flex",
+    gap: "12px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: "22px",
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+  },
+  status: {
+    display: "inline-flex",
+    gap: "6px",
+    alignItems: "center",
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+  },
+  offline: {
+    color: "var(--no-ink)",
+  },
+  online: {
+    color: "var(--yes-ink)",
+  },
+  spin: {
+    display: "inline-block",
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "24px",
+    height: "24px",
+    borderWidth: "3px",
+    borderStyle: "solid",
+    borderColor: palette["--panel-2"],
+    borderTopColor: "var(--c)",
+    borderRadius: "50%",
+    animationName: { default: turn, [REDUCE]: pulse },
+    animationDuration: "700ms",
+    animationTimingFunction: { default: "linear", [REDUCE]: "ease-in-out" },
+    animationIterationCount: "infinite",
+    animationDirection: { default: null, [REDUCE]: "alternate" },
+  },
+  spinSmall: {
+    width: "12px",
+    height: "12px",
+    borderWidth: "2px",
+  },
+  spinInFigure: {
+    justifySelf: "start",
+    marginBlock: "6px",
+    marginInline: 0,
+  },
+  wf: {
+    display: "grid",
+    gridTemplateColumns: { default: "92px minmax(0, 1fr)", [PHONE]: "82px minmax(0, 1fr)" },
+    rowGap: "6px",
+    columnGap: { default: "10px", [PHONE]: "8px" },
+    alignContent: "start",
+  },
+  lanes: {
+    display: "grid",
+    gridAutoRows: "26px",
+    gap: "4px",
+    minHeight: "116px",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: 0,
+    paddingInline: 0,
+    listStyle: "none",
+  },
+  label: {
+    display: "flex",
+    alignItems: "center",
+    fontWeight: 600,
+    fontSize: { default: "11.5px", [PHONE]: "10.5px" },
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+    whiteSpace: "nowrap",
+  },
+  plot: {
+    position: "relative",
+    paddingBottom: "30px",
+    borderRadius: "6px",
+    overflow: "hidden",
+  },
+  lane: {
+    position: "relative",
+  },
+  bar: {
+    position: "absolute",
+    top: "7px",
+    minWidth: "4px",
+    height: "12px",
+    borderRadius: "4px",
+  },
+  code: {
+    backgroundColor: palette["--hair"],
+  },
+  render: {
+    backgroundColor: palette["--dim"],
+  },
+  req: {
+    backgroundColor: {
+      default: "var(--c)",
+      [stylex.when.ancestor('[data-side="bad"]')]: "var(--no)",
+    },
+    boxShadow: {
+      default: "0 2px 0 var(--key-c)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `0 2px 0 ${palette["--no-shadow"]}`,
+    },
+  },
+  defer: {
+    backgroundImage:
+      "repeating-linear-gradient(135deg, color-mix(in srgb, var(--c) 50%, transparent) 0 4px, transparent 4px 8px)",
+    boxShadow: "inset 0 0 0 1.5px color-mix(in srgb, var(--c) 75%, transparent)",
+  },
+  paint: {
+    position: "absolute",
+    top: 0,
+    bottom: "4px",
+    zIndex: 4,
+    width: "2px",
+    marginLeft: "-1px",
+    borderRadius: "1px",
+    backgroundColor: palette["--text"],
+  },
+  paintArmed: {
+    opacity: 0,
+  },
+  paintRun: {
+    animationName: { default: mark, [REDUCE]: "none" },
+    animationDuration: { default: "260ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--snap"], [REDUCE]: "ease" },
+    animationDelay: { default: "var(--at)", [REDUCE]: "0s" },
+    animationFillMode: { default: "backwards", [REDUCE]: "none" },
+  },
+  paintTag: {
+    position: "absolute",
+    bottom: 0,
+    left: "6px",
+    paddingBlock: "3px",
+    paddingInline: "7px",
+    borderRadius: "6px",
+    backgroundColor: palette["--text"],
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--bg"],
+    whiteSpace: "nowrap",
+  },
+  paintTagEnd: {
+    right: "6px",
+    left: "auto",
+  },
+  long: {
+    display: { default: null, [PHONE]: "none" },
+  },
+  grid: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: "30px",
+    left: 0,
+    zIndex: 3,
+    pointerEvents: "none",
+    backgroundImage: "linear-gradient(90deg, var(--grid) 1px, transparent 1px)",
+    backgroundSize: "25% 100%",
+  },
+  cover: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 2,
+    display: "none",
+    backgroundColor: "var(--code-bg)",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      bottom: "30px",
+      left: 0,
+      width: "2px",
+      backgroundColor: "var(--c)",
+      boxShadow: "0 0 10px var(--c)",
+    },
+  },
+  coverShown: {
+    display: { default: "block", [REDUCE]: "none" },
+  },
+  coverRun: {
+    animationName: sweep,
+    animationDuration: "var(--sweep)",
+    animationTimingFunction: "linear",
+    animationFillMode: "forwards",
+  },
+  axis: {
+    position: "relative",
+    gridColumn: 2,
+    height: "14px",
+    fontWeight: 500,
+    fontSize: "10.5px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+  },
+  tick: {
+    position: "absolute",
+    fontStyle: "normal",
+    transform: {
+      default: "translateX(-50%)",
+      ":first-child": "none",
+      ":last-child": "translateX(-100%)",
+    },
+  },
+  key: {
+    display: "inline-block",
+    width: "14px",
+    height: "8px",
+    marginLeft: { default: "4px", ":first-child": 0 },
+    borderRadius: "3px",
+  },
+  keyReq: {
+    backgroundColor: {
+      default: "var(--c)",
+      [stylex.when.ancestor('[data-side="bad"]')]: "var(--no)",
+    },
+  },
+  keyCode: {
+    backgroundColor: palette["--hair"],
+  },
+  keyDefer: {
+    backgroundColor: "color-mix(in srgb, var(--c) 45%, transparent)",
+    boxShadow: "inset 0 0 0 1.5px var(--c)",
+  },
+  figure: {
+    display: "grid",
+    gap: "4px",
+    alignContent: "center",
+    minHeight: "82px",
+  },
+  amount: {
+    fontWeight: 900,
+    fontSize: { default: "34px", [PHONE]: "28px" },
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    color: palette["--text"],
+    fontVariantNumeric: "tabular-nums",
+    animationName: { default: null, [REDUCE]: fade },
+  },
+  amountFresh: {
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "320ms",
+    animationTimingFunction: motion["--out"],
+  },
+  sub: {
+    fontSize: "13px",
+    color: "var(--yes-ink)",
+  },
+  hidden: {
+    visibility: "hidden",
+  },
+  mail: {
+    display: "grid",
+    gap: "10px",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: 0,
+    paddingInline: 0,
+    listStyle: "none",
+  },
+  mailRow: {
+    display: "grid",
+    gridTemplateColumns: "28px minmax(0, 1fr)",
+    gap: "10px",
+    alignItems: "center",
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+  },
+  mailRowStill: {
+    animationName: "none",
+    animationDuration: "0s",
+    animationTimingFunction: "ease",
+  },
+  avatar: {
+    display: "grid",
+    placeItems: "center",
+    width: "28px",
+    height: "28px",
+    borderRadius: "9px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    fontStyle: "normal",
+    color: palette["--dim"],
+  },
+  mailText: {
+    display: "grid",
+    justifyItems: "start",
+    gap: "2px",
+    minWidth: 0,
+    fontSize: "13px",
+    lineHeight: 1.35,
+  },
+  mailLine: {
+    maxWidth: "100%",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  mailFrom: {
+    fontWeight: 600,
+    color: palette["--text"],
+  },
+  mailSubject: {
+    fontStyle: "normal",
+    color: palette["--dim"],
+  },
+  bone: {
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    color: "transparent",
+    animationName: pulse,
+    animationDuration: "900ms",
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+    animationDirection: "alternate",
+  },
+  said: {
+    minHeight: "2.9em",
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: 1.45,
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+  },
+  body: {
+    display: "grid",
+    placeItems: "center",
+    minHeight: "132px",
+  },
+  people: {
+    display: "grid",
+    gap: "10px",
+    justifySelf: "stretch",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: 0,
+    paddingInline: 0,
+    listStyle: "none",
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+  },
+  person: {
+    display: "grid",
+    gridTemplateColumns: "28px auto minmax(0, 1fr)",
+    gap: "10px",
+    alignItems: "center",
+    fontSize: "14px",
+  },
+  personName: {
+    fontWeight: 600,
+    color: palette["--text"],
+  },
+  personRole: {
+    justifySelf: "end",
+    fontSize: "13px",
+    color: palette["--mute"],
+  },
+  error: {
+    display: "grid",
+    gap: "6px",
+    justifyItems: "center",
+    maxWidth: "30ch",
+    textAlign: "center",
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+  },
+  errorTitle: {
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--no-ink)",
+  },
+  errorText: {
+    fontSize: "13px",
+    lineHeight: 1.45,
+    color: palette["--dim"],
+  },
+  errorButton: {
+    marginTop: "4px",
+  },
+  errorCode: {
+    fontSize: "11px",
+    color: palette["--mute"],
+  },
+  empty: {
+    fontSize: "14px",
+    color: palette["--mute"],
+  },
+  toast: {
+    position: "absolute",
+    bottom: "12px",
+    left: "50%",
+    paddingBlock: "8px",
+    paddingInline: "14px",
+    borderRadius: "10px",
+    backgroundColor: palette["--text"],
+    boxShadow: `0 8px 20px ${palette["--lift"]}`,
+    fontSize: "13px",
+    fontWeight: 600,
+    color: palette["--bg"],
+    whiteSpace: "nowrap",
+    translate: "-50% 0",
+    opacity: 0,
+    animationName: { default: toast, [REDUCE]: toastFade },
+    animationDuration: "3s",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "forwards",
+  },
+  source: {
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: "12px",
+    paddingInline: "14px",
+    borderRadius: "10px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: 1.65,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  },
+  comment: {
+    color: palette["--mute"],
+  },
+  mark: {
+    paddingBlock: 0,
+    paddingInline: "3px",
+    borderRadius: "4px",
+    backgroundColor: "color-mix(in srgb, var(--c) 26%, transparent)",
+    color: "inherit",
+  },
+  result: {
+    placeItems: "center",
+    minHeight: "96px",
+  },
+  profile: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    justifySelf: "start",
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+  },
+  profileAvatar: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "11px",
+    backgroundColor: "var(--c)",
+    color: "var(--on-c)",
+  },
+  profileName: {
+    fontWeight: 700,
+    fontSize: "16px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+  },
+  city: {
+    paddingBlock: "2px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: "var(--yes-ink)",
+  },
+  crash: {
+    display: "grid",
+    gap: "6px",
+    justifySelf: "stretch",
+    paddingBlock: "12px",
+    paddingInline: "14px",
+    borderRadius: "10px",
+    backgroundColor: "color-mix(in srgb, var(--no) 12%, transparent)",
+    boxShadow: "inset 3px 0 0 var(--no)",
+    animationName: fade,
+    animationDuration: "200ms",
+    animationTimingFunction: "ease-out",
+  },
+  crashTitle: {
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--no-ink)",
+  },
+  crashCode: {
+    fontSize: "12px",
+    lineHeight: 1.5,
+    color: "var(--no-ink)",
+    overflowWrap: "anywhere",
+  },
+  balance: {
+    display: "grid",
+    gap: "2px",
+    minHeight: "62px",
+    alignContent: "center",
+  },
+  balanceLabel: {
+    fontSize: "12px",
+    color: palette["--dim"],
+  },
+  balanceValue: {
+    fontWeight: 900,
+    fontSize: "30px",
+    lineHeight: 1.15,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    color: palette["--text"],
+    fontVariantNumeric: "tabular-nums",
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "320ms",
+    animationTimingFunction: motion["--out"],
+  },
+  balanceJump: {
+    animationName: { default: `${fresh}, ${jump}`, [REDUCE]: `${fade}, ${jump}` },
+    animationDuration: "320ms, 1400ms",
+    animationTimingFunction: {
+      default: `${motion["--out"]}, ease-out`,
+      [REDUCE]: "ease-out, ease-out",
+    },
+  },
+  balanceWait: {
+    fontWeight: 600,
+    fontSize: "15px",
+    lineHeight: 1.5,
+    fontFamily: fonts["--sans"],
+    fontVariantNumeric: "normal",
+    letterSpacing: 0,
+    color: palette["--mute"],
+    animationName: "none",
+    animationDuration: "0s",
+    animationTimingFunction: "ease",
+  },
+  hist: {
+    display: "grid",
+    gap: "8px",
+    paddingTop: "10px",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: palette["--hair"],
+  },
+  histHead: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: "22px",
+    fontSize: "12px",
+    color: palette["--dim"],
+  },
+  stamp: {
+    paddingBlock: "2px",
+    paddingInline: "7px",
+    borderRadius: "6px",
+    backgroundColor: "color-mix(in srgb, var(--c) 18%, transparent)",
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: "var(--c-ink)",
+    whiteSpace: "nowrap",
+  },
+  histList: {
+    display: "grid",
+    gap: "6px",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: 0,
+    paddingInline: 0,
+    listStyle: "none",
+  },
+  histRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "12px",
+    fontSize: "13px",
+    color: palette["--dim"],
+    animationName: { default: null, [REDUCE]: fade },
+  },
+  histRowNew: {
+    animationName: { default: fresh, [REDUCE]: fade },
+    animationDuration: "320ms",
+    animationTimingFunction: motion["--out"],
+  },
+  histAmount: {
+    fontWeight: 600,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  },
+  time: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    minWidth: { default: "54px", [PHONE]: "46px" },
+    fontWeight: 700,
+    color: "var(--c-ink)",
+  },
+});
 
 type Step = readonly [at: number, run: () => void];
 
@@ -23,13 +749,17 @@ function useScript() {
   };
 }
 
-function Spinner({ small = false }: { small?: boolean }) {
-  return <span className={small ? "dl-spin sm" : "dl-spin"} aria-hidden="true" />;
+function Spinner({ small = false, style }: { small?: boolean; style?: stylex.StyleXStyles }) {
+  return (
+    <span {...stylex.props(styles.spin, small && styles.spinSmall, style)} aria-hidden="true" />
+  );
 }
 
 function Controls({ children }: { children: ReactNode }) {
-  return <div className="dl-ctl">{children}</div>;
+  return <div {...stylex.props(styles.ctl)}>{children}</div>;
 }
+
+const CTL_BUTTON = `btn soft sm ${stylex.props(styles.ctlButton).className}`;
 
 const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
@@ -75,19 +805,21 @@ function WaterfallView({ bars, paint }: Waterfall) {
   const run = sweep.state === "run" ? sweep.n : 0;
 
   return (
-    <div ref={ref} className="dl-view">
-      <div className="wf" data-state={sweep.state} style={{ "--sweep": `${SWEEP}ms` }}>
-        <ul className="wf-labels" aria-hidden="true">
+    <div ref={ref} {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.wf)} style={{ "--sweep": `${SWEEP}ms` }}>
+        <ul {...stylex.props(styles.lanes)} aria-hidden="true">
           {bars.map((bar) => (
-            <li key={bar.label}>{bar.label}</li>
+            <li key={bar.label} {...stylex.props(styles.label)}>
+              {bar.label}
+            </li>
           ))}
         </ul>
-        <div key={run} className="wf-plot">
-          <ul className="wf-lanes">
+        <div key={run} {...stylex.props(styles.plot)}>
+          <ul {...stylex.props(styles.lanes)}>
             {bars.map((bar) => (
-              <li key={bar.label}>
+              <li key={bar.label} {...stylex.props(styles.lane)}>
                 <span
-                  className={`wf-bar ${bar.kind}`}
+                  {...stylex.props(styles.bar, styles[bar.kind])}
                   style={{ left: pct(bar.from), width: pct(bar.to - bar.from) }}
                 />
                 <span className="sr-only">
@@ -98,38 +830,49 @@ function WaterfallView({ bars, paint }: Waterfall) {
             ))}
           </ul>
           <span
-            className="wf-paint"
-            data-end={paint > AXIS * 0.6 || undefined}
+            {...stylex.props(
+              styles.paint,
+              sweep.state === "armed" && styles.paintArmed,
+              sweep.state === "run" && styles.paintRun,
+            )}
             style={{ left: pct(paint), "--at": `${(paint / AXIS) * SWEEP}ms` }}
           >
-            <b>
-              <span className="wf-long">on screen </span>
+            <b {...stylex.props(styles.paintTag, paint > AXIS * 0.6 && styles.paintTagEnd)}>
+              <span {...stylex.props(styles.long)}>on screen </span>
               {paint}ms
             </b>
           </span>
-          <span className="wf-cover" aria-hidden="true" />
-          <span className="wf-grid" aria-hidden="true" />
+          <span
+            {...stylex.props(
+              styles.cover,
+              sweep.state !== "still" && styles.coverShown,
+              sweep.state === "run" && styles.coverRun,
+            )}
+            aria-hidden="true"
+          />
+          <span {...stylex.props(styles.grid)} aria-hidden="true" />
         </div>
-        <span className="wf-axis" aria-hidden="true">
+        <span {...stylex.props(styles.axis)} aria-hidden="true">
           {[0, 250, 500, 750, 1000].map((ms) => (
-            <i key={ms} style={{ left: pct(ms) }}>
+            <i key={ms} {...stylex.props(styles.tick)} style={{ left: pct(ms) }}>
               {ms}
             </i>
           ))}
         </span>
       </div>
       <Controls>
-        <span className="dl-note">
-          <i className="wf-key req" /> request <i className="wf-key code" /> code
+        <span {...stylex.props(styles.note)}>
+          <i {...stylex.props(styles.key, styles.keyReq)} /> request{" "}
+          <i {...stylex.props(styles.key, styles.keyCode)} /> code
           {bars.some((bar) => bar.kind === "defer") && (
             <>
-              <i className="wf-key defer" /> deferred
+              <i {...stylex.props(styles.key, styles.keyDefer)} /> deferred
             </>
           )}
         </span>
         <button
           type="button"
-          className="btn soft sm dl-replay"
+          className={CTL_BUTTON}
           onClick={() => setSweep({ state: "run", n: run + 1 })}
         >
           Replay
@@ -155,11 +898,11 @@ function RevenueCard({ swr }: { swr: boolean }) {
   }
 
   return (
-    <div className="dl-view">
-      <div className="dl-card">
-        <div className="dl-head">
+    <div {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.card)}>
+        <div {...stylex.props(styles.head)}>
           <span>Revenue, this week</span>
-          <span className="dl-status" aria-live="polite">
+          <span {...stylex.props(styles.status)} aria-live="polite">
             {swr && card.fetching ? (
               <>
                 <Spinner small /> Updating
@@ -171,22 +914,20 @@ function RevenueCard({ swr }: { swr: boolean }) {
             )}
           </span>
         </div>
-        <div className="dl-figure">
+        <div {...stylex.props(styles.figure)}>
           {blank ? (
-            <Spinner />
+            <Spinner style={styles.spinInFigure} />
           ) : (
-            <b key={card.at} data-fresh={card.fresh || undefined}>
+            <b key={card.at} {...stylex.props(styles.amount, card.fresh && styles.amountFresh)}>
               {money(value)}
             </b>
           )}
-          <span className="dl-sub" data-hide={blank || undefined}>
-            12% over last week
-          </span>
+          <span {...stylex.props(styles.sub, blank && styles.hidden)}>12% over last week</span>
         </div>
       </div>
       <Controls>
-        <span className="dl-note">Refetch takes 900ms</span>
-        <button type="button" className="btn soft sm" disabled={card.fetching} onClick={refetch}>
+        <span {...stylex.props(styles.note)}>Refetch takes 900ms</span>
+        <button type="button" className={CTL_BUTTON} disabled={card.fetching} onClick={refetch}>
           Refetch
         </button>
       </Controls>
@@ -239,33 +980,42 @@ function InboxView({ delay }: { delay: boolean }) {
   const rows = [0, 1, 2].map((offset) => MAIL[(inbox.top + offset) % MAIL.length] ?? MAIL[0]);
 
   return (
-    <div className="dl-view">
-      <div className="dl-card">
-        <div className="dl-head">
+    <div {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.card)}>
+        <div {...stylex.props(styles.head)}>
           <span>Inbox</span>
-          <span className="dl-status">{inbox.top + 3} unread</span>
+          <span {...stylex.props(styles.status)}>{inbox.top + 3} unread</span>
         </div>
-        <ul className="dl-mail" data-skeleton={skeleton || undefined}>
+        <ul {...stylex.props(styles.mail)}>
           {rows.map(([from, subject], index) => (
-            <li key={`${inbox.top}-${index}`}>
-              <i aria-hidden="true">{from.charAt(0)}</i>
-              <span>
-                <b>{from}</b>
-                <em>{subject}</em>
+            <li
+              key={`${inbox.top}-${index}`}
+              {...stylex.props(styles.mailRow, skeleton && styles.mailRowStill)}
+            >
+              <i aria-hidden="true" {...stylex.props(styles.avatar, skeleton && styles.bone)}>
+                {from.charAt(0)}
+              </i>
+              <span {...stylex.props(styles.mailText)}>
+                <b {...stylex.props(styles.mailLine, styles.mailFrom, skeleton && styles.bone)}>
+                  {from}
+                </b>
+                <em {...stylex.props(styles.mailLine, styles.mailSubject, skeleton && styles.bone)}>
+                  {subject}
+                </em>
               </span>
             </li>
           ))}
         </ul>
-        <p className="dl-said" aria-live="polite">
+        <p {...stylex.props(styles.said)} aria-live="polite">
           {inbox.said ?? "Pick how fast the server replies."}
         </p>
       </div>
       <Controls>
-        <span className="dl-note">Server replies in</span>
-        <span className="dl-pair">
+        <span {...stylex.props(styles.note)}>Server replies in</span>
+        <span {...stylex.props(styles.pair)}>
           <button
             type="button"
-            className="btn soft sm"
+            className={CTL_BUTTON}
             disabled={inbox.phase === "wait"}
             onClick={() => load(80)}
           >
@@ -273,7 +1023,7 @@ function InboxView({ delay }: { delay: boolean }) {
           </button>
           <button
             type="button"
-            className="btn soft sm"
+            className={CTL_BUTTON}
             disabled={inbox.phase === "wait"}
             onClick={() => load(1200)}
           >
@@ -317,47 +1067,55 @@ function TeamView({ inline }: { inline: boolean }) {
   }
 
   return (
-    <div className="dl-view">
-      <div className="dl-card dl-team">
-        <div className="dl-head">
+    <div {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.card)}>
+        <div {...stylex.props(styles.head)}>
           <span>Team</span>
-          <span className="dl-status">3 members</span>
+          <span {...stylex.props(styles.status)}>3 members</span>
         </div>
-        <div className="dl-body">
+        <div {...stylex.props(styles.body)}>
           {team === "loading" ? (
             <Spinner />
           ) : team === "ok" ? (
-            <ul className="dl-people">
+            <ul {...stylex.props(styles.people)}>
               {TEAM.map(([name, role]) => (
-                <li key={name}>
-                  <i aria-hidden="true">{name.charAt(0)}</i>
-                  <b>{name}</b>
-                  <span>{role}</span>
+                <li key={name} {...stylex.props(styles.person)}>
+                  <i aria-hidden="true" {...stylex.props(styles.avatar)}>
+                    {name.charAt(0)}
+                  </i>
+                  <b {...stylex.props(styles.personName)}>{name}</b>
+                  <span {...stylex.props(styles.personRole)}>{role}</span>
                 </li>
               ))}
             </ul>
           ) : inline ? (
-            <div className="dl-error" role="alert">
-              <b>Couldn't load the team.</b>
-              <span>The server didn't answer. Your other cards are fine.</span>
-              <button type="button" className="btn go sm" onClick={retry}>
+            <div {...stylex.props(styles.error)} role="alert">
+              <b {...stylex.props(styles.errorTitle)}>Couldn't load the team.</b>
+              <span {...stylex.props(styles.errorText)}>
+                The server didn't answer. Your other cards are fine.
+              </span>
+              <button
+                type="button"
+                className={`btn go sm ${stylex.props(styles.errorButton).className}`}
+                onClick={retry}
+              >
                 Retry
               </button>
-              <code>logged · req 7f3a</code>
+              <code {...stylex.props(styles.errorCode)}>logged · req 7f3a</code>
             </div>
           ) : (
-            <p className="dl-empty">No members yet</p>
+            <p {...stylex.props(styles.empty)}>No members yet</p>
           )}
         </div>
         {toast > 0 && (
-          <p key={toast} className="dl-toast" role="status">
+          <p key={toast} {...stylex.props(styles.toast)} role="status">
             Something went wrong
           </p>
         )}
       </div>
       <Controls>
-        <span className="dl-note">The next request fails</span>
-        <button type="button" className="btn soft sm" disabled={team === "loading"} onClick={fail}>
+        <span {...stylex.props(styles.note)}>The next request fails</span>
+        <button type="button" className={CTL_BUTTON} disabled={team === "loading"} onClick={fail}>
           Fail a request
         </button>
       </Controls>
@@ -414,46 +1172,48 @@ function ParseView({ parse }: { parse: boolean }) {
   }
 
   return (
-    <div className="dl-view">
-      <pre className="dl-code">
-        <span className="c">{"// GET /users/1 → "}</span>
+    <div {...stylex.props(styles.view)}>
+      <pre {...stylex.props(styles.source)}>
+        <span {...stylex.props(styles.comment)}>{"// GET /users/1 → "}</span>
         {RESPONSE}
         {"\n"}
         {parse ? (
           <>
             {"const user = "}
-            <mark>User.parse</mark>
+            <mark {...stylex.props(styles.mark)}>User.parse</mark>
             {"(await res.json());\n"}
-            <span className="c">{'// city: z.string().catch("Unknown")'}</span>
+            <span {...stylex.props(styles.comment)}>{'// city: z.string().catch("Unknown")'}</span>
           </>
         ) : (
           <>
             {"const user = await res.json(); "}
-            <span className="c">{"// any"}</span>
+            <span {...stylex.props(styles.comment)}>{"// any"}</span>
           </>
         )}
         {"\n"}
         {"render(user.city.toUpperCase());"}
       </pre>
-      <div className="dl-card dl-result" aria-live="polite">
+      <div {...stylex.props(styles.card, styles.result)} aria-live="polite">
         {fetching ? (
           <Spinner />
         ) : outcome.ok ? (
-          <div key={runs} className="dl-profile">
-            <i aria-hidden="true">{outcome.user.name.charAt(0)}</i>
-            <b>{outcome.user.name}</b>
-            <span className="dl-city">{outcome.user.city}</span>
+          <div key={runs} {...stylex.props(styles.profile)}>
+            <i aria-hidden="true" {...stylex.props(styles.avatar, styles.profileAvatar)}>
+              {outcome.user.name.charAt(0)}
+            </i>
+            <b {...stylex.props(styles.profileName)}>{outcome.user.name}</b>
+            <span {...stylex.props(styles.city)}>{outcome.user.city}</span>
           </div>
         ) : (
-          <div key={runs} className="dl-crash" role="alert">
-            <b>Uncaught {outcome.error.split(":")[0]}</b>
-            <code>{outcome.error}</code>
+          <div key={runs} {...stylex.props(styles.crash)} role="alert">
+            <b {...stylex.props(styles.crashTitle)}>Uncaught {outcome.error.split(":")[0]}</b>
+            <code {...stylex.props(styles.crashCode)}>{outcome.error}</code>
           </div>
         )}
       </div>
       <Controls>
-        <span className="dl-note">The API left out city</span>
-        <button type="button" className="btn soft sm" disabled={fetching} onClick={fetchUser}>
+        <span {...stylex.props(styles.note)}>The API left out city</span>
+        <button type="button" className={CTL_BUTTON} disabled={fetching} onClick={fetchUser}>
           Fetch /users/1
         </button>
       </Controls>
@@ -482,11 +1242,17 @@ function WalletView({ careful }: { careful: boolean }) {
   }
 
   return (
-    <div className="dl-view">
-      <div className="dl-card">
-        <div className="dl-head">
+    <div {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.card)}>
+        <div {...stylex.props(styles.head)}>
           <span>Wallet</span>
-          <span className="dl-status" data-signal={signal}>
+          <span
+            {...stylex.props(
+              styles.status,
+              signal === "offline" && styles.offline,
+              online && styles.online,
+            )}
+          >
             {signal === "connecting" ? (
               <>
                 <Spinner small /> Connecting
@@ -498,30 +1264,35 @@ function WalletView({ careful }: { careful: boolean }) {
             )}
           </span>
         </div>
-        <div className="dl-balance">
-          <span>Balance</span>
+        <div {...stylex.props(styles.balance)}>
+          <span {...stylex.props(styles.balanceLabel)}>Balance</span>
           {online ? (
-            <b key="live" data-jump={!careful || undefined}>
+            <b key="live" {...stylex.props(styles.balanceValue, !careful && styles.balanceJump)}>
               {money(310)}
             </b>
           ) : careful ? (
-            <b className="dl-wait">Needs a connection</b>
+            <b {...stylex.props(styles.balanceValue, styles.balanceWait)}>Needs a connection</b>
           ) : (
-            <b>{money(2140)}</b>
+            <b {...stylex.props(styles.balanceValue)}>{money(2140)}</b>
           )}
         </div>
-        <div className="dl-hist">
-          <div className="dl-hist-head">
+        <div {...stylex.props(styles.hist)}>
+          <div {...stylex.props(styles.histHead)}>
             <span>Recent</span>
             {careful && (
-              <span className="dl-stamp">{online ? "Updated just now" : "Updated 2 days ago"}</span>
+              <span {...stylex.props(styles.stamp)}>
+                {online ? "Updated just now" : "Updated 2 days ago"}
+              </span>
             )}
           </div>
-          <ul>
+          <ul {...stylex.props(styles.histList)}>
             {rows.map((row) => (
-              <li key={row.label} data-new={(online && row === SPENT) || undefined}>
+              <li
+                key={row.label}
+                {...stylex.props(styles.histRow, online && row === SPENT && styles.histRowNew)}
+              >
                 <span>{row.label}</span>
-                <b>
+                <b {...stylex.props(styles.histAmount)}>
                   {row.amount < 0 ? "−" : "+"}
                   {money(Math.abs(row.amount))}
                 </b>
@@ -531,10 +1302,10 @@ function WalletView({ careful }: { careful: boolean }) {
         </div>
       </div>
       <Controls>
-        <span className="dl-note">Opened from cache</span>
+        <span {...stylex.props(styles.note)}>Opened from cache</span>
         <button
           type="button"
-          className="btn soft sm"
+          className={CTL_BUTTON}
           disabled={signal === "connecting"}
           onClick={online ? () => setSignal("offline") : connect}
         >
@@ -660,10 +1431,10 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p className="dl-stores">
-        <code>localStorage · ~5MB, sync</code>
-        <code>IndexedDB · large, async</code>
-        <code>PGlite · SQL + sync</code>
+      <p {...stylex.props(styles.stores)}>
+        <code {...stylex.props(styles.store)}>localStorage · ~5MB, sync</code>
+        <code {...stylex.props(styles.store)}>IndexedDB · large, async</code>
+        <code {...stylex.props(styles.store)}>PGlite · SQL + sync</code>
       </p>
     ),
     bad: {
@@ -691,7 +1462,7 @@ const TLDR = [
 
 const at = (ms: string, text: string) => (
   <>
-    <time>{ms}</time>
+    <time {...stylex.props(styles.time)}>{ms}</time>
     {text}
   </>
 );
