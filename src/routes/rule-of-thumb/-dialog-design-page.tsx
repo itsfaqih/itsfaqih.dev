@@ -1,5 +1,7 @@
 import { SpeakerHighIcon, XIcon } from "@phosphor-icons/react";
+import * as stylex from "@stylexjs/stylex";
 import {
+  type ComponentProps,
   type FocusEvent,
   type KeyboardEvent,
   type ReactNode,
@@ -12,13 +14,505 @@ import {
   useState,
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
-import {
-  type Lesson,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-} from "./-components/rule-landing";
-import "./dialog-design.css";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+
+const PHONE = "@media (max-width: 640px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const LIGHT = ":is(.light *)";
+
+const ringIn = stylex.keyframes({
+  from: { opacity: 0, transform: "scale(1.12)" },
+});
+
+const styles = stylex.create({
+  stage: {
+    display: "grid",
+    gap: "12px",
+    alignContent: "start",
+  },
+  screen: {
+    position: "relative",
+    isolation: "isolate",
+    overflow: "hidden",
+    height: "260px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
+    fontWeight: 500,
+    fontSize: "13px",
+    lineHeight: 1.35,
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+  },
+  page: {
+    display: "grid",
+    gap: "12px",
+    alignContent: "start",
+    height: "100%",
+    paddingBlock: { default: "14px", [PHONE]: "12px" },
+    paddingInline: { default: "14px", [PHONE]: "12px" },
+  },
+  checkout: {
+    gridTemplateRows: "auto auto 1fr",
+  },
+  spread: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  logo: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "20px",
+    height: "20px",
+    borderRadius: "6px",
+    backgroundColor: "var(--c)",
+  },
+  ghost: {
+    display: "block",
+    width: "var(--w, 60%)",
+    height: "8px",
+    borderRadius: "4px",
+    backgroundColor: `color-mix(in srgb, ${palette["--text"]} 12%, transparent)`,
+  },
+  card: {
+    display: "grid",
+    gap: "10px",
+    paddingBlock: "12px",
+    paddingInline: "12px",
+    borderRadius: "10px",
+    backgroundColor: palette["--panel-2"],
+  },
+  gone: {
+    backgroundColor: `color-mix(in srgb, var(--no) 14%, ${palette["--panel-2"]})`,
+  },
+  strong: {
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  goneName: {
+    color: "var(--no-ink)",
+  },
+  price: {
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+  },
+  row: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+  },
+  pay: {
+    alignSelf: "end",
+    justifyContent: "flex-end",
+  },
+  link: {
+    justifySelf: "start",
+    marginBlock: "-4px",
+    marginInline: "-6px",
+    paddingBlock: "6px",
+    paddingInline: "6px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    backgroundColor: "transparent",
+    backgroundImage: "none",
+    backgroundPosition: "0px 0px",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    textDecorationLine: "underline",
+    textUnderlineOffset: "3px",
+    color: palette["--dim"],
+    cursor: cursors["--cursor-point"],
+  },
+  pill: {
+    height: "26px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "13px",
+    backgroundColor: "color-mix(in srgb, var(--c) 18%, transparent)",
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--c-ink)",
+    cursor: cursors["--cursor-point"],
+  },
+  mail: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    height: "22px",
+  },
+  dot: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: "var(--c)",
+  },
+  tag: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "30px",
+    height: "14px",
+    borderRadius: "7px",
+    backgroundColor: "color-mix(in srgb, var(--c) 30%, transparent)",
+  },
+  project: {
+    display: "grid",
+    gap: "2px",
+    minWidth: 0,
+  },
+  meta: {
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+  },
+  article: {
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+    scrollbarGutter: "stable",
+    scrollbarWidth: "thin",
+  },
+  locked: {
+    overflowY: "hidden",
+  },
+  para: {
+    display: "grid",
+    gap: "7px",
+  },
+  figure: {
+    height: "64px",
+    marginBottom: "4px",
+    borderRadius: "8px",
+    backgroundColor: `color-mix(in srgb, var(--c) 16%, ${palette["--panel-2"]})`,
+  },
+  scrim: {
+    position: "absolute",
+    zIndex: 2,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: { default: "rgb(6 6 10 / 0.55)", [LIGHT]: "rgb(20 20 30 / 0.32)" },
+    opacity: 0,
+    pointerEvents: "none",
+    transition: `opacity 180ms ${motion["--out"]}`,
+  },
+  scrimTop: {
+    zIndex: 5,
+  },
+  scrimOn: {
+    opacity: 1,
+    pointerEvents: "auto",
+  },
+  dialog: {
+    position: "absolute",
+    zIndex: 4,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    display: "grid",
+    gap: "10px",
+    width: "min(300px, 100% - 24px)",
+    height: "fit-content",
+    marginBlock: "auto",
+    marginInline: "auto",
+    paddingBlock: { default: "14px", [PHONE]: "12px" },
+    paddingInline: { default: "14px", [PHONE]: "12px" },
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}, 0 14px 32px rgb(0 0 0 / 0.35)`,
+    opacity: 0,
+    visibility: "hidden",
+    transform: { default: "translateY(8px) scale(0.97)", [REDUCE]: "none" },
+    transition: "opacity 140ms ease, transform 140ms ease, visibility 0s 140ms",
+  },
+  dialogTop: {
+    zIndex: 6,
+    width: "min(270px, 100% - 40px)",
+  },
+  dialogOpen: {
+    opacity: 1,
+    // inherit, not visible: on a phone the hidden pane must keep its open dialog hidden too.
+    visibility: "inherit",
+    transform: "none",
+    transition: `opacity 200ms ${motion["--out"]}, transform 240ms ${motion["--out"]}, visibility 0s`,
+  },
+  head: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: "28px",
+  },
+  title: {
+    marginBlock: 0,
+    marginInline: 0,
+    fontWeight: 700,
+    fontSize: "15px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  body: {
+    marginTop: "-4px",
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    fontSize: "12.5px",
+    lineHeight: 1.45,
+    color: palette["--dim"],
+  },
+  field: {
+    display: "grid",
+    gap: "5px",
+    outline: { default: null, ":focus-visible": "none" },
+  },
+  label: {
+    fontWeight: 600,
+    fontSize: "11.5px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--dim"],
+  },
+  inputWrap: {
+    position: "relative",
+    display: "block",
+  },
+  input: {
+    width: "100%",
+    height: "34px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "8px",
+    backgroundColor: palette["--bg"],
+    fontWeight: 500,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+    "::placeholder": {
+      color: palette["--mute"],
+    },
+  },
+  acts: {
+    display: "flex",
+    gap: "8px",
+    justifyContent: "flex-end",
+  },
+  share: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+  },
+  url: {
+    overflow: "hidden",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    minWidth: 0,
+    height: "32px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderRadius: "8px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "32px",
+    fontFamily: fonts["--mono"],
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: palette["--dim"],
+  },
+  btn: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    height: "32px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "9px",
+    backgroundColor: "var(--c)",
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    whiteSpace: "nowrap",
+    color: "var(--on-c)",
+    cursor: cursors["--cursor-point"],
+  },
+  soft: {
+    backgroundColor: { default: palette["--panel"], ":hover": palette["--soft-hover"] },
+    boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
+    color: palette["--text"],
+  },
+  softInCard: {
+    backgroundColor: { default: palette["--bg"], ":hover": palette["--soft-hover"] },
+  },
+  plain: {
+    backgroundColor: { default: "transparent", ":hover": palette["--soft-hover"] },
+    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    color: palette["--text"],
+  },
+  red: {
+    "--c": "var(--no)",
+  },
+  redTint: {
+    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
+    color: "var(--no-ink)",
+  },
+  close: {
+    display: "grid",
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    placeItems: "center",
+    width: "28px",
+    height: "28px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "8px",
+    backgroundColor: { default: "transparent", ":hover": palette["--soft-hover"] },
+    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    color: palette["--dim"],
+    cursor: cursors["--cursor-point"],
+  },
+  closeIcon: {
+    width: "14px",
+    height: "14px",
+  },
+  // Every focus stop in the window: the demo draws its own ring, so the browser's stays off.
+  stop: {
+    position: "relative",
+    outline: { default: null, ":focus-visible": "none" },
+  },
+  ring: {
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: "-4px",
+      right: "-4px",
+      bottom: "-4px",
+      left: "-4px",
+      borderWidth: "2px",
+      borderStyle: "solid",
+      borderColor: palette["--focus"],
+      borderRadius: "12px",
+      pointerEvents: "none",
+      animationName: { default: ringIn, [REDUCE]: "none" },
+      animationDuration: { default: "220ms", [REDUCE]: "0s" },
+      animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+    },
+  },
+  ringBehind: {
+    zIndex: 3,
+    "::after": {
+      borderStyle: "dashed",
+      borderColor: "var(--no)",
+    },
+  },
+  bar: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "12px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: "34px",
+  },
+  keys: {
+    display: "flex",
+    gap: "6px",
+  },
+  key: {
+    minWidth: "46px",
+    height: "30px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "8px",
+    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    boxShadow: {
+      default: `0 3px 0 ${palette["--drop-ink"]}`,
+      ":active": `0 1px 0 ${palette["--drop-ink"]}`,
+    },
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    cursor: cursors["--cursor-point"],
+    transform: {
+      default: null,
+      ":active": { default: "translateY(2px)", [REDUCE]: "none" },
+    },
+    outlineWidth: { default: null, ":focus-visible": "2px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "2px" },
+    transition: `transform 120ms ${motion["--out"]}, box-shadow 120ms ${motion["--out"]}`,
+  },
+  read: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "140px",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: 1.4,
+    fontFamily: fonts["--mono"],
+    textAlign: "right",
+    color: palette["--dim"],
+  },
+  readNo: {
+    color: "var(--no-ink)",
+  },
+  readYes: {
+    color: "var(--yes-ink)",
+  },
+  speech: {
+    display: "inline-flex",
+    gap: "6px",
+    alignItems: "baseline",
+    textAlign: "left",
+  },
+  speaker: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "13px",
+    height: "13px",
+    translate: "0 2px",
+  },
+});
 
 function useWindowFocus() {
   const ref = useRef<HTMLDivElement>(null);
@@ -67,8 +561,17 @@ function useWindowFocus() {
     setFocus({ at: stop });
   }
 
-  function stop(name: string) {
-    return { "data-stop": name, "data-at": focus.at === name || undefined };
+  /** `behind` marks a stop on the page while the dialog is open. */
+  function stop(
+    name: string,
+    style: stylex.StyleXArray<stylex.CompiledStyles | false>,
+    behind = false,
+  ) {
+    const at = focus.at === name;
+    return {
+      "data-stop": name,
+      ...stylex.props(styles.stop, style, at && styles.ring, at && behind && styles.ringBehind),
+    };
   }
 
   return { ref, at: focus.at, find, move, next, onFocus, stop };
@@ -89,13 +592,16 @@ function Screen({ focus, open, page, children, onScrim, onKeyDown }: ScreenProps
   return (
     <div
       ref={focus.ref}
-      className="dd-screen"
-      data-open={open || undefined}
       onFocus={focus.onFocus}
       onKeyDown={onKeyDown}
+      {...stylex.props(styles.screen)}
     >
       {page}
-      <div className="dd-scrim" aria-hidden="true" onClick={onScrim} />
+      <div
+        aria-hidden="true"
+        onClick={onScrim}
+        {...stylex.props(styles.scrim, open && styles.scrimOn)}
+      />
       {children}
     </div>
   );
@@ -120,21 +626,20 @@ function Dialog({ open, title, body, children, close, bare, held, top, ref }: Di
   return (
     <div
       ref={ref}
-      className={top ? "dd-dialog dd-top" : "dd-dialog"}
       role={bare ? undefined : "dialog"}
       aria-labelledby={bare ? undefined : `${id}t`}
       aria-describedby={bare || !body ? undefined : `${id}d`}
-      data-open={open || undefined}
       inert={!open || held}
+      {...stylex.props(styles.dialog, top && styles.dialogTop, open && styles.dialogOpen)}
     >
-      <div className="dd-head">
-        <p id={`${id}t`} className="dd-title">
+      <div {...stylex.props(styles.head)}>
+        <p id={`${id}t`} {...stylex.props(styles.title)}>
           {title}
         </p>
         {close}
       </div>
       {body && (
-        <p id={`${id}d`} className="dd-body">
+        <p id={`${id}d`} {...stylex.props(styles.body)}>
           {body}
         </p>
       )}
@@ -147,15 +652,22 @@ type CloseProps = { focus: WindowFocus; onClose: () => void };
 
 function CloseX({ focus, onClose }: CloseProps) {
   return (
-    <button
-      type="button"
-      className="dd-x"
-      aria-label="Close"
-      {...focus.stop("x")}
-      onClick={onClose}
-    >
-      <XIcon weight="bold" aria-hidden="true" />
+    <button type="button" aria-label="Close" {...focus.stop("x", styles.close)} onClick={onClose}>
+      <XIcon weight="bold" aria-hidden="true" {...stylex.props(styles.closeIcon)} />
     </button>
+  );
+}
+
+type FieldProps = { focus: WindowFocus; name: string; label: string } & ComponentProps<"input">;
+
+function Field({ focus, name, label, ...input }: FieldProps) {
+  return (
+    <label {...stylex.props(styles.field)}>
+      <span {...stylex.props(styles.label)}>{label}</span>
+      <span {...stylex.props(styles.inputWrap, focus.at === name && styles.ring)}>
+        <input {...input} data-stop={name} {...stylex.props(styles.stop, styles.input)} />
+      </span>
+    </label>
   );
 }
 
@@ -163,7 +675,7 @@ function Key({ children, onPress }: { children: ReactNode; onPress: () => void }
   return (
     <button
       type="button"
-      className="dd-key"
+      {...stylex.props(styles.key)}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onPress}
     >
@@ -182,11 +694,18 @@ type StageProps = {
 
 function Stage({ stageRef, keys, read, tone, children }: StageProps) {
   return (
-    <div ref={stageRef} className="dd-stage">
+    <div ref={stageRef} {...stylex.props(styles.stage)}>
       {children}
-      <div className="dd-bar">
-        <span className="dd-keys">{keys}</span>
-        <span className="dd-read" data-tone={tone} aria-live="polite">
+      <div {...stylex.props(styles.bar)}>
+        <span {...stylex.props(styles.keys)}>{keys}</span>
+        <span
+          aria-live="polite"
+          {...stylex.props(
+            styles.read,
+            tone === "no" && styles.readNo,
+            tone === "yes" && styles.readYes,
+          )}
+        >
           {read}
         </span>
       </div>
@@ -289,31 +808,30 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
           open={open}
           onKeyDown={onKeyDown}
           page={
-            <div className="dd-page dd-checkout" inert={sealed && open}>
-              <div className="dd-nav">
-                <span className="dd-logo" />
-                <button type="button" className="dd-link" {...focus.stop("help")}>
+            <div inert={sealed && open} {...stylex.props(styles.page, styles.checkout)}>
+              <div {...stylex.props(styles.spread)}>
+                <span {...stylex.props(styles.logo)} />
+                <button type="button" {...focus.stop("help", styles.link, open)}>
                   Help
                 </button>
               </div>
-              <div className="dd-card">
-                <div className="dd-line">
-                  <b>Order #2041</b>
-                  <span>$86.00</span>
+              <div {...stylex.props(styles.card)}>
+                <div {...stylex.props(styles.spread)}>
+                  <b {...stylex.props(styles.strong)}>Order #2041</b>
+                  <span {...stylex.props(styles.price)}>$86.00</span>
                 </div>
-                <span className="dd-ghost" style={{ "--w": "70%" }} />
-                <span className="dd-ghost" style={{ "--w": "48%" }} />
+                <span style={{ "--w": "70%" }} {...stylex.props(styles.ghost)} />
+                <span style={{ "--w": "48%" }} {...stylex.props(styles.ghost)} />
               </div>
-              <div className="dd-row">
+              <div {...stylex.props(styles.row, styles.pay)}>
                 <button
                   type="button"
-                  className="dd-btn soft"
-                  {...focus.stop("trigger")}
+                  {...focus.stop("trigger", [styles.btn, styles.soft], open)}
                   onClick={() => show(true)}
                 >
                   Edit profile
                 </button>
-                <button type="button" className="dd-btn" {...focus.stop("pay")}>
+                <button type="button" {...focus.stop("pay", styles.btn, open)}>
                   Pay now
                 </button>
               </div>
@@ -321,22 +839,16 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
           }
         >
           <Dialog ref={dialogRef} open={open} title="Edit profile">
-            <label className="dd-field">
-              <span>Name</span>
-              <span className="dd-in">
-                <input defaultValue="Ada Lovelace" {...focus.stop("name")} />
-              </span>
-            </label>
-            <div className="dd-acts">
+            <Field focus={focus} name="name" label="Name" defaultValue="Ada Lovelace" />
+            <div {...stylex.props(styles.acts)}>
               <button
                 type="button"
-                className="dd-btn text"
-                {...focus.stop("cancel")}
+                {...focus.stop("cancel", [styles.btn, styles.plain])}
                 onClick={hide}
               >
                 Cancel
               </button>
-              <button type="button" className="dd-btn" {...focus.stop("save")} onClick={hide}>
+              <button type="button" {...focus.stop("save", styles.btn)} onClick={hide}>
                 Save
               </button>
             </div>
@@ -387,17 +899,17 @@ function EscapeDemo({ sealed }: { sealed: boolean }) {
         onKeyDown={(event) => event.key === "Escape" && escape()}
         onScrim={() => (sealed ? close("a click outside") : refuse("Click outside"))}
         page={
-          <div className="dd-page" inert={open}>
-            <div className="dd-nav">
-              <span className="dd-logo" />
-              <button type="button" className="dd-pill" {...focus.stop("trigger")} onClick={show}>
+          <div inert={open} {...stylex.props(styles.page)}>
+            <div {...stylex.props(styles.spread)}>
+              <span {...stylex.props(styles.logo)} />
+              <button type="button" {...focus.stop("trigger", styles.pill, open)} onClick={show}>
                 What's new
               </button>
             </div>
             {[72, 54, 64, 46].map((width) => (
-              <div key={width} className="dd-mail">
-                <span className="dd-dot" />
-                <span className="dd-ghost" style={{ "--w": `${width}%` }} />
+              <div key={width} {...stylex.props(styles.mail)}>
+                <span {...stylex.props(styles.dot)} />
+                <span style={{ "--w": `${width}%` }} {...stylex.props(styles.ghost)} />
               </div>
             ))}
           </div>
@@ -409,13 +921,8 @@ function EscapeDemo({ sealed }: { sealed: boolean }) {
           body="Threads fold up, and search now finds attachments."
           close={<CloseX focus={focus} onClose={() => close("×")} />}
         >
-          <div className="dd-acts">
-            <button
-              type="button"
-              className="dd-btn"
-              {...focus.stop("ok")}
-              onClick={() => close("Got it")}
-            >
+          <div {...stylex.props(styles.acts)}>
+            <button type="button" {...focus.stop("ok", styles.btn)} onClick={() => close("Got it")}>
               Got it
             </button>
           </div>
@@ -455,22 +962,21 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
         open={open}
         onKeyDown={(event) => event.key === "Escape" && open && go("idle", "trigger")}
         page={
-          <div className="dd-page" inert={open}>
-            <div className="dd-nav">
-              <span className="dd-logo" />
-              <span className="dd-ghost" style={{ "--w": "30%" }} />
+          <div inert={open} {...stylex.props(styles.page)}>
+            <div {...stylex.props(styles.spread)}>
+              <span {...stylex.props(styles.logo)} />
+              <span style={{ "--w": "30%" }} {...stylex.props(styles.ghost)} />
             </div>
-            <div className="dd-card dd-project" data-gone={phase === "deleted" || undefined}>
+            <div {...stylex.props(styles.spread, styles.card, phase === "deleted" && styles.gone)}>
               {phase === "deleted" ? (
                 <>
-                  <span className="dd-proj-copy">
-                    <b>Moonbase deleted</b>
-                    <small>214 files gone</small>
+                  <span {...stylex.props(styles.project)}>
+                    <b {...stylex.props(styles.strong, styles.goneName)}>Moonbase deleted</b>
+                    <small {...stylex.props(styles.meta)}>214 files gone</small>
                   </span>
                   <button
                     type="button"
-                    className="dd-btn soft"
-                    {...focus.stop("reset")}
+                    {...focus.stop("reset", [styles.btn, styles.soft, styles.softInCard], open)}
                     onClick={() => go("idle", "trigger")}
                   >
                     Restore
@@ -478,14 +984,13 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
                 </>
               ) : (
                 <>
-                  <span className="dd-proj-copy">
-                    <b>Moonbase</b>
-                    <small>214 files · edited 2h ago</small>
+                  <span {...stylex.props(styles.project)}>
+                    <b {...stylex.props(styles.strong)}>Moonbase</b>
+                    <small {...stylex.props(styles.meta)}>214 files · edited 2h ago</small>
                   </span>
                   <button
                     type="button"
-                    className="dd-btn red tint"
-                    {...focus.stop("trigger")}
+                    {...focus.stop("trigger", [styles.btn, styles.red, styles.redTint], open)}
                     onClick={() => go("open", sealed ? "cancel" : "delete")}
                   >
                     Delete project
@@ -493,8 +998,8 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
                 </>
               )}
             </div>
-            <span className="dd-ghost" style={{ "--w": "62%" }} />
-            <span className="dd-ghost" style={{ "--w": "48%" }} />
+            <span style={{ "--w": "62%" }} {...stylex.props(styles.ghost)} />
+            <span style={{ "--w": "48%" }} {...stylex.props(styles.ghost)} />
           </div>
         }
       >
@@ -503,19 +1008,17 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
           title="Delete Moonbase?"
           body="Its 214 files go too. This can't be undone."
         >
-          <div className="dd-acts">
+          <div {...stylex.props(styles.acts)}>
             <button
               type="button"
-              className="dd-btn text"
-              {...focus.stop("cancel")}
+              {...focus.stop("cancel", [styles.btn, styles.plain])}
               onClick={() => go("idle", "trigger")}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="dd-btn red"
-              {...focus.stop("delete")}
+              {...focus.stop("delete", [styles.btn, styles.red])}
               onClick={() => go("deleted", "reset")}
             >
               Delete
@@ -628,22 +1131,21 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
         onKeyDown={(event) => event.key === "Escape" && escape()}
         onScrim={() => phase === "open" && strayClick()}
         page={
-          <div className="dd-page" inert={phase !== "closed"}>
-            <div className="dd-nav">
-              <span className="dd-logo" />
+          <div inert={phase !== "closed"} {...stylex.props(styles.page)}>
+            <div {...stylex.props(styles.spread)}>
+              <span {...stylex.props(styles.logo)} />
               <button
                 type="button"
-                className="dd-btn soft"
-                {...focus.stop("trigger")}
+                {...focus.stop("trigger", [styles.btn, styles.soft], phase !== "closed")}
                 onClick={show}
               >
                 New issue
               </button>
             </div>
             {[66, 52, 74].map((width) => (
-              <div key={width} className="dd-mail">
-                <span className="dd-tag" />
-                <span className="dd-ghost" style={{ "--w": `${width}%` }} />
+              <div key={width} {...stylex.props(styles.mail)}>
+                <span {...stylex.props(styles.tag)} />
+                <span style={{ "--w": `${width}%` }} {...stylex.props(styles.ghost)} />
               </div>
             ))}
           </div>
@@ -656,22 +1158,18 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
           title="New issue"
           close={<CloseX focus={focus} onClose={() => leave("×")} />}
         >
-          <label className="dd-field">
-            <span>Title</span>
-            <span className="dd-in">
-              <input
-                value={draft}
-                placeholder="What broke?"
-                onChange={(event) => setDraft(event.target.value)}
-                {...focus.stop("title")}
-              />
-            </span>
-          </label>
-          <div className="dd-acts">
+          <Field
+            focus={focus}
+            name="title"
+            label="Title"
+            value={draft}
+            placeholder="What broke?"
+            onChange={(event) => setDraft(event.target.value)}
+          />
+          <div {...stylex.props(styles.acts)}>
             <button
               type="button"
-              className="dd-btn"
-              {...focus.stop("create")}
+              {...focus.stop("create", styles.btn)}
               onClick={() => {
                 setPhase("closed");
                 focus.move("trigger", true);
@@ -686,9 +1184,12 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
         {sealed && (
           <>
             <div
-              className="dd-scrim dd-top"
-              data-on={phase === "confirm" || undefined}
               aria-hidden="true"
+              {...stylex.props(
+                styles.scrim,
+                styles.scrimTop,
+                phase === "confirm" && styles.scrimOn,
+              )}
             />
             <Dialog
               top
@@ -696,19 +1197,17 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
               title="Discard this draft?"
               body={`You'll lose ${draft.length} characters.`}
             >
-              <div className="dd-acts">
+              <div {...stylex.props(styles.acts)}>
                 <button
                   type="button"
-                  className="dd-btn text"
-                  {...focus.stop("keep")}
+                  {...focus.stop("keep", [styles.btn, styles.plain])}
                   onClick={keepEditing}
                 >
                   Keep editing
                 </button>
                 <button
                   type="button"
-                  className="dd-btn red"
-                  {...focus.stop("discard")}
+                  {...focus.stop("discard", [styles.btn, styles.red])}
                   onClick={() => drop("Discarded")}
                 >
                   Discard
@@ -773,29 +1272,27 @@ function ScrollDemo({ sealed }: { sealed: boolean }) {
         page={
           <div
             ref={pageRef}
-            className="dd-page dd-article"
-            data-locked={locked || undefined}
             inert={open}
+            {...stylex.props(styles.page, styles.article, locked && styles.locked)}
           >
-            <div className="dd-line">
-              <b>Why we moved to Postgres</b>
+            <div {...stylex.props(styles.spread)}>
+              <b {...stylex.props(styles.strong)}>Why we moved to Postgres</b>
               <button
                 type="button"
-                className="dd-btn soft"
-                {...focus.stop("trigger")}
+                {...focus.stop("trigger", [styles.btn, styles.soft], open)}
                 onClick={show}
               >
                 Share
               </button>
             </div>
             {[0, 1, 2, 3, 4, 5].map((block) => (
-              <div key={block} className="dd-para">
-                {block % 3 === 1 && <span className="dd-figure" />}
+              <div key={block} {...stylex.props(styles.para)}>
+                {block % 3 === 1 && <span {...stylex.props(styles.figure)} />}
                 {[96, 88, 92, 60].map((width) => (
                   <span
                     key={width}
-                    className="dd-ghost"
                     style={{ "--w": `${width - (block % 3) * 4}%` }}
+                    {...stylex.props(styles.ghost)}
                   />
                 ))}
               </div>
@@ -804,9 +1301,9 @@ function ScrollDemo({ sealed }: { sealed: boolean }) {
         }
       >
         <Dialog open={open} title="Share this post" close={<CloseX focus={focus} onClose={hide} />}>
-          <div className="dd-share">
-            <span className="dd-url">itsfaqih.dev/p/42</span>
-            <button type="button" className="dd-btn" {...focus.stop("copy")} onClick={hide}>
+          <div {...stylex.props(styles.share)}>
+            <span {...stylex.props(styles.url)}>itsfaqih.dev/p/42</span>
+            <button type="button" {...focus.stop("copy", styles.btn)} onClick={hide}>
               Copy link
             </button>
           </div>
@@ -867,8 +1364,9 @@ function NameDemo({ sealed }: { sealed: boolean }) {
       }
       read={
         speech ? (
-          <span className="dd-speech">
-            <SpeakerHighIcon weight="bold" aria-hidden="true" />“{speech}”
+          <span {...stylex.props(styles.speech)}>
+            <SpeakerHighIcon weight="bold" aria-hidden="true" {...stylex.props(styles.speaker)} />“
+            {speech}”
           </span>
         ) : (
           "Open Rename to hear it"
@@ -881,26 +1379,25 @@ function NameDemo({ sealed }: { sealed: boolean }) {
         open={open}
         onKeyDown={(event) => event.key === "Escape" && open && hide()}
         page={
-          <div className="dd-page" inert={open}>
-            <div className="dd-nav">
-              <span className="dd-logo" />
-              <span className="dd-ghost" style={{ "--w": "34%" }} />
+          <div inert={open} {...stylex.props(styles.page)}>
+            <div {...stylex.props(styles.spread)}>
+              <span {...stylex.props(styles.logo)} />
+              <span style={{ "--w": "34%" }} {...stylex.props(styles.ghost)} />
             </div>
-            <div className="dd-card dd-project">
-              <span className="dd-proj-copy">
-                <b>report.pdf</b>
-                <small>2.4 MB · shared</small>
+            <div {...stylex.props(styles.spread, styles.card)}>
+              <span {...stylex.props(styles.project)}>
+                <b {...stylex.props(styles.strong)}>report.pdf</b>
+                <small {...stylex.props(styles.meta)}>2.4 MB · shared</small>
               </span>
               <button
                 type="button"
-                className="dd-btn soft"
-                {...focus.stop("trigger")}
+                {...focus.stop("trigger", [styles.btn, styles.soft, styles.softInCard], open)}
                 onClick={show}
               >
                 Rename
               </button>
             </div>
-            <span className="dd-ghost" style={{ "--w": "58%" }} />
+            <span style={{ "--w": "58%" }} {...stylex.props(styles.ghost)} />
           </div>
         }
       >
@@ -911,17 +1408,16 @@ function NameDemo({ sealed }: { sealed: boolean }) {
           title="Rename file"
           body="Pick a name your team will find."
         >
-          <label className="dd-field">
-            <span>Name</span>
-            <span className="dd-in">
-              <input defaultValue="report.pdf" {...focus.stop("name")} />
-            </span>
-          </label>
-          <div className="dd-acts">
-            <button type="button" className="dd-btn text" {...focus.stop("cancel")} onClick={hide}>
+          <Field focus={focus} name="name" label="Name" defaultValue="report.pdf" />
+          <div {...stylex.props(styles.acts)}>
+            <button
+              type="button"
+              {...focus.stop("cancel", [styles.btn, styles.plain])}
+              onClick={hide}
+            >
               Cancel
             </button>
-            <button type="button" className="dd-btn" {...focus.stop("save")} onClick={hide}>
+            <button type="button" {...focus.stop("save", styles.btn)} onClick={hide}>
               Save
             </button>
           </div>
