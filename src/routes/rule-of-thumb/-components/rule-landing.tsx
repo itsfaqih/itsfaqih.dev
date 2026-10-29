@@ -28,6 +28,7 @@ import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
+import { button } from "../../../components/button";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
@@ -259,7 +260,7 @@ function Landing({
             </Tone>
             <div {...stylex.props(heroType.acts, takeKit.acts)}>
               <CopyMarkdown url={markdownUrl} />
-              <a className="btn soft" href={markdownUrl} target="_blank" rel="noopener noreferrer">
+              <a {...stylex.props(button.base, button.soft)} href={markdownUrl} target="_blank" rel="noopener noreferrer">
                 View .md
               </a>
             </div>
@@ -1025,7 +1026,7 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   return (
     <button
       type="button"
-      className={`btn soft sm ${stylex.props(shell.share, shell.in, shell.first).className}`}
+      {...stylex.props(button.base, button.soft, button.sm, shell.share, shell.in, shell.first)}
       onClick={share}
     >
       {copied ? (
@@ -1128,7 +1129,7 @@ function CopyMarkdown({ url }: { url: string }) {
   }
 
   return (
-    <button type="button" className="btn go" onClick={handleCopy}>
+    <button type="button" {...stylex.props(button.base, button.go)} onClick={handleCopy}>
       {copied ? "Copied" : "Copy as Markdown"}
     </button>
   );

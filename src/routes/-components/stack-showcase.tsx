@@ -93,12 +93,11 @@ export function StackShowcase({
         </h2>
       </div>
 
-      {/* .stack-filter-row and .pups-group key the veil under their h3 in arcade.css, and .chips
-          the chips' focus ring. */}
+      {/* .stack-filter-row and .pups-group key the veil under their h3 in arcade.css. */}
       <div {...stylex.props(styles.filter)}>
         <div className={`stack-filter-row ${stylex.props(styles.row).className}`}>
           <span {...stylex.props(styles.spacer)} />
-          <div className={`chips ${stylex.props(chips.group, styles.chips).className}`}>
+          <div {...stylex.props(chips.group, styles.chips)}>
             <button
               type="button"
               {...stylex.props(chips.chip)}
@@ -119,7 +118,7 @@ export function StackShowcase({
               {row.label}
             </h3>
             <div
-              className={`chips ${stylex.props(chips.group, styles.chips).className}`}
+              {...stylex.props(chips.group, styles.chips)}
               role="group"
               aria-label={`Filter by ${row.label.toLowerCase()}`}
             >

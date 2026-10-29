@@ -12,6 +12,7 @@ import {
   Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
+import { button } from "../../components/button";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -775,7 +776,7 @@ function Controls({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.ctl)}>{children}</div>;
 }
 
-const CTL_BUTTON = `btn soft sm ${stylex.props(styles.ctlButton).className}`;
+const CTL_BUTTON = stylex.props(button.base, button.soft, button.sm, styles.ctlButton).className;
 
 const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
@@ -1112,7 +1113,7 @@ function TeamView({ inline }: { inline: boolean }) {
               </span>
               <button
                 type="button"
-                className={`btn go sm ${stylex.props(styles.errorButton).className}`}
+                {...stylex.props(button.base, button.go, button.sm, styles.errorButton)}
                 onClick={retry}
               >
                 Retry

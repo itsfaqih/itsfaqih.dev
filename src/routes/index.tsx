@@ -14,6 +14,7 @@ import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { useCutIns } from "./-components/use-cut-ins";
 import { LINKS, pageHead } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
+import { button } from "../components/button";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -341,11 +342,11 @@ function Index() {
             <span data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
           <div {...stylex.props(heroType.acts)} data-cut style={{ marginTop: 24 }}>
-            <a className="btn go" href={`mailto:${LINKS.email}`}>
+            <a {...stylex.props(button.base, button.go)} href={`mailto:${LINKS.email}`}>
               {`Email ${LINKS.email}`}
             </a>
             <a
-              className="btn soft"
+              {...stylex.props(button.base, button.soft)}
               href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"

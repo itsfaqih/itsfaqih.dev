@@ -18,6 +18,7 @@ import {
   RuleLanding,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
+import { button } from "../../components/button";
 
 const TABLET = "@media (max-width: 820px)";
 const PHONE = "@media (max-width: 640px)";
@@ -794,7 +795,7 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
   return (
     <button
       type="button"
-      className={`btn soft sm ${stylex.props(styles.toggle).className}`}
+      {...stylex.props(button.base, button.soft, button.sm, styles.toggle)}
       data-toggle={name}
       aria-pressed={on}
       onClick={() => setOn((value) => !value)}

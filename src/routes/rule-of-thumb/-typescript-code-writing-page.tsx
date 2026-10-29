@@ -14,6 +14,7 @@ import {
   Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
+import { button } from "../../components/button";
 
 type Tone = "no" | "yes";
 type Note = { text: string; tone?: Tone; error?: true };
@@ -319,7 +320,7 @@ function Checked({ lines }: { lines: Line[] }) {
         </span>
         <button
           type="button"
-          className={`btn soft sm ${stylex.props(styles.run).className}`}
+          {...stylex.props(button.base, button.soft, button.sm, styles.run)}
           disabled={phase === "run"}
           onClick={() => {
             touched.current = true;

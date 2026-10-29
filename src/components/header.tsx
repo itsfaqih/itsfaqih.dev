@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
+import { button } from "./button";
 
 let activityHost: HTMLElement | null = null;
 let activityCount = 0;
@@ -234,7 +235,7 @@ export function Header() {
           <Link
             to="/"
             hash="contact"
-            className={`btn go sm ${stylex.props(styles.connect).className}`}
+            {...stylex.props(button.base, button.go, button.sm, styles.connect)}
           >
             Connect
           </Link>

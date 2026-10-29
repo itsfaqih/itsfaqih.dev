@@ -5,6 +5,7 @@ import { useMediaQuery } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { heroType } from "../hero-type";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
+import { button } from "../../../components/button";
 
 // The home hero: the headline cycles through what I build, and the bench beside it shows each in
 // print. The slides advance on a timer once the intro hands off; the pips jump, the button pauses.
@@ -80,7 +81,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
         </p>
         <div {...stylex.props(heroType.acts)}>
           <a
-            className={`btn go ${stylex.props(styles.go).className}`}
+            {...stylex.props(button.base, button.go, styles.go)}
             href="#contact"
             data-cut
             style={{ "--c": current.color }}
