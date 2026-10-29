@@ -5,31 +5,552 @@ import {
   GearSixIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
-import {
-  type Lesson,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-} from "./-components/rule-landing";
-import "./button-design.css";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+
+const TABLET = "@media (max-width: 820px)";
+const PHONE = "@media (max-width: 640px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
+const roll = stylex.keyframes({ from: { opacity: 0, translate: "0 9px" } });
+const spin = stylex.keyframes({ to: { rotate: "1turn" } });
+const stepIn = stylex.keyframes({ from: { opacity: 0, translate: "0 4px" } });
+const fade = stylex.keyframes({ from: { opacity: 0 } });
+
+const styles = stylex.create({
+  stage: {
+    display: "grid",
+    placeItems: "center",
+    alignContent: "center",
+    gap: "18px",
+    minHeight: { default: "176px", [TABLET]: "200px" },
+    paddingBlock: "8px",
+    paddingInline: 0,
+  },
+  key: {
+    // Declared on the key, not the page, so a red key's --c reaches its shadow and ink too.
+    "--key": "color-mix(in oklab, var(--c) 60%, #000)",
+    "--ink": `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
+    "--face": "var(--c)",
+    "--lit": "color-mix(in oklab, var(--c) 82%, #fff)",
+    position: "relative",
+    display: "inline-flex",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "44px",
+    paddingTop: 0,
+    paddingRight: "var(--pr, 20px)",
+    paddingBottom: 0,
+    paddingLeft: "var(--pl, 20px)",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "12px",
+    backgroundColor: "var(--face)",
+    boxShadow: "0 4px 0 var(--key)",
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.01em",
+    whiteSpace: "nowrap",
+    color: "var(--on-c)",
+    cursor: cursors["--cursor"],
+    transition: `transform 150ms ${motion["--out"]}, background-color 150ms ease, box-shadow 150ms ease`,
+    outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-visible": "3px" },
+  },
+  live: {
+    backgroundColor: { default: "var(--face)", ":hover": "var(--lit)" },
+    transform: {
+      default: null,
+      ":active": { default: "translateY(2px) scale(0.97)", [REDUCE]: "none" },
+    },
+    boxShadow: { default: "0 4px 0 var(--key)", ":active": "0 2px 0 var(--key)" },
+  },
+  icon: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "16px",
+    height: "16px",
+  },
+  sm: {
+    "--pl": "16px",
+    "--pr": "16px",
+    height: "38px",
+    borderRadius: "10px",
+    fontSize: "12px",
+  },
+  red: {
+    "--c": "var(--no)",
+  },
+  tint: {
+    "--face": "color-mix(in srgb, var(--c) 18%, transparent)",
+    "--lit": "color-mix(in srgb, var(--c) 28%, transparent)",
+    boxShadow: "none",
+    color: "var(--ink)",
+  },
+  text: {
+    "--face": "transparent",
+    "--lit": `color-mix(in srgb, ${palette["--text"]} 8%, transparent)`,
+    boxShadow: "none",
+    color: palette["--text"],
+  },
+  plain: {
+    "--face": palette["--panel-2"],
+    "--lit": palette["--soft-hover"],
+    boxShadow: {
+      default: `0 4px 0 ${palette["--drop-ink"]}`,
+      ":active": `0 2px 0 ${palette["--drop-ink"]}`,
+    },
+    color: palette["--text"],
+  },
+  hover: {
+    backgroundColor: "var(--lit)",
+  },
+  press: {
+    transform: { default: "translateY(2px) scale(0.97)", [REDUCE]: "none" },
+    boxShadow: "0 2px 0 var(--key)",
+  },
+  focus: {
+    outline: `3px solid ${palette["--focus"]}`,
+    outlineOffset: "3px",
+  },
+  flat: {
+    transition: "none",
+    outline: { default: null, ":hover": "none", ":active": "none", ":focus-visible": "none" },
+  },
+  flatForced: {
+    backgroundColor: "var(--face)",
+    boxShadow: "0 4px 0 var(--key)",
+    transform: "none",
+    outline: "none",
+  },
+  specimens: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, auto)",
+    gap: { default: "14px", [PHONE]: "6px" },
+    paddingTop: "14px",
+    paddingRight: { default: "16px", [PHONE]: "8px" },
+    paddingBottom: "10px",
+    paddingLeft: { default: "16px", [PHONE]: "8px" },
+    borderRadius: "12px",
+    backgroundColor: `color-mix(in srgb, ${palette["--panel-2"]} 60%, transparent)`,
+  },
+  specimen: {
+    display: "grid",
+    gap: "10px",
+    justifyItems: "center",
+  },
+  specimenKey: {
+    "--pl": "12px",
+    "--pr": "12px",
+    height: "32px",
+    borderRadius: "8px",
+    fontSize: "11px",
+    transition: "none",
+  },
+  small: {
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+  },
+  measure: {
+    display: "inline-grid",
+    gap: "10px",
+  },
+  save: {
+    display: "inline-grid",
+  },
+  waiting: {
+    cursor: "wait",
+  },
+  label: {
+    display: "inline-flex",
+    gridRowStart: 1,
+    gridColumnStart: 1,
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0,
+    translate: { default: "0 -8px", [REDUCE]: "none" },
+    transition: `opacity 120ms ease, translate 160ms ${motion["--out"]}`,
+  },
+  labelOn: {
+    opacity: 1,
+    translate: "none",
+    animationName: { default: roll, [REDUCE]: fade },
+    animationDuration: { default: "220ms", [REDUCE]: "160ms" },
+    animationTimingFunction: { default: "cubic-bezier(0.16, 1, 0.3, 1)", [REDUCE]: "ease" },
+  },
+  jumpy: {
+    animationName: "none",
+    animationDuration: "0s",
+    animationTimingFunction: "ease",
+  },
+  jumpyOff: {
+    display: "none",
+  },
+  spin: {
+    animationName: { default: spin, [REDUCE]: "none" },
+    animationDuration: { default: "700ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: "linear", [REDUCE]: "ease" },
+    animationIterationCount: { default: "infinite", [REDUCE]: 1 },
+  },
+  ruler: {
+    position: "relative",
+    height: "9px",
+    borderLeftWidth: "1.5px",
+    borderLeftStyle: "solid",
+    borderLeftColor: palette["--mute"],
+    borderRightWidth: "1.5px",
+    borderRightStyle: "solid",
+    borderRightColor: palette["--mute"],
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: "4px",
+      right: 0,
+      bottom: "auto",
+      left: 0,
+      height: "1.5px",
+      backgroundColor: palette["--mute"],
+    },
+  },
+  width: {
+    position: "absolute",
+    top: "14px",
+    left: "50%",
+    translate: "-50% 0",
+    whiteSpace: "nowrap",
+    color: palette["--text"],
+  },
+  saveNote: {
+    marginTop: "14px",
+  },
+  form: {
+    gridTemplateColumns: { default: "minmax(0, 1fr) auto", [PHONE]: "minmax(0, 1fr)" },
+    alignItems: "end",
+    justifyItems: "stretch",
+    gap: "12px",
+    width: "min(100%, 360px)",
+    marginInline: "auto",
+  },
+  field: {
+    display: "grid",
+    gap: "6px",
+    minWidth: 0,
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--dim"],
+  },
+  input: {
+    height: "38px",
+    minWidth: 0,
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+    backgroundColor: palette["--panel"],
+    fontWeight: 500,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+    outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-visible": "1px" },
+  },
+  formKey: {
+    "--pl": "16px",
+    "--pr": "16px",
+    height: "38px",
+    borderRadius: "10px",
+    fontSize: "12px",
+  },
+  formEnd: {
+    justifySelf: { default: null, [PHONE]: "start" },
+  },
+  off: {
+    "--face": palette["--panel-2"],
+    boxShadow: `0 4px 0 ${palette["--drop-ink"]}`,
+    color: palette["--dim"],
+    cursor: "not-allowed",
+  },
+  faded: {
+    opacity: 0.35,
+    cursor: cursors["--cursor-point"],
+  },
+  tip: {
+    position: "relative",
+    display: "inline-grid",
+  },
+  tooltip: {
+    position: "absolute",
+    bottom: "calc(100% + 12px)",
+    left: "50%",
+    zIndex: 2,
+    paddingBlock: "6px",
+    paddingInline: "10px",
+    borderRadius: "8px",
+    backgroundColor: palette["--text"],
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    whiteSpace: "nowrap",
+    color: palette["--bg"],
+    pointerEvents: "none",
+    opacity: { default: 0, [stylex.when.siblingBefore(":is(:hover, :focus-visible)")]: 1 },
+    translate: {
+      default: "-50% 4px",
+      [REDUCE]: "-50% 0",
+      [stylex.when.siblingBefore(":is(:hover, :focus-visible)")]: "-50% 0",
+    },
+    transition: `opacity 150ms ease, translate 200ms ${motion["--out"]}`,
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: "100%",
+      left: "50%",
+      translate: "-50% 0",
+      borderWidth: "5px",
+      borderStyle: "solid",
+      borderColor: "transparent",
+      borderTopColor: palette["--text"],
+    },
+  },
+  tooltipOpen: {
+    opacity: 1,
+    translate: "-50% 0",
+  },
+  card: {
+    display: "grid",
+    gap: "4px",
+    width: "min(100%, 380px)",
+    paddingBlock: { default: "18px", [PHONE]: "14px" },
+    paddingInline: { default: "18px", [PHONE]: "14px" },
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}`,
+    transition: "filter 200ms ease",
+    filter: {
+      default: null,
+      [stylex.when.ancestor(':has([data-toggle="squint"][aria-pressed="true"])')]: "blur(5px)",
+    },
+  },
+  cardTitle: {
+    fontWeight: 700,
+    fontSize: "15px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.02em",
+    color: palette["--text"],
+  },
+  cardSub: {
+    fontSize: "13px",
+    color: palette["--mute"],
+  },
+  row: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    justifyContent: "flex-end",
+  },
+  cardRow: {
+    marginTop: "16px",
+    gap: { default: "8px", [PHONE]: "6px" },
+  },
+  cardRowKey: {
+    "--pl": { default: "16px", [PHONE]: "12px" },
+    "--pr": { default: "16px", [PHONE]: "12px" },
+    flexGrow: { default: null, [PHONE]: 1 },
+    flexShrink: { default: null, [PHONE]: 0 },
+    flexBasis: { default: null, [PHONE]: "auto" },
+  },
+  toggle: {
+    marginTop: "4px",
+  },
+  dot: {
+    width: "10px",
+    height: "10px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: palette["--mute"],
+    borderRadius: "50%",
+    transition: "background-color var(--t-fb) ease, border-color var(--t-fb) ease",
+  },
+  dotOn: {
+    borderColor: "var(--c-ink)",
+    backgroundColor: "var(--c)",
+  },
+  project: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "14px",
+    columnGap: "20px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "min(100%, 420px)",
+    minHeight: "80px",
+    paddingBlock: "16px",
+    paddingInline: "18px",
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}`,
+  },
+  confirm: {
+    boxShadow: "0 0 0 1.5px color-mix(in srgb, var(--no) 55%, transparent)",
+  },
+  deleted: {
+    backgroundColor: "transparent",
+    boxShadow: `0 0 0 1.5px ${palette["--hair"]} inset`,
+  },
+  stepIn: {
+    animationName: { default: stepIn, [REDUCE]: fade },
+    animationDuration: { default: "200ms", [REDUCE]: "160ms" },
+    animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+  },
+  projectRow: {
+    marginLeft: "auto",
+  },
+  projectCopy: {
+    display: "grid",
+    gap: "2px",
+  },
+  projectName: {
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.02em",
+    color: palette["--text"],
+  },
+  projectGone: {
+    color: "var(--no-ink)",
+  },
+  projectMeta: {
+    fontSize: "13px",
+    color: palette["--mute"],
+  },
+  icons: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "14px",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  lead: {
+    "--pl": "12px",
+  },
+  trail: {
+    "--pr": "12px",
+  },
+  even: {
+    "--pl": "16px",
+    "--pr": "16px",
+    display: "inline-block",
+    lineHeight: "38px",
+  },
+  evenIcon: {
+    display: "inline",
+    verticalAlign: "baseline",
+  },
+  evenLeadIcon: {
+    marginRight: "8px",
+  },
+  evenTrailIcon: {
+    marginLeft: "8px",
+  },
+  square: {
+    "--pl": "0px",
+    "--pr": "0px",
+    width: "38px",
+  },
+  wide: {
+    "--pl": "18px",
+    "--pr": "18px",
+  },
+  pads: {
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      width: "var(--pl)",
+      borderTopLeftRadius: "10px",
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
+      borderBottomLeftRadius: "10px",
+      backgroundImage: `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`,
+      opacity: {
+        default: 0,
+        [stylex.when.ancestor(':has([data-toggle="pads"][aria-pressed="true"])')]: 1,
+      },
+      transition: "opacity 150ms ease",
+    },
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: "var(--pr)",
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: "10px",
+      borderBottomRightRadius: "10px",
+      borderBottomLeftRadius: 0,
+      backgroundImage: `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`,
+      opacity: {
+        default: 0,
+        [stylex.when.ancestor(':has([data-toggle="pads"][aria-pressed="true"])')]: 1,
+      },
+      transition: "opacity 150ms ease",
+    },
+  },
+});
 
 const STATES = ["idle", "hover", "press", "focus"] as const;
 
+const FORCED = {
+  idle: null,
+  hover: styles.hover,
+  press: styles.press,
+  focus: styles.focus,
+} as const;
+
 function StatesDemo({ careful }: { careful: boolean }) {
   return (
-    <div className={careful ? "bd-stage" : "bd-stage bd-flat"}>
-      <button type="button" className="bd-key">
+    <div {...stylex.props(styles.stage)}>
+      <button type="button" {...stylex.props(styles.key, careful ? styles.live : styles.flat)}>
         Save changes
       </button>
-      <div className="bd-specimens" aria-hidden="true">
+      <div {...stylex.props(styles.specimens)} aria-hidden="true">
         {STATES.map((state) => (
-          <span key={state}>
-            <span className="bd-key sm" data-force={state}>
+          <span key={state} {...stylex.props(styles.specimen)}>
+            <span
+              {...stylex.props(
+                styles.key,
+                styles.sm,
+                styles.specimenKey,
+                FORCED[state],
+                !careful && styles.flatForced,
+              )}
+            >
               Save
             </span>
-            <small>{state}</small>
+            <small {...stylex.props(styles.small)}>{state}</small>
           </span>
         ))}
       </div>
@@ -102,36 +623,48 @@ function SaveDemo({ careful }: { careful: boolean }) {
   }, []);
 
   return (
-    <div ref={stageRef} className="bd-stage bd-save-stage">
-      <div className="bd-measure">
+    <div ref={stageRef} {...stylex.props(styles.stage)}>
+      <div {...stylex.props(styles.measure)}>
         <button
           ref={buttonRef}
           type="button"
-          className="bd-key bd-save"
-          data-phase={save.phase}
-          data-jumpy={careful ? undefined : ""}
-          data-force={pressing ? "press" : undefined}
+          {...stylex.props(
+            styles.key,
+            !busy && styles.live,
+            styles.save,
+            busy && save.phase === "pending" && styles.waiting,
+            pressing && styles.press,
+          )}
           aria-disabled={busy || undefined}
           onClick={press}
         >
-          {LABELS.map(({ phase, text }) => (
-            <span
-              key={phase}
-              className="bd-lbl"
-              data-on={save.phase === phase || undefined}
-              aria-hidden={save.phase !== phase || undefined}
-            >
-              {phase === "pending" && <CircleNotchIcon weight="bold" className="bd-spin" />}
-              {phase === "done" && <CheckIcon weight="bold" />}
-              {text}
-            </span>
-          ))}
+          {LABELS.map(({ phase, text }) => {
+            const on = save.phase === phase;
+            return (
+              <span
+                key={phase}
+                {...stylex.props(
+                  styles.label,
+                  on && styles.labelOn,
+                  !careful && styles.jumpy,
+                  !careful && !on && styles.jumpyOff,
+                )}
+                aria-hidden={!on || undefined}
+              >
+                {phase === "pending" && (
+                  <CircleNotchIcon weight="bold" {...stylex.props(styles.icon, styles.spin)} />
+                )}
+                {phase === "done" && <CheckIcon weight="bold" {...stylex.props(styles.icon)} />}
+                {text}
+              </span>
+            );
+          })}
         </button>
-        <span className="bd-ruler" aria-hidden="true">
-          <b>{width ?? "–"} px</b>
+        <span {...stylex.props(styles.ruler)} aria-hidden="true">
+          <b {...stylex.props(styles.small, styles.width)}>{width ?? "–"} px</b>
         </span>
       </div>
-      <span className="bd-note">
+      <span {...stylex.props(styles.small, styles.saveNote)}>
         {save.sent === 1 ? "1 request sent" : `${save.sent} requests sent`}
       </span>
     </div>
@@ -159,7 +692,7 @@ function DisabledDemo({ careful }: { careful: boolean }) {
 
   const label = published ? (
     <>
-      <CheckIcon weight="bold" />
+      <CheckIcon weight="bold" {...stylex.props(styles.icon)} />
       Published
     </>
   ) : (
@@ -167,20 +700,27 @@ function DisabledDemo({ careful }: { careful: boolean }) {
   );
 
   return (
-    <div className="bd-stage bd-form">
-      <label className="bd-field">
+    <div {...stylex.props(styles.stage, styles.form)}>
+      <label {...stylex.props(styles.field)}>
         <span>Title</span>
         <input
           value={title}
           placeholder="Untitled post"
           onChange={(event) => setTitle(event.target.value)}
+          {...stylex.props(styles.input)}
         />
       </label>
       {careful ? (
-        <span className="bd-tip" data-open={(nudged && !ready) || undefined}>
+        <span {...stylex.props(styles.tip, styles.formEnd)}>
           <button
             type="button"
-            className="bd-key"
+            {...stylex.props(
+              styles.key,
+              ready && styles.live,
+              styles.formKey,
+              !ready && styles.off,
+              stylex.defaultMarker(),
+            )}
             aria-disabled={!ready || undefined}
             aria-describedby={ready ? undefined : tipId}
             onClick={() => (ready ? setPublished(true) : setNudged(true))}
@@ -188,7 +728,11 @@ function DisabledDemo({ careful }: { careful: boolean }) {
             {label}
           </button>
           {!ready && (
-            <span role="tooltip" id={tipId}>
+            <span
+              role="tooltip"
+              id={tipId}
+              {...stylex.props(styles.tooltip, nudged && styles.tooltipOpen)}
+            >
               Add a title first
             </span>
           )}
@@ -196,7 +740,13 @@ function DisabledDemo({ careful }: { careful: boolean }) {
       ) : (
         <button
           type="button"
-          className="bd-key bd-faded"
+          {...stylex.props(
+            styles.key,
+            ready && styles.live,
+            styles.formKey,
+            styles.formEnd,
+            !ready && styles.faded,
+          )}
           disabled={!ready}
           onClick={() => setPublished(true)}
         >
@@ -208,19 +758,21 @@ function DisabledDemo({ careful }: { careful: boolean }) {
 }
 
 function HierarchyDemo({ careful }: { careful: boolean }) {
+  const key = [styles.key, styles.sm, styles.live];
+  const inRow = styles.cardRowKey;
   return (
-    <div className="bd-stage bd-squint-me">
-      <div className="bd-card">
-        <span className="bd-card-title">Spring launch notes</span>
-        <span className="bd-card-sub">Draft · 1,240 words</span>
-        <div className="bd-row">
-          <button type="button" className={careful ? "bd-key sm text" : "bd-key sm plain"}>
+    <div {...stylex.props(styles.stage)}>
+      <div {...stylex.props(styles.card)}>
+        <span {...stylex.props(styles.cardTitle)}>Spring launch notes</span>
+        <span {...stylex.props(styles.cardSub)}>Draft · 1,240 words</span>
+        <div {...stylex.props(styles.row, styles.cardRow)}>
+          <button type="button" {...stylex.props(key, careful ? styles.text : styles.plain, inRow)}>
             Cancel
           </button>
-          <button type="button" className={careful ? "bd-key sm tint" : "bd-key sm"}>
+          <button type="button" {...stylex.props(key, careful && styles.tint, inRow)}>
             Save draft
           </button>
-          <button type="button" className={careful ? "bd-key sm" : "bd-key sm red"}>
+          <button type="button" {...stylex.props(key, !careful && styles.red, inRow)}>
             Publish
           </button>
         </div>
@@ -234,12 +786,12 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
   return (
     <button
       type="button"
-      className="btn soft sm bd-toggle"
+      className={`btn soft sm ${stylex.props(styles.toggle).className}`}
       data-toggle={name}
       aria-pressed={on}
       onClick={() => setOn((value) => !value)}
     >
-      <span className="bd-dot" aria-hidden="true" />
+      <span {...stylex.props(styles.dot, on && styles.dotOn)} aria-hidden="true" />
       {label}
     </button>
   );
@@ -262,18 +814,26 @@ function DeleteDemo({ careful }: { careful: boolean }) {
     rootRef.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
   }, [step]);
 
+  const key = [styles.key, styles.sm, styles.live];
+  const copy = stylex.props(styles.projectCopy, styles.stepIn);
   return (
-    <div ref={rootRef} className="bd-stage bd-danger">
-      <div className="bd-project" data-step={step}>
+    <div ref={rootRef} {...stylex.props(styles.stage)}>
+      <div
+        {...stylex.props(
+          styles.project,
+          step === "confirm" && styles.confirm,
+          step === "deleted" && styles.deleted,
+        )}
+      >
         {step === "deleted" ? (
           <>
-            <span className="bd-project-copy">
-              <b>Moonbase is gone</b>
-              <small>214 files deleted</small>
+            <span {...copy}>
+              <b {...stylex.props(styles.projectName, styles.projectGone)}>Moonbase is gone</b>
+              <small {...stylex.props(styles.projectMeta)}>214 files deleted</small>
             </span>
             <button
               type="button"
-              className="bd-key sm text"
+              {...stylex.props(key, styles.text, styles.stepIn)}
               data-autofocus
               onClick={() => go("idle")}
             >
@@ -282,33 +842,39 @@ function DeleteDemo({ careful }: { careful: boolean }) {
           </>
         ) : step === "confirm" ? (
           <>
-            <span className="bd-project-copy">
-              <b>Delete Moonbase?</b>
-              <small>Its 214 files go too. This can't be undone.</small>
+            <span {...copy}>
+              <b {...stylex.props(styles.projectName)}>Delete Moonbase?</b>
+              <small {...stylex.props(styles.projectMeta)}>
+                Its 214 files go too. This can't be undone.
+              </small>
             </span>
-            <span className="bd-row">
+            <span {...stylex.props(styles.row, styles.projectRow, styles.stepIn)}>
               <button
                 type="button"
-                className="bd-key sm text"
+                {...stylex.props(key, styles.text)}
                 data-autofocus
                 onClick={() => go("idle")}
               >
                 Cancel
               </button>
-              <button type="button" className="bd-key sm red" onClick={() => go("deleted")}>
+              <button
+                type="button"
+                {...stylex.props(key, styles.red)}
+                onClick={() => go("deleted")}
+              >
                 Delete project
               </button>
             </span>
           </>
         ) : (
           <>
-            <span className="bd-project-copy">
-              <b>Moonbase</b>
-              <small>214 files · edited 2h ago</small>
+            <span {...copy}>
+              <b {...stylex.props(styles.projectName)}>Moonbase</b>
+              <small {...stylex.props(styles.projectMeta)}>214 files · edited 2h ago</small>
             </span>
             <button
               type="button"
-              className={careful ? "bd-key sm red tint" : "bd-key sm red"}
+              {...stylex.props(key, styles.red, careful && styles.tint, styles.stepIn)}
               data-autofocus
               onClick={() => go(careful ? "confirm" : "deleted")}
             >
@@ -323,33 +889,48 @@ function DeleteDemo({ careful }: { careful: boolean }) {
 
 function IconsDemo({ careful }: { careful: boolean }) {
   const tipId = useId();
+  const key = [styles.key, styles.sm, styles.live];
+  const pad = [styles.pads, !careful && styles.even];
+  const icon = [styles.icon, !careful && styles.evenIcon];
   return (
-    <div className={careful ? "bd-stage bd-icons" : "bd-stage bd-icons bd-even"}>
-      <button type="button" className="bd-key sm tint" data-pad="lead">
-        <PlusIcon weight="bold" aria-hidden="true" />
+    <div {...stylex.props(styles.stage, styles.icons)}>
+      <button type="button" {...stylex.props(key, styles.tint, styles.lead, pad)} data-pad="lead">
+        <PlusIcon
+          weight="bold"
+          aria-hidden="true"
+          {...stylex.props(icon, !careful && styles.evenLeadIcon)}
+        />
         New project
       </button>
-      <button type="button" className="bd-key sm" data-pad="trail">
+      <button type="button" {...stylex.props(key, styles.trail, pad)} data-pad="trail">
         Continue
-        <ArrowRightIcon weight="bold" aria-hidden="true" />
+        <ArrowRightIcon
+          weight="bold"
+          aria-hidden="true"
+          {...stylex.props(icon, !careful && styles.evenTrailIcon)}
+        />
       </button>
       {careful ? (
-        <span className="bd-tip">
+        <span {...stylex.props(styles.tip)}>
           <button
             type="button"
-            className="bd-key sm plain bd-square"
+            {...stylex.props(key, styles.plain, styles.square, stylex.defaultMarker())}
             aria-label="Settings"
             aria-describedby={tipId}
           >
-            <GearSixIcon weight="bold" aria-hidden="true" />
+            <GearSixIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
           </button>
-          <span role="tooltip" id={tipId}>
+          <span role="tooltip" id={tipId} {...stylex.props(styles.tooltip)}>
             Settings
           </span>
         </span>
       ) : (
-        <button type="button" className="bd-key sm plain bd-wide" aria-label="Settings">
-          <GearSixIcon weight="bold" aria-hidden="true" />
+        <button
+          type="button"
+          {...stylex.props(key, styles.plain, styles.wide)}
+          aria-label="Settings"
+        >
+          <GearSixIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
         </button>
       )}
     </div>

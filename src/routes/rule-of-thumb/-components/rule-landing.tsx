@@ -468,7 +468,11 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
   const most = Math.max(treeRows(lesson.bad.view), treeRows(lesson.good.view));
 
   return (
-    <article ref={cardRef} className="lesson" data-rev>
+    <article
+      ref={cardRef}
+      className={`lesson ${stylex.props(stylex.defaultMarker()).className}`}
+      data-rev
+    >
       <div className="lesson-copy">
         {lesson.exception && <span className="exc">Exception</span>}
         <h3>{lesson.title}</h3>
