@@ -5,9 +5,10 @@ import Fuse from "fuse.js";
 import { colorOf, ruleNumber, TOPICS } from "../../data/guidelines";
 import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { chips } from "./chips";
 import { reticle } from "./reticle";
 import { RuleThumb, useRuleOpen } from "./rule-art";
-import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { fonts, motion, palette } from "../../theme.stylex";
 
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
@@ -157,20 +158,20 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
             <kbd {...stylex.props(styles.key)}>/</kbd>
           </label>
         </div>
-        <div {...stylex.props(styles.chips)} role="group" aria-label="Filter by topic">
+        <div {...stylex.props(chips.group)} role="group" aria-label="Filter by topic">
           {["All", ...TOPICS].map((name) => (
             <button
               key={name}
               type="button"
-              {...stylex.props(styles.chip)}
+              {...stylex.props(chips.chip)}
               data-cut
               aria-pressed={category === name}
               style={{ "--c": colorOf(name) }}
               onClick={() => setCategory(name)}
             >
-              <i {...stylex.props(styles.chipDot)} />
+              <i {...stylex.props(chips.dot)} />
               {name}
-              <b {...stylex.props(styles.chipCount, category === name && styles.chipCountOn)}>
+              <b {...stylex.props(chips.count, category === name && chips.countOn)}>
                 {name === "All" ? rules.length : rules.filter((rule) => rule.label === name).length}
               </b>
             </button>
@@ -524,59 +525,6 @@ const styles = stylex.create({
     borderRadius: "6px",
     paddingBlock: "1px",
     paddingInline: "7px",
-  },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "6px",
-    marginBottom: "18px",
-  },
-  // A [data-cut] piece, so the pressed state keys on aria-pressed.
-  chip: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "6px",
-    height: "34px",
-    paddingBlock: 0,
-    paddingInline: "12px",
-    borderRadius: "999px",
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderColor: { default: palette["--hair"], ':is([aria-pressed="true"])': INK },
-    // Solid, so the backdrop's dots never show through.
-    backgroundColor: {
-      default: palette["--panel"],
-      ':is([aria-pressed="true"])': `color-mix(in srgb, var(--c) 14%, ${palette["--panel"]})`,
-    },
-    color: { default: palette["--dim"], ':is([aria-pressed="true"])': palette["--text"] },
-    fontWeight: 500,
-    fontSize: "12px",
-    lineHeight: "normal",
-    fontFamily: fonts["--display"],
-    cursor: cursors["--cursor-point"],
-    transform: { default: null, ":active": "scale(0.97)" },
-    outlineWidth: { default: null, ":focus-visible": "3px" },
-    outlineStyle: { default: null, ":focus-visible": "solid" },
-    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
-    outlineOffset: { default: null, ":focus-visible": "3px" },
-    transitionProperty: "background-color, color, border-color, transform",
-    transitionDuration: "120ms, 120ms, 120ms, 150ms",
-    transitionTimingFunction: "ease, ease, ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-    transitionDelay: "0s, 0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal, normal",
-  },
-  chipDot: {
-    width: "8px",
-    height: "8px",
-    borderRadius: "50%",
-    backgroundColor: "var(--c)",
-  },
-  chipCount: {
-    color: palette["--mute"],
-  },
-  chipCountOn: {
-    color: palette["--dim"],
-    fontWeight: 500,
   },
   tiles: {
     display: "grid",
