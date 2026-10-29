@@ -35,7 +35,7 @@ const styles = stylex.create({
           ":is(.dark *)": "none",
         },
       },
-      // The old sheet's `background: none` minified to `background: 0 0`.
+      // `background: none` minifies to a 0 0 position, which computes to 0px 0px.
       backgroundPosition: { default: null, [PHONE]: { default: null, ":is(.dark *)": "0 0" } },
       maskImage: {
         default: null,

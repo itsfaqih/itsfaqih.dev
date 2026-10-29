@@ -29,7 +29,7 @@ import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
 import { button } from "../../../components/button";
-import { section } from "../../-components/section";
+import { section, veil } from "../../-components/section";
 import { arcade } from "../../../components/arcade";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -188,12 +188,12 @@ function Landing({
           <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
             <h2
               id="learn-title"
-              {...stylex.props(section.title, lessonKit.veil, lessonKit.headItem, lessonKit.secTitle)}
+              {...stylex.props(section.title, veil.soft, lessonKit.headItem, lessonKit.secTitle)}
             >
               {learn.title}
             </h2>
             <Tone value="wrap">
-              <p {...stylex.props(lessonKit.veil, lessonKit.headItem, lessonKit.secText)}>
+              <p {...stylex.props(veil.soft, lessonKit.headItem, lessonKit.secText)}>
                 {learn.intro}
               </p>
             </Tone>
@@ -204,7 +204,7 @@ function Landing({
             ))}
           </div>
           <div {...stylex.props(lessonKit.sheetWrap, shell.rev)} data-rev>
-            <h3 {...stylex.props(lessonKit.veil, lessonKit.sheetTitle)}>TL;DR</h3>
+            <h3 {...stylex.props(veil.soft, lessonKit.sheetTitle)}>TL;DR</h3>
             <ol {...stylex.props(lessonKit.panel, lessonKit.sheet)}>
               {tldr.map(([situation, answer]) => (
                 <li key={situation} {...stylex.props(lessonKit.sheetRow)}>
@@ -218,7 +218,7 @@ function Landing({
 
         <section id="quiz" aria-labelledby="quiz-title" {...stylex.props(section.block, quizKit.section)}>
           <div {...stylex.props(quizKit.head, shell.rev)} data-rev>
-            <div {...stylex.props(lessonKit.veil, lessonKit.headItem, quizKit.headCopy)}>
+            <div {...stylex.props(veil.soft, lessonKit.headItem, quizKit.headCopy)}>
               <h2 id="quiz-title" {...stylex.props(section.title, lessonKit.secTitle)}>
                 Mini quiz
               </h2>
@@ -252,7 +252,7 @@ function Landing({
         </section>
 
         <section {...stylex.props(section.block, takeKit.section)}>
-          <div {...stylex.props(lessonKit.veil, takeKit.copy, shell.rev)} data-rev>
+          <div {...stylex.props(veil.soft, takeKit.copy, shell.rev)} data-rev>
             <h2 {...stylex.props(section.title, takeKit.title)}>Take the rule with you</h2>
             <Tone value="take">
               <p {...stylex.props(takeKit.text)}>
@@ -443,7 +443,6 @@ const keyOf = (row: TreeRow) => (row.k === undefined ? row.text : row.k);
 const treeRows = (view: ReactNode) =>
   isValidElement<{ rows: TreeRow[] }>(view) && view.type === Tree ? view.props.rows.length : 0;
 
-/** Splits a line of code into plain text and matches of `token`, each with its capture group. */
 /** Colours a line of code: a match of `token`'s nth capture group gets the style `kinds[n]`. */
 export function paint(
   source: string,
@@ -1455,11 +1454,6 @@ const lessonKit = stylex.create({
     gap: "14px",
     marginBottom: "48px",
   },
-  veil: {
-    backgroundColor: palette["--veil"],
-    boxShadow: palette["--veil-edge"],
-    borderRadius: "16px",
-  },
   headItem: {
     justifySelf: "start",
   },
@@ -2222,7 +2216,7 @@ const pager = stylex.create({
     },
     transform: {
       default: null,
-      // Reduced motion has only ever stilled the press: the lift outranked the old reset.
+      // Reduced motion stills only the press; hover and focus keep their lift.
       ":hover": LIFTED,
       ":focus-visible": LIFTED,
       ":active": { default: PRESSED, [REDUCE]: "none" },

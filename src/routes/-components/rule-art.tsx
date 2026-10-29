@@ -255,8 +255,8 @@ function ButtonArt({ play, at }: ArtProps) {
 // Data loading: fresh rows go stale, a revalidate sweep runs, and they come back fresh.
 function DataLoadingArt({ play, at }: ArtProps) {
   const playing = play && draw.play;
-  // On the data-loading page's own cover the screen has always picked up that page's demo card
-  // styles and its slide in place of the sweep, so it keeps them there.
+  // On the data-loading page's own cover the screen takes that page's demo card styles, and its
+  // slide in place of the sweep.
   const own = at === "cover";
   const rows = [
     { y: 34, width: 50, value: "$12" },
@@ -815,7 +815,7 @@ const dataLoading = stylex.create({
     fill: "color-mix(in srgb, var(--c) 6%, transparent)",
     stroke: "var(--c-dim)",
   },
-  // The data-loading page's demo card, which the cover's screen there has always matched.
+  // The data-loading page's demo card, which the cover's screen there matches.
   ownCard: {
     position: "relative",
     display: "grid",

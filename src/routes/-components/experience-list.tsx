@@ -201,7 +201,7 @@ const styles = stylex.create({
     borderColor: "currentcolor",
     backgroundColor: "transparent",
     backgroundImage: "none",
-    // The old sheet minified `background: none` to `0 0`, which computes to 0px 0px.
+    // `background: none` minifies to a 0 0 position, which computes to 0px 0px.
     backgroundPosition: "0 0",
     color: "inherit",
     font: "inherit",

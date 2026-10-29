@@ -694,7 +694,7 @@ export function HeroPrints({
       {...stylex.props(styles.root, stylex.defaultMarker())}
       data-paused={playing && !held ? undefined : ""}
     >
-      {/* The backends scene's keyframes are worked out from its geometry here, so they stay a sheet. */}
+      {/* The backends scene's keyframes are worked out from its geometry here, so they ship as a sheet. */}
       <style>{KEYFRAMES}</style>
       <div ref={stageRef} {...stylex.props(styles.stage)}>
         <div ref={cardRef} {...stylex.props(styles.card)} style={{ transform: restTransform }}>

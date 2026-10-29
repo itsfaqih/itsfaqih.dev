@@ -137,7 +137,7 @@ const styles = stylex.create({
   },
   // While any link is hovered, the other entries dim.
   item: {
-    // -webkit-box without a clamp: the old line-clamp utility never set -webkit-line-clamp.
+    // -webkit-box with no -webkit-line-clamp, so it clamps nothing.
     display: "-webkit-box",
     overflow: "hidden",
     opacity: {

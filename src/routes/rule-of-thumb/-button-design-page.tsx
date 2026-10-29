@@ -537,7 +537,7 @@ const FORCED = {
   hover: styles.hover,
   press: styles.press,
   focus: styles.focus,
-} as const;
+};
 
 function StatesDemo({ careful }: { careful: boolean }) {
   return (

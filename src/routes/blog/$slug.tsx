@@ -138,7 +138,7 @@ function BlogPost() {
   );
 }
 
-// The tags the posts render. Values follow Tailwind Typography's prose-zinc, which the blog started on.
+// The tags the posts render. Values follow Tailwind Typography's prose-zinc.
 const components: MDXComponents = {
   p: (props: ComponentProps<"p">) => <p {...props} {...stylex.props(prose.p)} />,
   h2: (props: ComponentProps<"h2">) => <h2 {...props} {...stylex.props(prose.h2)} />,

@@ -24,7 +24,7 @@ export const reticle = stylex.create({
       inset: "-10px",
       pointerEvents: "none",
       backgroundImage: Array(8).fill(BRACKET).join(", "),
-      // Written per axis in percentages, as the old keywords computed.
+      // Per axis, so the minifier cannot fold 0% 0% into 0 0, which computes to 0px 0px.
       backgroundPositionX: "0%, 0%, 100%, 100%, 0%, 0%, 100%, 100%",
       backgroundPositionY: "0%, 0%, 0%, 0%, 100%, 100%, 100%, 100%",
       backgroundSize: Array(4).fill(`${LEG} ${BAR}, ${BAR} ${LEG}`).join(", "),

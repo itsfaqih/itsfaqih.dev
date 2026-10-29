@@ -39,7 +39,7 @@ const kitLight = stylex.createTheme(kit, {
   "--grid": "color-mix(in srgb, var(--hair) 70%, transparent)",
 });
 
-/** The classes each theme puts on <html>. `light` and `dark` stay for the selectors plain CSS keys on. */
+/** The classes each theme puts on <html>. `light` and `dark` are for the selectors plain CSS keys on. */
 export const THEME_CLASSES: Record<Theme, string[]> = {
   light: ["light", ...(stylex.props(lightTheme, kitLight).className ?? "").split(" ")],
   dark: ["dark"],

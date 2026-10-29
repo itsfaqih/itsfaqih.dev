@@ -210,7 +210,7 @@ const styles = stylex.create({
     transitionDuration: "0.15s",
   },
   summary: {
-    // -webkit-box without a clamp: the old line-clamp utility never set -webkit-line-clamp.
+    // -webkit-box with no -webkit-line-clamp, so it clamps nothing.
     display: "-webkit-box",
     overflow: "hidden",
     lineHeight: 1.625,

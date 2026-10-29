@@ -349,7 +349,7 @@ const halftoneOverHue = {
   backgroundPositionY: "0, 0%",
   backgroundSize: "25px 25px, auto",
   backgroundColor: "var(--c)",
-} as const;
+};
 
 const styles = stylex.create({
   select: {

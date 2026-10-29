@@ -360,7 +360,6 @@ const styles = stylex.create({
     animationTimingFunction: { default: null, [READY]: SPRING },
     animationFillMode: { default: null, [READY]: "backwards" },
   },
-  // Each part boots in with loadIn.islandPart.
   seg: {
     display: "grid",
     gridTemplateColumns: "0fr",

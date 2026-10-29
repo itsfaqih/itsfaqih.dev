@@ -13,7 +13,7 @@ export const palette = stylex.defineVars({
   "--hair": "#2c2c3a",
   "--text": "#f4f4f8",
   "--dim": "#a1a1b5",
-  // The blog and code blocks still use the old site's greys, which match the cabinet only in dark.
+  // The blog and code blocks use their own greys, which match the cabinet only in dark.
   "--card": "#17171f",
   "--border": "#2c2c3a",
   "--muted-foreground": "#a1a1b5",

@@ -31,7 +31,7 @@ export function Counter() {
   );
 }
 
-// Tailwind's zinc greys. 700, 600 and 400 keep the lab() form the old build compiled them to.
+// Tailwind's zinc greys, with 700, 600 and 400 in lab() form.
 const zinc700 = "lab(26.8019% 1.35387 -4.68303)";
 const zinc600 = "lab(35.1166% 1.78212 -6.1173)";
 const zinc400 = "lab(65.6464% 1.53497 -5.42429)";
