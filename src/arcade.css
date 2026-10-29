@@ -767,151 +767,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   max-width: 34em;
 }
 
-/* ---------- Rule select grid ---------- */
-.arc .select {
-  position: relative;
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 24px;
-  align-items: start;
-}
-.arc .sel {
-  position: sticky;
-  z-index: 2;
-  top: 92px;
-  border-radius: 22px;
-  padding: 20px;
-  background: var(--panel);
-  border: 2px solid var(--c, var(--hair));
-  box-shadow:
-    var(--raise),
-    0 4px 0 var(--drop-ink);
-  overflow: hidden;
-  transition:
-    border-color 150ms ease,
-    box-shadow 180ms ease;
-}
-.arc .sel .p {
-  font: 700 12px var(--display);
-  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-  display: flex;
-  justify-content: space-between;
-}
-.arc .sel .thumb {
-  margin: 12px 0 16px;
-  animation: enter 380ms var(--snap);
-}
-@keyframes enter {
-  from {
-    transform: translateX(-60px) scale(0.7);
-    opacity: 0;
-  }
-}
-/* The description gets a fixed three-line slot, so a longer blurb never changes the panel's
-   height. The title takes only the lines it needs. */
-.arc .sel h3 {
-  margin: 0 0 8px;
-  font: 900 24px/1.1 var(--display);
-  letter-spacing: -0.03em;
-  color: var(--text);
-}
-.arc .sel p {
-  margin: 0 0 16px;
-  font-size: 15px;
-  line-height: 1.6;
-  height: 4.8em;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-}
-.arc .scramble-word {
-  white-space: nowrap;
-}
-/* The real letter holds the cell's width; its stand-in is drawn centred over it. */
-.arc .scramble-cell {
-  position: relative;
-}
-.arc .scramble-cell[data-glyph] {
-  color: transparent;
-}
-.arc .scramble-cell[data-glyph]::after {
-  content: attr(data-glyph);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  color: var(--text);
-}
-.arc .sel[data-empty] {
-  border-style: dashed;
-}
-.arc .sel[data-empty] .p,
-.arc .sel[data-empty] h3 {
-  color: var(--mute);
-}
-/* With no rule there is no topic hue, so the screen goes grey: switched on, projecting nothing. */
-.arc .sel[data-empty] .thumb {
-  --c: var(--mute);
-}
-.arc .sel dl {
-  margin: 0;
-  display: grid;
-  gap: 6px;
-  font-size: 13px;
-}
-.arc .sel dl div {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  align-items: center;
-  gap: 10px;
-}
-.arc .sel dt {
-  font: 500 11px var(--display);
-  color: var(--mute);
-}
-.arc .sel dd {
-  margin: 0;
-  color: var(--text);
-}
-.arc .tools {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.arc .search {
-  flex: 1 1 260px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 46px;
-  padding: 0 14px;
-  border-radius: 12px;
-  background: var(--panel);
-  border: 2px solid var(--hair);
-  color: var(--mute);
-  font: 500 12px var(--display);
-}
-.arc .search:focus-within {
-  border-color: var(--focus);
-}
-.arc .search input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: none;
-  color: var(--text);
-  font: 400 15px var(--sans);
-}
-.arc .search kbd {
-  font: 500 11px var(--display);
-  border: 1px solid var(--hair);
-  border-radius: 6px;
-  padding: 1px 7px;
-}
+/* ---------- Topic chips ----------
+   The stack filter's chips (stack-showcase.tsx). The rule select styles its own. */
 .arc .chips {
   display: flex;
   flex-wrap: wrap;
@@ -957,155 +814,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   border-color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
   color: var(--text);
   background: color-mix(in srgb, var(--c) 14%, var(--panel));
-}
-.arc .tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 10px;
-}
-.arc .tile {
-  position: relative;
-  border-radius: 16px;
-  padding: 10px 10px 14px;
-  background: var(--panel);
-  border: 2px solid var(--hair);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow:
-    inset 0 4px 0 var(--c),
-    var(--raise),
-    0 4px 0 var(--drop-ink);
-  transition:
-    opacity 160ms ease,
-    transform 220ms var(--snap),
-    border-color 120ms ease,
-    box-shadow 160ms ease;
-}
-.arc .tile .n {
-  font: 700 11px var(--display);
-  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-  display: flex;
-  justify-content: space-between;
-  padding: 0 4px;
-}
-.arc .tile .t {
-  position: relative;
-  z-index: 1;
-  padding: 0 4px;
-  font: 700 14px/1.2 var(--display);
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-.arc .tiles:hover .tile:not([data-on]),
-.arc .tiles:focus-within .tile:not([data-on]) {
-  opacity: 0.25;
-}
-.arc .tile[data-on] {
-  border-color: var(--c);
-  transform: translateY(-4px);
-  box-shadow:
-    inset 0 4px 0 var(--c),
-    var(--raise),
-    0 8px 0 var(--key);
-  z-index: 2;
-}
-.arc .tile[data-on]:active {
-  transform: translateY(3px);
-  box-shadow:
-    inset 0 4px 0 var(--c),
-    var(--raise),
-    0 1px 0 var(--key);
-  transition-duration: 100ms;
-}
-.arc .tile:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-/* A lit tile turns into the projector's lens: its face fills with its hue under the halftone
-   screen, and the beam (.beam) carries the light from it onto the panel, which shows what it
-   projects. */
-.arc .tile::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: 14px;
-  pointer-events: none;
-  background: var(--halftone), var(--c);
-  opacity: 0;
-  transition: opacity 120ms ease;
-}
-.arc .tile[data-lit]::before {
-  opacity: 1;
-}
-/* The light is brightest at the lens and spreads thinner toward the panel. useLayoutEffect in
-   rule-select.tsx clips it to the hull of the tile and the panel and puts the lens at the tile's
-   centre. It shines over the dimmed tiles and under the lit one and the panel. */
-.arc .beam {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: var(--halftone), var(--c);
-  mask: radial-gradient(
-    circle at var(--lens-x) var(--lens-y),
-    rgb(0 0 0 / 0.5),
-    rgb(0 0 0 / 0.12) var(--reach)
-  );
-  mix-blend-mode: screen;
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-.light .arc .beam {
-  mix-blend-mode: multiply;
-  mask: radial-gradient(
-    circle at var(--lens-x) var(--lens-y),
-    rgb(0 0 0 / 0.32),
-    rgb(0 0 0 / 0.06) var(--reach)
-  );
-}
-.arc .select[data-lit] .beam {
-  opacity: 1;
-  animation: beam-on 260ms steps(1) both;
-}
-/* The lamp catches with a stutter, once per hover of the grid, not per tile. */
-@keyframes beam-on {
-  0% {
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.85;
-  }
-  40% {
-    opacity: 0.25;
-  }
-  60% {
-    opacity: 1;
-  }
-}
-.arc .select[data-lit] .sel {
-  box-shadow:
-    var(--raise),
-    0 4px 0 var(--drop-ink),
-    0 0 56px -12px color-mix(in srgb, var(--c) 55%, transparent);
-}
-
-/* Filtered tiles deal instead of glitching, since a new filter deals a fresh hand. */
-.arc .tiles .tile[data-cut].in {
-  animation: deal var(--t-pop) var(--snap) calc(min(var(--cut-order, 0), 12) * var(--t-step))
-    backwards;
-}
-@keyframes deal {
-  from {
-    opacity: 0;
-    transform: scale(0.6) rotate(-6deg);
-  }
-}
-.arc .empty {
-  margin: 0;
-  padding: 0;
-  font: 500 14px var(--display);
 }
 
 /* ---------- Rule spread (home) ----------
@@ -1776,8 +1484,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     animation: none !important;
     transition-property: opacity, color, background-color, border-color !important;
   }
-  .arc .tile[data-on],
-  .arc .tile[data-on]:active,
   .arc .stg:hover,
   .arc .stg:focus-visible,
   .arc .stg:active {
@@ -1806,8 +1512,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc .pups-group h3 {
     padding-top: 0;
   }
-  .arc .hero,
-  .arc .select {
+  .arc .hero {
     grid-template-columns: 1fr;
   }
   .arc h1 {
@@ -1818,18 +1523,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
   .arc .hero {
     gap: 28px;
-  }
-  .arc .sel,
-  .arc .beam {
-    display: none;
-  }
-  .arc .tiles {
-    grid-template-columns: 1fr 1fr;
-  }
-  .arc .tile {
-    aspect-ratio: auto;
-    min-height: 118px;
-    gap: 18px;
   }
   .arc .hs-row {
     grid-template-columns: 1fr;

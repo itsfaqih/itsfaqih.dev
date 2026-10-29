@@ -7,6 +7,7 @@ import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { reticle } from "./reticle";
 import { RuleThumb, useRuleOpen } from "./rule-art";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
 
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
@@ -94,10 +95,10 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   };
 
   return (
-    <div ref={selectRef} className="select" data-lit={litId ? "" : undefined}>
+    <div ref={selectRef} {...stylex.props(styles.select)} data-lit={litId ? "" : undefined}>
       <aside
         {...panelProps}
-        className="sel"
+        {...stylex.props(styles.panel)}
         data-cut
         data-empty={selected ? undefined : ""}
         aria-live="polite"
@@ -105,77 +106,82 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
       >
         {selected ? (
           <>
-            <div className="p">
+            <div {...stylex.props(styles.plate)}>
               <span>No.{ruleNumber(selected)}</span>
               <span>{selected.label.toUpperCase()}</span>
             </div>
-            <RuleThumb key={selected.id} rule={selected} play at="panel" style={styles.thumb} />
-            <h3>
+            <RuleThumb key={selected.id} rule={selected} play at="panel" style={[styles.thumb, styles.panelThumb]} />
+            <h3 {...stylex.props(styles.title)}>
               <ScrambleText text={selected.title} />
               <span className="sr-only">{selected.title}</span>
             </h3>
-            <p>{selected.description}</p>
-            <dl>
-              <div>
-                <dt>TOPIC</dt>
-                <dd>{selected.label}</dd>
+            <p {...stylex.props(styles.blurb)}>{selected.description}</p>
+            <dl {...stylex.props(styles.facts)}>
+              <div {...stylex.props(styles.fact)}>
+                <dt {...stylex.props(styles.term)}>TOPIC</dt>
+                <dd {...stylex.props(styles.value)}>{selected.label}</dd>
               </div>
             </dl>
           </>
         ) : (
           <>
-            <div className="p">
+            <div {...stylex.props(styles.plate, styles.standby)}>
               <span>No.—</span>
               <span>STANDBY</span>
             </div>
-            <RuleThumb style={styles.thumb} />
-            <h3>Pick a rule</h3>
-            <p>Hover or focus a tile to preview it here.</p>
-            <dl>
-              <div>
-                <dt>TOPIC</dt>
-                <dd>{category}</dd>
+            <RuleThumb style={[styles.thumb, styles.panelThumb]} />
+            <h3 {...stylex.props(styles.title, styles.standby)}>Pick a rule</h3>
+            <p {...stylex.props(styles.blurb)}>Hover or focus a tile to preview it here.</p>
+            <dl {...stylex.props(styles.facts)}>
+              <div {...stylex.props(styles.fact)}>
+                <dt {...stylex.props(styles.term)}>TOPIC</dt>
+                <dd {...stylex.props(styles.value)}>{category}</dd>
               </div>
             </dl>
           </>
         )}
       </aside>
       <div>
-        <div className="tools">
-          <label className="search" data-cut>
+        <div {...stylex.props(styles.tools)}>
+          <label {...stylex.props(styles.search)} data-cut>
             FIND
             <input
               ref={searchRef}
+              {...stylex.props(styles.input)}
               type="search"
               placeholder="button, cache, null…"
               aria-label="Search rules"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
-            <kbd>/</kbd>
+            <kbd {...stylex.props(styles.key)}>/</kbd>
           </label>
         </div>
-        <div className="chips" role="group" aria-label="Filter by topic">
+        <div {...stylex.props(styles.chips)} role="group" aria-label="Filter by topic">
           {["All", ...TOPICS].map((name) => (
             <button
               key={name}
               type="button"
+              {...stylex.props(styles.chip)}
               data-cut
               aria-pressed={category === name}
               style={{ "--c": colorOf(name) }}
               onClick={() => setCategory(name)}
             >
-              <i />
+              <i {...stylex.props(styles.chipDot)} />
               {name}
-              <b>
+              <b {...stylex.props(styles.chipCount, category === name && styles.chipCountOn)}>
                 {name === "All" ? rules.length : rules.filter((rule) => rule.label === name).length}
               </b>
             </button>
           ))}
         </div>
-        <div className="tiles" key={`${category}|${normalizedQuery}`} onPointerLeave={() => {
+        <div
+          {...stylex.props(styles.tiles)}
+          key={`${category}|${normalizedQuery}`}
+          onPointerLeave={(event) => {
             setLitId(null);
-            if (!selectRef.current?.querySelector(".tile:focus-visible")) setSelectedId(null);
+            if (!event.currentTarget.querySelector(":focus-visible")) setSelectedId(null);
           }}
         >
           {matches.map((rule) => (
@@ -183,7 +189,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               key={rule.id}
               to={rule.href}
               preload="intent"
-              className={`tile ${stylex.props(reticle.card, reticle.on).className}`}
+              {...stylex.props(reticle.card, reticle.on, styles.tile)}
               data-cut
               data-on={rule === selected ? "" : undefined}
               data-lit={rule.id === litId ? "" : undefined}
@@ -203,25 +209,26 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               {...openRule(rule)}
             >
               <RuleThumb rule={rule} play={rule === selected} />
-              <span className="n">
+              <span {...stylex.props(styles.number)}>
                 <span>{ruleNumber(rule)}</span>
                 <span aria-label={rule.interactive ? "Has demos" : undefined}>
                   {rule.interactive ? "▶" : ""}
                 </span>
               </span>
-              <span className="t">{rule.title}</span>
+              {/* .t names the title for the rule-open view transition in arcade.css. */}
+              <span className={`t ${stylex.props(styles.tileTitle).className}`}>{rule.title}</span>
             </Link>
           ))}
         </div>
         {matches.length === 0 && (
-          <p className="empty">
+          <p {...stylex.props(styles.empty)}>
             No rule matches “{query.trim()}”{category !== "All" ? ` in ${category}` : ""} yet.
           </p>
         )}
       </div>
       <div
         ref={beamRef}
-        className="beam"
+        {...stylex.props(styles.beam, selected && styles.beamHue)}
         aria-hidden="true"
         style={{ "--c": selected ? colorOf(selected.label) : undefined }}
       />
@@ -280,19 +287,19 @@ function ScrambleText({ text }: { text: string }) {
 
   let at = 0;
   return (
-    <span className="scramble" aria-hidden="true">
+    <span aria-hidden="true">
       {text.split(" ").map((word, w) => {
         const from = at;
         at += word.length + 1;
         return (
           <Fragment key={w}>
             {w > 0 && " "}
-            <span className="scramble-word">
+            <span {...stylex.props(styles.word)}>
               {Array.from(word, (char, c) => {
                 const index = from + c;
                 const live = index >= settled ? glyphs[index] : undefined;
                 return (
-                  <span key={c} className="scramble-cell" data-glyph={live}>
+                  <span key={c} {...stylex.props(styles.cell)} data-glyph={live}>
                     {char}
                   </span>
                 );
@@ -305,8 +312,397 @@ function ScrambleText({ text }: { text: string }) {
   );
 }
 
+const STACKED = "@media (max-width: 960px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const LIGHT = ":is(.light *)";
+// The grid's pointer or focus is on a tile's parent; the other tiles dim, except any still
+// waiting for its cut-in, which the load-in keeps hidden.
+const DIMMED = ":not([data-on]):is(:hover > *, :focus-within > *):not(:is(.js *):not(.in, [data-rest]))";
+const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
+const PANEL_SHADOW = `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`;
+const TILE_TOP = "inset 0 4px 0 var(--c)";
+const LENS = (near: string, far: string) =>
+  `radial-gradient(circle at var(--lens-x) var(--lens-y), ${near}, ${far} var(--reach))`;
+
+const enter = stylex.keyframes({
+  from: { transform: "translate(-60px) scale(0.7)", opacity: 0 },
+});
+
+// Filtered tiles deal instead of glitching, since a new filter deals a fresh hand.
+const deal = stylex.keyframes({
+  from: { opacity: 0, transform: "scale(0.6) rotate(-6deg)" },
+});
+
+// The lamp catches with a stutter, once per hover of the grid, not per tile.
+const beamOn = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "20%": { opacity: 0.85 },
+  "40%": { opacity: 0.25 },
+  "60%": { opacity: 1 },
+});
+
+// The halftone over the hue, as two layers so the colour sits under the dots. Positions are
+// written per axis: the minifier folds 0% 0% into 0 0, which computes to 0px 0px.
+const halftoneOverHue = {
+  backgroundImage: `${palette["--halftone"]}, none`,
+  backgroundPositionX: "0, 0%",
+  backgroundPositionY: "0, 0%",
+  backgroundSize: "25px 25px, auto",
+  backgroundColor: "var(--c)",
+} as const;
+
 const styles = stylex.create({
+  select: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: { default: "340px 1fr", [STACKED]: "1fr" },
+    gap: "24px",
+    alignItems: "start",
+  },
+  // The panel the lit tile projects onto. A [data-cut] piece: its states key on attributes, so its
+  // class list never changes and the cut-in's .in survives a re-render.
+  panel: {
+    position: "sticky",
+    zIndex: 2,
+    top: "92px",
+    display: { default: null, [STACKED]: "none" },
+    borderRadius: "22px",
+    padding: "20px",
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: { default: "solid", ":is([data-empty])": "dashed" },
+    borderColor: `var(--c, ${palette["--hair"]})`,
+    boxShadow: {
+      default: PANEL_SHADOW,
+      ":is([data-lit] > *)": `${PANEL_SHADOW}, 0 0 56px -12px color-mix(in srgb, var(--c) 55%, transparent)`,
+    },
+    overflow: "hidden",
+    transitionProperty: "border-color, box-shadow",
+    transitionDuration: "150ms, 180ms",
+    transitionTimingFunction: "ease, ease",
+    transitionDelay: "0s, 0s",
+    transitionBehavior: "normal, normal",
+  },
+  plate: {
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: INK,
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  // With no rule there is no topic hue.
+  standby: {
+    color: palette["--mute"],
+  },
   thumb: {
     borderRadius: "14px",
   },
+  panelThumb: {
+    marginBlock: "12px 16px",
+    marginInline: 0,
+    animationName: enter,
+    animationDuration: "380ms",
+    animationTimingFunction: motion["--snap"],
+  },
+  // The description gets a fixed three-line slot, so a longer blurb never changes the panel's
+  // height. The title takes only the lines it needs.
+  title: {
+    marginBlock: "0 8px",
+    marginInline: 0,
+    fontWeight: 900,
+    fontSize: "24px",
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    color: palette["--text"],
+  },
+  blurb: {
+    marginBlock: "0 16px",
+    marginInline: 0,
+    fontSize: "15px",
+    lineHeight: 1.6,
+    height: "4.8em",
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 3,
+    overflow: "hidden",
+  },
+  facts: {
+    margin: 0,
+    display: "grid",
+    gap: "6px",
+    fontSize: "13px",
+  },
+  fact: {
+    display: "grid",
+    gridTemplateColumns: "80px 1fr",
+    alignItems: "center",
+    gap: "10px",
+  },
+  term: {
+    fontWeight: 500,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--mute"],
+  },
+  value: {
+    margin: 0,
+    color: palette["--text"],
+  },
+  word: {
+    whiteSpace: "nowrap",
+  },
+  // The real letter holds the cell's width; its stand-in is drawn centred over it.
+  cell: {
+    position: "relative",
+    color: { default: null, ":is([data-glyph])": "transparent" },
+    "::after": {
+      content: { default: null, ":is([data-glyph])": "attr(data-glyph)" },
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      justifyContent: "center",
+      color: palette["--text"],
+    },
+  },
+  tools: {
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginBottom: "12px",
+  },
+  search: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "260px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    height: "46px",
+    paddingBlock: 0,
+    paddingInline: "14px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: { default: palette["--hair"], ":focus-within": palette["--focus"] },
+    color: palette["--mute"],
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  input: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    minWidth: 0,
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    outline: 0,
+    backgroundColor: "transparent",
+    backgroundPosition: "0 0",
+    color: palette["--text"],
+    fontWeight: 400,
+    fontSize: "15px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+  },
+  key: {
+    fontWeight: 500,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "6px",
+    paddingBlock: "1px",
+    paddingInline: "7px",
+  },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+    marginBottom: "18px",
+  },
+  // A [data-cut] piece, so the pressed state keys on aria-pressed.
+  chip: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    height: "34px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderRadius: "999px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: { default: palette["--hair"], ':is([aria-pressed="true"])': INK },
+    // Solid, so the backdrop's dots never show through.
+    backgroundColor: {
+      default: palette["--panel"],
+      ':is([aria-pressed="true"])': `color-mix(in srgb, var(--c) 14%, ${palette["--panel"]})`,
+    },
+    color: { default: palette["--dim"], ':is([aria-pressed="true"])': palette["--text"] },
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    cursor: cursors["--cursor-point"],
+    transform: { default: null, ":active": "scale(0.97)" },
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "3px" },
+    transitionProperty: "background-color, color, border-color, transform",
+    transitionDuration: "120ms, 120ms, 120ms, 150ms",
+    transitionTimingFunction: "ease, ease, ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    transitionDelay: "0s, 0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal, normal",
+  },
+  chipDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: "var(--c)",
+  },
+  chipCount: {
+    color: palette["--mute"],
+  },
+  chipCountOn: {
+    color: palette["--dim"],
+    fontWeight: 500,
+  },
+  tiles: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(auto-fill, minmax(168px, 1fr))", [STACKED]: "1fr 1fr" },
+    gap: "10px",
+  },
+  // A [data-cut] piece: its states key on data-on, data-lit and .in, so its class list never
+  // changes and the cut-in's .in survives a re-render. The picked tile rises onto its key.
+  tile: {
+    position: "relative",
+    zIndex: { default: null, ":is([data-on])": 2 },
+    minHeight: { default: null, [STACKED]: "118px" },
+    borderRadius: "16px",
+    paddingTop: "10px",
+    paddingInline: "10px",
+    paddingBottom: "14px",
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: { default: palette["--hair"], ":is([data-on])": "var(--c)" },
+    display: "flex",
+    flexDirection: "column",
+    gap: { default: "10px", [STACKED]: "18px" },
+    opacity: { default: null, [DIMMED]: 0.25 },
+    transform: {
+      default: null,
+      ":is([data-on])": { default: "translateY(-4px)", ":active": "translateY(3px)", [REDUCE]: "none" },
+    },
+    boxShadow: {
+      default: `${TILE_TOP}, ${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+      ":is([data-on])": {
+        default: `${TILE_TOP}, ${palette["--raise"]}, 0 8px 0 var(--key)`,
+        ":active": `${TILE_TOP}, ${palette["--raise"]}, 0 1px 0 var(--key)`,
+      },
+    },
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "3px" },
+    transitionProperty: "opacity, transform, border-color, box-shadow",
+    transitionDuration: {
+      default: "160ms, 220ms, 120ms, 160ms",
+      ":is([data-on])": { default: null, ":active": "100ms" },
+    },
+    transitionTimingFunction: `ease, ${motion["--snap"]}, ease, ease`,
+    transitionDelay: "0s, 0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal, normal",
+    animationName: { default: null, ":is(.in)": deal },
+    animationDuration: { default: null, ":is(.in)": motion["--t-pop"] },
+    animationTimingFunction: { default: null, ":is(.in)": motion["--snap"] },
+    animationDelay: {
+      default: null,
+      ":is(.in)": `calc(min(var(--cut-order, 0), 12) * ${motion["--t-step"]})`,
+    },
+    animationFillMode: { default: null, ":is(.in)": "backwards" },
+    // A lit tile turns into the projector's lens: its face fills with its hue under the halftone
+    // screen, and the beam carries the light from it onto the panel, which shows what it projects.
+    "::before": {
+      content: '""',
+      position: "absolute",
+      inset: 0,
+      zIndex: 2,
+      borderRadius: "14px",
+      pointerEvents: "none",
+      ...halftoneOverHue,
+      opacity: { default: 0, ":is([data-lit])": 1 },
+      transitionProperty: "opacity",
+      transitionDuration: "120ms",
+      transitionTimingFunction: "ease",
+    },
+  },
+  number: {
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: INK,
+    display: "flex",
+    justifyContent: "space-between",
+    paddingBlock: 0,
+    paddingInline: "4px",
+  },
+  tileTitle: {
+    position: "relative",
+    zIndex: 1,
+    paddingBlock: 0,
+    paddingInline: "4px",
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: 1.2,
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+    letterSpacing: "-0.02em",
+  },
+  empty: {
+    margin: 0,
+    padding: 0,
+    fontWeight: 500,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  // The light is brightest at the lens and spreads thinner toward the panel. The layout effect
+  // above clips it to the hull of the tile and the panel and puts the lens at the tile's centre.
+  // It shines over the dimmed tiles and under the lit one and the panel, and catches with a
+  // stutter while the grid is lit.
+  beam: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 1,
+    display: { default: null, [STACKED]: "none" },
+    pointerEvents: "none",
+    maskImage: {
+      default: LENS("rgb(0 0 0 / 0.5)", "rgb(0 0 0 / 0.12)"),
+      [LIGHT]: LENS("rgb(0 0 0 / 0.32)", "rgb(0 0 0 / 0.06)"),
+    },
+    mixBlendMode: { default: "screen", [LIGHT]: "multiply" },
+    opacity: { default: 0, ":is([data-lit] > *)": 1 },
+    transitionProperty: "opacity",
+    transitionDuration: "180ms",
+    transitionTimingFunction: "ease",
+    animationName: { default: null, ":is([data-lit] > *)": beamOn },
+    animationDuration: { default: null, ":is([data-lit] > *)": "260ms" },
+    animationTimingFunction: { default: null, ":is([data-lit] > *)": "steps(1)" },
+    animationFillMode: { default: null, ":is([data-lit] > *)": "both" },
+  },
+  // Only while a rule is picked: with no hue there is no light to carry.
+  beamHue: halftoneOverHue,
 });

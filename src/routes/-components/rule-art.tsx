@@ -86,7 +86,7 @@ export function RuleThumb({ rule, play = false, at = "card", style }: RuleThumbP
   const Art = rule && ART.get(rule.id);
   return (
     <div
-      className={`thumb ${stylex.props(screen.root, style).className}`}
+      className={`thumb ${stylex.props(screen.root, !rule && screen.blank, style).className}`}
       style={rule && { "--c": colorOf(rule.label) }}
       aria-hidden="true"
     >
@@ -492,6 +492,10 @@ const screen = stylex.create({
       [LIGHT]:
         "inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), inset 0 3px 0 rgb(30 30 60 / 0.06)",
     },
+  },
+  // With no rule there is no topic hue, so the screen goes grey: switched on, projecting nothing.
+  blank: {
+    "--c": palette["--mute"],
   },
   art: {
     position: "absolute",

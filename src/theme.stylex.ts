@@ -52,10 +52,10 @@ export const palette = stylex.defineVars({
   "--sink": "inset 0 2px 0 var(--bevel-lo)",
   // A lifted card sits on a darker shade of its own hue, like the keys sit on --go-shadow.
   "--key-mix": "42%",
-  // The hero prints' halftone screen as a 25px tile: dots 7.9px apart on a grid turned atan(1/3),
-  // the angle nearest their 18deg whose grid repeats in a square. Dark lightens the hue under it,
-  // like the prints' screen blend; light darkens it, like their multiply.
-  "--halftone": `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23fff' fill-opacity='.4'%3E${dots}") 0 0 / 25px 25px`,
+  // The hero prints' halftone screen, an image tiled at 25px from 0 0: dots 7.9px apart on a grid
+  // turned atan(1/3), the angle nearest their 18deg whose grid repeats in a square. Dark lightens
+  // the hue under it, like the prints' screen blend; light darkens it, like their multiply.
+  "--halftone": `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='25' fill='%23fff' fill-opacity='.4'%3E${dots}")`,
 });
 
 export const fonts = stylex.defineVars({
