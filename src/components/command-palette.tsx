@@ -476,10 +476,11 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "8px",
-    // Keeps the 0 0 position that `background: none` minified to in the plain sheet this replaced.
+    // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
+    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
     backgroundPosition: {
       default: "0 0",
-      ":hover": { default: null, "@media (hover: hover)": "0% 0%" },
+      ":hover": { default: null, "@media (hover: hover)": "initial" },
     },
     backgroundColor: {
       default: "transparent",
