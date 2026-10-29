@@ -1751,7 +1751,6 @@ export function TableDesign() {
   return (
     <DemosContext value={demos}>
       <RuleLanding
-        className="table-design"
         costsStyle={styles.costs}
         lead={
           <>

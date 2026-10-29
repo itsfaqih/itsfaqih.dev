@@ -1103,7 +1103,6 @@ const LEVELS: Level[] = [
 export function HandlingTimestamps() {
   return (
     <RuleLanding
-      className="handling-timestamps"
       costsStyle={styles.costs}
       lead={
         <>

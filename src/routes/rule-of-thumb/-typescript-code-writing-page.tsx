@@ -854,7 +854,6 @@ const LEVELS: Level[] = [
 export function TypeScriptCodeWriting() {
   return (
     <RuleLanding
-      className="typescript-code-writing"
       lead={
         <>
           Six habits, each with the loose code beside the precise one and what tsc says about every

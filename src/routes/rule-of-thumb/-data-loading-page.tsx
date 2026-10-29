@@ -11,7 +11,6 @@ import {
   RuleLanding,
   Tip,
 } from "./-components/rule-landing";
-import "./data-loading.css";
 import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
@@ -1704,7 +1703,6 @@ const LEVELS: Level[] = [
 export function DataLoading() {
   return (
     <RuleLanding
-      className="data-loading"
       lead={
         <>
           Six loading moments, each running the wrong way and the right way side by side. Then a

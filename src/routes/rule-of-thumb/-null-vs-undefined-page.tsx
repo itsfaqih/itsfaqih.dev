@@ -1177,7 +1177,6 @@ const LEVELS: Level[] = [
 export function NullVsUndefined() {
   return (
     <RuleLanding
-      className="null-vs-undefined"
       lead={
         <>
           Six cases, each with the code that blurs the two beside the code that keeps them apart,

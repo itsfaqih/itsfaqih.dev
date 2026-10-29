@@ -479,7 +479,6 @@ const LEVELS: Level[] = [
 export function ProximityPrinciple() {
   return (
     <RuleLanding
-      className="proximity"
       lead={
         <>
           Five placements, each with the wrong spot and the right one side by side in a real tree.

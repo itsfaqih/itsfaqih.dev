@@ -3,64 +3,44 @@ import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { colorOf } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { fonts } from "../../theme.stylex";
+import { fonts, motion, palette } from "../../theme.stylex";
 
-function Icon({ children }: { children: ReactNode }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {children}
-    </svg>
-  );
-}
+type StrokeProps = ReturnType<typeof stylex.props>;
 
-const CATEGORY_ICON = new Map<string, ReactNode>([
-  [
-    "Code Writing",
-    <Icon>
-      <path d="M8 6l-6 6 6 6M16 6l6 6-6 6" />
-    </Icon>,
-  ],
-  [
-    "UX Design",
-    <Icon>
-      <path d="M5 3l6.5 17 2.5-7 7-2.5z" />
-    </Icon>,
-  ],
+// Each topic's glyph on a 24-unit grid. Every stroke takes the art's beat while it plays.
+const GLYPH = new Map<string, (stroke: StrokeProps) => ReactNode>([
+  ["Code Writing", (stroke) => <path {...stroke} d="M8 6l-6 6 6 6M16 6l6 6-6 6" />],
+  ["UX Design", (stroke) => <path {...stroke} d="M5 3l6.5 17 2.5-7 7-2.5z" />],
   [
     "Architecture",
-    <Icon>
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="8.5" y="14" width="7" height="7" rx="1" />
-      <path d="M6.5 10v2h11v-2M12 12v2" />
-    </Icon>,
+    (stroke) => (
+      <>
+        <rect {...stroke} x="3" y="3" width="7" height="7" rx="1" />
+        <rect {...stroke} x="14" y="3" width="7" height="7" rx="1" />
+        <rect {...stroke} x="8.5" y="14" width="7" height="7" rx="1" />
+        <path {...stroke} d="M6.5 10v2h11v-2M12 12v2" />
+      </>
+    ),
   ],
   [
     "Best Practices",
-    <Icon>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M8 12.5l2.5 2.5L16 9" />
-    </Icon>,
+    (stroke) => (
+      <>
+        <circle {...stroke} cx="12" cy="12" r="9" />
+        <path {...stroke} d="M8 12.5l2.5 2.5L16 9" />
+      </>
+    ),
   ],
   [
     "Accessibility",
-    <Icon>
-      <circle cx="12" cy="4.5" r="1.8" />
-      <path d="M5 8.5l7 1.5 7-1.5M12 10v5M9 21l3-6 3 6" />
-    </Icon>,
+    (stroke) => (
+      <>
+        <circle {...stroke} cx="12" cy="4.5" r="1.8" />
+        <path {...stroke} d="M5 8.5l7 1.5 7-1.5M12 10v5M9 21l3-6 3 6" />
+      </>
+    ),
   ],
 ]);
-
-const iconOf = (category: string) =>
-  CATEGORY_ICON.get(category) ?? CATEGORY_ICON.get("Best Practices");
 
 const RULE_OPEN = "rule-open";
 
@@ -104,40 +84,33 @@ type RuleThumbProps = {
 
 export function RuleThumb({ rule, play = false, at = "card", style }: RuleThumbProps) {
   const Art = rule && ART.get(rule.id);
-  const large = at !== "card";
   return (
     <div
       className={`thumb ${stylex.props(screen.root, style).className}`}
       style={rule && { "--c": colorOf(rule.label) }}
-      data-play={play || undefined}
       aria-hidden="true"
     >
-      {rule && (Art ? <Art play={play} large={large} /> : <GlyphArt rule={rule} />)}
+      {rule && (Art ? <Art play={play} at={at} /> : <GlyphArt rule={rule} play={play} />)}
     </div>
   );
 }
 
-type ArtProps = { play: boolean; large: boolean };
+type ArtProps = { play: boolean; at: NonNullable<RuleThumbProps["at"]> };
 
 type ChipProps = {
   beats: string[];
   /** Each beat's keyframes while the art plays. */
-  moves?: stylex.StyleXStyles[];
+  moves: stylex.StyleXStyles[];
   /** The art's beat (its length and easing) while it plays. */
-  playing?: stylex.StyleXStyles | false;
-  large: boolean;
+  playing: stylex.StyleXStyles | false;
+  at: ArtProps["at"];
 };
 
-function Chip({ beats, moves, playing, large }: ChipProps) {
+function Chip({ beats, moves, playing, at }: ChipProps) {
   return (
-    <span
-      className={`chip ${stylex.props(screen.chip, large && screen.chipLarge, playing).className}`}
-    >
+    <span {...stylex.props(screen.chip, at !== "card" && screen.chipLarge, playing)}>
       {beats.map((beat, index) => (
-        <b
-          key={beat}
-          className={`b${index + 1} ${stylex.props(screen.beat, playing, playing && moves?.[index]).className}`}
-        >
+        <b key={beat} {...stylex.props(screen.beat, playing, playing && moves[index])}>
           {beat}
         </b>
       ))}
@@ -146,7 +119,7 @@ function Chip({ beats, moves, playing, large }: ChipProps) {
 }
 
 // Proximity: styles.ts walks out to shared/ and back home into OrderCard/.
-function ProximityArt({ play, large }: ArtProps) {
+function ProximityArt({ play, at }: ArtProps) {
   const playing = play && draw.play;
   return (
     <div {...stylex.props(screen.art, playing)}>
@@ -192,19 +165,14 @@ function ProximityArt({ play, large }: ArtProps) {
           </text>
         </g>
       </svg>
-      <Chip
-        beats={["FAR", "NEAR"]}
-        moves={[beat.away, beat.rest]}
-        playing={playing}
-        large={large}
-      />
+      <Chip beats={["FAR", "NEAR"]} moves={[beat.away, beat.rest]} playing={playing} at={at} />
     </div>
   );
 }
 
 // Button: done 0-8%, eases back to idle 8-16%, hover 22-34%, press 38-44%, pending 46-74%, done
 // again 74-100%.
-function ButtonArt({ play, large }: ArtProps) {
+function ButtonArt({ play, at }: ArtProps) {
   const playing = play && draw.playSlow;
   return (
     <div {...stylex.props(screen.art, playing)}>
@@ -278,73 +246,197 @@ function ButtonArt({ play, large }: ArtProps) {
         beats={["IDLE", "HOVER", "PRESS", "LOAD", "DONE"]}
         moves={[beat.idle, beat.hover, beat.press, beat.load, beat.done]}
         playing={playing}
-        large={large}
+        at={at}
       />
     </div>
   );
 }
 
-function DataLoadingArt({ large }: ArtProps) {
+// Data loading: fresh rows go stale, a revalidate sweep runs, and they come back fresh.
+function DataLoadingArt({ play, at }: ArtProps) {
+  const playing = play && draw.play;
+  // On the data-loading page's own cover the screen has always picked up that page's demo card
+  // styles and its slide in place of the sweep, so it keeps them there.
+  const own = at === "cover";
   const rows = [
     { y: 34, width: 50, value: "$12" },
     { y: 52, width: 38, value: "$14" },
     { y: 70, width: 58, value: "$31" },
   ];
   return (
-    <div className={`dl ${stylex.props(screen.art).className}`}>
-      <svg viewBox="0 0 160 100">
-        <rect className="dl-card" x="22" y="16" width="116" height="72" rx="8" />
-        <rect className="dl-flash" x="24" y="44" width="112" height="16" rx="3" />
-        <g className="dl-rows">
+    <div {...stylex.props(screen.art, playing)}>
+      <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
+        <rect
+          {...stylex.props(dataLoading.card, own && dataLoading.ownCard, draw.moving, playing)}
+          x="22"
+          y="16"
+          width="116"
+          height="72"
+          rx="8"
+        />
+        <rect
+          {...stylex.props(dataLoading.flash, draw.moving, playing, play && dataLoading.flashPlay)}
+          x="24"
+          y="44"
+          width="112"
+          height="16"
+          rx="3"
+        />
+        <g {...stylex.props(draw.moving, playing, play && dataLoading.rowsPlay)}>
           {rows.map((row, index) => (
-            <g key={row.y}>
-              <circle cx="36" cy={row.y + 2} r="4" />
-              <rect x="46" y={row.y - 1} width={row.width} height="6" rx="3" />
-              <text className={index === 1 ? "hi dl-new" : "hi"} x="130" y={row.y + 5}>
+            <g key={row.y} {...stylex.props(playing)}>
+              <circle {...stylex.props(dataLoading.mark, playing)} cx="36" cy={row.y + 2} r="4" />
+              <rect
+                {...stylex.props(dataLoading.mark, playing)}
+                x="46"
+                y={row.y - 1}
+                width={row.width}
+                height="6"
+                rx="3"
+              />
+              <text
+                {...stylex.props(
+                  draw.text,
+                  draw.hi,
+                  dataLoading.value,
+                  index === 1 && draw.moving,
+                  playing,
+                  play && index === 1 && dataLoading.newPlay,
+                )}
+                x="130"
+                y={row.y + 5}
+              >
                 {row.value}
               </text>
             </g>
           ))}
         </g>
-        <text className="dl-old" x="130" y="57">
+        <text
+          {...stylex.props(
+            draw.text,
+            dataLoading.value,
+            dataLoading.old,
+            draw.moving,
+            playing,
+            play && dataLoading.oldPlay,
+          )}
+          x="130"
+          y="57"
+        >
           $8
         </text>
-        <rect className="dl-sweep" x="22" y="16" width="116" height="3" rx="1.5" />
+        <rect
+          {...stylex.props(
+            dataLoading.sweep,
+            draw.moving,
+            playing,
+            play && (own ? dataLoading.slidePlay : dataLoading.sweepPlay),
+          )}
+          x="22"
+          y="16"
+          width="116"
+          height="3"
+          rx="1.5"
+        />
       </svg>
-      <Chip beats={["STALE", "FRESH"]} large={large} />
+      <Chip beats={["STALE", "FRESH"]} moves={[beat.away, beat.rest]} playing={playing} at={at} />
     </div>
   );
 }
 
-function NullArt({ large }: ArtProps) {
+// Null vs undefined: the null box lifts out of its slot and drops back in; undefined stays empty.
+function NullArt({ play, at }: ArtProps) {
+  const playing = play && draw.play;
   return (
-    <div className={`nu ${stylex.props(screen.art).className}`}>
-      <svg viewBox="0 0 160 100">
-        <rect className="nu-slot" x="20" y="20" width="52" height="46" rx="8" />
-        <text className="nu-q" x="46" y="51">
+    <div {...stylex.props(screen.art, playing)}>
+      <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
+        <rect
+          {...stylex.props(nullish.slot, draw.moving, playing)}
+          x="20"
+          y="20"
+          width="52"
+          height="46"
+          rx="8"
+        />
+        <text
+          {...stylex.props(
+            nullish.mark,
+            nullish.question,
+            draw.moving,
+            playing,
+            play && nullish.questionPlay,
+          )}
+          x="46"
+          y="51"
+        >
           ?
         </text>
-        <rect className="nu-slot" x="88" y="20" width="52" height="46" rx="8" />
-        <g className="nu-box">
-          <rect x="91" y="23" width="46" height="40" rx="6" />
-          <text x="114" y="51">
+        <rect
+          {...stylex.props(nullish.slot, draw.moving, playing)}
+          x="88"
+          y="20"
+          width="52"
+          height="46"
+          rx="8"
+        />
+        <g {...stylex.props(draw.moving, playing, play && nullish.boxPlay)}>
+          <rect
+            {...stylex.props(nullish.box, playing)}
+            x="91"
+            y="23"
+            width="46"
+            height="40"
+            rx="6"
+          />
+          <text {...stylex.props(nullish.mark, playing)} x="114" y="51">
             ∅
           </text>
         </g>
-        <text className="nu-label dim" x="46" y="84">
+        <text
+          {...stylex.props(draw.text, draw.dim, nullish.label, draw.moving, playing)}
+          x="46"
+          y="84"
+        >
           undefined
         </text>
-        <text className="nu-label hi" x="114" y="84">
+        <text
+          {...stylex.props(draw.text, draw.hi, nullish.label, draw.moving, playing)}
+          x="114"
+          y="84"
+        >
           null
         </text>
       </svg>
-      <Chip beats={["MISSING", "EMPTY"]} large={large} />
+      <Chip
+        beats={["MISSING", "EMPTY"]}
+        moves={[beat.missing, beat.empty]}
+        playing={playing}
+        at={at}
+      />
     </div>
   );
 }
 
-function GlyphArt({ rule }: { rule: Guideline }) {
-  return <div className={`gl ${stylex.props(screen.art).className}`}>{iconOf(rule.label)}</div>;
+// Rules without custom art yet: the topic glyph on the same screen.
+function GlyphArt({ rule, play }: { rule: Guideline; play: boolean }) {
+  const playing = play && draw.play;
+  const strokes = GLYPH.get(rule.label) ?? GLYPH.get("Best Practices")!;
+  return (
+    <div {...stylex.props(screen.art, glyph.box, playing)}>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        {...stylex.props(glyph.svg, playing, play && glyph.float)}
+      >
+        {strokes(stylex.props(playing))}
+      </svg>
+    </div>
+  );
 }
 
 const ART = new Map<string, (props: ArtProps) => ReactNode>([
@@ -364,8 +456,6 @@ const screen = stylex.create({
   // the topic hues, so deepening them here keeps thin strokes and 9px labels legible on white, and
   // labels darken further still.
   root: {
-    "--dur": "4.4s",
-    "--io": "cubic-bezier(0.645, 0.045, 0.355, 1)",
     "--c-hi": {
       default: "color-mix(in srgb, var(--c) 55%, white)",
       [LIGHT]: "color-mix(in oklab, var(--c) 68%, #000)",
@@ -684,6 +774,176 @@ const button = stylex.create({
 // The progress pips fill one by one; the first is lit throughout.
 const PIP_PLAY = [null, button.pip2Play, button.pip3Play, button.pip4Play, button.pip5Play];
 
+const dlRows = stylex.keyframes({
+  "0%, 16%": { opacity: 1 },
+  "28%, 60%": { opacity: 0.45 },
+  "70%, 100%": { opacity: 1 },
+});
+const dlNew = stylex.keyframes({
+  "0%, 16%": { opacity: 1 },
+  "26%, 62%": { opacity: 0 },
+  "68%, 100%": { opacity: 1 },
+});
+const dlOld = stylex.keyframes({
+  "0%, 16%": { opacity: 0 },
+  "26%, 62%": { opacity: 1 },
+  "68%, 100%": { opacity: 0 },
+});
+const dlFlash = stylex.keyframes({
+  "0%, 62%": { opacity: 0 },
+  "67%": { opacity: 0.3 },
+  "84%, 100%": { opacity: 0 },
+});
+const dlSweep = stylex.keyframes({
+  "0%, 30%": { opacity: 0, transform: "scaleX(0)" },
+  "34%": { opacity: 1, transform: "scaleX(0)" },
+  "62%": { opacity: 1, transform: "none" },
+  "70%, 100%": { opacity: 0, transform: "none" },
+});
+const dlSlide = stylex.keyframes({
+  to: { transform: "translate(calc(100% + 12px))" },
+});
+
+const PHONE = "@media (max-width: 640px)";
+
+const dataLoading = stylex.create({
+  card: {
+    fill: "color-mix(in srgb, var(--c) 6%, transparent)",
+    stroke: "var(--c-dim)",
+  },
+  // The data-loading page's demo card, which the cover's screen there has always matched.
+  ownCard: {
+    position: "relative",
+    display: "grid",
+    gap: "12px",
+    alignContent: "start",
+    padding: { default: "14px 16px 16px", [PHONE]: "12px 12px 14px" },
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    overflow: "hidden",
+  },
+  mark: {
+    fill: "var(--c-dim)",
+  },
+  value: {
+    textAnchor: "end",
+  },
+  flash: {
+    fill: "var(--c)",
+    opacity: 0,
+  },
+  old: {
+    opacity: 0,
+  },
+  sweep: {
+    fill: "var(--c)",
+    transformOrigin: "left",
+    opacity: 0,
+  },
+  rowsPlay: {
+    animationName: dlRows,
+  },
+  newPlay: {
+    animationName: dlNew,
+  },
+  oldPlay: {
+    animationName: dlOld,
+  },
+  flashPlay: {
+    animationName: dlFlash,
+  },
+  sweepPlay: {
+    animationName: dlSweep,
+  },
+  slidePlay: {
+    animationName: dlSlide,
+  },
+});
+
+const nuBox = stylex.keyframes({
+  "0%, 36%": { opacity: 1, transform: "none" },
+  "50%": { opacity: 0, transform: "translateY(-40px)" },
+  "58%": {
+    opacity: 0,
+    animationTimingFunction: motion["--snap"],
+    transform: "translateY(-64px)",
+  },
+  "76%, 100%": { opacity: 1, transform: "none" },
+});
+const nuQuestion = stylex.keyframes({ to: { opacity: 0.35 } });
+const nuMissing = stylex.keyframes({
+  "0%, 40%": { opacity: 0 },
+  "44%, 62%": { opacity: 1 },
+  "66%, 100%": { opacity: 0 },
+});
+const nuEmpty = stylex.keyframes({
+  "0%, 40%": { opacity: 1 },
+  "44%, 62%": { opacity: 0 },
+  "66%, 100%": { opacity: 1 },
+});
+
+const nullish = stylex.create({
+  slot: {
+    fill: "none",
+    stroke: "var(--c-dim)",
+    strokeWidth: "1.2",
+    strokeDasharray: "3 3",
+  },
+  mark: {
+    font: `700 20px ${fonts["--display"]}`,
+    fill: "var(--c-hi)",
+    textAnchor: "middle",
+  },
+  question: {
+    fill: "var(--c-dim)",
+  },
+  questionPlay: {
+    animationName: nuQuestion,
+    animationDuration: "1.4s",
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+    animationDirection: "alternate",
+  },
+  box: {
+    fill: {
+      default: "color-mix(in srgb, var(--c) 22%, #101017)",
+      [LIGHT]: "color-mix(in srgb, var(--c) 12%, #fff)",
+    },
+    stroke: "var(--c)",
+    strokeWidth: "1.5",
+  },
+  boxPlay: {
+    animationName: nuBox,
+  },
+  label: {
+    textAnchor: "middle",
+  },
+});
+
+const glFloat = stylex.keyframes({ "50%": { transform: "translateY(-4px)" } });
+
+const glyph = stylex.create({
+  box: {
+    display: "grid",
+    placeItems: "center",
+    color: "var(--c)",
+  },
+  svg: {
+    display: "block",
+    width: "34%",
+    height: "auto",
+    overflow: "visible",
+    filter: "drop-shadow(0 0 14px color-mix(in srgb, var(--c) 55%, transparent))",
+  },
+  float: {
+    animationName: glFloat,
+    animationDuration: "4.4s",
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+  },
+});
+
 const beat = stylex.create({
   away: {
     animationName: awayBeat,
@@ -705,5 +965,11 @@ const beat = stylex.create({
   },
   done: {
     animationName: btChipDone,
+  },
+  missing: {
+    animationName: nuMissing,
+  },
+  empty: {
+    animationName: nuEmpty,
   },
 });

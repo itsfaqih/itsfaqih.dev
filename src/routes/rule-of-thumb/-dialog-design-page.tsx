@@ -1786,7 +1786,6 @@ const LEVELS: Level[] = [
 export function DialogDesign() {
   return (
     <RuleLanding
-      className="dialog-design"
       lead={
         <>
           Six dialogs, each built the leaky way and the sealed way, side by side and live. Open

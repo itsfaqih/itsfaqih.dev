@@ -68,7 +68,6 @@ type RuleLandingProps = {
   quiz: { intro: ReactNode; levels: Level[]; board: string };
   /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
   take: string;
-  className?: string;
   /** Applied last to the row of cost tags under each lesson's panes. */
   costsStyle?: stylex.StyleXStyles;
 };
@@ -92,7 +91,6 @@ function Landing({
   tldr,
   quiz,
   take,
-  className,
   costsStyle,
 }: RuleLandingProps & { rule: PublishedGuideline }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -122,11 +120,7 @@ function Landing({
   const next = VISIBLE_GUIDELINES[at + 1];
 
   return (
-    <div
-      ref={rootRef}
-      className={`arc rule-page ${className ?? ""} ${stylex.props(shell.root, reveal).className}`}
-      style={hue}
-    >
+    <div ref={rootRef} className={`arc ${stylex.props(shell.root, reveal).className}`} style={hue}>
       <div {...stylex.props(shell.ground)} aria-hidden="true" />
       <IslandActivity>
         <span {...stylex.props(styles.activity)} style={hue}>

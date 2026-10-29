@@ -1292,7 +1292,6 @@ const LEVELS: Level[] = [
 export function ButtonDesign() {
   return (
     <RuleLanding
-      className="button-design"
       lead={
         <>
           Six buttons, each built the quick way and the careful way, side by side and live. Hover
