@@ -4,7 +4,7 @@ import {
   type Lesson,
   type Level,
   onceOnScreen,
-  paint,
+  paintClasses,
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
@@ -22,11 +22,11 @@ function Code({ lines }: { lines: Line[] }) {
     <div className="nv-code">
       {lines.map((line, index) => (
         <div key={index} className="nv-ln" data-hot={line.hot || undefined}>
-          <code>{line.c ? paint(line.c, TOKEN, KINDS) : " "}</code>
+          <code>{line.c ? paintClasses(line.c, TOKEN, KINDS) : " "}</code>
           {line.out && (
             <span className="nv-out" data-tone={line.tone}>
               <span className="sr-only">gives </span>
-              {paint(line.out, TOKEN, KINDS)}
+              {paintClasses(line.out, TOKEN, KINDS)}
             </span>
           )}
         </div>
@@ -140,7 +140,7 @@ function Flow({ save, fields, before, body, intent, children }: FlowProps) {
         {phase === "idle" ? (
           <span className="nv-idle">not sent yet</span>
         ) : (
-          <code className="nv-body">{paint(JSON.stringify(body), TOKEN, KINDS)}</code>
+          <code className="nv-body">{paintClasses(JSON.stringify(body), TOKEN, KINDS)}</code>
         )}
         <i className="nv-packet" aria-hidden="true" />
       </div>
@@ -473,7 +473,7 @@ const TLDR = [
   ["A lookup that found nothing", "Return null"],
 ] as const;
 
-const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
+const code = (text: string) => <code>{paintClasses(text, TOKEN, KINDS)}</code>;
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>

@@ -370,22 +370,48 @@ const keyOf = (row: TreeRow) => (row.k === undefined ? row.text : row.k);
 const treeRows = (view: ReactNode) =>
   isValidElement<{ rows: TreeRow[] }>(view) && view.type === Tree ? view.props.rows.length : 0;
 
-/** Colours a line of code: a match of `token`'s nth capture group gets the class `t-<kinds[n]>`. */
-export function paint(source: string, token: RegExp, kinds: readonly string[]): ReactNode[] {
-  const parts: ReactNode[] = [];
+/** Splits a line of code into plain text and matches of `token`, each with its capture group. */
+function tokens(source: string, token: RegExp) {
+  const parts: { at: number; text: string; group: number }[] = [];
   let at = 0;
   for (const match of source.matchAll(token)) {
-    if (match.index > at) parts.push(source.slice(at, match.index));
-    const kind = kinds[match.slice(1).findIndex((group) => group !== undefined)];
-    parts.push(
-      <span key={match.index} className={`t-${kind}`}>
-        {match[0]}
-      </span>,
-    );
+    if (match.index > at) parts.push({ at, text: source.slice(at, match.index), group: -1 });
+    const group = match.slice(1).findIndex((value) => value !== undefined);
+    parts.push({ at: match.index, text: match[0], group });
     at = match.index + match[0].length;
   }
-  if (at < source.length) parts.push(source.slice(at));
+  if (at < source.length) parts.push({ at, text: source.slice(at), group: -1 });
   return parts;
+}
+
+/** Colours a line of code: a match of `token`'s nth capture group gets the style `kinds[n]`. */
+export function paint(
+  source: string,
+  token: RegExp,
+  kinds: readonly stylex.StyleXStyles[],
+): ReactNode[] {
+  return tokens(source, token).map(({ at, text, group }) =>
+    group < 0 ? (
+      text
+    ) : (
+      <span key={at} {...stylex.props(kinds[group])}>
+        {text}
+      </span>
+    ),
+  );
+}
+
+/** Like paint(), for a page whose sheet still colours the class `t-<kinds[n]>`. */
+export function paintClasses(source: string, token: RegExp, kinds: readonly string[]) {
+  return tokens(source, token).map(({ at, text, group }) =>
+    group < 0 ? (
+      text
+    ) : (
+      <span key={at} className={`t-${kinds[group]}`}>
+        {text}
+      </span>
+    ),
+  );
 }
 
 function LessonCard({ lesson }: { lesson: Lesson }) {
@@ -486,7 +512,11 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
           ))}
         </div>
         {SIDES.map((key) => (
-          <figure key={key} className="pane well" data-side={key}>
+          <figure
+            key={key}
+            className={`pane well ${stylex.props(stylex.defaultMarker()).className}`}
+            data-side={key}
+          >
             <figcaption>
               <span aria-hidden="true">{MARK[key]}</span>
               <span className="sr-only">{key === "bad" ? "Avoid: " : "Do: "}</span>
@@ -781,7 +811,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
                     if (element) slotRefs.current.set(slot.id, element);
                     else slotRefs.current.delete(slot.id);
                   }}
-                  className="slot"
+                  className={`slot ${stylex.props(stylex.defaultMarker()).className}`}
                   disabled={cleared || !(picked || dragging)}
                   data-near={near === slot.id || undefined}
                   data-miss={miss?.id === slot.id || undefined}

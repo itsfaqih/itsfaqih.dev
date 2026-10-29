@@ -1,5 +1,7 @@
+import * as stylex from "@stylexjs/stylex";
 import { useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
+import { fonts, palette } from "../../theme.stylex";
 import {
   type Lesson,
   type Level,
@@ -9,7 +11,6 @@ import {
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
-import "./typescript-code-writing.css";
 
 type Tone = "no" | "yes";
 type Note = { text: string; tone?: Tone; error?: true };
@@ -17,7 +18,171 @@ type Line = { c: string; hot?: boolean; note?: Note };
 
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(export|default|function|import|from|type|interface|extends|enum|const|let|return|as|true|false)\b|\b([A-Z][A-Za-z]*)\b|\b(\d+)\b/g;
-const KINDS = ["com", "str", "kw", "ty", "num"] as const;
+const PHONE = "@media (max-width: 640px)";
+
+const styles = stylex.create({
+  kw: { color: "var(--c-ink)" },
+  ty: { color: palette["--text"], fontWeight: 600 },
+  str: { color: `color-mix(in oklab, ${palette["--ar"]} ${palette["--ink-mix"]}, #000)` },
+  quiet: { color: palette["--mute"] },
+  view: {
+    display: "grid",
+    gridTemplateRows: "1fr auto",
+    gap: "14px",
+  },
+  code: {
+    position: "relative",
+    display: "grid",
+    gap: "2px",
+    alignContent: "start",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+  },
+  line: {
+    position: "relative",
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "2px",
+    columnGap: "12px",
+    alignItems: "center",
+    minHeight: "26px",
+    paddingBlock: "1px",
+    paddingInline: { default: "8px", [PHONE]: "6px" },
+    borderRadius: "6px",
+  },
+  hot: {
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
+    },
+    boxShadow: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
+    },
+  },
+  source: {
+    position: "relative",
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: "auto",
+    minWidth: 0,
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    color: palette["--text"],
+  },
+  out: {
+    maxWidth: "100%",
+    marginLeft: "auto",
+    paddingBlock: "1px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "11.5px",
+    lineHeight: 1.6,
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+    overflowWrap: "anywhere",
+    "::before": {
+      content: '"→ "',
+      color: palette["--mute"],
+    },
+  },
+  outNo: {
+    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
+    color: "var(--no-ink)",
+  },
+  outYes: {
+    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    color: "var(--yes-ink)",
+  },
+  // A squiggle under the line, drawn by a mask so it takes the tone's colour.
+  squiggle: {
+    position: "absolute",
+    right: 0,
+    bottom: "-3px",
+    left: 0,
+    height: "4px",
+    backgroundColor: "var(--no)",
+    transformOrigin: "left",
+    pointerEvents: "none",
+    maskImage:
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 3 1.5 1 3 3 4.5 1 6 3' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E\")",
+    maskRepeat: "repeat-x",
+    maskPosition: "left",
+    maskSize: "6px 4px",
+  },
+  squiggleYes: {
+    backgroundColor: "var(--c)",
+  },
+  cursor: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    left: 0,
+    height: "26px",
+    borderRadius: "6px",
+    backgroundColor: "color-mix(in srgb, var(--c) 14%, transparent)",
+    boxShadow: "inset 0 -2px 0 var(--c)",
+    opacity: 0,
+    transformOrigin: "top",
+    pointerEvents: "none",
+  },
+  unrun: {
+    opacity: 0,
+  },
+  term: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "10px",
+    alignItems: "center",
+    paddingTop: "12px",
+    borderTopWidth: "1.5px",
+    borderTopStyle: "dashed",
+    borderTopColor: palette["--hair"],
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+  },
+  command: {
+    color: "var(--c-ink)",
+  },
+  summary: {
+    color: palette["--dim"],
+  },
+  run: {
+    marginLeft: "auto",
+    opacity: { default: null, ":disabled": 0.5 },
+  },
+  boardCode: {
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  },
+  holds: {
+    color: {
+      default: palette["--dim"],
+      [stylex.when.ancestor(":enabled")]: palette["--text"],
+    },
+  },
+  gap: {
+    display: { default: null, [stylex.when.ancestor("[data-off]")]: "none" },
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "3.2em",
+    height: "1.1em",
+    borderBottomWidth: "2px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "color-mix(in srgb, var(--c) 55%, transparent)",
+  },
+});
+
+const KINDS = [styles.quiet, styles.str, styles.kw, styles.ty, styles.quiet];
 
 const STEP = 110;
 
@@ -116,17 +281,26 @@ function Checked({ lines }: { lines: Line[] }) {
           : `${errors} errors`;
 
   return (
-    <div ref={ref} className="ts-view" data-phase={phase}>
-      <div className="ts-code">
-        <i className="ts-cursor" aria-hidden="true" />
+    <div ref={ref} {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.code)}>
+        <i aria-hidden="true" className={`ts-cursor ${stylex.props(styles.cursor).className}`} />
         {lines.map((line, index) => (
-          <div key={index} className="ts-ln" data-hot={line.hot || undefined}>
-            <code>
+          <div
+            key={index}
+            className={`ts-ln ${stylex.props(styles.line, line.hot && styles.hot).className}`}
+          >
+            <code {...stylex.props(styles.source)}>
               {line.c ? paint(line.c, TOKEN, KINDS) : " "}
-              {line.note?.error && <i className="ts-sq" data-tone={line.note.tone} />}
+              {line.note?.error && (
+                <i
+                  className={`ts-sq ${stylex.props(styles.squiggle, line.note.tone === "yes" && styles.squiggleYes, phase === "idle" && styles.unrun).className}`}
+                />
+              )}
             </code>
             {line.note && (
-              <span className="ts-out" data-tone={line.note.tone}>
+              <span
+                className={`ts-out ${stylex.props(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes, phase === "idle" && styles.unrun).className}`}
+              >
                 <span className="sr-only">{line.note.error ? "error: " : "gives "}</span>
                 {line.note.text}
               </span>
@@ -134,14 +308,14 @@ function Checked({ lines }: { lines: Line[] }) {
           </div>
         ))}
       </div>
-      <div className="ts-term">
-        <span className="ts-cmd">$ tsc</span>
-        <span className="ts-sum" aria-live="polite" data-clean={errors === 0 || undefined}>
+      <div {...stylex.props(styles.term)}>
+        <span {...stylex.props(styles.command)}>$ tsc</span>
+        <span aria-live="polite" {...stylex.props(styles.summary)}>
           {summary}
         </span>
         <button
           type="button"
-          className="btn soft sm"
+          className={`btn soft sm ${stylex.props(styles.run).className}`}
           disabled={phase === "run"}
           onClick={() => {
             touched.current = true;
@@ -485,14 +659,18 @@ const TLDR = [
   ["A new tsconfig", "strict, noUncheckedIndexedAccess, verbatimModuleSyntax, ESM"],
 ] as const;
 
-const code = (text: string) => <code>{paint(text, TOKEN, KINDS)}</code>;
+const code = (text: string) => (
+  <code {...stylex.props(styles.boardCode)}>{paint(text, TOKEN, KINDS)}</code>
+);
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
-    <span className="ts-gap" aria-hidden="true" />
+    <span aria-hidden="true" {...stylex.props(styles.gap)} />
   </>
 );
-const holds = (text: string) => <code className="ts-holds">{paint(text, TOKEN, KINDS)}</code>;
+const holds = (text: string) => (
+  <code {...stylex.props(styles.boardCode, styles.holds)}>{paint(text, TOKEN, KINDS)}</code>
+);
 
 const LEVELS: Level[] = [
   {
