@@ -1001,11 +1001,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .tiles:focus-within .tile:not([data-on]) {
   opacity: 0.25;
 }
-.arc .tile,
-.arc .stg,
-.arc .rot-card {
-  --key: color-mix(in oklab, var(--c, var(--go)) var(--key-mix), #000);
-}
 .arc .tile[data-on] {
   border-color: var(--c);
   transform: translateY(-4px);
@@ -1773,48 +1768,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   color: var(--text);
 }
 
-/* The select reticle: four corner brackets in the card's hue lock onto the card under the
-   pointer or keyboard focus, like a character-select cursor. One ::after, eight legs. */
-.arc .tile::after,
-.arc .stg::after,
-.arc .rot-card::after {
-  --rl: 12px;
-  --rw: 3px;
-  --rc: color-mix(in oklab, var(--c, var(--go)) var(--ink-mix), #000);
-  content: "";
-  position: absolute;
-  inset: -10px;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--rc) 0 0) left top / var(--rl) var(--rw),
-    linear-gradient(var(--rc) 0 0) left top / var(--rw) var(--rl),
-    linear-gradient(var(--rc) 0 0) right top / var(--rl) var(--rw),
-    linear-gradient(var(--rc) 0 0) right top / var(--rw) var(--rl),
-    linear-gradient(var(--rc) 0 0) left bottom / var(--rl) var(--rw),
-    linear-gradient(var(--rc) 0 0) left bottom / var(--rw) var(--rl),
-    linear-gradient(var(--rc) 0 0) right bottom / var(--rl) var(--rw),
-    linear-gradient(var(--rc) 0 0) right bottom / var(--rw) var(--rl);
-  background-repeat: no-repeat;
-  opacity: 0;
-  transform: scale(1.08);
-  transition:
-    opacity 120ms ease,
-    transform 200ms var(--snap);
-}
-.arc .tile[data-on]::after,
-.arc .stg:focus-visible::after,
-.arc .rot-card:focus-visible::after {
-  opacity: 1;
-  transform: none;
-}
-@media (hover: hover) {
-  .arc .stg:hover::after,
-  .arc .rot-card:hover::after {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .arc *,
   .arc *::before,
@@ -1825,11 +1778,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
   .arc .tile[data-on],
   .arc .tile[data-on]:active,
-  .arc .tile::after,
   .arc .stg:hover,
   .arc .stg:focus-visible,
-  .arc .stg::after,
-  .arc .rot-card::after,
   .arc .stg:active {
     transform: none;
   }

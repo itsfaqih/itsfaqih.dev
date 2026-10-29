@@ -5,6 +5,7 @@ import Fuse from "fuse.js";
 import { colorOf, ruleNumber, TOPICS } from "../../data/guidelines";
 import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { reticle } from "./reticle";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
@@ -182,7 +183,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               key={rule.id}
               to={rule.href}
               preload="intent"
-              className="tile"
+              className={`tile ${stylex.props(reticle.card, reticle.on).className}`}
               data-cut
               data-on={rule === selected ? "" : undefined}
               data-lit={rule.id === litId ? "" : undefined}

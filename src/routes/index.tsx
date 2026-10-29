@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
@@ -5,6 +6,7 @@ import { SLIDES } from "../data/home";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
+import { reticle } from "./-components/reticle";
 import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { TechIcon, techBrand } from "./-components/tech-icon";
@@ -314,7 +316,7 @@ function Index() {
             {PROJECTS.map((project) => (
               <a
                 key={project.title}
-                className="stg"
+                className={`stg ${stylex.props(reticle.card, reticle.aim).className}`}
                 data-cut
                 href={project.href}
                 target="_blank"

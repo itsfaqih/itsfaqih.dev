@@ -22,6 +22,7 @@ import {
   VISIBLE_GUIDELINES,
 } from "../../../data/guidelines";
 import type { PublishedGuideline } from "../../../data/guidelines";
+import { reticle } from "../../-components/reticle";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
@@ -275,7 +276,7 @@ function Landing({
                 ) : (
                   <Link
                     to="/rule-of-thumb"
-                    className={`rot-card ${stylex.props(pager.card, pager.all).className}`}
+                    {...stylex.props(reticle.card, reticle.aim, pager.card, pager.all)}
                   >
                     <span {...stylex.props(pager.dir)}>That's every rule so far</span>
                     <span {...stylex.props(pager.title)}>Back to all rules →</span>
@@ -303,7 +304,7 @@ function PagerCard({
     <Link
       to={rule.href}
       preload="intent"
-      className={`rot-card ${stylex.props(pager.card, direction === "Next" && pager.next).className}`}
+      {...stylex.props(reticle.card, reticle.aim, pager.card, direction === "Next" && pager.next)}
       style={{ "--c": colorOf(rule.label) }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
