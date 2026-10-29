@@ -8,6 +8,7 @@ import { RuleThumb, useRuleOpen } from "./rule-art";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { veil } from "./section";
 import { loadIn } from "../../components/load-in";
+import { arcade } from "../../components/arcade";
 
 const STEP = 0.68;
 const RUBBER = 0.35;
@@ -229,7 +230,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
         ))}
       </div>
       <div {...stylex.props(loadIn.piece, styles.nav)} data-cut>
-        <span className={`sr-only ${stylex.props(veil.dense).className}`} aria-live="polite">
+        <span {...stylex.props(arcade.srOnly, veil.dense)} aria-live="polite">
           {rule.title}
         </span>
         <button

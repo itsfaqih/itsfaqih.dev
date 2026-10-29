@@ -13,6 +13,7 @@ import {
   Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
+import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
 const LIGHT = ":is(.light *)";
@@ -513,7 +514,7 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
               <span {...stylex.props(styles.date)}>{dayOf(reading.shown)}</span>
               {off && (
                 <span {...stylex.props(styles.should)}>
-                  <span className="sr-only">{off}, </span>should be {timeOf(reading.truth)}
+                  <span {...stylex.props(arcade.srOnly)}>{off}, </span>should be {timeOf(reading.truth)}
                 </span>
               )}
             </span>
@@ -616,7 +617,7 @@ function ReminderDemo({ way }: { way: Way }) {
     <div {...stylex.props(styles.view)}>
       <div {...stylex.props(styles.form)}>
         <span {...stylex.props(styles.formHead)}>New reminder · Rina, Jakarta</span>
-        <label htmlFor={`${id}-date`} className="sr-only">
+        <label htmlFor={`${id}-date`} {...stylex.props(arcade.srOnly)}>
           Date
         </label>
         <input
@@ -627,7 +628,7 @@ function ReminderDemo({ way }: { way: Way }) {
           onChange={(event) => setDate(event.target.value)}
           {...stylex.props(styles.input)}
         />
-        <label htmlFor={`${id}-time`} className="sr-only">
+        <label htmlFor={`${id}-time`} {...stylex.props(arcade.srOnly)}>
           Time
         </label>
         <input

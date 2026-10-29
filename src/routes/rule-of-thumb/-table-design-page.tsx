@@ -23,6 +23,7 @@ import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { Code, type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
 import { row, tipped } from "./-table-design.stylex";
 import { kit } from "./-components/rule-landing.stylex";
+import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -733,7 +734,7 @@ function NumbersDemo({ careful }: { careful: boolean }) {
   return (
     <div {...stylex.props(styles.card)}>
       <table {...stylex.props(styles.table)}>
-        <caption className="sr-only">Monthly revenue by account</caption>
+        <caption {...stylex.props(arcade.srOnly)}>Monthly revenue by account</caption>
         <colgroup>
           <col />
           <col {...stylex.props(styles.colMoney)} />
@@ -756,7 +757,7 @@ function NumbersDemo({ careful }: { careful: boolean }) {
                   )}
                   {careful ? (
                     <>
-                      <span className="sr-only">{money(value)}</span>
+                      <span {...stylex.props(arcade.srOnly)}>{money(value)}</span>
                       <Reels text={money(value)} />
                     </>
                   ) : (
@@ -813,7 +814,7 @@ function LiveSwitch() {
       ) : (
         <PlayIcon weight="bold" aria-hidden="true" {...stylex.props(styles.liveIcon)} />
       )}
-      <span className="sr-only">{playing ? ", pause updates" : ", play updates"}</span>
+      <span {...stylex.props(arcade.srOnly)}>{playing ? ", pause updates" : ", play updates"}</span>
     </button>
   );
 }
@@ -1021,7 +1022,7 @@ function StatesDemo({ careful }: { careful: boolean }) {
         <SearchBox value={now.query} onChange={(query) => set({ query })} />
       </div>
       <table {...stylex.props(styles.table)} aria-busy={view === "loading" || undefined}>
-        <caption className="sr-only">Team members</caption>
+        <caption {...stylex.props(arcade.srOnly)}>Team members</caption>
         <colgroup>
           <col />
           <col {...stylex.props(styles.colRole)} />
@@ -1054,7 +1055,7 @@ function ActionsDemo({ careful }: { careful: boolean }) {
   return (
     <div {...stylex.props(styles.card)}>
       <table {...stylex.props(styles.table)}>
-        <caption className="sr-only">Team members with actions</caption>
+        <caption {...stylex.props(arcade.srOnly)}>Team members with actions</caption>
         <colgroup>
           <col />
           <col {...stylex.props(styles.colRole)} />
@@ -1066,7 +1067,7 @@ function ActionsDemo({ careful }: { careful: boolean }) {
             <Th>Role</Th>
             {careful && (
               <Th style={styles.num}>
-                <span className="sr-only">Actions</span>
+                <span {...stylex.props(arcade.srOnly)}>Actions</span>
               </Th>
             )}
           </tr>
@@ -1242,7 +1243,7 @@ function PagedTable({ people, careful }: { people: readonly Person[]; careful: b
   return (
     <div {...stylex.props(styles.card)}>
       <table {...stylex.props(styles.table)}>
-        <caption className="sr-only">Users, page {page}</caption>
+        <caption {...stylex.props(arcade.srOnly)}>Users, page {page}</caption>
         <colgroup>
           <col />
           <col {...stylex.props(styles.colRole)} />
@@ -1373,7 +1374,7 @@ function UrlDemo({ careful }: { careful: boolean }) {
         </span>
       </div>
       <table {...stylex.props(styles.table)}>
-        <caption className="sr-only">Users, page {now.page}</caption>
+        <caption {...stylex.props(arcade.srOnly)}>Users, page {now.page}</caption>
         <colgroup>
           <col />
           <col {...stylex.props(styles.colRole)} />

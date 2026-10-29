@@ -17,6 +17,7 @@ import { fonts, motion, palette } from "../theme.stylex";
 import { button } from "../components/button";
 import { section, veil } from "./-components/section";
 import { loadIn } from "../components/load-in";
+import { arcade } from "../components/arcade";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -262,11 +263,11 @@ function Index() {
   useCutIns(rootRef, introDone);
 
   return (
-    <div ref={rootRef} className="arc arc-scan">
+    <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>
       <Backdrop />
       <Intro onDone={setIntroDone} />
 
-      <div className="arc-wrap">
+      <div {...stylex.props(arcade.wrap)}>
         <Hero introDone={introDone} />
       </div>
 
@@ -280,7 +281,7 @@ function Index() {
         </div>
       </div>
 
-      <div className="arc-wrap">
+      <div {...stylex.props(arcade.wrap)}>
         <section id="rules" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>

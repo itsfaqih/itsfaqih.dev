@@ -13,6 +13,7 @@ import {
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 import { button } from "../../components/button";
+import { arcade } from "../../components/arcade";
 
 type Tone = "no" | "yes";
 type Line = { c: string; out?: string; tone?: Tone; hot?: boolean };
@@ -465,7 +466,7 @@ function CodeBlock({ lines }: { lines: Line[] }) {
                 line.tone === "yes" && styles.outYes,
               )}
             >
-              <span className="sr-only">gives </span>
+              <span {...stylex.props(arcade.srOnly)}>gives </span>
               {paint(line.out, TOKEN, OUT_KINDS)}
             </span>
           )}
@@ -957,7 +958,7 @@ const code = (text: string) => (
 );
 const blank = (text: string) => (
   <>
-    <span className="sr-only">{text}</span>
+    <span {...stylex.props(arcade.srOnly)}>{text}</span>
     <span aria-hidden="true" {...stylex.props(styles.gap)} />
   </>
 );

@@ -30,6 +30,7 @@ import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
 import { button } from "../../../components/button";
 import { section } from "../../-components/section";
+import { arcade } from "../../../components/arcade";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
@@ -124,7 +125,7 @@ function Landing({
   const next = VISIBLE_GUIDELINES[at + 1];
 
   return (
-    <div ref={rootRef} className={`arc ${stylex.props(shell.root, reveal).className}`} style={hue}>
+    <div ref={rootRef} className={`arc ${stylex.props(arcade.root, shell.root, reveal).className}`} style={hue}>
       <div {...stylex.props(shell.ground)} aria-hidden="true" />
       <IslandActivity>
         <span {...stylex.props(styles.activity)} style={hue}>
@@ -149,7 +150,7 @@ function Landing({
           <ShareButton data={share} inIsland />
         </span>
       </IslandActivity>
-      <header className={`arc-wrap ${stylex.props(shell.titleScreen).className}`}>
+      <header {...stylex.props(arcade.wrap, shell.titleScreen)}>
         <div {...stylex.props(shell.heroCopy)}>
           <div {...stylex.props(shell.crumbRow)}>
             <nav
@@ -182,7 +183,7 @@ function Landing({
         <Cover rule={rule} entering={!morphed} />
       </header>
 
-      <div className="arc-wrap">
+      <div {...stylex.props(arcade.wrap)}>
         <section id="learn" aria-labelledby="learn-title" {...stylex.props(section.block, lessonKit.section)}>
           <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
             <h2
@@ -268,7 +269,7 @@ function Landing({
           </div>
           <div {...stylex.props(shell.rev)} data-rev>
             {at !== -1 && (
-              <nav className={`arc ${stylex.props(pager.nav).className}`} aria-label="More rules">
+              <nav {...stylex.props(arcade.root, pager.nav)} aria-label="More rules">
                 {prev ? (
                   <PagerCard rule={prev} direction="Previous" />
                 ) : (
@@ -588,7 +589,7 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
               <span aria-hidden="true" {...stylex.props(lessonKit.mark)}>
                 {MARK[key]}
               </span>
-              <span className="sr-only">{key === "bad" ? "Avoid: " : "Do: "}</span>
+              <span {...stylex.props(arcade.srOnly)}>{key === "bad" ? "Avoid: " : "Do: "}</span>
               {lesson[key].label}
             </figcaption>
             {lesson[key].view}
@@ -1018,7 +1019,7 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
         ) : (
           <ShareNetworkIcon size={16} weight="bold" aria-hidden="true" />
         )}
-        <span className="sr-only" aria-live="polite">
+        <span {...stylex.props(arcade.srOnly)} aria-live="polite">
           {label}
         </span>
       </button>

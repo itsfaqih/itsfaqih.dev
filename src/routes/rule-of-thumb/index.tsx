@@ -9,6 +9,7 @@ import { useCutIns } from "../-components/use-cut-ins";
 import { pageHead } from "../../seo";
 import { veil } from "../-components/section";
 import { loadIn } from "../../components/load-in";
+import { arcade } from "../../components/arcade";
 
 const LEDE =
   "Opinions, guidelines, and patterns I've adopted for building web applications. Many come with demos you can try.";
@@ -29,9 +30,9 @@ function RuleOfThumbsIndex() {
   useCutIns(rootRef);
 
   return (
-    <div ref={rootRef} className="arc arc-scan">
+    <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>
       <Backdrop />
-      <div className="arc-wrap">
+      <div {...stylex.props(arcade.wrap)}>
         <div {...stylex.props(styles.head)}>
           <div {...stylex.props(loadIn.piece, veil.dense, veil.fit, heroType.tag)} data-cut>
             {RULES.length} rules · {TOPICS.length} topics

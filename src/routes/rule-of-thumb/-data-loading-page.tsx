@@ -13,6 +13,7 @@ import {
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 import { button } from "../../components/button";
+import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -839,7 +840,7 @@ function WaterfallView({ bars, paint }: Waterfall) {
                   {...stylex.props(styles.bar, styles[bar.kind])}
                   style={{ left: pct(bar.from), width: pct(bar.to - bar.from) }}
                 />
-                <span className="sr-only">
+                <span {...stylex.props(arcade.srOnly)}>
                   {bar.label}: {bar.from} to {bar.to}ms
                   {bar.kind === "defer" ? ", deferred" : ""}
                 </span>

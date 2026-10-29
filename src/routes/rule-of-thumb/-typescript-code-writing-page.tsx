@@ -15,6 +15,7 @@ import {
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 import { button } from "../../components/button";
+import { arcade } from "../../components/arcade";
 
 type Tone = "no" | "yes";
 type Note = { text: string; tone?: Tone; error?: true };
@@ -306,7 +307,7 @@ function Checked({ lines }: { lines: Line[] }) {
               <span
                 className={`ts-out ${stylex.props(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes, phase === "idle" && styles.unrun).className}`}
               >
-                <span className="sr-only">{line.note.error ? "error: " : "gives "}</span>
+                <span {...stylex.props(arcade.srOnly)}>{line.note.error ? "error: " : "gives "}</span>
                 {line.note.text}
               </span>
             )}
@@ -667,7 +668,7 @@ const TLDR = [
 const code = (text: string) => <Code style={styles.boardCode}>{paint(text, TOKEN, KINDS)}</Code>;
 const blank = (text: string) => (
   <>
-    <span className="sr-only">{text}</span>
+    <span {...stylex.props(arcade.srOnly)}>{text}</span>
     <span aria-hidden="true" {...stylex.props(styles.gap)} />
   </>
 );

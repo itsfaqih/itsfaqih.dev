@@ -10,6 +10,7 @@ import { reticle } from "./reticle";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 import { fonts, motion, palette } from "../../theme.stylex";
 import { loadIn } from "../../components/load-in";
+import { arcade } from "../../components/arcade";
 
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
@@ -115,7 +116,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
             <RuleThumb key={selected.id} rule={selected} play at="panel" style={[styles.thumb, styles.panelThumb]} />
             <h3 {...stylex.props(styles.title)}>
               <ScrambleText text={selected.title} />
-              <span className="sr-only">{selected.title}</span>
+              <span {...stylex.props(arcade.srOnly)}>{selected.title}</span>
             </h3>
             <p {...stylex.props(styles.blurb)}>{selected.description}</p>
             <dl {...stylex.props(styles.facts)}>

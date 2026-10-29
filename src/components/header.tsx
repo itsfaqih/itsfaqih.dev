@@ -7,6 +7,7 @@ import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { button } from "./button";
 import { loadIn } from "./load-in";
+import { arcade } from "./arcade";
 
 let activityHost: HTMLElement | null = null;
 let activityCount = 0;
@@ -139,7 +140,7 @@ export function Header() {
 
   return (
     <div
-      className={`arc arc-bar ${stylex.props(styles.bar).className}`}
+      className={`arc arc-bar ${stylex.props(arcade.root, styles.bar).className}`}
       data-scrolled={scrolled ? "" : undefined}
       data-mode={compact ? "compact" : "full"}
       data-open={open || undefined}
