@@ -239,42 +239,6 @@ body.site-shell {
   color-scheme: dark;
 }
 
-.code-block {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  min-height: calc(var(--lines, 0) * var(--diffs-line-height) + 2 * var(--diffs-gap-block) + 2px);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  background: var(--card);
-  color: var(--text);
-  /* The shadow DOM uses light-dark(); pin it to the site's explicit mode. */
-  color-scheme: light;
-  --diffs-gap-block: 0.5rem;
-  --diffs-line-height: 1.625rem;
-  --diffs-font-family: var(--font-mono);
-  --diffs-header-font-family: var(--font-sans);
-  --diffs-light-bg: var(--card);
-  --diffs-dark-bg: var(--card);
-  --diffs-foreground: var(--text);
-  --diffs-background: var(--panel);
-  --diffs-token-comment: var(--mute);
-  --diffs-token-keyword: color-mix(in oklab, var(--ux) var(--ink-mix), #000);
-  --diffs-token-string: color-mix(in oklab, var(--ts) var(--ink-mix), #000);
-  --diffs-token-string-expression: color-mix(in oklab, var(--ts) var(--ink-mix), #000);
-  --diffs-token-constant: var(--go-ink);
-  --diffs-token-function: color-mix(in oklab, var(--cw) var(--ink-mix), #000);
-  --diffs-token-parameter: color-mix(in oklab, var(--ax) var(--ink-mix), #000);
-  --diffs-token-punctuation: var(--dim);
-  --diffs-token-link: color-mix(in oklab, var(--cw) var(--ink-mix), #000);
-}
-
-.dark .code-block {
-  color-scheme: dark;
-}
-
 /* arcade.css's reduced-motion fade-ins resolve to this definition, which comes after its own. */
 @keyframes fade-in {
   from {
