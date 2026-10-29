@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 import { TOPICS, VISIBLE_GUIDELINES as RULES } from "../../data/guidelines";
@@ -28,17 +29,38 @@ function RuleOfThumbsIndex() {
     <div ref={rootRef} className="arc arc-scan">
       <Backdrop />
       <div className="arc-wrap">
-        <div className="index-head">
+        <div className={`index-head ${stylex.props(styles.head).className}`}>
           <div className="tag" data-cut>
             {RULES.length} rules · {TOPICS.length} topics
           </div>
-          <h1 data-cut>Rule of Thumb</h1>
-          <p data-cut>{LEDE}</p>
+          <h1 data-cut {...stylex.props(styles.title)}>
+            Rule of Thumb
+          </h1>
+          <p data-cut {...stylex.props(styles.lede)}>
+            {LEDE}
+          </p>
         </div>
-        <div className="index-body">
+        <div {...stylex.props(styles.body)}>
           <RuleSelect rules={RULES} />
         </div>
       </div>
     </div>
   );
 }
+
+const styles = stylex.create({
+  head: {
+    paddingTop: "48px",
+    paddingBottom: "32px",
+  },
+  title: {
+    marginBottom: "14px",
+  },
+  lede: {
+    maxWidth: "34em",
+    fontSize: "18px",
+  },
+  body: {
+    paddingBottom: "96px",
+  },
+});

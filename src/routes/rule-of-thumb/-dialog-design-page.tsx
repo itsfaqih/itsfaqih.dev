@@ -276,6 +276,7 @@ const styles = stylex.create({
     minHeight: "28px",
   },
   title: {
+    textWrap: "pretty",
     marginBlock: 0,
     marginInline: 0,
     fontWeight: 700,
@@ -284,6 +285,7 @@ const styles = stylex.create({
     fontFamily: fonts["--display"],
   },
   body: {
+    textWrap: "pretty",
     marginTop: "-4px",
     marginRight: 0,
     marginBottom: 0,

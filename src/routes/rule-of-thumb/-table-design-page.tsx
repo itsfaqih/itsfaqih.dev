@@ -611,6 +611,7 @@ const styles = stylex.create({
     opacity: 0.3,
   },
   note: {
+    textWrap: "pretty",
     paddingTop: "10px",
     paddingRight: "14px",
     paddingBottom: "12px",

@@ -23,7 +23,6 @@ import {
 } from "../../../data/guidelines";
 import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
-import "./rule-landing.css";
 import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
@@ -253,16 +252,16 @@ function Landing({
           </Rail>
         </section>
 
-        <section className="take">
-          <div className={`take-copy ${stylex.props(shell.rev).className}`} data-rev>
-            <h2>Take the rule with you</h2>
+        <section {...stylex.props(takeKit.section)}>
+          <div {...stylex.props(lessonKit.veil, takeKit.copy, shell.rev)} data-rev>
+            <h2 {...stylex.props(takeKit.title)}>Take the rule with you</h2>
             <Tone value="take">
-              <p>
+              <p {...stylex.props(takeKit.text)}>
                 The whole rule as plain Markdown. Paste it into your <Code>AGENTS.md</Code>
                 {` and your agents will ${take}.`}
               </p>
             </Tone>
-            <div className="acts">
+            <div className={`acts ${stylex.props(takeKit.acts).className}`}>
               <CopyMarkdown url={markdownUrl} />
               <a className="btn soft" href={markdownUrl} target="_blank" rel="noopener noreferrer">
                 View .md
@@ -271,14 +270,21 @@ function Landing({
           </div>
           <div {...stylex.props(shell.rev)} data-rev>
             {at !== -1 && (
-              <nav className="arc rot-pager" aria-label="More rules">
-                {prev ? <PagerCard rule={prev} direction="Previous" /> : <div />}
+              <nav className={`arc ${stylex.props(pager.nav).className}`} aria-label="More rules">
+                {prev ? (
+                  <PagerCard rule={prev} direction="Previous" />
+                ) : (
+                  <div {...stylex.props(pager.gap)} />
+                )}
                 {next ? (
                   <PagerCard rule={next} direction="Next" />
                 ) : (
-                  <Link to="/rule-of-thumb" className="rot-card rot-all">
-                    <span className="d">That's every rule so far</span>
-                    <span className="t">Back to all rules →</span>
+                  <Link
+                    to="/rule-of-thumb"
+                    className={`rot-card ${stylex.props(pager.card, pager.all).className}`}
+                  >
+                    <span {...stylex.props(pager.dir)}>That's every rule so far</span>
+                    <span {...stylex.props(pager.title)}>Back to all rules →</span>
                   </Link>
                 )}
               </nav>
@@ -303,20 +309,22 @@ function PagerCard({
     <Link
       to={rule.href}
       preload="intent"
-      className={direction === "Next" ? "rot-card next" : "rot-card"}
+      className={`rot-card ${stylex.props(pager.card, direction === "Next" && pager.next).className}`}
       style={{ "--c": colorOf(rule.label) }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
     >
-      <RuleThumb rule={rule} play={hovered} />
-      <span className="meta">
-        <span className="d">{direction === "Next" ? "Next rule →" : "← Previous rule"}</span>
-        <span className="n">
+      <RuleThumb rule={rule} play={hovered} style={pager.thumb} />
+      <span {...stylex.props(pager.meta)}>
+        <span {...stylex.props(pager.dir)}>
+          {direction === "Next" ? "Next rule →" : "← Previous rule"}
+        </span>
+        <span {...stylex.props(pager.number)}>
           No.{ruleNumber(rule)} · {rule.label}
         </span>
-        <span className="t">{rule.title}</span>
+        <span {...stylex.props(pager.title)}>{rule.title}</span>
       </span>
     </Link>
   );
@@ -345,15 +353,15 @@ function Cover({ rule, entering }: CoverProps) {
   return (
     <div
       ref={ref}
-      className={`cover ${stylex.props(entering && shell.in, shell.third).className}`}
+      className={`cover ${stylex.props(cover.box, entering && shell.in, shell.third).className}`}
       onPointerMove={lean}
       onPointerLeave={rest}
     >
-      <div className="cover-card">
-        <RuleThumb rule={rule} play />
-        <div className="cover-foot" aria-hidden="true">
+      <div {...stylex.props(cover.card)}>
+        <RuleThumb rule={rule} play style={cover.thumb} />
+        <div aria-hidden="true" {...stylex.props(cover.foot)}>
           <span>{rule.id}.md</span>
-          <span>{rule.coverTag}</span>
+          <span {...stylex.props(cover.tag)}>{rule.coverTag}</span>
         </div>
       </div>
     </div>
@@ -2134,6 +2142,216 @@ const quizKit = stylex.create({
     animationDelay: "300ms",
     animationTimingFunction: motion["--out"],
     animationFillMode: "both",
+  },
+});
+
+const takeKit = stylex.create({
+  section: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr) minmax(0, 1.1fr)",
+      [PAIRED]: "minmax(0, 1fr)",
+    },
+    gap: "40px",
+    alignItems: "center",
+    paddingTop: { default: "128px", [PHONE]: "88px" },
+    paddingBottom: { default: "160px", [PHONE]: "96px" },
+  },
+  copy: {
+    display: "grid",
+    gap: "16px",
+  },
+  title: {
+    fontWeight: 900,
+    fontSize: { default: "40px", [PHONE]: "30px" },
+    lineHeight: 1.05,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.035em",
+    textWrap: "balance",
+  },
+  text: {
+    marginBottom: "8px",
+    textWrap: "pretty",
+  },
+  acts: {
+    rowGap: "14px",
+    columnGap: "14px",
+    alignItems: "center",
+  },
+});
+
+const LIFTED = "translateY(-4px)";
+const PRESSED = "translateY(3px)";
+const ACCENT = `var(--c, ${palette["--go"]})`;
+
+const pager = stylex.create({
+  nav: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: "12px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+  },
+  gap: {
+    display: "none",
+  },
+  card: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    paddingBlock: "10px",
+    paddingInline: "10px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": ACCENT,
+      ":focus-visible": ACCENT,
+      ":active": ACCENT,
+    },
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
+    borderBottomLeftRadius: "16px",
+    borderBottomRightRadius: "16px",
+    backgroundColor: palette["--panel"],
+    boxShadow: {
+      default: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+      ":hover": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":focus-visible": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":active": `${palette["--raise"]}, 0 1px 0 var(--key)`,
+    },
+    transform: {
+      default: null,
+      // Reduced motion has only ever stilled the press: the lift outranked the old reset.
+      ":hover": LIFTED,
+      ":focus-visible": LIFTED,
+      ":active": { default: PRESSED, [REDUCE]: "none" },
+    },
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "3px" },
+    transitionProperty: "transform, box-shadow, border-color",
+    transitionDuration: { default: "220ms, 220ms, 120ms", ":active": "100ms" },
+    transitionDelay: "0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal",
+    transitionTimingFunction: `${motion["--snap"]}, ${motion["--snap"]}, ease`,
+  },
+  next: {
+    flexDirection: "row-reverse",
+    textAlign: "right",
+  },
+  all: {
+    flexDirection: "column",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: "6px",
+    minHeight: "92px",
+    textAlign: "right",
+  },
+  thumb: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: { default: "112px", "@media (max-width: 720px)": "96px" },
+  },
+  meta: {
+    display: "grid",
+    gap: "4px",
+    minWidth: 0,
+  },
+  dir: {
+    fontWeight: 500,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--mute"],
+  },
+  number: {
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
+  },
+  title: {
+    fontWeight: 700,
+    fontSize: "16px",
+    lineHeight: 1.2,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.02em",
+    color: palette["--text"],
+  },
+});
+
+const cover = stylex.create({
+  box: {
+    "--rx": "0deg",
+    "--ry": "0deg",
+    position: "relative",
+    justifySelf: { default: null, "@media (max-width: 720px)": "start" },
+    width: { default: null, "@media (max-width: 720px)": "min(100%, 240px)" },
+    maxWidth: { default: null, [STACKED]: "520px" },
+    marginLeft: { default: null, "@media (max-width: 720px)": "6px" },
+    paddingBlock: { default: "24px", [PHONE]: "16px" },
+    paddingInline: { default: "12px", [PHONE]: "8px" },
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "var(--c)",
+    borderRadius: "18px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent), 0 20px 50px ${palette["--lift"]}`,
+    transform: "rotate(2deg)",
+    perspective: "1200px",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      inset: "40px 0 8px 32px",
+      borderRadius: "24px",
+      backgroundColor: "var(--c)",
+      boxShadow: "0 8px 0 var(--key-c)",
+      rotate: "4deg",
+    },
+  },
+  card: {
+    position: "relative",
+    display: "grid",
+    gap: "12px",
+    padding: "14px",
+    borderRadius: "22px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 10px 0 ${palette["--drop-ink"]}, 0 30px 60px ${palette["--lift"]}`,
+    transform: "rotate(-4deg) rotateX(var(--rx)) rotateY(var(--ry))",
+    transitionProperty: { default: "transform", [REDUCE]: "none" },
+    transitionDuration: { default: motion["--t-panel"], [REDUCE]: "0s" },
+    transitionTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+  },
+  thumb: {
+    borderTopLeftRadius: "12px",
+    borderTopRightRadius: "12px",
+    borderBottomLeftRadius: "12px",
+    borderBottomRightRadius: "12px",
+    viewTransitionName: { default: null, [RULE_OPEN]: "rule-thumb" },
+  },
+  foot: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "12px",
+    paddingTop: 0,
+    paddingRight: "4px",
+    paddingBottom: "2px",
+    paddingLeft: "4px",
+    fontWeight: 600,
+    fontSize: { default: "12px", [PHONE]: "11px" },
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+  },
+  tag: {
+    color: "var(--c-ink)",
   },
 });
 

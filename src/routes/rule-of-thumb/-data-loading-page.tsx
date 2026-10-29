@@ -184,6 +184,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   label: {
+    textWrap: "pretty",
     display: "flex",
     alignItems: "center",
     fontWeight: 600,
@@ -200,6 +201,7 @@ const styles = stylex.create({
     overflow: "hidden",
   },
   lane: {
+    textWrap: "pretty",
     position: "relative",
   },
   bar: {
@@ -389,6 +391,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   mailRow: {
+    textWrap: "pretty",
     display: "grid",
     gridTemplateColumns: "28px minmax(0, 1fr)",
     gap: "10px",
@@ -449,6 +452,7 @@ const styles = stylex.create({
     animationDirection: "alternate",
   },
   said: {
+    textWrap: "pretty",
     minHeight: "2.9em",
     fontWeight: 500,
     fontSize: "12px",
@@ -475,6 +479,7 @@ const styles = stylex.create({
     animationTimingFunction: motion["--out"],
   },
   person: {
+    textWrap: "pretty",
     display: "grid",
     gridTemplateColumns: "28px auto minmax(0, 1fr)",
     gap: "10px",
@@ -520,10 +525,12 @@ const styles = stylex.create({
     color: palette["--mute"],
   },
   empty: {
+    textWrap: "pretty",
     fontSize: "14px",
     color: palette["--mute"],
   },
   toast: {
+    textWrap: "pretty",
     position: "absolute",
     bottom: "12px",
     left: "50%",
@@ -714,6 +721,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   histRow: {
+    textWrap: "pretty",
     display: "flex",
     justifyContent: "space-between",
     gap: "12px",

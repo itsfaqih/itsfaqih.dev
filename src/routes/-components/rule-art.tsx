@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { colorOf } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
@@ -94,12 +95,14 @@ export function isOpeningRule() {
 type RuleThumbProps = {
   rule: Guideline;
   play?: boolean;
+  style?: stylex.StyleXStyles;
 };
 
-export function RuleThumb({ rule, play = false }: RuleThumbProps) {
+export function RuleThumb({ rule, play = false, style }: RuleThumbProps) {
+  const { className } = stylex.props(style);
   return (
     <div
-      className="thumb"
+      className={className ? `thumb ${className}` : "thumb"}
       style={{ "--c": colorOf(rule.label) }}
       data-play={play || undefined}
       aria-hidden="true"

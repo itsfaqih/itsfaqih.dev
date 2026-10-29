@@ -2534,134 +2534,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   color: var(--text);
 }
 
-/* ---------- Rule of Thumb index page ---------- */
-.arc .index-head {
-  padding: 48px 0 32px;
-}
-.arc .index-head h1 {
-  margin-bottom: 14px;
-}
-.arc .index-head p {
-  margin: 0;
-  max-width: 34em;
-  font-size: 18px;
-}
-.arc .index-body {
-  padding: 0 0 96px;
-}
-
-/* ---------- Rule of Thumb articles ---------- */
-.arc .cover {
-  padding: 8px;
-  border-radius: 18px;
-  background: var(--panel);
-  border: 2px solid var(--c);
-  box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent),
-    0 20px 50px var(--lift);
-  transform: rotate(2deg);
-}
-.arc .cover .thumb {
-  border-radius: 12px;
-}
-
-/* Previous / next cartridges at the end of an article. */
-.arc.rot-pager {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 80px;
-  padding-top: 32px;
-  border-top: 2px solid var(--hair);
-}
-.arc .rot-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 10px;
-  position: relative;
-  border-radius: 16px;
-  background: var(--panel);
-  border: 2px solid var(--hair);
-  box-shadow:
-    var(--raise),
-    0 4px 0 var(--drop-ink);
-  transition:
-    transform 220ms var(--snap),
-    box-shadow 220ms var(--snap),
-    border-color 120ms ease;
-}
-.arc .rot-card:active {
-  transform: translateY(3px);
-  border-color: var(--c, var(--go));
-  box-shadow:
-    var(--raise),
-    0 1px 0 var(--key);
-  transition-duration: 100ms;
-}
-.arc .rot-card.next {
-  flex-direction: row-reverse;
-  text-align: right;
-}
-.arc .rot-card:hover:not(:active),
-.arc .rot-card:focus-visible:not(:active) {
-  border-color: var(--c, var(--go));
-  transform: translateY(-4px);
-  box-shadow:
-    var(--raise),
-    0 8px 0 var(--key);
-}
-.arc .rot-card:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-.arc .rot-card .thumb {
-  flex: none;
-  width: 112px;
-}
-.arc .rot-card .meta {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-.arc .rot-card .d {
-  font: 500 11px var(--display);
-  color: var(--mute);
-}
-.arc .rot-card .n {
-  font: 700 11px var(--display);
-  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-}
-.arc .rot-card .t {
-  font: 700 16px/1.2 var(--display);
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-.arc .rot-all {
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 6px;
-  min-height: 92px;
-  text-align: right;
-}
-@media (max-width: 720px) {
-  .arc .cover {
-    width: min(100%, 240px);
-    justify-self: start;
-    margin-left: 6px;
-  }
-  .arc.rot-pager {
-    grid-template-columns: 1fr;
-  }
-  .arc.rot-pager > div:empty {
-    display: none;
-  }
-  .arc .rot-card .thumb {
-    width: 96px;
-  }
-}
-
 /* The select reticle: four corner brackets in the card's hue lock onto the card under the
    pointer or keyboard focus, like a character-select cursor. One ::after, eight legs. */
 .arc .tile::after,
@@ -2719,10 +2591,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc .stg:focus-visible,
   .arc .stg::after,
   .arc .rot-card::after,
-  .arc .stg:active,
-  .arc .rot-card:hover,
-  .arc .rot-card:focus-visible,
-  .arc .rot-card:active {
+  .arc .stg:active {
     transform: none;
   }
 }
@@ -2794,7 +2663,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     padding: 28px;
   }
 }
-
 
 /* ---------- Load-in ----------
    Pieces boot like a corrupted game frame: each cuts in as torn slices that jump sideways on a

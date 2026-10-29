@@ -207,6 +207,7 @@ const styles = stylex.create({
     },
   },
   sum: {
+    textWrap: "pretty",
     fontSize: "14px",
     color: palette["--dim"],
   },
@@ -258,6 +259,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   order: {
+    textWrap: "pretty",
     display: "grid",
     gridTemplateColumns: "auto minmax(0, 1fr) auto",
     gap: "10px",
