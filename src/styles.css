@@ -275,16 +275,6 @@ body.site-shell {
   color-scheme: dark;
 }
 
-.page-container {
-  padding-top: 96px !important;
-}
-
-@media (max-width: 639px) {
-  .page-container {
-    padding-top: 0 !important;
-  }
-}
-
 /* arcade.css's reduced-motion fade-ins resolve to this definition, which comes after its own. */
 @keyframes fade-in {
   from {
@@ -296,27 +286,3 @@ body.site-shell {
     transform: translateY(0);
   }
 }
-
-@media (max-width: 639px) {
-  .page-container {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .page-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent 0%, #FFFFFF 0%, #FFFFFF 100%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%);
-    opacity: 0.90;
-  }
-
-  .dark .page-container::before {
-    background: none;
-  }
-}
-
