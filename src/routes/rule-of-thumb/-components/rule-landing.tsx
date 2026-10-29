@@ -50,7 +50,7 @@ type TreeRow = {
 
 type Slot = { id: string; label: ReactNode; note: string; cost: string[] };
 type BoardRow =
-  | { depth: number; text: ReactNode; kind?: string; tag?: string }
+  | { depth: number; text: ReactNode; kind?: TreeRow["kind"]; tag?: string }
   | { depth: number; slot: Slot; lead?: ReactNode };
 export type Level = {
   name: string;
@@ -188,11 +188,16 @@ function Landing({
       <div className="arc-wrap">
         <section id="learn" aria-labelledby="learn-title" {...stylex.props(lessonKit.section)}>
           <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
-            <h2 id="learn-title" {...stylex.props(lessonKit.veil, lessonKit.secTitle)}>
+            <h2
+              id="learn-title"
+              {...stylex.props(lessonKit.veil, lessonKit.headItem, lessonKit.secTitle)}
+            >
               {learn.title}
             </h2>
             <Tone value="wrap">
-              <p {...stylex.props(lessonKit.veil, lessonKit.secText)}>{learn.intro}</p>
+              <p {...stylex.props(lessonKit.veil, lessonKit.headItem, lessonKit.secText)}>
+                {learn.intro}
+              </p>
             </Tone>
           </div>
           <div {...stylex.props(lessonKit.lessons)}>
@@ -213,19 +218,21 @@ function Landing({
           </div>
         </section>
 
-        <section className="game" id="quiz" aria-labelledby="quiz-title">
-          <div className={`sec-head quiz-head ${stylex.props(shell.rev).className}`} data-rev>
-            <div>
-              <h2 id="quiz-title">Mini quiz</h2>
+        <section id="quiz" aria-labelledby="quiz-title" {...stylex.props(quizKit.section)}>
+          <div {...stylex.props(quizKit.head, shell.rev)} data-rev>
+            <div {...stylex.props(lessonKit.veil, lessonKit.headItem, quizKit.headCopy)}>
+              <h2 id="quiz-title" {...stylex.props(lessonKit.secTitle)}>
+                Mini quiz
+              </h2>
               <Tone value="wrap">
-                <p>{quiz.intro}</p>
+                <p {...stylex.props(lessonKit.secText)}>{quiz.intro}</p>
               </Tone>
             </div>
-            <div className="score">
+            <div {...stylex.props(lessonKit.headItem, quizKit.score)}>
               <span>
                 {clearedCount(results)}/{levels.length} cleared
               </span>
-              <span className="score-stars">
+              <span {...stylex.props(quizKit.scoreStars)}>
                 ★ {starTotal(results)}/{levels.length * 3}
               </span>
             </div>
@@ -581,7 +588,10 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
             {lesson[key].view}
             <div {...stylex.props(lessonKit.costs, costsStyle)}>
               {lesson[key].costs.map((cost) => (
-                <span key={cost} {...stylex.props(lessonKit.cost, lessonKit[`${key}Cost`])}>
+                <span
+                  key={cost}
+                  {...stylex.props(lessonKit.cost, lessonKit.costIn, lessonKit[`${key}Cost`])}
+                >
                   {cost}
                 </span>
               ))}
@@ -596,9 +606,9 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
 function Stars({ stars }: { stars: number | null }) {
   if (stars === null) return null;
   return (
-    <span className="stars" aria-label={`${stars} of 3 stars`}>
+    <span aria-label={`${stars} of 3 stars`} {...stylex.props(quizKit.stars)}>
       {[1, 2, 3].map((at) => (
-        <i key={at} data-on={at <= stars || undefined}>
+        <i key={at} {...stylex.props(quizKit.star, at <= stars && quizKit.starOn)}>
           ★
         </i>
       ))}
@@ -641,9 +651,9 @@ function Rail({ results, children }: { results: Results; children: ReactNode }) 
   }, [reached, results.length]);
 
   return (
-    <div ref={railRef} className="lvls">
-      <span className="rail" aria-hidden="true">
-        <i ref={fillRef} />
+    <div ref={railRef} {...stylex.props(quizKit.levels)}>
+      <span aria-hidden="true" {...stylex.props(quizKit.rail)}>
+        <i ref={fillRef} {...stylex.props(quizKit.railFill)} />
       </span>
       {children}
     </div>
@@ -809,79 +819,103 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
   return (
     <article
       id={`lv-${n}`}
-      className={`level panel ${stylex.props(shell.rev).className}`}
+      {...stylex.props(lessonKit.panel, quizKit.level, shell.rev)}
       data-rev
-      data-clear={cleared || undefined}
       onKeyDown={onKeyDown}
     >
-      <span className="node" aria-hidden="true">
+      <span
+        className={`node ${stylex.props(quizKit.node, cleared && quizKit.nodeClear).className}`}
+        aria-hidden="true"
+      >
         {cleared ? "✓" : n}
       </span>
-      <div className="lv-copy">
-        <div className="lv-head">
-          <span className="badge">LV {n}</span>
-          {cleared && <span className="stamp">Clear</span>}
+      <div {...stylex.props(quizKit.copy)}>
+        <div {...stylex.props(quizKit.levelHead)}>
+          <span {...stylex.props(quizKit.badge)}>LV {n}</span>
+          {cleared && <span {...stylex.props(quizKit.stamp)}>Clear</span>}
           <Stars stars={stars} />
         </div>
-        <h3>{level.name}</h3>
+        <h3 {...stylex.props(quizKit.title)}>{level.name}</h3>
         <Tone value="prompt">
-          <p className="prompt">{level.prompt}</p>
+          <p {...stylex.props(quizKit.prompt)}>{level.prompt}</p>
         </Tone>
         <div
-          className="say"
           aria-live="polite"
-          data-tone={cleared ? "yes" : said ? "no" : undefined}
+          {...stylex.props(quizKit.say, cleared ? quizKit.sayYes : said && quizKit.sayNo)}
         >
-          <p key={said ? `${said.id}-${miss?.at ?? 0}` : "hint"}>
+          <p
+            key={said ? `${said.id}-${miss?.at ?? 0}` : "hint"}
+            {...stylex.props(quizKit.said, said && quizKit.saidToned)}
+          >
             {said ? said.note : `Drag the piece into the ${board}. Or tap it, then tap a spot.`}
           </p>
           {said && (
-            <span className="costs">
+            <span {...stylex.props(lessonKit.costs)}>
               {said.cost.map((cost) => (
-                <span key={cost}>{cost}</span>
+                <span
+                  key={cost}
+                  {...stylex.props(
+                    lessonKit.cost,
+                    cleared ? lessonKit.goodCost : lessonKit.badCost,
+                  )}
+                >
+                  {cost}
+                </span>
               ))}
             </span>
           )}
         </div>
       </div>
 
-      <div className="board well" data-drag={dragging || picked || undefined}>
-        <ul className="tree">
+      <div {...stylex.props(lessonKit.well, quizKit.board)}>
+        <ul {...stylex.props(tree.list)}>
           {level.rows.map((row, index) => {
             if (!("slot" in row)) {
               return (
                 <li
                   key={index}
-                  className={row.kind ? `row ${row.kind}` : "row"}
                   style={{ "--d": row.depth }}
+                  {...stylex.props(tree.row, row.kind && tree[row.kind])}
                 >
                   {row.text}
-                  {row.tag && <span className="calls">{row.tag}</span>}
+                  {row.tag && <span {...stylex.props(tree.calls)}>{row.tag}</span>}
                 </li>
               );
             }
             const { slot } = row;
             const seated = placed === slot.id;
+            const open = !cleared && (picked || dragging);
+            const missed = miss?.id === slot.id;
             return (
-              <li key={index} className="row" style={{ "--d": row.depth }}>
-                {row.lead && <span className="slot-lead">{row.lead}</span>}
+              <li
+                key={index}
+                style={{ "--d": row.depth }}
+                {...stylex.props(tree.row, row.lead ? quizKit.leadRow : null)}
+              >
+                {row.lead && <span {...stylex.props(quizKit.lead)}>{row.lead}</span>}
                 <button
                   type="button"
                   ref={(element) => {
                     if (element) slotRefs.current.set(slot.id, element);
                     else slotRefs.current.delete(slot.id);
                   }}
-                  className={`slot ${stylex.props(stylex.defaultMarker()).className}`}
-                  disabled={cleared || !(picked || dragging)}
-                  data-near={near === slot.id || undefined}
-                  data-miss={miss?.id === slot.id || undefined}
+                  {...stylex.props(
+                    quizKit.slot,
+                    row.lead ? quizKit.slotAfterLead : null,
+                    open && quizKit.slotOpen,
+                    near === slot.id && quizKit.slotNear,
+                    missed && (open ? quizKit.slotMissOpen : quizKit.slotMiss),
+                    cleared && !seated && quizKit.slotOff,
+                    seated && quizKit.slotSeat,
+                    stylex.defaultMarker(),
+                  )}
+                  disabled={!open}
                   data-off={(cleared && !seated) || undefined}
-                  data-seat={seated || undefined}
-                  key={miss?.id === slot.id ? miss.at : "slot"}
+                  key={missed ? miss.at : "slot"}
                   onClick={() => drop(slot.id)}
                 >
                   {seated ? (
-                    <span ref={seatRef} className="piece seated">
+                    <span ref={seatRef} {...stylex.props(quizKit.piece, quizKit.seated)}>
                       {level.piece}
                       <Burst />
                     </span>
@@ -893,13 +927,16 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
             );
           })}
         </ul>
-        <div className="tray">
+        <div {...stylex.props(quizKit.tray)}>
           {!cleared && (
             <button
               ref={pieceRef}
               type="button"
-              className="piece"
-              data-picked={picked || undefined}
+              {...stylex.props(
+                quizKit.piece,
+                picked && quizKit.picked,
+                dragging && quizKit.dragging,
+              )}
               data-dragging={dragging || undefined}
               aria-pressed={picked}
               aria-label={`${level.piece}. ${picked ? `Picked up: choose a spot in the ${board}.` : "Pick up"}`}
@@ -915,7 +952,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
               {level.piece}
             </button>
           )}
-          <span className="tray-note">
+          <span {...stylex.props(quizKit.trayNote)}>
             {cleared
               ? "In its place."
               : picked
@@ -930,9 +967,13 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
 
 function Burst() {
   return (
-    <span className="burst" aria-hidden="true">
+    <span aria-hidden="true" {...stylex.props(quizKit.burst)}>
       {Array.from({ length: 8 }, (_, index) => (
-        <i key={index} style={{ "--a": `${index * 45 + 22}deg` }} />
+        <i
+          key={index}
+          style={{ "--a": `${index * 45 + 22}deg` }}
+          {...stylex.props(quizKit.spark)}
+        />
       ))}
     </span>
   );
@@ -1134,6 +1175,18 @@ const dockShrink = stylex.keyframes({
 });
 
 const said = stylex.keyframes({ from: { opacity: 0, translate: "0 6px" } });
+const pop = stylex.keyframes({ "40%": { scale: 1.2 } });
+const stamp = stylex.keyframes({ from: { opacity: 0, scale: 0.6, rotate: "-12deg" } });
+const shake = stylex.keyframes({
+  "20%": { translate: "-6px 0" },
+  "40%": { translate: "6px 0" },
+  "60%": { translate: "-4px 0" },
+  "80%": { translate: "4px 0" },
+});
+const burst = stylex.keyframes({
+  from: { transform: "translate(18px) scale(1)", opacity: 1 },
+  to: { transform: "translate(64px) scale(0)", opacity: 0 },
+});
 
 const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
@@ -1401,8 +1454,10 @@ const lessonKit = stylex.create({
     boxShadow: palette["--veil-edge"],
     borderRadius: "16px",
   },
-  secTitle: {
+  headItem: {
     justifySelf: "start",
+  },
+  secTitle: {
     fontWeight: 900,
     fontSize: "clamp(32px, 4vw, 52px)",
     lineHeight: 1,
@@ -1410,7 +1465,6 @@ const lessonKit = stylex.create({
     letterSpacing: "-0.04em",
   },
   secText: {
-    justifySelf: "start",
     maxWidth: "60ch",
     fontSize: "17px",
     lineHeight: 1.6,
@@ -1558,6 +1612,8 @@ const lessonKit = stylex.create({
     fontSize: "12px",
     lineHeight: "normal",
     fontFamily: fonts["--mono"],
+  },
+  costIn: {
     animationName: { default: null, [TAB]: { default: said, [REDUCE]: "none" } },
     animationDuration: { default: null, [TAB]: "200ms" },
     animationTimingFunction: { default: null, [TAB]: motion["--out"] },
@@ -1624,13 +1680,13 @@ const lessonKit = stylex.create({
 const tree = stylex.create({
   list: {
     display: "grid",
-    alignContent: "start",
     gap: "4px",
     fontSize: "13px",
     lineHeight: 1.4,
     fontFamily: fonts["--mono"],
   },
   inPane: {
+    alignContent: "start",
     minHeight: { default: null, [TAB]: "calc(var(--rows) * 32px)" },
   },
   row: {
@@ -1676,6 +1732,408 @@ const tree = stylex.create({
     fontFamily: fonts["--display"],
     color: "var(--c-ink)",
     whiteSpace: "nowrap",
+  },
+});
+
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const ON = "var(--c)";
+const ON_TINT = "color-mix(in srgb, var(--c) 16%, transparent)";
+
+const quizKit = stylex.create({
+  section: {
+    paddingTop: { default: "144px", [PHONE]: "104px" },
+    paddingBottom: 0,
+    scrollMarginTop: "8px",
+  },
+  head: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr) auto", [PHONE]: "minmax(0, 1fr)" },
+    rowGap: "24px",
+    columnGap: "48px",
+    alignItems: "end",
+    marginBottom: "48px",
+  },
+  headCopy: {
+    display: "grid",
+    gap: "14px",
+  },
+  score: {
+    display: "flex",
+    flexWrap: { default: null, [PHONE]: "wrap" },
+    gap: "14px",
+    alignItems: "center",
+    borderRadius: "12px",
+    backgroundColor: palette["--veil-dense"],
+    boxShadow: palette["--veil-dense-edge"],
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+    whiteSpace: "nowrap",
+  },
+  scoreStars: {
+    color: "var(--c-ink)",
+  },
+  stars: {
+    display: "inline-flex",
+    gap: "1px",
+    fontSize: "13px",
+    whiteSpace: "nowrap",
+  },
+  star: {
+    fontStyle: "normal",
+    color: palette["--hair"],
+  },
+  starOn: {
+    color: "var(--c-ink)",
+  },
+  levels: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: { default: "40px", [PHONE]: "28px" },
+    paddingLeft: { default: "72px", [PHONE]: 0 },
+  },
+  rail: {
+    position: "absolute",
+    top: "44px",
+    bottom: "44px",
+    left: "21px",
+    display: { default: null, [PHONE]: "none" },
+    width: "4px",
+    borderRadius: "2px",
+    backgroundColor: palette["--panel-2"],
+    overflow: "hidden",
+  },
+  railFill: {
+    position: "absolute",
+    inset: 0,
+    backgroundColor: ON,
+    transform: "scaleY(0)",
+    transformOrigin: "top",
+    transition: {
+      default: `transform ${motion["--t-panel"]} ${motion["--out"]}`,
+      [REDUCE]: "none",
+    },
+  },
+  level: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 0.92fr) minmax(0, 1.08fr)",
+      [PAIRED]: "minmax(0, 1fr)",
+    },
+    gap: { default: "32px", [PAIRED]: "24px" },
+    paddingTop: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
+    paddingRight: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
+    paddingBottom: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
+    paddingLeft: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
+    scrollMarginTop: "24px",
+  },
+  node: {
+    position: "absolute",
+    top: "28px",
+    left: "-65px",
+    display: { default: "grid", [PHONE]: "none" },
+    placeItems: "center",
+    width: "32px",
+    height: "32px",
+    borderRadius: "10px",
+    backgroundColor: palette["--panel-2"],
+    boxShadow: `inset 0 0 0 2px ${palette["--hair"]}`,
+    fontWeight: 900,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  },
+  nodeClear: {
+    backgroundColor: ON,
+    boxShadow: "0 3px 0 var(--key-c)",
+    color: "var(--on-c)",
+    animationName: { default: pop, [REDUCE]: "none" },
+    animationDuration: { default: motion["--t-pop"], [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--snap"], [REDUCE]: "ease" },
+  },
+  copy: {
+    display: "grid",
+    gap: "14px",
+    alignContent: "start",
+  },
+  levelHead: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+    minHeight: "28px",
+  },
+  badge: {
+    paddingBlock: "5px",
+    paddingInline: "9px",
+    borderRadius: "8px",
+    backgroundColor: ON,
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--on-c)",
+  },
+  stamp: {
+    paddingBlock: "3px",
+    paddingInline: "8px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: kit["--yes-ink"],
+    borderRadius: "6px",
+    fontWeight: 900,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: kit["--yes-ink"],
+    rotate: "-4deg",
+    animationName: { default: stamp, [REDUCE]: "none" },
+    animationDuration: { default: motion["--t-pop"], [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--snap"], [REDUCE]: "ease" },
+  },
+  title: {
+    color: palette["--text"],
+    fontWeight: 900,
+    fontSize: { default: "26px", [PHONE]: "22px" },
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    textWrap: "pretty",
+  },
+  prompt: {
+    maxWidth: "42ch",
+    fontSize: "17px",
+    lineHeight: 1.6,
+    color: palette["--dim"],
+    textWrap: "pretty",
+  },
+  say: {
+    display: "grid",
+    gap: "10px",
+    alignContent: "start",
+    minHeight: "84px",
+    marginTop: "4px",
+    paddingBlock: "14px",
+    paddingInline: "16px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  },
+  sayNo: {
+    boxShadow: `inset 3px 0 0 ${kit["--no"]}`,
+  },
+  sayYes: {
+    boxShadow: `inset 3px 0 0 ${kit["--yes-ink"]}`,
+  },
+  said: {
+    fontSize: "15px",
+    lineHeight: 1.5,
+    color: palette["--dim"],
+    textWrap: "pretty",
+    animationName: { default: said, [REDUCE]: "none" },
+    animationDuration: { default: "150ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+  },
+  saidToned: {
+    color: palette["--text"],
+  },
+  board: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "14px",
+    alignContent: "start",
+    padding: { default: "18px", [PHONE]: "14px" },
+  },
+  leadRow: {
+    flexWrap: "wrap",
+  },
+  lead: {
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: "auto",
+    minWidth: 0,
+    color: palette["--dim"],
+  },
+  // `background: transparent` minifies to a 0 0 position; each tinted state's background resets it.
+  slot: {
+    position: "relative",
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    alignItems: "center",
+    minWidth: 0,
+    minHeight: "36px",
+    paddingBlock: "6px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+    backgroundColor: "transparent",
+    backgroundPosition: "0 0",
+    font: "inherit",
+    color: palette["--mute"],
+    textAlign: "left",
+    overflowWrap: "anywhere",
+    textWrap: "pretty",
+    transition: `border-color ${kit["--t-fb"]} ease, background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, opacity ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
+  },
+  slotAfterLead: {
+    flexBasis: "7em",
+  },
+  slotOpen: {
+    borderStyle: {
+      default: "dashed",
+      ":focus-visible": "solid",
+      ":hover": { default: null, [HOVER]: "solid" },
+    },
+    borderColor: {
+      default: `color-mix(in srgb, ${ON} 60%, transparent)`,
+      ":focus-visible": ON,
+      ":hover": { default: null, [HOVER]: ON },
+    },
+    backgroundColor: {
+      default: `color-mix(in srgb, ${ON} 6%, transparent)`,
+      ":focus-visible": ON_TINT,
+      ":hover": { default: null, [HOVER]: ON_TINT },
+    },
+    backgroundPosition: "initial",
+    color: palette["--text"],
+    cursor: cursors["--cursor-point"],
+    transform: {
+      default: null,
+      ":focus-visible": { default: "scale(1.03)", [REDUCE]: "none" },
+    },
+  },
+  slotNear: {
+    borderStyle: "solid",
+    borderColor: ON,
+    backgroundColor: ON_TINT,
+    backgroundPosition: "initial",
+    transform: { default: "scale(1.03)", [REDUCE]: "none" },
+  },
+  slotMiss: {
+    borderColor: kit["--no"],
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+    backgroundPosition: "initial",
+    color: kit["--no-ink"],
+    animationName: { default: shake, [REDUCE]: "none" },
+    animationDuration: { default: "320ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--cut"], [REDUCE]: "ease" },
+  },
+  // A missed slot that takes the piece again: hover and focus still outrank the miss tint.
+  slotMissOpen: {
+    borderColor: {
+      default: kit["--no"],
+      ":focus-visible": ON,
+      ":hover": { default: null, [HOVER]: ON },
+    },
+    backgroundColor: {
+      default: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+      ":focus-visible": ON_TINT,
+      ":hover": { default: null, [HOVER]: ON_TINT },
+    },
+    backgroundPosition: "initial",
+    color: kit["--no-ink"],
+    animationName: { default: shake, [REDUCE]: "none" },
+    animationDuration: { default: "320ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--cut"], [REDUCE]: "ease" },
+  },
+  slotOff: {
+    borderColor: "transparent",
+    opacity: 0.4,
+    textDecoration: "line-through",
+  },
+  slotSeat: {
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderStyle: "solid",
+    borderColor: kit["--yes-ink"],
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 10%, transparent)`,
+    backgroundPosition: "initial",
+  },
+  tray: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "14px",
+    alignItems: "center",
+    minHeight: "60px",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "12px",
+  },
+  trayNote: {
+    fontSize: "13px",
+    color: palette["--mute"],
+  },
+  piece: {
+    position: "relative",
+    display: "inline-flex",
+    alignItems: "center",
+    height: { default: "38px", [PHONE]: "auto" },
+    minHeight: { default: null, [PHONE]: "38px" },
+    maxWidth: { default: null, [PHONE]: "100%" },
+    paddingBlock: 0,
+    paddingInline: "14px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "10px",
+    backgroundColor: ON,
+    boxShadow: "0 4px 0 var(--key-c)",
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: "var(--on-c)",
+    whiteSpace: { default: "nowrap", [PHONE]: "normal" },
+    cursor: cursors["--cursor-grab"],
+    touchAction: "none",
+    userSelect: "none",
+    transition: `box-shadow ${kit["--t-fb"]} ${motion["--out"]}, translate ${kit["--t-fb"]} ${motion["--out"]}`,
+  },
+  picked: {
+    translate: "0 -4px",
+    boxShadow: `0 8px 0 var(--key-c), 0 14px 28px ${palette["--lift"]}`,
+  },
+  dragging: {
+    zIndex: 30,
+    boxShadow: `0 10px 0 var(--key-c), 0 20px 36px ${palette["--lift"]}`,
+    cursor: cursors["--cursor-grabbing"],
+  },
+  seated: {
+    height: "30px",
+    paddingInline: "12px",
+    fontSize: "13px",
+    boxShadow: "0 3px 0 var(--key-c)",
+    cursor: "inherit",
+  },
+  burst: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    pointerEvents: "none",
+  },
+  spark: {
+    position: "absolute",
+    width: "6px",
+    height: "6px",
+    margin: "-3px",
+    backgroundColor: ON,
+    rotate: "var(--a)",
+    animationName: burst,
+    animationDuration: "600ms",
+    animationDelay: "300ms",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "both",
   },
 });
 

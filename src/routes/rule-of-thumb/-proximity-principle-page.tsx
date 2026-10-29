@@ -275,7 +275,7 @@ const LEVELS: Level[] = [
         },
       },
       { depth: 1, text: "routes/profile/", kind: "dir" },
-      { depth: 2, text: "user-profile.tsx", kind: "file", tag: "uses it" },
+      { depth: 2, text: "user-profile.tsx", tag: "uses it" },
       {
         depth: 3,
         slot: {
@@ -319,7 +319,7 @@ const LEVELS: Level[] = [
           cost: ["5 files", "4 imports"],
         },
       },
-      { depth: 2, text: "user-profile.tsx", kind: "file" },
+      { depth: 2, text: "user-profile.tsx" },
       {
         depth: 3,
         slot: {
@@ -406,7 +406,7 @@ const LEVELS: Level[] = [
         },
       },
       { depth: 2, text: "cart/", kind: "dir" },
-      { depth: 3, text: "summary.tsx", kind: "file", tag: "uses it" },
+      { depth: 3, text: "summary.tsx", tag: "uses it" },
       {
         depth: 3,
         slot: {
@@ -417,7 +417,7 @@ const LEVELS: Level[] = [
         },
       },
       { depth: 2, text: "checkout/", kind: "dir" },
-      { depth: 3, text: "pay-button.tsx", kind: "file", tag: "uses it" },
+      { depth: 3, text: "pay-button.tsx", tag: "uses it" },
       { depth: 1, text: "hooks/", kind: "dir" },
       {
         depth: 2,
