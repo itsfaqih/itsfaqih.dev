@@ -353,12 +353,12 @@ function Cover({ rule, entering }: CoverProps) {
   return (
     <div
       ref={ref}
-      className={`cover ${stylex.props(cover.box, entering && shell.in, shell.third).className}`}
+      {...stylex.props(cover.box, entering && shell.in, shell.third)}
       onPointerMove={lean}
       onPointerLeave={rest}
     >
       <div {...stylex.props(cover.card)}>
-        <RuleThumb rule={rule} play style={cover.thumb} />
+        <RuleThumb rule={rule} play at="cover" style={cover.thumb} />
         <div aria-hidden="true" {...stylex.props(cover.foot)}>
           <span>{rule.id}.md</span>
           <span {...stylex.props(cover.tag)}>{rule.coverTag}</span>

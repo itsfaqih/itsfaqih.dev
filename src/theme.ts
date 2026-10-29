@@ -5,7 +5,7 @@ import { palette } from "./theme.stylex";
 export type Theme = "light" | "dark";
 
 // The same cabinet on paper. Panels go white, hairlines and hard shadows go grey, and accents
-// keep their fills but darken for text. Thumbnails deepen their hues instead (see .light .arc .thumb).
+// keep their fills but darken for text. Thumbnails deepen their hues instead (see rule-art.tsx).
 const lightTheme = stylex.createTheme(palette, {
   "--bg": "#f5f5f8",
   "--panel": "#ffffff",

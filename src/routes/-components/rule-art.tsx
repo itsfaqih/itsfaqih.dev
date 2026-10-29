@@ -3,6 +3,7 @@ import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { colorOf } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { fonts } from "../../theme.stylex";
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -93,30 +94,36 @@ export function isOpeningRule() {
 }
 
 type RuleThumbProps = {
-  rule: Guideline;
+  /** With no rule the screen is blank. */
+  rule?: Guideline;
   play?: boolean;
+  /** Where the screen sits. The select panel and a rule's cover show it large, with a bigger chip. */
+  at?: "card" | "panel" | "cover";
   style?: stylex.StyleXStyles;
 };
 
-export function RuleThumb({ rule, play = false, style }: RuleThumbProps) {
-  const { className } = stylex.props(style);
+export function RuleThumb({ rule, play = false, at = "card", style }: RuleThumbProps) {
+  const Art = rule && ART.get(rule.id);
+  const large = at !== "card";
   return (
     <div
-      className={className ? `thumb ${className}` : "thumb"}
-      style={{ "--c": colorOf(rule.label) }}
+      className={`thumb ${stylex.props(screen.root, style).className}`}
+      style={rule && { "--c": colorOf(rule.label) }}
       data-play={play || undefined}
       aria-hidden="true"
     >
-      {ART.get(rule.id) ?? <GlyphArt rule={rule} />}
+      {rule && (Art ? <Art large={large} /> : <GlyphArt rule={rule} />)}
     </div>
   );
 }
 
-function Chip({ beats }: { beats: string[] }) {
+type ArtProps = { large: boolean };
+
+function Chip({ beats, large }: { beats: string[]; large: boolean }) {
   return (
-    <span className="chip">
+    <span className={`chip ${stylex.props(screen.chip, large && screen.chipLarge).className}`}>
       {beats.map((beat, index) => (
-        <b key={beat} className={`b${index + 1}`}>
+        <b key={beat} className={`b${index + 1} ${stylex.props(screen.beat).className}`}>
           {beat}
         </b>
       ))}
@@ -124,9 +131,9 @@ function Chip({ beats }: { beats: string[] }) {
   );
 }
 
-function ProximityArt() {
+function ProximityArt({ large }: ArtProps) {
   return (
-    <div className="art px">
+    <div className={`px ${stylex.props(screen.art).className}`}>
       <svg viewBox="0 0 160 100">
         <rect className="px-box" x="14" y="21" width="108" height="46" rx="6" />
         <text className="dim" x="14" y="15">
@@ -149,14 +156,14 @@ function ProximityArt() {
           </text>
         </g>
       </svg>
-      <Chip beats={["FAR", "NEAR"]} />
+      <Chip beats={["FAR", "NEAR"]} large={large} />
     </div>
   );
 }
 
-function ButtonArt() {
+function ButtonArt({ large }: ArtProps) {
   return (
-    <div className="art bt">
+    <div className={`bt ${stylex.props(screen.art).className}`}>
       <svg viewBox="0 0 160 100">
         <g className="bt-btn">
           <rect className="bt-face" x="38" y="30" width="84" height="28" rx="8" />
@@ -187,19 +194,19 @@ function ButtonArt() {
         ))}
         <path className="bt-cursor" d="M100 46l0 16 4.5-4.2 3 6.6 2.6-1.2-3-6.4 6-.4z" />
       </svg>
-      <Chip beats={["IDLE", "HOVER", "PRESS", "LOAD", "DONE"]} />
+      <Chip beats={["IDLE", "HOVER", "PRESS", "LOAD", "DONE"]} large={large} />
     </div>
   );
 }
 
-function DataLoadingArt() {
+function DataLoadingArt({ large }: ArtProps) {
   const rows = [
     { y: 34, width: 50, value: "$12" },
     { y: 52, width: 38, value: "$14" },
     { y: 70, width: 58, value: "$31" },
   ];
   return (
-    <div className="art dl">
+    <div className={`dl ${stylex.props(screen.art).className}`}>
       <svg viewBox="0 0 160 100">
         <rect className="dl-card" x="22" y="16" width="116" height="72" rx="8" />
         <rect className="dl-flash" x="24" y="44" width="112" height="16" rx="3" />
@@ -219,14 +226,14 @@ function DataLoadingArt() {
         </text>
         <rect className="dl-sweep" x="22" y="16" width="116" height="3" rx="1.5" />
       </svg>
-      <Chip beats={["STALE", "FRESH"]} />
+      <Chip beats={["STALE", "FRESH"]} large={large} />
     </div>
   );
 }
 
-function NullArt() {
+function NullArt({ large }: ArtProps) {
   return (
-    <div className="art nu">
+    <div className={`nu ${stylex.props(screen.art).className}`}>
       <svg viewBox="0 0 160 100">
         <rect className="nu-slot" x="20" y="20" width="52" height="46" rx="8" />
         <text className="nu-q" x="46" y="51">
@@ -246,18 +253,96 @@ function NullArt() {
           null
         </text>
       </svg>
-      <Chip beats={["MISSING", "EMPTY"]} />
+      <Chip beats={["MISSING", "EMPTY"]} large={large} />
     </div>
   );
 }
 
 function GlyphArt({ rule }: { rule: Guideline }) {
-  return <div className="art gl">{iconOf(rule.label)}</div>;
+  return <div className={`gl ${stylex.props(screen.art).className}`}>{iconOf(rule.label)}</div>;
 }
 
-const ART = new Map<string, ReactNode>([
-  ["proximity-principle", <ProximityArt />],
-  ["button-design", <ButtonArt />],
-  ["data-loading", <DataLoadingArt />],
-  ["null-vs-undefined", <NullArt />],
+const ART = new Map<string, (props: ArtProps) => ReactNode>([
+  ["proximity-principle", ProximityArt],
+  ["button-design", ButtonArt],
+  ["data-loading", DataLoadingArt],
+  ["null-vs-undefined", NullArt],
 ]);
+
+const LIGHT = ":is(.light *)";
+
+// Each rule's art holds a still frame by default. While it plays it loops forever through the rule
+// in a few beats: it moves out of the still frame and glides back into it, so 100% meets 0% without
+// a cut. Anything that has to jump does it while invisible. Only transform and opacity animate.
+const screen = stylex.create({
+  // A dark screen in the topic's hue. Light puts it on paper with the page; colorOf points --c at
+  // the topic hues, so deepening them here keeps thin strokes and 9px labels legible on white, and
+  // labels darken further still.
+  root: {
+    "--dur": "4.4s",
+    "--io": "cubic-bezier(0.645, 0.045, 0.355, 1)",
+    "--c-hi": {
+      default: "color-mix(in srgb, var(--c) 55%, white)",
+      [LIGHT]: "color-mix(in oklab, var(--c) 68%, #000)",
+    },
+    "--c-dim": "color-mix(in srgb, var(--c) 40%, transparent)",
+    "--cw": { default: null, [LIGHT]: "#0a9cd4" },
+    "--ux": { default: null, [LIGHT]: "#e0389f" },
+    "--ar": { default: null, [LIGHT]: "#e38a00" },
+    "--ts": { default: null, [LIGHT]: "#2aa816" },
+    "--ax": { default: null, [LIGHT]: "#7650ee" },
+    "--go": { default: null, [LIGHT]: "#c99a00" },
+    position: "relative",
+    aspectRatio: "16 / 10",
+    borderRadius: "10px",
+    overflow: "hidden",
+    // A dot screen over the hue, as two layers so the colour sits under the dots.
+    backgroundImage: {
+      default:
+        "radial-gradient(circle, color-mix(in srgb, var(--c) 16%, transparent) 0.8px, transparent 1.2px), none",
+      [LIGHT]:
+        "radial-gradient(circle, color-mix(in srgb, var(--c) 26%, transparent) 0.8px, transparent 1.2px), none",
+    },
+    // Written per axis: the minifier folds a 0% 0% position into 0 0, which computes to 0px 0px.
+    backgroundPositionX: "0, 0%",
+    backgroundPositionY: "0, 0%",
+    backgroundSize: "8px 8px, auto",
+    backgroundColor: {
+      default: "color-mix(in srgb, var(--c) 9%, #101017)",
+      [LIGHT]: "color-mix(in srgb, var(--c) 6%, #fff)",
+    },
+    boxShadow: {
+      default:
+        "inset 0 0 0 1px color-mix(in srgb, var(--c) 24%, transparent), inset 0 3px 0 rgb(0 0 0 / 0.35)",
+      [LIGHT]:
+        "inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), inset 0 3px 0 rgb(30 30 60 / 0.06)",
+    },
+  },
+  art: {
+    position: "absolute",
+    inset: 0,
+  },
+  // The beat chip in the corner names the state the art is in. Its labels share one cell; the
+  // last one shows at rest.
+  chip: {
+    position: "absolute",
+    top: "6%",
+    right: "4%",
+    display: "grid",
+    justifyItems: "end",
+    font: `700 8px ${fonts["--display"]}`,
+    letterSpacing: "0.04em",
+    color: "var(--c)",
+  },
+  chipLarge: {
+    fontSize: "10px",
+  },
+  beat: {
+    gridArea: "1 / 1",
+    padding: "2px 5px",
+    borderRadius: "4px",
+    backgroundColor: { default: "rgb(0 0 0 / 0.45)", [LIGHT]: "rgb(255 255 255 / 0.85)" },
+    boxShadow: "inset 0 0 0 1px var(--c-dim)",
+    opacity: { default: 0, ":last-child": 1 },
+  },
+});

@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { colorOf, ruleNumber } from "../../data/guidelines";
@@ -210,7 +211,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
                 <span>No.{ruleNumber(item)}</span>
                 <span>{item.interactive ? "▶ DEMO" : "ARTICLE"}</span>
               </span>
-              <RuleThumb rule={item} play={index === active} />
+              <RuleThumb rule={item} play={index === active} style={styles.thumb} />
               <span className="t">{item.title}</span>
               <span className="s">{item.description}</span>
               <span className="f">
@@ -255,3 +256,9 @@ function SlideNumber({ value }: { value: number }) {
     </span>
   );
 }
+
+const styles = stylex.create({
+  thumb: {
+    borderRadius: "14px",
+  },
+});

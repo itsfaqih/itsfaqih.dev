@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import Fuse from "fuse.js";
@@ -107,7 +108,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               <span>No.{ruleNumber(selected)}</span>
               <span>{selected.label.toUpperCase()}</span>
             </div>
-            <RuleThumb key={selected.id} rule={selected} play />
+            <RuleThumb key={selected.id} rule={selected} play at="panel" style={styles.thumb} />
             <h3>
               <ScrambleText text={selected.title} />
               <span className="sr-only">{selected.title}</span>
@@ -126,7 +127,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               <span>No.—</span>
               <span>STANDBY</span>
             </div>
-            <div className="thumb" aria-hidden="true" />
+            <RuleThumb style={styles.thumb} />
             <h3>Pick a rule</h3>
             <p>Hover or focus a tile to preview it here.</p>
             <dl>
@@ -302,3 +303,9 @@ function ScrambleText({ text }: { text: string }) {
     </span>
   );
 }
+
+const styles = stylex.create({
+  thumb: {
+    borderRadius: "14px",
+  },
+});
