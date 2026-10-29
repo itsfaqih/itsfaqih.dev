@@ -112,18 +112,32 @@ export function RuleThumb({ rule, play = false, at = "card", style }: RuleThumbP
       data-play={play || undefined}
       aria-hidden="true"
     >
-      {rule && (Art ? <Art large={large} /> : <GlyphArt rule={rule} />)}
+      {rule && (Art ? <Art play={play} large={large} /> : <GlyphArt rule={rule} />)}
     </div>
   );
 }
 
-type ArtProps = { large: boolean };
+type ArtProps = { play: boolean; large: boolean };
 
-function Chip({ beats, large }: { beats: string[]; large: boolean }) {
+type ChipProps = {
+  beats: string[];
+  /** Each beat's keyframes while the art plays. */
+  moves?: stylex.StyleXStyles[];
+  /** The art's beat (its length and easing) while it plays. */
+  playing?: stylex.StyleXStyles | false;
+  large: boolean;
+};
+
+function Chip({ beats, moves, playing, large }: ChipProps) {
   return (
-    <span className={`chip ${stylex.props(screen.chip, large && screen.chipLarge).className}`}>
+    <span
+      className={`chip ${stylex.props(screen.chip, large && screen.chipLarge, playing).className}`}
+    >
       {beats.map((beat, index) => (
-        <b key={beat} className={`b${index + 1} ${stylex.props(screen.beat).className}`}>
+        <b
+          key={beat}
+          className={`b${index + 1} ${stylex.props(screen.beat, playing, playing && moves?.[index]).className}`}
+        >
           {beat}
         </b>
       ))}
@@ -131,60 +145,123 @@ function Chip({ beats, large }: { beats: string[]; large: boolean }) {
   );
 }
 
-function ProximityArt({ large }: ArtProps) {
+// Proximity: styles.ts walks out to shared/ and back home into OrderCard/.
+function ProximityArt({ play, large }: ArtProps) {
+  const playing = play && draw.play;
   return (
-    <div className={`px ${stylex.props(screen.art).className}`}>
-      <svg viewBox="0 0 160 100">
-        <rect className="px-box" x="14" y="21" width="108" height="46" rx="6" />
-        <text className="dim" x="14" y="15">
+    <div {...stylex.props(screen.art, playing)}>
+      <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
+        <rect
+          {...stylex.props(proximity.box, draw.moving, playing, play && proximity.boxPlay)}
+          x="14"
+          y="21"
+          width="108"
+          height="46"
+          rx="6"
+        />
+        <text {...stylex.props(draw.text, draw.dim, playing)} x="14" y="15">
           src/
         </text>
-        <text className="hi" x="22" y="33">
+        <text {...stylex.props(draw.text, draw.hi, playing)} x="22" y="33">
           OrderCard/
         </text>
-        <text x="32" y="47">
+        <text {...stylex.props(draw.text, playing)} x="32" y="47">
           OrderCard.tsx
         </text>
-        <text className="dim" x="22" y="77">
+        <text {...stylex.props(draw.text, draw.dim, playing)} x="22" y="77">
           shared/
         </text>
-        <line className="px-link" x1="27" y1="50" x2="27" y2="89" />
-        <g className="px-file">
-          <rect x="30" y="52" width="56" height="12" rx="3" />
-          <text x="34" y="61">
+        <line
+          {...stylex.props(proximity.link, draw.moving, playing, play && proximity.linkPlay)}
+          x1="27"
+          y1="50"
+          x2="27"
+          y2="89"
+        />
+        <g {...stylex.props(draw.moving, playing, play && proximity.filePlay)}>
+          <rect
+            {...stylex.props(proximity.file, playing)}
+            x="30"
+            y="52"
+            width="56"
+            height="12"
+            rx="3"
+          />
+          <text {...stylex.props(draw.text, proximity.fileName, playing)} x="34" y="61">
             styles.ts
           </text>
         </g>
       </svg>
-      <Chip beats={["FAR", "NEAR"]} large={large} />
+      <Chip
+        beats={["FAR", "NEAR"]}
+        moves={[beat.away, beat.rest]}
+        playing={playing}
+        large={large}
+      />
     </div>
   );
 }
 
-function ButtonArt({ large }: ArtProps) {
+// Button: done 0-8%, eases back to idle 8-16%, hover 22-34%, press 38-44%, pending 46-74%, done
+// again 74-100%.
+function ButtonArt({ play, large }: ArtProps) {
+  const playing = play && draw.playSlow;
   return (
-    <div className={`bt ${stylex.props(screen.art).className}`}>
-      <svg viewBox="0 0 160 100">
-        <g className="bt-btn">
-          <rect className="bt-face" x="38" y="30" width="84" height="28" rx="8" />
-          <rect className="bt-hover" x="38" y="30" width="84" height="28" rx="8" />
-          <text className="bt-l1" x="80" y="48">
+    <div {...stylex.props(screen.art, playing)}>
+      <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
+        <g {...stylex.props(button.button, draw.moving, playing, play && button.buttonPlay)}>
+          <rect
+            {...stylex.props(button.face, draw.moving, playing)}
+            x="38"
+            y="30"
+            width="84"
+            height="28"
+            rx="8"
+          />
+          <rect
+            {...stylex.props(button.hover, draw.moving, playing, play && button.hoverPlay)}
+            x="38"
+            y="30"
+            width="84"
+            height="28"
+            rx="8"
+          />
+          <text
+            {...stylex.props(
+              button.text,
+              button.hidden,
+              draw.moving,
+              playing,
+              play && button.idlePlay,
+            )}
+            x="80"
+            y="48"
+          >
             Save
           </text>
-          <g className="bt-l2">
-            <circle className="bt-spin" cx="52" cy="44" r="5" />
-            <text x="88" y="47.5">
+          <g {...stylex.props(button.hidden, draw.moving, playing, play && button.pendingPlay)}>
+            <circle
+              {...stylex.props(button.spinner, draw.moving, playing, play && button.spinnerPlay)}
+              cx="52"
+              cy="44"
+              r="5"
+            />
+            <text {...stylex.props(button.text, button.pendingText, playing)} x="88" y="47.5">
               Saving…
             </text>
           </g>
-          <text className="bt-l3" x="80" y="48">
+          <text
+            {...stylex.props(button.text, draw.moving, playing, play && button.donePlay)}
+            x="80"
+            y="48"
+          >
             Saved ✓
           </text>
         </g>
-        {[0, 1, 2, 3, 4].map((index) => (
+        {PIP_PLAY.map((pipPlay, index) => (
           <rect
             key={index}
-            className={`bt-pip p${index + 1}`}
+            {...stylex.props(button.pip, draw.moving, playing, play && pipPlay)}
             x={52 + index * 12}
             y="72"
             width="8"
@@ -192,9 +269,17 @@ function ButtonArt({ large }: ArtProps) {
             rx="2"
           />
         ))}
-        <path className="bt-cursor" d="M100 46l0 16 4.5-4.2 3 6.6 2.6-1.2-3-6.4 6-.4z" />
+        <path
+          {...stylex.props(button.cursor, draw.moving, playing, play && button.cursorPlay)}
+          d="M100 46l0 16 4.5-4.2 3 6.6 2.6-1.2-3-6.4 6-.4z"
+        />
       </svg>
-      <Chip beats={["IDLE", "HOVER", "PRESS", "LOAD", "DONE"]} large={large} />
+      <Chip
+        beats={["IDLE", "HOVER", "PRESS", "LOAD", "DONE"]}
+        moves={[beat.idle, beat.hover, beat.press, beat.load, beat.done]}
+        playing={playing}
+        large={large}
+      />
     </div>
   );
 }
@@ -344,5 +429,281 @@ const screen = stylex.create({
     backgroundColor: { default: "rgb(0 0 0 / 0.45)", [LIGHT]: "rgb(255 255 255 / 0.85)" },
     boxShadow: "inset 0 0 0 1px var(--c-dim)",
     opacity: { default: 0, ":last-child": 1 },
+  },
+});
+
+const IO = "cubic-bezier(0.645, 0.045, 0.355, 1)";
+
+// What every art draws with, and the beat each part of it keeps while the art plays.
+const draw = stylex.create({
+  svg: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    overflow: "visible",
+  },
+  text: {
+    font: `500 9px ${fonts["--mono"]}`,
+    fill: "var(--c-hi)",
+  },
+  dim: {
+    fill: "var(--c-dim)",
+  },
+  hi: {
+    fill: "var(--c)",
+  },
+  // A part that moves turns and scales about its own box.
+  moving: {
+    transformBox: "fill-box",
+  },
+  play: {
+    animationDuration: "4.4s",
+    animationTimingFunction: IO,
+    animationIterationCount: "infinite",
+  },
+  playSlow: {
+    animationDuration: "5.2s",
+    animationTimingFunction: IO,
+    animationIterationCount: "infinite",
+  },
+});
+
+// Two-beat chips: the second label at rest, crossfading to the first and back.
+const awayBeat = stylex.keyframes({
+  "0%, 22%": { opacity: 0 },
+  "28%, 64%": { opacity: 1 },
+  "70%, 100%": { opacity: 0 },
+});
+const restBeat = stylex.keyframes({
+  "0%, 22%": { opacity: 1 },
+  "28%, 64%": { opacity: 0 },
+  "70%, 100%": { opacity: 1 },
+});
+
+const pxBox = stylex.keyframes({
+  "0%, 14%": { opacity: 1 },
+  "30%, 62%": { opacity: 0 },
+  "78%, 100%": { opacity: 1 },
+});
+const pxLink = stylex.keyframes({
+  "0%, 14%": { transform: "scaleY(0.205)" },
+  "36%, 58%": { transform: "scaleY(1)" },
+  "80%, 100%": { transform: "scaleY(0.205)" },
+});
+const pxFile = stylex.keyframes({
+  "0%, 14%": { transform: "none" },
+  "36%, 58%": { transform: "translateY(31px)" },
+  "80%, 100%": { transform: "none" },
+});
+
+const proximity = stylex.create({
+  box: {
+    fill: "color-mix(in srgb, var(--c) 8%, transparent)",
+    stroke: "var(--c)",
+    strokeWidth: "1.2",
+  },
+  boxPlay: {
+    animationName: pxBox,
+  },
+  link: {
+    stroke: "var(--c)",
+    strokeWidth: "1.2",
+    strokeDasharray: "2 2",
+    transformOrigin: "top",
+    transform: "scaleY(0.205)",
+  },
+  linkPlay: {
+    animationName: pxLink,
+  },
+  file: {
+    fill: "var(--c)",
+  },
+  filePlay: {
+    animationName: pxFile,
+  },
+  fileName: {
+    fill: "var(--on-c)",
+    fontWeight: 600,
+  },
+});
+
+const spin = stylex.keyframes({ to: { transform: "rotate(360deg)" } });
+const btPress = stylex.keyframes({
+  "0%, 38%": { transform: "none" },
+  "41%": { transform: "scale(0.92)" },
+  "44%, 100%": { transform: "none" },
+});
+const btHover = stylex.keyframes({
+  "0%, 28%": { opacity: 0 },
+  "34%, 74%": { opacity: 0.22 },
+  "80%, 100%": { opacity: 0 },
+});
+const btIdle = stylex.keyframes({
+  "0%, 8%": { opacity: 0 },
+  "14%, 46%": { opacity: 1 },
+  "50%, 100%": { opacity: 0 },
+});
+const btPending = stylex.keyframes({
+  "0%, 46%": { opacity: 0 },
+  "50%, 74%": { opacity: 1 },
+  "78%, 100%": { opacity: 0 },
+});
+const btDone = stylex.keyframes({
+  "0%, 8%": { opacity: 1 },
+  "14%, 74%": { opacity: 0 },
+  "78%, 100%": { opacity: 1 },
+});
+const btCursor = stylex.keyframes({
+  "0%, 16%": { opacity: 0, transform: "translate(34px, 30px)" },
+  "22%": { opacity: 1, transform: "translate(34px, 30px)" },
+  "32%, 74%": { opacity: 1, transform: "none" },
+  "86%, 100%": { opacity: 0, transform: "translate(34px, 30px)" },
+});
+const btPip2 = stylex.keyframes({
+  "0%, 8%": { opacity: 1 },
+  "14%, 28%": { opacity: 0.2 },
+  "31%, 100%": { opacity: 1 },
+});
+const btPip3 = stylex.keyframes({
+  "0%, 8%": { opacity: 1 },
+  "14%, 37%": { opacity: 0.2 },
+  "40%, 100%": { opacity: 1 },
+});
+const btPip4 = stylex.keyframes({
+  "0%, 8%": { opacity: 1 },
+  "14%, 46%": { opacity: 0.2 },
+  "49%, 100%": { opacity: 1 },
+});
+const btPip5 = stylex.keyframes({
+  "0%, 8%": { opacity: 1 },
+  "14%, 74%": { opacity: 0.2 },
+  "77%, 100%": { opacity: 1 },
+});
+const btChipIdle = stylex.keyframes({
+  "0%, 10%": { opacity: 0 },
+  "14%, 28%": { opacity: 1 },
+  "31%, 100%": { opacity: 0 },
+});
+const btChipHover = stylex.keyframes({
+  "0%, 28%": { opacity: 0 },
+  "31%, 37%": { opacity: 1 },
+  "40%, 100%": { opacity: 0 },
+});
+const btChipPress = stylex.keyframes({
+  "0%, 37%": { opacity: 0 },
+  "40%, 45%": { opacity: 1 },
+  "48%, 100%": { opacity: 0 },
+});
+const btChipLoad = stylex.keyframes({
+  "0%, 45%": { opacity: 0 },
+  "48%, 73%": { opacity: 1 },
+  "76%, 100%": { opacity: 0 },
+});
+const btChipDone = stylex.keyframes({
+  "0%, 10%": { opacity: 1 },
+  "14%, 73%": { opacity: 0 },
+  "76%, 100%": { opacity: 1 },
+});
+
+const button = stylex.create({
+  button: {
+    transformOrigin: "center",
+  },
+  buttonPlay: {
+    animationName: btPress,
+  },
+  face: {
+    fill: "var(--c)",
+  },
+  hover: {
+    fill: "white",
+    opacity: 0,
+  },
+  hoverPlay: {
+    animationName: btHover,
+  },
+  text: {
+    font: `700 10px ${fonts["--display"]}`,
+    fill: "var(--on-c)",
+    textAnchor: "middle",
+  },
+  hidden: {
+    opacity: 0,
+  },
+  idlePlay: {
+    animationName: btIdle,
+  },
+  pendingPlay: {
+    animationName: btPending,
+  },
+  spinner: {
+    fill: "none",
+    stroke: "var(--on-c)",
+    strokeWidth: "2",
+    strokeDasharray: "20 12",
+    transformOrigin: "center",
+  },
+  spinnerPlay: {
+    animationName: spin,
+    animationDuration: "700ms",
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
+  },
+  pendingText: {
+    fontSize: "8px",
+  },
+  donePlay: {
+    animationName: btDone,
+  },
+  pip: {
+    fill: "var(--c)",
+  },
+  pip2Play: {
+    animationName: btPip2,
+  },
+  pip3Play: {
+    animationName: btPip3,
+  },
+  pip4Play: {
+    animationName: btPip4,
+  },
+  pip5Play: {
+    animationName: btPip5,
+  },
+  cursor: {
+    fill: "white",
+    stroke: "#0e0e13",
+    strokeWidth: "1",
+    opacity: 0,
+  },
+  cursorPlay: {
+    animationName: btCursor,
+  },
+});
+
+// The progress pips fill one by one; the first is lit throughout.
+const PIP_PLAY = [null, button.pip2Play, button.pip3Play, button.pip4Play, button.pip5Play];
+
+const beat = stylex.create({
+  away: {
+    animationName: awayBeat,
+  },
+  rest: {
+    animationName: restBeat,
+  },
+  idle: {
+    animationName: btChipIdle,
+  },
+  hover: {
+    animationName: btChipHover,
+  },
+  press: {
+    animationName: btChipPress,
+  },
+  load: {
+    animationName: btChipLoad,
+  },
+  done: {
+    animationName: btChipDone,
   },
 });
