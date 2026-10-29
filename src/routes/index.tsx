@@ -7,6 +7,7 @@ import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { ExperienceList, type Job } from "./-components/experience-list";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
+import { Intro } from "./-components/intro";
 import { reticle } from "./-components/reticle";
 import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
@@ -379,78 +380,6 @@ function Index() {
             </a>
           </span>
         </footer>
-      </div>
-    </div>
-  );
-}
-
-const SKIP_GRACE_MS = 1200;
-function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [gone, setGone] = useState(false);
-
-  useEffect(() => {
-    const element = ref.current;
-    const html = document.documentElement;
-    if (!element || html.classList.contains("no-intro")) {
-      setGone(true);
-      onDone(true);
-      return;
-    }
-
-    const openedAt = performance.now();
-    let removeTimer = 0;
-    const finish = () => {
-      if (element.classList.contains("out")) return;
-      element.classList.add("out");
-      html.classList.add("no-intro");
-      try {
-        sessionStorage.setItem("intro-seen", "1");
-      } catch {}
-      onDone(true);
-      removeTimer = window.setTimeout(() => setGone(true), 700);
-    };
-    const skip = () => {
-      if (performance.now() - openedAt > SKIP_GRACE_MS) finish();
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (["Escape", "Enter", " "].includes(event.key)) skip();
-    };
-    const onAnimationEnd = (event: AnimationEvent) => {
-      if (event.target === element) finish();
-    };
-
-    element.addEventListener("animationend", onAnimationEnd);
-    element.addEventListener("click", skip);
-    addEventListener("keydown", onKeyDown);
-    element.classList.add("play");
-    return () => {
-      element.removeEventListener("animationend", onAnimationEnd);
-      element.removeEventListener("click", skip);
-      removeEventListener("keydown", onKeyDown);
-      clearTimeout(removeTimer);
-    };
-  }, [onDone]);
-
-  if (gone) return null;
-
-  return (
-    <div ref={ref} className="arc-intro" aria-hidden="true">
-      <div className="sh t" />
-      <div className="sh b" />
-      <div className="stage">
-        <div className="name">FAQIH MUNTASHIR</div>
-        <div className="slot">
-          {SLIDES.slice(0, 4).map(({ tab, color }, index, words) => (
-            <span
-              key={tab}
-              className={index === words.length - 1 ? "cutw last" : "cutw"}
-              style={{ "--i": index, "--c": color }}
-            >
-              {tab.toUpperCase()}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   );

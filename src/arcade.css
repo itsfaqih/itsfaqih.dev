@@ -393,111 +393,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-/* ---------- Intro: name slam, fast cuts through what I build, shutter split ---------- */
-.no-intro .arc-intro {
-  display: none;
-}
-.arc-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  cursor: var(--cursor-point);
-  display: grid;
-  place-items: center;
-}
-.arc-intro .sh {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: #07070a;
-  transition: transform 560ms var(--cut);
-}
-.arc-intro .sh.t {
-  top: 0;
-  border-bottom: 3px solid var(--go);
-}
-.arc-intro .sh.b {
-  bottom: 0;
-  border-top: 3px solid var(--go);
-}
-.arc-intro.out .sh.t {
-  transform: translateY(-101%);
-}
-.arc-intro.out .sh.b {
-  transform: translateY(101%);
-}
-.arc-intro .stage {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  transition: opacity 120ms ease;
-}
-.arc-intro.out .stage {
-  opacity: 0;
-}
-.arc-intro .name {
-  font: 900 clamp(36px, 7vw, 84px)/1 var(--display);
-  color: var(--text);
-  opacity: 0;
-  letter-spacing: -0.03em;
-}
-.arc-intro.play {
-  animation: intro-hold 2000ms linear forwards;
-}
-.arc-intro.play .name {
-  animation: slam 260ms var(--out) 150ms forwards;
-}
-.arc-intro .slot {
-  position: relative;
-  height: clamp(56px, 9vw, 110px);
-  margin-top: 18px;
-}
-.arc-intro .cutw {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font: 900 clamp(40px, 8vw, 100px)/1 var(--display);
-  white-space: nowrap;
-  opacity: 0;
-  color: var(--c);
-  transform: translate(-50%, -50%);
-}
-.arc-intro.play .cutw {
-  animation: cutw 240ms var(--out);
-  animation-delay: calc(650ms + var(--i) * 260ms);
-}
-.arc-intro.play .cutw.last {
-  animation-fill-mode: forwards;
-  animation-duration: 420ms;
-}
-@keyframes intro-hold {
-  to {
-    opacity: 1;
-  }
-}
-@keyframes cutw {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.5) skewX(-10deg);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-@keyframes slam {
-  from {
-    opacity: 0;
-    transform: scale(1.8);
-    filter: blur(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
 @keyframes blink {
   50% {
     opacity: 0;
@@ -780,8 +675,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 @media (prefers-reduced-motion: reduce) {
   .arc *,
   .arc *::before,
-  .arc *::after,
-  .arc-intro * {
+  .arc *::after {
     animation: none !important;
     transition-property: opacity, color, background-color, border-color !important;
   }
