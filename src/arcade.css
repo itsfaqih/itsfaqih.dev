@@ -111,67 +111,13 @@ html.cur-on {
   transition-timing-function: linear;
 }
 
-/* The page scrollbar (components/page-scrollbar.tsx): one bar in the hue of what sits mid-screen,
-   no track, shown while scrolling or within reach. With it on, the native bar is hidden. */
+/* page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
 html.sb-own {
   scrollbar-width: none;
 }
+/* The native bar is a pseudo-element of html. */
 html.sb-own::-webkit-scrollbar {
   display: none;
-}
-.page-scrollbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2147483646;
-  width: 24px;
-  pointer-events: none;
-  --sb-hue: var(--go);
-}
-.page-scrollbar-thumb {
-  position: absolute;
-  top: 0;
-  right: 6px;
-  width: 6px;
-  border-radius: 3px;
-  background: color-mix(in oklab, var(--sb-hue) var(--ink-mix), #000);
-  opacity: 0;
-  cursor: var(--cursor-grab);
-  transition:
-    opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 160ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 180ms ease;
-}
-.page-scrollbar[data-gold] .page-scrollbar-thumb {
-  background-color: var(--go-ink);
-}
-.page-scrollbar[data-shown] {
-  pointer-events: auto;
-}
-.page-scrollbar[data-shown] .page-scrollbar-thumb {
-  opacity: 1;
-  transition-duration: 120ms, 160ms, 180ms;
-  transition-timing-function: ease-out, cubic-bezier(0.22, 1, 0.36, 1), ease;
-}
-.page-scrollbar[data-shown]:hover .page-scrollbar-thumb,
-.page-scrollbar[data-dragging] .page-scrollbar-thumb {
-  width: 10px;
-  border-radius: 5px;
-}
-.page-scrollbar[data-dragging] .page-scrollbar-thumb {
-  cursor: var(--cursor-grabbing);
-}
-@media (prefers-reduced-motion: reduce) {
-  .page-scrollbar-thumb,
-  .page-scrollbar[data-shown] .page-scrollbar-thumb {
-    transition: background-color 180ms ease;
-  }
-}
-@media (forced-colors: active) {
-  .page-scrollbar-thumb {
-    background: CanvasText;
-  }
 }
 
 .arc {

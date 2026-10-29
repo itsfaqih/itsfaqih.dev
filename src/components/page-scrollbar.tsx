@@ -1,7 +1,9 @@
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef } from "react";
 
 import { jumpTo } from "./smooth-scroll";
 import { reducedMotion } from "../hooks/use-media-query";
+import { cursors, palette } from "../theme.stylex";
 
 const REVEAL_PX = 32;
 const LINGER_MS = 900;
@@ -132,8 +134,67 @@ export function PageScrollbar() {
   }, []);
 
   return (
-    <div ref={trackRef} className="page-scrollbar" aria-hidden="true">
-      <div ref={thumbRef} className="page-scrollbar-thumb" />
+    <div ref={trackRef} {...stylex.props(styles.track, stylex.defaultMarker())} aria-hidden="true">
+      <div ref={thumbRef} {...stylex.props(styles.thumb)} />
     </div>
   );
 }
+
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+// One bar in the hue of what sits mid-screen, no track, shown while scrolling or within reach.
+// The handlers above set data-shown, data-gold and data-dragging on the track.
+const styles = stylex.create({
+  track: {
+    "--sb-hue": palette["--go"],
+    position: "fixed",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 2147483646,
+    width: "24px",
+    pointerEvents: { default: "none", ":is([data-shown])": "auto" },
+  },
+  thumb: {
+    position: "absolute",
+    top: 0,
+    right: "6px",
+    width: {
+      default: "6px",
+      [stylex.when.ancestor(":is([data-shown]:hover, [data-dragging])")]: "10px",
+    },
+    borderRadius: {
+      default: "3px",
+      [stylex.when.ancestor(":is([data-shown]:hover, [data-dragging])")]: "5px",
+    },
+    backgroundColor: {
+      default: `color-mix(in oklab, var(--sb-hue) ${palette["--ink-mix"]}, #000)`,
+      [stylex.when.ancestor("[data-gold]")]: palette["--go-ink"],
+      "@media (forced-colors: active)": {
+        default: "CanvasText",
+        [stylex.when.ancestor("[data-gold]")]: palette["--go-ink"],
+      },
+    },
+    opacity: { default: 0, [stylex.when.ancestor("[data-shown]")]: 1 },
+    cursor: {
+      default: cursors["--cursor-grab"],
+      [stylex.when.ancestor("[data-dragging]")]: cursors["--cursor-grabbing"],
+    },
+    transition: {
+      default: `opacity 320ms ${EASE}, width 160ms ${EASE}, background-color 180ms ease`,
+      [REDUCE]: "background-color 180ms ease",
+    },
+    transitionDuration: {
+      default: null,
+      [stylex.when.ancestor("[data-shown]")]: { default: "120ms, 160ms, 180ms", [REDUCE]: "180ms" },
+    },
+    transitionTimingFunction: {
+      default: null,
+      [stylex.when.ancestor("[data-shown]")]: {
+        default: `ease-out, ${EASE}, ease`,
+        [REDUCE]: "ease",
+      },
+    },
+  },
+});
