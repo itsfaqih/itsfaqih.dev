@@ -8,6 +8,7 @@ import {
   PlayIcon,
   TrashIcon,
 } from "@phosphor-icons/react";
+import * as stylex from "@stylexjs/stylex";
 import {
   createContext,
   type ReactNode,
@@ -18,8 +19,611 @@ import {
   useSyncExternalStore,
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
-import "./table-design.css";
+import { row, tipped } from "./-table-design.stylex";
+
+const PHONE = "@media (max-width: 640px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
+const flash = stylex.keyframes({
+  to: { opacity: 0 },
+});
+const beat = stylex.keyframes({
+  "50%": { opacity: 0.35 },
+});
+const turn = stylex.keyframes({
+  to: { transform: "rotate(1turn)" },
+});
+const pulse = stylex.keyframes({
+  to: { opacity: 0.45 },
+});
+
+const styles = stylex.create({
+  costs: {
+    alignSelf: "end",
+  },
+  card: {
+    display: "grid",
+    alignSelf: "start",
+    alignContent: "start",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    overflow: "hidden",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    tableLayout: "fixed",
+    fontSize: "14px",
+    lineHeight: "20px",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+  },
+  th: {
+    height: "36px",
+    paddingBlock: 0,
+    paddingInline: { default: "14px", [PHONE]: "10px" },
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: palette["--hair"],
+    backgroundColor: `color-mix(in srgb, ${palette["--panel-2"]} 55%, transparent)`,
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "16px",
+    fontFamily: fonts["--sans"],
+    color: palette["--mute"],
+    textAlign: "left",
+  },
+  td: {
+    position: "relative",
+    isolation: "isolate",
+    height: "40px",
+    paddingBlock: 0,
+    paddingInline: { default: "14px", [PHONE]: "10px" },
+    borderTopWidth: { default: "1px", [stylex.when.ancestor(":first-child", row)]: 0 },
+    borderTopStyle: { default: "solid", [stylex.when.ancestor(":first-child", row)]: "none" },
+    borderTopColor: {
+      default: `color-mix(in srgb, ${palette["--hair"]} 70%, transparent)`,
+      [stylex.when.ancestor(":first-child", row)]: "currentcolor",
+    },
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor(":hover", row)]:
+        `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+    },
+    transition: "background-color var(--t-fb) ease",
+  },
+  still: {
+    backgroundColor: { default: null, [stylex.when.ancestor(":hover", row)]: "transparent" },
+  },
+  editing: {
+    backgroundColor: {
+      default: "color-mix(in srgb, var(--c) 10%, transparent)",
+      [stylex.when.ancestor(":hover", row)]:
+        `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+    },
+  },
+  num: {
+    textAlign: "right",
+    fontVariantNumeric: "tabular-nums",
+  },
+  ragged: {
+    fontVariantNumeric: "proportional-nums",
+  },
+  dim: {
+    color: palette["--dim"],
+  },
+  overflowing: {
+    overflow: "visible",
+  },
+  colRole: {
+    width: { default: "84px", [PHONE]: "70px" },
+  },
+  colActs: {
+    width: "76px",
+  },
+  colMoney: {
+    width: "52%",
+  },
+  flash: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: -1,
+    backgroundColor: "color-mix(in srgb, var(--c) 22%, transparent)",
+    pointerEvents: "none",
+    animationName: flash,
+    animationDuration: "1100ms",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "both",
+  },
+  reels: {
+    display: "inline-flex",
+    verticalAlign: "top",
+  },
+  reel: {
+    display: "inline-block",
+    height: "20px",
+    overflow: "hidden",
+  },
+  strip: {
+    display: "grid",
+    transform: "translateY(calc(var(--n) * -20px))",
+    transition: { default: `transform 320ms ${motion["--out"]}`, [REDUCE]: "none" },
+  },
+  digit: {
+    height: "20px",
+  },
+  ring: {
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "2px" },
+  },
+  live: {
+    display: "inline-flex",
+    gap: "8px",
+    alignItems: "center",
+    minHeight: "34px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "9px",
+    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+    cursor: cursors["--cursor-point"],
+    transition: "background-color var(--t-fb) ease",
+  },
+  liveIcon: {
+    width: "13px",
+    height: "13px",
+    color: palette["--dim"],
+  },
+  dot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    backgroundColor: palette["--mute"],
+  },
+  dotOn: {
+    backgroundColor: "var(--c)",
+    animationName: { default: beat, [REDUCE]: "none" },
+    animationDuration: { default: "1600ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: "ease-in-out", [REDUCE]: "ease" },
+    animationIterationCount: { default: "infinite", [REDUCE]: 1 },
+  },
+  seg: {
+    display: { default: "inline-flex", [PHONE]: "grid" },
+    flexWrap: "wrap",
+    gridTemplateColumns: { default: null, [PHONE]: "repeat(3, minmax(0, 1fr))" },
+    gap: "4px",
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  },
+  segButton: {
+    minHeight: "34px",
+    paddingBlock: 0,
+    paddingInline: { default: "12px", [PHONE]: "6px" },
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "9px",
+    backgroundColor: "transparent",
+    backgroundPosition: "0px 0px",
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: { default: palette["--dim"], ":hover": palette["--text"] },
+    whiteSpace: "nowrap",
+    cursor: cursors["--cursor-point"],
+    transition:
+      "background-color var(--t-fb) ease, color var(--t-fb) ease, box-shadow var(--t-fb) ease",
+  },
+  segOn: {
+    backgroundColor: "var(--c)",
+    backgroundPosition: "initial",
+    boxShadow: "0 3px 0 var(--key-c)",
+    color: "var(--on-c)",
+  },
+  bar: {
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    paddingBlock: "10px",
+    paddingInline: "10px",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: palette["--hair"],
+  },
+  search: {
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    gap: "8px",
+    alignItems: "center",
+    minWidth: 0,
+    height: "34px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderRadius: "8px",
+    boxShadow: {
+      default: `inset 0 0 0 1px ${palette["--hair"]}`,
+      ":focus-within": "inset 0 0 0 2px var(--c)",
+    },
+    color: palette["--mute"],
+    transition: "box-shadow var(--t-fb) ease",
+  },
+  searchIcon: {
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "14px",
+    height: "14px",
+  },
+  searchInput: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    minWidth: 0,
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    outlineWidth: 0,
+    outlineStyle: "none",
+    outlineColor: "currentcolor",
+    backgroundColor: "transparent",
+    backgroundPosition: "0px 0px",
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+    "::placeholder": {
+      color: palette["--mute"],
+    },
+  },
+  blank: {
+    height: "56px",
+    color: palette["--mute"],
+    textAlign: "center",
+    whiteSpace: "normal",
+  },
+  said: {
+    display: "grid",
+    gap: "4px",
+    placeContent: "center",
+    justifyItems: "center",
+    minHeight: "calc(40px * 4)",
+    paddingBlock: "8px",
+    paddingInline: 0,
+  },
+  saidTitle: {
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: "20px",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+  },
+  saidError: {
+    color: "var(--no-ink)",
+  },
+  saidHint: {
+    fontSize: "13px",
+    lineHeight: "18px",
+    color: palette["--dim"],
+  },
+  saidButton: {
+    marginTop: "10px",
+  },
+  spin: {
+    display: "inline-block",
+    width: "18px",
+    height: "18px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderTopColor: palette["--dim"],
+    borderRadius: "50%",
+    verticalAlign: "middle",
+    animationName: { default: turn, [REDUCE]: "none" },
+    animationDuration: { default: "800ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: "linear", [REDUCE]: "ease" },
+    animationIterationCount: { default: "infinite", [REDUCE]: 1 },
+  },
+  bone: {
+    display: "block",
+    width: "var(--w)",
+    maxWidth: "100%",
+    height: "10px",
+    borderRadius: "5px",
+    backgroundColor: palette["--panel-2"],
+    animationName: { default: pulse, [REDUCE]: "none" },
+    animationDuration: { default: "1200ms", [REDUCE]: "0s" },
+    animationTimingFunction: { default: "ease-in-out", [REDUCE]: "ease" },
+    animationIterationCount: { default: "infinite", [REDUCE]: 1 },
+    animationDirection: { default: "alternate", [REDUCE]: "normal" },
+  },
+  btn: {
+    display: "inline-flex",
+    gap: "6px",
+    alignItems: "center",
+    height: "32px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "8px",
+    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    boxShadow: {
+      default: `0 3px 0 ${palette["--drop-ink"]}`,
+      ":active": `0 1px 0 ${palette["--drop-ink"]}`,
+    },
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+    cursor: cursors["--cursor-point"],
+    transform: { default: null, ":active": "translateY(2px)" },
+    transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color var(--t-fb) ease`,
+  },
+  go: {
+    backgroundColor: "var(--c)",
+    boxShadow: { default: "0 3px 0 var(--key-c)", ":active": "0 1px 0 var(--key-c)" },
+    color: "var(--on-c)",
+    filter: { default: null, ":hover": "brightness(1.06)" },
+  },
+  btnIcon: {
+    width: "14px",
+    height: "14px",
+  },
+  icons: {
+    display: "inline-flex",
+    gap: "2px",
+    verticalAlign: "middle",
+  },
+  tipped: {
+    position: "relative",
+    display: "inline-flex",
+  },
+  icon: {
+    display: "grid",
+    placeItems: "center",
+    width: "30px",
+    height: "30px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "8px",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in srgb, var(--c) 16%, transparent)",
+    },
+    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    color: { default: palette["--dim"], ":hover": "var(--c-ink)" },
+    opacity: { default: null, ":disabled": 0.4 },
+    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor"] },
+    transition: "background-color var(--t-fb) ease, color var(--t-fb) ease",
+  },
+  iconPressed: {
+    backgroundColor: "color-mix(in srgb, var(--c) 16%, transparent)",
+    backgroundPosition: "initial",
+    color: "var(--c-ink)",
+  },
+  iconDanger: {
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in srgb, var(--no) 14%, transparent)",
+    },
+    color: { default: palette["--dim"], ":hover": "var(--no-ink)" },
+  },
+  iconGlyph: {
+    width: "16px",
+    height: "16px",
+  },
+  tip: {
+    position: "absolute",
+    top: "50%",
+    right: "calc(100% + 6px)",
+    zIndex: 2,
+    paddingBlock: "3px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    backgroundColor: palette["--text"],
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "16px",
+    fontFamily: fonts["--sans"],
+    fontVariantNumeric: "normal",
+    color: palette["--bg"],
+    whiteSpace: "nowrap",
+    opacity: { default: 0, [stylex.when.ancestor(":is(:hover, :has(:focus-visible))", tipped)]: 1 },
+    translate: {
+      default: "4px -50%",
+      [stylex.when.ancestor(":is(:hover, :has(:focus-visible))", tipped)]: "0 -50%",
+      [REDUCE]: "0 -50%",
+    },
+    pointerEvents: "none",
+    transition: `opacity 120ms ease, translate 160ms ${motion["--out"]}`,
+  },
+  inline: {
+    display: "inline-flex",
+    gap: "2px",
+    marginLeft: "6px",
+    verticalAlign: "middle",
+    opacity: { default: 0, [stylex.when.ancestor(":is(:hover, :focus-within)", row)]: 1 },
+    transition: "opacity 120ms ease",
+  },
+  inlineButton: {
+    paddingBlock: "2px",
+    paddingInline: "6px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "6px",
+    backgroundColor: { default: "transparent", ":hover": palette["--panel-2"] },
+    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "18px",
+    fontFamily: fonts["--sans"],
+    color: "var(--c-ink)",
+    cursor: cursors["--cursor-point"],
+  },
+  inlineDelete: {
+    color: "var(--no-ink)",
+  },
+  foot: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: "40px",
+    paddingTop: 0,
+    paddingRight: "8px",
+    paddingBottom: 0,
+    paddingLeft: "14px",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: palette["--hair"],
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--mute"],
+  },
+  link: {
+    paddingBlock: "4px",
+    paddingInline: "8px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "6px",
+    backgroundColor: { default: "transparent", ":hover": palette["--panel-2"] },
+    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: "var(--c-ink)",
+    cursor: cursors["--cursor-point"],
+  },
+  pager: {
+    display: "flex",
+    gap: "8px",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: "48px",
+    paddingTop: 0,
+    paddingRight: "8px",
+    paddingBottom: 0,
+    paddingLeft: "14px",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: palette["--hair"],
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+  },
+  pages: {
+    display: "flex",
+    gap: "2px",
+  },
+  page: {
+    display: "grid",
+    placeItems: "center",
+    minWidth: "30px",
+    height: "30px",
+    paddingBlock: 0,
+    paddingInline: "6px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "8px",
+    backgroundColor: { default: "transparent", ":hover:enabled": palette["--panel-2"] },
+    backgroundPosition: { default: "0px 0px", ":hover:enabled": "initial" },
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    fontVariantNumeric: "tabular-nums",
+    color: { default: palette["--dim"], ":hover:enabled": palette["--text"] },
+    opacity: { default: null, ":disabled": 0.35 },
+    cursor: { default: cursors["--cursor-point"], ":disabled": "not-allowed" },
+    transition: "background-color var(--t-fb) ease, color var(--t-fb) ease",
+  },
+  pageOn: {
+    backgroundColor: { default: "var(--c)", ":hover:enabled": palette["--panel-2"] },
+    backgroundPosition: "initial",
+    color: { default: "var(--on-c)", ":hover:enabled": palette["--text"] },
+  },
+  pageIcon: {
+    width: "12px",
+    height: "12px",
+  },
+  address: {
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    alignItems: "center",
+    minWidth: 0,
+    height: "30px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderRadius: "15px",
+    backgroundColor: palette["--panel-2"],
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+  },
+  host: {
+    color: palette["--mute"],
+  },
+  query: {
+    fontWeight: 600,
+    color: "var(--c-ink)",
+  },
+  body: {
+    transition: "opacity 120ms ease",
+  },
+  reloading: {
+    opacity: 0.3,
+  },
+  note: {
+    paddingTop: "10px",
+    paddingRight: "14px",
+    paddingBottom: "12px",
+    paddingLeft: "14px",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: palette["--hair"],
+    fontSize: "12px",
+    lineHeight: "18px",
+    fontFamily: fonts["--sans"],
+    color: palette["--mute"],
+  },
+});
 
 type Store<T> = {
   get: () => T;
@@ -58,9 +662,9 @@ function useDemos() {
 
 type Person = { name: string; role: "Admin" | "Editor" | "Viewer" };
 
-function Th({ children, className }: { children: ReactNode; className?: string }) {
+function Th({ children, style }: { children: ReactNode; style?: stylex.StyleXStyles }) {
   return (
-    <th scope="col" className={className}>
+    <th scope="col" {...stylex.props(styles.th, style)}>
       {children}
     </th>
   );
@@ -100,15 +704,17 @@ const tick = (now: Ticker): Ticker => {
 function Reels({ text }: { text: string }) {
   const chars = [...text];
   return (
-    <span className="td-reels" aria-hidden="true">
+    <span {...stylex.props(styles.reels)} aria-hidden="true">
       {chars.map((char, at) => {
         const key = chars.length - at;
         if (!/\d/.test(char)) return <span key={key}>{char}</span>;
         return (
-          <span key={key} className="td-reel">
-            <span className="td-strip" style={{ "--n": Number(char) }}>
+          <span key={key} {...stylex.props(styles.reel)}>
+            <span {...stylex.props(styles.strip)} style={{ "--n": Number(char) }}>
               {DIGITS.map((digit) => (
-                <span key={digit}>{digit}</span>
+                <span key={digit} {...stylex.props(styles.digit)}>
+                  {digit}
+                </span>
               ))}
             </span>
           </span>
@@ -124,27 +730,29 @@ function NumbersDemo({ careful }: { careful: boolean }) {
   const { ticker } = useDemos();
   const { values, step, hot } = useStore(ticker);
   return (
-    <div className="td-card">
-      <table className={careful ? "td-table td-money" : "td-table td-money td-ragged"}>
+    <div {...stylex.props(styles.card)}>
+      <table {...stylex.props(styles.table)}>
         <caption className="sr-only">Monthly revenue by account</caption>
         <colgroup>
           <col />
-          <col className="td-col-money" />
+          <col {...stylex.props(styles.colMoney)} />
         </colgroup>
         <thead>
           <tr>
             <Th>Account</Th>
-            <Th className={careful ? "td-num" : undefined}>MRR ($)</Th>
+            <Th style={careful && styles.num}>MRR ($)</Th>
           </tr>
         </thead>
-        <tbody>
-          {ACCOUNTS.map((account, row) => {
-            const value = values[row] ?? 0;
+        <tbody {...stylex.props(styles.body)}>
+          {ACCOUNTS.map((account, at) => {
+            const value = values[at] ?? 0;
             return (
-              <tr key={account}>
-                <td>{account}</td>
-                <td className={careful ? "td-num" : undefined}>
-                  {hot === row && <i key={step} className="td-flash" aria-hidden="true" />}
+              <tr key={account} {...stylex.props(row)}>
+                <td {...stylex.props(styles.td)}>{account}</td>
+                <td {...stylex.props(styles.td, careful ? styles.num : styles.ragged)}>
+                  {hot === at && (
+                    <i key={step} {...stylex.props(styles.flash)} aria-hidden="true" />
+                  )}
                   {careful ? (
                     <>
                       <span className="sr-only">{money(value)}</span>
@@ -193,16 +801,16 @@ function LiveSwitch() {
     <button
       ref={ref}
       type="button"
-      className="td-live"
+      {...stylex.props(styles.live, styles.ring)}
       aria-pressed={!playing}
       onClick={() => setPlaying((value) => !value)}
     >
-      <span className="td-dot" data-on={playing || undefined} aria-hidden="true" />
+      <span {...stylex.props(styles.dot, playing && styles.dotOn)} aria-hidden="true" />
       {playing ? "Live" : "Paused"}
       {playing ? (
-        <PauseIcon weight="bold" aria-hidden="true" />
+        <PauseIcon weight="bold" aria-hidden="true" {...stylex.props(styles.liveIcon)} />
       ) : (
-        <PlayIcon weight="bold" aria-hidden="true" />
+        <PlayIcon weight="bold" aria-hidden="true" {...stylex.props(styles.liveIcon)} />
       )}
       <span className="sr-only">{playing ? ", pause updates" : ", play updates"}</span>
     </button>
@@ -283,9 +891,15 @@ function Segments<T extends string>({
   onPick: (next: T) => void;
 }) {
   return (
-    <div className="td-seg" role="group" aria-label={label}>
+    <div {...stylex.props(styles.seg)} role="group" aria-label={label}>
       {options.map(([key, name]) => (
-        <button key={key} type="button" aria-pressed={value === key} onClick={() => onPick(key)}>
+        <button
+          key={key}
+          type="button"
+          aria-pressed={value === key}
+          {...stylex.props(styles.segButton, value === key && styles.segOn, styles.ring)}
+          onClick={() => onPick(key)}
+        >
           {name}
         </button>
       ))}
@@ -295,10 +909,11 @@ function Segments<T extends string>({
 
 function SearchBox({ value, onChange }: { value: string; onChange: (next: string) => void }) {
   return (
-    <label className="td-search">
-      <MagnifyingGlassIcon weight="bold" aria-hidden="true" />
+    <label {...stylex.props(styles.search)}>
+      <MagnifyingGlassIcon weight="bold" aria-hidden="true" {...stylex.props(styles.searchIcon)} />
       <input
         type="search"
+        {...stylex.props(styles.searchInput)}
         value={value}
         placeholder="Search users"
         aria-label="Search users"
@@ -317,17 +932,17 @@ function StatesDemo({ careful }: { careful: boolean }) {
   let body: ReactNode;
   if (view === "data") {
     body = matches(now).map((user) => (
-      <tr key={user.name}>
-        <td>{user.name}</td>
-        <td className="td-dim">{user.role}</td>
+      <tr key={user.name} {...stylex.props(row)}>
+        <td {...stylex.props(styles.td)}>{user.name}</td>
+        <td {...stylex.props(styles.td, styles.dim)}>{user.role}</td>
       </tr>
     ));
   } else if (!careful) {
     body = (
-      <tr>
-        <td colSpan={2} className="td-blank">
+      <tr {...stylex.props(row)}>
+        <td colSpan={2} {...stylex.props(styles.td, styles.blank, styles.still)}>
           {view === "loading" ? (
-            <span className="td-spin" role="img" aria-label="Loading" />
+            <span {...stylex.props(styles.spin)} role="img" aria-label="Loading" />
           ) : (
             "No data"
           )}
@@ -336,12 +951,12 @@ function StatesDemo({ careful }: { careful: boolean }) {
     );
   } else if (view === "loading") {
     body = TEAM.map((user) => (
-      <tr key={user.name} className="td-bones" aria-hidden="true">
-        <td>
-          <span className="td-bone" style={{ "--w": `${user.name.length * 6}px` }} />
+      <tr key={user.name} {...stylex.props(row)} aria-hidden="true">
+        <td {...stylex.props(styles.td, styles.still)}>
+          <span {...stylex.props(styles.bone)} style={{ "--w": `${user.name.length * 6}px` }} />
         </td>
-        <td>
-          <span className="td-bone" style={{ "--w": "44px" }} />
+        <td {...stylex.props(styles.td, styles.still)}>
+          <span {...stylex.props(styles.bone)} style={{ "--w": "44px" }} />
         </td>
       </tr>
     ));
@@ -367,17 +982,30 @@ function StatesDemo({ careful }: { careful: boolean }) {
       },
     }[view];
     body = (
-      <tr>
-        <td colSpan={2} className="td-blank">
-          <div className="td-said" data-tone={view}>
-            <b>{say.title}</b>
-            <span>{say.hint}</span>
+      <tr {...stylex.props(row)}>
+        <td colSpan={2} {...stylex.props(styles.td, styles.blank, styles.still)}>
+          <div {...stylex.props(styles.said)}>
+            <b {...stylex.props(styles.saidTitle, view === "error" && styles.saidError)}>
+              {say.title}
+            </b>
+            <span {...stylex.props(styles.saidHint)}>{say.hint}</span>
             <button
               type="button"
-              className={view === "none" ? "td-btn" : "td-btn go"}
+              {...stylex.props(
+                styles.btn,
+                view !== "none" && styles.go,
+                styles.saidButton,
+                styles.ring,
+              )}
               onClick={say.run}
             >
-              {view === "error" && <ArrowClockwiseIcon weight="bold" aria-hidden="true" />}
+              {view === "error" && (
+                <ArrowClockwiseIcon
+                  weight="bold"
+                  aria-hidden="true"
+                  {...stylex.props(styles.btnIcon)}
+                />
+              )}
               {say.act}
             </button>
           </div>
@@ -387,18 +1015,15 @@ function StatesDemo({ careful }: { careful: boolean }) {
   }
 
   return (
-    <div className="td-card">
-      <div className="td-bar">
+    <div {...stylex.props(styles.card)}>
+      <div {...stylex.props(styles.bar)}>
         <SearchBox value={now.query} onChange={(query) => set({ query })} />
       </div>
-      <table
-        className={careful ? "td-table td-held" : "td-table"}
-        aria-busy={view === "loading" || undefined}
-      >
+      <table {...stylex.props(styles.table)} aria-busy={view === "loading" || undefined}>
         <caption className="sr-only">Team members</caption>
         <colgroup>
           <col />
-          <col className="td-col-role" />
+          <col {...stylex.props(styles.colRole)} />
         </colgroup>
         <thead>
           <tr>
@@ -406,7 +1031,7 @@ function StatesDemo({ careful }: { careful: boolean }) {
             <Th>Role</Th>
           </tr>
         </thead>
-        <tbody>{body}</tbody>
+        <tbody {...stylex.props(styles.body)}>{body}</tbody>
       </table>
     </div>
   );
@@ -426,36 +1051,37 @@ function ActionsDemo({ careful }: { careful: boolean }) {
   const edit = (name: string) => setEditing((now) => (now === name ? null : name));
 
   return (
-    <div className="td-card">
-      <table className={careful ? "td-table td-acts" : "td-table td-acts td-hover-acts"}>
+    <div {...stylex.props(styles.card)}>
+      <table {...stylex.props(styles.table)}>
         <caption className="sr-only">Team members with actions</caption>
         <colgroup>
           <col />
-          <col className="td-col-role" />
-          {careful && <col className="td-col-acts" />}
+          <col {...stylex.props(styles.colRole)} />
+          {careful && <col {...stylex.props(styles.colActs)} />}
         </colgroup>
         <thead>
           <tr>
             <Th>Name</Th>
             <Th>Role</Th>
             {careful && (
-              <Th className="td-num">
+              <Th style={styles.num}>
                 <span className="sr-only">Actions</span>
               </Th>
             )}
           </tr>
         </thead>
-        <tbody>
+        <tbody {...stylex.props(styles.body)}>
           {rows.map(({ name, role }) => (
-            <tr key={name} data-editing={editing === name || undefined}>
-              <td>
+            <tr key={name} {...stylex.props(row)}>
+              <td {...stylex.props(styles.td, editing === name && styles.editing)}>
                 {name}
                 {!careful && (
-                  <span className="td-inline">
+                  <span {...stylex.props(styles.inline)}>
                     <button
                       type="button"
                       aria-label={`Edit ${name}`}
                       aria-pressed={editing === name}
+                      {...stylex.props(styles.inlineButton, styles.ring)}
                       onClick={() => edit(name)}
                     >
                       Edit
@@ -463,6 +1089,7 @@ function ActionsDemo({ careful }: { careful: boolean }) {
                     <button
                       type="button"
                       aria-label={`Delete ${name}`}
+                      {...stylex.props(styles.inlineButton, styles.inlineDelete, styles.ring)}
                       onClick={() => remove(name)}
                     >
                       Delete
@@ -470,17 +1097,26 @@ function ActionsDemo({ careful }: { careful: boolean }) {
                   </span>
                 )}
               </td>
-              <td className="td-dim">{role}</td>
+              <td {...stylex.props(styles.td, styles.dim, editing === name && styles.editing)}>
+                {role}
+              </td>
               {careful && (
-                <td className="td-num">
-                  <span className="td-icons">
+                <td
+                  {...stylex.props(
+                    styles.td,
+                    styles.num,
+                    styles.overflowing,
+                    editing === name && styles.editing,
+                  )}
+                >
+                  <span {...stylex.props(styles.icons)}>
                     <IconButton
                       tip="Edit"
                       label={`Edit ${name}`}
                       pressed={editing === name}
                       onClick={() => edit(name)}
                     >
-                      <PencilSimpleIcon weight="bold" />
+                      <PencilSimpleIcon weight="bold" {...stylex.props(styles.iconGlyph)} />
                     </IconButton>
                     <IconButton
                       tip="Delete"
@@ -488,7 +1124,7 @@ function ActionsDemo({ careful }: { careful: boolean }) {
                       danger
                       onClick={() => remove(name)}
                     >
-                      <TrashIcon weight="bold" />
+                      <TrashIcon weight="bold" {...stylex.props(styles.iconGlyph)} />
                     </IconButton>
                   </span>
                 </td>
@@ -497,12 +1133,16 @@ function ActionsDemo({ careful }: { careful: boolean }) {
           ))}
         </tbody>
       </table>
-      <div className="td-foot">
+      <div {...stylex.props(styles.foot)}>
         <span>
           {rows.length} of {CREW.length} users
         </span>
         {rows.length < CREW.length && (
-          <button type="button" className="td-link" onClick={() => setRows(CREW)}>
+          <button
+            type="button"
+            {...stylex.props(styles.link, styles.ring)}
+            onClick={() => setRows(CREW)}
+          >
             Restore
           </button>
         )}
@@ -527,17 +1167,22 @@ function IconButton({
   children: ReactNode;
 }) {
   return (
-    <span className="td-tipped">
+    <span {...stylex.props(styles.tipped, tipped)}>
       <button
         type="button"
-        className={danger ? "td-icon no" : "td-icon"}
+        {...stylex.props(
+          styles.icon,
+          danger && styles.iconDanger,
+          pressed && styles.iconPressed,
+          styles.ring,
+        )}
         aria-label={label}
         aria-pressed={pressed}
         onClick={onClick}
       >
         {children}
       </button>
-      <span className="td-tip" aria-hidden="true">
+      <span {...stylex.props(styles.tip)} aria-hidden="true">
         {tip}
       </span>
     </span>
@@ -594,12 +1239,12 @@ function PagedTable({ people, careful }: { people: readonly Person[]; careful: b
   const pages = Math.ceil(people.length / PER_PAGE);
   const shown = people.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   return (
-    <div className="td-card">
-      <table className="td-table">
+    <div {...stylex.props(styles.card)}>
+      <table {...stylex.props(styles.table)}>
         <caption className="sr-only">Users, page {page}</caption>
         <colgroup>
           <col />
-          <col className="td-col-role" />
+          <col {...stylex.props(styles.colRole)} />
         </colgroup>
         <thead>
           <tr>
@@ -607,21 +1252,21 @@ function PagedTable({ people, careful }: { people: readonly Person[]; careful: b
             <Th>Role</Th>
           </tr>
         </thead>
-        <tbody>
+        <tbody {...stylex.props(styles.body)}>
           {shown.length === 0 ? (
-            <tr>
-              <td colSpan={2} className="td-blank">
-                <div className="td-said">
-                  <b>No owners</b>
-                  <span>Nobody has the Owner role yet.</span>
+            <tr {...stylex.props(row)}>
+              <td colSpan={2} {...stylex.props(styles.td, styles.blank, styles.still)}>
+                <div {...stylex.props(styles.said)}>
+                  <b {...stylex.props(styles.saidTitle)}>No owners</b>
+                  <span {...stylex.props(styles.saidHint)}>Nobody has the Owner role yet.</span>
                 </div>
               </td>
             </tr>
           ) : (
             shown.map((person) => (
-              <tr key={person.name}>
-                <td>{person.name}</td>
-                <td className="td-dim">{person.role}</td>
+              <tr key={person.name} {...stylex.props(row)}>
+                <td {...stylex.props(styles.td)}>{person.name}</td>
+                <td {...stylex.props(styles.td, styles.dim)}>{person.role}</td>
               </tr>
             ))
           )}
@@ -642,24 +1287,26 @@ function Pager({
   onPage: (next: number) => void;
 }) {
   return (
-    <nav className="td-pager" aria-label="Pages">
+    <nav {...stylex.props(styles.pager)} aria-label="Pages">
       <span>
         Page {page} of {pages}
       </span>
-      <span className="td-pages">
+      <span {...stylex.props(styles.pages)}>
         <button
           type="button"
           aria-label="Previous page"
           disabled={page <= 1}
+          {...stylex.props(styles.page, styles.ring)}
           onClick={() => onPage(page - 1)}
         >
-          <CaretLeftIcon weight="bold" aria-hidden="true" />
+          <CaretLeftIcon weight="bold" aria-hidden="true" {...stylex.props(styles.pageIcon)} />
         </button>
         {Array.from({ length: pages }, (_, at) => at + 1).map((n) => (
           <button
             key={n}
             type="button"
             aria-current={n === page ? "page" : undefined}
+            {...stylex.props(styles.page, n === page && styles.pageOn, styles.ring)}
             onClick={() => onPage(n)}
           >
             {n}
@@ -669,9 +1316,10 @@ function Pager({
           type="button"
           aria-label="Next page"
           disabled={page >= pages}
+          {...stylex.props(styles.page, styles.ring)}
           onClick={() => onPage(page + 1)}
         >
-          <CaretRightIcon weight="bold" aria-hidden="true" />
+          <CaretRightIcon weight="bold" aria-hidden="true" {...stylex.props(styles.pageIcon)} />
         </button>
       </span>
     </nav>
@@ -703,27 +1351,31 @@ function UrlDemo({ careful }: { careful: boolean }) {
 
   const shown = STAFF.slice((now.page - 1) * URL_PER_PAGE, now.page * URL_PER_PAGE);
   return (
-    <div className="td-card">
-      <div className="td-bar td-browser">
+    <div {...stylex.props(styles.card)}>
+      <div {...stylex.props(styles.bar)}>
         <button
           type="button"
-          className="td-icon"
+          {...stylex.props(styles.icon, styles.ring)}
           aria-label="Reload"
           disabled={now.reloading}
           onClick={() => setNow((old) => ({ ...old, reloading: true }))}
         >
-          <ArrowClockwiseIcon weight="bold" aria-hidden="true" />
+          <ArrowClockwiseIcon
+            weight="bold"
+            aria-hidden="true"
+            {...stylex.props(styles.iconGlyph)}
+          />
         </button>
-        <span className="td-address">
-          <span className="td-host">acme.app</span>/users
-          {query && <b>{query}</b>}
+        <span {...stylex.props(styles.address)}>
+          <span {...stylex.props(styles.host)}>acme.app</span>/users
+          {query && <b {...stylex.props(styles.query)}>{query}</b>}
         </span>
       </div>
-      <table className="td-table" data-reloading={now.reloading || undefined}>
+      <table {...stylex.props(styles.table)}>
         <caption className="sr-only">Users, page {now.page}</caption>
         <colgroup>
           <col />
-          <col className="td-col-role" />
+          <col {...stylex.props(styles.colRole)} />
         </colgroup>
         <thead>
           <tr>
@@ -731,11 +1383,11 @@ function UrlDemo({ careful }: { careful: boolean }) {
             <Th>Role</Th>
           </tr>
         </thead>
-        <tbody>
+        <tbody {...stylex.props(styles.body, now.reloading && styles.reloading)}>
           {shown.map((person) => (
-            <tr key={person.name}>
-              <td>{person.name}</td>
-              <td className="td-dim">{person.role}</td>
+            <tr key={person.name} {...stylex.props(row)}>
+              <td {...stylex.props(styles.td)}>{person.name}</td>
+              <td {...stylex.props(styles.td, styles.dim)}>{person.role}</td>
             </tr>
           ))}
         </tbody>
@@ -745,7 +1397,7 @@ function UrlDemo({ careful }: { careful: boolean }) {
         pages={URL_PAGES}
         onPage={(page) => setNow((old) => ({ ...old, page }))}
       />
-      <p className="td-note" aria-live="polite">
+      <p {...stylex.props(styles.note)} aria-live="polite">
         {now.reloads === 0
           ? "Pick a page, then reload."
           : careful
@@ -1099,6 +1751,7 @@ export function TableDesign() {
     <DemosContext value={demos}>
       <RuleLanding
         className="table-design"
+        costsStyle={styles.costs}
         lead={
           <>
             Five tables, each built the usual way and the careful way side by side, and every one of
