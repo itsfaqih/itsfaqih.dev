@@ -14,6 +14,7 @@ import { fonts, motion, palette } from "../../theme.stylex";
 import { chips } from "./chips";
 import { TechIcon, techBadge, techBrand } from "./tech-icon";
 import { section, veil } from "./section";
+import { loadIn } from "../../components/load-in";
 
 export type StackGroup = { label: string; tools: string[] };
 type StackUse = { kind: "work" | "project"; name: string; detail: string };
@@ -87,10 +88,10 @@ export function StackShowcase({
     <section ref={sectionRef} id="stack" {...stylex.props(section.block, styles.section)}>
       <div {...stylex.props(section.head)}>
         <h2 {...stylex.props(section.title, veil.soft)}>
-          <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ar)" }}>
+          <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ar)" }}>
             Tools I use
           </small>
-          <span {...stylex.props(section.titleText)} data-cut>Stack</span>
+          <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Stack</span>
         </h2>
       </div>
 
@@ -100,7 +101,7 @@ export function StackShowcase({
           <div {...stylex.props(chips.group, styles.chips)}>
             <button
               type="button"
-              {...stylex.props(chips.chip)}
+              {...stylex.props(loadIn.piece, chips.chip)}
               data-cut
               aria-pressed={usedAt === null}
               style={{ "--c": "var(--go)" }}
@@ -114,7 +115,7 @@ export function StackShowcase({
         </div>
         {FILTER_ROWS.map((row) => (
           <div key={row.kind} {...stylex.props(styles.row)}>
-            <h3 {...stylex.props(veil.dense, styles.rowLabel)} data-cut>
+            <h3 {...stylex.props(loadIn.piece, veil.dense, styles.rowLabel)} data-cut>
               {row.label}
             </h3>
             <div
@@ -126,7 +127,7 @@ export function StackShowcase({
                 <button
                   key={name}
                   type="button"
-                  {...stylex.props(chips.chip)}
+                  {...stylex.props(loadIn.piece, chips.chip)}
                   data-cut
                   aria-pressed={usedAt === name}
                   style={{ "--c": row.color }}
@@ -148,14 +149,14 @@ export function StackShowcase({
         {shownGroups.map((group) => (
           <ViewTransition key={group.label} {...FILTER_MOTION}>
             <div {...stylex.props(styles.group)}>
-              <h3 {...stylex.props(veil.dense, styles.groupLabel)} data-cut>
+              <h3 {...stylex.props(loadIn.piece, veil.dense, styles.groupLabel)} data-cut>
                 {group.label}
               </h3>
               <ul {...stylex.props(styles.tools)}>
                 {group.tools.map((tool) => (
                   <ViewTransition key={tool} {...FILTER_MOTION}>
                     <li
-                      {...stylex.props(techBadge.badge, styles.tool)}
+                      {...stylex.props(loadIn.piece, techBadge.badge, styles.tool)}
                       data-cut
                       tabIndex={0}
                       aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
@@ -247,7 +248,6 @@ function usePlaceCard(
 }
 
 const STACKED = "@media (max-width: 960px)";
-const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
 const peekIn = stylex.keyframes({
   from: { opacity: 0, transform: "scale(0.96)" },
@@ -359,9 +359,9 @@ const styles = stylex.create({
       ':is([data-side="bottom"])': "top center",
       ':is([data-side="top"])': "bottom center",
     },
-    animationName: { default: peekIn, [REDUCE]: "fade-in" },
-    animationDuration: { default: "180ms", [REDUCE]: "120ms" },
-    animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+    animationName: peekIn,
+    animationDuration: "180ms",
+    animationTimingFunction: motion["--out"],
   },
   peekHead: {
     display: "flex",

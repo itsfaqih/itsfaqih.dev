@@ -9,6 +9,7 @@ import { chips } from "./chips";
 import { reticle } from "./reticle";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 import { fonts, motion, palette } from "../../theme.stylex";
+import { loadIn } from "../../components/load-in";
 
 export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
   const [query, setQuery] = useState("");
@@ -99,7 +100,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
     <div ref={selectRef} {...stylex.props(styles.select)} data-lit={litId ? "" : undefined}>
       <aside
         {...panelProps}
-        {...stylex.props(styles.panel)}
+        {...stylex.props(loadIn.piece, styles.panel)}
         data-cut
         data-empty={selected ? undefined : ""}
         aria-live="polite"
@@ -144,7 +145,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
       </aside>
       <div>
         <div {...stylex.props(styles.tools)}>
-          <label {...stylex.props(styles.search)} data-cut>
+          <label {...stylex.props(loadIn.piece, styles.search)} data-cut>
             FIND
             <input
               ref={searchRef}
@@ -163,7 +164,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
             <button
               key={name}
               type="button"
-              {...stylex.props(chips.chip)}
+              {...stylex.props(loadIn.piece, chips.chip)}
               data-cut
               aria-pressed={category === name}
               style={{ "--c": colorOf(name) }}
@@ -190,7 +191,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               key={rule.id}
               to={rule.href}
               preload="intent"
-              {...stylex.props(reticle.card, reticle.on, styles.tile)}
+              {...stylex.props(loadIn.piece, loadIn.deal, reticle.card, reticle.on, styles.tile)}
               data-cut
               data-on={rule === selected ? "" : undefined}
               data-lit={rule.id === litId ? "" : undefined}
@@ -316,9 +317,11 @@ function ScrambleText({ text }: { text: string }) {
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const LIGHT = ":is(.light *)";
+// A tile waiting for its cut-in, or inside a piece still waiting, stays hidden (loadIn.piece).
+const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
 // The grid's pointer or focus is on a tile's parent; the other tiles dim, except any still
-// waiting for its cut-in, which the load-in keeps hidden.
-const DIMMED = ":not([data-on]):is(:hover > *, :focus-within > *):not(:is(.js *):not(.in, [data-rest]))";
+// waiting for its own cut-in.
+const DIMMED = ":not([data-on]):is(:hover > *, :focus-within > *):not(:is(.js *):not(.in))";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
 const PANEL_SHADOW = `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`;
 const TILE_TOP = "inset 0 4px 0 var(--c)";
@@ -327,11 +330,6 @@ const LENS = (near: string, far: string) =>
 
 const enter = stylex.keyframes({
   from: { transform: "translate(-60px) scale(0.7)", opacity: 0 },
-});
-
-// Filtered tiles deal instead of glitching, since a new filter deals a fresh hand.
-const deal = stylex.keyframes({
-  from: { opacity: 0, transform: "scale(0.6) rotate(-6deg)" },
 });
 
 // The lamp catches with a stutter, once per hover of the grid, not per tile.
@@ -548,7 +546,7 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: { default: "10px", [STACKED]: "18px" },
-    opacity: { default: null, [DIMMED]: 0.25 },
+    opacity: { default: null, [WAITING]: 0, [DIMMED]: 0.25 },
     transform: {
       default: null,
       ":is([data-on])": { default: "translateY(-4px)", ":active": "translateY(3px)", [REDUCE]: "none" },
@@ -572,14 +570,6 @@ const styles = stylex.create({
     transitionTimingFunction: `ease, ${motion["--snap"]}, ease, ease`,
     transitionDelay: "0s, 0s, 0s, 0s",
     transitionBehavior: "normal, normal, normal, normal",
-    animationName: { default: null, ":is(.in)": deal },
-    animationDuration: { default: null, ":is(.in)": motion["--t-pop"] },
-    animationTimingFunction: { default: null, ":is(.in)": motion["--snap"] },
-    animationDelay: {
-      default: null,
-      ":is(.in)": `calc(min(var(--cut-order, 0), 12) * ${motion["--t-step"]})`,
-    },
-    animationFillMode: { default: null, ":is(.in)": "backwards" },
     // A lit tile turns into the projector's lens: its face fills with its hue under the halftone
     // screen, and the beam carries the light from it onto the panel, which shows what it projects.
     "::before": {

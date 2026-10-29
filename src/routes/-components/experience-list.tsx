@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { TechIcon, techBadge, techBrand } from "./tech-icon";
+import { loadIn } from "../../components/load-in";
 
 export type Job = {
   years: string;
@@ -70,7 +71,7 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
         return (
           <div
             key={job.company}
-            {...stylex.props(styles.row, stylex.defaultMarker())}
+            {...stylex.props(loadIn.piece, styles.row, stylex.defaultMarker())}
             data-cut
             data-on={isOpen ? "" : undefined}
           >

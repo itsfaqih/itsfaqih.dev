@@ -237,15 +237,3 @@ body.site-shell {
 .dark body.site-shell {
   color-scheme: dark;
 }
-
-/* arcade.css's reduced-motion fade-ins resolve to this definition, which comes after its own. */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}

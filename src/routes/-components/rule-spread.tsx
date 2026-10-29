@@ -7,6 +7,7 @@ import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { veil } from "./section";
+import { loadIn } from "../../components/load-in";
 
 const STEP = 0.68;
 const RUBBER = 0.35;
@@ -199,7 +200,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           >
             <Link
               to={item.href}
-              {...stylex.props(styles.card)}
+              {...stylex.props(loadIn.piece, styles.card)}
               data-cut
               draggable={false}
               aria-current={index === active ? "true" : undefined}
@@ -227,7 +228,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           </div>
         ))}
       </div>
-      <div {...stylex.props(styles.nav)} data-cut>
+      <div {...stylex.props(loadIn.piece, styles.nav)} data-cut>
         <span className={`sr-only ${stylex.props(veil.dense).className}`} aria-live="polite">
           {rule.title}
         </span>

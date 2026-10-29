@@ -6,6 +6,7 @@ import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosph
 import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { button } from "./button";
+import { loadIn } from "./load-in";
 
 let activityHost: HTMLElement | null = null;
 let activityCount = 0;
@@ -70,7 +71,7 @@ type SegProps = {
 function Seg({ on, compact, style, rowStyle, children }: SegProps) {
   return (
     <div
-      {...stylex.props(styles.seg, on && styles.segOn, style)}
+      {...stylex.props(loadIn.islandPart, styles.seg, on && styles.segOn, style)}
       data-compact={compact}
       inert={!on}
     >
@@ -353,51 +354,16 @@ const styles = stylex.create({
     },
     color: palette["--text"],
     opacity: { default: null, [WAITING]: 0 },
-    animationName: { default: null, [READY]: { default: islandIn, [REDUCE]: "fade-in" } },
-    animationDuration: { default: null, [READY]: { default: FOLD, [REDUCE]: "240ms" } },
-    animationTimingFunction: { default: null, [READY]: { default: SPRING, [REDUCE]: "ease" } },
+    animationName: { default: null, [READY]: islandIn },
+    animationDuration: { default: null, [READY]: FOLD },
+    animationTimingFunction: { default: null, [READY]: SPRING },
     animationFillMode: { default: null, [READY]: "backwards" },
   },
-  // Each part boots like a corrupted game frame once the page is ready (see the Load-in section of
-  // arcade.css), staggered across the island, with neighbours on alternating slice patterns.
-  // Reduced motion only fades them in; its !important outranks the reset `.arc *` applies there.
+  // Each part boots in with loadIn.islandPart.
   seg: {
     display: "grid",
     gridTemplateColumns: "0fr",
     transition: { default: `grid-template-columns ${FOLD} ${SPRING}`, [REDUCE]: "none" },
-    opacity: { default: null, [WAITING]: 0 },
-    animationName: {
-      default: null,
-      [READY]: {
-        default: "glitch-in",
-        ":nth-child(2n)": "glitch-in-alt",
-        [REDUCE]: "fade-in !important",
-      },
-    },
-    animationDuration: {
-      default: null,
-      [READY]: { default: "560ms", [REDUCE]: "240ms !important" },
-    },
-    animationTimingFunction: {
-      default: null,
-      [READY]: { default: "steps(1, end)", [REDUCE]: "ease !important" },
-    },
-    animationDelay: {
-      default: null,
-      [READY]: {
-        default: "0ms",
-        ":nth-child(2)": "40ms",
-        ":nth-child(3)": "80ms",
-        ":nth-child(4)": "120ms",
-        ":nth-child(5)": "160ms",
-        ":nth-child(6)": "200ms",
-        [REDUCE]: "0s !important",
-      },
-    },
-    animationFillMode: {
-      default: null,
-      [READY]: { default: "backwards", [REDUCE]: "backwards !important" },
-    },
   },
   segOn: {
     gridTemplateColumns: "1fr",

@@ -16,6 +16,7 @@ import { LINKS, pageHead } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
 import { button } from "../components/button";
 import { section, veil } from "./-components/section";
+import { loadIn } from "../components/load-in";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -269,7 +270,7 @@ function Index() {
         <Hero introDone={introDone} />
       </div>
 
-      <div {...stylex.props(styles.ticker)} data-loop data-cut aria-hidden="true">
+      <div {...stylex.props(loadIn.piece, styles.ticker)} data-loop data-cut aria-hidden="true">
         <div {...stylex.props(styles.tickerTrack, styles.pausable)}>
           {TICKER_RUN.map(({ ticker, color }, index) => (
             <span key={index} {...stylex.props(styles.tickerTile, styles.pausable)} style={{ "--c": color }}>
@@ -283,12 +284,12 @@ function Index() {
         <section id="rules" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--cw)" }}>
+              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--cw)" }}>
                 Writing
               </small>
-              <span {...stylex.props(section.titleText)} data-cut>Rule of Thumb</span>
+              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Rule of Thumb</span>
             </h2>
-            <p {...stylex.props(section.blurb, veil.dense)} data-cut>Opinions I've earned from my experience</p>
+            <p {...stylex.props(loadIn.piece, section.blurb, veil.dense)} data-cut>Opinions I've earned from my experience</p>
           </div>
           <RuleSpread rules={VISIBLE_GUIDELINES} />
         </section>
@@ -296,10 +297,10 @@ function Index() {
         <section id="work" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ux)" }}>
+              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ux)" }}>
                 Experience
               </small>
-              <span {...stylex.props(section.titleText)} data-cut>Where I've worked</span>
+              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Where I've worked</span>
             </h2>
           </div>
           <ExperienceList jobs={EXPERIENCE} />
@@ -310,17 +311,17 @@ function Index() {
         <section id="projects" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ts)" }}>
+              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ts)" }}>
                 Side projects
               </small>
-              <span {...stylex.props(section.titleText)} data-cut>Projects</span>
+              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Projects</span>
             </h2>
           </div>
           <div {...stylex.props(styles.projects)}>
             {PROJECTS.map((project) => (
               <a
                 key={project.title}
-                {...stylex.props(reticle.card, reticle.aim, styles.project)}
+                {...stylex.props(loadIn.piece, reticle.card, reticle.aim, styles.project)}
                 data-cut
                 href={project.href}
                 target="_blank"
@@ -335,14 +336,14 @@ function Index() {
           </div>
         </section>
 
-        <div id="contact" {...stylex.props(styles.contact)} data-cut>
+        <div id="contact" {...stylex.props(loadIn.piece, styles.contact)} data-cut>
           <h2 {...stylex.props(section.title)}>
-            <small {...stylex.props(section.eyebrow)} data-cut style={{ "--c": "var(--ax)" }}>
+            <small {...stylex.props(loadIn.piece, section.eyebrow)} data-cut style={{ "--c": "var(--ax)" }}>
               Contact
             </small>
-            <span {...stylex.props(section.titleText)} data-cut>Ready to bring the next level of care to your product?</span>
+            <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
-          <div {...stylex.props(heroType.acts)} data-cut style={{ marginTop: 24 }}>
+          <div {...stylex.props(loadIn.piece, heroType.acts)} data-cut style={{ marginTop: 24 }}>
             <a {...stylex.props(button.base, button.go)} href={`mailto:${LINKS.email}`}>
               {`Email ${LINKS.email}`}
             </a>
@@ -357,7 +358,7 @@ function Index() {
           </div>
         </div>
 
-        <footer {...stylex.props(styles.footer)} data-cut>
+        <footer {...stylex.props(loadIn.piece, styles.footer)} data-cut>
           <span {...stylex.props(veil.dense)}>© 2026 Faqih Muntashir</span>
           <span {...stylex.props(veil.dense)}>
             <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
@@ -417,7 +418,7 @@ const styles = stylex.create({
     backgroundColor: "var(--c)",
     whiteSpace: "nowrap",
   },
-  // useCutIns sets .paused on the band while it is off screen (arcade.css pauses the band itself).
+  // useCutIns sets .paused on the band while it is off screen (loadIn.piece pauses the band itself).
   pausable: {
     animationPlayState: { default: null, ":is(.paused *)": "paused !important" },
   },

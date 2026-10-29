@@ -7,6 +7,7 @@ import { heroType } from "../hero-type";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
 import { button } from "../../../components/button";
 import { veil } from "../section";
+import { loadIn } from "../../../components/load-in";
 
 // The home hero: the headline cycles through what I build, and the bench beside it shows each in
 // print. The slides advance on a timer once the intro hands off; the pips jump, the button pauses.
@@ -48,10 +49,10 @@ export function Hero({ introDone }: { introDone: boolean }) {
   return (
     <div {...stylex.props(styles.root)}>
       <div {...stylex.props(veil.soft)}>
-        <div {...stylex.props(veil.dense, heroType.tag)} data-cut>
+        <div {...stylex.props(loadIn.piece, veil.dense, heroType.tag)} data-cut>
           Full-stack engineer · Yogyakarta
         </div>
-        <h1 data-cut {...stylex.props(heroType.title, styles.title)}>
+        <h1 data-cut {...stylex.props(loadIn.piece, heroType.title, styles.title)}>
           <span {...stylex.props(styles.line)}>I build</span>
           <span {...stylex.props(styles.phrases)}>
             {SLIDES.map((item, index) => {
@@ -72,7 +73,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
             })}
           </span>
         </h1>
-        <p {...stylex.props(heroType.lead)} data-cut>
+        <p {...stylex.props(loadIn.piece, heroType.lead)} data-cut>
           I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
           lately the agent tooling around them. Right now I'm building healthcare software at{" "}
           <a {...stylex.props(styles.leadLink)} href="https://evidence.care" target="_blank" rel="noopener noreferrer">
@@ -82,14 +83,14 @@ export function Hero({ introDone }: { introDone: boolean }) {
         </p>
         <div {...stylex.props(heroType.acts)}>
           <a
-            {...stylex.props(button.base, button.go, styles.go)}
+            {...stylex.props(loadIn.piece, button.base, button.go, styles.go)}
             href="#contact"
             data-cut
             style={{ "--c": current.color }}
           >
             Connect with me
           </a>
-          <a {...stylex.props(styles.cue)} href="#rules" data-cut>
+          <a {...stylex.props(loadIn.piece, styles.cue)} href="#rules" data-cut>
             <span {...stylex.props(styles.mouse)} aria-hidden="true">
               <span {...stylex.props(styles.wheel)} />
             </span>
@@ -98,7 +99,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
         </div>
       </div>
 
-      <div {...stylex.props(styles.bench)} data-cut style={{ "--c": current.color }}>
+      <div {...stylex.props(loadIn.piece, styles.bench)} data-cut style={{ "--c": current.color }}>
         <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} held={userPaused} />
         <div {...stylex.props(styles.controls)}>
           <div {...stylex.props(styles.pips)} role="group" aria-label="What I build">
