@@ -1,32 +1,468 @@
+import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import {
   type Lesson,
   type Level,
   onceOnScreen,
-  paintClasses,
+  paint,
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
-import "./null-vs-undefined.css";
 
 type Tone = "no" | "yes";
 type Line = { c: string; out?: string; tone?: Tone; hot?: boolean };
 
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(null)\b|\b(undefined)\b|\b(const|let|function|return|type|await|new)\b/g;
-const KINDS = ["com", "str", "nul", "und", "kw"] as const;
+const PHONE = "@media (max-width: 640px)";
+const MOTION = "@media (prefers-reduced-motion: no-preference)";
+
+const flash = stylex.keyframes({
+  from: { opacity: 1 },
+  to: { opacity: 0 },
+});
+const typeIn = stylex.keyframes({
+  from: { opacity: 0, transform: "translateX(-8px)" },
+});
+const drop = stylex.keyframes({
+  from: { opacity: 1, transform: "translateY(-14px)" },
+  "70%": { opacity: 1 },
+  to: { opacity: 0, transform: "translateY(16px)" },
+});
+const land = stylex.keyframes({
+  from: { opacity: 0, transform: "translateY(6px)" },
+});
+
+const styles = stylex.create({
+  kw: { color: "var(--c-ink)" },
+  str: { color: `color-mix(in oklab, ${palette["--ar"]} ${palette["--ink-mix"]}, #000)` },
+  com: { color: palette["--mute"] },
+  nul: {
+    paddingBlock: 0,
+    paddingInline: "3px",
+    borderRadius: "4px",
+    backgroundColor: "color-mix(in srgb, var(--c) 20%, transparent)",
+    boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent)",
+    fontWeight: 700,
+    color: "var(--c-ink)",
+  },
+  und: {
+    paddingBlock: 0,
+    paddingInline: "3px",
+    borderRadius: "4px",
+    outlineWidth: "1px",
+    outlineStyle: "dashed",
+    outlineColor: palette["--mute"],
+    outlineOffset: "-1px",
+    fontWeight: 700,
+    color: palette["--dim"],
+  },
+  inherit: { color: "inherit" },
+  introCode: {
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "0.88em",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  },
+  view: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "14px",
+    alignContent: "start",
+  },
+  code: {
+    display: "grid",
+    gap: "2px",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+  },
+  line: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "2px",
+    columnGap: "12px",
+    alignItems: "center",
+    minHeight: "26px",
+    paddingBlock: "1px",
+    paddingInline: { default: "8px", [PHONE]: "6px" },
+    borderRadius: "6px",
+  },
+  hot: {
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
+    },
+    boxShadow: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
+    },
+  },
+  source: {
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: "auto",
+    minWidth: 0,
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    color: palette["--text"],
+  },
+  out: {
+    maxWidth: "100%",
+    marginLeft: "auto",
+    paddingBlock: "1px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "11.5px",
+    lineHeight: 1.6,
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+    overflowWrap: "anywhere",
+    "::before": {
+      content: '"→ "',
+      color: palette["--mute"],
+    },
+  },
+  outNo: {
+    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
+    color: "var(--no-ink)",
+  },
+  outYes: {
+    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    color: "var(--yes-ink)",
+  },
+  flow: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "10px",
+  },
+  form: {
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "10px",
+    alignItems: "center",
+    minHeight: "58px",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: palette["--raise"],
+  },
+  label: {
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  },
+  field: {
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "160px",
+    gap: "10px",
+    alignItems: "center",
+    minWidth: 0,
+  },
+  input: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    minWidth: 0,
+    height: "38px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "solid",
+    borderColor: { default: palette["--hair"], ":focus-visible": "var(--c)" },
+    borderRadius: "10px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: {
+      default: null,
+      ":focus-visible": "color-mix(in srgb, var(--c) 30%, transparent)",
+    },
+    outlineOffset: { default: null, ":focus-visible": 0 },
+    transition: "border-color var(--t-fb) ease",
+  },
+  chip: {
+    display: "inline-flex",
+    gap: "4px",
+    alignItems: "center",
+    height: "34px",
+    paddingTop: 0,
+    paddingRight: "4px",
+    paddingBottom: 0,
+    paddingLeft: "12px",
+    borderRadius: "999px",
+    backgroundColor: palette["--panel-2"],
+    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+  },
+  remove: {
+    display: "grid",
+    alignItems: "center",
+    justifyItems: "center",
+    width: "26px",
+    height: "26px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "999px",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in srgb, var(--no) 18%, transparent)",
+    },
+    fontSize: "12px",
+    color: { default: palette["--dim"], ":hover": "var(--no-ink)" },
+    cursor: cursors["--cursor-point"],
+    transform: { default: null, ":active": "scale(0.92)" },
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "1px" },
+    transition: `background-color var(--t-fb) ease, color var(--t-fb) ease, transform var(--t-fb) ${motion["--out"]}`,
+  },
+  none: {
+    display: "inline-flex",
+    alignItems: "center",
+    height: "34px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "999px",
+    fontSize: "14px",
+    color: palette["--mute"],
+  },
+  again: {
+    marginLeft: "auto",
+    opacity: { default: null, ":disabled": 0.5 },
+  },
+  wire: {
+    position: "relative",
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "4px",
+    columnGap: "10px",
+    alignItems: "baseline",
+    minHeight: "38px",
+    paddingBlock: "8px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+    fontSize: "12px",
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+  },
+  verb: {
+    fontWeight: 700,
+    color: "var(--c-ink)",
+  },
+  idle: {
+    color: palette["--mute"],
+  },
+  body: {
+    minWidth: 0,
+    overflowWrap: "anywhere",
+    color: palette["--text"],
+  },
+  typing: {
+    animationName: { default: null, [MOTION]: typeIn },
+    animationDuration: { default: null, [MOTION]: "180ms" },
+    animationTimingFunction: { default: null, [MOTION]: motion["--out"] },
+    animationFillMode: { default: null, [MOTION]: "both" },
+  },
+  packet: {
+    position: "absolute",
+    bottom: "-4px",
+    left: "50%",
+    width: "6px",
+    height: "6px",
+    marginLeft: "-3px",
+    backgroundColor: "var(--c)",
+    opacity: 0,
+  },
+  dropping: {
+    animationName: { default: null, [MOTION]: drop },
+    animationDuration: { default: null, [MOTION]: "260ms" },
+    animationTimingFunction: { default: null, [MOTION]: motion["--out"] },
+    animationDelay: { default: null, [MOTION]: "180ms" },
+    animationFillMode: { default: null, [MOTION]: "both" },
+  },
+  record: {
+    display: "grid",
+    gridAutoColumns: "minmax(0, 1fr)",
+    gridAutoFlow: "column",
+    gap: "2px",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  },
+  cell: {
+    position: "relative",
+    display: "grid",
+    gap: "2px",
+    alignContent: "start",
+    minWidth: 0,
+    paddingBlock: "8px",
+    paddingInline: { default: "10px", [PHONE]: "8px" },
+    borderRadius: "9px",
+    isolation: "isolate",
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      zIndex: -1,
+      borderRadius: "inherit",
+      opacity: 0,
+    },
+  },
+  cellSaved: {
+    "::after": {
+      backgroundColor: "color-mix(in srgb, var(--yes) 22%, transparent)",
+    },
+  },
+  cellLost: {
+    "::after": {
+      backgroundColor: "color-mix(in srgb, var(--no) 24%, transparent)",
+    },
+  },
+  flashing: {
+    "::after": {
+      animationName: flash,
+      animationDuration: "640ms",
+      animationTimingFunction: motion["--out"],
+      animationDelay: "calc(var(--i) * 40ms)",
+      animationFillMode: "both",
+    },
+  },
+  name: {
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+  },
+  value: {
+    minHeight: "21px",
+    marginBlock: 0,
+    marginInline: 0,
+    fontWeight: 600,
+    fontSize: "13px",
+    lineHeight: 1.6,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    overflowWrap: "anywhere",
+  },
+  valueLost: {
+    color: "var(--no-ink)",
+  },
+  landing: {
+    animationName: { default: null, [MOTION]: land },
+    animationDuration: { default: null, [MOTION]: "240ms" },
+    animationTimingFunction: { default: null, [MOTION]: motion["--out"] },
+    animationDelay: { default: null, [MOTION]: "calc(var(--i) * 40ms)" },
+    animationFillMode: { default: null, [MOTION]: "both" },
+  },
+  nulLost: {
+    backgroundColor: "color-mix(in srgb, var(--no) 18%, transparent)",
+    boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--no) 70%, transparent)",
+    color: "var(--no-ink)",
+  },
+  tag: {
+    justifySelf: "start",
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "5px",
+    fontWeight: 700,
+    fontSize: "10px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  tagKept: {
+    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    color: "var(--yes-ink)",
+  },
+  tagLost: {
+    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
+    color: "var(--no-ink)",
+  },
+  boardCode: {
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  },
+  gap: {
+    display: { default: null, [stylex.when.ancestor("[data-off]")]: "none" },
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "3.2em",
+    height: "1.1em",
+    marginLeft: "8px",
+    borderBottomWidth: "2px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "color-mix(in srgb, var(--c) 55%, transparent)",
+  },
+});
+
+const KINDS = [styles.com, styles.str, styles.nul, styles.und, styles.kw];
+// Inside an output note the note's tone colours strings and nothings.
+const OUT_KINDS = [
+  styles.com,
+  [styles.str, styles.inherit],
+  [styles.nul, styles.inherit],
+  [styles.und, styles.inherit],
+  styles.kw,
+];
 
 function Code({ lines }: { lines: Line[] }) {
   return (
-    <div className="nv-code">
+    <div {...stylex.props(styles.code)}>
       {lines.map((line, index) => (
-        <div key={index} className="nv-ln" data-hot={line.hot || undefined}>
-          <code>{line.c ? paintClasses(line.c, TOKEN, KINDS) : " "}</code>
+        <div key={index} {...stylex.props(styles.line, line.hot && styles.hot)}>
+          <code {...stylex.props(styles.source)}>{line.c ? paint(line.c, TOKEN, KINDS) : " "}</code>
           {line.out && (
-            <span className="nv-out" data-tone={line.tone}>
+            <span
+              {...stylex.props(
+                styles.out,
+                line.tone === "no" && styles.outNo,
+                line.tone === "yes" && styles.outYes,
+              )}
+            >
               <span className="sr-only">gives </span>
-              {paintClasses(line.out, TOKEN, KINDS)}
+              {paint(line.out, TOKEN, OUT_KINDS)}
             </span>
           )}
         </div>
@@ -132,27 +568,60 @@ function Flow({ save, fields, before, body, intent, children }: FlowProps) {
   const { phase, runs } = save;
   const after = { ...before, ...arrived(body) };
   const row = phase === "done" ? after : before;
+  const ran = runs > 0;
   return (
-    <div ref={save.ref} className="nv-flow" data-phase={phase} data-ran={runs > 0 || undefined}>
-      <div className="nv-form">{children}</div>
-      <div className="nv-wire" key={`w${runs}`}>
-        <span className="nv-verb">PATCH /tasks/12</span>
+    <div ref={save.ref} {...stylex.props(styles.flow)}>
+      <div {...stylex.props(styles.form)}>{children}</div>
+      <div key={`w${runs}`} {...stylex.props(styles.wire)}>
+        <span {...stylex.props(styles.verb)}>PATCH /tasks/12</span>
         {phase === "idle" ? (
-          <span className="nv-idle">not sent yet</span>
+          <span {...stylex.props(styles.idle)}>not sent yet</span>
         ) : (
-          <code className="nv-body">{paintClasses(JSON.stringify(body), TOKEN, KINDS)}</code>
+          <code {...stylex.props(styles.body, phase === "sent" && styles.typing)}>
+            {paint(JSON.stringify(body), TOKEN, KINDS)}
+          </code>
         )}
-        <i className="nv-packet" aria-hidden="true" />
+        <i
+          aria-hidden="true"
+          {...stylex.props(styles.packet, phase === "sent" && styles.dropping)}
+        />
       </div>
-      <dl className="nv-rec" key={phase === "done" ? `r${runs}` : "before"}>
+      <dl key={phase === "done" ? `r${runs}` : "before"} {...stylex.props(styles.record)}>
         {fields.map((field, index) => {
           const verdict = phase === "done" ? verdictOf(field, before, after, intent) : undefined;
+          const good = verdict === "saved" || verdict === "kept";
+          const bad = verdict === "wiped" || verdict === "lost";
           const value = row[field];
           return (
-            <div key={field} className="nv-cell" data-verdict={verdict} style={{ "--i": index }}>
-              <dt>{field}</dt>
-              <dd>{value === null ? <span className="t-nul">null</span> : value}</dd>
-              {verdict && <span className="nv-tag">{verdict}</span>}
+            <div
+              key={field}
+              style={{ "--i": index }}
+              {...stylex.props(
+                styles.cell,
+                verdict === "saved" && styles.cellSaved,
+                bad && styles.cellLost,
+                ran && verdict && styles.flashing,
+              )}
+            >
+              <dt {...stylex.props(styles.name)}>{field}</dt>
+              <dd
+                {...stylex.props(
+                  styles.value,
+                  bad && styles.valueLost,
+                  ran && phase === "done" && styles.landing,
+                )}
+              >
+                {value === null ? (
+                  <span {...stylex.props(styles.nul, bad && styles.nulLost)}>null</span>
+                ) : (
+                  value
+                )}
+              </dd>
+              {verdict && (
+                <span {...stylex.props(styles.tag, good && styles.tagKept, bad && styles.tagLost)}>
+                  {verdict}
+                </span>
+              )}
             </div>
           );
         })}
@@ -167,7 +636,7 @@ function ClearDemo({ way }: { way: Way }) {
   const save = useSave();
   const cleared = save.phase !== "idle";
   return (
-    <div className="nv-view">
+    <div {...stylex.props(styles.view)}>
       <Code
         lines={[
           { c: "// ✕ on the reviewer chip" },
@@ -182,13 +651,18 @@ function ClearDemo({ way }: { way: Way }) {
         body={{ reviewer: way === "bad" ? undefined : null }}
         intent={{ reviewer: null }}
       >
-        <span className="nv-label">Reviewer</span>
+        <span {...stylex.props(styles.label)}>Reviewer</span>
         {cleared ? (
-          <span className="nv-none">None</span>
+          <span {...stylex.props(styles.none)}>None</span>
         ) : (
-          <span className="nv-chip">
+          <span {...stylex.props(styles.chip)}>
             Rina
-            <button type="button" aria-label="Remove reviewer Rina" onClick={save.send}>
+            <button
+              type="button"
+              aria-label="Remove reviewer Rina"
+              onClick={save.send}
+              {...stylex.props(styles.remove)}
+            >
               ✕
             </button>
           </span>
@@ -196,7 +670,7 @@ function ClearDemo({ way }: { way: Way }) {
         {cleared && (
           <button
             type="button"
-            className="btn soft sm nv-again"
+            className={`btn soft sm ${stylex.props(styles.again).className}`}
             disabled={save.phase === "sent"}
             onClick={save.reset}
           >
@@ -216,7 +690,7 @@ function RenameDemo({ way }: { way: Way }) {
   const body: Body = way === "bad" ? { title, assignee: null, due: null } : { title };
   const saved = save.phase === "done";
   return (
-    <div className="nv-view">
+    <div {...stylex.props(styles.view)}>
       <Code
         lines={
           way === "bad"
@@ -241,11 +715,12 @@ function RenameDemo({ way }: { way: Way }) {
         body={body}
         intent={{ title }}
       >
-        <label className="nv-field">
-          <span className="nv-label">Title</span>
+        <label {...stylex.props(styles.field)}>
+          <span {...stylex.props(styles.label)}>Title</span>
           <input
             value={title}
             spellCheck={false}
+            {...stylex.props(styles.input)}
             onChange={(event) => {
               setTitle(event.target.value);
               if (saved) save.reset();
@@ -254,7 +729,7 @@ function RenameDemo({ way }: { way: Way }) {
         </label>
         <button
           type="button"
-          className="btn soft sm nv-again"
+          className={`btn soft sm ${stylex.props(styles.again).className}`}
           disabled={save.phase === "sent"}
           onClick={saved ? save.reset : save.send}
         >
@@ -473,11 +948,13 @@ const TLDR = [
   ["A lookup that found nothing", "Return null"],
 ] as const;
 
-const code = (text: string) => <code>{paintClasses(text, TOKEN, KINDS)}</code>;
+const code = (text: string) => (
+  <code {...stylex.props(styles.boardCode)}>{paint(text, TOKEN, KINDS)}</code>
+);
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
-    <span className="nv-gap" aria-hidden="true" />
+    <span aria-hidden="true" {...stylex.props(styles.gap)} />
   </>
 );
 
@@ -708,9 +1185,10 @@ export function NullVsUndefined() {
         title: "Missing is not empty",
         intro: (
           <>
-            <code>undefined</code> says no value was given. <code>null</code> says the value is
-            empty, on purpose. Each example runs the same code twice: on the left where the two
-            blur, on the right where the rule keeps them apart. What each line gives sits beside it.
+            <code {...stylex.props(styles.introCode)}>undefined</code> says no value was given.{" "}
+            <code {...stylex.props(styles.introCode)}>null</code> says the value is empty, on
+            purpose. Each example runs the same code twice: on the left where the two blur, on the
+            right where the rule keeps them apart. What each line gives sits beside it.
           </>
         ),
       }}
