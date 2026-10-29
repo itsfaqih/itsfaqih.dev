@@ -14,6 +14,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import babel from "@rolldown/plugin-babel";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import stylex from "@stylexjs/unplugin";
+import { Features } from "lightningcss";
 import { CODE_OPTIONS, codeFile } from "./src/components/code-file.ts";
 import { PUBLISHED_GUIDELINES } from "./src/data/guidelines.ts";
 import { OG_DIR, SITE_ORIGIN } from "./src/seo.ts";
@@ -325,6 +326,9 @@ const config = defineConfig({
       // The sheet built from src/styles.css, which every page links. Without a match StyleX appends
       // to whichever CSS asset comes first, which may load on one route only.
       cssInjectionTarget: (filepath) => /(?:^|\/)styles-[\w-]+\.css$/.test(filepath),
+      // Ship oklch() and oklab() as written, like the plain CSS. Lowered to lab(), they shade
+      // anti-aliased edges one step differently.
+      lightningcssOptions: { exclude: Features.OklabColors },
     }),
     tanstackStart({
       server: {

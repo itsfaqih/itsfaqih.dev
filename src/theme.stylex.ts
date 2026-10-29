@@ -13,6 +13,10 @@ export const palette = stylex.defineVars({
   "--hair": "#2c2c3a",
   "--text": "#f4f4f8",
   "--dim": "#a1a1b5",
+  // The blog and code blocks still use the old site's greys, which match the cabinet only in dark.
+  "--card": "#17171f",
+  "--border": "#2c2c3a",
+  "--muted-foreground": "#a1a1b5",
   "--mute": "#87879d",
   "--cw": "#4dd4ff",
   "--ux": "#ff6ad5",
@@ -71,6 +75,13 @@ export const motion = stylex.defineVars({
   "--t-pop": "420ms",
   "--t-panel": "560ms",
   "--t-bar": "200ms",
+});
+
+/** The blog's transitions. */
+export const transitions = stylex.defineConsts({
+  colors: "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke",
+  transform: "transform, translate, scale, rotate",
+  ease: "cubic-bezier(0.4, 0, 0.2, 1)",
 });
 
 /** Pixel cursors from scripts/cursors.py, shown until the print cursor takes over. Each falls back to its system cursor. */

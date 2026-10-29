@@ -2,7 +2,7 @@
 
 ## Core Philosophy
 
-This project uses **StyleX** for extracted, type-safe component styles. Prefer static StyleX styles and the shared `cx` helper over adding a new utility framework or writing ad-hoc inline style objects.
+This project uses **StyleX** for extracted, type-safe component styles. Every component styles itself with a colocated `stylex.create`. Do not add a utility framework, a class-merging helper, or ad-hoc inline style objects.
 
 ## Rules
 
@@ -12,17 +12,18 @@ Use `stylex.create` for reusable styles and `stylex.props` when rendering a host
 
 ```tsx
 import * as stylex from "@stylexjs/stylex";
+import { palette } from "../theme.stylex";
 
 const styles = stylex.create({
   card: {
     borderRadius: "0.75rem",
     padding: "1rem",
-    backgroundColor: "var(--card)",
+    backgroundColor: palette["--panel"],
   },
   interactive: {
-    cursor: "pointer",
-    ":hover": {
-      borderColor: "var(--muted-foreground)",
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--dim"] },
     },
   },
 });
@@ -34,60 +35,62 @@ export function Card() {
 
 Keep style definitions static so the Vite StyleX plugin can extract them at build time.
 
-### 2. Use `cx` for Existing Utility Composition
+### 2. Accept StyleX Styles, Not Class Strings
 
-The current site has a large amount of existing utility-style markup. Use `cx` from `src/stylex.ts` when combining those styles or accepting a `className` prop:
+A component that lets its caller adjust it takes a `style?: stylex.StyleXStyles` prop and passes it last to `stylex.props`, so the caller's values win:
 
 ```tsx
-import { cx } from "@/stylex";
-
-<div className={cx("flex items-center gap-2", className)} />;
+export function Panel({ style }: { style?: stylex.StyleXStyles }) {
+  return <div {...stylex.props(styles.panel, style)} />;
+}
 ```
 
-Do not add another class-merging dependency.
+Parent hover and focus states use `stylex.when.ancestor(...)` with `stylex.defaultMarker()` on the parent.
 
 ### 3. Prefer Semantic Theme Variables
 
-Theme tokens live in `src/styles.css` and are shared by StyleX and the selector fallbacks:
+Tokens live in `src/theme.stylex.ts`, and `src/theme.ts` overrides them for the light theme. StyleX styles read them through the exported objects, so a misspelt token fails the typecheck. Each keeps its literal `--name`, so plain CSS and runtime values read it as `var(--name)`:
 
 ```tsx
 const styles = stylex.create({
   root: {
-    color: "var(--foreground)",
-    backgroundColor: "var(--background)",
+    color: palette["--text"],
+    backgroundColor: palette["--bg"],
   },
 });
 ```
 
-Use semantic variables such as `--background`, `--foreground`, `--card`, `--muted-foreground`, `--border`, and `--brand` instead of duplicating color values.
+Use the semantic variables (`--bg`, `--text`, `--panel`, `--hair`, `--dim`) instead of duplicating colour values. The blog and code blocks read `--card`, `--border` and `--muted-foreground`, which keep the old site's greys in light mode.
 
 ### 4. Keep Global CSS Focused
 
 Global CSS is appropriate for:
 
-- theme variable definitions and color-mode switching;
+- colour-mode rules that key on the `.light` and `.dark` classes;
 - document-level resets and typography;
 - keyframes and page-wide backgrounds;
 - syntax-highlighter and third-party component overrides;
-- selector relationships that StyleX cannot express as an atomic rule, such as descendant typography or parent-state selectors.
+- selector relationships that StyleX cannot express as an atomic rule. Style rendered Markdown through an MDX `components` map instead of descendant selectors.
 
 Do not add a new global utility class when a local StyleX rule can express the same style.
 
 ### 5. Preserve Interactive and Responsive States
 
-Use StyleX pseudo-classes and media queries for new work:
+Nest pseudo-classes and media queries under the property they change. Hover styles sit inside `@media (hover: hover)` so touch screens do not keep them after a tap:
 
 ```tsx
 const styles = stylex.create({
   link: {
-    color: "var(--muted-foreground)",
-    ":hover": { color: "var(--foreground)" },
-    "@media (min-width: 640px)": { fontSize: "0.875rem" },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    fontSize: { default: "1rem", "@media (min-width: 640px)": "0.875rem" },
   },
 });
 ```
 
-When a state depends on a third-party component's data attribute or on a parent selector, keep the selector in the dedicated fallback stylesheet rather than introducing another styling dependency.
+When a state depends on a third-party component's data attribute, keep the selector in `src/styles.css` rather than introducing another styling dependency.
 
 ## Verification
 

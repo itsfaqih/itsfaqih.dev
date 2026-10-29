@@ -1,9 +1,10 @@
-import { cx } from "@/stylex";
+import * as stylex from "@stylexjs/stylex";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts } from "./-components/posts";
 import { PageContainer } from "../../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
 import { pageHead } from "../../seo";
+import { palette, transitions } from "../../theme.stylex";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
@@ -21,67 +22,60 @@ function BlogIndex() {
   const { posts } = Route.useLoaderData();
 
   return (
-    <div className={cx("relative min-h-screen")}>
-      <PageContainer maxWidth="3xl" className={cx("relative pb-12")}>
-        <div className={cx("mb-8")}>
-          <div className={cx("flex items-center gap-3 mb-4")}>
-            <div className={cx("p-2.5 rounded-xl bg-card border border-border")}>
-              <FileTextIcon size={20} className={cx("text-foreground")} />
+    <div {...stylex.props(styles.page)}>
+      <PageContainer maxWidth="3xl" style={styles.container}>
+        <div {...stylex.props(styles.intro)}>
+          <div {...stylex.props(styles.label)}>
+            <div {...stylex.props(styles.labelIcon)}>
+              <FileTextIcon size={20} />
             </div>
-            <span className={cx("text-sm font-medium text-foreground")}>Blog</span>
+            <span {...stylex.props(styles.labelText)}>Blog</span>
           </div>
-          <h1 className={cx("text-3xl sm:text-4xl font-bold text-foreground mb-3")}>
-            Thoughts & Tutorials
-          </h1>
-          <p className={cx("text-base text-muted-foreground max-w-xl")}>
+          <h1 {...stylex.props(styles.title)}>Thoughts & Tutorials</h1>
+          <p {...stylex.props(styles.lede)}>
             Exploring web development, design patterns, and the technologies that power modern
             applications.
           </p>
         </div>
 
-        <div className={cx("space-y-4")}>
+        <div>
           {posts.length === 0 ? (
-            <div className={cx("rounded-2xl p-12 bg-(--card-bg) border border-border text-center")}>
-              <FileTextIcon size={48} className={cx("mx-auto mb-4 text-muted-foreground")} />
-              <p className={cx("text-muted-foreground text-lg")}>No posts yet. Check back soon!</p>
+            <div {...stylex.props(styles.empty)}>
+              <FileTextIcon size={48} {...stylex.props(styles.emptyIcon)} />
+              <p {...stylex.props(styles.muted, styles.emptyText)}>
+                No posts yet. Check back soon!
+              </p>
             </div>
           ) : (
             posts.map((post) => (
-              <article key={post.slug}>
+              <article key={post.slug} {...stylex.props(styles.post)}>
                 <Link
                   to="/blog/$slug"
                   params={{ slug: post.slug }}
-                  className={cx("block group active:scale-[0.99] transition-transform")}
+                  {...stylex.props(styles.postLink, stylex.defaultMarker())}
                 >
-                  <div className={cx("rounded-2xl p-5 sm:p-6 bg-(--card-bg) border border-border hover:border-muted-foreground transition-all duration-300")}>
-                    <div className={cx("flex items-start justify-between gap-4")}>
-                      <div className={cx("flex-1 min-w-0")}>
+                  <div {...stylex.props(styles.card)}>
+                    <div {...stylex.props(styles.cardRow)}>
+                      <div {...stylex.props(styles.cardBody)}>
                         {post.frontmatter.publishedAt && (
-                          <div className={cx("flex items-center gap-2 mb-3")}>
-                            <CalendarBlankIcon size={14} className={cx("text-muted-foreground")} />
-                            <time className={cx("text-sm text-muted-foreground")}>
+                          <div {...stylex.props(styles.date)}>
+                            <CalendarBlankIcon size={14} {...stylex.props(styles.muted)} />
+                            <time {...stylex.props(styles.muted, styles.small)}>
                               {BLOG_DATE_FORMATTER.format(new Date(post.frontmatter.publishedAt))}
                             </time>
                           </div>
                         )}
 
-                        <h2 className={cx("text-lg sm:text-xl font-bold text-foreground mb-2 transition-colors")}>
-                          {post.frontmatter.title}
-                        </h2>
+                        <h2 {...stylex.props(styles.postTitle)}>{post.frontmatter.title}</h2>
 
                         {post.frontmatter.summary && (
-                          <p className={cx("text-muted-foreground leading-relaxed line-clamp-2")}>
-                            {post.frontmatter.summary}
-                          </p>
+                          <p {...stylex.props(styles.summary)}>{post.frontmatter.summary}</p>
                         )}
                       </div>
 
-                      <div className={cx("shrink-0 mt-2")}>
-                        <div className={cx("p-3 rounded-xl bg-card transition-colors")}>
-                          <ArrowRightIcon
-                            size={20}
-                            className={cx("text-muted-foreground group-hover:translate-x-1 transition-all")}
-                          />
+                      <div {...stylex.props(styles.arrowSlot)}>
+                        <div {...stylex.props(styles.arrowWell)}>
+                          <ArrowRightIcon size={20} {...stylex.props(styles.arrow)} />
                         </div>
                       </div>
                     </div>
@@ -92,16 +86,9 @@ function BlogIndex() {
           )}
         </div>
 
-        <div className={cx("mt-8 pt-6 border-t border-border")}>
-          <Link
-            to="/"
-            preload="intent"
-            className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group")}
-          >
-            <ArrowRightIcon
-              size={16}
-              className={cx("rotate-180 group-hover:-translate-x-1 transition-transform")}
-            />
+        <div {...stylex.props(styles.footer)}>
+          <Link to="/" preload="intent" {...stylex.props(styles.backLink, stylex.defaultMarker())}>
+            <ArrowRightIcon size={16} {...stylex.props(styles.backArrow)} />
             Back to Home
           </Link>
         </div>
@@ -109,3 +96,175 @@ function BlogIndex() {
     </div>
   );
 }
+
+const styles = stylex.create({
+  page: {
+    position: "relative",
+    minHeight: "100vh",
+  },
+  container: {
+    position: "relative",
+  },
+  intro: {
+    marginBottom: "2rem",
+  },
+  label: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    marginBottom: "1rem",
+  },
+  labelIcon: {
+    padding: "0.625rem",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: palette["--border"],
+    borderRadius: "0.75rem",
+    backgroundColor: palette["--card"],
+  },
+  labelText: {
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    fontWeight: 500,
+  },
+  title: {
+    marginBottom: "0.75rem",
+    fontSize: { default: "1.875rem", "@media (min-width: 40rem)": "2.25rem" },
+    lineHeight: { default: "2.25rem", "@media (min-width: 40rem)": "2.5rem" },
+    fontWeight: 700,
+  },
+  lede: {
+    maxWidth: "36rem",
+    color: palette["--muted-foreground"],
+  },
+  empty: {
+    padding: "3rem",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: palette["--border"],
+    borderRadius: "1rem",
+    textAlign: "center",
+  },
+  emptyIcon: {
+    marginInline: "auto",
+    marginBottom: "1rem",
+    color: palette["--muted-foreground"],
+  },
+  emptyText: {
+    fontSize: "1.125rem",
+    lineHeight: "1.75rem",
+  },
+  muted: {
+    color: palette["--muted-foreground"],
+  },
+  small: {
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+  },
+  post: {
+    marginBottom: { default: "1rem", ":last-child": 0 },
+  },
+  postLink: {
+    display: "block",
+    scale: { default: null, ":active": 0.99 },
+    transitionProperty: transitions.transform,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  card: {
+    padding: "1.25rem",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: {
+      default: palette["--border"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--muted-foreground"] },
+    },
+    borderRadius: "1rem",
+    transitionProperty: "all",
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.3s",
+  },
+  cardRow: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  cardBody: {
+    flex: "1",
+    minWidth: 0,
+  },
+  date: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    marginBottom: "0.75rem",
+  },
+  postTitle: {
+    marginBottom: "0.5rem",
+    fontSize: { default: "1.125rem", "@media (min-width: 40rem)": "1.25rem" },
+    lineHeight: "1.75rem",
+    fontWeight: 700,
+    transitionProperty: transitions.colors,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  summary: {
+    // -webkit-box without a clamp: the old line-clamp utility never set -webkit-line-clamp.
+    display: "-webkit-box",
+    overflow: "hidden",
+    lineHeight: 1.625,
+    color: palette["--muted-foreground"],
+  },
+  arrowSlot: {
+    flexShrink: 0,
+    marginTop: "0.5rem",
+  },
+  arrowWell: {
+    padding: "0.75rem",
+    borderRadius: "0.75rem",
+    backgroundColor: palette["--card"],
+    transitionProperty: transitions.colors,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  arrow: {
+    color: palette["--muted-foreground"],
+    translate: {
+      default: null,
+      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "0.25rem 0" },
+    },
+    transitionProperty: "all",
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  footer: {
+    marginTop: "2rem",
+    paddingTop: "1.5rem",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderColor: palette["--border"],
+  },
+  backLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    color: {
+      default: palette["--muted-foreground"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    transitionProperty: transitions.colors,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  backArrow: {
+    rotate: "180deg",
+    translate: {
+      default: null,
+      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "-0.25rem 0" },
+    },
+    transitionProperty: transitions.transform,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+});

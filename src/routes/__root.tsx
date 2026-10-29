@@ -1,4 +1,5 @@
-import { cx } from "@/stylex";
+import * as stylex from "@stylexjs/stylex";
+import { palette } from "../theme.stylex";
 import { HeadContent, Scripts, createRootRoute, Link } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -15,15 +16,9 @@ import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
   notFoundComponent: () => (
-    <div className={cx("flex flex-col items-center justify-center min-h-[60vh] space-y-4")}>
-      <h1 className={cx("text-2xl font-bold text-foreground")}>Page Not Found</h1>
-      <Link
-        to="/"
-        preload="intent"
-        className={cx(
-          "text-muted-foreground hover:text-foreground underline decoration-border underline-offset-4",
-        )}
-      >
+    <div {...stylex.props(styles.notFound)}>
+      <h1 {...stylex.props(styles.notFoundTitle)}>Page Not Found</h1>
+      <Link to="/" preload="intent" {...stylex.props(styles.homeLink)}>
         Go back home
       </Link>
     </div>
@@ -56,7 +51,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cx("scroll-smooth")} suppressHydrationWarning>
+    <html lang="en" {...stylex.props(styles.html)} suppressHydrationWarning>
       <head>
         <HeadContent />
         <script
@@ -94,15 +89,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body
-        className={cx(
-          "m-0 min-h-screen antialiased font-sans overflow-x-hidden relative site-shell",
-          "bg-background text-foreground",
-        )}
-      >
+      <body className={`site-shell ${stylex.props(styles.body).className}`}>
         <Header />
         <CommandPalette />
-        <main className={cx("relative z-10")}>{children}</main>
+        <main {...stylex.props(styles.main)}>{children}</main>
         <PrintCursor />
         <FaviconCycle />
         <SmoothScroll />
@@ -116,3 +106,43 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     </html>
   );
 }
+
+const styles = stylex.create({
+  notFound: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "60vh",
+  },
+  notFoundTitle: {
+    marginBottom: "1rem",
+    fontSize: "1.5rem",
+    lineHeight: "2rem",
+    fontWeight: 700,
+  },
+  homeLink: {
+    color: {
+      default: palette["--muted-foreground"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    textDecorationLine: "underline",
+    textDecorationColor: palette["--border"],
+    textUnderlineOffset: "4px",
+  },
+  html: {
+    scrollBehavior: "smooth",
+  },
+  body: {
+    position: "relative",
+    minHeight: "100vh",
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale",
+    color: palette["--text"],
+    backgroundColor: palette["--bg"],
+  },
+  main: {
+    position: "relative",
+    zIndex: 10,
+  },
+});

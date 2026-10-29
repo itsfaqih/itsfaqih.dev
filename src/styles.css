@@ -1,8 +1,229 @@
 @import "./fonts.css";
 @import "lenis/dist/lenis.css";
-@import "./stylex-fallback.css";
 @import "./arcade.css";
 @import "./routes/-components/hero/hero-prints.css";
+
+/* Tailwind's preflight, which every page was laid out against. Layered so that any unlayered rule wins. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  :host {
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    line-height: 1.5;
+    font-family: var(--font-sans);
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+
+  abbr:where([title]) {
+    text-decoration: underline dotted;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  b,
+  strong {
+    font-weight: bolder;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    font-size: 1em;
+  }
+
+  small {
+    font-size: 80%;
+  }
+
+  sub,
+  sup {
+    vertical-align: baseline;
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+  }
+
+  sub {
+    bottom: -0.25em;
+  }
+
+  sup {
+    top: -0.5em;
+  }
+
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+
+  :-moz-focusring:where(:not(iframe)) {
+    outline: auto;
+  }
+
+  progress {
+    vertical-align: baseline;
+  }
+
+  summary {
+    display: list-item;
+  }
+
+  ol,
+  ul,
+  menu {
+    list-style: none;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    vertical-align: middle;
+    display: block;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  button,
+  input,
+  select,
+  optgroup,
+  textarea,
+  ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    opacity: 1;
+    background-color: transparent;
+    border-radius: 0;
+  }
+
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+
+  ::placeholder {
+    opacity: 1;
+  }
+
+  @supports (not (-webkit-appearance: -apple-pay-button)) or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+    padding-block: 0;
+  }
+
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+
+  ::-webkit-datetime-edit-year-field,
+  ::-webkit-datetime-edit-month-field,
+  ::-webkit-datetime-edit-day-field,
+  ::-webkit-datetime-edit-hour-field,
+  ::-webkit-datetime-edit-minute-field,
+  ::-webkit-datetime-edit-second-field,
+  ::-webkit-datetime-edit-millisecond-field,
+  ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+
+  button,
+  input:where([type="button"], [type="reset"], [type="submit"]),
+  ::file-selector-button {
+    appearance: button;
+  }
+
+  ::-webkit-inner-spin-button,
+  ::-webkit-outer-spin-button {
+    height: auto;
+  }
+
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
 
 html,
 body.site-shell {
@@ -28,7 +249,7 @@ body.site-shell {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: var(--card);
-  color: var(--foreground);
+  color: var(--text);
   /* The shadow DOM uses light-dark(); pin it to the site's explicit mode. */
   color-scheme: light;
   --diffs-gap-block: 0.5rem;
@@ -64,6 +285,7 @@ body.site-shell {
   }
 }
 
+/* arcade.css's reduced-motion fade-ins resolve to this definition, which comes after its own. */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -72,74 +294,6 @@ body.site-shell {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@layer base {
-  :root {
-    --background: #f5f5f8;
-    --foreground: #111117;
-    
-    --card: oklch(1 0 0 / 50%);
-    
-    --popover: oklch(1 0 0);
-    
-    --brand: oklch(0.556 0.182 254.604);
-    --brand-foreground: oklch(0.985 0 0);
-    
-    --neutral-foreground: oklch(0.145 0 0);
-    
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.145 0 0);
-    
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    
-    --negative: oklch(0.637 0.237 25.331);
-    --negative-foreground: oklch(0.577 0.245 27.325);
-    
-    --positive: oklch(0.696 0.17 162.48);
-    --positive-foreground: oklch(0.596 0.145 163.225);
-    
-    --border: oklch(0.922 0 0);
-    --ring: oklch(0.556 0.182 254.604);
-    
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: #0e0e13;
-    --foreground: #f4f4f8;
-    
-    --card: #17171f;
-    
-    --popover: #20202b;
-    
-    --brand: oklch(0.556 0.182 254.604);
-    --brand-foreground: oklch(0.985 0 0);
-    
-    --neutral-foreground: oklch(0.985 0 0);
-    
-    --muted: #20202b;
-    --muted-foreground: #a1a1b5;
-    
-    --accent: #2c2c3a;
-    --accent-foreground: oklch(0.985 0 0);
-    
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    
-    --negative: oklch(0.637 0.237 25.331);
-    --negative-foreground: oklch(0.808 0.114 19.571);
-    
-    --positive: oklch(0.696 0.17 162.48);
-    --positive-foreground: oklch(0.845 0.143 164.978);
-    
-    --border: #2c2c3a;
-    --ring: #ffe14d;
   }
 }
 

@@ -1,4 +1,6 @@
-import { cx } from "@/stylex";
+import * as stylex from "@stylexjs/stylex";
+import type { ComponentProps } from "react";
+import type { MDXComponents } from "mdx/types";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getPost } from "./-components/posts";
@@ -7,6 +9,7 @@ import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor
 import { Drawer } from "vaul";
 import { TableOfContents } from "./-components/table-of-contents";
 import { pageHead } from "../../seo";
+import { palette, transitions } from "../../theme.stylex";
 
 function requirePost(slug: string) {
   const post = getPost(slug);
@@ -44,77 +47,67 @@ function BlogPost() {
   const [isTocOpen, setIsTocOpen] = useState(false);
 
   return (
-    <div className={cx("relative min-h-screen")}>
-      <div className={cx("relative max-w-6xl mx-auto px-6 pt-8 sm:pt-24 pb-12 animate-fade-in")}>
-        <div className={cx("grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-12 items-start")}>
+    <div {...stylex.props(styles.page)}>
+      <div {...stylex.props(styles.shell)}>
+        <div {...stylex.props(styles.layout)}>
           <div>
             <Link
               to="/blog"
               preload="intent"
-              className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group mb-8 active:scale-95")}
+              {...stylex.props(styles.backLink, styles.backLinkTop, stylex.defaultMarker())}
             >
-              <ArrowLeftIcon
-                size={16}
-                className={cx("group-hover:-translate-x-1 transition-transform")}
-              />
+              <ArrowLeftIcon size={16} {...stylex.props(styles.backArrow)} />
               Back to Blog
             </Link>
 
             <article>
-              <header className={cx("mb-8")}>
-                <div className={cx("flex flex-wrap items-center gap-4 mb-6")}>
+              <header {...stylex.props(styles.header)}>
+                <div {...stylex.props(styles.meta)}>
                   {post.frontmatter.publishedAt && (
-                    <div className={cx("flex items-center gap-2 text-sm text-muted-foreground")}>
-                      <CalendarBlankIcon size={14} className={cx("text-muted-foreground")} />
+                    <div {...stylex.props(styles.metaItem, styles.small, styles.muted)}>
+                      <CalendarBlankIcon size={14} />
                       <time>
                         {BLOG_DATE_FORMATTER.format(new Date(post.frontmatter.publishedAt))}
                       </time>
                     </div>
                   )}
-                  <div className={cx("flex items-center gap-2 text-sm text-muted-foreground")}>
-                    <ClockIcon size={14} className={cx("text-muted-foreground")} />
+                  <div {...stylex.props(styles.metaItem, styles.small, styles.muted)}>
+                    <ClockIcon size={14} />
                     <span>5 min read</span>
                   </div>
                 </div>
 
-                <h1 className={cx("text-3xl sm:text-4xl font-bold text-foreground leading-tight mb-4")}>
-                  {post.frontmatter.title}
-                </h1>
+                <h1 {...stylex.props(styles.title)}>{post.frontmatter.title}</h1>
 
                 {post.frontmatter.summary && (
-                  <p className={cx("text-lg text-muted-foreground leading-relaxed")}>
-                    {post.frontmatter.summary}
-                  </p>
+                  <p {...stylex.props(styles.summary)}>{post.frontmatter.summary}</p>
                 )}
               </header>
 
-              <div className={cx("h-px bg-border mb-8")} />
+              <div {...stylex.props(styles.rule)} />
 
-              <div className={cx("prose prose-invert dark:prose-invert prose-zinc dark:prose-zinc max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-foreground prose-a:underline hover:prose-a:text-muted-foreground prose-code:text-foreground prose-pre:bg-card prose-pre:border prose-pre:border-border prose-headings:scroll-mt-24")}>
-                <Component components={{ pre: MarkdownCodeBlock }} />
+              <div {...stylex.props(styles.body)}>
+                <Component components={components} />
               </div>
             </article>
 
-            <footer className={cx("mt-8 pt-6 border-t border-border")}>
-              <div className={cx("flex flex-col sm:flex-row items-center justify-between gap-4")}>
+            <footer {...stylex.props(styles.footer)}>
+              <div {...stylex.props(styles.footerRow)}>
                 <Link
                   to="/blog"
                   preload="intent"
-                  className={cx("inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group active:scale-95")}
+                  {...stylex.props(styles.backLink, stylex.defaultMarker())}
                 >
-                  <ArrowLeftIcon
-                    size={16}
-                    className={cx("group-hover:-translate-x-1 transition-transform")}
-                  />
+                  <ArrowLeftIcon size={16} {...stylex.props(styles.backArrow)} />
                   Back to all posts
                 </Link>
 
-                <p className={cx("text-sm text-muted-foreground")}>Thanks for reading!</p>
+                <p {...stylex.props(styles.small, styles.muted)}>Thanks for reading!</p>
               </div>
             </footer>
           </div>
 
-          <div className={cx("hidden lg:block sticky top-12")}>
+          <div {...stylex.props(styles.tocRail)}>
             <TableOfContents />
           </div>
         </div>
@@ -122,26 +115,18 @@ function BlogPost() {
 
       <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
         <Drawer.Trigger asChild>
-          <button
-            className={cx("fixed bottom-6 right-6 p-4 rounded-full bg-foreground text-background lg:hidden z-50 hover:scale-105 active:scale-95 transition-all")}
-            aria-label="Table of Contents"
-          >
+          <button {...stylex.props(styles.tocButton)} aria-label="Table of Contents">
             <ListIcon size={24} />
           </button>
         </Drawer.Trigger>
         <Drawer.Portal>
-          <Drawer.Overlay className={cx("fixed inset-0 bg-black/40 z-50")} />
-          <Drawer.Content className={cx("bg-background flex flex-col rounded-t-[10px] fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] outline-none border-t border-border")}>
-            <div className={cx("p-4 bg-background rounded-t-[10px] flex-1 flex flex-col min-h-0")}>
-              <div
-                aria-hidden
-                className={cx("mx-auto w-12 h-1.5 shrink-0 rounded-full bg-border mb-6")}
-              />
-              <div className={cx("max-w-md mx-auto w-full flex-1 flex flex-col min-h-0")}>
-                <Drawer.Title className={cx("font-bold text-lg text-foreground mb-4 shrink-0")}>
-                  Table of Contents
-                </Drawer.Title>
-                <div className={cx("overflow-y-auto flex-1")}>
+          <Drawer.Overlay {...stylex.props(styles.overlay)} />
+          <Drawer.Content {...stylex.props(styles.drawer)}>
+            <div {...stylex.props(styles.drawerPanel)}>
+              <div aria-hidden {...stylex.props(styles.handle)} />
+              <div {...stylex.props(styles.drawerBody)}>
+                <Drawer.Title {...stylex.props(styles.drawerTitle)}>Table of Contents</Drawer.Title>
+                <div {...stylex.props(styles.drawerScroll)}>
                   <TableOfContents onLinkClick={() => setIsTocOpen(false)} />
                 </div>
               </div>
@@ -152,3 +137,219 @@ function BlogPost() {
     </div>
   );
 }
+
+// The tags the posts render. Values follow Tailwind Typography's prose-zinc, which the blog started on.
+const components: MDXComponents = {
+  p: (props: ComponentProps<"p">) => <p {...props} {...stylex.props(prose.p)} />,
+  h2: (props: ComponentProps<"h2">) => <h2 {...props} {...stylex.props(prose.h2)} />,
+  pre: MarkdownCodeBlock,
+};
+
+const prose = stylex.create({
+  p: {
+    marginTop: { default: "1.25em", ":first-child": 0, ":is(h2 + *)": 0 },
+    marginBottom: { default: "1.25em", ":last-child": 0 },
+    color: palette["--muted-foreground"],
+  },
+  h2: {
+    marginTop: "2em",
+    marginBottom: "1em",
+    scrollMarginTop: "6rem",
+    fontSize: "1.5em",
+    lineHeight: "calc(32 / 24)",
+    fontWeight: 700,
+    color: palette["--text"],
+  },
+});
+
+const styles = stylex.create({
+  page: {
+    position: "relative",
+    minHeight: "100vh",
+  },
+  shell: {
+    position: "relative",
+    maxWidth: "72rem",
+    marginInline: "auto",
+    paddingInline: "1.5rem",
+    paddingTop: "2rem",
+    paddingBottom: "3rem",
+  },
+  layout: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(1, minmax(0, 1fr))",
+      "@media (min-width: 64rem)": "1fr 250px",
+    },
+    alignItems: "flex-start",
+    gap: "3rem",
+  },
+  backLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    color: {
+      default: palette["--muted-foreground"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    scale: { default: null, ":active": "95% 95%" },
+    transitionProperty: transitions.colors,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  backLinkTop: {
+    marginBottom: "2rem",
+  },
+  backArrow: {
+    translate: {
+      default: null,
+      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "-0.25rem 0" },
+    },
+    transitionProperty: transitions.transform,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  header: {
+    marginBottom: "2rem",
+  },
+  meta: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: "1rem",
+    marginBottom: "1.5rem",
+  },
+  metaItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  muted: {
+    color: palette["--muted-foreground"],
+  },
+  small: {
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+  },
+  title: {
+    marginBottom: "1rem",
+    fontSize: { default: "1.875rem", "@media (min-width: 40rem)": "2.25rem" },
+    lineHeight: 1.25,
+    fontWeight: 700,
+  },
+  summary: {
+    fontSize: "1.125rem",
+    lineHeight: 1.625,
+    color: palette["--muted-foreground"],
+  },
+  rule: {
+    height: 1,
+    marginBottom: "2rem",
+    backgroundColor: palette["--border"],
+  },
+  body: {
+    lineHeight: 1.75,
+    color: "oklch(87.1% .006 286.286)",
+  },
+  footer: {
+    marginTop: "2rem",
+    paddingTop: "1.5rem",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderColor: palette["--border"],
+  },
+  footerRow: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  tocRail: {
+    display: { default: "none", "@media (min-width: 64rem)": "block" },
+    position: "sticky",
+    top: "3rem",
+  },
+  tocButton: {
+    position: "fixed",
+    right: "1.5rem",
+    bottom: "1.5rem",
+    zIndex: 50,
+    display: { default: null, "@media (min-width: 64rem)": "none" },
+    padding: "1rem",
+    borderRadius: "2147483647px",
+    color: palette["--bg"],
+    backgroundColor: palette["--text"],
+    scale: {
+      default: null,
+      ":hover": { default: null, "@media (hover: hover)": "105% 105%" },
+      // Repeated under the media query, which would otherwise let hovering outrank pressing.
+      ":active": { default: "95% 95%", "@media (hover: hover)": "95% 95%" },
+    },
+    transitionProperty: "all",
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: "0.15s",
+  },
+  overlay: {
+    position: "fixed",
+    inset: 0,
+    zIndex: 50,
+    backgroundColor: "rgb(0 0 0 / 0.4)",
+  },
+  drawer: {
+    position: "fixed",
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 50,
+    display: "flex",
+    flexDirection: "column",
+    maxHeight: "85vh",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderColor: palette["--border"],
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    outlineStyle: "none",
+    backgroundColor: palette["--bg"],
+  },
+  drawerPanel: {
+    display: "flex",
+    flex: "1",
+    flexDirection: "column",
+    minHeight: 0,
+    padding: "1rem",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    backgroundColor: palette["--bg"],
+  },
+  handle: {
+    flexShrink: 0,
+    width: "3rem",
+    height: "0.375rem",
+    marginInline: "auto",
+    marginBottom: "1.5rem",
+    borderRadius: "2147483647px",
+    backgroundColor: palette["--border"],
+  },
+  drawerBody: {
+    display: "flex",
+    flex: "1",
+    flexDirection: "column",
+    width: "100%",
+    maxWidth: "28rem",
+    minHeight: 0,
+    marginInline: "auto",
+  },
+  drawerTitle: {
+    flexShrink: 0,
+    marginBottom: "1rem",
+    fontSize: "1.125rem",
+    lineHeight: "1.75rem",
+    fontWeight: 700,
+  },
+  drawerScroll: {
+    flex: "1",
+    overflowY: "auto",
+  },
+});

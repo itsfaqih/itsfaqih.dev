@@ -1,4 +1,5 @@
-import { cx } from "@/stylex";
+import * as stylex from "@stylexjs/stylex";
+import { palette, transitions } from "../../../theme.stylex";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 type TableOfContentsProps = {
@@ -93,21 +94,18 @@ export function TableOfContents({ onLinkClick }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className={cx("space-y-2")}>
-      <p className={cx("font-medium text-sm text-foreground mb-4")}>On this page</p>
-      <ul className={cx("text-base lg:text-sm [&:has(a:hover)_li:not(:hover)]:opacity-50")}>
+    <nav>
+      <p {...stylex.props(styles.title)}>On this page</p>
+      <ul {...stylex.props(styles.list, stylex.defaultMarker())}>
         {headings.map((heading) => (
           <li
             key={heading.id}
+            {...stylex.props(styles.item)}
             style={{ paddingLeft: (heading.level - 2) * 12 }}
-            className={cx("line-clamp-1 transition-opacity duration-250 hover:duration-0 hover:opacity-100")}
           >
             <a
               href={`#${heading.id}`}
-              className={cx(
-                "block py-3 lg:py-1.5 transition-colors duration-1000 hover:duration-0 hover:text-foreground",
-                activeId === heading.id ? "text-foreground font-medium" : "text-muted-foreground",
-              )}
+              {...stylex.props(styles.link, activeId === heading.id ? styles.active : styles.idle)}
               onClick={(e) => {
                 e.preventDefault();
                 document.getElementById(heading.id)?.scrollIntoView({
@@ -125,3 +123,52 @@ export function TableOfContents({ onLinkClick }: TableOfContentsProps) {
     </nav>
   );
 }
+
+const styles = stylex.create({
+  title: {
+    marginBottom: "1rem",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    fontWeight: 500,
+  },
+  list: {
+    fontSize: { default: "1rem", "@media (min-width: 64rem)": "0.875rem" },
+    lineHeight: { default: 1.5, "@media (min-width: 64rem)": "1.25rem" },
+  },
+  // While any link is hovered, the other entries dim.
+  item: {
+    // -webkit-box without a clamp: the old line-clamp utility never set -webkit-line-clamp.
+    display: "-webkit-box",
+    overflow: "hidden",
+    opacity: {
+      default: null,
+      ":hover": { default: null, "@media (hover: hover)": 1 },
+      [stylex.when.ancestor(":has(a:hover)")]: { default: null, ":not(:hover)": 0.5 },
+    },
+    transitionProperty: "opacity",
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: {
+      default: "0.25s",
+      ":hover": { default: null, "@media (hover: hover)": "0s" },
+    },
+  },
+  link: {
+    display: "block",
+    paddingBlock: { default: "0.75rem", "@media (min-width: 64rem)": "0.375rem" },
+    transitionProperty: transitions.colors,
+    transitionTimingFunction: transitions.ease,
+    transitionDuration: {
+      default: "1s",
+      ":hover": { default: null, "@media (hover: hover)": "0s" },
+    },
+  },
+  active: {
+    fontWeight: 500,
+  },
+  idle: {
+    color: {
+      default: palette["--muted-foreground"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+  },
+});

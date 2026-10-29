@@ -13,6 +13,9 @@ const lightTheme = stylex.createTheme(palette, {
   "--text": "#111117",
   "--dim": "#4b4b5b",
   "--mute": "#67677a",
+  "--card": "oklch(1 0 0 / 50%)",
+  "--border": "oklch(0.922 0 0)",
+  "--muted-foreground": "oklch(0.556 0 0)",
   // As bright as the green can go and still hold 4.5:1 on white.
   "--ink-mix": "62%",
   // Yellow darkened toward black turns olive; light mode takes a gold of its own.
