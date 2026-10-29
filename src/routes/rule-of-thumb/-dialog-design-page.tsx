@@ -16,6 +16,7 @@ import {
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -87,7 +88,7 @@ const styles = stylex.create({
     backgroundColor: palette["--panel-2"],
   },
   gone: {
-    backgroundColor: `color-mix(in srgb, var(--no) 14%, ${palette["--panel-2"]})`,
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 14%, ${palette["--panel-2"]})`,
   },
   strong: {
     fontWeight: 700,
@@ -96,7 +97,7 @@ const styles = stylex.create({
     fontFamily: fonts["--display"],
   },
   goneName: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   price: {
     fontWeight: 600,
@@ -381,11 +382,11 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   red: {
-    "--c": "var(--no)",
+    "--c": kit["--no"],
   },
   redTint: {
-    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
   close: {
     display: "grid",
@@ -435,7 +436,7 @@ const styles = stylex.create({
     zIndex: 3,
     "::after": {
       borderStyle: "dashed",
-      borderColor: "var(--no)",
+      borderColor: kit["--no"],
     },
   },
   bar: {
@@ -493,10 +494,10 @@ const styles = stylex.create({
     color: palette["--dim"],
   },
   readNo: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   readYes: {
-    color: "var(--yes-ink)",
+    color: kit["--yes-ink"],
   },
   speech: {
     display: "inline-flex",
@@ -1069,7 +1070,7 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
     if (!dialog) return;
     if (reducedMotion()) {
       dialog.animate(
-        [{ boxShadow: "0 0 0 2px var(--no)" }, { boxShadow: "0 0 0 2px transparent" }],
+        [{ boxShadow: `0 0 0 2px ${kit["--no"]}` }, { boxShadow: "0 0 0 2px transparent" }],
         {
           duration: 480,
           easing: "ease-out",

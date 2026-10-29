@@ -10,6 +10,7 @@ import {
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
+import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
 const LIGHT = ":is(.light *)";
@@ -45,12 +46,12 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -109,17 +110,17 @@ const styles = stylex.create({
     marginTop: "2px",
     fontSize: "12.5px",
     fontWeight: 600,
-    color: "var(--yes-ink)",
+    color: kit["--yes-ink"],
   },
   off: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   clock: {
     position: "relative",
     width: "48px",
     height: "48px",
     borderRadius: "50%",
-    backgroundColor: "var(--code-bg)",
+    backgroundColor: kit["--code-bg"],
     boxShadow: `inset 0 0 0 1.5px ${palette["--hair"]}`,
     "::before": {
       content: '""',
@@ -161,10 +162,10 @@ const styles = stylex.create({
     backgroundColor: palette["--dim"],
   },
   hourOff: {
-    backgroundColor: "var(--no-ink)",
+    backgroundColor: kit["--no-ink"],
   },
   ghost: {
-    backgroundColor: "var(--yes-ink)",
+    backgroundColor: kit["--yes-ink"],
     opacity: 0.5,
   },
   table: {
@@ -197,7 +198,7 @@ const styles = stylex.create({
   },
   at: {
     whiteSpace: "nowrap",
-    color: { default: palette["--text"], [stylex.when.ancestor('[data-side="bad"]')]: "var(--no-ink)" },
+    color: { default: palette["--text"], [stylex.when.ancestor('[data-side="bad"]')]: kit["--no-ink"] },
   },
   sum: {
     fontSize: "14px",
@@ -241,7 +242,7 @@ const styles = stylex.create({
     outlineStyle: { default: null, ":focus-visible": "solid" },
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "2px" },
-    transition: "border-color var(--t-fb) ease",
+    transition: `border-color ${kit["--t-fb"]} ease`,
   },
   orders: {
     display: "grid",
@@ -263,7 +264,7 @@ const styles = stylex.create({
     lineHeight: 1.3,
     fontFamily: fonts["--mono"],
     color: palette["--text"],
-    transition: "opacity var(--t-fb) ease, background-color var(--t-fb) ease",
+    transition: `opacity ${kit["--t-fb"]} ease, background-color ${kit["--t-fb"]} ease`,
   },
   orderOut: {
     opacity: 0.45,
@@ -272,8 +273,8 @@ const styles = stylex.create({
     backgroundColor: "color-mix(in srgb, var(--c) 8%, transparent)",
   },
   orderWrong: {
-    backgroundColor: "color-mix(in srgb, var(--no) 8%, transparent)",
-    boxShadow: "inset 2px 0 0 var(--no)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 8%, transparent)`,
+    boxShadow: `inset 2px 0 0 ${kit["--no"]}`,
   },
   orderId: {
     color: palette["--mute"],
@@ -283,7 +284,7 @@ const styles = stylex.create({
   },
   whenMissed: {
     textDecorationLine: "line-through",
-    textDecorationColor: "color-mix(in srgb, var(--no) 60%, transparent)",
+    textDecorationColor: `color-mix(in srgb, ${kit["--no"]} 60%, transparent)`,
   },
   utc: {
     fontSize: "11px",
@@ -300,12 +301,12 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   fateShown: {
-    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
-    color: "var(--yes-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
   },
   fateWrong: {
-    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
 });
 

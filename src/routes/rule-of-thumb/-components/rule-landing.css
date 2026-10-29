@@ -1,23 +1,3 @@
-.arc.rule-page {
-  --no: #ff5468;
-  --yes: #7dff6a;
-  --c-ink: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-  --no-ink: color-mix(in oklab, var(--no) var(--ink-mix), #000);
-  --yes-ink: color-mix(in oklab, var(--yes) var(--ink-mix), #000);
-  --key-c: color-mix(in oklab, var(--c) 60%, #000);
-  --code-bg: #121219;
-  --grid: color-mix(in srgb, var(--hair) 55%, transparent);
-  --t-fb: 160ms;
-  position: relative;
-  isolation: isolate;
-}
-.light .arc.rule-page {
-  --code-bg: #fbfbfd;
-  --grid: color-mix(in srgb, var(--hair) 70%, transparent);
-}
-.rule-page {
-  overflow-wrap: break-word;
-}
 .rule-page :is(h1, h2, h3, p, ol, ul) {
   margin: 0;
 }
@@ -51,76 +31,6 @@
   align-items: center;
 }
 
-.rule-page .grid-ground {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: center -1px;
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-}
-
-.rule-page .crumb-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  justify-self: stretch;
-  margin-bottom: 8px;
-  transition:
-    opacity 240ms var(--out) 40ms,
-    filter 260ms var(--out) 40ms,
-    visibility 0s;
-}
-:root:has(.arc-bar[data-mode="compact"]) .rule-page .crumb-row {
-  opacity: 0;
-  filter: blur(4px);
-  visibility: hidden;
-  transition:
-    opacity 120ms ease,
-    filter 120ms ease,
-    visibility 0s 120ms;
-}
-.rule-page .crumb {
-  gap: 10px;
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--dim);
-  white-space: nowrap;
-}
-.rule-page .crumb::before {
-  display: none;
-}
-.rule-page .crumb a {
-  margin-block: -12px;
-  padding-block: 12px;
-  transition: color 120ms ease;
-}
-.rule-page .crumb a:hover {
-  color: var(--text);
-}
-.rule-page .crumb .c {
-  font-weight: 700;
-  color: var(--c-ink);
-}
-.rule-page .share svg {
-  width: 16px;
-  height: 16px;
-}
-
-.rule-page .title-screen {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 56px;
-  align-items: center;
-  min-height: calc(100svh - 72px);
-  padding-block: 48px 72px;
-}
-.rule-page .hero-copy,
 .rule-page .sec-head > *,
 .rule-page .sheet-wrap h3,
 .rule-page .take-copy {
@@ -131,95 +41,14 @@
 .rule-page .sec-head > * {
   justify-self: start;
 }
-.rule-page .crumb,
 .rule-page .score {
   background: var(--veil-dense);
   box-shadow: var(--veil-dense-edge);
   border-radius: 12px;
 }
-.rule-page .hero-copy {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
-  justify-items: start;
-}
-.rule-page .title-screen h1 {
-  width: fit-content;
-  max-width: 100%;
-  margin-bottom: 8px;
-  font: 900 min(clamp(44px, 7vw, 108px), var(--fit, 108px)) / 0.94 var(--display);
-  letter-spacing: -0.05em;
-}
-.rule-page .title-screen h1 .ln {
-  display: block;
-}
-.rule-page .title-screen h1 .ln:first-child {
-  position: relative;
-  z-index: 1;
-}
-.rule-page .title-screen h1 .hl {
-  padding: 0 0.06em;
-  border-radius: 0.06em;
-}
-html:active-view-transition-type(rule-open) .rule-page .title-screen h1 {
-  view-transition-name: rule-title;
-}
 html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   view-transition-name: rule-thumb;
 }
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .rule-page .title-screen h1 {
-      position: relative;
-      z-index: 41;
-      transform-origin: 0 50%;
-      animation:
-        rule-page-dock-x cubic-bezier(0.5, 0, 0.75, 0) both,
-        rule-page-dock linear both;
-      animation-timeline: scroll(root), scroll(root);
-      animation-range: 0px var(--dock-end, 100vh);
-    }
-  }
-}
-@keyframes rule-page-dock-x {
-  to {
-    translate: var(--dock-x, 0px) 0;
-  }
-}
-@keyframes rule-page-dock {
-  90% {
-    opacity: 1;
-  }
-  to {
-    scale: var(--dock-k, 1);
-    opacity: 0;
-  }
-}
-.rule-page .claim {
-  max-width: 20em;
-  font: 700 clamp(21px, 2vw, 28px) / 1.25 var(--display);
-  letter-spacing: -0.025em;
-  color: var(--text);
-}
-.rule-page .title-screen .lead {
-  max-width: 34em;
-  font-size: 18px;
-  line-height: 1.6;
-}
-.rule-page .in {
-  animation: rule-page-in 560ms var(--out) both;
-  animation-delay: calc(var(--i, 0) * 60ms + 200ms);
-}
-/* Not quite 0: Chrome skips a text paint at opacity 0 for LCP, and a fade runs on the compositor
-   without painting again, so a fully transparent start leaves the lead out of LCP until some
-   unrelated repaint seconds later. */
-@keyframes rule-page-in {
-  from {
-    opacity: 0.01;
-    translate: 0 12px;
-  }
-}
-
 .rule-page .cover {
   --rx: 0deg;
   --ry: 0deg;
@@ -904,23 +733,7 @@ html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   display: none;
 }
 
-.rule-page[data-rev-on] [data-rev] {
-  transition:
-    opacity var(--t-panel) var(--out),
-    translate var(--t-panel) var(--out);
-}
-.rule-page[data-rev-on] [data-rev]:not([data-in]) {
-  opacity: 0;
-  translate: 0 16px;
-}
-
 @media (max-width: 960px) {
-  .rule-page .title-screen {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
-    min-height: 0;
-    padding-top: 40px;
-  }
   .rule-page .cover {
     max-width: 520px;
   }
@@ -986,24 +799,11 @@ html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   .rule-page .score {
     flex-wrap: wrap;
   }
-  .rule-page .share {
-    justify-content: center;
-    width: 38px;
-    padding: 0;
-  }
   .rule-page .flip button {
     min-width: 0;
     padding: 6px 10px;
     white-space: normal;
     text-wrap: balance;
-  }
-  .rule-page .share .lbl {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
   .rule-page .lesson {
     padding: 20px;
@@ -1047,24 +847,13 @@ html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   }
 }
 
-@media (max-width: 400px) {
-  .rule-page .crumb-row,
-  .rule-page .crumb {
-    gap: 6px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .rule-page .in,
   .rule-page .stamp,
   .rule-page .burst,
   .rule-page .slot[data-miss],
   .rule-page .level[data-clear] .node,
   .rule-page .say p {
     animation: none;
-  }
-  .rule-page[data-rev-on] [data-rev]:not([data-in]) {
-    translate: none;
   }
   .rule-page .slot[data-near],
   .rule-page .slot:enabled:focus-visible {
@@ -1076,8 +865,5 @@ html:active-view-transition-type(rule-open) .rule-page .cover .thumb {
   }
   .rule-page .pane .costs span {
     animation: none;
-  }
-  .rule-page .crumb-row {
-    filter: none !important;
   }
 }

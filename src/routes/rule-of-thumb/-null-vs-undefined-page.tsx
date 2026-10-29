@@ -10,6 +10,7 @@ import {
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
+import { kit } from "./-components/rule-landing.stylex";
 
 type Tone = "no" | "yes";
 type Line = { c: string; out?: string; tone?: Tone; hot?: boolean };
@@ -98,12 +99,12 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -135,12 +136,12 @@ const styles = stylex.create({
     },
   },
   outNo: {
-    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
   outYes: {
-    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
-    color: "var(--yes-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
   },
   flow: {
     display: "grid",
@@ -201,7 +202,7 @@ const styles = stylex.create({
       ":focus-visible": "color-mix(in srgb, var(--c) 30%, transparent)",
     },
     outlineOffset: { default: null, ":focus-visible": 0 },
-    transition: "border-color var(--t-fb) ease",
+    transition: `border-color ${kit["--t-fb"]} ease`,
   },
   chip: {
     display: "inline-flex",
@@ -233,17 +234,17 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: "transparent",
-      ":hover": "color-mix(in srgb, var(--no) 18%, transparent)",
+      ":hover": `color-mix(in srgb, ${kit["--no"]} 18%, transparent)`,
     },
     fontSize: "12px",
-    color: { default: palette["--dim"], ":hover": "var(--no-ink)" },
+    color: { default: palette["--dim"], ":hover": kit["--no-ink"] },
     cursor: cursors["--cursor-point"],
     transform: { default: null, ":active": "scale(0.92)" },
     outlineWidth: { default: null, ":focus-visible": "3px" },
     outlineStyle: { default: null, ":focus-visible": "solid" },
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "1px" },
-    transition: `background-color var(--t-fb) ease, color var(--t-fb) ease, transform var(--t-fb) ${motion["--out"]}`,
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
   },
   none: {
     display: "inline-flex",
@@ -351,12 +352,12 @@ const styles = stylex.create({
   },
   cellSaved: {
     "::after": {
-      backgroundColor: "color-mix(in srgb, var(--yes) 22%, transparent)",
+      backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 22%, transparent)`,
     },
   },
   cellLost: {
     "::after": {
-      backgroundColor: "color-mix(in srgb, var(--no) 24%, transparent)",
+      backgroundColor: `color-mix(in srgb, ${kit["--no"]} 24%, transparent)`,
     },
   },
   flashing: {
@@ -387,7 +388,7 @@ const styles = stylex.create({
     overflowWrap: "anywhere",
   },
   valueLost: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   landing: {
     animationName: { default: null, [MOTION]: land },
@@ -397,9 +398,9 @@ const styles = stylex.create({
     animationFillMode: { default: null, [MOTION]: "both" },
   },
   nulLost: {
-    backgroundColor: "color-mix(in srgb, var(--no) 18%, transparent)",
-    boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--no) 70%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 18%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${kit["--no"]} 70%, transparent)`,
+    color: kit["--no-ink"],
   },
   tag: {
     justifySelf: "start",
@@ -412,12 +413,12 @@ const styles = stylex.create({
     fontFamily: fonts["--display"],
   },
   tagKept: {
-    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
-    color: "var(--yes-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
   },
   tagLost: {
-    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
   boardCode: {
     whiteSpace: "pre-wrap",

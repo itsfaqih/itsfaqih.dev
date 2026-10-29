@@ -4,6 +4,7 @@ import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
 import "./data-loading.css";
+import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -32,7 +33,7 @@ const fade = stylex.keyframes({
   from: { opacity: 0 },
 });
 const jump = stylex.keyframes({
-  "from, 40%": { color: "var(--no-ink)" },
+  "from, 40%": { color: kit["--no-ink"] },
 });
 const toastFade = stylex.keyframes({
   "0%, 100%": { opacity: 0 },
@@ -123,10 +124,10 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   offline: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   online: {
-    color: "var(--yes-ink)",
+    color: kit["--yes-ink"],
   },
   spin: {
     display: "inline-block",
@@ -209,7 +210,7 @@ const styles = stylex.create({
   req: {
     backgroundColor: {
       default: "var(--c)",
-      [stylex.when.ancestor('[data-side="bad"]')]: "var(--no)",
+      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no"],
     },
     boxShadow: {
       default: "0 2px 0 var(--key-c)",
@@ -271,7 +272,7 @@ const styles = stylex.create({
     left: 0,
     zIndex: 3,
     pointerEvents: "none",
-    backgroundImage: "linear-gradient(90deg, var(--grid) 1px, transparent 1px)",
+    backgroundImage: `linear-gradient(90deg, ${kit["--grid"]} 1px, transparent 1px)`,
     backgroundSize: "25% 100%",
   },
   cover: {
@@ -282,7 +283,7 @@ const styles = stylex.create({
     left: 0,
     zIndex: 2,
     display: "none",
-    backgroundColor: "var(--code-bg)",
+    backgroundColor: kit["--code-bg"],
     "::before": {
       content: '""',
       position: "absolute",
@@ -332,7 +333,7 @@ const styles = stylex.create({
   keyReq: {
     backgroundColor: {
       default: "var(--c)",
-      [stylex.when.ancestor('[data-side="bad"]')]: "var(--no)",
+      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no"],
     },
   },
   keyCode: {
@@ -365,7 +366,7 @@ const styles = stylex.create({
   },
   sub: {
     fontSize: "13px",
-    color: "var(--yes-ink)",
+    color: kit["--yes-ink"],
   },
   hidden: {
     visibility: "hidden",
@@ -496,7 +497,7 @@ const styles = stylex.create({
     fontSize: "14px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   errorText: {
     fontSize: "13px",
@@ -591,12 +592,12 @@ const styles = stylex.create({
     paddingBlock: "2px",
     paddingInline: "8px",
     borderRadius: "6px",
-    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
     fontWeight: 600,
     fontSize: "12px",
     lineHeight: "normal",
     fontFamily: fonts["--mono"],
-    color: "var(--yes-ink)",
+    color: kit["--yes-ink"],
   },
   crash: {
     display: "grid",
@@ -605,8 +606,8 @@ const styles = stylex.create({
     paddingBlock: "12px",
     paddingInline: "14px",
     borderRadius: "10px",
-    backgroundColor: "color-mix(in srgb, var(--no) 12%, transparent)",
-    boxShadow: "inset 3px 0 0 var(--no)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 12%, transparent)`,
+    boxShadow: `inset 3px 0 0 ${kit["--no"]}`,
     animationName: fade,
     animationDuration: "200ms",
     animationTimingFunction: "ease-out",
@@ -616,12 +617,12 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   crashCode: {
     fontSize: "12px",
     lineHeight: 1.5,
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
     overflowWrap: "anywhere",
   },
   balance: {

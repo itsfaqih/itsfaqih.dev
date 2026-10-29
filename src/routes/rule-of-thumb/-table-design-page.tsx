@@ -22,6 +22,7 @@ import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
 import { row, tipped } from "./-table-design.stylex";
+import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -96,7 +97,7 @@ const styles = stylex.create({
       [stylex.when.ancestor(":hover", row)]:
         `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
     },
-    transition: "background-color var(--t-fb) ease",
+    transition: `background-color ${kit["--t-fb"]} ease`,
   },
   still: {
     backgroundColor: { default: null, [stylex.when.ancestor(":hover", row)]: "transparent" },
@@ -185,7 +186,7 @@ const styles = stylex.create({
     fontFamily: fonts["--display"],
     color: palette["--text"],
     cursor: cursors["--cursor-point"],
-    transition: "background-color var(--t-fb) ease",
+    transition: `background-color ${kit["--t-fb"]} ease`,
   },
   liveIcon: {
     width: "13px",
@@ -233,7 +234,7 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     cursor: cursors["--cursor-point"],
     transition:
-      "background-color var(--t-fb) ease, color var(--t-fb) ease, box-shadow var(--t-fb) ease",
+      `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, box-shadow ${kit["--t-fb"]} ease`,
   },
   segOn: {
     backgroundColor: "var(--c)",
@@ -268,7 +269,7 @@ const styles = stylex.create({
       ":focus-within": "inset 0 0 0 2px var(--c)",
     },
     color: palette["--mute"],
-    transition: "box-shadow var(--t-fb) ease",
+    transition: `box-shadow ${kit["--t-fb"]} ease`,
   },
   searchIcon: {
     flexGrow: 0,
@@ -321,7 +322,7 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   saidError: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   saidHint: {
     fontSize: "13px",
@@ -382,7 +383,7 @@ const styles = stylex.create({
     color: palette["--text"],
     cursor: cursors["--cursor-point"],
     transform: { default: null, ":active": "translateY(2px)" },
-    transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color var(--t-fb) ease`,
+    transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color ${kit["--t-fb"]} ease`,
   },
   go: {
     backgroundColor: "var(--c)",
@@ -420,7 +421,7 @@ const styles = stylex.create({
     color: { default: palette["--dim"], ":hover": "var(--c-ink)" },
     opacity: { default: null, ":disabled": 0.4 },
     cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor"] },
-    transition: "background-color var(--t-fb) ease, color var(--t-fb) ease",
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
   },
   iconPressed: {
     backgroundColor: "color-mix(in srgb, var(--c) 16%, transparent)",
@@ -430,9 +431,9 @@ const styles = stylex.create({
   iconDanger: {
     backgroundColor: {
       default: "transparent",
-      ":hover": "color-mix(in srgb, var(--no) 14%, transparent)",
+      ":hover": `color-mix(in srgb, ${kit["--no"]} 14%, transparent)`,
     },
-    color: { default: palette["--dim"], ":hover": "var(--no-ink)" },
+    color: { default: palette["--dim"], ":hover": kit["--no-ink"] },
   },
   iconGlyph: {
     width: "16px",
@@ -488,7 +489,7 @@ const styles = stylex.create({
     cursor: cursors["--cursor-point"],
   },
   inlineDelete: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   foot: {
     display: "flex",
@@ -567,7 +568,7 @@ const styles = stylex.create({
     color: { default: palette["--dim"], ":hover:enabled": palette["--text"] },
     opacity: { default: null, ":disabled": 0.35 },
     cursor: { default: cursors["--cursor-point"], ":disabled": "not-allowed" },
-    transition: "background-color var(--t-fb) ease, color var(--t-fb) ease",
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
   },
   pageOn: {
     backgroundColor: { default: "var(--c)", ":hover:enabled": palette["--panel-2"] },

@@ -11,6 +11,7 @@ import {
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
+import { kit } from "./-components/rule-landing.stylex";
 
 type Tone = "no" | "yes";
 type Note = { text: string; tone?: Tone; error?: true };
@@ -54,12 +55,12 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -92,12 +93,12 @@ const styles = stylex.create({
     },
   },
   outNo: {
-    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
-    color: "var(--no-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
   outYes: {
-    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
-    color: "var(--yes-ink)",
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
   },
   // A squiggle under the line, drawn by a mask so it takes the tone's colour.
   squiggle: {
@@ -106,7 +107,7 @@ const styles = stylex.create({
     bottom: "-3px",
     left: 0,
     height: "4px",
-    backgroundColor: "var(--no)",
+    backgroundColor: kit["--no"],
     transformOrigin: "left",
     pointerEvents: "none",
     maskImage:

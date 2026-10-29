@@ -23,7 +23,8 @@ import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import "./rule-landing.css";
 import { reducedMotion } from "../../../hooks/use-media-query";
-import { cursors, motion, palette } from "../../../theme.stylex";
+import { cursors, fonts, motion, palette } from "../../../theme.stylex";
+import { kit, reveal } from "./rule-landing.stylex";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
@@ -122,10 +123,10 @@ function Landing({
   return (
     <div
       ref={rootRef}
-      className={className ? `arc rule-page ${className}` : "arc rule-page"}
+      className={`arc rule-page ${className ?? ""} ${stylex.props(shell.root, reveal).className}`}
       style={hue}
     >
-      <div className="grid-ground" aria-hidden="true" />
+      <div {...stylex.props(shell.ground)} aria-hidden="true" />
       <IslandActivity>
         <span {...stylex.props(styles.activity)} style={hue}>
           <Link to="/rule-of-thumb" {...stylex.props(styles.action, styles.back)}>
@@ -149,30 +150,33 @@ function Landing({
           <ShareButton data={share} inIsland />
         </span>
       </IslandActivity>
-      <header className="arc-wrap title-screen">
-        <div className="hero-copy">
-          <div className="crumb-row">
-            <nav className="tag crumb in" style={{ "--i": 0 }} aria-label="Breadcrumb">
-              <Link to="/rule-of-thumb">← All rules</Link>
-              {number && <span className="c">No.{number}</span>}
-              <span className="c">{rule.label}</span>
+      <header className={`arc-wrap ${stylex.props(shell.titleScreen).className}`}>
+        <div {...stylex.props(shell.heroCopy)}>
+          <div {...stylex.props(shell.crumbRow)}>
+            <nav
+              className={`tag ${stylex.props(shell.crumb, shell.in, shell.first).className}`}
+              aria-label="Breadcrumb"
+            >
+              <Link to="/rule-of-thumb" {...stylex.props(shell.crumbLink)}>
+                ← All rules
+              </Link>
+              {number && <span {...stylex.props(shell.crumbTag)}>No.{number}</span>}
+              <span {...stylex.props(shell.crumbTag)}>{rule.label}</span>
             </nav>
             <ShareButton data={share} />
           </div>
-          <h1 ref={titleRef}>
+          <h1 ref={titleRef} {...stylex.props(shell.title)}>
             {head && (
               <>
-                <span className="ln">{head}</span>{" "}
+                <span {...stylex.props(shell.titleLine)}>{head}</span>{" "}
               </>
             )}
-            <span className="ln">
-              <span className="hl">{last}</span>
+            <span {...stylex.props(shell.titleLine)}>
+              <span className={`hl ${stylex.props(shell.titleMark).className}`}>{last}</span>
             </span>
           </h1>
-          <p className="claim in" style={{ "--i": 1 }}>
-            {rule.claim}
-          </p>
-          <p className="lead in" style={{ "--i": 2 }}>
+          <p {...stylex.props(shell.claim, shell.in, shell.second)}>{rule.claim}</p>
+          <p className={`lead ${stylex.props(shell.lead, shell.in, shell.third).className}`}>
             {lead}
           </p>
         </div>
@@ -181,7 +185,7 @@ function Landing({
 
       <div className="arc-wrap">
         <section className="learn" id="learn" aria-labelledby="learn-title">
-          <div className="sec-head" data-rev>
+          <div className={`sec-head ${stylex.props(shell.rev).className}`} data-rev>
             <h2 id="learn-title">{learn.title}</h2>
             <p>{learn.intro}</p>
           </div>
@@ -190,7 +194,7 @@ function Landing({
               <LessonCard key={lesson.title} lesson={lesson} costsStyle={costsStyle} />
             ))}
           </div>
-          <div className="sheet-wrap" data-rev>
+          <div className={`sheet-wrap ${stylex.props(shell.rev).className}`} data-rev>
             <h3>TL;DR</h3>
             <ol className="sheet panel">
               {tldr.map(([situation, answer]) => (
@@ -204,7 +208,7 @@ function Landing({
         </section>
 
         <section className="game" id="quiz" aria-labelledby="quiz-title">
-          <div className="sec-head quiz-head" data-rev>
+          <div className={`sec-head quiz-head ${stylex.props(shell.rev).className}`} data-rev>
             <div>
               <h2 id="quiz-title">Mini quiz</h2>
               <p>{quiz.intro}</p>
@@ -235,7 +239,7 @@ function Landing({
         </section>
 
         <section className="take">
-          <div className="take-copy" data-rev>
+          <div className={`take-copy ${stylex.props(shell.rev).className}`} data-rev>
             <h2>Take the rule with you</h2>
             <p>
               The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code>
@@ -248,7 +252,7 @@ function Landing({
               </a>
             </div>
           </div>
-          <div data-rev>
+          <div {...stylex.props(shell.rev)} data-rev>
             {at !== -1 && (
               <nav className="arc rot-pager" aria-label="More rules">
                 {prev ? <PagerCard rule={prev} direction="Previous" /> : <div />}
@@ -324,8 +328,7 @@ function Cover({ rule, entering }: CoverProps) {
   return (
     <div
       ref={ref}
-      className={entering ? "cover in" : "cover"}
-      style={{ "--i": 2 }}
+      className={`cover ${stylex.props(entering && shell.in, shell.third).className}`}
       onPointerMove={lean}
       onPointerLeave={rest}
     >
@@ -470,7 +473,7 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
   return (
     <article
       ref={cardRef}
-      className={`lesson ${stylex.props(stylex.defaultMarker()).className}`}
+      className={`lesson ${stylex.props(shell.rev, stylex.defaultMarker()).className}`}
       data-rev
     >
       <div className="lesson-copy">
@@ -737,7 +740,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
   return (
     <article
       id={`lv-${n}`}
-      className="level panel"
+      className={`level panel ${stylex.props(shell.rev).className}`}
       data-rev
       data-clear={cleared || undefined}
       onKeyDown={onKeyDown}
@@ -904,13 +907,17 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
     );
   }
   return (
-    <button type="button" className="btn soft sm share in" style={{ "--i": 0 }} onClick={share}>
+    <button
+      type="button"
+      className={`btn soft sm ${stylex.props(shell.share, shell.in, shell.first).className}`}
+      onClick={share}
+    >
       {copied ? (
-        <CheckIcon weight="bold" aria-hidden="true" />
+        <CheckIcon weight="bold" aria-hidden="true" {...stylex.props(shell.shareIcon)} />
       ) : (
-        <ShareNetworkIcon weight="bold" aria-hidden="true" />
+        <ShareNetworkIcon weight="bold" aria-hidden="true" {...stylex.props(shell.shareIcon)} />
       )}
-      <span className="lbl" aria-live="polite">
+      <span aria-live="polite" {...stylex.props(shell.shareLabel)}>
         {label}
       </span>
     </button>
@@ -1048,9 +1055,209 @@ function useReveal(rootRef: RefObject<HTMLElement | null>) {
   }, [rootRef]);
 }
 
+const enter = stylex.keyframes({ from: { opacity: 0.01, translate: "0 12px" } });
+const dockSlide = stylex.keyframes({ to: { translate: "var(--dock-x,0px) 0" } });
+const dockShrink = stylex.keyframes({
+  "90%": { opacity: 1 },
+  to: { scale: "var(--dock-k,1)", opacity: 0 },
+});
+
+const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
+const TINY = "@media (max-width: 400px)";
+const COMPACT = ':is(:root:has(.arc-bar[data-mode="compact"]) *)';
+const RULE_OPEN = ":is(html:active-view-transition-type(rule-open) *)";
+const DOCKS = "@supports (animation-timeline: scroll())";
+const MOVES = "@media (prefers-reduced-motion: no-preference)";
 const NARROW = "@media (max-width: 480px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
+const shell = stylex.create({
+  root: {
+    "--c-ink": `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
+    "--key-c": "color-mix(in oklab, var(--c) 60%, #000)",
+    position: "relative",
+    isolation: "isolate",
+    overflowWrap: "break-word",
+  },
+  ground: {
+    position: "absolute",
+    inset: 0,
+    zIndex: -1,
+    pointerEvents: "none",
+    backgroundImage: `linear-gradient(${kit["--grid"]} 1px, transparent 1px), linear-gradient(90deg, ${kit["--grid"]} 1px, transparent 1px)`,
+    backgroundSize: "48px 48px",
+    backgroundPosition: "center -1px",
+    maskImage: "linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent)",
+  },
+  // Off while the header is compact: the island carries the way back then.
+  crumbRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: { default: "16px", [TINY]: "6px" },
+    justifySelf: "stretch",
+    marginBottom: "8px",
+    opacity: { default: null, [COMPACT]: 0 },
+    filter: { default: null, [COMPACT]: { default: "blur(4px)", [REDUCE]: "none" } },
+    visibility: { default: null, [COMPACT]: "hidden" },
+    transition: {
+      default: `opacity 240ms ${motion["--out"]} 40ms, filter 260ms ${motion["--out"]} 40ms, visibility 0s`,
+      [COMPACT]: "opacity 120ms ease, filter 120ms ease, visibility 0s 120ms",
+    },
+  },
+  crumb: {
+    gap: { default: "10px", [TINY]: "6px" },
+    marginBottom: 0,
+    fontSize: "0.875rem",
+    color: palette["--dim"],
+    whiteSpace: "nowrap",
+    backgroundColor: palette["--veil-dense"],
+    boxShadow: palette["--veil-dense-edge"],
+    borderRadius: "12px",
+    "::before": { display: "none" },
+  },
+  crumbLink: {
+    marginBlock: "-12px",
+    paddingBlock: "12px",
+    color: { default: null, ":hover": palette["--text"] },
+    transition: "color 120ms ease",
+  },
+  crumbTag: {
+    fontWeight: 700,
+    color: "var(--c-ink)",
+  },
+  share: {
+    justifyContent: { default: null, [PHONE]: "center" },
+    width: { default: null, [PHONE]: "38px" },
+  },
+  shareIcon: {
+    width: "16px",
+    height: "16px",
+  },
+  shareLabel: {
+    position: { default: null, [PHONE]: "absolute" },
+    width: { default: null, [PHONE]: "1px" },
+    height: { default: null, [PHONE]: "1px" },
+    overflow: { default: null, [PHONE]: "hidden" },
+    clipPath: { default: null, [PHONE]: "inset(50%)" },
+    whiteSpace: { default: null, [PHONE]: "nowrap" },
+  },
+  titleScreen: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1.15fr) minmax(0, 1fr)", [STACKED]: "minmax(0, 1fr)" },
+    gap: { default: "56px", [STACKED]: "40px" },
+    alignItems: "center",
+    minHeight: { default: "calc(100svh - 72px)", [STACKED]: 0 },
+    paddingTop: { default: "48px", [STACKED]: "40px" },
+    paddingBottom: "72px",
+  },
+  heroCopy: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "16px",
+    justifyItems: "start",
+    backgroundColor: palette["--veil"],
+    boxShadow: palette["--veil-edge"],
+    borderRadius: "16px",
+  },
+  // useTitleFit caps the size with --fit; useTitleDock sets --dock-x, --dock-k and --dock-end, and
+  // the heading flies onto the island's label as the page scrolls.
+  title: {
+    width: "fit-content",
+    maxWidth: "100%",
+    marginBottom: "8px",
+    fontWeight: 900,
+    fontSize: "min(clamp(44px, 7vw, 108px), var(--fit, 108px))",
+    lineHeight: 0.94,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.05em",
+    viewTransitionName: { default: null, [RULE_OPEN]: "rule-title" },
+    position: { default: null, [DOCKS]: { default: null, [MOVES]: "relative" } },
+    zIndex: { default: null, [DOCKS]: { default: null, [MOVES]: 41 } },
+    transformOrigin: { default: null, [DOCKS]: { default: null, [MOVES]: "0 50%" } },
+    animationName: {
+      default: null,
+      [DOCKS]: { default: null, [MOVES]: `${dockSlide}, ${dockShrink}` },
+    },
+    animationDuration: { default: null, [DOCKS]: { default: null, [MOVES]: "auto, auto" } },
+    animationTimingFunction: {
+      default: null,
+      [DOCKS]: { default: null, [MOVES]: "cubic-bezier(0.5, 0, 0.75, 0), linear" },
+    },
+    animationDelay: { default: null, [DOCKS]: { default: null, [MOVES]: "0s, 0s" } },
+    animationIterationCount: { default: null, [DOCKS]: { default: null, [MOVES]: "1, 1" } },
+    animationDirection: { default: null, [DOCKS]: { default: null, [MOVES]: "normal, normal" } },
+    animationFillMode: { default: null, [DOCKS]: { default: null, [MOVES]: "both, both" } },
+    animationPlayState: { default: null, [DOCKS]: { default: null, [MOVES]: "running, running" } },
+    animationTimeline: {
+      default: null,
+      [DOCKS]: { default: null, [MOVES]: "scroll(root), scroll(root)" },
+    },
+    animationRangeStart: { default: null, [DOCKS]: { default: null, [MOVES]: "0px" } },
+    animationRangeEnd: {
+      default: null,
+      [DOCKS]: { default: null, [MOVES]: "var(--dock-end, 100vh)" },
+    },
+  },
+  titleLine: {
+    display: "block",
+    position: { default: null, ":first-child": "relative" },
+    zIndex: { default: null, ":first-child": 1 },
+  },
+  titleMark: {
+    paddingInline: "0.06em",
+    borderRadius: "0.06em",
+  },
+  claim: {
+    maxWidth: "20em",
+    fontWeight: 700,
+    fontSize: "clamp(21px, 2vw, 28px)",
+    lineHeight: 1.25,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.025em",
+    color: palette["--text"],
+    textWrap: "pretty",
+  },
+  // .arc .lead keeps its margin, as it always outranked the page's reset.
+  lead: {
+    maxWidth: "34em",
+    fontSize: "18px",
+    lineHeight: 1.6,
+    textWrap: "pretty",
+  },
+  // The load-in starts at 0.01, not 0: Chrome skips a text paint at opacity 0 for LCP, and a fade runs
+  // on the compositor without painting again, so a fully transparent start leaves the lead out of LCP
+  // until some unrelated repaint seconds later.
+  in: {
+    animationName: { default: enter, [REDUCE]: "none" },
+    animationDuration: "560ms",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "both",
+    animationDelay: "calc(var(--i, 0) * 60ms + 200ms)",
+  },
+  first: { "--i": "0" },
+  second: { "--i": "1" },
+  third: { "--i": "2" },
+  // useReveal marks what starts on screen with data-in, then sets data-rev-on; the rest rises in.
+  rev: {
+    opacity: {
+      default: null,
+      [stylex.when.ancestor("[data-rev-on]", reveal)]: { default: null, ":not([data-in])": 0 },
+    },
+    translate: {
+      default: null,
+      [stylex.when.ancestor("[data-rev-on]", reveal)]: {
+        default: null,
+        ":not([data-in])": { default: "0 16px", [REDUCE]: "none" },
+      },
+    },
+    transition: {
+      default: null,
+      [stylex.when.ancestor("[data-rev-on]", reveal)]: `opacity ${motion["--t-panel"]} ${motion["--out"]}, translate ${motion["--t-panel"]} ${motion["--out"]}`,
+    },
+  },
+});
 
 // The live activity this page lends the header island: a back link, a label that trades the
 // page's tags for its title once the heading docks (useTitleDock sets data-swap), and Share.

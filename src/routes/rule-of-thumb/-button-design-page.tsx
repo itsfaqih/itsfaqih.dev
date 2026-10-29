@@ -10,6 +10,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+import { kit } from "./-components/rule-landing.stylex";
 
 const TABLET = "@media (max-width: 820px)";
 const PHONE = "@media (max-width: 640px)";
@@ -87,7 +88,7 @@ const styles = stylex.create({
     fontSize: "12px",
   },
   red: {
-    "--c": "var(--no)",
+    "--c": kit["--no"],
   },
   tint: {
     "--face": "color-mix(in srgb, var(--c) 18%, transparent)",
@@ -388,7 +389,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: palette["--mute"],
     borderRadius: "50%",
-    transition: "background-color var(--t-fb) ease, border-color var(--t-fb) ease",
+    transition: `background-color ${kit["--t-fb"]} ease, border-color ${kit["--t-fb"]} ease`,
   },
   dotOn: {
     borderColor: "var(--c-ink)",
@@ -410,7 +411,7 @@ const styles = stylex.create({
     boxShadow: `0 0 0 1px ${palette["--hair"]}`,
   },
   confirm: {
-    boxShadow: "0 0 0 1.5px color-mix(in srgb, var(--no) 55%, transparent)",
+    boxShadow: `0 0 0 1.5px color-mix(in srgb, ${kit["--no"]} 55%, transparent)`,
   },
   deleted: {
     backgroundColor: "transparent",
@@ -437,7 +438,7 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   projectGone: {
-    color: "var(--no-ink)",
+    color: kit["--no-ink"],
   },
   projectMeta: {
     fontSize: "13px",
