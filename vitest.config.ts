@@ -1,3 +1,4 @@
+import stylex from "@stylexjs/unplugin";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
@@ -5,6 +6,10 @@ export default defineConfig({
     passWithNoTests: true,
     projects: [
       {
+        // Components style themselves with StyleX, whose calls fail at runtime unless compiled. The
+        // plugin's dev-server hook starts an interval that only an HTTP server's close clears, and
+        // the test server has none, so it is dropped to let the run exit.
+        plugins: [{ ...stylex.vite({ devMode: "css-only" }), configureServer: undefined }],
         test: {
           name: "unit",
           environment: "jsdom",
