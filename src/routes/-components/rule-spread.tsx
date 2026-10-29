@@ -5,6 +5,7 @@ import { colorOf, ruleNumber } from "../../data/guidelines";
 import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
 
 const STEP = 0.68;
 const RUBBER = 0.35;
@@ -158,10 +159,10 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
 
   const rule = rules[active]!;
   return (
-    <div className="spread" style={{ "--c": colorOf(rule.label) }}>
+    <div {...stylex.props(styles.spread)} style={{ "--c": colorOf(rule.label) }}>
       <div
         ref={stageRef}
-        className="spread-stage"
+        {...stylex.props(styles.stage)}
         role="group"
         aria-roledescription="carousel"
         aria-label="Rules. Drag, scroll sideways, or use the left and right arrow keys."
@@ -188,7 +189,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
             ref={(slot) => {
               if (slot) slots.current[index] = slot;
             }}
-            className="spread-slot"
+            {...stylex.props(styles.slot)}
             style={{
               "--d": index - initial,
               "--ad": Math.abs(index - initial),
@@ -197,7 +198,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           >
             <Link
               to={item.href}
-              className="spread-card"
+              {...stylex.props(styles.card)}
               data-cut
               draggable={false}
               aria-current={index === active ? "true" : undefined}
@@ -207,32 +208,48 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
                 if (event.currentTarget.matches(":focus-visible")) goTo(index);
               }}
             >
-              <span className="n">
+              <span {...stylex.props(styles.plate)}>
                 <span>No.{ruleNumber(item)}</span>
                 <span>{item.interactive ? "▶ DEMO" : "ARTICLE"}</span>
               </span>
               <RuleThumb rule={item} play={index === active} style={styles.thumb} />
-              <span className="t">{item.title}</span>
-              <span className="s">{item.description}</span>
-              <span className="f">
+              {/* .t names the title for the rule-open view transition in arcade.css. */}
+              <span className={`t ${stylex.props(styles.title).className}`}>{item.title}</span>
+              <span {...stylex.props(styles.summary)}>{item.description}</span>
+              <span {...stylex.props(styles.plate, styles.foot)}>
                 <span>{item.label}</span>
-                <span aria-hidden="true">↗</span>
+                <span {...stylex.props(styles.arrow)} aria-hidden="true">
+                  ↗
+                </span>
               </span>
             </Link>
           </div>
         ))}
       </div>
-      <div className="spread-nav" data-cut>
+      {/* .spread-nav keys the veil under the count in arcade.css. */}
+      <div className={`spread-nav ${stylex.props(styles.nav).className}`} data-cut>
         <span className="sr-only" aria-live="polite">
           {rule.title}
         </span>
-        <button type="button" aria-label="Previous rule" disabled={active === 0} onClick={() => goTo(active - 1)}>
+        <button
+          type="button"
+          {...stylex.props(styles.step)}
+          aria-label="Previous rule"
+          disabled={active === 0}
+          onClick={() => goTo(active - 1)}
+        >
           ←
         </button>
         <span>
           <SlideNumber value={active + 1} /> / {pad(rules.length)}
         </span>
-        <button type="button" aria-label="Next rule" disabled={active === last} onClick={() => goTo(active + 1)}>
+        <button
+          type="button"
+          {...stylex.props(styles.step)}
+          aria-label="Next rule"
+          disabled={active === last}
+          onClick={() => goTo(active + 1)}
+        >
           →
         </button>
       </div>
@@ -246,19 +263,259 @@ function SlideNumber({ value }: { value: number }) {
   const [shown, setShown] = useState({ value, previous: value });
   if (shown.value !== value) setShown({ value, previous: shown.value });
   return (
-    <span className="slide-num" data-dir={shown.value < shown.previous ? "down" : "up"}>
+    <span {...stylex.props(number.root)} data-dir={shown.value < shown.previous ? "down" : "up"}>
       {shown.previous !== shown.value && (
-        <span key={`${shown.previous}-${shown.value}`} className="was" aria-hidden="true">
+        <span
+          key={`${shown.previous}-${shown.value}`}
+          {...stylex.props(number.digits, number.was)}
+          aria-hidden="true"
+        >
           {pad(shown.previous)}
         </span>
       )}
-      <span key={shown.value}>{pad(shown.value)}</span>
+      <span key={shown.value} {...stylex.props(number.digits, shown.previous !== shown.value && number.now)}>
+        {pad(shown.value)}
+      </span>
     </span>
   );
 }
 
+const STACKED = "@media (max-width: 960px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+// A press or hover counts only while the deck is not being dragged.
+const STILL = ":not([data-dragging] *)";
+const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
+
+/*
+ * The cards share one grid cell and take their pose from --d, the card's offset from the centre,
+ * and --ad, its distance. Per step from the centre a card moves 68% of its width sideways, 10px
+ * down and 92px back, turns 13deg toward the centre, tilts 2.5deg, and fades 20%, gone by the
+ * third step. The glow behind the deck takes the centred card's hue.
+ */
 const styles = stylex.create({
+  // --glow is registered in arcade.css, so it can ease between hues.
+  spread: {
+    "--glow": "var(--c)",
+    transitionProperty: "--glow",
+    transitionDuration: "600ms",
+    transitionTimingFunction: "ease",
+  },
+  stage: {
+    position: "relative",
+    display: "grid",
+    justifyItems: "center",
+    paddingTop: "20px",
+    paddingInline: 0,
+    paddingBottom: "48px",
+    // Out to the screen edge, so the neighbours peek in from it instead of stopping at the gutter.
+    marginInline: { default: null, [STACKED]: "-18px" },
+    perspective: "1400px",
+    overflowX: "clip",
+    touchAction: "pan-y",
+    cursor: { default: cursors["--cursor-grab"], ":is([data-dragging])": cursors["--cursor-grabbing"] },
+    userSelect: "none",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      inset: "0 8%",
+      backgroundImage: "radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent)",
+      pointerEvents: "none",
+    },
+  },
+  slot: {
+    gridArea: "1 / 1",
+    display: "grid",
+    width: "min(300px, 66vw)",
+    transform:
+      "translateX(calc(var(--d) * 68%)) translateY(calc(var(--ad) * 10px)) translateZ(calc(var(--ad) * -92px)) rotateY(calc(var(--d) * -13deg)) rotateZ(calc(var(--d) * 2.5deg))",
+  },
+  // A [data-cut] piece: its states key on pseudo-classes, so its class list never changes and the
+  // cut-in's .in survives a re-render.
+  card: {
+    "--key": `color-mix(in oklab, var(--c) ${palette["--key-mix"]}, #000)`,
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    paddingTop: "14px",
+    paddingInline: "14px",
+    paddingBottom: "16px",
+    borderRadius: "22px",
+    backgroundColor: palette["--panel"],
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "var(--c)",
+    boxShadow: {
+      default: `${palette["--raise"]}, 0 6px 0 var(--key)`,
+      [`:active${STILL}`]: `${palette["--raise"]}, 0 3px 0 var(--key)`,
+    },
+    translate: { default: null, [`:active${STILL}`]: "0 3px" },
+    color: palette["--text"],
+    textDecoration: "none",
+    WebkitUserDrag: "none",
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "4px" },
+    transitionProperty: "translate, box-shadow",
+    transitionDuration: "100ms, 100ms",
+    transitionTimingFunction: "ease, ease",
+    transitionDelay: "0s, 0s",
+    transitionBehavior: "normal, normal",
+    // Cards fade into the page under a cover of its colour rather than going see-through, so a
+    // card behind never shows through the one in front. With reduced motion the deck jumps to the
+    // chosen card, and only the fade eases.
+    "::after": {
+      content: '""',
+      position: "absolute",
+      inset: "-3px -3px -9px",
+      borderRadius: "24px",
+      backgroundColor: palette["--bg"],
+      opacity: "clamp(0, var(--ad) * 0.2 + max(0, var(--ad) - 2) * 0.4, 1)",
+      pointerEvents: "none",
+      transitionProperty: { default: null, [REDUCE]: "opacity" },
+      transitionDuration: { default: null, [REDUCE]: "200ms" },
+      transitionTimingFunction: { default: null, [REDUCE]: "ease" },
+    },
+  },
+  plate: {
+    display: "flex",
+    justifyContent: "space-between",
+    paddingBlock: 0,
+    paddingInline: "2px",
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: INK,
+  },
+  foot: {
+    marginTop: "auto",
+    fontWeight: 500,
+    color: palette["--mute"],
+  },
+  arrow: {
+    fontSize: "15px",
+    lineHeight: "11px",
+    color: INK,
+    translate: {
+      default: null,
+      "@media (hover: hover)": { default: null, [`:is(:hover > * > *)${STILL}`]: "2px -2px" },
+    },
+    transitionProperty: "translate",
+    transitionDuration: "150ms",
+    transitionTimingFunction: motion["--out"],
+  },
   thumb: {
     borderRadius: "14px",
+  },
+  title: {
+    paddingBlock: 0,
+    paddingInline: "2px",
+    fontWeight: 900,
+    fontSize: "20px",
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+  },
+  // A fixed two-line slot, so every card in the deck keeps one height.
+  summary: {
+    height: "3em",
+    marginTop: "-9px",
+    paddingBlock: 0,
+    paddingInline: "2px",
+    fontSize: "13px",
+    lineHeight: 1.5,
+    color: palette["--dim"],
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+  },
+  nav: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "12px",
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    fontVariantNumeric: "tabular-nums",
+    color: palette["--dim"],
+  },
+  step: {
+    width: "44px",
+    height: "44px",
+    borderRadius: "14px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: { default: palette["--hair"], ":hover:not(:disabled)": palette["--hair-hover"] },
+    backgroundColor: palette["--panel"],
+    color: palette["--text"],
+    fontWeight: 700,
+    fontSize: "16px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    // The nav's tabular figures are for the count, not the arrows.
+    fontVariantNumeric: "normal",
+    boxShadow: {
+      default: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+      ":active:not(:disabled)": `${palette["--raise"]}, 0 1px 0 ${palette["--drop-ink"]}`,
+    },
+    transform: { default: null, ":active:not(:disabled)": "translateY(2px)" },
+    opacity: { default: null, ":disabled": 0.35 },
+    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor"] },
+    outlineWidth: { default: null, ":focus-visible": "3px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "2px" },
+    transitionProperty: "transform, box-shadow, border-color, opacity",
+    transitionDuration: "100ms, 100ms, 120ms, 120ms",
+    transitionTimingFunction: "ease, ease, ease, ease",
+    transitionDelay: "0s, 0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal, normal",
+  },
+});
+
+const numIn = stylex.keyframes({
+  from: { translate: "0 var(--num-from, 100%)", opacity: 0 },
+});
+
+const numOut = stylex.keyframes({
+  to: { translate: "0 var(--num-to, -100%)", opacity: 0 },
+});
+
+// The count's new digits slide in from the side it moved toward while the old ones leave.
+const number = stylex.create({
+  root: {
+    "--num-from": {
+      default: null,
+      ':is([data-dir="down"])': "-100%",
+      [REDUCE]: { default: null, ':not([data-dir="down"])': "0" },
+    },
+    "--num-to": {
+      default: null,
+      ':is([data-dir="down"])': "100%",
+      [REDUCE]: { default: null, ':not([data-dir="down"])': "0" },
+    },
+    display: "inline-grid",
+    overflow: "clip",
+    verticalAlign: "bottom",
+  },
+  digits: {
+    gridArea: "1 / 1",
+  },
+  was: {
+    animationName: numOut,
+    animationDuration: "180ms",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "forwards",
+  },
+  now: {
+    animationName: numIn,
+    animationDuration: "220ms",
+    animationTimingFunction: motion["--out"],
+    animationFillMode: "backwards",
   },
 });
