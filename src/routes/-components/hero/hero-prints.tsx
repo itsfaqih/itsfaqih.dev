@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { type CSSProperties, type ReactNode, useEffect, useEffectEvent, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   blend,
@@ -13,19 +14,20 @@ import {
   traced,
 } from "./hero-morph";
 import { reducedMotion } from "../../../hooks/use-media-query";
+import { palette } from "../../../theme.stylex";
 
 type TopInk = "solid" | "hue" | "outline";
 
 function Ink({ p, top = "solid", children }: { p: string; top?: TopInk; children: ReactNode }) {
   return (
     <>
-      <g transform="translate(5 4)" fill={`url(#${p}ht)`} className="mis">
+      <g transform="translate(5 4)" fill={`url(#${p}ht)`} {...stylex.props(styles.part, styles.screen)}>
         {children}
       </g>
-      {top === "solid" && <g className="i">{children}</g>}
-      {top === "hue" && <g className="h mis">{children}</g>}
+      {top === "solid" && <g {...draw(styles.ink)}>{children}</g>}
+      {top === "hue" && <g {...draw(styles.hue, styles.screen)}>{children}</g>}
       {top === "outline" && (
-        <g className="is" strokeWidth={3}>
+        <g {...draw(styles.inkLine)} strokeWidth={3}>
           {children}
         </g>
       )}
@@ -35,26 +37,27 @@ function Ink({ p, top = "solid", children }: { p: string; top?: TopInk; children
 
 function Paper({ p }: { p: string }) {
   return (
-    <defs>
+    <defs {...draw()}>
       <pattern
+        {...draw()}
         id={`${p}ht`}
         width="5"
         height="5"
         patternUnits="userSpaceOnUse"
         patternTransform="rotate(18)"
       >
-        <circle className="dot" cx="2.5" cy="2.5" r="1.75" />
+        <circle {...draw(styles.hue)} cx="2.5" cy="2.5" r="1.75" />
       </pattern>
     </defs>
   );
 }
 
-function RegistrationMark({ x, y, className }: { x: number; y: number; className: string }) {
+function RegistrationMark({ x, y, style }: { x: number; y: number; style: stylex.StyleXStyles }) {
   return (
-    <g className={className}>
-      <circle className="hs" strokeWidth={1.8} cx={x} cy={y} r={8} />
+    <g {...draw(style)}>
+      <circle {...draw(styles.hueLine)} strokeWidth={1.8} cx={x} cy={y} r={8} />
       <path
-        className="hs"
+        {...draw(styles.hueLine)}
         strokeWidth={1.8}
         d={`M${x - 14} ${y} H${x + 14} M${x} ${y - 14} V${y + 14}`}
       />
@@ -262,7 +265,7 @@ const settleVars = ({ dx, dy, r = 0 }: Piece, i: number, span: number, step: num
 
 function Float({ at = 0, ms = 1600, children }: { at?: number; ms?: number; children: ReactNode }) {
   return (
-    <g className="float" style={vars({ "float-at": `${at}ms`, "float-ms": `${ms}ms` })}>
+    <g {...draw(styles.float)} style={vars({ "float-at": `${at}ms`, "float-ms": `${ms}ms` })}>
       {children}
     </g>
   );
@@ -279,9 +282,9 @@ const SCENES: Scene[] = [
       <>
         {TUMBLE.map((piece, i) => (
           <Float key={i} at={settledAt(i, 0.5, 1 / 6)} ms={TUMBLE_FLOAT_MS[i]}>
-            <g className="settle" style={settleVars(piece, i, 0.5, 1 / 6)}>
+            <g {...draw(styles.settle)} style={settleVars(piece, i, 0.5, 1 / 6)}>
               <Ink p={p} top={piece.top}>
-                <path data-token={i} d={toPath(piece.outline)} />
+                <path {...draw(styles.token)} data-token={i} d={toPath(piece.outline)} />
               </Ink>
             </g>
           </Float>
@@ -294,14 +297,14 @@ const SCENES: Scene[] = [
     body: (p) => (
       <Float at={settledAt(0, 0.3, 0.18)}>
         {QUARTERS.map((piece, i) => (
-          <g key={i} className="settle" style={settleVars(piece, i, 0.3, 0.18)}>
+          <g key={i} {...draw(styles.settle)} style={settleVars(piece, i, 0.3, 0.18)}>
             <Ink p={p} top={piece.top}>
-              <path data-token={QUARTER_TOKENS.indexOf(i)} d={toPath(piece.outline)} />
+              <path {...draw(styles.token)} data-token={QUARTER_TOKENS.indexOf(i)} d={toPath(piece.outline)} />
             </Ink>
           </g>
         ))}
         <path
-          className="is ring"
+          {...draw(styles.inkLine, styles.ring)}
           pathLength={1}
           strokeWidth={3}
           d="M160 14 A86 86 0 1 1 159.99 14"
@@ -313,26 +316,26 @@ const SCENES: Scene[] = [
     label: "A ball takes the straight line while its ghost walks the long way round",
     body: (p) => (
       <>
-        <path className="is ghost" d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`} />
+        <path {...draw(styles.inkLine, styles.ghost)} d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`} />
         <Float at={DEV_TOOLS_HIT_AT}>
           <Ink p={p} top="hue">
-            <polygon data-token={1} points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
+            <polygon {...draw(styles.token)} data-token={1} points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
           </Ink>
           <Ink p={p} top="outline">
-            <circle data-token={3} cx="40" cy="160" r="14" />
+            <circle {...draw(styles.token)} data-token={3} cx="40" cy="160" r="14" />
           </Ink>
           <Ink p={p} top="outline">
-            <rect data-token={2} x="264" y="24" width="32" height="32" />
+            <rect {...draw(styles.token)} data-token={2} x="264" y="24" width="32" height="32" />
           </Ink>
-          <rect className="h mis cut-hit" x="268" y="28" width="24" height="24" />
+          <rect {...draw(styles.hue, styles.screen, styles.cutHit)} x="268" y="28" width="24" height="24" />
         </Float>
-        <g className="vb cut-ghost">
-          <circle className="is" strokeWidth={1.6} strokeDasharray="3 3" r="10" />
+        <g {...draw(styles.viewBox, styles.cutGhost)}>
+          <circle {...draw(styles.inkLine)} strokeWidth={1.6} strokeDasharray="3 3" r="10" />
         </g>
         <Float at={DEV_TOOLS_HIT_AT}>
-          <g className="vb cut-ball">
+          <g {...draw(styles.viewBox, styles.cutBall)}>
             <Ink p={p}>
-              <circle data-token={0} r="10" />
+              <circle {...draw(styles.token)} data-token={0} r="10" />
             </Ink>
           </g>
         </Float>
@@ -342,39 +345,39 @@ const SCENES: Scene[] = [
   {
     label: "A worker drains a queue of jobs; one fails, goes back in line, and passes on retry",
     body: (p) => (
-      <g style={{ "--scene-duration": `${BACKENDS_MS}ms` }}>
+      <g {...draw()} style={{ "--scene-duration": `${BACKENDS_MS}ms` }}>
         {SLOT_X.map((x) => (
-          <rect key={x} className="is ghost" x={x - 14} y="110" width="28" height="28" />
+          <rect key={x} {...draw(styles.inkLine, styles.ghost)} x={x - 14} y="110" width="28" height="28" />
         ))}
-        <path className="is ghost" d="M200 124 H226 M220 118 L226 124 L220 130" />
+        <path {...draw(styles.inkLine, styles.ghost)} d="M200 124 H226 M220 118 L226 124 L220 130" />
         <path
-          className="hs ghost"
+          {...draw(styles.hueLine, styles.ghost)}
           d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
         />
         <Float>
           <Ink p={p} top="outline">
-            <rect data-token={2} x="230" y="92" width="64" height="64" />
+            <rect {...draw(styles.token)} data-token={2} x="230" y="92" width="64" height="64" />
           </Ink>
-          <rect data-token={3} className="h mis q-work" x="246" y="108" width="32" height="32" />
-          <rect className="i q-out" x="298" y="119" width="10" height="10" />
-          <rect className="h q-out-retry" x="298" y="119" width="10" height="10" />
+          <rect {...draw(styles.hue, styles.screen, styles.queueWork, styles.token)} data-token={3} x="246" y="108" width="32" height="32" />
+          <rect {...draw(styles.ink, styles.queueOut)} x="298" y="119" width="10" height="10" />
+          <rect {...draw(styles.hue, styles.queueOutRetry)} x="298" y="119" width="10" height="10" />
         </Float>
         {JOBS.map((job, k) => (
-          <g key={k} className="q-job" style={{ animationName: `hp-job-${k}` }}>
+          <g key={k} {...draw(styles.queueJob)} style={{ animationName: `hp-job-${k}` }}>
             <Ink p={p} top={job.top}>
-              <circle data-token={k < 2 ? k : undefined} cx="0" cy={QUEUE_Y} r="11" />
+              <circle {...draw(k < 2 && styles.token)} data-token={k < 2 ? k : undefined} cx="0" cy={QUEUE_Y} r="11" />
             </Ink>
           </g>
         ))}
         <Float>
           <path
-            className="is q-x"
+            {...draw(styles.inkLine, styles.queueReject)}
             strokeWidth={3.5}
             strokeLinecap="round"
             d="M252 114 L272 134 M272 114 L252 134"
           />
         </Float>
-        <path className="is" strokeWidth={3} d="M16 165.5 H304" />
+        <path {...draw(styles.inkLine)} strokeWidth={3} d="M16 165.5 H304" />
       </g>
     ),
   },
@@ -384,36 +387,36 @@ const SCENES: Scene[] = [
       const comp = (x0: number, slip: boolean) => {
         const square = (
           <Ink p={p}>
-            <rect data-token={slip ? 1 : 0} x={x0 + 62} y="92" width="34" height="34" />
+            <rect {...draw(styles.token)} data-token={slip ? 1 : 0} x={x0 + 62} y="92" width="34" height="34" />
           </Ink>
         );
         return (
           <Float>
             <Ink p={p} top="hue">
-              <circle data-token={slip ? 3 : 2} cx={x0 + 40} cy="74" r="18" />
+              <circle {...draw(styles.token)} data-token={slip ? 3 : 2} cx={x0 + 40} cy="74" r="18" />
             </Ink>
-            {slip ? <g className="snap-slip">{square}</g> : square}
+            {slip ? <g {...draw(styles.snapSlip)}>{square}</g> : square}
             <Ink p={p}>
-              <rect x={x0 + 16} y="146" width="92" height="8" />
+              <rect {...draw()} x={x0 + 16} y="146" width="92" height="8" />
             </Ink>
-            {slip && <RegistrationMark x={267} y={95} className="snap-reg" />}
+            {slip && <RegistrationMark x={267} y={95} style={styles.snapMark} />}
           </Float>
         );
       };
       return (
         <>
-          <rect className="is ghost" x="20" y="34" width="124" height="132" />
-          <rect className="is ghost" x="176" y="34" width="124" height="132" />
+          <rect {...draw(styles.inkLine, styles.ghost)} x="20" y="34" width="124" height="132" />
+          <rect {...draw(styles.inkLine, styles.ghost)} x="176" y="34" width="124" height="132" />
           {comp(20, false)}
           {comp(176, true)}
-          <path className="is" strokeWidth={3} d="M152 94 H168 M152 104 H168" />
+          <path {...draw(styles.inkLine)} strokeWidth={3} d="M152 94 H168 M152 104 H168" />
           <path
-            className="hs snap-neq"
+            {...draw(styles.hueLine, styles.snapNeq)}
             strokeWidth={3}
             strokeLinecap="round"
             d="M165 86 L155 112"
           />
-          <rect className="h snap-scan" x="20" y="26" width="3" height="148" />
+          <rect {...draw(styles.hue, styles.snapScan)} x="20" y="26" width="3" height="148" />
         </>
       );
     },
@@ -605,13 +608,13 @@ function MorphTokens({ p }: { p: string }) {
   return (
     <>
       {Array.from({ length: TOKEN_COUNT }, (_, k) => (
-        <g key={k}>
-          <path transform="translate(5 4)" fill={`url(#${p}ht)`} className="mis" />
+        <g key={k} {...draw()}>
+          <path transform="translate(5 4)" fill={`url(#${p}ht)`} {...stylex.props(styles.part, styles.screen)} />
           {TOPS.map((top) => (
             <path
               key={top}
               data-top={top}
-              className={top === "solid" ? "i" : top === "hue" ? "h mis" : "is"}
+              {...draw(...(top === "solid" ? [styles.ink] : top === "hue" ? [styles.hue, styles.screen] : [styles.inkLine]))}
               strokeWidth={top === "outline" ? 3 : undefined}
             />
           ))}
@@ -676,20 +679,27 @@ export function HeroPrints({
   index,
   restartKey,
   playing,
+  held,
 }: {
   index: number;
   restartKey: number;
   playing: boolean;
+  held: boolean;
 }) {
   const p = useId().replace(/[^a-zA-Z0-9]/g, "");
   const { stageRef, cardRef } = useTiltToCursor();
   const { stage, refFor, morphRef } = useSceneMorph(index, restartKey);
   return (
-    <div className="hp" data-play={playing ? "" : undefined}>
+    <div
+      {...stylex.props(styles.root, stylex.defaultMarker())}
+      data-paused={playing && !held ? undefined : ""}
+    >
+      {/* The backends scene's keyframes are worked out from its geometry here, so they stay a sheet. */}
       <style>{KEYFRAMES}</style>
-      <div ref={stageRef} className="hp-stage">
-        <div ref={cardRef} className="hp-card" style={{ transform: restTransform }}>
+      <div ref={stageRef} {...stylex.props(styles.stage)}>
+        <div ref={cardRef} {...stylex.props(styles.card)} style={{ transform: restTransform }}>
           <svg
+            {...stylex.props(styles.svg)}
             viewBox="0 0 320 200"
             role="img"
             aria-label={SCENES[index]!.label}
@@ -700,14 +710,14 @@ export function HeroPrints({
               <g
                 key={layerKey(layer)}
                 ref={refFor(layer)}
-                className="hp-layer"
+                {...draw(styles.layer, stylex.defaultMarker())}
                 data-leaving={stage.phase === "leaving" ? "" : undefined}
               >
                 {SCENES[layer.index]!.body(p)}
               </g>
             ))}
             {stage.phase === "leaving" && (
-              <g ref={morphRef}>
+              <g ref={morphRef} {...draw()}>
                 <MorphTokens p={p} />
               </g>
             )}
@@ -717,3 +727,212 @@ export function HeroPrints({
     </div>
   );
 }
+
+// Every shape and group the prints draw: it holds still while the hero is paused or its layer is
+// on the way out, and turns about its own box. The halftone copies carry a transform attribute
+// instead, so they take the hold alone.
+const draw = (...more: (stylex.StyleXStyles | false)[]) => stylex.props(styles.part, styles.box, ...more);
+
+const SCENE = "var(--scene-duration)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const still = (name: string | null) => ({ default: name, [REDUCE]: "none !important" });
+
+const settle = stylex.keyframes({
+  "0%": { transform: "translate(var(--dx), var(--dy)) rotate(var(--r,0deg))" },
+});
+const ring = stylex.keyframes({
+  "0%, 64%": { strokeDashoffset: "1px", animationTimingFunction: "var(--inout)" },
+  to: { strokeDashoffset: "0" },
+});
+const ball = stylex.keyframes({
+  "0%": { opacity: 0, animationTimingFunction: "var(--inout)", transform: "translate(40px,160px)" },
+  "4%": { opacity: 1 },
+  "24%, to": { opacity: 1, transform: "translate(280px,40px)" },
+});
+const hit = stylex.keyframes({
+  "0%, 22%": { opacity: 0, animationTimingFunction: "var(--spring)", transform: "scale(.2)" },
+  "30%, to": { opacity: 1, transform: "none" },
+});
+const float = stylex.keyframes({ to: { transform: "translateY(-2px)" } });
+const slip = stylex.keyframes({
+  "0%, 56%": { animationTimingFunction: "var(--spring)", transform: "translate(12px,-14px)rotate(16deg)" },
+  "70%, to": { transform: "none" },
+});
+const scan = stylex.keyframes({
+  "0%": { opacity: 0, animationTimingFunction: "linear", transform: "none" },
+  "2%": { opacity: 1 },
+  "40%": { opacity: 1, transform: "translate(280px)" },
+  "42%, to": { opacity: 0, transform: "translate(280px)" },
+});
+const notEqual = stylex.keyframes({
+  "0%, 62%": { opacity: 1 },
+  "68%, to": { opacity: 0 },
+});
+const mark = stylex.keyframes({
+  "0%, 38%": { opacity: 0, animationTimingFunction: "var(--spring)", transform: "scale(.3)rotate(-45deg)" },
+  "46%, 58%": { opacity: 1, transform: "none" },
+  "66%, to": { opacity: 0, transform: "none" },
+});
+
+const styles = stylex.create({
+  // --hue is registered in arcade.css, so a new slide's colour eases in.
+  root: {
+    width: "100%",
+    maxWidth: "560px",
+    "--spring": SPRING,
+    "--inout": INOUT,
+    "--hue": "var(--c)",
+    transitionProperty: "--hue",
+    transitionDuration: "600ms",
+    transitionTimingFunction: "var(--inout)",
+  },
+  stage: {
+    perspective: "900px",
+    padding: "12px 8px 20px",
+  },
+  card: {
+    position: "relative",
+    aspectRatio: "16 / 10",
+    transformStyle: "preserve-3d",
+  },
+  svg: {
+    position: "absolute",
+    inset: 0,
+    display: "block",
+    width: "100%",
+    height: "100%",
+    overflow: "visible",
+  },
+  part: {
+    animationPlayState: {
+      default: null,
+      [stylex.when.ancestor(":is([data-paused], [data-leaving])")]: "paused !important",
+    },
+  },
+  box: {
+    transformBox: "fill-box",
+    transformOrigin: "center",
+  },
+  viewBox: {
+    transformBox: "view-box",
+    transformOrigin: "0 0",
+  },
+  hue: { fill: "var(--hue)" },
+  ink: { fill: palette["--text"] },
+  hueLine: { stroke: "var(--hue)", fill: "none" },
+  inkLine: { stroke: palette["--text"], fill: "none" },
+  // Ink in the hue lightens the dark page like a screen print, and darkens the light one.
+  screen: { mixBlendMode: { default: "screen", ":is(.light *)": "multiply" } },
+  ghost: {
+    strokeDasharray: "3 4",
+    strokeWidth: "1.4",
+    opacity: 0.65,
+  },
+  // The prints' fades: a layer fades all its ink by --fade, and the shapes the morph picks up stay
+  // whole, hidden while the morph carries them.
+  layer: {
+    fillOpacity: "var(--fade, 1)",
+    strokeOpacity: "var(--fade, 1)",
+  },
+  token: {
+    fillOpacity: 1,
+    strokeOpacity: 1,
+    visibility: { default: null, [stylex.when.ancestor("[data-leaving]")]: "hidden" },
+  },
+  // Each piece flies in from its own --dx, --dy and --r, one --step after another.
+  settle: {
+    animationName: still(settle),
+    animationDuration: `calc(${SCENE} * var(--span))`,
+    animationTimingFunction: "var(--spring)",
+    animationDelay: `calc(${SCENE} * var(--step) * var(--i))`,
+    animationFillMode: "both",
+  },
+  ring: {
+    strokeDasharray: "1",
+    animationName: still(ring),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  cutBall: {
+    transform: "translate(280px, 40px)",
+    animationName: still(ball),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  cutHit: {
+    animationName: still(hit),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  cutGhost: {
+    transform: "translate(280px, 40px)",
+    animationName: still("hp-ghost"),
+    animationDuration: SCENE,
+    animationTimingFunction: "linear",
+    animationFillMode: "both",
+  },
+  // Each job names its own keyframes inline.
+  queueJob: {
+    opacity: 0,
+    animationName: still(null),
+    animationDuration: SCENE,
+    animationTimingFunction: "linear",
+    animationFillMode: "both",
+  },
+  queueWork: {
+    transform: "scale(0.72)",
+    animationName: still("hp-work"),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  queueOut: {
+    opacity: 0,
+    animationName: still("hp-out"),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  queueOutRetry: {
+    opacity: 0,
+    animationName: still("hp-out-retry"),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  queueReject: {
+    opacity: 0,
+    animationName: still("hp-x"),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  float: {
+    animationName: still(float),
+    animationDuration: "var(--float-ms)",
+    animationTimingFunction: "var(--inout)",
+    animationDelay: "var(--float-at)",
+    animationIterationCount: "infinite",
+    animationDirection: "alternate",
+    animationFillMode: "both",
+  },
+  snapSlip: {
+    animationName: still(slip),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  snapScan: {
+    opacity: 0,
+    animationName: still(scan),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  snapNeq: {
+    opacity: 0,
+    animationName: still(notEqual),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+  snapMark: {
+    opacity: 0,
+    animationName: still(mark),
+    animationDuration: SCENE,
+    animationFillMode: "both",
+  },
+});

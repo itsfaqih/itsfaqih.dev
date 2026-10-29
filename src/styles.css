@@ -1,7 +1,6 @@
 @import "./fonts.css";
 @import "lenis/dist/lenis.css";
 @import "./arcade.css";
-@import "./routes/-components/hero/hero-prints.css";
 
 /* Tailwind's preflight, which every page was laid out against. Layered so that any unlayered rule wins. */
 @layer base {

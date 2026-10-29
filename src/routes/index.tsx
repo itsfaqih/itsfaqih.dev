@@ -471,7 +471,7 @@ function Hero({ introDone }: { introDone: boolean }) {
         data-held={userPaused ? "" : undefined}
         style={{ "--c": current.color }}
       >
-        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} />
+        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} held={userPaused} />
         <div className="bench-ctl">
           <div className="pips" role="group" aria-label="What I build">
             {SLIDES.map((item, index) => (

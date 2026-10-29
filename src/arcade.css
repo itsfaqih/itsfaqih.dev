@@ -492,7 +492,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   flex-wrap: wrap;
 }
 
-/* Bench: the hero's screen and its slide controls (the card is in hero-prints.css) */
+/* Bench: the hero's screen and its slide controls (the card is in hero-prints.tsx) */
 .arc .bench {
   display: grid;
   gap: 12px;
@@ -666,6 +666,13 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
    The deck styles itself (rule-spread.tsx). @property registrations stay global: --glow must be a
    registered <color> so the glow behind the deck eases between hues. */
 @property --glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+/* The hero prints style themselves (hero-prints.tsx); --hue is registered for the same reason, so the
+   prints' ink eases to the next slide's colour. */
+@property --hue {
   syntax: "<color>";
   inherits: true;
   initial-value: transparent;
