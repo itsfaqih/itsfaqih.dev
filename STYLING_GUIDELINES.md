@@ -62,15 +62,16 @@ const styles = stylex.create({
 
 Use the semantic variables (`--bg`, `--text`, `--panel`, `--hair`, `--dim`) instead of duplicating colour values. The blog and code blocks read `--card`, `--border` and `--muted-foreground`, which keep the old site's greys in light mode.
 
-### 4. Keep Global CSS Focused
+### 4. Keep Global CSS to What StyleX Cannot Express
 
-Global CSS is appropriate for:
+Global CSS lives in `src/styles.css`, `src/arcade.css` and `src/fonts.css`, and every rule there carries a one-line comment saying why it is global. A rule belongs there only when:
 
-- colour-mode rules that key on the `.light` and `.dark` classes;
-- document-level resets and typography;
-- keyframes and page-wide backgrounds;
-- syntax-highlighter and third-party component overrides;
-- selector relationships that StyleX cannot express as an atomic rule. Style rendered Markdown through an MDX `components` map instead of descendant selectors.
+- it is an at-rule with no StyleX form: `@font-face`, `@property`, or the preflight's `@layer base`;
+- it styles `<html>` itself, a pseudo-element of it (the native scrollbar, view transitions), or a class or attribute a script sets on it, where no component renders a class;
+- it styles third-party markup that takes no class, such as the Lenis sheet;
+- it must reach every element under a root, such as the reduced-motion blanket.
+
+Everything else is StyleX, including keyframes, page backgrounds, and states keyed on a class a script sets on `<html>`, which a component reads with a condition such as `":is(.dark *)"` or `":is(.js.no-intro *)"`. When several files share a style, export it from a `stylex.create` module at their lowest common ancestor (`src/components/button.ts`, `src/routes/-components/section.ts`) and compose it first, before the caller's own styles. Style rendered Markdown through an MDX `components` map instead of descendant selectors.
 
 Do not add a new global utility class when a local StyleX rule can express the same style.
 
@@ -90,7 +91,7 @@ const styles = stylex.create({
 });
 ```
 
-When a state depends on a third-party component's data attribute, keep the selector in `src/styles.css` rather than introducing another styling dependency.
+When a state depends on a component's data attribute, key on it with a StyleX condition such as `":is([data-shown])"`, or `stylex.when.ancestor(...)` for a parent's attribute, rather than a global selector.
 
 ## Verification
 

@@ -146,6 +146,8 @@ src/
             └── card.tsx
 ```
 
+Shared StyleX styles follow the same rule: `src/components/button.ts` serves the whole site, while `src/routes/-components/section.ts` serves only the home page and the rule pages under `src/routes/`.
+
 ---
 
 ## Organizing by Type
