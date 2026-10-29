@@ -67,6 +67,8 @@ type RuleLandingProps = {
   /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
   take: string;
   className?: string;
+  /** Applied last to the row of cost tags under each lesson's panes. */
+  costsStyle?: stylex.StyleXStyles;
 };
 
 type Results = (number | null)[];
@@ -89,6 +91,7 @@ function Landing({
   quiz,
   take,
   className,
+  costsStyle,
 }: RuleLandingProps & { rule: PublishedGuideline }) {
   const rootRef = useRef<HTMLDivElement>(null);
   useReveal(rootRef);
@@ -184,7 +187,7 @@ function Landing({
           </div>
           <div className="lessons">
             {lessons.map((lesson) => (
-              <LessonCard key={lesson.title} lesson={lesson} />
+              <LessonCard key={lesson.title} lesson={lesson} costsStyle={costsStyle} />
             ))}
           </div>
           <div className="sheet-wrap" data-rev>
@@ -414,7 +417,7 @@ export function paintClasses(source: string, token: RegExp, kinds: readonly stri
   );
 }
 
-function LessonCard({ lesson }: { lesson: Lesson }) {
+function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: stylex.StyleXStyles }) {
   const cardRef = useRef<HTMLElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
   const placed = useRef(new Map<string, { x: number; y: number }>());
@@ -523,7 +526,7 @@ function LessonCard({ lesson }: { lesson: Lesson }) {
               {lesson[key].label}
             </figcaption>
             {lesson[key].view}
-            <div className="costs">
+            <div className={`costs ${stylex.props(costsStyle).className ?? ""}`.trim()}>
               {lesson[key].costs.map((cost) => (
                 <span key={cost}>{cost}</span>
               ))}

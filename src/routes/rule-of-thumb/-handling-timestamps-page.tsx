@@ -1,5 +1,7 @@
+import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
+import { fonts, palette } from "../../theme.stylex";
 import {
   type Lesson,
   type Level,
@@ -8,7 +10,304 @@ import {
   RuleLanding,
   TABBED,
 } from "./-components/rule-landing";
-import "./handling-timestamps.css";
+
+const PHONE = "@media (max-width: 640px)";
+const LIGHT = ":is(.light *)";
+
+const styles = stylex.create({
+  view: {
+    display: "grid",
+    gap: "14px",
+    alignContent: "start",
+  },
+  costs: {
+    alignContent: "end",
+  },
+  wire: {
+    display: "grid",
+    gap: "2px",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+  },
+  line: {
+    minHeight: "24px",
+    paddingBlock: "2px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    color: palette["--text"],
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  },
+  note: {
+    color: palette["--mute"],
+  },
+  hot: {
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "color-mix(in srgb, var(--no) 10%, transparent)",
+      [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
+    },
+    boxShadow: {
+      default: null,
+      [stylex.when.ancestor('[data-side="bad"]')]: "inset 2px 0 0 var(--no)",
+      [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
+    },
+  },
+  str: {
+    display: "inline-block",
+    maxWidth: "100%",
+    color: {
+      default: `color-mix(in oklab, ${palette["--ar"]} ${palette["--ink-mix"]}, #000)`,
+      [stylex.when.ancestor("[data-note]")]: "inherit",
+    },
+  },
+  readers: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(auto-fit, minmax(190px, 1fr))",
+      [PHONE]: "minmax(0, 1fr)",
+    },
+    gap: "10px",
+  },
+  reader: {
+    display: "grid",
+    gridTemplateColumns: "auto minmax(0, 1fr)",
+    rowGap: "4px",
+    columnGap: "12px",
+    alignItems: "center",
+    paddingBlock: "12px",
+    paddingInline: "12px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+  },
+  read: {
+    display: "grid",
+    minWidth: 0,
+  },
+  who: {
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  },
+  time: {
+    fontWeight: 700,
+    fontSize: { default: "20px", [PHONE]: "18px" },
+    lineHeight: 1.25,
+    fontFamily: fonts["--mono"],
+    letterSpacing: "-0.02em",
+    color: palette["--text"],
+  },
+  date: {
+    fontSize: "13px",
+    color: palette["--dim"],
+  },
+  should: {
+    marginTop: "2px",
+    fontSize: "12.5px",
+    fontWeight: 600,
+    color: "var(--yes-ink)",
+  },
+  off: {
+    color: "var(--no-ink)",
+  },
+  clock: {
+    position: "relative",
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    backgroundColor: "var(--code-bg)",
+    boxShadow: `inset 0 0 0 1.5px ${palette["--hair"]}`,
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: "3px",
+      right: "3px",
+      bottom: "3px",
+      left: "3px",
+      borderRadius: "50%",
+      backgroundImage: `repeating-conic-gradient(from -3deg, ${palette["--mute"]} 0 6deg, transparent 6deg 90deg)`,
+      maskImage: "radial-gradient(circle, transparent 17px, #000 17.5px)",
+    },
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: "calc(50% - 3px)",
+      right: "calc(50% - 3px)",
+      bottom: "calc(50% - 3px)",
+      left: "calc(50% - 3px)",
+      borderRadius: "50%",
+      backgroundColor: palette["--text"],
+    },
+  },
+  hand: {
+    position: "absolute",
+    bottom: "50%",
+    left: "calc(50% - 1.5px)",
+    width: "3px",
+    height: "13px",
+    borderRadius: "2px",
+    backgroundColor: palette["--text"],
+    transform: "rotate(var(--a))",
+    transformOrigin: "50% 100%",
+  },
+  minuteHand: {
+    left: "calc(50% - 1px)",
+    width: "2px",
+    height: "19px",
+    backgroundColor: palette["--dim"],
+  },
+  hourOff: {
+    backgroundColor: "var(--no-ink)",
+  },
+  ghost: {
+    backgroundColor: "var(--yes-ink)",
+    opacity: 0.5,
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: 1.4,
+    fontFamily: fonts["--mono"],
+  },
+  th: {
+    paddingBlock: "6px",
+    paddingInline: "8px",
+    borderBottomWidth: "1.5px",
+    borderBottomStyle: "solid",
+    borderBottomColor: palette["--hair"],
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+    textAlign: "left",
+  },
+  td: {
+    paddingBlock: "8px",
+    paddingInline: "8px",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: `color-mix(in srgb, ${palette["--hair"]} 60%, transparent)`,
+    color: palette["--text"],
+  },
+  at: {
+    whiteSpace: "nowrap",
+    color: { default: palette["--text"], [stylex.when.ancestor('[data-side="bad"]')]: "var(--no-ink)" },
+  },
+  sum: {
+    fontSize: "14px",
+    color: palette["--dim"],
+  },
+  form: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    alignItems: "center",
+  },
+  formHead: {
+    flexBasis: "100%",
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  },
+  input: {
+    minHeight: "38px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderWidth: "1.5px",
+    borderStyle: "solid",
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": palette["--hair-hover"],
+      ":focus-visible": "var(--c-ink)",
+    },
+    borderRadius: "10px",
+    backgroundColor: palette["--panel"],
+    fontStyle: "normal",
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    colorScheme: { default: "dark", [LIGHT]: "light" },
+    outlineWidth: { default: null, ":focus-visible": "2px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "2px" },
+    transition: "border-color var(--t-fb) ease",
+  },
+  orders: {
+    display: "grid",
+    gap: "4px",
+    paddingBlock: 0,
+    paddingInline: 0,
+    listStyle: "none",
+  },
+  order: {
+    display: "grid",
+    gridTemplateColumns: "auto minmax(0, 1fr) auto",
+    gap: "10px",
+    alignItems: "center",
+    minHeight: "40px",
+    paddingBlock: "4px",
+    paddingInline: "10px",
+    borderRadius: "8px",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: 1.3,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    transition: "opacity var(--t-fb) ease, background-color var(--t-fb) ease",
+  },
+  orderOut: {
+    opacity: 0.45,
+  },
+  orderShown: {
+    backgroundColor: "color-mix(in srgb, var(--c) 8%, transparent)",
+  },
+  orderWrong: {
+    backgroundColor: "color-mix(in srgb, var(--no) 8%, transparent)",
+    boxShadow: "inset 2px 0 0 var(--no)",
+  },
+  orderId: {
+    color: palette["--mute"],
+  },
+  when: {
+    display: "grid",
+  },
+  whenMissed: {
+    textDecorationLine: "line-through",
+    textDecorationColor: "color-mix(in srgb, var(--no) 60%, transparent)",
+  },
+  utc: {
+    fontSize: "11px",
+    color: palette["--mute"],
+  },
+  fate: {
+    paddingBlock: "2px",
+    paddingInline: "7px",
+    borderRadius: "6px",
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    whiteSpace: "nowrap",
+  },
+  fateShown: {
+    backgroundColor: "color-mix(in srgb, var(--yes) 18%, transparent)",
+    color: "var(--yes-ink)",
+  },
+  fateWrong: {
+    backgroundColor: "color-mix(in srgb, var(--no) 16%, transparent)",
+    color: "var(--no-ink)",
+  },
+});
 
 type Person = { who: string; city: string; tz: string };
 const RINA: Person = { who: "Rina", city: "Jakarta", tz: "Asia/Jakarta" };
@@ -171,29 +470,38 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
   }, [key]);
 
   return (
-    <div ref={ref} className="ts-readers">
+    <div ref={ref} {...stylex.props(styles.readers)}>
       {readings.map((reading) => {
         const off = offBy(reading);
         return (
-          <div key={reading.person.who} className="ts-reader" data-off={off ? "" : undefined}>
-            <span className="ts-clock" aria-hidden="true">
+          <div
+            key={reading.person.who}
+            className={`ts-reader ${stylex.props(styles.reader).className}`}
+          >
+            <span aria-hidden="true" {...stylex.props(styles.clock)}>
               {off && (
                 <i
-                  className="ts-hand ts-ghost"
+                  {...stylex.props(styles.hand, styles.ghost)}
                   style={{ "--a": `${hourAngle(reading.truth)}deg` }}
                 />
               )}
-              <i className="ts-hand ts-min" style={{ "--a": `${minuteAngle(reading.shown)}deg` }} />
-              <i className="ts-hand ts-hour" style={{ "--a": `${hourAngle(reading.shown)}deg` }} />
+              <i
+                className={`ts-min ${stylex.props(styles.hand, styles.minuteHand).className}`}
+                style={{ "--a": `${minuteAngle(reading.shown)}deg` }}
+              />
+              <i
+                className={`ts-hour ${stylex.props(styles.hand, off !== null && styles.hourOff).className}`}
+                style={{ "--a": `${hourAngle(reading.shown)}deg` }}
+              />
             </span>
-            <span className="ts-read">
-              <span className="ts-who">
+            <span {...stylex.props(styles.read)}>
+              <span {...stylex.props(styles.who)}>
                 {reading.person.who} · {reading.person.city}
               </span>
-              <b className="ts-time">{timeOf(reading.shown)}</b>
-              <span className="ts-date">{dayOf(reading.shown)}</span>
+              <b {...stylex.props(styles.time, off !== null && styles.off)}>{timeOf(reading.shown)}</b>
+              <span {...stylex.props(styles.date)}>{dayOf(reading.shown)}</span>
               {off && (
-                <span className="ts-should">
+                <span {...stylex.props(styles.should)}>
                   <span className="sr-only">{off}, </span>should be {timeOf(reading.truth)}
                 </span>
               )}
@@ -209,13 +517,17 @@ type Line = { c: ReactNode; hot?: boolean; note?: boolean };
 
 function Wire({ lines }: { lines: Line[] }) {
   return (
-    <div className="ts-wire">
+    <div {...stylex.props(styles.wire)}>
       {lines.map((line, index) => (
         <code
           key={index}
-          className="ts-ln"
-          data-hot={line.hot || undefined}
           data-note={line.note || undefined}
+          {...stylex.props(
+            styles.line,
+            line.note && styles.note,
+            line.hot && styles.hot,
+            stylex.defaultMarker(),
+          )}
         >
           {line.c}
         </code>
@@ -224,7 +536,7 @@ function Wire({ lines }: { lines: Line[] }) {
   );
 }
 
-const str = (text: string) => <span className="ts-str">"{text}"</span>;
+const str = (text: string) => <span {...stylex.props(styles.str)}>"{text}"</span>;
 
 type Way = "bad" | "good";
 
@@ -238,7 +550,7 @@ function OrdersTable({ way }: { way: Way }) {
   const first = rows[0]?.at ?? 0;
   const gap = ((rows[rows.length - 1]?.at ?? 0) - first) / HOUR;
   return (
-    <div className="ts-view">
+    <div {...stylex.props(styles.view)}>
       <Wire
         lines={[
           { c: "-- Rina and Sam order in the same second", note: true },
@@ -248,25 +560,31 @@ function OrdersTable({ way }: { way: Way }) {
           },
         ]}
       />
-      <table className="ts-table">
+      <table {...stylex.props(styles.table)}>
         <thead>
           <tr>
-            <th scope="col">id</th>
-            <th scope="col">by</th>
-            <th scope="col">created_at</th>
+            <th scope="col" {...stylex.props(styles.th)}>
+              id
+            </th>
+            <th scope="col" {...stylex.props(styles.th)}>
+              by
+            </th>
+            <th scope="col" {...stylex.props(styles.th)}>
+              created_at
+            </th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>{row.id}</td>
-              <td>{row.by.who}</td>
-              <td className="ts-at">{digits(row.at).replace("T", " ")}</td>
+              <td {...stylex.props(styles.td)}>{row.id}</td>
+              <td {...stylex.props(styles.td)}>{row.by.who}</td>
+              <td {...stylex.props(styles.td, styles.at)}>{digits(row.at).replace("T", " ")}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="ts-sum" data-tone={gap ? "no" : "yes"}>
+      <p {...stylex.props(styles.sum)}>
         {gap ? `One second, stored ${gap} h apart.` : "One second, one value."}
       </p>
     </div>
@@ -284,9 +602,9 @@ function ReminderDemo({ way }: { way: Way }) {
   const stored = way === "bad" ? wall : meant;
   const id = `ts-${way}`;
   return (
-    <div className="ts-view">
-      <div className="ts-form">
-        <span className="ts-form-head">New reminder · Rina, Jakarta</span>
+    <div {...stylex.props(styles.view)}>
+      <div {...stylex.props(styles.form)}>
+        <span {...stylex.props(styles.formHead)}>New reminder · Rina, Jakarta</span>
         <label htmlFor={`${id}-date`} className="sr-only">
           Date
         </label>
@@ -296,6 +614,7 @@ function ReminderDemo({ way }: { way: Way }) {
           value={date}
           required
           onChange={(event) => setDate(event.target.value)}
+          {...stylex.props(styles.input)}
         />
         <label htmlFor={`${id}-time`} className="sr-only">
           Time
@@ -306,6 +625,7 @@ function ReminderDemo({ way }: { way: Way }) {
           value={time}
           required
           onChange={(event) => setTime(event.target.value)}
+          {...stylex.props(styles.input)}
         />
       </div>
       <Wire
@@ -353,14 +673,15 @@ function FilterDemo({ way }: { way: Way }) {
     return { id: 51 + index, wall, instant, fate };
   });
   return (
-    <div className="ts-view">
-      <label className="ts-form">
-        <span className="ts-form-head">Rina's orders on</span>
+    <div {...stylex.props(styles.view)}>
+      <label {...stylex.props(styles.form)}>
+        <span {...stylex.props(styles.formHead)}>Rina's orders on</span>
         <input
           type="date"
           value={date}
           required
           onChange={(event) => setDate(event.target.value)}
+          {...stylex.props(styles.input)}
         />
       </label>
       <Wire
@@ -378,19 +699,40 @@ function FilterDemo({ way }: { way: Way }) {
               ]
         }
       />
-      <ul className="ts-orders">
-        {orders.map((order) => (
-          <li key={order.id} data-fate={order.fate}>
-            <span className="ts-oid">#{order.id}</span>
-            <span className="ts-when">
-              {shortDay(order.wall)}, {timeOf(order.wall)}
-              <small>
-                {shortDay(order.instant)}, {hhmm(order.instant)} UTC
-              </small>
-            </span>
-            {FATE[order.fate] && <span className="ts-fate">{FATE[order.fate]}</span>}
-          </li>
-        ))}
+      <ul {...stylex.props(styles.orders)}>
+        {orders.map((order) => {
+          const wrong = order.fate === "missed" || order.fate === "extra";
+          return (
+            <li
+              key={order.id}
+              {...stylex.props(
+                styles.order,
+                order.fate === "out" && styles.orderOut,
+                order.fate === "shown" && styles.orderShown,
+                wrong && styles.orderWrong,
+              )}
+            >
+              <span {...stylex.props(styles.orderId)}>#{order.id}</span>
+              <span {...stylex.props(styles.when, order.fate === "missed" && styles.whenMissed)}>
+                {shortDay(order.wall)}, {timeOf(order.wall)}
+                <small {...stylex.props(styles.utc)}>
+                  {shortDay(order.instant)}, {hhmm(order.instant)} UTC
+                </small>
+              </span>
+              {FATE[order.fate] && (
+                <span
+                  {...stylex.props(
+                    styles.fate,
+                    order.fate === "shown" && styles.fateShown,
+                    wrong && styles.fateWrong,
+                  )}
+                >
+                  {FATE[order.fate]}
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -452,7 +794,7 @@ const LESSONS: Lesson[] = [
       label: "No Z",
       costs: ["Rina 7 h early", "Sam 5 h late"],
       view: (
-        <div className="ts-view">
+        <div {...stylex.props(styles.view)}>
           <Wire
             lines={[
               { c: "GET /orders/41" },
@@ -467,7 +809,7 @@ const LESSONS: Lesson[] = [
       label: "Ends in Z",
       costs: ["0 h off"],
       view: (
-        <div className="ts-view">
+        <div {...stylex.props(styles.view)}>
           <Wire
             lines={[
               { c: "GET /orders/41" },
@@ -491,7 +833,7 @@ const LESSONS: Lesson[] = [
       label: "Server time",
       costs: ["right for 1 of 2", "Rina 12 h off"],
       view: (
-        <div className="ts-view">
+        <div {...stylex.props(styles.view)}>
           <Wire
             lines={[
               { c: "// the API, running in New York", note: true },
@@ -507,7 +849,7 @@ const LESSONS: Lesson[] = [
       label: "Viewer's time",
       costs: ["right for 2 of 2"],
       view: (
-        <div className="ts-view">
+        <div {...stylex.props(styles.view)}>
           <Wire
             lines={[
               { c: "// in each reader's browser", note: true },
@@ -751,6 +1093,7 @@ export function HandlingTimestamps() {
   return (
     <RuleLanding
       className="handling-timestamps"
+      costsStyle={styles.costs}
       lead={
         <>
           Five steps a timestamp takes, each with the wrong way and the right one side by side,
