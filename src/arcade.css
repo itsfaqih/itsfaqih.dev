@@ -57,8 +57,8 @@ html {
   cursor: var(--cursor-text);
 }
 
-/* The print cursor (components/print-cursor.tsx) draws the shape itself. Each token becomes a
-   blank image whose fragment names that shape, so it can read the cursor an element asks for. */
+/* print-cursor.tsx sets html.cur-on and draws the shape itself, so every element's cursor token
+   becomes a blank image whose fragment names that shape, for the cursor to read back. */
 html.cur-on {
   --cursor: url("/cursors/none.svg#arrow") 0 0, none;
   --cursor-point: url("/cursors/none.svg#point") 0 0, none;
@@ -66,51 +66,6 @@ html.cur-on {
   --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
   --cursor-text: url("/cursors/none.svg#text") 0 0, none;
 }
-.print-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2147483647;
-  pointer-events: none;
-  visibility: hidden;
-  --pc-hue: var(--go);
-}
-.print-cursor.on:not([data-mode="native"]) {
-  visibility: visible;
-}
-.print-cursor svg {
-  position: absolute;
-  top: -24px;
-  left: -24px;
-  width: 48px;
-  height: 48px;
-  overflow: visible;
-}
-.print-cursor :is(.pc-ink, .pc-fill, .pc-plate path) {
-  shape-rendering: crispEdges;
-}
-/* Every glyph is solid: black on light, white on dark, edged in the page colour. */
-.print-cursor .pc-ink {
-  fill: var(--bg);
-}
-.print-cursor .pc-fill {
-  fill: var(--text);
-}
-.print-cursor circle {
-  fill: var(--pc-hue);
-  transition: fill 180ms ease;
-}
-.print-cursor .pc-body {
-  transform-box: view-box;
-  transform-origin: 24px 24px;
-  transition: transform 260ms var(--snap);
-}
-.print-cursor.down .pc-body {
-  transform: scale(0.88);
-  transition-duration: 15ms;
-  transition-timing-function: linear;
-}
-
 /* page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
 html.sb-own {
   scrollbar-width: none;

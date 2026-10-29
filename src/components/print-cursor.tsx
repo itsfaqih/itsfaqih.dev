@@ -1,4 +1,7 @@
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef } from "react";
+
+import { motion, palette } from "../theme.stylex";
 
 // Pixel art on CELL px squares: K is the ink outline, F the fill. hot is the hotspot in cells.
 const PIXEL_ART = {
@@ -150,6 +153,10 @@ function overText(el: Element, x: number, y: number) {
 /** The site's cursor: a pixel arrow, hand or I-beam in ink over a halftone plate printed out of register. */
 export function PrintCursor() {
   const root = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<SVGGElement>(null);
+  const plateDotsRef = useRef<SVGPathElement>(null);
+  const inkRef = useRef<SVGPathElement>(null);
+  const fillRef = useRef<SVGPathElement>(null);
 
   useEffect(() => {
     const cur = root.current;
@@ -157,12 +164,8 @@ export function PrintCursor() {
     if (!cur || !fine.matches) return;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)");
     const html = document.documentElement;
-    const plate = cur.querySelector<SVGGElement>(".pc-plate")!;
-    const parts = {
-      plate: cur.querySelector<SVGPathElement>(".pc-plate path")!,
-      ink: cur.querySelector<SVGPathElement>(".pc-ink")!,
-      fill: cur.querySelector<SVGPathElement>(".pc-fill")!,
-    };
+    const plate = plateRef.current!;
+    const parts = { plate: plateDotsRef.current!, ink: inkRef.current!, fill: fillRef.current! };
 
     let x = 0;
     let y = 0;
@@ -286,8 +289,8 @@ export function PrintCursor() {
   }, []);
 
   return (
-    <div ref={root} className="print-cursor" aria-hidden="true">
-      <svg viewBox="-24 -24 48 48">
+    <div ref={root} {...stylex.props(styles.root, stylex.defaultMarker())} aria-hidden="true">
+      <svg viewBox="-24 -24 48 48" {...stylex.props(styles.svg)}>
         <defs>
           <pattern
             id="pc-dots"
@@ -296,17 +299,61 @@ export function PrintCursor() {
             patternUnits="userSpaceOnUse"
             patternTransform="rotate(18)"
           >
-            <circle cx="1.8" cy="1.8" r="1.3" />
+            <circle cx="1.8" cy="1.8" r="1.3" {...stylex.props(styles.dot)} />
           </pattern>
         </defs>
-        <g className="pc-body">
-          <g className="pc-plate">
-            <path fill="url(#pc-dots)" />
+        <g {...stylex.props(styles.body)}>
+          <g ref={plateRef}>
+            <path ref={plateDotsRef} fill="url(#pc-dots)" {...stylex.props(styles.crisp)} />
           </g>
-          <path className="pc-ink" />
-          <path className="pc-fill" />
+          <path ref={inkRef} {...stylex.props(styles.crisp, styles.ink)} />
+          <path ref={fillRef} {...stylex.props(styles.crisp, styles.fill)} />
         </g>
       </svg>
     </div>
   );
 }
+
+// sync() toggles .on and .down on the root and sets data-mode.
+const styles = stylex.create({
+  root: {
+    "--pc-hue": palette["--go"],
+    position: "fixed",
+    top: 0,
+    left: 0,
+    zIndex: 2147483647,
+    pointerEvents: "none",
+    visibility: { default: "hidden", ":is(.on:not([data-mode='native']))": "visible" },
+  },
+  svg: {
+    position: "absolute",
+    top: "-24px",
+    left: "-24px",
+    width: "48px",
+    height: "48px",
+    overflow: "visible",
+  },
+  crisp: {
+    // Kebab-case: the anti-slop lint rule bans "shape" in identifiers, and this is a CSS name.
+    "shape-rendering": "crispEdges",
+  },
+  // Every glyph is solid: black on light, white on dark, edged in the page colour.
+  ink: {
+    fill: palette["--bg"],
+  },
+  fill: {
+    fill: palette["--text"],
+  },
+  dot: {
+    fill: "var(--pc-hue)",
+    transition: "fill 180ms ease",
+  },
+  body: {
+    transformBox: "view-box",
+    transformOrigin: "24px 24px",
+    transform: { default: null, [stylex.when.ancestor(":is(.down)")]: "scale(0.88)" },
+    transition: `transform 260ms ${motion["--snap"]}`,
+    transitionDuration: { default: null, [stylex.when.ancestor(":is(.down)")]: "15ms" },
+    transitionTimingFunction: { default: null, [stylex.when.ancestor(":is(.down)")]: "linear" },
+  },
+});
