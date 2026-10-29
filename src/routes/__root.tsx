@@ -132,10 +132,14 @@ const styles = stylex.create({
   },
   html: {
     scrollBehavior: "smooth",
+    // Anchored sections land below the fixed header bar.
+    scrollPaddingTop: "88px",
   },
   body: {
     position: "relative",
     minHeight: "100vh",
+    // Room for the fixed header bar.
+    paddingTop: "72px",
     WebkitFontSmoothing: "antialiased",
     MozOsxFontSmoothing: "grayscale",
     color: palette["--text"],

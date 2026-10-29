@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { ArrowLeftIcon, CheckIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
@@ -22,10 +23,10 @@ import type { PublishedGuideline } from "../../../data/guidelines";
 import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
 import "./rule-landing.css";
 import { reducedMotion } from "../../../hooks/use-media-query";
+import { cursors, motion, palette } from "../../../theme.stylex";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
-
 
 type Side = { label: string; view: ReactNode; costs: string[] };
 export type Lesson = {
@@ -123,17 +124,21 @@ function Landing({
     >
       <div className="grid-ground" aria-hidden="true" />
       <IslandActivity>
-        <span className="act-in" style={hue}>
-          <Link to="/rule-of-thumb" className="act-back">
+        <span {...stylex.props(styles.activity)} style={hue}>
+          <Link to="/rule-of-thumb" {...stylex.props(styles.action, styles.back)}>
             <ArrowLeftIcon size={16} weight="bold" aria-hidden="true" />
-            <span className="act-txt">All rules</span>
+            <span {...stylex.props(styles.backText)}>All rules</span>
           </Link>
-          <span className="act-label">
-            <span className="tags">
+          <span {...stylex.props(styles.label, stylex.defaultMarker())}>
+            <span {...stylex.props(styles.labelPart, styles.tags)}>
               {number && <span>No.{number}</span>}
               <span>{rule.label}</span>
             </span>
-            <span ref={setSlot} className="title" aria-hidden="true">
+            <span
+              ref={setSlot}
+              aria-hidden="true"
+              {...stylex.props(styles.labelPart, styles.title)}
+            >
               {head && `${head} `}
               <span className="hl">{last}</span>
             </span>
@@ -870,7 +875,7 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   const label = copied ? "Link copied" : "Share";
   if (inIsland) {
     return (
-      <button type="button" className="act-btn" onClick={share}>
+      <button type="button" onClick={share} {...stylex.props(styles.action)}>
         {copied ? (
           <CheckIcon size={16} weight="bold" aria-hidden="true" />
         ) : (
@@ -924,7 +929,7 @@ function useTitleDock(
   useLayoutEffect(() => {
     const root = rootRef.current;
     const title = titleRef.current;
-    const label = slot?.closest<HTMLElement>(".act-label");
+    const label = slot?.parentElement;
     if (!root || !title || !slot || !label) return;
     const flies = CSS.supports("animation-timeline: scroll()") && !reducedMotion();
     let land = Infinity;
@@ -1026,3 +1031,108 @@ function useReveal(rootRef: RefObject<HTMLElement | null>) {
     return () => observer.disconnect();
   }, [rootRef]);
 }
+
+const PHONE = "@media (max-width: 640px)";
+const NARROW = "@media (max-width: 480px)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
+// The live activity this page lends the header island: a back link, a label that trades the
+// page's tags for its title once the heading docks (useTitleDock sets data-swap), and Share.
+const styles = stylex.create({
+  activity: {
+    display: "flex",
+    alignItems: "center",
+    gap: "2px",
+  },
+  action: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    height: "36px",
+    minWidth: "36px",
+    padding: "0 10px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "999px",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+    },
+    // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
+    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
+    backgroundPosition: {
+      default: "0 0",
+      ":hover": { default: null, "@media (hover: hover)": "initial" },
+    },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    font: "inherit",
+    whiteSpace: "nowrap",
+    cursor: cursors["--cursor-point"],
+    outline: { default: null, ":focus-visible": `2px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-visible": "-2px" },
+    transition: "background-color 120ms ease, color 120ms ease",
+  },
+  // Phones: the back link keeps its name for screen readers and shows only the arrow.
+  back: {
+    padding: { default: "0 10px", [PHONE]: 0 },
+  },
+  backText: {
+    position: { default: null, [PHONE]: "absolute" },
+    width: { default: null, [PHONE]: "1px" },
+    height: { default: null, [PHONE]: "1px" },
+    overflow: { default: null, [PHONE]: "hidden" },
+    clipPath: { default: null, [PHONE]: "inset(50%)" },
+    whiteSpace: { default: null, [PHONE]: "nowrap" },
+  },
+  // A long rule title would push the island past the screen on narrow phones: the label takes what
+  // is left after the back link, Share, the tools, the menu and the island's padding, and ends in an
+  // ellipsis. compactBox reads the capped width, so the title still docks onto it.
+  label: {
+    display: "grid",
+    maxWidth: { default: null, [NARROW]: "calc(100vw - 206px)" },
+    padding: { default: "0 8px", [NARROW]: "0 4px" },
+    whiteSpace: "nowrap",
+  },
+  labelPart: {
+    gridArea: "1 / 1",
+    alignSelf: "center",
+    minWidth: { default: null, [NARROW]: 0 },
+    overflow: { default: null, [NARROW]: "hidden" },
+    textOverflow: { default: null, [NARROW]: "ellipsis" },
+    transition: `opacity 200ms ${motion["--out"]}, filter 200ms ${motion["--out"]}, translate 200ms ${motion["--out"]}`,
+  },
+  tags: {
+    display: "flex",
+    gap: "8px",
+    color: palette["--mute"],
+    opacity: { default: null, [stylex.when.ancestor("[data-swap]")]: 0 },
+    filter: {
+      default: null,
+      [stylex.when.ancestor("[data-swap]")]: { default: "blur(2px)", [REDUCE]: "none" },
+    },
+    translate: {
+      default: null,
+      [stylex.when.ancestor("[data-swap]")]: { default: "0 -6px", [REDUCE]: "none" },
+    },
+  },
+  title: {
+    fontWeight: 900,
+    fontSize: "0.875rem",
+    opacity: { default: 0, [stylex.when.ancestor("[data-swap]")]: 1 },
+    filter: {
+      default: "blur(2px)",
+      [stylex.when.ancestor("[data-swap]")]: "none",
+      [REDUCE]: "none",
+    },
+    translate: {
+      default: "0 6px",
+      [stylex.when.ancestor("[data-swap]")]: { default: "0 0", [REDUCE]: "none" },
+      [REDUCE]: "none",
+    },
+  },
+});

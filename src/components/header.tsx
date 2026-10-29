@@ -1,8 +1,10 @@
+import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { useTheme } from "../hooks/use-theme";
+import { cursors, fonts, motion, palette } from "../theme.stylex";
 
 let activityHost: HTMLElement | null = null;
 let activityCount = 0;
@@ -59,20 +61,22 @@ export function compactBox(element: HTMLElement) {
 type SegProps = {
   on: boolean;
   compact?: "idle" | "live" | "always";
-  className?: string;
+  style?: stylex.StyleXStyles;
+  rowStyle?: stylex.StyleXStyles;
   children: ReactNode;
 };
 
-function Seg({ on, compact, className, children }: SegProps) {
+function Seg({ on, compact, style, rowStyle, children }: SegProps) {
   return (
     <div
-      className={className ? `seg ${className}` : "seg"}
-      data-on={on || undefined}
+      {...stylex.props(styles.seg, on && styles.segOn, style)}
       data-compact={compact}
       inert={!on}
     >
-      <div className="clip">
-        <div className="row">{children}</div>
+      <div {...stylex.props(styles.clip)}>
+        <div className={`row ${stylex.props(styles.row, on && styles.rowOn, rowStyle).className}`}>
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -133,31 +137,39 @@ export function Header() {
 
   return (
     <div
-      className="arc arc-bar"
+      className={`arc arc-bar ${stylex.props(styles.bar).className}`}
       data-scrolled={scrolled ? "" : undefined}
       data-mode={compact ? "compact" : "full"}
       data-open={open || undefined}
     >
       <header
         ref={islandRef}
-        className="arc-header island"
+        className={`island ${stylex.props(styles.island).className}`}
         onClick={(event) => {
           if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
         }}
       >
-        <Seg on={full || !live} compact="idle" className="home">
-          <Link to="/" className="brand" aria-label="Faqih Muntashir, home">
+        <Seg
+          on={full || !live}
+          compact="idle"
+          style={open && styles.homeFolded}
+          rowStyle={open && styles.homeFoldedRow}
+        >
+          <Link
+            to="/"
+            aria-label="Faqih Muntashir, home"
+            {...stylex.props(styles.brand, styles.ring)}
+          >
             FAQIH
           </Link>
         </Seg>
-        <Seg on={full} className="hide-sm">
-          <span className="where">
+        <Seg on={full} style={styles.wideOnlySeg}>
+          <span {...stylex.props(styles.where)}>
             Yogyakarta · <JakartaClock />
           </span>
         </Seg>
-        <Seg on={compact && live} compact="live" className="activity">
+        <Seg on={compact && live} compact="live">
           <div
-            className="act"
             ref={(node) => {
               activityHost = node;
               emit();
@@ -169,43 +181,61 @@ export function Header() {
           />
         </Seg>
         <Seg on={full}>
-          <nav aria-label="Main">
-            <Link to="/rule-of-thumb" activeProps={{ "aria-current": "page" }}>
+          <nav aria-label="Main" {...stylex.props(styles.nav)}>
+            <Link
+              to="/rule-of-thumb"
+              activeProps={{ "aria-current": "page" }}
+              {...stylex.props(styles.navLink, styles.ring)}
+            >
               Rule of Thumb
             </Link>
-            <Link to="/" hash="work" className="hide-sm" activeOptions={{ includeHash: true }}>
+            <Link
+              to="/"
+              hash="work"
+              activeOptions={{ includeHash: true }}
+              {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
+            >
               Experience
             </Link>
-            <Link to="/" hash="projects" className="hide-sm" activeOptions={{ includeHash: true }}>
+            <Link
+              to="/"
+              hash="projects"
+              activeOptions={{ includeHash: true }}
+              {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
+            >
               Projects
             </Link>
           </nav>
         </Seg>
-        <Seg on compact="always" className="tools">
+        <Seg on compact="always" style={styles.toolsSeg}>
           <button
             type="button"
-            className="find"
             onClick={openCommandPalette}
             aria-label="Search the site"
+            {...stylex.props(styles.find, styles.ring)}
           >
             <MagnifyingGlassIcon size={16} weight="bold" />
-            <kbd className="hide-sm">⌘K</kbd>
+            <kbd {...stylex.props(styles.findKey, styles.wideOnly)}>⌘K</kbd>
           </button>
           <button
             type="button"
-            className="find theme"
             onClick={(event) => {
               const box = event.currentTarget.getBoundingClientRect();
               toggleTheme({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
             }}
             aria-label="Switch theme"
+            {...stylex.props(styles.find, styles.ring, styles.iconButton)}
           >
-            <SunIcon className="to-light" size={16} weight="bold" />
-            <MoonIcon className="to-dark" size={16} weight="bold" />
+            <SunIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.sunInLight)} />
+            <MoonIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.moonInDark)} />
           </button>
         </Seg>
-        <Seg on={full} className="connect">
-          <Link to="/" hash="contact" className="btn go sm">
+        <Seg on={full} style={styles.connectSeg} rowStyle={styles.connectRow}>
+          <Link
+            to="/"
+            hash="contact"
+            className={`btn go sm ${stylex.props(styles.connect).className}`}
+          >
             Connect
           </Link>
         </Seg>
@@ -213,13 +243,21 @@ export function Header() {
           <button
             ref={toggleRef}
             type="button"
-            className="find menu"
+            className={`find menu ${stylex.props(styles.find, styles.ring, styles.iconButton, styles.menu).className}`}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((value) => !value)}
           >
-            <ListIcon className="to-open" size={16} weight="bold" />
-            <XIcon className="to-close" size={16} weight="bold" />
+            <ListIcon
+              size={16}
+              weight="bold"
+              {...stylex.props(styles.glyph, open && styles.turnedRight)}
+            />
+            <XIcon
+              size={16}
+              weight="bold"
+              {...stylex.props(styles.glyph, !open && styles.turnedLeft)}
+            />
           </button>
         </Seg>
       </header>
@@ -244,3 +282,284 @@ function JakartaClock() {
 
   return <time>{time}</time>;
 }
+
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const TABLET = "@media (max-width: 960px)";
+const PHONE = "@media (max-width: 640px)";
+const NARROW = "@media (max-width: 480px)";
+const TINY = "@media (max-width: 380px)";
+const DARK = ":is(.dark *)";
+const LIGHT = ":is(.light *)";
+// The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
+const READY = ":is(.js.no-intro *)";
+const WAITING = ":is(.js:not(.no-intro) *)";
+
+// A sampled spring (damping 0.72), about 4% past and back.
+const SPRING =
+  "linear(0, 0.034, 0.12, 0.234, 0.359, 0.484, 0.601, 0.705, 0.793, 0.865, 0.922, 0.965, 0.996, 1.017, 1.03, 1.036, 1.038, 1.037, 1.034, 1.03, 1.025, 1.02, 1.016, 1.012, 1.008, 1.005, 1.003, 1.001, 1, 0.999, 0.999, 0.999, 0.999)";
+const FOLD = "560ms";
+
+// The island drops in on the page's first frame, a touch small, and settles on the spring.
+const islandIn = stylex.keyframes({
+  from: { opacity: 0, scale: 0.82 },
+});
+
+const ROW_IN = `opacity 240ms ${motion["--out"]} 40ms, filter 260ms ${motion["--out"]} 40ms`;
+const ROW_OUT = "opacity 120ms ease, filter 120ms ease";
+
+// A black capsule that floats over every page. At the top it holds the whole nav; once the page
+// scrolls it folds to the brand, or to the live activity a page lends it (IslandActivity), beside
+// search and the theme switch, and a menu button unfolds it again. Each part folds its own column
+// from 1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the parts
+// blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
+// over the dark one, so it is always the one shape that stands apart from the page.
+const styles = stylex.create({
+  // A clear strip at the top of every page that only centres the island; presses pass through it
+  // everywhere but the island itself.
+  bar: {
+    position: "fixed",
+    inset: "12px 0 auto",
+    zIndex: 50,
+    display: "flex",
+    justifyContent: "center",
+    padding: "0 12px",
+    pointerEvents: "none",
+  },
+  island: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    height: "48px",
+    maxWidth: "100%",
+    padding: { default: "0 10px", [NARROW]: "0 6px" },
+    borderRadius: "999px",
+    font: `500 13px ${fonts["--display"]}`,
+    pointerEvents: "auto",
+    backgroundColor: { default: "#0a0a0c", [DARK]: "#fff" },
+    boxShadow: {
+      default: "inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 28px -12px rgb(0 0 0 / 0.55)",
+      [DARK]: "inset 0 0 0 1px rgb(0 0 0 / 0.06), 0 10px 28px -12px rgb(0 0 0 / 0.7)",
+    },
+    // The island's own ground, so everything inside reads light on black (dark on white).
+    "--text": { default: "#fff", [DARK]: "#0a0a0c" },
+    "--dim": { default: "rgb(255 255 255 / 0.66)", [DARK]: "rgb(10 10 12 / 0.68)" },
+    "--mute": { default: "rgb(255 255 255 / 0.46)", [DARK]: "rgb(10 10 12 / 0.5)" },
+    "--hair": { default: "rgb(255 255 255 / 0.18)", [DARK]: "rgb(10 10 12 / 0.16)" },
+    "--panel-2": { default: "rgb(255 255 255 / 0.1)", [DARK]: "rgb(10 10 12 / 0.07)" },
+    "--focus": {
+      default: palette["--go"],
+      [DARK]: `color-mix(in oklab, ${palette["--go"]} 45%, #000)`,
+    },
+    color: palette["--text"],
+    opacity: { default: null, [WAITING]: 0 },
+    animationName: { default: null, [READY]: { default: islandIn, [REDUCE]: "fade-in" } },
+    animationDuration: { default: null, [READY]: { default: FOLD, [REDUCE]: "240ms" } },
+    animationTimingFunction: { default: null, [READY]: { default: SPRING, [REDUCE]: "ease" } },
+    animationFillMode: { default: null, [READY]: "backwards" },
+  },
+  // Each part boots like a corrupted game frame once the page is ready (see the Load-in section of
+  // arcade.css), staggered across the island, with neighbours on alternating slice patterns.
+  // Reduced motion only fades them in; its !important outranks the reset `.arc *` applies there.
+  seg: {
+    display: "grid",
+    gridTemplateColumns: "0fr",
+    transition: { default: `grid-template-columns ${FOLD} ${SPRING}`, [REDUCE]: "none" },
+    opacity: { default: null, [WAITING]: 0 },
+    animationName: {
+      default: null,
+      [READY]: {
+        default: "glitch-in",
+        ":nth-child(2n)": "glitch-in-alt",
+        [REDUCE]: "fade-in !important",
+      },
+    },
+    animationDuration: {
+      default: null,
+      [READY]: { default: "560ms", [REDUCE]: "240ms !important" },
+    },
+    animationTimingFunction: {
+      default: null,
+      [READY]: { default: "steps(1, end)", [REDUCE]: "ease !important" },
+    },
+    animationDelay: {
+      default: null,
+      [READY]: {
+        default: "0ms",
+        ":nth-child(2)": "40ms",
+        ":nth-child(3)": "80ms",
+        ":nth-child(4)": "120ms",
+        ":nth-child(5)": "160ms",
+        ":nth-child(6)": "200ms",
+        [REDUCE]: "0s !important",
+      },
+    },
+    animationFillMode: {
+      default: null,
+      [READY]: { default: "backwards", [REDUCE]: "backwards !important" },
+    },
+  },
+  segOn: {
+    gridTemplateColumns: "1fr",
+  },
+  // Clips sideways only, so the button's press and the focus ring keep their height.
+  clip: {
+    minWidth: 0,
+    overflowX: "clip",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    gap: "2px",
+    width: "max-content",
+    padding: { default: "0 4px", [PHONE]: "0 2px", [NARROW]: 0 },
+    opacity: 0,
+    filter: { default: "blur(4px)", [REDUCE]: "none" },
+    transition: ROW_OUT,
+  },
+  rowOn: {
+    opacity: 1,
+    filter: "none",
+    transition: ROW_IN,
+  },
+  // Narrow phones: the open menu has no room for the brand as well as the close button.
+  homeFolded: {
+    gridTemplateColumns: { default: "1fr", [NARROW]: "0fr" },
+  },
+  homeFoldedRow: {
+    opacity: { default: 1, [NARROW]: 0 },
+    filter: { default: "none", [NARROW]: { default: "blur(4px)", [REDUCE]: "none" } },
+    visibility: { default: null, [NARROW]: "hidden" },
+    transition: { default: ROW_IN, [NARROW]: `${ROW_OUT}, visibility 0s 120ms` },
+  },
+  wideOnlySeg: {
+    display: { default: "grid", [TABLET]: "none" },
+  },
+  wideOnly: {
+    display: { default: null, [TABLET]: "none" },
+  },
+  // Unlike the folding segments, the tools sit in a flex row, and the 12px bottom margin lifts the
+  // buttons 6px within the island.
+  toolsSeg: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: "10px",
+    marginBottom: "12px",
+  },
+  // Narrow phones: the hero's contact button sits right below, so the island drops its copy.
+  connectSeg: {
+    display: { default: "grid", [TINY]: "none" },
+  },
+  connectRow: {
+    paddingLeft: { default: "8px", [NARROW]: "4px" },
+  },
+  connect: {
+    flex: "none",
+    whiteSpace: "nowrap",
+    borderRadius: "999px",
+    paddingInline: { default: null, [TABLET]: "12px" },
+  },
+  ring: {
+    outline: { default: null, ":focus-visible": `2px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-visible": "-2px" },
+  },
+  brand: {
+    padding: { default: "0 8px 0 12px", [PHONE]: "0 6px 0 10px", [NARROW]: "0 4px 0 10px" },
+    fontWeight: 900,
+    color: palette["--text"],
+  },
+  where: {
+    padding: "0 8px",
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+    fontVariantNumeric: "tabular-nums",
+  },
+  nav: {
+    display: "flex",
+    gap: "2px",
+  },
+  navLink: {
+    whiteSpace: "nowrap",
+    padding: { default: "8px 12px", [TABLET]: "8px" },
+    borderRadius: "999px",
+    backgroundColor: {
+      default: null,
+      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+      ":is([aria-current='page'])": palette["--panel-2"],
+    },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":is([aria-current='page'])": palette["--text"],
+    },
+    transition: "background-color 120ms ease, color 120ms ease",
+  },
+  find: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    whiteSpace: "nowrap",
+    // The compact island holds the activity beside search, theme and menu; on narrow phones these
+    // keep it inside the screen.
+    padding: { default: "8px 12px", [TABLET]: "8px", [NARROW]: "8px 6px" },
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "999px",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+    },
+    // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
+    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
+    backgroundPosition: {
+      default: "0 0",
+      ":hover": { default: null, "@media (hover: hover)": "initial" },
+    },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+    },
+    font: "inherit",
+    cursor: cursors["--cursor-point"],
+    transition: "background-color 120ms ease, color 120ms ease",
+  },
+  findKey: {
+    padding: "1px 6px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "6px",
+    font: `500 11px ${fonts["--display"]}`,
+  },
+  // Both icons share one cell; the outgoing one turns away as the incoming one turns in.
+  iconButton: {
+    display: "inline-grid",
+    placeItems: "center",
+  },
+  menu: {
+    width: "36px",
+    height: "36px",
+    padding: { default: 0, [NARROW]: "8px 6px" },
+  },
+  glyph: {
+    gridArea: "1 / 1",
+    transition: `opacity 200ms ${motion["--out"]}, transform 200ms ${motion["--out"]}`,
+  },
+  sunInLight: {
+    opacity: { default: null, [LIGHT]: 0 },
+    transform: { default: null, [LIGHT]: "rotate(90deg) scale(0.6)" },
+  },
+  moonInDark: {
+    opacity: { default: null, [DARK]: 0 },
+    transform: { default: null, [DARK]: "rotate(-90deg) scale(0.6)" },
+  },
+  turnedRight: {
+    opacity: 0,
+    transform: "rotate(90deg) scale(0.6)",
+  },
+  turnedLeft: {
+    opacity: 0,
+    transform: "rotate(-90deg) scale(0.6)",
+  },
+});

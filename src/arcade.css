@@ -1,4 +1,4 @@
-/* Arcade theme: the home page, the Rule of Thumb index, and the site header.
+/* Arcade theme: the home page and the Rule of Thumb index.
    Selector-heavy motion (parent states, staggered keyframes) lives here because
    StyleX cannot express it as atomic rules. Everything is scoped under .arc. */
 
@@ -133,315 +133,6 @@ html.sb-own::-webkit-scrollbar {
   );
 }
 
-/* ---------- Header: the island ----------
-   A black capsule that floats over every page. At the top it holds the whole nav; once the
-   page scrolls it folds to the brand, or to the live activity a page lends it (IslandActivity),
-   beside search and the theme switch, and a menu button unfolds it again. Each part folds its own column from
-   1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the parts
-   blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
-   over the dark one, so it is always the one shape that stands apart from the page. */
-:root {
-  /* A sampled spring (damping 0.72), about 4% past and back. */
-  --spring: linear(
-    0, 0.034, 0.12, 0.234, 0.359, 0.484, 0.601, 0.705, 0.793, 0.865, 0.922, 0.965, 0.996, 1.017,
-    1.03, 1.036, 1.038, 1.037, 1.034, 1.03, 1.025, 1.02, 1.016, 1.012, 1.008, 1.005, 1.003, 1.001,
-    1, 0.999, 0.999, 0.999, 0.999
-  );
-  --t-island: 560ms;
-}
-.arc-header {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 48px;
-  max-width: 100%;
-  padding: 0 10px;
-  border-radius: 999px;
-  font: 500 13px var(--display);
-  pointer-events: auto;
-  background: #0a0a0c;
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.08),
-    0 10px 28px -12px rgb(0 0 0 / 0.55);
-  /* The island's own ground, so everything inside reads light on black. */
-  --text: #fff;
-  --dim: rgb(255 255 255 / 0.66);
-  --mute: rgb(255 255 255 / 0.46);
-  --hair: rgb(255 255 255 / 0.18);
-  --panel-2: rgb(255 255 255 / 0.1);
-  --focus: var(--go);
-  color: var(--text);
-}
-.dark .arc-header {
-  background: #fff;
-  box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.06),
-    0 10px 28px -12px rgb(0 0 0 / 0.7);
-  --text: #0a0a0c;
-  --dim: rgb(10 10 12 / 0.68);
-  --mute: rgb(10 10 12 / 0.5);
-  --hair: rgb(10 10 12 / 0.16);
-  --panel-2: rgb(10 10 12 / 0.07);
-  --focus: color-mix(in oklab, var(--go) 45%, #000);
-}
-.island .seg {
-  display: grid;
-  grid-template-columns: 0fr;
-  transition: grid-template-columns var(--t-island) var(--spring);
-}
-.island .seg[data-on] {
-  grid-template-columns: 1fr;
-}
-/* Clips sideways only, so the button's press and the focus ring keep their height. */
-.island .clip {
-  min-width: 0;
-  overflow-x: clip;
-}
-.island .row {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  width: max-content;
-  padding: 0 4px;
-  opacity: 0;
-  filter: blur(4px);
-  transition:
-    opacity 120ms ease,
-    filter 120ms ease;
-}
-.island .seg[data-on] .row {
-  opacity: 1;
-  filter: none;
-  transition:
-    opacity 240ms var(--out) 40ms,
-    filter 260ms var(--out) 40ms;
-}
-.arc-header .brand {
-  padding: 0 8px 0 12px;
-  font-weight: 900;
-  color: var(--text);
-}
-.arc-header .where {
-  padding: 0 8px;
-  color: var(--mute);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.arc-header nav {
-  display: flex;
-  gap: 2px;
-}
-.arc-header nav a,
-.arc-header .find {
-  white-space: nowrap;
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--dim);
-  transition:
-    background-color 120ms ease,
-    color 120ms ease;
-}
-.arc-header nav a:hover,
-.arc-header nav a[aria-current="page"],
-.arc-header .find:hover {
-  background: var(--panel-2);
-  color: var(--text);
-}
-.arc-header a:focus-visible,
-.arc-header button:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-.arc-header .find {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  background: none;
-  font: inherit;
-  cursor: var(--cursor-point);
-}
-.arc-header .btn {
-  flex: none;
-  white-space: nowrap;
-}
-.arc-header .btn.sm {
-  height: 36px;
-  border-radius: 999px;
-  box-shadow: none;
-}
-.arc-header .connect .row {
-  padding-left: 8px;
-}
-/* Both icons share one cell; the outgoing one turns away as the incoming one turns in. */
-.arc-header .find.theme,
-.arc-header .find.menu {
-  display: inline-grid;
-  place-items: center;
-}
-.arc-header .find.menu {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-}
-.arc-header .theme svg,
-.arc-header .menu svg {
-  grid-area: 1 / 1;
-  transition:
-    opacity 200ms var(--out),
-    transform 200ms var(--out);
-}
-.light .arc-header .theme .to-light,
-.arc-header .menu[aria-expanded="true"] .to-open {
-  opacity: 0;
-  transform: rotate(90deg) scale(0.6);
-}
-.dark .arc-header .theme .to-dark,
-.arc-header .menu[aria-expanded="false"] .to-close {
-  opacity: 0;
-  transform: rotate(-90deg) scale(0.6);
-}
-
-/* Live activity: a back link, a label that trades the page's tags for its title, and actions. */
-.island .act-in {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-.island .act-back,
-.island .act-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 36px;
-  min-width: 36px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: var(--dim);
-  font: inherit;
-  white-space: nowrap;
-  cursor: var(--cursor-point);
-  transition:
-    background-color 120ms ease,
-    color 120ms ease;
-}
-.island .act-back:hover,
-.island .act-btn:hover {
-  background: var(--panel-2);
-  color: var(--text);
-}
-.island .act-label {
-  display: grid;
-  padding: 0 8px;
-  white-space: nowrap;
-}
-.island .act-label > * {
-  grid-area: 1 / 1;
-  align-self: center;
-  transition:
-    opacity 200ms var(--out),
-    filter 200ms var(--out),
-    translate 200ms var(--out);
-}
-.island .act-label .tags {
-  display: flex;
-  gap: 8px;
-  color: var(--mute);
-}
-.island .act-label .title {
-  font-weight: 900;
-  font-size: 0.875rem;
-  opacity: 0;
-  filter: blur(2px);
-  translate: 0 6px;
-}
-.island .act-label[data-swap] .tags {
-  opacity: 0;
-  filter: blur(2px);
-  translate: 0 -6px;
-}
-.island .act-label[data-swap] .title {
-  opacity: 1;
-  filter: none;
-  translate: 0 0;
-}
-/* Phones: the parts pack tighter, and the back link keeps its name for screen readers and shows
-   only the arrow. */
-@media (max-width: 640px) {
-  .island .row {
-    padding: 0 2px;
-  }
-  .arc-header .brand {
-    padding: 0 6px 0 10px;
-  }
-  .island .act-back {
-    padding: 0;
-  }
-  .island .act-txt {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
-/* Narrow phones: the whole nav only just fits, and the open menu has no room for the brand as
-   well as the close button. */
-@media (max-width: 480px) {
-  .arc-header {
-    padding: 0 6px;
-  }
-  .island .row {
-    padding: 0;
-  }
-  .arc-header .brand {
-    padding: 0 4px 0 10px;
-  }
-  .arc-header nav a,
-  .arc-header .find {
-    padding: 8px 7px;
-  }
-  .arc-header .btn.sm {
-    padding: 0 12px;
-  }
-  .arc-header .connect .row {
-    padding-left: 4px;
-  }
-  /* The compact island holds the activity beside search, theme and menu; these two keep it
-     inside the screen. The bar prefix outranks the 960px rule further down. */
-  .arc-bar .arc-header .find {
-    padding: 8px 6px;
-  }
-  /* A long rule title would push the island past the screen: the label takes what is left after
-     the back link, Share, the tools, the menu and the island's padding, and ends in an ellipsis.
-     compactBox reads the capped width, so the title still docks onto it. */
-  .island .act-label {
-    max-width: calc(100vw - 206px);
-    padding: 0 4px;
-  }
-  .island .act-label > * {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .arc-bar[data-open] .island .home {
-    grid-template-columns: 0fr;
-  }
-  .arc-bar[data-open] .island .home .row {
-    opacity: 0;
-    filter: blur(4px);
-    visibility: hidden;
-    transition:
-      opacity 120ms ease,
-      filter 120ms ease,
-      visibility 0s 120ms;
-  }
-}
-
 /* Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
 html[data-theme-swap]::view-transition-old(root),
 html[data-theme-swap]::view-transition-new(root) {
@@ -562,12 +253,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   ::view-transition-old(.stack-out) {
     animation-duration: 0s;
   }
-}
-.arc-header .find kbd {
-  font: 500 11px var(--display);
-  border: 1px solid var(--hair);
-  border-radius: 6px;
-  padding: 1px 6px;
 }
 
 /* ---------- Buttons ---------- */
@@ -3046,16 +2731,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc-wrap {
     padding: 0 18px;
   }
-  .arc .hide-sm {
-    display: none;
-  }
-  .arc-header nav a,
-  .arc-header .find {
-    padding: 8px;
-  }
-  .arc-header .btn.sm {
-    padding: 0 12px;
-  }
   .arc .stages {
     grid-template-columns: 1fr 1fr;
   }
@@ -3120,58 +2795,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-/* Narrow phones: the hero's contact button sits right below, so the island drops its copy. */
-@media (max-width: 380px) {
-  .arc-header .connect {
-    display: none;
-  }
-}
-
-/* ---------- Fixed header bar ----------
-   A clear strip at the top of every page that only centres the island; presses pass through
-   it everywhere but the island itself. */
-body.site-shell {
-  padding-top: 72px;
-}
-html {
-  scroll-padding-top: 88px;
-}
-.arc-bar {
-  position: fixed;
-  inset: 12px 0 auto;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  padding: 0 12px;
-  pointer-events: none;
-}
-/* The island drops in on the page's first frame, a touch small, and settles on the spring. */
-.js.no-intro .arc-bar .island {
-  animation: island-in var(--t-island) var(--spring) backwards;
-}
-@keyframes island-in {
-  from {
-    opacity: 0;
-    scale: 0.82;
-  }
-}
-.js:not(.no-intro) .arc-bar .island {
-  opacity: 0;
-}
-/* Reduced motion: the island snaps to its new size and its parts only fade. */
-@media (prefers-reduced-motion: reduce) {
-  .island .seg {
-    transition: none;
-  }
-  .island .row,
-  .island .act-label > * {
-    filter: none !important;
-    translate: none !important;
-  }
-  .js.no-intro .arc-bar .island {
-    animation: fade-in 240ms ease backwards;
-  }
-}
 
 /* ---------- Load-in ----------
    Pieces boot like a corrupted game frame: each cuts in as torn slices that jump sideways on a
@@ -3179,41 +2802,22 @@ html {
    [data-cut] plays once, when 30% of it is first on screen (useCutIns), and pieces that arrive in
    the same frame stagger by --cut-order. A piece inside another waits for its container too.
    Siblings alternate two slice patterns so a row never tears in unison. The pattern and delay
-   ride on --glitch and --glitch-at, which the shared shorthand cannot reset. The navbar plays once
-   the page is ready: on home that is when the intro hands off. Without JS everything sits at rest. */
-.js:not(.no-intro) .arc-bar .arc-header > *,
+   ride on --glitch and --glitch-at, which the shared shorthand cannot reset. Without JS everything
+   sits at rest. header.tsx plays the same keyframes on the island's parts, by name. */
 .js .arc [data-cut]:not(.in, [data-rest]),
 .js .arc [data-cut]:not(.in, [data-rest]) [data-cut] {
   opacity: 0;
   animation: none;
 }
 
-.js.no-intro .arc-bar .arc-header > *,
 .arc [data-cut].in {
   animation: var(--glitch, glitch-in) 560ms steps(1, end) var(--glitch-at, 0ms) backwards;
 }
 .arc [data-cut].in {
   --glitch-at: calc(min(var(--cut-order, 0), 12) * var(--t-step));
 }
-.js.no-intro .arc-bar .arc-header > :nth-child(even),
 .arc [data-cut].in:nth-child(even) {
   --glitch: glitch-in-alt;
-}
-
-.js.no-intro .arc-bar .arc-header > :nth-child(2) {
-  --glitch-at: 40ms;
-}
-.js.no-intro .arc-bar .arc-header > :nth-child(3) {
-  --glitch-at: 80ms;
-}
-.js.no-intro .arc-bar .arc-header > :nth-child(4) {
-  --glitch-at: 120ms;
-}
-.js.no-intro .arc-bar .arc-header > :nth-child(5) {
-  --glitch-at: 160ms;
-}
-.js.no-intro .arc-bar .arc-header > :nth-child(6) {
-  --glitch-at: 200ms;
 }
 
 /* Slices clip top and bottom only, with room at the sides for the colour split. */
@@ -3329,7 +2933,6 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js.no-intro .arc-bar .arc-header > *,
   .arc [data-cut].in {
     animation: fade-in 240ms ease backwards !important;
   }
