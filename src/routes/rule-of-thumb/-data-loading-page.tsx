@@ -2,7 +2,15 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+import {
+  Code,
+  type Lesson,
+  LessonText,
+  type Level,
+  onceOnScreen,
+  RuleLanding,
+  Tip,
+} from "./-components/rule-landing";
 import "./data-loading.css";
 import { kit } from "./-components/rule-landing.stylex";
 
@@ -1322,7 +1330,7 @@ const LESSONS: Lesson[] = [
     title: "Start fetching early",
     body: (
       <>
-        Fetch in the route loader, not in a component. A fetch in <code>useEffect</code> waits for
+        Fetch in the route loader, not in a component. A fetch in <Code>useEffect</Code> waits for
         the page's code to load and render first. A loader starts it with the navigation, so the two
         run side by side. Await what the page needs and stream the rest.
       </>
@@ -1400,16 +1408,16 @@ const LESSONS: Lesson[] = [
     title: "Parse at the boundary",
     body: (
       <>
-        Data from an API is a guess until you check it. Parse it right after <code>fetch()</code>,
+        Data from an API is a guess until you check it. Parse it right after <Code>fetch()</Code>,
         give optional fields a fallback, and the rest of your code gets real types. Skip it and a
         missing field crashes far from where it came in.
       </>
     ),
     extra: (
-      <p className="tip">
+      <Tip>
         When a required field fails, show a plain message and log the details. Update the schema
         when the API changes; it documents the API too.
-      </p>
+      </Tip>
     ),
     bad: {
       label: "Trust it",
@@ -1432,11 +1440,11 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p {...stylex.props(styles.stores)}>
-        <code {...stylex.props(styles.store)}>localStorage · ~5MB, sync</code>
-        <code {...stylex.props(styles.store)}>IndexedDB · large, async</code>
-        <code {...stylex.props(styles.store)}>PGlite · SQL + sync</code>
-      </p>
+      <LessonText style={styles.stores}>
+        <Code style={styles.store}>localStorage · ~5MB, sync</Code>
+        <Code style={styles.store}>IndexedDB · large, async</Code>
+        <Code style={styles.store}>PGlite · SQL + sync</Code>
+      </LessonText>
     ),
     bad: {
       label: "Persist all",
@@ -1474,7 +1482,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         Most replies to this list land in 80ms. A few take 2s. When does the{" "}
-        <code>&lt;Spinner /&gt;</code> appear?
+        <Code>&lt;Spinner /&gt;</Code> appear?
       </>
     ),
     piece: "<Spinner />",
@@ -1558,7 +1566,7 @@ const LEVELS: Level[] = [
     name: "Twenty orders",
     prompt: (
       <>
-        The orders page lists 20 orders, one <code>&lt;OrderRow&gt;</code> each. Where does the
+        The orders page lists 20 orders, one <Code>&lt;OrderRow&gt;</Code> each. Where does the
         fetch start?
       </>
     ),
@@ -1601,7 +1609,7 @@ const LEVELS: Level[] = [
     name: "One card fails",
     prompt: (
       <>
-        A dashboard loads five cards. <code>GET /revenue</code> fails with a 500. What does the user
+        A dashboard loads five cards. <Code>GET /revenue</Code> fails with a 500. What does the user
         see?
       </>
     ),

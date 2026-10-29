@@ -3,6 +3,7 @@ import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import {
+  Code,
   type Lesson,
   type Level,
   onceOnScreen,
@@ -25,7 +26,7 @@ const flash = stylex.keyframes({
   to: { opacity: 0 },
 });
 const typeIn = stylex.keyframes({
-  from: { opacity: 0, transform: "translateX(-8px)" },
+  from: { opacity: 0, transform: "translate(-8px)" },
 });
 const drop = stylex.keyframes({
   from: { opacity: 1, transform: "translateY(-14px)" },
@@ -99,7 +100,8 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+      [stylex.when.ancestor('[data-side="bad"]')]:
+        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
@@ -448,7 +450,7 @@ const OUT_KINDS = [
   styles.kw,
 ];
 
-function Code({ lines }: { lines: Line[] }) {
+function CodeBlock({ lines }: { lines: Line[] }) {
   return (
     <div {...stylex.props(styles.code)}>
       {lines.map((line, index) => (
@@ -638,7 +640,7 @@ function ClearDemo({ way }: { way: Way }) {
   const cleared = save.phase !== "idle";
   return (
     <div {...stylex.props(styles.view)}>
-      <Code
+      <CodeBlock
         lines={[
           { c: "// ✕ on the reviewer chip" },
           { c: `changes.reviewer = ${way === "bad" ? "undefined" : "null"}`, hot: true },
@@ -692,7 +694,7 @@ function RenameDemo({ way }: { way: Way }) {
   const saved = save.phase === "done";
   return (
     <div {...stylex.props(styles.view)}>
-      <Code
+      <CodeBlock
         lines={
           way === "bad"
             ? [
@@ -746,16 +748,16 @@ const LESSONS: Lesson[] = [
     title: "Missing or empty",
     body: (
       <>
-        <code>undefined</code> means nobody gave a value. <code>null</code> means someone checked
+        <Code>undefined</Code> means nobody gave a value. <Code>null</Code> means someone checked
         and the answer is nothing. Ana skipped the phone question. Bo said he has no phone. Send
-        both as <code>null</code> and no code can tell them apart.
+        both as <Code>null</Code> and no code can tell them apart.
       </>
     ),
     bad: {
       label: "Both null",
       costs: ["1 user nagged"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "ask = (u) => u.phone === null", hot: true },
             { c: "// Ana skipped it. Bo has none." },
@@ -769,7 +771,7 @@ const LESSONS: Lesson[] = [
       label: "Missing vs null",
       costs: ["0 nagged"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "ask = (u) => u.phone === undefined", hot: true },
             { c: "// Ana skipped it. Bo has none." },
@@ -784,8 +786,8 @@ const LESSONS: Lesson[] = [
     title: "Optional means undefined",
     body: (
       <>
-        A value the caller may leave out is <code>undefined</code> when they do. Type it with{" "}
-        <code>?:</code>, and the caller just leaves it out. Typed <code>| null</code>, every call
+        A value the caller may leave out is <Code>undefined</Code> when they do. Type it with{" "}
+        <Code>?:</Code>, and the caller just leaves it out. Typed <Code>| null</Code>, every call
         has to spell out the nothing.
       </>
     ),
@@ -793,7 +795,7 @@ const LESSONS: Lesson[] = [
       label: "string | null",
       costs: ["1 type error", "null at every call"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "function welcome(name: string | null) {", hot: true },
             { c: '  return `Hi, ${name ?? "guest"}`' },
@@ -808,7 +810,7 @@ const LESSONS: Lesson[] = [
       label: "name?: string",
       costs: ["0 errors", "0 extra args"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "function welcome(name?: string) {", hot: true },
             { c: '  return `Hi, ${name ?? "guest"}`' },
@@ -824,8 +826,8 @@ const LESSONS: Lesson[] = [
     title: "Clear with null",
     body: (
       <>
-        When the user empties a field, say so with <code>null</code>. JSON drops every key set to{" "}
-        <code>undefined</code>, so a clear sent that way never reaches the server.
+        When the user empties a field, say so with <Code>null</Code>. JSON drops every key set to{" "}
+        <Code>undefined</Code>, so a clear sent that way never reaches the server.
       </>
     ),
     bad: {
@@ -843,7 +845,7 @@ const LESSONS: Lesson[] = [
     title: "Leave untouched fields out",
     body: (
       <>
-        A PATCH changes what it carries. Start a draft at <code>null</code> and every field the user
+        A PATCH changes what it carries. Start a draft at <Code>null</Code> and every field the user
         never touched goes out as a clear. Start it empty, and only what they changed is sent.
       </>
     ),
@@ -862,16 +864,16 @@ const LESSONS: Lesson[] = [
     title: "Force the decision",
     body: (
       <>
-        <code>?:</code> lets a caller skip a field without a word. When every caller must decide,
+        <Code>?:</Code> lets a caller skip a field without a word. When every caller must decide,
         make the field required and nullable. Forgetting it is then an error, and "nobody" is a{" "}
-        <code>null</code> someone wrote on purpose.
+        <Code>null</Code> someone wrote on purpose.
       </>
     ),
     bad: {
       label: "assignee?: User",
       costs: ["forgot it: 0 errors"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "type Task = {" },
             { c: "  title: string" },
@@ -887,7 +889,7 @@ const LESSONS: Lesson[] = [
       label: "User | null",
       costs: ["forgot it: 1 error"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "type Task = {" },
             { c: "  title: string" },
@@ -904,8 +906,8 @@ const LESSONS: Lesson[] = [
     title: "Not found is null",
     body: (
       <>
-        A lookup that finds nothing has an answer, and the answer is <code>null</code>.{" "}
-        <code>Map.get</code> hands you <code>undefined</code>, and <code>JSON.stringify</code> turns
+        A lookup that finds nothing has an answer, and the answer is <Code>null</Code>.{" "}
+        <Code>Map.get</Code> hands you <Code>undefined</Code>, and <Code>JSON.stringify</Code> turns
         that into no body at all.
       </>
     ),
@@ -913,7 +915,7 @@ const LESSONS: Lesson[] = [
       label: "res.json(user)",
       costs: ["0-byte body", "1 SyntaxError"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "const user = users.get(email)", out: "undefined" },
             { c: "res.json(user)", out: "body: 0 bytes", tone: "no", hot: true },
@@ -927,7 +929,7 @@ const LESSONS: Lesson[] = [
       label: "user ?? null",
       costs: ["4-byte body", "0 errors"],
       view: (
-        <Code
+        <CodeBlock
           lines={[
             { c: "const user = users.get(email)", out: "undefined" },
             { c: "res.json(user ?? null)", out: "body: null", tone: "yes", hot: true },
@@ -965,7 +967,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         The user pressed ✕ on the due date. They never opened the assignee or the notes. Which field
-        gets <code>null</code>?
+        gets <Code>null</Code>?
       </>
     ),
     piece: "null",
@@ -1011,7 +1013,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         The user renamed the task and removed its reviewer. They didn't touch the due date. Which
-        field can be <code>undefined</code>?
+        field can be <Code>undefined</Code>?
       </>
     ),
     piece: "undefined",
@@ -1056,8 +1058,8 @@ const LEVELS: Level[] = [
     name: "Two sign-ups",
     prompt: (
       <>
-        You looked up <code>bo@x.io</code> and nobody has that email. You haven't looked up{" "}
-        <code>cy@x.io</code> yet. Which entry gets <code>null</code>?
+        You looked up <Code>bo@x.io</Code> and nobody has that email. You haven't looked up{" "}
+        <Code>cy@x.io</Code> yet. Which entry gets <Code>null</Code>?
       </>
     ),
     piece: "null",
@@ -1093,7 +1095,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         Every new task must name an assignee or say there's none. The colour is optional and falls
-        back to grey. Where does <code>| null</code> go?
+        back to grey. Where does <Code>| null</Code> go?
       </>
     ),
     piece: "| null",
@@ -1137,7 +1139,7 @@ const LEVELS: Level[] = [
     name: "Fields you asked for",
     prompt: (
       <>
-        The client asked for <code>?fields=name,manager</code>. Bo has no manager. Nobody asked for
+        The client asked for <Code>?fields=name,manager</Code>. Bo has no manager. Nobody asked for
         his phone. Which key do you leave out?
       </>
     ),
@@ -1186,10 +1188,10 @@ export function NullVsUndefined() {
         title: "Missing is not empty",
         intro: (
           <>
-            <code {...stylex.props(styles.introCode)}>undefined</code> says no value was given.{" "}
-            <code {...stylex.props(styles.introCode)}>null</code> says the value is empty, on
-            purpose. Each example runs the same code twice: on the left where the two blur, on the
-            right where the rule keeps them apart. What each line gives sits beside it.
+            <Code style={styles.introCode}>undefined</Code> says no value was given.{" "}
+            <Code style={styles.introCode}>null</Code> says the value is empty, on purpose. Each
+            example runs the same code twice: on the left where the two blur, on the right where the
+            rule keeps them apart. What each line gives sits beside it.
           </>
         ),
       }}

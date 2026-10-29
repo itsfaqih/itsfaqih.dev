@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { fonts, palette } from "../../theme.stylex";
 import {
+  Code,
   type Lesson,
   type Level,
   onceOnScreen,
@@ -10,6 +11,7 @@ import {
   paint,
   RuleLanding,
   TABBED,
+  Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 
@@ -55,7 +57,8 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+      [stylex.when.ancestor('[data-side="bad"]')]:
+        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
@@ -335,9 +338,9 @@ const LESSONS: Lesson[] = [
     title: "Name it once",
     body: (
       <>
-        Export each function by name, with the <code>function</code> keyword. A default export takes
+        Export each function by name, with the <Code>function</Code> keyword. A default export takes
         whatever name each importer gives it, so a typo compiles and the stack trace says{" "}
-        <code>default</code>. Keep arrow functions for callbacks.
+        <Code>default</Code>. Keep arrow functions for callbacks.
       </>
     ),
     bad: {
@@ -388,9 +391,9 @@ const LESSONS: Lesson[] = [
     title: "Extend with interface",
     body: (
       <>
-        Use <code>type</code> for shapes, unions and aliases. To build one shape on another, use{" "}
-        <code>interface … extends</code>: a clash fails on the declaration, in plain words. With{" "}
-        <code>&</code> the clash compiles, the field turns into <code>never</code>, and the error
+        Use <Code>type</Code> for shapes, unions and aliases. To build one shape on another, use{" "}
+        <Code>interface … extends</Code>: a clash fails on the declaration, in plain words. With{" "}
+        <Code>&</Code> the clash compiles, the field turns into <Code>never</Code>, and the error
         waits for the first object that tries to fill it.
       </>
     ),
@@ -448,10 +451,10 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p className="tip">
+      <Tip>
         Need the values at runtime too? Write{" "}
-        <code>const ROLES = ["ADMIN", "VIEWER"] as const</code> and derive the type from it.
-      </p>
+        <Code>const ROLES = ["ADMIN", "VIEWER"] as const</Code> and derive the type from it.
+      </Tip>
     ),
     bad: {
       label: "enum Role",
@@ -600,17 +603,17 @@ const LESSONS: Lesson[] = [
     title: "Turn the flags on",
     body: (
       <>
-        <code>strict</code> is the floor, not the ceiling. Even under it, <code>users[0]</code>{" "}
-        reads as a <code>User</code> on an empty list. <code>noUncheckedIndexedAccess</code> makes
+        <Code>strict</Code> is the floor, not the ceiling. Even under it, <Code>users[0]</Code>{" "}
+        reads as a <Code>User</Code> on an empty list. <Code>noUncheckedIndexedAccess</Code> makes
         every index read say it may be missing.
       </>
     ),
     extra: (
-      <p className="tip">
-        Add <code>verbatimModuleSyntax</code> too, so a type import must say{" "}
-        <code>import type</code>. Write ESM only: <code>import</code> and <code>export</code>, never{" "}
-        <code>require</code>.
-      </p>
+      <Tip>
+        Add <Code>verbatimModuleSyntax</Code> too, so a type import must say{" "}
+        <Code>import type</Code>. Write ESM only: <Code>import</Code> and <Code>export</Code>, never{" "}
+        <Code>require</Code>.
+      </Tip>
     ),
     bad: {
       label: "strict only",
@@ -660,9 +663,7 @@ const TLDR = [
   ["A new tsconfig", "strict, noUncheckedIndexedAccess, verbatimModuleSyntax, ESM"],
 ] as const;
 
-const code = (text: string) => (
-  <code {...stylex.props(styles.boardCode)}>{paint(text, TOKEN, KINDS)}</code>
-);
+const code = (text: string) => <Code style={styles.boardCode}>{paint(text, TOKEN, KINDS)}</Code>;
 const blank = (text: string) => (
   <>
     <span className="sr-only">{text}</span>
@@ -670,7 +671,7 @@ const blank = (text: string) => (
   </>
 );
 const holds = (text: string) => (
-  <code {...stylex.props(styles.boardCode, styles.holds)}>{paint(text, TOKEN, KINDS)}</code>
+  <Code style={[styles.boardCode, styles.holds]}>{paint(text, TOKEN, KINDS)}</Code>
 );
 
 const LEVELS: Level[] = [
@@ -716,8 +717,8 @@ const LEVELS: Level[] = [
     name: "The role list",
     prompt: (
       <>
-        You loop over the roles at runtime and want a <code>Role</code> type that stays in step with
-        the list. Where does <code>as const</code> go?
+        You loop over the roles at runtime and want a <Code>Role</Code> type that stays in step with
+        the list. Where does <Code>as const</Code> go?
       </>
     ),
     piece: "as const",
@@ -760,8 +761,8 @@ const LEVELS: Level[] = [
     name: "The contract",
     prompt: (
       <>
-        <code>getUser</code> is the module's public API, and <code>find</code> may come back empty.
-        Where does <code>: User</code> go?
+        <Code>getUser</Code> is the module's public API, and <Code>find</Code> may come back empty.
+        Where does <Code>: User</Code> go?
       </>
     ),
     piece: ": User",
@@ -806,7 +807,7 @@ const LEVELS: Level[] = [
     name: "The crash report",
     prompt: (
       <>
-        <code>users[0].name</code> crashed in production on an empty list. <code>strict</code> is
+        <Code>users[0].name</Code> crashed in production on an empty list. <Code>strict</Code> is
         already on. Which flag would have failed the build?
       </>
     ),

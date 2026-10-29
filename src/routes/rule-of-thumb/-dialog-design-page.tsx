@@ -15,7 +15,15 @@ import {
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+import {
+  Code,
+  Kbd,
+  type Lesson,
+  type Level,
+  onceOnScreen,
+  RuleLanding,
+  Tip,
+} from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
@@ -1433,7 +1441,7 @@ const LESSONS: Lesson[] = [
     title: "Keep focus inside",
     body: (
       <>
-        When a dialog opens, focus moves into it. <kbd>Tab</kbd> goes round its controls and never
+        When a dialog opens, focus moves into it. <Kbd>Tab</Kbd> goes round its controls and never
         reaches the page behind, which is inert. When it closes, focus goes back to the button that
         opened it. Press Tab in both.
       </>
@@ -1453,7 +1461,7 @@ const LESSONS: Lesson[] = [
     title: "Let Escape close it",
     body: (
       <>
-        <kbd>Esc</kbd> is how keyboard users leave, so it closes every dialog, every time. An info
+        <Kbd>Esc</Kbd> is how keyboard users leave, so it closes every dialog, every time. An info
         dialog has nothing to lose, so a click outside closes it too.
       </>
     ),
@@ -1473,13 +1481,13 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A form focuses its first field, so people can type at once. A confirm that destroys
-        something focuses Cancel, so a stray <kbd>Enter</kbd> backs out. Open both and press Enter.
+        something focuses Cancel, so a stray <Kbd>Enter</Kbd> backs out. Open both and press Enter.
       </>
     ),
     extra: (
-      <p className="tip">
+      <Tip>
         Focus the destructive button only where speed matters more and the action can be undone.
-      </p>
+      </Tip>
     ),
     bad: {
       label: "Delete first",
@@ -1497,7 +1505,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A click outside is often a slip. Once a form has input, the backdrop stops closing it. The
-        dialog shakes instead, and <kbd>Esc</kbd> or × asks before it throws the draft away. Click
+        dialog shakes instead, and <Kbd>Esc</Kbd> or × asks before it throws the draft away. Click
         the dim area in both.
       </>
     ),
@@ -1516,8 +1524,8 @@ const LESSONS: Lesson[] = [
     title: "Lock the page behind",
     body: (
       <>
-        While the dialog is up, the page under it stays still. Set <code>overflow: hidden</code> on
-        the body, and keep the scrollbar's room with <code>scrollbar-gutter: stable</code> so
+        While the dialog is up, the page under it stays still. Set <Code>overflow: hidden</Code> on
+        the body, and keep the scrollbar's room with <Code>scrollbar-gutter: stable</Code> so
         nothing shifts. Open Share, then scroll.
       </>
     ),
@@ -1537,9 +1545,9 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A screen reader needs to hear that a dialog opened and what it's called. Give it{" "}
-        <code>role="dialog"</code>, and point <code>aria-labelledby</code> at the title and{" "}
-        <code>aria-describedby</code> at the text. On a real page add <code>aria-modal="true"</code>
-        , or use <code>&lt;dialog&gt;</code> with <code>showModal()</code>.
+        <Code>role="dialog"</Code>, and point <Code>aria-labelledby</Code> at the title and{" "}
+        <Code>aria-describedby</Code> at the text. On a real page add <Code>aria-modal="true"</Code>
+        , or use <Code>&lt;dialog&gt;</Code> with <Code>showModal()</Code>.
       </>
     ),
     bad: {
@@ -1734,7 +1742,7 @@ const LEVELS: Level[] = [
     name: "Hold the page",
     prompt: (
       <>
-        <b>Share</b> opens over a long article. Where does <code>overflow: hidden</code> go so the
+        <b>Share</b> opens over a long article. Where does <Code>overflow: hidden</Code> go so the
         article stays put?
       </>
     ),

@@ -1,5 +1,14 @@
 import * as stylex from "@stylexjs/stylex";
-import { type Lesson, type Level, RuleLanding, Tree } from "./-components/rule-landing";
+import {
+  Code,
+  Kbd,
+  type Lesson,
+  LessonText,
+  type Level,
+  RuleLanding,
+  Tip,
+  Tree,
+} from "./-components/rule-landing";
 
 const styles = stylex.create({
   suffixes: {
@@ -21,7 +30,7 @@ const LESSONS: Lesson[] = [
     title: "Inline first",
     body: (
       <>
-        Code used once stays where it's used. A helper in <code>utils/</code> for a single caller is
+        Code used once stays where it's used. A helper in <Code>utils/</Code> for a single caller is
         one more file to open and one more import to keep, and nothing is shared.
       </>
     ),
@@ -144,10 +153,10 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p className="tip">
-        Name folders for what they hold, like <code>routes/</code> or <code>controllers/</code>. Not{" "}
-        <code>features/</code>.
-      </p>
+      <Tip>
+        Name folders for what they hold, like <Code>routes/</Code> or <Code>controllers/</Code>. Not{" "}
+        <Code>features/</Code>.
+      </Tip>
     ),
     bad: {
       label: "In hooks/",
@@ -187,15 +196,15 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Code used almost everywhere, like a button, belongs to no page. Give it a folder named for
-        its type, and a suffix so <kbd>⌘P</kbd> finds it.
+        its type, and a suffix so <Kbd>⌘P</Kbd> finds it.
       </>
     ),
     extra: (
-      <p {...stylex.props(styles.suffixes)}>
-        <code {...stylex.props(styles.suffix)}>user.schema.ts</code>
-        <code {...stylex.props(styles.suffix)}>use-auth.hook.ts</code>
-        <code {...stylex.props(styles.suffix)}>dashboard.page.tsx</code>
-      </p>
+      <LessonText style={styles.suffixes}>
+        <Code style={styles.suffix}>user.schema.ts</Code>
+        <Code style={styles.suffix}>use-auth.hook.ts</Code>
+        <Code style={styles.suffix}>dashboard.page.tsx</Code>
+      </LessonText>
     ),
     bad: {
       label: "In settings/",
@@ -247,7 +256,7 @@ const LEVELS: Level[] = [
     name: "One caller",
     prompt: (
       <>
-        <code>formatDate()</code> is called once, by <code>user-profile.tsx</code>. Where does it
+        <Code>formatDate()</Code> is called once, by <Code>user-profile.tsx</Code>. Where does it
         live?
       </>
     ),
@@ -292,7 +301,7 @@ const LEVELS: Level[] = [
     name: "A component's own parts",
     prompt: (
       <>
-        <code>UserProfile</code> has its own types, styles and a hook. Nothing else uses them. Where
+        <Code>UserProfile</Code> has its own types, styles and a hook. Nothing else uses them. Where
         do they go?
       </>
     ),
@@ -335,7 +344,7 @@ const LEVELS: Level[] = [
     name: "A search box",
     prompt: (
       <>
-        A search box keeps what you type in <code>useState</code>, and each keystroke re-renders
+        A search box keeps what you type in <Code>useState</Code>, and each keystroke re-renders
         whatever owns that state. Where should it live?
       </>
     ),
@@ -378,8 +387,8 @@ const LEVELS: Level[] = [
     name: "Two callers",
     prompt: (
       <>
-        <code>useCart()</code> is now called by <code>cart/summary.tsx</code> and{" "}
-        <code>checkout/pay-button.tsx</code>. Where does it move?
+        <Code>useCart()</Code> is now called by <Code>cart/summary.tsx</Code> and{" "}
+        <Code>checkout/pay-button.tsx</Code>. Where does it move?
       </>
     ),
     piece: "useCart()",
@@ -425,7 +434,7 @@ const LEVELS: Level[] = [
     name: "Twelve callers",
     prompt: (
       <>
-        <code>button.tsx</code> is used by twelve pages, from settings to checkout. Where does it
+        <Code>button.tsx</Code> is used by twelve pages, from settings to checkout. Where does it
         go?
       </>
     ),

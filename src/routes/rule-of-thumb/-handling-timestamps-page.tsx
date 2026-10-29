@@ -3,12 +3,14 @@ import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { fonts, palette } from "../../theme.stylex";
 import {
+  Code,
   type Lesson,
   type Level,
   onceOnScreen,
   OUT,
   RuleLanding,
   TABBED,
+  Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 
@@ -46,7 +48,8 @@ const styles = stylex.create({
   hot: {
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+      [stylex.when.ancestor('[data-side="bad"]')]:
+        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
@@ -198,7 +201,10 @@ const styles = stylex.create({
   },
   at: {
     whiteSpace: "nowrap",
-    color: { default: palette["--text"], [stylex.when.ancestor('[data-side="bad"]')]: kit["--no-ink"] },
+    color: {
+      default: palette["--text"],
+      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no-ink"],
+    },
   },
   sum: {
     fontSize: "14px",
@@ -499,7 +505,9 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
               <span {...stylex.props(styles.who)}>
                 {reading.person.who} · {reading.person.city}
               </span>
-              <b {...stylex.props(styles.time, off !== null && styles.off)}>{timeOf(reading.shown)}</b>
+              <b {...stylex.props(styles.time, off !== null && styles.off)}>
+                {timeOf(reading.shown)}
+              </b>
               <span {...stylex.props(styles.date)}>{dayOf(reading.shown)}</span>
               {off && (
                 <span {...stylex.props(styles.should)}>
@@ -767,9 +775,9 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p className="tip">
+      <Tip>
         UTC has no daylight saving and no political changes. It means the same moment everywhere.
-      </p>
+      </Tip>
     ),
     bad: {
       label: "Local, no offset",
@@ -786,8 +794,8 @@ const LESSONS: Lesson[] = [
     title: "Return it with a Z",
     body: (
       <>
-        An ISO string with no <code>Z</code> has no zone, so each browser reads the digits as its
-        own local time. Rina and Sam both see 6:00 AM, and both are wrong. With the <code>Z</code>,
+        An ISO string with no <Code>Z</Code> has no zone, so each browser reads the digits as its
+        own local time. Rina and Sam both see 6:00 AM, and both are wrong. With the <Code>Z</Code>,
         each browser moves it to its own zone.
       </>
     ),
@@ -867,8 +875,8 @@ const LESSONS: Lesson[] = [
     title: "Send the zone with the input",
     body: (
       <>
-        Rina sets a reminder for 7:00 AM. Sent as <code>2026-01-01T07:00:00</code>, the server can't
-        tell whose 7:00 that is and reads it as UTC. Send the UTC time with a <code>Z</code>, or the
+        Rina sets a reminder for 7:00 AM. Sent as <Code>2026-01-01T07:00:00</Code>, the server can't
+        tell whose 7:00 that is and reads it as UTC. Send the UTC time with a <Code>Z</Code>, or the
         time with its offset. Both name one moment.
       </>
     ),
@@ -914,14 +922,14 @@ const TLDR = [
   ["Date math", "On Date values, never on the string"],
 ] as const;
 
-const code = (text: string) => <code>{text}</code>;
+const code = (text: string) => <Code>{text}</Code>;
 
 const LEVELS: Level[] = [
   {
     name: "Two readers",
     prompt: (
       <>
-        The order is stored as <code>2026-01-10 06:00:00</code> UTC. Rina should see 1:00 PM and Sam
+        The order is stored as <Code>2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam
         1:00 AM. Where does the formatting run?
       </>
     ),
@@ -1003,7 +1011,7 @@ const LEVELS: Level[] = [
     name: "One offset",
     prompt: (
       <>
-        Rina's browser has her 7:00 AM and its <code>+07:00</code> offset. Where is the offset worth
+        Rina's browser has her 7:00 AM and its <Code>+07:00</Code> offset. Where is the offset worth
         sending?
       </>
     ),
@@ -1050,7 +1058,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         Three filters for Jan 10 each need a start. Whose day starts at{" "}
-        <code>2026-01-09T17:00Z</code>?
+        <Code>2026-01-09T17:00Z</Code>?
       </>
     ),
     piece: "from=2026-01-09T17:00Z",

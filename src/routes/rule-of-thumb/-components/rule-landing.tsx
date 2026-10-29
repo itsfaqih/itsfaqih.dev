@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowLeftIcon, CheckIcon, ShareNetworkIcon } from "@phosphor-icons/react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
+  createContext,
   isValidElement,
   type KeyboardEvent,
   type PointerEvent,
@@ -9,6 +10,7 @@ import {
   type RefObject,
   useEffect,
   useLayoutEffect,
+  useContext,
   useRef,
   useState,
 } from "react";
@@ -184,23 +186,27 @@ function Landing({
       </header>
 
       <div className="arc-wrap">
-        <section className="learn" id="learn" aria-labelledby="learn-title">
-          <div className={`sec-head ${stylex.props(shell.rev).className}`} data-rev>
-            <h2 id="learn-title">{learn.title}</h2>
-            <p>{learn.intro}</p>
+        <section id="learn" aria-labelledby="learn-title" {...stylex.props(lessonKit.section)}>
+          <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
+            <h2 id="learn-title" {...stylex.props(lessonKit.veil, lessonKit.secTitle)}>
+              {learn.title}
+            </h2>
+            <Tone value="wrap">
+              <p {...stylex.props(lessonKit.veil, lessonKit.secText)}>{learn.intro}</p>
+            </Tone>
           </div>
-          <div className="lessons">
+          <div {...stylex.props(lessonKit.lessons)}>
             {lessons.map((lesson) => (
               <LessonCard key={lesson.title} lesson={lesson} costsStyle={costsStyle} />
             ))}
           </div>
-          <div className={`sheet-wrap ${stylex.props(shell.rev).className}`} data-rev>
-            <h3>TL;DR</h3>
-            <ol className="sheet panel">
+          <div {...stylex.props(lessonKit.sheetWrap, shell.rev)} data-rev>
+            <h3 {...stylex.props(lessonKit.veil, lessonKit.sheetTitle)}>TL;DR</h3>
+            <ol {...stylex.props(lessonKit.panel, lessonKit.sheet)}>
               {tldr.map(([situation, answer]) => (
-                <li key={situation}>
-                  <span>{situation}</span>
-                  <b>{answer}</b>
+                <li key={situation} {...stylex.props(lessonKit.sheetRow)}>
+                  <span {...stylex.props(lessonKit.situation)}>{situation}</span>
+                  <b {...stylex.props(lessonKit.answer)}>{answer}</b>
                 </li>
               ))}
             </ol>
@@ -211,7 +217,9 @@ function Landing({
           <div className={`sec-head quiz-head ${stylex.props(shell.rev).className}`} data-rev>
             <div>
               <h2 id="quiz-title">Mini quiz</h2>
-              <p>{quiz.intro}</p>
+              <Tone value="wrap">
+                <p>{quiz.intro}</p>
+              </Tone>
             </div>
             <div className="score">
               <span>
@@ -241,10 +249,12 @@ function Landing({
         <section className="take">
           <div className={`take-copy ${stylex.props(shell.rev).className}`} data-rev>
             <h2>Take the rule with you</h2>
-            <p>
-              The whole rule as plain Markdown. Paste it into your <code>AGENTS.md</code>
-              {` and your agents will ${take}.`}
-            </p>
+            <Tone value="take">
+              <p>
+                The whole rule as plain Markdown. Paste it into your <Code>AGENTS.md</Code>
+                {` and your agents will ${take}.`}
+              </p>
+            </Tone>
             <div className="acts">
               <CopyMarkdown url={markdownUrl} />
               <a className="btn soft" href={markdownUrl} target="_blank" rel="noopener noreferrer">
@@ -349,9 +359,52 @@ const MARK = { bad: "✕", good: "✓" } as const;
 
 export const TABBED = "(max-width: 820px)";
 
+/** How inline code reads where the kit puts it: a chip in lesson copy, a tint in a quiz prompt. */
+const Tone = createContext<"plain" | "wrap" | "chip" | "prompt" | "take">("plain");
+
+export function Code({ children, style }: { children: ReactNode; style?: stylex.StyleXStyles }) {
+  const tone = useContext(Tone);
+  return (
+    <code
+      {...stylex.props(
+        tone !== "plain" && text.wrap,
+        tone === "chip" && text.chip,
+        tone === "prompt" && text.tint,
+        tone === "take" && text.bright,
+        style,
+      )}
+    >
+      {children}
+    </code>
+  );
+}
+
+export function Kbd({ children }: { children: ReactNode }) {
+  return <kbd {...stylex.props(text.chip)}>{children}</kbd>;
+}
+
+/** A paragraph of lesson copy, for a lesson's `extra` as well as its body. */
+export function LessonText({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: stylex.StyleXStyles;
+}) {
+  return (
+    <Tone value="chip">
+      <p {...stylex.props(text.lesson, style)}>{children}</p>
+    </Tone>
+  );
+}
+
+export function Tip({ children }: { children: ReactNode }) {
+  return <LessonText style={text.tip}>{children}</LessonText>;
+}
+
 export function Tree({ rows }: { rows: TreeRow[] }) {
   return (
-    <ul className="tree">
+    <ul {...stylex.props(tree.list, tree.inPane)}>
       {rows.map((row) => {
         const k = keyOf(row);
         return (
@@ -359,11 +412,11 @@ export function Tree({ rows }: { rows: TreeRow[] }) {
             key={k}
             data-k={k}
             data-moved={row.moved || undefined}
-            className={row.kind ? `row ${row.kind}` : "row"}
+            {...stylex.props(tree.row, row.kind && tree[row.kind])}
             style={{ "--d": row.depth }}
           >
-            <span className="nm">{row.text}</span>
-            {row.tag && <span className="calls">{row.tag}</span>}
+            <span {...stylex.props(row.moved && tree.moved)}>{row.text}</span>
+            {row.tag && <span {...stylex.props(tree.calls)}>{row.tag}</span>}
           </li>
         );
       })}
@@ -473,29 +526,36 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
   return (
     <article
       ref={cardRef}
-      className={`lesson ${stylex.props(shell.rev, stylex.defaultMarker()).className}`}
+      className={`lesson ${stylex.props(lessonKit.lesson, shell.rev, stylex.defaultMarker()).className}`}
       data-rev
     >
-      <div className="lesson-copy">
-        {lesson.exception && <span className="exc">Exception</span>}
-        <h3>{lesson.title}</h3>
-        <p>{lesson.body}</p>
-        {lesson.extra}
+      <div {...stylex.props(lessonKit.copy)}>
+        {lesson.exception && <span {...stylex.props(lessonKit.exception)}>Exception</span>}
+        <h3 {...stylex.props(lessonKit.title)}>{lesson.title}</h3>
+        <LessonText>{lesson.body}</LessonText>
+        <Tone value="wrap">{lesson.extra}</Tone>
       </div>
-      <div ref={demoRef} className="demo" data-show={side} style={{ "--rows": most }}>
-        <div className="flip" role="group" aria-label={`${lesson.title}: compare`}>
+      <div
+        ref={demoRef}
+        data-show={side}
+        style={{ "--rows": most }}
+        {...stylex.props(lessonKit.demo)}
+      >
+        <div role="group" aria-label={`${lesson.title}: compare`} {...stylex.props(lessonKit.flip)}>
           {SIDES.map((key) => (
             <button
               key={key}
               type="button"
-              data-key={key}
               aria-pressed={side === key}
               onClick={() => {
                 touched.current = true;
                 setSide(key);
               }}
+              {...stylex.props(lessonKit.flipKey, side === key && lessonKit[key])}
             >
-              <span aria-hidden="true">{MARK[key]}</span>
+              <span aria-hidden="true" {...stylex.props(lessonKit.mark)}>
+                {MARK[key]}
+              </span>
               {lesson[key].label}
             </button>
           ))}
@@ -503,18 +563,27 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
         {SIDES.map((key) => (
           <figure
             key={key}
-            className={`pane well ${stylex.props(stylex.defaultMarker()).className}`}
             data-side={key}
+            {...stylex.props(
+              lessonKit.well,
+              lessonKit.pane,
+              side !== key && lessonKit.behind,
+              stylex.defaultMarker(),
+            )}
           >
-            <figcaption>
-              <span aria-hidden="true">{MARK[key]}</span>
+            <figcaption {...stylex.props(lessonKit.caption, lessonKit[key])}>
+              <span aria-hidden="true" {...stylex.props(lessonKit.mark)}>
+                {MARK[key]}
+              </span>
               <span className="sr-only">{key === "bad" ? "Avoid: " : "Do: "}</span>
               {lesson[key].label}
             </figcaption>
             {lesson[key].view}
-            <div className={`costs ${stylex.props(costsStyle).className ?? ""}`.trim()}>
+            <div {...stylex.props(lessonKit.costs, costsStyle)}>
               {lesson[key].costs.map((cost) => (
-                <span key={cost}>{cost}</span>
+                <span key={cost} {...stylex.props(lessonKit.cost, lessonKit[`${key}Cost`])}>
+                  {cost}
+                </span>
               ))}
             </div>
           </figure>
@@ -755,7 +824,9 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
           <Stars stars={stars} />
         </div>
         <h3>{level.name}</h3>
-        <p className="prompt">{level.prompt}</p>
+        <Tone value="prompt">
+          <p className="prompt">{level.prompt}</p>
+        </Tone>
         <div
           className="say"
           aria-live="polite"
@@ -815,7 +886,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
                       <Burst />
                     </span>
                   ) : (
-                    slot.label
+                    <Tone value="wrap">{slot.label}</Tone>
                   )}
                 </button>
               </li>
@@ -1062,6 +1133,8 @@ const dockShrink = stylex.keyframes({
   to: { scale: "var(--dock-k,1)", opacity: 0 },
 });
 
+const said = stylex.keyframes({ from: { opacity: 0, translate: "0 6px" } });
+
 const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
@@ -1145,7 +1218,10 @@ const shell = stylex.create({
   },
   titleScreen: {
     display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1.15fr) minmax(0, 1fr)", [STACKED]: "minmax(0, 1fr)" },
+    gridTemplateColumns: {
+      default: "minmax(0, 1.15fr) minmax(0, 1fr)",
+      [STACKED]: "minmax(0, 1fr)",
+    },
     gap: { default: "56px", [STACKED]: "40px" },
     alignItems: "center",
     minHeight: { default: "calc(100svh - 72px)", [STACKED]: 0 },
@@ -1254,8 +1330,352 @@ const shell = stylex.create({
     },
     transition: {
       default: null,
-      [stylex.when.ancestor("[data-rev-on]", reveal)]: `opacity ${motion["--t-panel"]} ${motion["--out"]}, translate ${motion["--t-panel"]} ${motion["--out"]}`,
+      [stylex.when.ancestor("[data-rev-on]", reveal)]:
+        `opacity ${motion["--t-panel"]} ${motion["--out"]}, translate ${motion["--t-panel"]} ${motion["--out"]}`,
     },
+  },
+});
+
+const TAB = `@media ${TABBED}`;
+const PAIRED = "@media (max-width: 860px)";
+const BAD_PANE = ':is([data-side="bad"])';
+
+const text = stylex.create({
+  wrap: {
+    display: "inline-block",
+    maxWidth: "100%",
+    overflowWrap: "anywhere",
+  },
+  chip: {
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+    fontWeight: 600,
+    fontSize: "0.86em",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  },
+  tint: {
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    fontSize: "0.86em",
+    color: palette["--text"],
+  },
+  bright: {
+    color: palette["--text"],
+  },
+  lesson: {
+    maxWidth: "62ch",
+    fontSize: "16px",
+    lineHeight: 1.6,
+    color: palette["--dim"],
+    textWrap: "pretty",
+  },
+  tip: {
+    paddingBlock: "10px",
+    paddingInline: "14px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+    fontSize: "14px",
+  },
+});
+
+const lessonKit = stylex.create({
+  section: {
+    paddingTop: "64px",
+    paddingBottom: 0,
+    scrollMarginTop: "8px",
+  },
+  secHead: {
+    display: "grid",
+    gap: "14px",
+    marginBottom: "48px",
+  },
+  veil: {
+    backgroundColor: palette["--veil"],
+    boxShadow: palette["--veil-edge"],
+    borderRadius: "16px",
+  },
+  secTitle: {
+    justifySelf: "start",
+    fontWeight: 900,
+    fontSize: "clamp(32px, 4vw, 52px)",
+    lineHeight: 1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.04em",
+  },
+  secText: {
+    justifySelf: "start",
+    maxWidth: "60ch",
+    fontSize: "17px",
+    lineHeight: 1.6,
+    color: palette["--dim"],
+    textWrap: "pretty",
+  },
+  lessons: {
+    display: "grid",
+    gap: "24px",
+  },
+  lesson: {
+    display: "grid",
+    gap: "28px",
+    paddingTop: { default: "32px", [PHONE]: "20px" },
+    paddingRight: { default: "32px", [PHONE]: "20px" },
+    paddingBottom: { default: "32px", [PHONE]: "20px" },
+    paddingLeft: { default: "36px", [PHONE]: "20px" },
+    borderRadius: "20px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 6px 0 ${palette["--drop-ink"]}`,
+  },
+  copy: {
+    display: "grid",
+    gap: "12px",
+    justifyItems: "start",
+  },
+  exception: {
+    paddingBlock: "3px",
+    paddingInline: "8px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: "var(--c-ink)",
+    borderRadius: "6px",
+    fontWeight: 900,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--c-ink)",
+    rotate: "-3deg",
+  },
+  title: {
+    color: palette["--text"],
+    fontWeight: 900,
+    fontSize: { default: "28px", [PHONE]: "24px" },
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    textWrap: "pretty",
+  },
+  demo: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr) minmax(0, 1fr)", [TAB]: "minmax(0, 1fr)" },
+    gap: { default: "16px", [TAB]: "12px" },
+  },
+  well: {
+    borderRadius: "14px",
+    backgroundColor: kit["--code-bg"],
+    boxShadow: palette["--sink"],
+  },
+  pane: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gridTemplateRows: { default: "auto 1fr auto", [TAB]: "1fr auto" },
+    gridArea: { default: null, [TAB]: "2 / 1" },
+    gap: "16px",
+    paddingTop: { default: "16px", [PHONE]: "14px" },
+    paddingRight: { default: "18px", [PHONE]: "12px" },
+    paddingBottom: { default: "18px", [PHONE]: "14px" },
+    paddingLeft: { default: "18px", [PHONE]: "12px" },
+  },
+  behind: {
+    visibility: { default: null, [TAB]: "hidden" },
+  },
+  caption: {
+    display: { default: "inline-flex", [TAB]: "none" },
+    justifySelf: "start",
+    alignItems: "center",
+    gap: "6px",
+    minHeight: "34px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderRadius: "9px",
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  },
+  mark: {
+    fontSize: "11px",
+  },
+  bad: {
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    backgroundPosition: "initial",
+    color: kit["--no-ink"],
+  },
+  good: {
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    backgroundPosition: "initial",
+    color: kit["--yes-ink"],
+  },
+  flip: {
+    display: { default: "none", [TAB]: "inline-flex" },
+    justifySelf: "start",
+    maxWidth: "100%",
+    gap: "4px",
+    padding: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  },
+  // `background: transparent` minifies to a 0 0 position; the pressed key's background resets it.
+  flipKey: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    minWidth: { default: null, [PHONE]: 0 },
+    minHeight: "34px",
+    paddingBlock: { default: 0, [PHONE]: "6px" },
+    paddingInline: { default: "12px", [PHONE]: "10px" },
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "9px",
+    backgroundColor: "transparent",
+    backgroundPosition: "0 0",
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+    whiteSpace: { default: "nowrap", [PHONE]: "normal" },
+    textWrap: { default: null, [PHONE]: "balance" },
+    cursor: cursors["--cursor-point"],
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
+  },
+  costs: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+  },
+  cost: {
+    paddingBlock: "3px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    animationName: { default: null, [TAB]: { default: said, [REDUCE]: "none" } },
+    animationDuration: { default: null, [TAB]: "200ms" },
+    animationTimingFunction: { default: null, [TAB]: motion["--out"] },
+  },
+  badCost: {
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
+  },
+  goodCost: {
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
+  },
+  sheetWrap: {
+    display: "grid",
+    gap: "20px",
+    marginTop: "72px",
+  },
+  sheetTitle: {
+    color: palette["--text"],
+    fontWeight: 900,
+    fontSize: { default: "28px", [PHONE]: "24px" },
+    lineHeight: 1.1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.03em",
+    textWrap: "pretty",
+  },
+  panel: {
+    borderRadius: "20px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 6px 0 ${palette["--drop-ink"]}`,
+  },
+  sheet: {
+    display: "grid",
+    padding: "8px",
+  },
+  sheetRow: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr) minmax(0, 1.2fr)",
+      [PAIRED]: "minmax(0, 1fr)",
+    },
+    gap: { default: "24px", [PAIRED]: "4px" },
+    alignItems: "baseline",
+    paddingBlock: "16px",
+    paddingInline: "18px",
+    borderTopWidth: { default: null, ":not(:first-child)": "1px" },
+    borderTopStyle: { default: null, ":not(:first-child)": "solid" },
+    borderTopColor: { default: null, ":not(:first-child)": palette["--hair"] },
+    textWrap: "pretty",
+  },
+  situation: {
+    color: palette["--dim"],
+  },
+  answer: {
+    fontWeight: 700,
+    fontSize: "17px",
+    lineHeight: 1.35,
+    fontFamily: fonts["--display"],
+    letterSpacing: "-0.015em",
+    color: palette["--text"],
+  },
+});
+
+const tree = stylex.create({
+  list: {
+    display: "grid",
+    alignContent: "start",
+    gap: "4px",
+    fontSize: "13px",
+    lineHeight: 1.4,
+    fontFamily: fonts["--mono"],
+  },
+  inPane: {
+    minHeight: { default: null, [TAB]: "calc(var(--rows) * 32px)" },
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    minHeight: "28px",
+    paddingLeft: { default: "calc(var(--d) * 20px)", [PHONE]: "calc(var(--d) * 14px)" },
+    color: palette["--text"],
+    textWrap: "pretty",
+  },
+  dir: { color: palette["--dim"] },
+  comp: { color: "var(--c-ink)" },
+  more: { color: palette["--mute"] },
+  moved: {
+    paddingBlock: "3px",
+    paddingInline: "10px",
+    borderRadius: "8px",
+    backgroundColor: {
+      default: "var(--c)",
+      [stylex.when.ancestor(BAD_PANE)]:
+        `color-mix(in srgb, ${kit["--no"]} 22%, ${palette["--panel-2"]})`,
+    },
+    boxShadow: {
+      default: "0 3px 0 var(--key-c)",
+      [stylex.when.ancestor(BAD_PANE)]:
+        `0 3px 0 color-mix(in srgb, ${kit["--no"]} 40%, ${palette["--drop-ink"]})`,
+    },
+    fontWeight: 600,
+    color: {
+      default: "var(--on-c)",
+      [stylex.when.ancestor(BAD_PANE)]: kit["--no-ink"],
+    },
+  },
+  calls: {
+    paddingBlock: "2px",
+    paddingInline: "6px",
+    borderRadius: "5px",
+    backgroundColor: "color-mix(in srgb, var(--c) 18%, transparent)",
+    fontWeight: 700,
+    fontSize: "10px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: "var(--c-ink)",
+    whiteSpace: "nowrap",
   },
 });
 

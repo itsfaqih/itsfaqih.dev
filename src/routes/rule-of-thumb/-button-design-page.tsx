@@ -9,7 +9,14 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { type Lesson, type Level, onceOnScreen, RuleLanding } from "./-components/rule-landing";
+import {
+  Code,
+  Kbd,
+  type Lesson,
+  type Level,
+  onceOnScreen,
+  RuleLanding,
+} from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 
 const TABLET = "@media (max-width: 820px)";
@@ -945,7 +952,7 @@ const LESSONS: Lesson[] = [
       <>
         Hover, press and keyboard focus each need their own look. Without them a click feels like it
         missed, and a keyboard user can't see where they are. Hover both, press both, then{" "}
-        <kbd>Tab</kbd> to them.
+        <Kbd>Tab</Kbd> to them.
       </>
     ),
     bad: {
@@ -1043,7 +1050,7 @@ const LESSONS: Lesson[] = [
       <>
         An icon carries white space inside its own box, so equal padding looks lopsided. Take 4px
         off the icon's side and centre it on the text. An icon with no label is square, and needs an{" "}
-        <code>aria-label</code> and a tooltip.
+        <Code>aria-label</Code> and a tooltip.
       </>
     ),
     extra: <LessonToggle label="Show padding" name="pads" />,
@@ -1203,7 +1210,7 @@ const LEVELS: Level[] = [
     name: "Less padding",
     prompt: (
       <>
-        <code>pl-2 pr-3</code> puts 8px on the left and 12px on the right. Which button in the
+        <Code>pl-2 pr-3</Code> puts 8px on the left and 12px on the right. Which button in the
         toolbar gets it?
       </>
     ),
@@ -1244,7 +1251,7 @@ const LEVELS: Level[] = [
     name: "Can't be pressed",
     prompt: (
       <>
-        Publish has three moments. Which one gets <code>cursor: not-allowed</code>?
+        Publish has three moments. Which one gets <Code>cursor: not-allowed</Code>?
       </>
     ),
     piece: "cursor: not-allowed",

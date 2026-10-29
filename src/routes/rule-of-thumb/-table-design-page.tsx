@@ -20,7 +20,7 @@ import {
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import { Code, type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
 import { row, tipped } from "./-table-design.stylex";
 import { kit } from "./-components/rule-landing.stylex";
 
@@ -233,8 +233,7 @@ const styles = stylex.create({
     color: { default: palette["--dim"], ":hover": palette["--text"] },
     whiteSpace: "nowrap",
     cursor: cursors["--cursor-point"],
-    transition:
-      `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, box-shadow ${kit["--t-fb"]} ease`,
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, box-shadow ${kit["--t-fb"]} ease`,
   },
   segOn: {
     backgroundColor: "var(--c)",
@@ -1415,8 +1414,8 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         People compare numbers by their last digits. Right-align the column, set{" "}
-        <code>tabular-nums</code> so every digit is the same width, and format with{" "}
-        <code>toLocaleString()</code>. The figures below are live. Watch the right edge.
+        <Code>tabular-nums</Code> so every digit is the same width, and format with{" "}
+        <Code>toLocaleString()</Code>. The figures below are live. Watch the right edge.
       </>
     ),
     extra: <LiveSwitch />,
@@ -1496,7 +1495,7 @@ const LESSONS: Lesson[] = [
     title: "Keep the page in the URL",
     body: (
       <>
-        Store the page in the address as <code>?page=2</code>. Then a reload, the Back button and a
+        Store the page in the address as <Code>?page=2</Code>. Then a reload, the Back button and a
         link you send all land where you were. Each table below starts on page 2. Reload both.
       </>
     ),
@@ -1572,8 +1571,8 @@ const LEVELS: Level[] = [
     name: "Format at the edge",
     prompt: (
       <>
-        The table sorts by MRR and shows <code>12,500.00</code>. Where should{" "}
-        <code>toLocaleString()</code> run?
+        The table sorts by MRR and shows <Code>12,500.00</Code>. Where should{" "}
+        <Code>toLocaleString()</Code> run?
       </>
     ),
     piece: "toLocaleString()",
