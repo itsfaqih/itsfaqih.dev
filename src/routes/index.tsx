@@ -1,15 +1,15 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { SLIDES } from "../data/home";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
+import { ExperienceList, type Job } from "./-components/experience-list";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
 import { reticle } from "./-components/reticle";
 import { RuleSpread } from "./-components/rule-spread";
 import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
-import { TechIcon, techBrand } from "./-components/tech-icon";
 import { useCutIns } from "./-components/use-cut-ins";
 import { LINKS, pageHead } from "../seo";
 
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
     }),
 });
 
-const EXPERIENCE = [
+const EXPERIENCE: Job[] = [
   {
     years: "2024 → now",
     company: "EvidenceCare",
@@ -298,7 +298,7 @@ function Index() {
               <span data-cut>Where I've worked</span>
             </h2>
           </div>
-          <ExperienceList />
+          <ExperienceList jobs={EXPERIENCE} />
         </section>
 
         <StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />
@@ -572,120 +572,4 @@ function Hero({ introDone }: { introDone: boolean }) {
       </div>
     </div>
   );
-}
-
-function ExperienceList() {
-  const [open, setOpen] = useState(0);
-  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const listRef = useRef<HTMLDivElement>(null);
-  const beforeRef = useRef<Snapshot | null>(null);
-
-  const toggle = (index: number) => {
-    const list = listRef.current;
-    if (list && !reduced) beforeRef.current = snapshotOf(list);
-    setOpen(open === index ? -1 : index);
-  };
-
-  useLayoutEffect(() => {
-    const list = listRef.current;
-    const before = beforeRef.current;
-    beforeRef.current = null;
-    if (!list || !before) return;
-    const after = snapshotOf(list);
-    const glide: KeyframeAnimationOptions = {
-      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-      fill: "backwards",
-      duration: 380,
-    };
-    if (before.height !== after.height) {
-      list.animate([{ height: `${before.height}px` }, { height: `${after.height}px` }], glide);
-    }
-    after.rows.forEach((to, row) => {
-      const from = before.rows.get(row);
-      if (from === undefined || Math.abs(from - to) < 0.5) return;
-      row.animate([{ transform: `translateY(${from - to}px)` }, { transform: "none" }], glide);
-    });
-    after.pills.forEach((to, pill) => {
-      const from = before.pills.get(pill);
-      if (!from) return;
-      const dx = from.xInRow - to.xInRow;
-      const dy = from.yInRow - to.yInRow;
-      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
-      pill.animate(
-        [
-          { offset: 0, opacity: 1, transform: `translate(${dx}px, ${dy}px)`, easing: "ease-in" },
-          { offset: 0.38, opacity: 0, transform: `translate(${dx}px, ${dy - 10}px)` },
-          { offset: 0.38, opacity: 0, transform: "translateX(-18px)", easing: glide.easing },
-          { offset: 1, opacity: 1, transform: "none" },
-        ],
-        { duration: 520, delay: to.order * 18, fill: "backwards" },
-      );
-    });
-  }, [open]);
-
-  return (
-    <div ref={listRef} className="hs">
-      {EXPERIENCE.map((job, index) => {
-        const isOpen = open === index;
-        const panelId = `job-${index}`;
-        return (
-          <div key={job.company} className="hs-row" data-cut data-on={isOpen ? "" : undefined}>
-            <button
-              type="button"
-              className="hs-head"
-              aria-expanded={isOpen}
-              aria-controls={panelId}
-              onClick={() => toggle(index)}
-            >
-              <span className="rk">{job.years}</span>
-              <h3>
-                {job.company}
-                <small>{job.role}</small>
-              </h3>
-              <span className="hs-x" aria-hidden="true" />
-            </button>
-            <ul className="hs-stack" aria-label={`${job.company} stack`}>
-              {job.stack.map((tool) => (
-                <li key={tool} style={techBrand(tool)}>
-                  <TechIcon name={tool} />
-                  {tool}
-                </li>
-              ))}
-            </ul>
-            <div id={panelId} className="hs-body">
-              {isOpen && (
-                <ul className="hs-list">
-                  {job.achievements.map((item, at) => (
-                    <li key={item} style={{ "--j": at }}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-type Snapshot = {
-  height: number;
-  rows: Map<Element, number>;
-  pills: Map<Element, { xInRow: number; yInRow: number; order: number }>;
-};
-
-function snapshotOf(list: HTMLElement): Snapshot {
-  const rows = new Map<Element, number>();
-  const pills = new Map<Element, { xInRow: number; yInRow: number; order: number }>();
-  for (const row of list.querySelectorAll(".hs-row")) {
-    const box = row.getBoundingClientRect();
-    rows.set(row, box.top);
-    row.querySelectorAll(".hs-stack li").forEach((pill, order) => {
-      const at = pill.getBoundingClientRect();
-      pills.set(pill, { xInRow: at.left - box.left, yInRow: at.top - box.top, order });
-    });
-  }
-  return { height: list.getBoundingClientRect().height, rows, pills };
 }

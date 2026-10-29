@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import type { CSSProperties } from "react";
 import {
   siAdonisjs,
@@ -54,6 +55,7 @@ import {
   siXyflow,
   siZod,
 } from "simple-icons";
+import { palette } from "../../theme.stylex";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
 const MARKS = new Map<string, Mark>(Object.entries({
@@ -168,12 +170,49 @@ export function techBrand(name: string) {
   return BRANDS.get(name);
 }
 
-export function TechIcon({ name }: { name: string }) {
+/** A tool's mark: one colour, a touch dimmer than the label. `style` lights it in context. */
+export function TechIcon({ name, style }: { name: string; style?: stylex.StyleXStyles }) {
   const mark = MARKS.get(name);
   if (!mark) return null;
   return (
-    <svg className="ti" viewBox={mark.viewBox ?? "0 0 24 24"} aria-hidden="true">
+    <svg {...stylex.props(styles.mark, style)} viewBox={mark.viewBox ?? "0 0 24 24"} aria-hidden="true">
       <path d={mark.path} fillRule={mark.evenOdd ? "evenodd" : undefined} />
     </svg>
   );
 }
+
+// The tool's own colour for the current theme, from techBrand's inline properties.
+const BRAND = {
+  "--brand": {
+    default: `var(--brand-dark, ${palette["--go-ink"]})`,
+    ":is(.light *)": `var(--brand-light, ${palette["--go-ink"]})`,
+  },
+};
+
+/**
+ * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, the colour the badge
+ * lights up in on hover. Pair either with techBrand(name) as the inline style.
+ */
+export const techBadge = stylex.create({
+  badge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    userSelect: "none",
+    ...BRAND,
+  },
+  brand: BRAND,
+});
+
+const styles = stylex.create({
+  mark: {
+    flex: "none",
+    width: "1.15em",
+    height: "1.15em",
+    fill: "currentColor",
+    color: palette["--mute"],
+    transitionProperty: "color",
+    transitionDuration: "120ms",
+    transitionTimingFunction: "ease",
+  },
+});

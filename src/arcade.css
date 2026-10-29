@@ -825,221 +825,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   initial-value: transparent;
 }
 
-/* ---------- Experience ---------- */
-.arc .hs {
-  background: var(--panel);
-  border: 2px solid var(--hair);
-  border-radius: 22px;
-  box-shadow:
-    var(--raise),
-    0 4px 0 var(--drop-ink);
-  overflow: hidden;
-}
-.arc .hs-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 14px 28px;
-  align-items: center;
-  padding: 18px 22px;
-  border-top: 2px solid var(--hair);
-  /* Opaque so a row sliding down covers the list opening above it. */
-  background: var(--panel);
-  transition: background-color 160ms ease;
-}
-.arc .hs-row:first-child {
-  border-top: 0;
-}
-.arc .hs-row[data-on] {
-  grid-template-rows: auto 1fr;
-  align-items: start;
-  background: var(--panel-2);
-}
-.arc .hs-head {
-  grid-area: 1 / 1;
-}
-/* Closed: the stack sits on the right. Open: it fills the left column under the head and the
-   achievements take the right column. */
-.arc .hs-stack {
-  grid-area: 1 / 2;
-}
-.arc .hs-row[data-on] .hs-stack {
-  grid-area: 2 / 1;
-  align-content: start;
-}
-.arc .hs-body {
-  grid-area: 1 / 2 / span 2;
-}
-.arc .hs-body:empty {
-  display: none;
-}
-.arc .hs-row:not([data-on]):hover {
-  background: color-mix(in srgb, var(--panel-2) 55%, transparent);
-}
-/* On paper the open row is the white sheet and the closed rows sit back in the page tone, so the
-   row being read has the most contrast. */
-.light .arc .hs-row {
-  background: var(--bg);
-}
-.light .arc .hs-row:not([data-on]):hover {
-  background: color-mix(in srgb, var(--panel-2) 55%, var(--bg));
-}
-.light .arc .hs-row[data-on] {
-  background: var(--panel);
-}
-.arc .hs-row:has(.hs-head:focus-visible) {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-/* The dates sit over the company and role; the chevron stays at the right. */
-.arc .hs-head {
-  display: grid;
-  grid-template-columns: 1fr 20px;
-  gap: 6px 18px;
-  align-items: center;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: var(--cursor-point);
-  outline: none;
-}
-/* A closed row is one big target; an open row only toggles from its head,
-   so its achievements stay selectable. */
-.arc .hs-row:not([data-on]) .hs-head::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-.arc .hs-row .rk {
-  grid-area: 1 / 1;
-  font: 500 12px var(--display);
-  color: var(--go-ink);
-}
-.arc .hs-row h3 {
-  grid-area: 2 / 1;
-}
-.arc .hs-row h3 {
-  margin: 0;
-  font: 700 18px/1.2 var(--display);
-  color: var(--text);
-}
-.arc .hs-row h3 small {
-  display: block;
-  font: 400 13px var(--sans);
-  color: var(--mute);
-  margin-top: 4px;
-}
-.arc .hs-x {
-  grid-area: 1 / 2 / span 2;
-  justify-self: end;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid var(--mute);
-  border-bottom: 2px solid var(--mute);
-  transform: translateY(-3px) rotate(45deg);
-  transition:
-    transform 220ms var(--snap),
-    border-color 120ms ease;
-}
-.arc .hs-row[data-on] .hs-x {
-  border-color: var(--go-ink);
-  transform: translateY(2px) rotate(-135deg);
-}
-.arc .hs-stack,
-.arc .hs-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.arc .hs-list li {
-  animation: hs-in 360ms var(--out) backwards;
-  animation-delay: calc(140ms + var(--j) * 45ms);
-}
-.arc .hs-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.arc .hs-stack li,
-.arc .pups li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  user-select: none;
-  -webkit-user-select: none;
-}
-/* Tech marks: one colour, a touch dimmer than the label, lit on hover. */
-.arc .ti {
-  flex: none;
-  width: 1.15em;
-  height: 1.15em;
-  fill: currentColor;
-  color: var(--mute);
-  transition: color 120ms ease;
-}
-.arc .hs-row:not([data-on]):hover .hs-stack .ti,
-.arc .hs-row[data-on] .hs-stack .ti {
-  color: var(--dim);
-}
-/* On hover a badge lights up in its tool's own brand colour (set per theme in tech-icon.tsx). */
-.arc .hs-stack li,
-.arc .pups li,
-.arc .peek {
-  --brand: var(--brand-dark, var(--go-ink));
-}
-.light .arc .hs-stack li,
-.light .arc .pups li,
-.light .arc .peek {
-  --brand: var(--brand-light, var(--go-ink));
-}
-.arc .pups li:hover .ti,
-.arc .hs-row .hs-stack li:hover .ti {
-  color: var(--brand);
-}
-.arc .hs-stack li {
-  padding: 5px 10px 5px 8px;
-  border-radius: 999px;
-  border: 2px solid var(--hair);
-  font: 500 12px var(--display);
-  color: var(--dim);
-  transition: border-color 120ms ease;
-}
-.arc .hs-row:not([data-on]):hover .hs-stack li {
-  border-color: var(--hair-hover);
-}
-.arc .hs-stack li:hover {
-  border-color: var(--brand);
-}
-.arc .hs-list {
-  display: grid;
-  gap: 10px;
-}
-.arc .hs-list li {
-  position: relative;
-  padding-left: 20px;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--dim);
-}
-.arc .hs-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--ts);
-}
-@keyframes hs-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
 /* ---------- Projects and stack ---------- */
 .arc .stages {
   display: grid;
@@ -1124,9 +909,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
-.arc .pups li:focus-visible .ti {
-  color: var(--brand);
-}
 
 .arc .stack-filter {
   margin-bottom: 20px;
@@ -1191,9 +973,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   gap: 2px 8px;
   font: 700 15px var(--display);
   color: var(--text);
-}
-.arc .peek header .ti {
-  color: var(--brand);
 }
 .arc .peek header small {
   flex-basis: 100%;
@@ -1306,17 +1085,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
   .arc .hero {
     gap: 28px;
-  }
-  .arc .hs-row {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  .arc .hs-row .hs-head,
-  .arc .hs-row .hs-stack,
-  .arc .hs-row[data-on] .hs-stack,
-  .arc .hs-row .hs-body {
-    grid-area: auto;
-    padding-left: 0;
   }
   .arc h2 {
     font-size: 34px;

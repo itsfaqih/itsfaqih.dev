@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import {
   addTransitionType,
   startTransition,
@@ -9,7 +10,8 @@ import {
   type PointerEvent,
   type RefObject,
 } from "react";
-import { TechIcon, techBrand } from "./tech-icon";
+import { palette } from "../../theme.stylex";
+import { TechIcon, techBadge, techBrand } from "./tech-icon";
 
 export type StackGroup = { label: string; tools: string[] };
 type StackUse = { kind: "work" | "project"; name: string; detail: string };
@@ -139,6 +141,7 @@ export function StackShowcase({
                 {group.tools.map((tool) => (
                   <ViewTransition key={tool} {...FILTER_MOTION}>
                     <li
+                      {...stylex.props(techBadge.badge)}
                       data-cut
                       tabIndex={0}
                       aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
@@ -149,7 +152,7 @@ export function StackShowcase({
                       onBlur={hide}
                       onKeyDown={(event) => event.key === "Escape" && event.currentTarget.blur()}
                     >
-                      <TechIcon name={tool} />
+                      <TechIcon name={tool} style={styles.toolMark} />
                       {tool}
                     </li>
                   </ViewTransition>
@@ -165,11 +168,11 @@ export function StackShowcase({
           ref={cardRef}
           id={PEEK_ID}
           role="tooltip"
-          className="peek"
+          className={`peek ${stylex.props(techBadge.brand).className}`}
           style={techBrand(peek.tool)}
         >
           <header>
-            <TechIcon name={peek.tool} />
+            <TechIcon name={peek.tool} style={styles.peekMark} />
             {peek.tool}
             <small>{groupOf(peek.tool)}</small>
           </header>
@@ -226,3 +229,13 @@ function usePlaceCard(
     card.dataset.side = fitsAbove ? "top" : "bottom";
   }, [sectionRef, cardRef, peek]);
 }
+
+const styles = stylex.create({
+  // A badge lights its mark in its tool's own colour under the pointer and keyboard focus.
+  toolMark: {
+    color: { default: palette["--mute"], ":is(:hover > *, :focus-visible > *)": "var(--brand)" },
+  },
+  peekMark: {
+    color: "var(--brand)",
+  },
+});
