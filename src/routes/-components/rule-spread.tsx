@@ -6,6 +6,7 @@ import type { PublishedGuideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RuleThumb, useRuleOpen } from "./rule-art";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { veil } from "./section";
 
 const STEP = 0.68;
 const RUBBER = 0.35;
@@ -226,9 +227,8 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           </div>
         ))}
       </div>
-      {/* .spread-nav keys the veil under the count in arcade.css. */}
-      <div className={`spread-nav ${stylex.props(styles.nav).className}`} data-cut>
-        <span className="sr-only" aria-live="polite">
+      <div {...stylex.props(styles.nav)} data-cut>
+        <span className={`sr-only ${stylex.props(veil.dense).className}`} aria-live="polite">
           {rule.title}
         </span>
         <button
@@ -240,7 +240,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
         >
           ←
         </button>
-        <span>
+        <span {...stylex.props(veil.dense)}>
           <SlideNumber value={active + 1} /> / {pad(rules.length)}
         </span>
         <button

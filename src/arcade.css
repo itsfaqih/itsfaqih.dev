@@ -105,34 +105,6 @@ html.sb-own::-webkit-scrollbar {
   background: repeating-linear-gradient(transparent 0 2px, var(--scan) 2px 3px);
 }
 
-.arc-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  /* Fade the grid toward the middle so it frames the content instead of sitting under copy. */
-  mask: radial-gradient(ellipse 75% 65% at 50% 45%, rgb(0 0 0 / 0.45), #000);
-}
-.arc-backdrop i,
-.arc-backdrop canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-/* The canvas draws the dots inside --hole; the grid skips them there. */
-.arc-backdrop i {
-  /* One cell taller, so sliding it up by a part of a cell never bares the bottom edge. */
-  height: calc(100% + 22px);
-  will-change: transform;
-  background: radial-gradient(circle, var(--dot) 1.25px, transparent 1.75px) 0 0 / 22px 22px;
-  mask: radial-gradient(
-    circle at var(--mx, 0) var(--my, 0),
-    transparent var(--hole, 0px),
-    #000 var(--hole, 0px)
-  );
-}
-
 /* Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
 html[data-theme-swap]::view-transition-old(root),
 html[data-theme-swap]::view-transition-new(root) {
@@ -261,72 +233,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   animation-play-state: paused !important;
 }
 
-/* ---------- Sections ---------- */
-.arc section {
-  padding: 88px 0;
-}
-/* Copy that sits straight on the dot field, with no card under it, rests on a veil: a soft patch
-   of page colour whose edge feathers out into the dots, so they never run through the words. */
-.arc .hero > :first-child,
-.arc .sh2 > *,
-.arc .spread-nav > span,
-.arc .stack-filter-row h3,
-.arc .pups-group h3,
-.arc footer > span,
-.arc .index-head > * {
-  background: var(--veil);
-  box-shadow: var(--veil-edge);
-  border-radius: 16px;
-}
-.arc .index-head > *,
-.arc .sh2 h2 > small {
-  width: fit-content;
-}
-.arc .hero .tag,
-.arc .sh2 h2 > small,
-.arc .sh2 > p,
-.arc .spread-nav > span,
-.arc .stack-filter-row h3,
-.arc .pups-group h3,
-.arc footer > span,
-.arc .index-head > .tag {
-  background: var(--veil-dense);
-  box-shadow: var(--veil-dense-edge);
-  border-radius: 12px;
-}
-.arc .sh2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 24px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-.arc h2 {
-  font: 900 44px/1 var(--display);
-  letter-spacing: -0.04em;
-  color: var(--text);
-  margin: 0;
-}
-.arc h2 small {
-  display: block;
-  font: 500 13px var(--display);
-  letter-spacing: 0;
-  color: var(--go-ink);
-  margin-bottom: 10px;
-}
-.arc h2 small[style*="--c"] {
-  color: color-mix(in oklab, var(--c) var(--ink-mix), #000);
-}
-/* The title is its own block so it can glitch apart from the eyebrow above it. */
-.arc h2 > span[data-cut] {
-  display: block;
-}
-.arc .sh2 p {
-  margin: 0;
-  max-width: 34em;
-}
-
 /* ---------- Rule spread (home) ----------
    The deck styles itself (rule-spread.tsx). @property registrations stay global: --glow must be a
    registered <color> so the glow behind the deck eases between hues. */
@@ -356,12 +262,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 @media (max-width: 960px) {
   .arc-wrap {
     padding: 0 18px;
-  }
-  .arc h2 {
-    font-size: 34px;
-  }
-  .arc section {
-    padding: 64px 0;
   }
 }
 

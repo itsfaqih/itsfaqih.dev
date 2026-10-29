@@ -13,6 +13,7 @@ import {
 import { fonts, motion, palette } from "../../theme.stylex";
 import { chips } from "./chips";
 import { TechIcon, techBadge, techBrand } from "./tech-icon";
+import { section, veil } from "./section";
 
 export type StackGroup = { label: string; tools: string[] };
 type StackUse = { kind: "work" | "project"; name: string; detail: string };
@@ -83,19 +84,18 @@ export function StackShowcase({
   const projects = peekUses.filter((use) => use.kind === "project");
 
   return (
-    <section ref={sectionRef} id="stack" {...stylex.props(styles.section)}>
-      <div className="sh2">
-        <h2>
-          <small data-cut style={{ "--c": "var(--ar)" }}>
+    <section ref={sectionRef} id="stack" {...stylex.props(section.block, styles.section)}>
+      <div {...stylex.props(section.head)}>
+        <h2 {...stylex.props(section.title, veil.soft)}>
+          <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ar)" }}>
             Tools I use
           </small>
-          <span data-cut>Stack</span>
+          <span {...stylex.props(section.titleText)} data-cut>Stack</span>
         </h2>
       </div>
 
-      {/* .stack-filter-row and .pups-group key the veil under their h3 in arcade.css. */}
       <div {...stylex.props(styles.filter)}>
-        <div className={`stack-filter-row ${stylex.props(styles.row).className}`}>
+        <div {...stylex.props(styles.row)}>
           <span {...stylex.props(styles.spacer)} />
           <div {...stylex.props(chips.group, styles.chips)}>
             <button
@@ -113,8 +113,8 @@ export function StackShowcase({
           </div>
         </div>
         {FILTER_ROWS.map((row) => (
-          <div key={row.kind} className={`stack-filter-row ${stylex.props(styles.row).className}`}>
-            <h3 {...stylex.props(styles.rowLabel)} data-cut>
+          <div key={row.kind} {...stylex.props(styles.row)}>
+            <h3 {...stylex.props(veil.dense, styles.rowLabel)} data-cut>
               {row.label}
             </h3>
             <div
@@ -147,8 +147,8 @@ export function StackShowcase({
       <div {...stylex.props(styles.groups)}>
         {shownGroups.map((group) => (
           <ViewTransition key={group.label} {...FILTER_MOTION}>
-            <div className={`pups-group ${stylex.props(styles.group).className}`}>
-              <h3 {...stylex.props(styles.groupLabel)} data-cut>
+            <div {...stylex.props(styles.group)}>
+              <h3 {...stylex.props(veil.dense, styles.groupLabel)} data-cut>
                 {group.label}
               </h3>
               <ul {...stylex.props(styles.tools)}>

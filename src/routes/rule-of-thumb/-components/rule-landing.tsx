@@ -29,6 +29,7 @@ import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
 import { button } from "../../../components/button";
+import { section } from "../../-components/section";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
@@ -182,11 +183,11 @@ function Landing({
       </header>
 
       <div className="arc-wrap">
-        <section id="learn" aria-labelledby="learn-title" {...stylex.props(lessonKit.section)}>
+        <section id="learn" aria-labelledby="learn-title" {...stylex.props(section.block, lessonKit.section)}>
           <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
             <h2
               id="learn-title"
-              {...stylex.props(lessonKit.veil, lessonKit.headItem, lessonKit.secTitle)}
+              {...stylex.props(section.title, lessonKit.veil, lessonKit.headItem, lessonKit.secTitle)}
             >
               {learn.title}
             </h2>
@@ -214,10 +215,10 @@ function Landing({
           </div>
         </section>
 
-        <section id="quiz" aria-labelledby="quiz-title" {...stylex.props(quizKit.section)}>
+        <section id="quiz" aria-labelledby="quiz-title" {...stylex.props(section.block, quizKit.section)}>
           <div {...stylex.props(quizKit.head, shell.rev)} data-rev>
             <div {...stylex.props(lessonKit.veil, lessonKit.headItem, quizKit.headCopy)}>
-              <h2 id="quiz-title" {...stylex.props(lessonKit.secTitle)}>
+              <h2 id="quiz-title" {...stylex.props(section.title, lessonKit.secTitle)}>
                 Mini quiz
               </h2>
               <Tone value="wrap">
@@ -249,9 +250,9 @@ function Landing({
           </Rail>
         </section>
 
-        <section {...stylex.props(takeKit.section)}>
+        <section {...stylex.props(section.block, takeKit.section)}>
           <div {...stylex.props(lessonKit.veil, takeKit.copy, shell.rev)} data-rev>
-            <h2 {...stylex.props(takeKit.title)}>Take the rule with you</h2>
+            <h2 {...stylex.props(section.title, takeKit.title)}>Take the rule with you</h2>
             <Tone value="take">
               <p {...stylex.props(takeKit.text)}>
                 The whole rule as plain Markdown. Paste it into your <Code>AGENTS.md</Code>

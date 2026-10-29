@@ -1,5 +1,7 @@
+import * as stylex from "@stylexjs/stylex";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { palette } from "../../theme.stylex";
 
 const CELL = 22;
 const RADIUS = 220;
@@ -21,13 +23,40 @@ export function Backdrop() {
 
   if (!mounted) return null;
   return createPortal(
-    <div ref={followPointer} className="arc-backdrop" aria-hidden="true">
-      <i />
-      <canvas />
+    <div ref={followPointer} {...stylex.props(styles.root)} aria-hidden="true">
+      <i {...stylex.props(styles.layer, styles.grid)} />
+      <canvas {...stylex.props(styles.layer)} />
     </div>,
     document.body,
   );
 }
+
+const styles = stylex.create({
+  root: {
+    position: "fixed",
+    inset: 0,
+    zIndex: -1,
+    pointerEvents: "none",
+    // Fade the grid toward the middle so it frames the content instead of sitting under copy.
+    mask: "radial-gradient(ellipse 75% 65% at 50% 45%, rgb(0 0 0 / 0.45), #000)",
+  },
+  layer: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+  },
+  // The canvas draws the dots inside --hole; the grid skips them there. It is one cell taller, so
+  // sliding it up by a part of a cell never bares the bottom edge.
+  grid: {
+    height: `calc(100% + ${CELL}px)`,
+    willChange: "transform",
+    backgroundImage: `radial-gradient(circle, ${palette["--dot"]} 1.25px, transparent 1.75px)`,
+    backgroundPosition: "0 0",
+    backgroundSize: `${CELL}px ${CELL}px`,
+    mask: "radial-gradient(circle at var(--mx, 0) var(--my, 0), transparent var(--hole, 0px), #000 var(--hole, 0px))",
+  },
+});
 
 function followPointer(element: HTMLDivElement) {
   const grid = element.querySelector("i");

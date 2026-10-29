@@ -6,6 +6,7 @@ import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { heroType } from "../hero-type";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
 import { button } from "../../../components/button";
+import { veil } from "../section";
 
 // The home hero: the headline cycles through what I build, and the bench beside it shows each in
 // print. The slides advance on a timer once the intro hands off; the pips jump, the button pauses.
@@ -45,9 +46,9 @@ export function Hero({ introDone }: { introDone: boolean }) {
   }, [introDone, userPaused, slide.run]);
 
   return (
-    <div className={`hero ${stylex.props(styles.root).className}`}>
-      <div>
-        <div className={`tag ${stylex.props(heroType.tag).className}`} data-cut>
+    <div {...stylex.props(styles.root)}>
+      <div {...stylex.props(veil.soft)}>
+        <div {...stylex.props(veil.dense, heroType.tag)} data-cut>
           Full-stack engineer · Yogyakarta
         </div>
         <h1 data-cut {...stylex.props(heroType.title, styles.title)}>

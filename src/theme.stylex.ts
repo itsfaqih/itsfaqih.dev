@@ -37,7 +37,7 @@ export const palette = stylex.defineVars({
   "--soft-hover": "#2a2a38",
   "--hair-hover": "#3a3a4c",
   "--scan": "rgb(0 0 0 / 0.18)",
-  // Text that sits straight on the dot field gets a patch of page colour under it (see .arc .sh2).
+  // Text that sits straight on the dot field gets a patch of page colour under it (see veil in routes/-components/section.ts).
   "--veil": "color-mix(in srgb, var(--bg) 72%, transparent)",
   "--veil-edge": "0 0 24px 12px var(--veil)",
   // Small text has thin strokes the dots break up easily, so its veil is denser and reaches further.

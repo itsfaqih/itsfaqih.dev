@@ -15,6 +15,7 @@ import { useCutIns } from "./-components/use-cut-ins";
 import { LINKS, pageHead } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
 import { button } from "../components/button";
+import { section, veil } from "./-components/section";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -279,26 +280,26 @@ function Index() {
       </div>
 
       <div className="arc-wrap">
-        <section id="rules">
-          <div className="sh2">
-            <h2>
-              <small data-cut style={{ "--c": "var(--cw)" }}>
+        <section id="rules" {...stylex.props(section.block)}>
+          <div {...stylex.props(section.head)}>
+            <h2 {...stylex.props(section.title, veil.soft)}>
+              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--cw)" }}>
                 Writing
               </small>
-              <span data-cut>Rule of Thumb</span>
+              <span {...stylex.props(section.titleText)} data-cut>Rule of Thumb</span>
             </h2>
-            <p data-cut>Opinions I've earned from my experience</p>
+            <p {...stylex.props(section.blurb, veil.dense)} data-cut>Opinions I've earned from my experience</p>
           </div>
           <RuleSpread rules={VISIBLE_GUIDELINES} />
         </section>
 
-        <section id="work">
-          <div className="sh2">
-            <h2>
-              <small data-cut style={{ "--c": "var(--ux)" }}>
+        <section id="work" {...stylex.props(section.block)}>
+          <div {...stylex.props(section.head)}>
+            <h2 {...stylex.props(section.title, veil.soft)}>
+              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ux)" }}>
                 Experience
               </small>
-              <span data-cut>Where I've worked</span>
+              <span {...stylex.props(section.titleText)} data-cut>Where I've worked</span>
             </h2>
           </div>
           <ExperienceList jobs={EXPERIENCE} />
@@ -306,13 +307,13 @@ function Index() {
 
         <StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />
 
-        <section id="projects">
-          <div className="sh2">
-            <h2>
-              <small data-cut style={{ "--c": "var(--ts)" }}>
+        <section id="projects" {...stylex.props(section.block)}>
+          <div {...stylex.props(section.head)}>
+            <h2 {...stylex.props(section.title, veil.soft)}>
+              <small {...stylex.props(section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ts)" }}>
                 Side projects
               </small>
-              <span data-cut>Projects</span>
+              <span {...stylex.props(section.titleText)} data-cut>Projects</span>
             </h2>
           </div>
           <div {...stylex.props(styles.projects)}>
@@ -335,11 +336,11 @@ function Index() {
         </section>
 
         <div id="contact" {...stylex.props(styles.contact)} data-cut>
-          <h2>
-            <small data-cut style={{ "--c": "var(--ax)" }}>
+          <h2 {...stylex.props(section.title)}>
+            <small {...stylex.props(section.eyebrow)} data-cut style={{ "--c": "var(--ax)" }}>
               Contact
             </small>
-            <span data-cut>Ready to bring the next level of care to your product?</span>
+            <span {...stylex.props(section.titleText)} data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
           <div {...stylex.props(heroType.acts)} data-cut style={{ marginTop: 24 }}>
             <a {...stylex.props(button.base, button.go)} href={`mailto:${LINKS.email}`}>
@@ -357,8 +358,8 @@ function Index() {
         </div>
 
         <footer {...stylex.props(styles.footer)} data-cut>
-          <span>© 2026 Faqih Muntashir</span>
-          <span>
+          <span {...stylex.props(veil.dense)}>© 2026 Faqih Muntashir</span>
+          <span {...stylex.props(veil.dense)}>
             <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
               GitHub
             </a>{" "}

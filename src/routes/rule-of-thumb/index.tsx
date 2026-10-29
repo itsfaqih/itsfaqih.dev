@@ -7,6 +7,7 @@ import { heroType } from "../-components/hero-type";
 import { RuleSelect } from "../-components/rule-select";
 import { useCutIns } from "../-components/use-cut-ins";
 import { pageHead } from "../../seo";
+import { veil } from "../-components/section";
 
 const LEDE =
   "Opinions, guidelines, and patterns I've adopted for building web applications. Many come with demos you can try.";
@@ -30,14 +31,14 @@ function RuleOfThumbsIndex() {
     <div ref={rootRef} className="arc arc-scan">
       <Backdrop />
       <div className="arc-wrap">
-        <div className={`index-head ${stylex.props(styles.head).className}`}>
-          <div className={`tag ${stylex.props(heroType.tag).className}`} data-cut>
+        <div {...stylex.props(styles.head)}>
+          <div {...stylex.props(veil.dense, veil.fit, heroType.tag)} data-cut>
             {RULES.length} rules · {TOPICS.length} topics
           </div>
-          <h1 data-cut {...stylex.props(heroType.title, styles.title)}>
+          <h1 data-cut {...stylex.props(veil.soft, veil.fit, heroType.title, styles.title)}>
             Rule of Thumb
           </h1>
-          <p data-cut {...stylex.props(styles.lede)}>
+          <p data-cut {...stylex.props(veil.soft, veil.fit, styles.lede)}>
             {LEDE}
           </p>
         </div>
