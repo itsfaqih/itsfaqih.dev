@@ -1,5 +1,20 @@
+import * as stylex from "@stylexjs/stylex";
 import { type Lesson, type Level, RuleLanding, Tree } from "./-components/rule-landing";
-import "./proximity-principle.css";
+
+const styles = stylex.create({
+  suffixes: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+  },
+  // Not the padding shorthand, which StyleX emits at class specificity, below the kit's code padding.
+  suffix: {
+    paddingBlock: "4px",
+    paddingInline: "8px",
+    fontSize: "13px",
+    color: "var(--c-ink)",
+  },
+});
 
 const LESSONS: Lesson[] = [
   {
@@ -176,10 +191,10 @@ const LESSONS: Lesson[] = [
       </>
     ),
     extra: (
-      <p className="suffixes">
-        <code>user.schema.ts</code>
-        <code>use-auth.hook.ts</code>
-        <code>dashboard.page.tsx</code>
+      <p {...stylex.props(styles.suffixes)}>
+        <code {...stylex.props(styles.suffix)}>user.schema.ts</code>
+        <code {...stylex.props(styles.suffix)}>use-auth.hook.ts</code>
+        <code {...stylex.props(styles.suffix)}>dashboard.page.tsx</code>
       </p>
     ),
     bad: {
