@@ -276,8 +276,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   transform: scale(0.97) translateY(2px);
 }
 .arc .btn:focus-visible,
-.arc .pip:focus-visible,
-.arc .pause:focus-visible,
 .arc .chips button:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
@@ -293,26 +291,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 .arc .btn.go:active {
   box-shadow: 0 2px 0 var(--go-shadow);
 }
-/* The hero's button wears the slide's hue. The hue eases slower than a hover would, so hover
-   moves to a brightness filter on its own quick timing. */
-.arc .btn.go[style*="--c"] {
-  --key: color-mix(in oklab, var(--c) 70%, #000);
-  background: var(--c);
-  color: var(--on-c);
-  box-shadow: 0 4px 0 var(--key);
-  transition:
-    transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    background-color 280ms ease,
-    box-shadow 280ms ease,
-    filter 120ms ease;
-}
-.arc .btn.go[style*="--c"]:hover {
-  background: var(--c);
-  filter: brightness(1.08);
-}
-.arc .btn.go[style*="--c"]:active {
-  box-shadow: 0 2px 0 var(--key);
-}
 .arc .btn.soft {
   background: var(--panel-2);
   color: var(--text);
@@ -327,72 +305,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   font-size: 12px;
 }
 
-/* The hero's scroll cue: a mouse whose wheel rolls down, rests, and rolls again. It sits on the
-   button row at button height. The loop rides on the wheel, since [data-cut] owns the link's
-   animation. */
-.arc .scroll-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  height: 48px;
-  margin-left: 12px;
-  padding: 0 6px;
-  border-radius: 12px;
-  font: 700 14px var(--display);
-  color: var(--dim);
-  text-decoration: none;
-  cursor: var(--cursor-point);
-  transition: color 120ms ease;
-}
-.arc .scroll-cue:hover {
-  color: var(--text);
-}
-.arc .scroll-cue:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
-.arc .scroll-cue .mouse {
-  position: relative;
-  flex: none;
-  width: 22px;
-  height: 34px;
-  border: 2px solid currentColor;
-  border-radius: 11px;
-}
-.arc .scroll-cue .wheel {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  width: 4px;
-  height: 7px;
-  margin-left: -2px;
-  border-radius: 2px;
-  background: var(--go-ink);
-  animation: scroll-wheel 1.8s infinite;
-}
-@keyframes scroll-wheel {
-  0% {
-    opacity: 0;
-    transform: translateY(-3px);
-    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
-  }
-  15% {
-    opacity: 1;
-    transform: none;
-    animation-timing-function: cubic-bezier(0.645, 0.045, 0.355, 1);
-  }
-  60%,
-  100% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .arc .scroll-cue .wheel {
-    animation: none;
-  }
-}
-
 @keyframes blink {
   50% {
     opacity: 0;
@@ -400,13 +312,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 
 /* ---------- Hero ---------- */
-.arc .hero {
-  display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: 48px;
-  align-items: center;
-  padding: 38px 0 80px;
-}
 .arc .tag {
   display: inline-flex;
   gap: 8px;
@@ -430,39 +335,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   color: var(--text);
   margin: 0 0 22px;
 }
-.arc h1 .lead-in {
-  display: block;
-}
-/* Every phrase sits in the same grid cell, so the headline keeps the height of the longest one. */
-.arc .rot {
-  display: grid;
-}
-.arc .rot .ph {
-  grid-area: 1 / 1;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 160ms ease,
-    visibility 0s 160ms;
-}
-.arc .rot .ph.on {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 120ms ease;
-}
-/* Later phrases slash in; the first arrives with the headline's glitch. */
-.arc .hero[data-started] .rot[data-cycled] .ph.on {
-  animation: slash 520ms var(--cut);
-}
-@keyframes slash {
-  from {
-    clip-path: polygon(0 0, 0 0, -20% 100%, -20% 100%);
-    transform: translateX(-16px);
-  }
-  to {
-    clip-path: polygon(0 0, 120% 0, 100% 100%, -20% 100%);
-  }
-}
 .arc .hl {
   color: var(--on-c);
   background: var(--c);
@@ -476,123 +348,15 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   max-width: 31em;
   margin: 0 0 30px;
 }
-.arc .lead a {
-  color: var(--text);
-  text-decoration: underline;
-  text-decoration-color: var(--hair);
-  text-underline-offset: 4px;
-  transition: text-decoration-color 120ms ease;
-}
-.arc .lead a:hover {
-  text-decoration-color: var(--go-ink);
-}
 .arc .acts {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-/* Bench: the hero's screen and its slide controls (the card is in hero-prints.tsx) */
-.arc .bench {
-  display: grid;
-  gap: 12px;
-  justify-items: center;
-}
-/* Above the tilted card, whose art may swing out past its edges. */
-.arc .bench-ctl {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.arc .pips {
-  display: flex;
-  gap: 2px;
-}
-.arc .pip {
-  display: grid;
-  align-items: center;
-  width: 36px;
-  height: 32px;
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  cursor: var(--cursor-point);
-}
-.arc .pip i {
-  display: block;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--hair);
-  overflow: hidden;
-  transition: background-color 150ms ease;
-}
-.arc .pip:hover i {
-  background: var(--mute);
-}
-.arc .pip[aria-pressed="true"] i {
-  background: color-mix(in oklab, var(--c) 30%, var(--hair));
-}
-.arc .pip[aria-pressed="true"] i::after {
-  content: "";
-  display: block;
-  height: 100%;
-  background: var(--c);
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: prog var(--ms) linear forwards;
-}
-.arc [data-held] .pip i::after {
-  animation-play-state: paused !important;
-}
-@keyframes prog {
-  to {
-    transform: scaleX(1);
-  }
-}
-.arc .pause {
-  width: 30px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  font: 500 10px var(--display);
-  border: 0;
-  background: var(--panel-2);
-  color: var(--text);
-  border-radius: 999px;
-  cursor: var(--cursor-point);
-  flex: none;
-}
-
-/* ---------- Ticker ---------- */
-.arc .ticker-wrap {
-  overflow: hidden;
-  background: var(--go);
-  color: var(--on-accent);
-}
-.arc .ticker {
-  display: flex;
-  width: max-content;
-  /* Three sets per half (see TICKER_RUN) at the speed two sets once ran in 26s. */
-  animation: marquee 64s linear infinite;
-  user-select: none;
-  -webkit-user-select: none;
-}
-/* Tiles butt edge to edge so the band reads as one striped bar. */
-.arc .ticker span {
-  font: 900 22px/56px var(--display);
-  padding: 0 28px;
-  background: var(--c);
-  white-space: nowrap;
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-.arc .paused,
-.arc .paused * {
+/* useCutIns pauses a [data-loop] while it is off screen. The ticker band is also a [data-cut] piece,
+   so its pause stays a class rule that the load-in's reduced-motion and rest rules still outrank. */
+.arc .paused {
   animation-play-state: paused !important;
 }
 
@@ -692,17 +456,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   .arc-wrap {
     padding: 0 18px;
   }
-  .arc .hero {
-    grid-template-columns: 1fr;
-  }
   .arc h1 {
     font-size: 36px;
-  }
-  .arc .hero {
-    padding-top: 24px;
-  }
-  .arc .hero {
-    gap: 28px;
   }
   .arc h2 {
     font-size: 34px;
@@ -826,26 +581,6 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
     translate: none;
     filter: none;
   }
-}
-
-/* Three-line hero: "I build" / the phrase / the highlight. The phrase line never wraps, so
-   the size follows the column to fit the longest one, "agentic setups that" at 12.2em:
-   two columns share (100vw - 112px) at 1 : 1.05 up to the 1200px wrap; one column is
-   100vw - 36px. */
-.arc .hero h1 {
-  font-size: clamp(28px, 3.9vw - 5px, 43px);
-}
-@media (max-width: 960px) {
-  .arc .hero h1 {
-    font-size: clamp(26px, 8vw - 4px, 44px);
-  }
-}
-.arc .rot .ph .l2,
-.arc .rot .ph .l3 {
-  display: block;
-}
-.arc .rot .ph .l2 {
-  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

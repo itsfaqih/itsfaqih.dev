@@ -1,12 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { SLIDES } from "../data/home";
-import { useMediaQuery } from "../hooks/use-media-query";
 import { Backdrop } from "./-components/backdrop";
 import { ExperienceList, type Job } from "./-components/experience-list";
-import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./-components/hero/hero-prints";
+import { Hero } from "./-components/hero/hero";
 import { Intro } from "./-components/intro";
 import { reticle } from "./-components/reticle";
 import { RuleSpread } from "./-components/rule-spread";
@@ -267,10 +266,10 @@ function Index() {
         <Hero introDone={introDone} />
       </div>
 
-      <div className="ticker-wrap" data-loop data-cut aria-hidden="true">
-        <div className="ticker">
+      <div {...stylex.props(styles.ticker)} data-loop data-cut aria-hidden="true">
+        <div {...stylex.props(styles.tickerTrack, styles.pausable)}>
           {TICKER_RUN.map(({ ticker, color }, index) => (
-            <span key={index} style={{ "--c": color }}>
+            <span key={index} {...stylex.props(styles.tickerTile, styles.pausable)} style={{ "--c": color }}>
               {ticker} ★
             </span>
           ))}
@@ -385,131 +384,40 @@ function Index() {
   );
 }
 
-function Hero({ introDone }: { introDone: boolean }) {
-  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const [slide, setSlide] = useState({ index: 0, run: 0, lead: 0 });
-  const [pausedByUser, setPausedByUser] = useState<boolean | null>(null);
-
-  const runRef = useRef(0);
-  const remainingRef = useRef(SLIDE_MS);
-
-  const userPaused = pausedByUser ?? reduced;
-  const current = SLIDES[slide.index]!;
-
-  const go = (index: number) => {
-    runRef.current += 1;
-    const lead = reduced ? 0 : SCENE_LEAD_MS;
-    remainingRef.current = SLIDE_MS + lead;
-    setSlide({ index, run: runRef.current, lead });
-  };
-
-  useEffect(() => {
-    const requested = Number(new URLSearchParams(location.search).get("slide"));
-    if (requested > 0 && requested < SLIDES.length) go(requested);
-  }, []);
-
-  const advance = useEffectEvent(() => go((slide.index + 1) % SLIDES.length));
-  useEffect(() => {
-    if (!introDone || userPaused) return;
-    const run = slide.run;
-    const armedAt = performance.now();
-    const timer = setTimeout(advance, remainingRef.current);
-    return () => {
-      clearTimeout(timer);
-      if (runRef.current === run) remainingRef.current -= performance.now() - armedAt;
-    };
-  }, [introDone, userPaused, slide.run]);
-
-  return (
-    <div className="hero" data-started={introDone ? "" : undefined}>
-      <div>
-        <div className="tag" data-cut>
-          Full-stack engineer · Yogyakarta
-        </div>
-        <h1 data-cut>
-          <span className="lead-in">I build</span>
-          <span className="rot" data-cycled={slide.run ? "" : undefined}>
-            {SLIDES.map((item, index) => (
-              <span
-                key={item.tab}
-                className={index === slide.index ? "ph on" : "ph"}
-                style={{ "--c": item.color }}
-                aria-hidden={index === slide.index ? undefined : true}
-              >
-                <span className="l2">{item.phrase}</span>
-                <span className="l3">
-                  <span className="hl">{item.highlight}</span>.
-                </span>
-              </span>
-            ))}
-          </span>
-        </h1>
-        <p className="lead" data-cut>
-          I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
-          lately the agent tooling around them. Right now I'm building healthcare software at{" "}
-          <a href="https://evidence.care" target="_blank" rel="noopener noreferrer">
-            EvidenceCare
-          </a>
-          .
-        </p>
-        <div className="acts">
-          <a className="btn go" href="#contact" data-cut style={{ "--c": current.color }}>
-            Connect with me
-          </a>
-          <a className="scroll-cue" href="#rules" data-cut>
-            <span className="mouse" aria-hidden="true">
-              <span className="wheel" />
-            </span>
-            Scroll down
-          </a>
-        </div>
-      </div>
-
-      <div
-        className="bench"
-        data-cut
-        data-held={userPaused ? "" : undefined}
-        style={{ "--c": current.color }}
-      >
-        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} held={userPaused} />
-        <div className="bench-ctl">
-          <div className="pips" role="group" aria-label="What I build">
-            {SLIDES.map((item, index) => (
-              <button
-                key={item.tab}
-                type="button"
-                className="pip"
-                aria-label={item.tab}
-                aria-pressed={index === slide.index}
-                style={{
-                  "--c": item.color,
-                  "--ms": `${SLIDE_MS + (index === slide.index ? slide.lead : 0)}ms`,
-                }}
-                onClick={() => go(index)}
-              >
-                <i key={index === slide.index ? slide.run : "idle"} />
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            className="pause"
-            aria-label={userPaused ? "Play" : "Pause"}
-            onClick={() => setPausedByUser(!userPaused)}
-          >
-            {userPaused ? "▶" : "❚❚"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const LIFT = "translateY(-4px) rotate(-1deg)";
 
+const marquee = stylex.keyframes({ to: { transform: "translate(-50%)" } });
+
 const styles = stylex.create({
+  ticker: {
+    overflow: "hidden",
+    backgroundColor: palette["--go"],
+    color: palette["--on-accent"],
+  },
+  // Three sets per half (see TICKER_RUN) at the speed two sets once ran in 26s.
+  tickerTrack: {
+    display: "flex",
+    width: "max-content",
+    animationName: marquee,
+    animationDuration: "64s",
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
+    userSelect: "none",
+  },
+  // Tiles butt edge to edge so the band reads as one striped bar.
+  tickerTile: {
+    font: `900 22px/56px ${fonts["--display"]}`,
+    paddingBlock: 0,
+    paddingInline: "28px",
+    backgroundColor: "var(--c)",
+    whiteSpace: "nowrap",
+  },
+  // useCutIns sets .paused on the band while it is off screen (arcade.css pauses the band itself).
+  pausable: {
+    animationPlayState: { default: null, ":is(.paused *)": "paused !important" },
+  },
   projects: {
     display: "grid",
     gridTemplateColumns: { default: "repeat(4, 1fr)", [STACKED]: "1fr 1fr" },
