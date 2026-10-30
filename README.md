@@ -43,6 +43,14 @@ vp build
 
 TanStack Start prerenders discoverable routes as complete HTML in `.output/public`. React hydrates those pages for client-side navigation and interactions; static hosting does not need a runtime server. The Cloudflare preview command uses `scripts/cloudflare-pages-preview.mjs` when the Cloudflare build environment is detected.
 
+## Fonts
+
+```bash
+uv run scripts/fonts.py
+```
+
+The build does not process fonts. The script cuts Geist, Geist Mono and Unbounded down to the weights, OpenType features and characters the site uses, writes two files per family to `public/fonts/` and their `@font-face` rules to `src/fonts.css`, and rebuilds the OG card fonts in `scripts/og/fonts/`; commit what it writes. The build inlines each `-core.woff2` (ASCII and common punctuation) into every page. A page fetches the family's `-extended.woff2` (Latin-1, Latin Extended-A and a few symbols) only when it draws one of those characters. Edit `FAMILIES` or `FEATURES` in the script and rerun it when a family is set at a weight outside its range or draws a character outside its two files, when a page turns on an OpenType feature or sets a `lang` other than English, or when a font is upgraded. Each run lists the characters in `src/` that no file has; a system font draws those.
+
 ## Storybook
 
 ```bash

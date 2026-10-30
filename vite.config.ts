@@ -85,7 +85,7 @@ function rehypeHighlightCode() {
 
 async function inlineAssetsBeforeApp(css: string, outDir: string) {
   for (const [url, asset] of css.matchAll(
-    /url\((\/(?:fonts\/[^)]+-inline\.woff2|cursors\/[^)#]+\.svg))\)/g,
+    /url\((\/(?:fonts\/[^)]+-core\.woff2|cursors\/[^)#]+\.svg))\)/g,
   )) {
     const data = (await readFile(path.join(outDir, asset!))).toString("base64");
     const mime = asset!.endsWith(".svg") ? "image/svg+xml" : "font/woff2";
