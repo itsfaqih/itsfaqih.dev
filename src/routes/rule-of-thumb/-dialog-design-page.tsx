@@ -1443,9 +1443,9 @@ const LESSONS: Lesson[] = [
     title: "Keep focus inside",
     body: (
       <>
-        When a dialog opens, focus moves into it. <Kbd>Tab</Kbd> cycles its controls and never
-        reaches the inert page behind. On close, focus returns to the button that opened it. Press
-        Tab in both.
+        Move focus into the dialog when it opens. Let <Kbd>Tab</Kbd> cycle its controls and never
+        reach the inert page behind. On close, return focus to the button that opened it. Press Tab
+        in both.
       </>
     ),
     bad: {
@@ -1454,7 +1454,7 @@ const LESSONS: Lesson[] = [
       view: <FocusDemo sealed={false} />,
     },
     good: {
-      label: "Focus held",
+      label: "Hold focus",
       costs: ["starts in Name", "Tab stays in", "back on close"],
       view: <FocusDemo sealed />,
     },
@@ -1463,8 +1463,8 @@ const LESSONS: Lesson[] = [
     title: "Let Escape close it",
     body: (
       <>
-        <Kbd>Esc</Kbd> is how keyboard users leave, so it closes every dialog, every time. An info
-        dialog has nothing to lose, so a click outside closes it too.
+        Close every dialog on <Kbd>Esc</Kbd>, every time, since keyboard users leave that way. Let a
+        click outside close an info dialog too, as it has nothing to lose.
       </>
     ),
     bad: {
@@ -1473,7 +1473,7 @@ const LESSONS: Lesson[] = [
       view: <EscapeDemo sealed={false} />,
     },
     good: {
-      label: "Esc closes",
+      label: "Close on Esc",
       costs: ["Esc closes", "4 ways out"],
       view: <EscapeDemo sealed />,
     },
@@ -1482,8 +1482,8 @@ const LESSONS: Lesson[] = [
     title: "Focus the safe answer",
     body: (
       <>
-        A form focuses its first field, so people can type at once. A confirm that destroys
-        something focuses Cancel, so a stray <Kbd>Enter</Kbd> backs out. Open both and press Enter.
+        Focus a form's first field so people can type at once. Focus Cancel on a confirm that
+        destroys something, so a stray <Kbd>Enter</Kbd> backs out. Open both and press Enter.
       </>
     ),
     extra: (
@@ -1497,7 +1497,7 @@ const LESSONS: Lesson[] = [
       view: <ConfirmDemo sealed={false} />,
     },
     good: {
-      label: "Cancel first",
+      label: "Focus Cancel",
       costs: ["Enter cancels", "0 files lost"],
       view: <ConfirmDemo sealed />,
     },
@@ -1506,9 +1506,9 @@ const LESSONS: Lesson[] = [
     title: "Ask before you drop a draft",
     body: (
       <>
-        A click outside is often a slip. Once a form has input, that click shakes the dialog instead
-        of closing it, and <Kbd>Esc</Kbd> or × asks before discarding the draft. Click the dim area
-        in both.
+        A click outside is often a slip. Once a form has input, shake the dialog on that click
+        instead of closing it, and ask before <Kbd>Esc</Kbd> or × discards the draft. Click the dim
+        area in both.
       </>
     ),
     bad: {
@@ -1517,7 +1517,7 @@ const LESSONS: Lesson[] = [
       view: <DraftDemo sealed={false} />,
     },
     good: {
-      label: "Asks first",
+      label: "Ask first",
       costs: ["0 chars lost", "asks first"],
       view: <DraftDemo sealed />,
     },
@@ -1537,7 +1537,7 @@ const LESSONS: Lesson[] = [
       view: <ScrollDemo sealed={false} />,
     },
     good: {
-      label: "Page locked",
+      label: "Lock the page",
       costs: ["0px moved", "0px shift"],
       view: <ScrollDemo sealed />,
     },
@@ -1546,7 +1546,7 @@ const LESSONS: Lesson[] = [
     title: "Give it a name",
     body: (
       <>
-        A screen reader needs to hear that a dialog opened and what it's called. Give it{" "}
+        Tell a screen reader that a dialog opened and what it's called. Give it{" "}
         <Code>role="dialog"</Code>, point <Code>aria-labelledby</Code> at the title and{" "}
         <Code>aria-describedby</Code> at the text. On a real page add <Code>aria-modal="true"</Code>
         , or use <Code>&lt;dialog&gt;</Code> with <Code>showModal()</Code>.
@@ -1558,7 +1558,7 @@ const LESSONS: Lesson[] = [
       view: <NameDemo sealed={false} />,
     },
     good: {
-      label: "A named dialog",
+      label: "Name the dialog",
       costs: ["role=dialog", "named", "described"],
       view: <NameDemo sealed />,
     },
@@ -1567,12 +1567,12 @@ const LESSONS: Lesson[] = [
 
 const CHEAT_SHEET = [
   ["It opens", "Focus the first field, or Cancel if it destroys something"],
-  ["While it's open", "Tab cycles inside. The page behind is inert and still"],
-  ["Escape", "Closes it, every time"],
-  ["A click outside", "Closes an info dialog. A form with input shakes or asks"],
-  ["It closes", "Focus goes back to the button that opened it"],
-  ["The markup", 'role="dialog", aria-modal, labelled by its title'],
-  ["On a phone", "A bottom sheet that swipes down to close"],
+  ["While it's open", "Cycle Tab inside. Keep the page behind inert and still"],
+  ["Escape", "Close it, every time"],
+  ["A click outside", "Close an info dialog. Shake or ask on a form with input"],
+  ["It closes", "Return focus to the button that opened it"],
+  ["The markup", 'Add role="dialog" and aria-modal. Label it by its title'],
+  ["On a phone", "Use a bottom sheet that swipes down to close"],
 ] as const;
 
 const LEVELS: Level[] = [
@@ -1580,7 +1580,7 @@ const LEVELS: Level[] = [
     name: "Delete forever",
     prompt: (
       <>
-        <b>Delete Moonbase?</b> removes 214 files for good. When it opens, where does focus land?
+        <b>Delete Moonbase?</b> removes 214 files for good. Place autoFocus.
       </>
     ),
     piece: "autoFocus",
@@ -1603,7 +1603,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "cancel",
           label: "<button> Cancel",
-          note: "The safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
+          note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
           cost: ["Enter cancels", "0 files lost"],
         },
       },
@@ -1622,7 +1622,7 @@ const LEVELS: Level[] = [
     name: "Add a contact",
     prompt: (
       <>
-        <b>Add contact</b> has Name and Email fields. When it opens, where does focus land?
+        <b>Add contact</b> has Name and Email fields. Place autoFocus.
       </>
     ),
     piece: "autoFocus",
@@ -1643,7 +1643,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "name",
           label: "<input> Name",
-          note: "They start typing at once, with no click or Tab.",
+          note: "Focus the first field so they start typing at once, with no click or Tab.",
           cost: ["0 clicks"],
         },
       },
@@ -1661,7 +1661,7 @@ const LEVELS: Level[] = [
   },
   {
     name: "A click outside",
-    prompt: <>Three dialogs. Which one closes when you click the dim page around it?</>,
+    prompt: <>Three dialogs. Place close() on the one a click outside should close.</>,
     piece: "close()",
     answer: "news",
     rows: [
@@ -1680,7 +1680,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "news",
           label: "What's new, nothing to fill in",
-          note: "Nothing to lose, so a click outside closes it.",
+          note: "Close it on a click outside, since there is nothing to lose.",
           cost: ["0 lost", "1 click out"],
         },
       },
@@ -1689,7 +1689,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "profile",
           label: "Edit profile, nothing changed yet",
-          note: "It's a form, one keystroke from holding input. Let Esc and Cancel close it.",
+          note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
           cost: ["a form", "risky by default"],
         },
       },
@@ -1700,7 +1700,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         You opened <b>Edit profile</b> from its button halfway down a settings page, then pressed
-        Save. Where does focus go?
+        Save. Place focus().
       </>
     ),
     piece: "focus()",
@@ -1722,7 +1722,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "trigger",
           label: "<button> Edit profile",
-          note: "They land where they left off, and one Tab continues down the page.",
+          note: "Return focus here, where they left off. One Tab continues down the page.",
           cost: ["0 Tabs back"],
         },
       },
@@ -1741,8 +1741,8 @@ const LEVELS: Level[] = [
     name: "Hold the page",
     prompt: (
       <>
-        <b>Share</b> opens over a long article. Where does <Code>overflow: hidden</Code> go so the
-        article stays still?
+        <b>Share</b> opens over a long article. Place <Code>overflow: hidden</Code> so the article
+        stays still.
       </>
     ),
     piece: "overflow: hidden",
@@ -1753,7 +1753,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "body",
           label: "<body>",
-          note: "The page stops while the dialog is open. Add scrollbar-gutter: stable so it doesn't shift.",
+          note: "Stop the page while the dialog is open. Add scrollbar-gutter: stable so it doesn't shift.",
           cost: ["0px moved", "0px shift"],
         },
       },
@@ -1783,21 +1783,17 @@ const LEVELS: Level[] = [
 export function DialogDesign() {
   return (
     <RuleLanding
-      lead={<>Six live dialogs, each built leaky and sealed, side by side. Then a mini quiz.</>}
+      lead={
+        <>Trap Tab inside the dialog, lock the page behind it, and name it for screen readers.</>
+      }
       learn={{
         title: "Hold focus, let go cleanly",
-        intro: (
-          <>
-            A dialog takes over the screen, so it owes people a way through and a way out. Each
-            example builds one dialog twice. The left is how it often ships, the right follows the
-            rule. The dialogs open inside their own small window, so use the keys.
-          </>
-        ),
+        intro: <>Give a dialog a way through and a way out, since it takes over the screen.</>,
       }}
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: <>Five dialogs. A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "screen",
       }}

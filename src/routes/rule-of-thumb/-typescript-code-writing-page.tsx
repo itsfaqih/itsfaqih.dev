@@ -446,18 +446,18 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Unions, not enums",
+    title: "Use unions, not enums",
     body: (
       <>
-        A string enum is a runtime object. It rejects the plain string it stands for, adds
-        JavaScript to your bundle, and won't run under Node's type stripping. A string union is only
-        a type.
+        Write a string union, which is only a type. A string enum is a runtime object. It rejects
+        the plain string it stands for, adds JavaScript to your bundle, and won't run under Node's
+        type stripping.
       </>
     ),
     extra: (
       <Tip>
-        Need the values at runtime too? Write{" "}
-        <Code>const ROLES = ["ADMIN", "VIEWER"] as const</Code> and derive the type from it.
+        For the values at runtime too, write <Code>const ROLES = ["ADMIN", "VIEWER"] as const</Code>{" "}
+        and derive the type from it.
       </Tip>
     ),
     bad: {
@@ -554,7 +554,7 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "One options object",
+    title: "Take one options object",
     body: (
       <>
         Past two parameters, take one object. Four positional arguments say nothing at the call, and
@@ -606,9 +606,9 @@ const LESSONS: Lesson[] = [
     title: "Turn the flags on",
     body: (
       <>
-        Under <Code>strict</Code> alone, <Code>users[0]</Code> still reads as a <Code>User</Code> on
-        an empty list. <Code>noUncheckedIndexedAccess</Code> types every index read as possibly{" "}
-        <Code>undefined</Code>.
+        Enable <Code>noUncheckedIndexedAccess</Code>, which types every index read as possibly{" "}
+        <Code>undefined</Code>. Under <Code>strict</Code> alone, <Code>users[0]</Code> still reads
+        as a <Code>User</Code> on an empty list.
       </>
     ),
     extra: (
@@ -657,13 +657,13 @@ const LESSONS: Lesson[] = [
 ];
 
 const TLDR = [
-  ["A function other files use", "export function name()"],
-  ["A shape, a union, an alias", "type"],
-  ["One shape built on another", "interface … extends"],
-  ["A fixed set of values", "A string union, not an enum"],
+  ["A function other files use", "Use export function name()"],
+  ["A shape, a union, an alias", "Use type"],
+  ["One shape built on another", "Use interface … extends"],
+  ["A fixed set of values", "Use a string union, not an enum"],
   ["A local value", "Infer it. Annotate returns and APIs."],
-  ["Three or more parameters", "One options object"],
-  ["A new tsconfig", "strict, noUncheckedIndexedAccess, verbatimModuleSyntax, ESM"],
+  ["Three or more parameters", "Take one options object"],
+  ["A new tsconfig", "Enable strict, noUncheckedIndexedAccess, verbatimModuleSyntax and ESM"],
 ] as const;
 
 const code = (text: string) => <Code style={styles.boardCode}>{paint(text, TOKEN, KINDS)}</Code>;
@@ -680,7 +680,7 @@ const holds = (text: string) => (
 const LEVELS: Level[] = [
   {
     name: "Send an email",
-    prompt: <>Strings in a row can swap with no error. Which signature needs an options object?</>,
+    prompt: <>Strings in a row can swap with no error. Place the options object.</>,
     piece: "options",
     answer: "send",
     rows: [
@@ -710,7 +710,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "send",
           label: holds("to, subject, body"),
-          note: "Three strings in a row swap without an error. Named keys can't.",
+          note: "Take one options object. Three strings in a row swap without an error, and named keys can't.",
           cost: ["swap: impossible"],
         },
       },
@@ -721,7 +721,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         You loop over the roles at runtime and want a <Code>Role</Code> type that matches the list.
-        Where does <Code>as const</Code> go?
+        Place <Code>as const</Code>.
       </>
     ),
     piece: "as const",
@@ -733,7 +733,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "roles",
           label: blank('const ROLES = ["ADMIN", "EDITOR"]'),
-          note: "ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
+          note: "Freeze the list. ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
           cost: ["Role: 2 members", "0 enum lines"],
         },
       },
@@ -765,7 +765,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         <Code>getUser</Code> is the module's public API, and <Code>find</Code> can return{" "}
-        <Code>undefined</Code>. Where does <Code>: User</Code> go?
+        <Code>undefined</Code>. Place <Code>: User</Code>.
       </>
     ),
     piece: ": User",
@@ -777,7 +777,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "ret",
           label: blank("export function getUser(id: string)"),
-          note: "The return type is the contract. find can miss, so the build fails at the return, inside getUser.",
+          note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside getUser.",
           cost: ["TS2322 at the return"],
         },
       },
@@ -800,7 +800,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "param",
           label: blank("users.map((u"),
-          note: "map already knows u is a User. The label repeats it and catches nothing.",
+          note: "Skip the label. map already knows u is a User, and the label catches nothing.",
           cost: ["0 errors caught"],
         },
       },
@@ -811,7 +811,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         <Code>users[0].name</Code> crashed in production on an empty list. <Code>strict</Code> is
-        already on. Which flag would have failed the build?
+        already on. Set the flag that fails the build.
       </>
     ),
     piece: "true",
@@ -835,7 +835,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "index",
           label: blank('"noUncheckedIndexedAccess":'),
-          note: "users[0] becomes User | undefined, and .name fails with TS18048 before it ships.",
+          note: "Turn it on. users[0] becomes User | undefined, and .name fails with TS18048 before it ships.",
           cost: ["TS18048 at build", "0 crashes"],
         },
       },
@@ -845,7 +845,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "verbatim",
           label: blank('"verbatimModuleSyntax":'),
-          note: "It makes type imports say import type. Worth having, but users[0] still reads as User.",
+          note: "It makes type imports say import type. Keep it, but users[0] still reads as User.",
           cost: ["crash: 0 errors"],
         },
       },
@@ -857,25 +857,15 @@ const LEVELS: Level[] = [
 export function TypeScriptCodeWriting() {
   return (
     <RuleLanding
-      lead={
-        <>
-          Six habits, each as loose code beside precise code, with what tsc says about every line.
-          Then a mini quiz.
-        </>
-      }
+      lead={<>Prefer named exports, unions and typed edges. Turn on the strict flags.</>}
       learn={{
         title: "Let the compiler catch it",
-        intro: (
-          <>
-            Each example shows the same code twice, loose on the left and precise on the right. What
-            tsc says about a line sits beside it. A squiggle marks a compile error.
-          </>
-        ),
+        intro: <>Make a typo fail where you wrote it, not in a caller.</>,
       }}
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: <>A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "code",
       }}

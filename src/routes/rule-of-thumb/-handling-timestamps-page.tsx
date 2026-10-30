@@ -774,7 +774,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores
-        each writer's local time, so one moment becomes two values. Store UTC and it stays one.
+        each writer's local time, so one moment becomes two values. Store UTC to keep it one.
       </>
     ),
     extra: (
@@ -788,7 +788,7 @@ const LESSONS: Lesson[] = [
       view: <OrdersTable way="bad" />,
     },
     good: {
-      label: "UTC",
+      label: "Store UTC",
       costs: ["1 moment, 1 value", "0 s apart"],
       view: <OrdersTable way="good" />,
     },
@@ -798,8 +798,8 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         An ISO string without a <Code>Z</Code> has no zone, so each browser reads it as local time.
-        Rina and Sam both see 6:00 AM, and both are wrong. With the <Code>Z</Code>, each browser
-        converts it to its own zone.
+        Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code>Z</Code> so each
+        browser converts it to its own zone.
       </>
     ),
     bad: {
@@ -818,7 +818,7 @@ const LESSONS: Lesson[] = [
       ),
     },
     good: {
-      label: "Ends in Z",
+      label: "End with Z",
       costs: ["0 h off"],
       view: (
         <div {...stylex.props(styles.view)}>
@@ -837,8 +837,8 @@ const LESSONS: Lesson[] = [
     title: "Turn it local in the browser",
     body: (
       <>
-        The server knows its own time zone, not the reader's. Format there and the time is right
-        only where the server runs. Send UTC and let each browser format it.
+        The server knows its own time zone, not the reader's, so a time it formats is right only
+        where it runs. Send UTC and let each browser format it.
       </>
     ),
     bad: {
@@ -858,7 +858,7 @@ const LESSONS: Lesson[] = [
       ),
     },
     good: {
-      label: "Reader's time",
+      label: "Format in browser",
       costs: ["right for 2 of 2"],
       view: (
         <div {...stylex.props(styles.view)}>
@@ -889,7 +889,7 @@ const LESSONS: Lesson[] = [
       view: <ReminderDemo way="bad" />,
     },
     good: {
-      label: "UTC or offset",
+      label: "Send UTC or offset",
       costs: ["0 h off"],
       view: <ReminderDemo way="good" />,
     },
@@ -899,7 +899,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day
-        before. Send midnight with no zone and the server queries 07:00 to 07:00 her time. Orders
+        before, so send that moment. Midnight with no zone queries 07:00 to 07:00 her time: orders
         before 07:00 go missing, and the next morning's show up.
       </>
     ),
@@ -909,7 +909,7 @@ const LESSONS: Lesson[] = [
       view: <FilterDemo way="bad" />,
     },
     good: {
-      label: "Her midnight",
+      label: "Use her midnight",
       costs: ["3 of 3", "0 extra"],
       view: <FilterDemo way="good" />,
     },
@@ -917,12 +917,12 @@ const LESSONS: Lesson[] = [
 ];
 
 const TLDR = [
-  ["Saving a timestamp", "UTC, with no offset column"],
-  ["Returning one from the API", "ISO 8601 ending in Z"],
+  ["Saving a timestamp", "Store UTC, with no offset column"],
+  ["Returning one from the API", "Return ISO 8601 ending in Z"],
   ["Showing it to someone", "Format it in their browser"],
   ["Sending a time the user picked", "Convert to UTC, or keep its offset"],
-  ["Filtering by a date", "The user's day as a UTC range"],
-  ["Date math", "On Date values, never on the string"],
+  ["Filtering by a date", "Send the user's day as a UTC range"],
+  ["Date math", "Do the math on Date values, never on the string"],
 ] as const;
 
 const code = (text: string) => <Code>{text}</Code>;
@@ -933,7 +933,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         The order is stored as <Code>2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam
-        1:00 AM. Where do you format it?
+        1:00 AM. Place the formatting.
       </>
     ),
     piece: "Intl.DateTimeFormat",
@@ -965,7 +965,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "browser",
           label: "when the order renders",
-          note: "Each browser knows its own zone, so one UTC string becomes 1:00 PM for Rina and 1:00 AM for Sam.",
+          note: "Format here. Each browser knows its own zone, so one UTC string becomes 1:00 PM for Rina and 1:00 AM for Sam.",
           cost: ["right for 2 of 2"],
         },
       },
@@ -973,7 +973,7 @@ const LEVELS: Level[] = [
   },
   {
     name: "7:00 in Jakarta",
-    prompt: <>Rina picks Jan 1, 7:00 AM for a reminder. Where does that time become UTC?</>,
+    prompt: <>Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</>,
     piece: "→ UTC",
     answer: "client",
     rows: [
@@ -984,7 +984,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "client",
           label: "before the request",
-          note: "Her browser knows she's at UTC+7, so it sends 2026-01-01T00:00:00.000Z. The server has nothing to guess.",
+          note: "Convert here. Her browser knows she's at UTC+7, so it sends 2026-01-01T00:00:00.000Z and the server has nothing to guess.",
           cost: ["0 h off"],
         },
       },
@@ -1014,8 +1014,7 @@ const LEVELS: Level[] = [
     name: "One offset",
     prompt: (
       <>
-        Rina's browser has her 7:00 AM and its <Code>+07:00</Code> offset. Where is the offset worth
-        sending?
+        Rina's browser has her 7:00 AM and its <Code>+07:00</Code> offset. Place the offset.
       </>
     ),
     piece: "+07:00",
@@ -1028,7 +1027,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "body",
           label: '…"',
-          note: "With the offset, the server knows the exact moment and stores 00:00 UTC.",
+          note: "Send it with the time, so the server knows the exact moment and stores 00:00 UTC.",
           cost: ["0 h off"],
         },
       },
@@ -1060,8 +1059,8 @@ const LEVELS: Level[] = [
     name: "Whose Jan 10?",
     prompt: (
       <>
-        Three filters for Jan 10 each need a start. Whose day starts at{" "}
-        <Code>2026-01-09T17:00Z</Code>?
+        Three filters for Jan 10 each need a start. Match <Code>2026-01-09T17:00Z</Code> to the day
+        it starts.
       </>
     ),
     piece: "from=2026-01-09T17:00Z",
@@ -1083,7 +1082,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "rina",
           label: "from=",
-          note: "Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
+          note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
           cost: ["3 of 3 orders"],
         },
       },
@@ -1107,29 +1106,23 @@ export function HandlingTimestamps() {
       costsStyle={styles.costs}
       lead={
         <>
-          Five steps a timestamp takes, the wrong way and the right way side by side, seen from two
-          time zones. Then a mini quiz.
+          Convert picked times to UTC in the browser, return ISO strings ending in Z, and filter by
+          the user's own day as a UTC range.
         </>
       }
       learn={{
         title: "One moment, two clocks",
         intro: (
           <>
-            Rina lives in Jakarta, at UTC+7. Sam lives in New York, at UTC−5. Each example follows
-            one moment to both of them. The left side shows the usual mistake, the right side the
-            rule.
+            Keep one moment as one value until it reaches the screen of Rina in Jakarta (UTC+7) or
+            Sam in New York (UTC−5).
           </>
         ),
       }}
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: (
-          <>
-            Four timestamps, four trips from browser to database and back. A wrong spot shows what
-            it costs.
-          </>
-        ),
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "flow",
       }}

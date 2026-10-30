@@ -1416,18 +1416,17 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         People compare numbers by their last digits. Set <Code>tabular-nums</Code> so every digit is
-        the same width, and format with <Code>toLocaleString()</Code>. These figures are live. Watch
-        the right edge.
+        the same width, and format with <Code>toLocaleString()</Code>. Watch the right edge.
       </>
     ),
     extra: <LiveSwitch />,
     bad: {
-      label: "Left, as typed",
+      label: "As typed",
       costs: ["edges 25px apart", "12500, no commas"],
       view: <NumbersDemo careful={false} />,
     },
     good: {
-      label: "Right, tabular",
+      label: "Align right, tabular",
       costs: ["1 edge", "tabular-nums", "12,500.00"],
       view: <NumbersDemo careful />,
     },
@@ -1436,19 +1435,19 @@ const LESSONS: Lesson[] = [
     title: "Give every state a next step",
     body: (
       <>
-        A table is often loading, empty, failed or showing no matches. Draw each one. Skeleton rows
-        keep the shape while it loads, and every blank says why and what to do next. Pick a state,
-        search, then press the buttons.
+        A table is often loading, empty, failed or showing no matches. Draw each one. Use skeleton
+        rows to keep the shape while it loads, and say why and what to do next in every blank. Pick
+        a state, search, then press the buttons.
       </>
     ),
     extra: <StateSwitch />,
     bad: {
-      label: "Left blank",
+      label: "Blank",
       costs: ["3 states, 1 message", "0 next steps"],
       view: <StatesDemo careful={false} />,
     },
     good: {
-      label: "Says what's next",
+      label: "Say what's next",
       costs: ["1 next step each", "height holds"],
       view: <StatesDemo careful />,
     },
@@ -1458,7 +1457,8 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Give the column a fixed width and right-align it, so Edit sits in the same place on every
-        row. Icon buttons save room, and a tooltip names each one. Hover the rows, then delete one.
+        row. Use icon buttons to save room, and name each one with a tooltip. Hover the rows, then
+        delete one.
       </>
     ),
     bad: {
@@ -1473,7 +1473,7 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "No pager for one page",
+    title: "Skip the pager for one page",
     body: (
       <>
         With one page, a pager is a row of dead arrows. Under an empty table, it reads Page 1 of 0.
@@ -1487,7 +1487,7 @@ const LESSONS: Lesson[] = [
       view: <PagerDemo careful={false} />,
     },
     good: {
-      label: "Only with 2+ pages",
+      label: "Show for 2+ pages",
       costs: ["0 dead controls"],
       view: <PagerDemo careful />,
     },
@@ -1497,7 +1497,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         With <Code>?page=2</Code> in the address, a reload, the Back button and a shared link all
-        land where you were. Both tables start on page 2. Reload each.
+        land where you were. Reload each.
       </>
     ),
     bad: {
@@ -1506,7 +1506,7 @@ const LESSONS: Lesson[] = [
       view: <UrlDemo careful={false} />,
     },
     good: {
-      label: "In the URL",
+      label: "Keep in the URL",
       costs: ["?page=2", "reload keeps it"],
       view: <UrlDemo careful />,
     },
@@ -1514,22 +1514,22 @@ const LESSONS: Lesson[] = [
 ];
 
 const CHEAT_SHEET = [
-  ["A column of numbers", "Right-aligned, tabular-nums, toLocaleString()"],
-  ["Money in a finance view", "A monospace face lines up even better"],
-  ["Rows still loading", "Skeleton rows at the real row height"],
-  ["Empty, failed or no match", "Say which, with one next step: Add, Retry, Clear search"],
-  ["Row actions", "Icon buttons with tooltips in a fixed last column"],
-  ["One page, or none", "No pager"],
-  ["The current page", "In the URL, as ?page=2"],
+  ["A column of numbers", "Right-align it, set tabular-nums, call toLocaleString()"],
+  ["Money in a finance view", "Use a monospace face"],
+  ["Rows still loading", "Draw skeleton rows at the real row height"],
+  ["Empty, failed or no match", "Say which and give one next step: Add, Retry, Clear search"],
+  ["Row actions", "Put icon buttons with tooltips in a fixed last column"],
+  ["One page, or none", "Skip the pager"],
+  ["The current page", "Put it in the URL as ?page=2"],
 ] as const;
 
 const LEVELS: Level[] = [
   {
-    name: "Where the actions go",
+    name: "Place the actions",
     prompt: (
       <>
-        Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Where
-        do the buttons go?
+        Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Place
+        the buttons.
       </>
     ),
     piece: "Edit · Delete",
@@ -1562,7 +1562,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "last",
           label: "+ <td> last, w-24, text-right",
-          note: "One right-aligned column at a fixed width. Edit sits in the same place on every row.",
+          note: "Fix the width and right-align the column, so Edit sits in the same place on every row.",
           cost: ["1 x-position", "96px"],
         },
       },
@@ -1572,8 +1572,8 @@ const LEVELS: Level[] = [
     name: "Format at the edge",
     prompt: (
       <>
-        The table sorts by MRR and shows <Code>12,500.00</Code>. Where should{" "}
-        <Code>toLocaleString()</Code> run?
+        The table sorts by MRR and shows <Code>12,500.00</Code>. Place <Code>toLocaleString()</Code>
+        .
       </>
     ),
     piece: "toLocaleString()",
@@ -1613,11 +1613,11 @@ const LEVELS: Level[] = [
     ],
   },
   {
-    name: "Nothing to show",
+    name: "Fill the blank",
     prompt: (
       <>
-        The users table can show no rows for three reasons. Which one gets the <b>Add user</b>
-        button?
+        The users table can show no rows for three reasons. Place the <b>Add user</b>
+        button.
       </>
     ),
     piece: "Add user",
@@ -1630,7 +1630,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "error",
           label: "+ its button",
-          note: "The list failed to load, so it isn't empty. Add user hides the failure, and Retry helps.",
+          note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
           cost: ["hides the error", "0 retries"],
         },
       },
@@ -1640,7 +1640,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "empty",
           label: "+ its button",
-          note: "Nothing here yet, so the next step is adding the first user.",
+          note: "Nothing here yet, so offer adding the first user.",
           cost: ["1 next step"],
         },
       },
@@ -1650,18 +1650,17 @@ const LEVELS: Level[] = [
         slot: {
           id: "search",
           label: "+ its button",
-          note: "The users exist. The search hid them, so Clear search brings them back.",
+          note: "The users exist and the search hid them. Offer Clear search to bring them back.",
           cost: ["wrong next step", "duplicate users"],
         },
       },
     ],
   },
   {
-    name: "One page or two",
+    name: "Count the pages",
     prompt: (
       <>
-        The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Which one gets
-        the pager?
+        The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Place the pager.
       </>
     ),
     piece: "<Pagination>",
@@ -1684,7 +1683,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "31",
           label: "+ pager",
-          note: "The last 6 rows go on page 2, so only this list needs a pager.",
+          note: "Add it here, since the last 6 rows go on page 2.",
           cost: ["2 pages"],
         },
       },
@@ -1701,12 +1700,9 @@ const LEVELS: Level[] = [
     ],
   },
   {
-    name: "Page 3, shared",
+    name: "Share page 3",
     prompt: (
-      <>
-        You're on page 3 of the orders and send the link to a teammate. Where does the page number
-        live?
-      </>
+      <>You're on page 3 of the orders and send the link to a teammate. Place the page number.</>
     ),
     piece: "page 3",
     answer: "url",
@@ -1726,7 +1722,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "url",
           label: "+ /orders?page=",
-          note: "The page is part of the link, so a reload, Back and your teammate all land on page 3.",
+          note: "Make the page part of the link, so a reload, Back and your teammate all land on page 3.",
           cost: ["?page=3", "shareable"],
         },
       },
@@ -1755,23 +1751,18 @@ export function TableDesign() {
         costsStyle={styles.costs}
         lead={
           <>
-            Five tables, each built the usual way and the careful way, side by side. All of them
-            work. Then a mini quiz.
+            Right-align numbers, pin actions to a fixed last column, and give every blank a next
+            step.
           </>
         }
         learn={{
-          title: "Tables get scanned, not read",
-          intro: (
-            <>
-              People run their eyes down a column to find one value. Each example shows one table
-              twice. Left is how tables usually ship. Right follows the rule.
-            </>
-          ),
+          title: "Design tables for scanning",
+          intro: <>Make each column easy to run an eye down, since people scan for one value.</>,
         }}
         lessons={LESSONS}
         tldr={CHEAT_SHEET}
         quiz={{
-          intro: <>Five tables, five pieces. A wrong spot shows what it costs.</>,
+          intro: <>Place each piece. A wrong spot shows what it costs.</>,
           levels: LEVELS,
           board: "table",
         }}

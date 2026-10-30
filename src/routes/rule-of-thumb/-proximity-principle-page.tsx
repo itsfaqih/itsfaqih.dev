@@ -27,10 +27,10 @@ const styles = stylex.create({
 
 const LESSONS: Lesson[] = [
   {
-    title: "Inline first",
+    title: "Inline it first",
     body: (
       <>
-        Code used once stays where it's used. A helper in <Code>utils/</Code> with one caller adds a
+        Keep code used once where it's used. A helper in <Code>utils/</Code> with one caller adds a
         file and an import, and shares nothing.
       </>
     ),
@@ -68,8 +68,8 @@ const LESSONS: Lesson[] = [
     title: "Prefer fewer files",
     body: (
       <>
-        One component, one file. Split its types, styles and hook into a folder, and reading it
-        takes five tabs.
+        Keep one component in one file. Split its types, styles and hook into a folder, and reading
+        it takes five tabs.
       </>
     ),
     bad: {
@@ -106,7 +106,7 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Own state, own component",
+    title: "Give state its own component",
     exception: true,
     body: (
       <>
@@ -145,7 +145,7 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Lowest common ancestor",
+    title: "Use the lowest common ancestor",
     body: (
       <>
         When a second file needs it, move it up to the nearest folder both callers share. The path
@@ -191,7 +191,7 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Global code, type folder",
+    title: "Give global code a type folder",
     exception: true,
     body: (
       <>
@@ -246,9 +246,9 @@ const CHEAT_SHEET = [
   ["Code used once", "Keep it inline"],
   ["Code too long", "Extract a function, same file"],
   ["Reused in the same file", "Extract a function, same file"],
-  ["Reused across files", "The lowest common ancestor"],
-  ["Used almost everywhere", "A type folder, like components/"],
-  ["A child with its own state", "Its own component"],
+  ["Reused across files", "Move it to the lowest common ancestor"],
+  ["Used almost everywhere", "Use a type folder, like components/"],
+  ["A child with its own state", "Give it its own component"],
 ] as const;
 
 const LEVELS: Level[] = [
@@ -256,7 +256,7 @@ const LEVELS: Level[] = [
     name: "One caller",
     prompt: (
       <>
-        Only <Code>user-profile.tsx</Code> calls <Code>formatDate()</Code>. Where does it live?
+        Only <Code>user-profile.tsx</Code> calls <Code>formatDate()</Code>. Place it.
       </>
     ),
     piece: "formatDate()",
@@ -280,7 +280,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "inline",
           label: "↳ inline, above UserProfile()",
-          note: "Used once, so it stays where it's used, with nothing to import or open.",
+          note: "Keep it where it's used, with nothing to import or open.",
           cost: ["0 files", "0 imports"],
         },
       },
@@ -300,8 +300,8 @@ const LEVELS: Level[] = [
     name: "A component's own parts",
     prompt: (
       <>
-        <Code>UserProfile</Code> has its own types, styles and a hook. Nothing else uses them. Where
-        do they go?
+        <Code>UserProfile</Code> has its own types, styles and a hook. Nothing else uses them. Place
+        them.
       </>
     ),
     piece: "types · styles · useProfile()",
@@ -324,7 +324,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "file",
           label: "↳ inside user-profile.tsx",
-          note: "One file holds the whole component.",
+          note: "Keep the whole component in one file.",
           cost: ["1 file", "0 imports"],
         },
       },
@@ -344,7 +344,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         A search box keeps its text in <Code>useState</Code>. Each keystroke re-renders whatever
-        owns that state. Where does it live?
+        owns that state. Place the state.
       </>
     ),
     piece: "useState(query)",
@@ -376,7 +376,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "child",
           label: "+ new <SearchInput>",
-          note: "Only SearchInput re-renders as you type. Worth a component, even if used once.",
+          note: "Extract it even when used once. Only SearchInput re-renders as you type.",
           cost: ["1 render per key"],
         },
       },
@@ -387,7 +387,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         <Code>cart/summary.tsx</Code> and <Code>checkout/pay-button.tsx</Code> now both call{" "}
-        <Code>useCart()</Code>. Where does it move?
+        <Code>useCart()</Code>. Move it.
       </>
     ),
     piece: "useCart()",
@@ -400,7 +400,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "shop",
           label: "+ use-cart.ts",
-          note: "routes/shop/ is the nearest folder both callers share, so the path names its owner.",
+          note: "Move it to routes/shop/, the nearest folder both callers share, so the path names its owner.",
           cost: ["1 hop each", "owner: shop"],
         },
       },
@@ -433,7 +433,7 @@ const LEVELS: Level[] = [
     name: "Twelve callers",
     prompt: (
       <>
-        Twelve pages use <Code>button.tsx</Code>. Where does it go?
+        Twelve pages use <Code>button.tsx</Code>. Place it.
       </>
     ),
     piece: "button.tsx",
@@ -445,7 +445,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "components",
           label: "+ components/button.tsx",
-          note: "Used almost everywhere, so it gets a type folder. components/ says what it is, and ⌘P finds it.",
+          note: "Give it a type folder. components/ says what it is, and ⌘P finds it.",
           cost: ["12 callers", "1 obvious home"],
         },
       },
@@ -477,26 +477,15 @@ const LEVELS: Level[] = [
 export function ProximityPrinciple() {
   return (
     <RuleLanding
-      lead={
-        <>
-          Five placements, each with the wrong spot and the right one side by side in a real tree.
-          Then a mini quiz.
-        </>
-      }
+      lead={<>Start inline. Extract only when a second caller, or its own state, demands it.</>}
       learn={{
-        title: "Near beats far",
-        intro: (
-          <>
-            Put code as close as you can to where it's used, and move it only as far as its callers
-            need. Each example shows the same code twice: on the left where it tends to drift, on
-            the right where the rule puts it.
-          </>
-        ),
+        title: "Choose near over far",
+        intro: <>Move code only as far as its callers need.</>,
       }}
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: <>A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "tree",
       }}

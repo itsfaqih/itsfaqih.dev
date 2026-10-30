@@ -1006,7 +1006,7 @@ const LESSONS: Lesson[] = [
     title: "Give every state a look",
     body: (
       <>
-        Without a look for hover, press and focus, a click feels like it missed and a keyboard user
+        Give hover, press and focus a look, or a click feels like it missed and a keyboard user
         can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.
       </>
     ),
@@ -1026,7 +1026,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Stop taking clicks the moment it's pressed, say what it's doing, then say it worked. Stack
-        the labels in one grid cell so the width holds. Press the left one a few times.
+        the labels in one grid cell so the width holds. Press each one a few times.
       </>
     ),
     bad: {
@@ -1035,7 +1035,7 @@ const LESSONS: Lesson[] = [
       view: <SaveDemo careful={false} />,
     },
     good: {
-      label: "Stacks the labels",
+      label: "Stack the labels",
       costs: ["width holds", "1 request", "cursor: wait"],
       view: <SaveDemo careful />,
     },
@@ -1054,13 +1054,13 @@ const LESSONS: Lesson[] = [
       view: <DisabledDemo careful={false} />,
     },
     good: {
-      label: "Says why",
+      label: "Say why",
       costs: ["1 reason", "6.4:1 contrast", "cursor: not-allowed"],
       view: <DisabledDemo careful />,
     },
   },
   {
-    title: "One filled button per screen",
+    title: "Fill one button per screen",
     body: (
       <>
         Visual weight shows people the next step. Fill the main action in the brand colour, tint the
@@ -1074,7 +1074,7 @@ const LESSONS: Lesson[] = [
       view: <HierarchyDemo careful={false} />,
     },
     good: {
-      label: "Filled, tinted, text",
+      label: "Fill, tint, text",
       costs: ["1 filled", "1 next step"],
       view: <HierarchyDemo careful />,
     },
@@ -1083,8 +1083,8 @@ const LESSONS: Lesson[] = [
     title: "Guard the destructive action",
     body: (
       <>
-        One stray click should never delete anything. Tint the trigger red, then confirm with a
-        filled red button that names what goes. Focus lands on Cancel, the safe answer.
+        Never let one stray click delete anything. Tint the trigger red, then confirm with a filled
+        red button that names what goes. Land focus on Cancel, the safe answer.
       </>
     ),
     bad: {
@@ -1093,7 +1093,7 @@ const LESSONS: Lesson[] = [
       view: <DeleteDemo careful={false} />,
     },
     good: {
-      label: "Confirm that names it",
+      label: "Confirm by name",
       costs: ["2 clicks", "names 214 files"],
       view: <DeleteDemo careful />,
     },
@@ -1102,8 +1102,8 @@ const LESSONS: Lesson[] = [
     title: "Pad the icon side less",
     body: (
       <>
-        An icon has white space inside its own box, so equal padding makes its side look wider. Take
-        4px off that side and the spacing looks even.
+        Take 4px off the icon's side. An icon has white space inside its own box, so equal padding
+        makes that side look wider.
       </>
     ),
     extra: <LessonToggle label="Show padding" name="pads" />,
@@ -1124,7 +1124,7 @@ const LESSONS: Lesson[] = [
       <>
         With no label, padding sets the size, so the button comes out wider than it is tall and
         changes with every icon. Make it a fixed square as tall as its neighbours, and centre the
-        icon. With no text to read, it also needs an <Code>aria-label</Code> and a tooltip.
+        icon. With no text to read, add an <Code>aria-label</Code> and a tooltip.
       </>
     ),
     bad: {
@@ -1141,13 +1141,13 @@ const LESSONS: Lesson[] = [
 ];
 
 const CHEAT_SHEET = [
-  ["Any button", "A look for hover, press and focus, in 100 to 200ms"],
+  ["Any button", "Give hover, press and focus a look, in 100 to 200ms"],
   ["Waiting on a request", "Stop clicks, keep the width, say Saving… then Saved"],
-  ["Not available yet", "cursor: not-allowed and a tooltip that says why"],
-  ["Picking a variant", "One filled per screen, tinted for secondary, text for Cancel"],
-  ["It deletes something", "Red, behind a confirm that names what goes"],
-  ["An icon beside the label", "4px less padding on the icon's side"],
-  ["An icon with no label", "A fixed square with an aria-label and a tooltip"],
+  ["Not available yet", "Set cursor: not-allowed and add a tooltip that says why"],
+  ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
+  ["It deletes something", "Make it red, behind a confirm that names what goes"],
+  ["An icon beside the label", "Take 4px off the icon's side"],
+  ["An icon with no label", "Make it a fixed square with an aria-label and a tooltip"],
 ] as const;
 
 const LEVELS: Level[] = [
@@ -1156,7 +1156,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted.
-        How should <b>Checkout</b> look?
+        Style <b>Checkout</b>.
       </>
     ),
     piece: "Checkout",
@@ -1188,7 +1188,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "brand",
           label: "+ filled, brand colour",
-          note: "One filled button in the brand colour marks the step that finishes the job.",
+          note: "Fill one button in the brand colour to mark the step that finishes the job.",
           cost: ["1 filled", "1 next step"],
         },
       },
@@ -1199,7 +1199,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         Each row on the team page can remove that member's access. You can invite them back later.
-        Which button goes in the row?
+        Pick the button for the row.
       </>
     ),
     piece: "Remove access",
@@ -1212,7 +1212,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "filled",
           label: "+ filled red, then a confirm",
-          note: "Filled red is for a delete you can't undo, like Delete project. On every row, it outweighs the rest of the page.",
+          note: "Save filled red for a delete you can't undo, like Delete project. On every row, it outweighs the rest of the page.",
           cost: ["red on 12 rows"],
         },
       },
@@ -1230,7 +1230,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "tint",
           label: "+ tinted red, then a confirm",
-          note: "You can undo it, so a milder warning fits. Tint it red and use a confirm that names Dana.",
+          note: "Tint it red and use a confirm that names Dana. You can undo it, so a milder warning fits.",
           cost: ["2 clicks", "names who"],
         },
       },
@@ -1240,8 +1240,8 @@ const LEVELS: Level[] = [
     name: "While it saves",
     prompt: (
       <>
-        Saving takes 1.2 seconds, and impatient people click again at 300ms. When should the button
-        stop taking clicks and say <b>Saving…</b>?
+        Saving takes 1.2 seconds, and impatient people click again at 300ms. Pick when the button
+        stops taking clicks and says <b>Saving…</b>
       </>
     ),
     piece: "disabled · Saving…",
@@ -1253,7 +1253,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "now",
           label: "+ right at the click",
-          note: "The click lands and the button says so at once. The second click does nothing.",
+          note: "Switch at the click. The button says so at once, and the second click does nothing.",
           cost: ["1 request", "0ms silent"],
         },
       },
@@ -1283,8 +1283,8 @@ const LEVELS: Level[] = [
     name: "Less padding",
     prompt: (
       <>
-        <Code>pl-2 pr-3</Code> puts 8px on the left and 12px on the right. Which button in the
-        toolbar gets it?
+        <Code>pl-2 pr-3</Code> puts 8px on the left and 12px on the right. Pick the toolbar button
+        for it.
       </>
     ),
     piece: "pl-2 pr-3",
@@ -1305,7 +1305,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "lead",
           label: "＋ New project",
-          note: "The icon leads, so its side gets less. Its own white space makes up the rest.",
+          note: "Trim the side the icon leads on. Its own white space makes up the rest.",
           cost: ["8 | 12px", "looks even"],
         },
       },
@@ -1314,7 +1314,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "only",
           label: "⚙ (icon only)",
-          note: "An icon-only button is square, with the same padding on every side.",
+          note: "Make an icon-only button square, with the same padding on every side.",
           cost: ["not square"],
         },
       },
@@ -1324,7 +1324,7 @@ const LEVELS: Level[] = [
     name: "Can't be pressed",
     prompt: (
       <>
-        Publish has three moments. Which one gets <Code>cursor: not-allowed</Code>?
+        Publish has three moments. Place <Code>cursor: not-allowed</Code>.
       </>
     ),
     piece: "cursor: not-allowed",
@@ -1336,7 +1336,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "idle",
           label: "+ idle, title filled in",
-          note: "It can be pressed, so it keeps the default arrow. The hand is for links.",
+          note: "Keep the default arrow on a button that can be pressed. The hand is for links.",
           cost: ["says no", "means yes"],
         },
       },
@@ -1345,7 +1345,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "busy",
           label: "+ saving, aria-busy",
-          note: "Saving is busy, not refused. cursor: wait says it's working.",
+          note: "Saving is busy. Use cursor: wait to say it's working.",
           cost: ["reads as refused"],
         },
       },
@@ -1354,7 +1354,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "off",
           label: "+ disabled, no title yet",
-          note: "It shows the no-entry sign on hover, and a tooltip says to add a title first.",
+          note: "Show the no-entry sign on hover, with a tooltip that says to add a title first.",
           cost: ["1 reason shown"],
         },
       },
@@ -1366,25 +1366,16 @@ export function ButtonDesign() {
   return (
     <RuleLanding
       lead={
-        <>
-          Seven buttons, each built the quick way and the careful way, side by side. Then a mini
-          quiz.
-        </>
+        <>Style every state, hold the width while it works, and confirm anything destructive.</>
       }
       learn={{
-        title: "Every press gets an answer",
-        intro: (
-          <>
-            A button promises something will happen, and its states keep that promise. Each example
-            builds one button twice, on the left as it often ships and on the right by the rule.
-            Both are live.
-          </>
-        ),
+        title: "Answer every press",
+        intro: <>Give each state, wait and refusal a visible change, so no press feels lost.</>,
       }}
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: <>A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "layout",
       }}

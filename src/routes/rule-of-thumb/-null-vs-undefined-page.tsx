@@ -747,12 +747,12 @@ function RenameDemo({ way }: { way: Way }) {
 
 const LESSONS: Lesson[] = [
   {
-    title: "Missing or empty",
+    title: "Tell missing from empty",
     body: (
       <>
-        <Code>undefined</Code> means nobody gave a value. <Code>null</Code> means someone checked
-        and the answer is nothing. Ana skipped the phone question. Bo said he has no phone. Send
-        both as <Code>null</Code> and no code can tell them apart.
+        Read <Code>undefined</Code> as nobody gave a value. Read <Code>null</Code> as someone
+        checked and the answer is nothing. Ana skipped the phone question. Bo said he has no phone.
+        Send both as <Code>null</Code> and no code can tell them apart.
       </>
     ),
     bad: {
@@ -770,7 +770,7 @@ const LESSONS: Lesson[] = [
       ),
     },
     good: {
-      label: "Missing vs null",
+      label: "Keep them apart",
       costs: ["0 nagged"],
       view: (
         <CodeBlock
@@ -785,11 +785,11 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Optional means undefined",
+    title: "Mark optional with ?:",
     body: (
       <>
-        A value the caller skips is <Code>undefined</Code>. Type it with <Code>?:</Code> and callers
-        can leave it out. Type it <Code>| null</Code> and callers with no value must pass{" "}
+        Leave a skipped value <Code>undefined</Code>. Type it with <Code>?:</Code> and callers can
+        leave it out. Type it <Code>| null</Code> and callers with no value must pass{" "}
         <Code>null</Code>.
       </>
     ),
@@ -848,7 +848,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A PATCH changes only the fields it carries. Fill a draft with <Code>null</Code> and every
-        untouched field goes out as a clear. Start it empty and only the changes go out.
+        untouched field goes out as a clear. Start it empty so only the changes go out.
       </>
     ),
     bad: {
@@ -905,10 +905,10 @@ const LESSONS: Lesson[] = [
     },
   },
   {
-    title: "Not found is null",
+    title: "Return null for not found",
     body: (
       <>
-        A lookup that finds nothing should return <Code>null</Code>. <Code>Map.get</Code> returns{" "}
+        Return <Code>null</Code> from a lookup that finds nothing. <Code>Map.get</Code> returns{" "}
         <Code>undefined</Code>, and <Code>JSON.stringify</Code> turns that into no body.
       </>
     ),
@@ -944,11 +944,11 @@ const LESSONS: Lesson[] = [
 ];
 
 const TLDR = [
-  ["Declared, not assigned yet", "It's undefined"],
-  ["An argument the caller may skip", "name?: string, so undefined"],
+  ["Declared, not assigned yet", "Leave it undefined"],
+  ["An argument the caller may skip", "Type it name?: string"],
   ["The user cleared a field", "Set it to null"],
   ["A field the user didn't touch", "Leave it out of the request"],
-  ["A field every caller must decide", "T | null, not ?:"],
+  ["A field every caller must decide", "Type it T | null, not ?:"],
   ["A lookup that found nothing", "Return null"],
 ] as const;
 
@@ -967,8 +967,8 @@ const LEVELS: Level[] = [
     name: "The date picker",
     prompt: (
       <>
-        The user cleared the due date and never opened the assignee or notes. Which field gets{" "}
-        <Code>null</Code>?
+        The user cleared the due date and never opened the assignee or notes. Place{" "}
+        <Code>null</Code>.
       </>
     ),
     piece: "null",
@@ -992,7 +992,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "due",
           label: blank("due:"),
-          note: "They cleared it on purpose, so null tells the server to clear it.",
+          note: "Send null to clear it, since they cleared it on purpose.",
           cost: ["1 field cleared", "0 wiped"],
         },
       },
@@ -1013,8 +1013,8 @@ const LEVELS: Level[] = [
     name: "Only the title",
     prompt: (
       <>
-        The user renamed the task and removed its reviewer. They didn't touch the due date. Which
-        field can be <Code>undefined</Code>?
+        The user renamed the task and removed its reviewer. They didn't touch the due date. Place{" "}
+        <Code>undefined</Code>.
       </>
     ),
     piece: "undefined",
@@ -1047,7 +1047,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "due",
           label: blank("due:"),
-          note: "It drops out of the JSON, so the server leaves due alone.",
+          note: "Leave it undefined so the server leaves due alone.",
           cost: ["0 fields wiped"],
         },
       },
@@ -1060,7 +1060,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         You looked up <Code>bo@x.io</Code> and nobody has that email. You haven't looked up{" "}
-        <Code>cy@x.io</Code> yet. Which entry gets <Code>null</Code>?
+        <Code>cy@x.io</Code> yet. Place <Code>null</Code>.
       </>
     ),
     piece: "null",
@@ -1074,7 +1074,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "bo",
           label: blank('["bo@x.io",'),
-          note: "You checked and nobody has it. null says so, and the next lookup is skipped.",
+          note: "Cache null: you checked and nobody has it, so the next lookup is skipped.",
           cost: ["1 lookup saved"],
         },
       },
@@ -1096,7 +1096,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         Every new task must name an assignee or say there's none. The colour is optional and falls
-        back to grey. Where does <Code>| null</Code> go?
+        back to grey. Place <Code>| null</Code>.
       </>
     ),
     piece: "| null",
@@ -1119,7 +1119,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "assignee",
           label: blank("assignee: User"),
-          note: "Callers can't skip it. They pass a user, or null on purpose.",
+          note: "Require it, so callers pass a user or null on purpose.",
           cost: ["forgot it: 1 error"],
         },
       },
@@ -1141,7 +1141,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         The client asked for <Code>?fields=name,manager</Code>. Bo has no manager. Nobody asked for
-        his phone. Which key do you leave out?
+        his phone. Pick the key to leave out.
       </>
     ),
     piece: "omit the key",
@@ -1180,24 +1180,23 @@ export function NullVsUndefined() {
     <RuleLanding
       lead={
         <>
-          Six cases, each with code that blurs the two beside code that keeps them apart. Then a
-          mini quiz.
+          Send <Code>null</Code> to clear a field. Leave a field out to keep it.
         </>
       }
       learn={{
-        title: "Missing is not empty",
+        title: "Keep missing and empty apart",
         intro: (
           <>
-            <Code style={styles.introCode}>undefined</Code> means no value was given.{" "}
-            <Code style={styles.introCode}>null</Code> means the value is empty on purpose. The left
-            pane blurs the two, the right keeps them apart. Each line's output sits beside it.
+            Give <Code style={styles.introCode}>undefined</Code> and{" "}
+            <Code style={styles.introCode}>null</Code> one meaning each, so no code has to guess
+            which it got.
           </>
         ),
       }}
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: <>A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "code",
       }}

@@ -1350,7 +1350,7 @@ const LESSONS: Lesson[] = [
       view: <WaterfallView {...LATE} />,
     },
     good: {
-      label: "In the loader",
+      label: "Fetch in the loader",
       costs: ["data at 520ms", "0 waterfalls"],
       view: <WaterfallView {...EARLY} />,
     },
@@ -1369,7 +1369,7 @@ const LESSONS: Lesson[] = [
       view: <RevenueCard swr={false} />,
     },
     good: {
-      label: "Stale, then fresh",
+      label: "Keep it, then swap",
       costs: ["0ms blank", "1 quiet update"],
       view: <RevenueCard swr />,
     },
@@ -1388,7 +1388,7 @@ const LESSONS: Lesson[] = [
       view: <InboxView delay={false} />,
     },
     good: {
-      label: "After 200ms",
+      label: "Wait 200ms",
       costs: ["0 flashes"],
       view: <InboxView delay />,
     },
@@ -1408,7 +1408,7 @@ const LESSONS: Lesson[] = [
       view: <TeamView inline={false} />,
     },
     good: {
-      label: "Inline, with Retry",
+      label: "Show it inline, with Retry",
       costs: ["1 tap to recover", "logged"],
       view: <TeamView inline />,
     },
@@ -1461,7 +1461,7 @@ const LESSONS: Lesson[] = [
       view: <WalletView careful={false} />,
     },
     good: {
-      label: "History only",
+      label: "Persist history only",
       costs: ["balance always live", "history dated"],
       view: <WalletView careful />,
     },
@@ -1490,8 +1490,8 @@ const LEVELS: Level[] = [
     name: "A quick reply",
     prompt: (
       <>
-        Most replies to this list land in 80ms. A few take 2s. When does the{" "}
-        <Code>&lt;Spinner /&gt;</Code> appear?
+        Most replies to this list land in 80ms. A few take 2s. Place the{" "}
+        <Code>&lt;Spinner /&gt;</Code>.
       </>
     ),
     piece: "<Spinner />",
@@ -1513,7 +1513,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "delay",
           label: "show it at 200ms, if still waiting",
-          note: "Quick replies never show it. Slow ones get it at 200ms, when the wait is real.",
+          note: "Wait 200ms. Quick replies never show it. Slow ones get it when the wait is real.",
           cost: ["0 flashes"],
         },
       },
@@ -1533,8 +1533,8 @@ const LEVELS: Level[] = [
     name: "Back to the tab",
     prompt: (
       <>
-        You return to a tab of prices loaded 5 minutes ago. They refetch on focus. What do the
-        cached prices do while it runs?
+        You return to a tab of prices loaded 5 minutes ago. They refetch on focus. Place the cached
+        prices.
       </>
     ),
     piece: "cached prices",
@@ -1555,7 +1555,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "stay",
           label: "stay, with a small spinner beside them",
-          note: "You can read them at once. Fresh numbers swap in place when they land.",
+          note: "Keep them readable. Fresh numbers swap in place when they land.",
           cost: ["0ms blank", "1 quiet update"],
         },
       },
@@ -1575,8 +1575,7 @@ const LEVELS: Level[] = [
     name: "Twenty orders",
     prompt: (
       <>
-        The orders page lists 20 orders, one <Code>&lt;OrderRow&gt;</Code> each. Where does the
-        fetch start?
+        The orders page lists 20 orders, one <Code>&lt;OrderRow&gt;</Code> each. Place the fetch.
       </>
     ),
     piece: "fetch(orders)",
@@ -1588,7 +1587,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "loader",
           label: "in the route loader",
-          note: "It starts with the navigation, while the page's code loads. One request for the list.",
+          note: "Start it with the navigation, while the page's code loads. One request covers the list.",
           cost: ["data at 500ms", "1 request"],
         },
       },
@@ -1618,8 +1617,8 @@ const LEVELS: Level[] = [
     name: "One card fails",
     prompt: (
       <>
-        A dashboard loads five cards. <Code>GET /revenue</Code> fails with a 500. What does the user
-        see?
+        A dashboard loads five cards. <Code>GET /revenue</Code> fails with a 500. Place what the
+        user sees.
       </>
     ),
     piece: "error + Retry",
@@ -1642,7 +1641,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "inline",
           label: "inside the revenue card",
-          note: "It sits where the chart would be. The other four stay, and one tap retries. Log it too.",
+          note: "Put it where the chart would be. The other four stay, and one tap retries. Log it too.",
           cost: ["1 tap to recover", "4 cards kept"],
         },
       },
@@ -1661,8 +1660,8 @@ const LEVELS: Level[] = [
     name: "Offline on day 3",
     prompt: (
       <>
-        A banking app persists its cache. On day 3 you open it with no signal. What may it show from
-        the cache?
+        A banking app persists its cache. On day 3 you open it with no signal. Place what it may
+        show from the cache.
       </>
     ),
     piece: "from cache",
@@ -1685,7 +1684,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "history",
           label: "Last week's payments, updated 2 days ago",
-          note: "Past payments don't change, and the date says how old the list is.",
+          note: "Persist it with the date. Past payments don't change.",
           cost: ["safe to persist", "dated"],
         },
       },
@@ -1707,23 +1706,18 @@ export function DataLoading() {
     <RuleLanding
       lead={
         <>
-          Six loading moments, run the wrong way and the right way side by side. Then a mini quiz on
-          a request timeline.
+          Start requests in the loader and keep stale data on screen. Show a skeleton only after
+          200ms.
         </>
       }
       learn={{
         title: "Fast first paint, smooth updates",
-        intro: (
-          <>
-            People judge loading by what they see while they wait. Each example runs the same
-            request twice, the common way on the left and the rule's way on the right.
-          </>
-        ),
+        intro: <>Design the wait, because people judge loading by what they see while it lasts.</>,
       }}
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: <>Five requests, five timelines. A wrong spot shows what it costs.</>,
+        intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "timeline",
       }}
