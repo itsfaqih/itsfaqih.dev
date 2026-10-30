@@ -1716,20 +1716,14 @@ export function DataLoading() {
         intro: (
           <>
             People judge loading by what they see while they wait. Each example runs the same
-            request twice, the common way on the left and the rule's way on the right. Press the
-            buttons on both.
+            request twice, the common way on the left and the rule's way on the right.
           </>
         ),
       }}
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: (
-          <>
-            Five requests, five timelines. Drag each piece into place, or tap it, then tap a spot. A
-            wrong spot shows what it would cost.
-          </>
-        ),
+        intro: <>Five requests, five timelines. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "timeline",
       }}

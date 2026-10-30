@@ -1174,7 +1174,7 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
             name="title"
             label="Title"
             value={draft}
-            placeholder="What broke?"
+            placeholder="Export button does nothing"
             onChange={(event) => setDraft(event.target.value)}
           />
           <div {...stylex.props(styles.acts)}>
@@ -1783,12 +1783,7 @@ const LEVELS: Level[] = [
 export function DialogDesign() {
   return (
     <RuleLanding
-      lead={
-        <>
-          Six live dialogs, each built leaky and sealed, side by side. Open them, press Tab, press
-          Escape. Then a mini quiz on where each piece goes.
-        </>
-      }
+      lead={<>Six live dialogs, each built leaky and sealed, side by side. Then a mini quiz.</>}
       learn={{
         title: "Hold focus, let go cleanly",
         intro: (
@@ -1802,12 +1797,7 @@ export function DialogDesign() {
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: (
-          <>
-            Five dialogs. Drag each piece to where it belongs, or tap it, then tap a spot. A wrong
-            spot shows what it would cost.
-          </>
-        ),
+        intro: <>Five dialogs. A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "screen",
       }}

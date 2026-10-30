@@ -1108,7 +1108,7 @@ export function HandlingTimestamps() {
       lead={
         <>
           Five steps a timestamp takes, the wrong way and the right way side by side, seen from two
-          time zones. Then a mini quiz where you place each piece in the flow.
+          time zones. Then a mini quiz.
         </>
       }
       learn={{
@@ -1126,8 +1126,8 @@ export function HandlingTimestamps() {
       quiz={{
         intro: (
           <>
-            Four timestamps, four trips from browser to database and back. Drag each piece to its
-            step, or tap it, then tap a spot. A wrong spot shows what it would cost.
+            Four timestamps, four trips from browser to database and back. A wrong spot shows what
+            it costs.
           </>
         ),
         levels: LEVELS,

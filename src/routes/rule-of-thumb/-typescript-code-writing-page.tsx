@@ -860,7 +860,7 @@ export function TypeScriptCodeWriting() {
       lead={
         <>
           Six habits, each as loose code beside precise code, with what tsc says about every line.
-          Then a mini quiz where you place each piece.
+          Then a mini quiz.
         </>
       }
       learn={{
@@ -875,12 +875,7 @@ export function TypeScriptCodeWriting() {
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: (
-          <>
-            Drag each piece of TypeScript to its line, or tap it, then tap a spot. A wrong spot
-            shows what it would cost.
-          </>
-        ),
+        intro: <>A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "code",
       }}

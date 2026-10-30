@@ -1756,7 +1756,7 @@ export function TableDesign() {
         lead={
           <>
             Five tables, each built the usual way and the careful way, side by side. All of them
-            work. Then a mini quiz where you place each piece.
+            work. Then a mini quiz.
           </>
         }
         learn={{
@@ -1764,19 +1764,14 @@ export function TableDesign() {
           intro: (
             <>
               People run their eyes down a column to find one value. Each example shows one table
-              twice. Left is how tables usually ship. Right follows the rule. Click both.
+              twice. Left is how tables usually ship. Right follows the rule.
             </>
           ),
         }}
         lessons={LESSONS}
         tldr={CHEAT_SHEET}
         quiz={{
-          intro: (
-            <>
-              Five tables, five pieces. Drag each piece to where it belongs, or tap it, then tap a
-              spot. A wrong spot shows what it would cost.
-            </>
-          ),
+          intro: <>Five tables, five pieces. A wrong spot shows what it costs.</>,
           levels: LEVELS,
           board: "table",
         }}

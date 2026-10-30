@@ -1367,8 +1367,8 @@ export function ButtonDesign() {
     <RuleLanding
       lead={
         <>
-          Seven buttons, each built the quick way and the careful way, side by side. Hover, press
-          and tab to them, then place the pieces in a mini quiz.
+          Seven buttons, each built the quick way and the careful way, side by side. Then a mini
+          quiz.
         </>
       }
       learn={{
@@ -1384,12 +1384,7 @@ export function ButtonDesign() {
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: (
-          <>
-            Drag each piece to where it belongs, or tap it, then tap a spot. A wrong spot shows what
-            it would cost.
-          </>
-        ),
+        intro: <>A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "layout",
       }}

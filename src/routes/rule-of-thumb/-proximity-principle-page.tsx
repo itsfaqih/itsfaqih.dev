@@ -480,7 +480,7 @@ export function ProximityPrinciple() {
       lead={
         <>
           Five placements, each with the wrong spot and the right one side by side in a real tree.
-          Then a mini quiz where you place the code yourself.
+          Then a mini quiz.
         </>
       }
       learn={{
@@ -496,12 +496,7 @@ export function ProximityPrinciple() {
       lessons={LESSONS}
       tldr={CHEAT_SHEET}
       quiz={{
-        intro: (
-          <>
-            Drag each piece to where it lives, or tap it, then tap a spot. A wrong spot shows its
-            cost.
-          </>
-        ),
+        intro: <>A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "tree",
       }}

@@ -1197,12 +1197,7 @@ export function NullVsUndefined() {
       lessons={LESSONS}
       tldr={TLDR}
       quiz={{
-        intro: (
-          <>
-            Drag each piece where it belongs, or tap it, then tap a spot. A wrong spot shows what it
-            costs.
-          </>
-        ),
+        intro: <>A wrong spot shows what it costs.</>,
         levels: LEVELS,
         board: "code",
       }}
