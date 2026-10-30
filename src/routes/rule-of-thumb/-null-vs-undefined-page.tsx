@@ -788,9 +788,9 @@ const LESSONS: Lesson[] = [
     title: "Optional means undefined",
     body: (
       <>
-        A value the caller may leave out is <Code>undefined</Code> when they do. Type it with{" "}
-        <Code>?:</Code>, and the caller just leaves it out. Typed <Code>| null</Code>, every call
-        has to spell out the nothing.
+        A value the caller skips is <Code>undefined</Code>. Type it with <Code>?:</Code> and callers
+        can leave it out. Type it <Code>| null</Code> and callers with no value must pass{" "}
+        <Code>null</Code>.
       </>
     ),
     bad: {
@@ -828,8 +828,8 @@ const LESSONS: Lesson[] = [
     title: "Clear with null",
     body: (
       <>
-        When the user empties a field, say so with <Code>null</Code>. JSON drops every key set to{" "}
-        <Code>undefined</Code>, so a clear sent that way never reaches the server.
+        When the user empties a field, send <Code>null</Code>. JSON drops keys set to{" "}
+        <Code>undefined</Code>, so that clear never reaches the server.
       </>
     ),
     bad: {
@@ -847,8 +847,8 @@ const LESSONS: Lesson[] = [
     title: "Leave untouched fields out",
     body: (
       <>
-        A PATCH changes what it carries. Start a draft at <Code>null</Code> and every field the user
-        never touched goes out as a clear. Start it empty, and only what they changed is sent.
+        A PATCH changes only the fields it carries. Fill a draft with <Code>null</Code> and every
+        untouched field goes out as a clear. Start it empty and only the changes go out.
       </>
     ),
     bad: {
@@ -866,8 +866,8 @@ const LESSONS: Lesson[] = [
     title: "Force the decision",
     body: (
       <>
-        <Code>?:</Code> lets a caller skip a field without a word. When every caller must decide,
-        make the field required and nullable. Forgetting it is then an error, and "nobody" is a{" "}
+        <Code>?:</Code> lets a caller skip a field silently. When every caller must decide, make it
+        required and nullable. Forgetting it becomes a type error, and "nobody" is a{" "}
         <Code>null</Code> someone wrote on purpose.
       </>
     ),
@@ -908,9 +908,8 @@ const LESSONS: Lesson[] = [
     title: "Not found is null",
     body: (
       <>
-        A lookup that finds nothing has an answer, and the answer is <Code>null</Code>.{" "}
-        <Code>Map.get</Code> hands you <Code>undefined</Code>, and <Code>JSON.stringify</Code> turns
-        that into no body at all.
+        A lookup that finds nothing should return <Code>null</Code>. <Code>Map.get</Code> returns{" "}
+        <Code>undefined</Code>, and <Code>JSON.stringify</Code> turns that into no body.
       </>
     ),
     bad: {
@@ -968,8 +967,8 @@ const LEVELS: Level[] = [
     name: "The date picker",
     prompt: (
       <>
-        The user pressed ✕ on the due date. They never opened the assignee or the notes. Which field
-        gets <Code>null</Code>?
+        The user cleared the due date and never opened the assignee or notes. Which field gets{" "}
+        <Code>null</Code>?
       </>
     ),
     piece: "null",
@@ -993,7 +992,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "due",
           label: blank("due:"),
-          note: "They cleared it on purpose, so you send null and the server clears it.",
+          note: "They cleared it on purpose, so null tells the server to clear it.",
           cost: ["1 field cleared", "0 wiped"],
         },
       },
@@ -1048,7 +1047,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "due",
           label: blank("due:"),
-          note: "It drops out of the JSON, so the server never sees due and leaves it alone.",
+          note: "It drops out of the JSON, so the server leaves due alone.",
           cost: ["0 fields wiped"],
         },
       },
@@ -1130,7 +1129,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "color",
           label: blank("color?: string"),
-          note: "Missing and null now both mean grey. Two ways to say one thing.",
+          note: "Missing and null now both mean grey.",
           cost: ["2 ways to say grey"],
         },
       },
@@ -1167,7 +1166,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "phone",
           label: blank('"phone":'),
-          note: "Nobody asked, so nothing is sent. A missing key says no value was given.",
+          note: "Nobody asked, so send nothing. A missing key means no value was given.",
           cost: ["0 bytes", "0 claims"],
         },
       },
@@ -1181,18 +1180,17 @@ export function NullVsUndefined() {
     <RuleLanding
       lead={
         <>
-          Six cases, each with the code that blurs the two beside the code that keeps them apart,
-          and the data each line produces. Then a mini quiz where you put each nothing in its place.
+          Six cases, each with code that blurs the two beside code that keeps them apart. Then a
+          mini quiz.
         </>
       }
       learn={{
         title: "Missing is not empty",
         intro: (
           <>
-            <Code style={styles.introCode}>undefined</Code> says no value was given.{" "}
-            <Code style={styles.introCode}>null</Code> says the value is empty, on purpose. Each
-            example runs the same code twice: on the left where the two blur, on the right where the
-            rule keeps them apart. What each line gives sits beside it.
+            <Code style={styles.introCode}>undefined</Code> means no value was given.{" "}
+            <Code style={styles.introCode}>null</Code> means the value is empty on purpose. The left
+            pane blurs the two, the right keeps them apart. Each line's output sits beside it.
           </>
         ),
       }}
@@ -1201,8 +1199,8 @@ export function NullVsUndefined() {
       quiz={{
         intro: (
           <>
-            Five fields waiting for nothing. Drag each piece to where it belongs, or tap it and then
-            tap a spot. A wrong spot tells you what it would cost.
+            Drag each piece where it belongs, or tap it, then tap a spot. A wrong spot shows what it
+            costs.
           </>
         ),
         levels: LEVELS,

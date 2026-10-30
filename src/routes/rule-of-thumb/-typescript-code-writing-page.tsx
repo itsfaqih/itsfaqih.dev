@@ -396,9 +396,9 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Use <Code>type</Code> for shapes, unions and aliases. To build one shape on another, use{" "}
-        <Code>interface … extends</Code>: a clash fails on the declaration, in plain words. With{" "}
-        <Code>&</Code> the clash compiles, the field turns into <Code>never</Code>, and the error
-        waits for the first object that tries to fill it.
+        <Code>interface … extends</Code>. A clash then fails at the declaration, in plain words.
+        With <Code>&</Code>, the clash compiles, the field becomes <Code>never</Code>, and the error
+        shows up at the first object of that type.
       </>
     ),
     bad: {
@@ -449,9 +449,9 @@ const LESSONS: Lesson[] = [
     title: "Unions, not enums",
     body: (
       <>
-        A string enum is a runtime object with its own rules: it won't take the plain string it
-        stands for, it adds JavaScript to your bundle, and Node's type stripping refuses to run it.
-        A union of strings is only a type.
+        A string enum is a runtime object. It rejects the plain string it stands for, adds
+        JavaScript to your bundle, and won't run under Node's type stripping. A string union is only
+        a type.
       </>
     ),
     extra: (
@@ -507,9 +507,8 @@ const LESSONS: Lesson[] = [
     title: "Infer inside, annotate the edges",
     body: (
       <>
-        Let TypeScript infer local values. A label on a local only widens it. Annotate where a
-        contract starts: a return type, a public API. Then a typo fails where you wrote it, not in
-        some caller.
+        Let TypeScript infer locals. A label on a local only widens it. Annotate where a contract
+        starts: a return type, a public API. Then a typo fails where you wrote it, not in a caller.
       </>
     ),
     bad: {
@@ -558,9 +557,9 @@ const LESSONS: Lesson[] = [
     title: "One options object",
     body: (
       <>
-        Past two parameters, take one object. Four arguments in a row are a guessing game at every
-        call, and two strings swap without a word. Named keys can't swap, read on their own, and
-        take a new optional field without breaking a caller.
+        Past two parameters, take one object. Four positional arguments say nothing at the call, and
+        two strings can swap with no error. Named keys can't swap, label each value, and take a new
+        optional field without breaking a caller.
       </>
     ),
     bad: {
@@ -607,9 +606,9 @@ const LESSONS: Lesson[] = [
     title: "Turn the flags on",
     body: (
       <>
-        <Code>strict</Code> is the floor, not the ceiling. Even under it, <Code>users[0]</Code>{" "}
-        reads as a <Code>User</Code> on an empty list. <Code>noUncheckedIndexedAccess</Code> makes
-        every index read say it may be missing.
+        Under <Code>strict</Code> alone, <Code>users[0]</Code> still reads as a <Code>User</Code> on
+        an empty list. <Code>noUncheckedIndexedAccess</Code> types every index read as possibly{" "}
+        <Code>undefined</Code>.
       </>
     ),
     extra: (
@@ -681,7 +680,7 @@ const holds = (text: string) => (
 const LEVELS: Level[] = [
   {
     name: "Send an email",
-    prompt: <>Strings in a row swap without a word. Which signature takes an options object?</>,
+    prompt: <>Strings in a row can swap with no error. Which signature needs an options object?</>,
     piece: "options",
     answer: "send",
     rows: [
@@ -721,8 +720,8 @@ const LEVELS: Level[] = [
     name: "The role list",
     prompt: (
       <>
-        You loop over the roles at runtime and want a <Code>Role</Code> type that stays in step with
-        the list. Where does <Code>as const</Code> go?
+        You loop over the roles at runtime and want a <Code>Role</Code> type that matches the list.
+        Where does <Code>as const</Code> go?
       </>
     ),
     piece: "as const",
@@ -765,8 +764,8 @@ const LEVELS: Level[] = [
     name: "The contract",
     prompt: (
       <>
-        <Code>getUser</Code> is the module's public API, and <Code>find</Code> may come back empty.
-        Where does <Code>: User</Code> go?
+        <Code>getUser</Code> is the module's public API, and <Code>find</Code> can return{" "}
+        <Code>undefined</Code>. Where does <Code>: User</Code> go?
       </>
     ),
     piece: ": User",
@@ -860,17 +859,16 @@ export function TypeScriptCodeWriting() {
     <RuleLanding
       lead={
         <>
-          Six habits, each with the loose code beside the precise one and what tsc says about every
-          line. Then a mini quiz where you put each piece where it belongs.
+          Six habits, each as loose code beside precise code, with what tsc says about every line.
+          Then a mini quiz where you place each piece.
         </>
       }
       learn={{
         title: "Let the compiler catch it",
         intro: (
           <>
-            Each example is the same code written twice: loose on the left, precise on the right.
-            tsc reads both from the top, and what it says about a line sits beside that line. A
-            squiggle marks a compile error.
+            Each example shows the same code twice, loose on the left and precise on the right. What
+            tsc says about a line sits beside it. A squiggle marks a compile error.
           </>
         ),
       }}
@@ -879,8 +877,8 @@ export function TypeScriptCodeWriting() {
       quiz={{
         intro: (
           <>
-            Four pieces of TypeScript looking for their line. Drag each one into place, or tap it
-            and then tap a spot. A wrong spot tells you what it would cost.
+            Drag each piece of TypeScript to its line, or tap it, then tap a spot. A wrong spot
+            shows what it would cost.
           </>
         ),
         levels: LEVELS,

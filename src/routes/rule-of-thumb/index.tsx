@@ -11,8 +11,7 @@ import { veil } from "../-components/section";
 import { loadIn } from "../../components/load-in";
 import { arcade } from "../../components/arcade";
 
-const LEDE =
-  "Opinions, guidelines, and patterns I've adopted for building web applications. Many come with demos you can try.";
+const LEDE = "Rules I follow when building web apps. Many have demos you can try.";
 
 export const Route = createFileRoute("/rule-of-thumb/")({
   component: RuleOfThumbsIndex,

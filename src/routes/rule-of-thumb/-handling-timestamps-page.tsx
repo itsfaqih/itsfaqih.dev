@@ -773,14 +773,13 @@ const LESSONS: Lesson[] = [
     title: "Store the moment in UTC",
     body: (
       <>
-        Rina in Jakarta and Sam in New York order in the same second. A column with no offset saves
-        each writer's own clock, so one moment lands as two times. Save it in UTC and it lands as
-        one.
+        Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores
+        each writer's local time, so one moment becomes two values. Store UTC and it stays one.
       </>
     ),
     extra: (
       <Tip>
-        UTC has no daylight saving and no political changes. It means the same moment everywhere.
+        UTC never shifts for daylight saving or politics. It means the same moment everywhere.
       </Tip>
     ),
     bad: {
@@ -798,9 +797,9 @@ const LESSONS: Lesson[] = [
     title: "Return it with a Z",
     body: (
       <>
-        An ISO string with no <Code>Z</Code> has no zone, so each browser reads the digits as its
-        own local time. Rina and Sam both see 6:00 AM, and both are wrong. With the <Code>Z</Code>,
-        each browser moves it to its own zone.
+        An ISO string without a <Code>Z</Code> has no zone, so each browser reads it as local time.
+        Rina and Sam both see 6:00 AM, and both are wrong. With the <Code>Z</Code>, each browser
+        converts it to its own zone.
       </>
     ),
     bad: {
@@ -838,8 +837,8 @@ const LESSONS: Lesson[] = [
     title: "Turn it local in the browser",
     body: (
       <>
-        The server knows its own time zone, not the reader's. Format the time there and it's right
-        only for people who live where the server runs. Send UTC, and let each browser format it.
+        The server knows its own time zone, not the reader's. Format there and the time is right
+        only where the server runs. Send UTC and let each browser format it.
       </>
     ),
     bad: {
@@ -859,7 +858,7 @@ const LESSONS: Lesson[] = [
       ),
     },
     good: {
-      label: "Viewer's time",
+      label: "Reader's time",
       costs: ["right for 2 of 2"],
       view: (
         <div {...stylex.props(styles.view)}>
@@ -879,8 +878,8 @@ const LESSONS: Lesson[] = [
     title: "Send the zone with the input",
     body: (
       <>
-        Rina sets a reminder for 7:00 AM. Sent as <Code>2026-01-01T07:00:00</Code>, the server can't
-        tell whose 7:00 that is and reads it as UTC. Send the UTC time with a <Code>Z</Code>, or the
+        Rina sets a reminder for 7:00 AM. From <Code>2026-01-01T07:00:00</Code> the server can't
+        tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code>Z</Code>, or the local
         time with its offset. Both name one moment.
       </>
     ),
@@ -899,9 +898,9 @@ const LESSONS: Lesson[] = [
     title: "Filter by the user's day",
     body: (
       <>
-        Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, which is 17:00
-        UTC the day before. Send midnight with no zone and the server queries 07:00 to 07:00 her
-        time: early orders go missing and the next morning's slip in.
+        Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day
+        before. Send midnight with no zone and the server queries 07:00 to 07:00 her time. Orders
+        before 07:00 go missing, and the next morning's show up.
       </>
     ),
     bad: {
@@ -934,7 +933,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         The order is stored as <Code>2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam
-        1:00 AM. Where does the formatting run?
+        1:00 AM. Where do you format it?
       </>
     ),
     piece: "Intl.DateTimeFormat",
@@ -956,7 +955,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "api",
           label: "before res.json()",
-          note: "The server formats on New York's clock. Sam gets 1:00 AM, and Rina gets it too.",
+          note: "The server uses New York time. Sam gets 1:00 AM, and so does Rina.",
           cost: ["Rina 12 h off"],
         },
       },
@@ -995,7 +994,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "api",
           label: "when the request arrives",
-          note: "The string that arrives has no zone. The server reads 07:00 as UTC, 7 hours after she meant.",
+          note: "The string has no zone, so the server reads 07:00 as UTC, 7 hours late.",
           cost: ["7 h late"],
         },
       },
@@ -1005,7 +1004,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "db",
           label: "on insert, as Asia/Jakarta",
-          note: "Right for Rina, but now everyone is assumed to live in Jakarta. Sam's reminders land 12 hours off.",
+          note: "Right for Rina, but it assumes everyone lives in Jakarta. Sam's reminders fire 12 hours off.",
           cost: ["right for Jakarta only"],
         },
       },
@@ -1029,7 +1028,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "body",
           label: '…"',
-          note: "With its offset the server knows the exact moment, and stores it as 00:00 UTC.",
+          note: "With the offset, the server knows the exact moment and stores 00:00 UTC.",
           cost: ["0 h off"],
         },
       },
@@ -1040,7 +1039,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "db",
           label: "new column",
-          note: "An offset you don't need, kept forever. Store the UTC moment and nothing else.",
+          note: "The column keeps an offset you don't need. Store only the UTC moment.",
           cost: ["+1 column", "2 zones per row"],
         },
       },
@@ -1051,7 +1050,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "reply",
           label: '…"',
-          note: "Sam gets Rina's offset back, and every writer's zone leaks into the reply. Return UTC with a Z.",
+          note: "Sam gets Rina's offset, and every writer's zone leaks into replies. Return UTC with a Z.",
           cost: ["1 format per writer"],
         },
       },
@@ -1108,9 +1107,8 @@ export function HandlingTimestamps() {
       costsStyle={styles.costs}
       lead={
         <>
-          Five steps a timestamp takes, each with the wrong way and the right one side by side,
-          shown to two people in two time zones. Then a mini quiz where you put each piece in the
-          flow yourself.
+          Five steps a timestamp takes, the wrong way and the right way side by side, seen from two
+          time zones. Then a mini quiz where you place each piece in the flow.
         </>
       }
       learn={{
@@ -1118,8 +1116,8 @@ export function HandlingTimestamps() {
         intro: (
           <>
             Rina lives in Jakarta, at UTC+7. Sam lives in New York, at UTC−5. Each example follows
-            one moment to both of them: on the left the way it tends to go wrong, on the right the
-            way the rule does it.
+            one moment to both of them. The left side shows the usual mistake, the right side the
+            rule.
           </>
         ),
       }}
@@ -1128,9 +1126,8 @@ export function HandlingTimestamps() {
       quiz={{
         intro: (
           <>
-            Four timestamps, four trips from a browser to the database and back. Drag each piece to
-            the step where it belongs, or tap it and then tap a spot. A wrong spot tells you what it
-            would cost.
+            Four timestamps, four trips from browser to database and back. Drag each piece to its
+            step, or tap it, then tap a spot. A wrong spot shows what it would cost.
           </>
         ),
         levels: LEVELS,

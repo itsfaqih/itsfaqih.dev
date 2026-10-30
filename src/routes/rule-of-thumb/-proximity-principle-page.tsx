@@ -30,8 +30,8 @@ const LESSONS: Lesson[] = [
     title: "Inline first",
     body: (
       <>
-        Code used once stays where it's used. A helper in <Code>utils/</Code> for a single caller is
-        one more file to open and one more import to keep, and nothing is shared.
+        Code used once stays where it's used. A helper in <Code>utils/</Code> with one caller adds a
+        file and an import, and shares nothing.
       </>
     ),
     bad: {
@@ -68,8 +68,8 @@ const LESSONS: Lesson[] = [
     title: "Prefer fewer files",
     body: (
       <>
-        One component, one file. Split its types, styles and hook into a folder and you open five
-        tabs to read one idea.
+        One component, one file. Split its types, styles and hook into a folder, and reading it
+        takes five tabs.
       </>
     ),
     bad: {
@@ -110,8 +110,8 @@ const LESSONS: Lesson[] = [
     exception: true,
     body: (
       <>
-        The one reason to extract code that's used once: it has its own state. In a child, a
-        keystroke re-renders the child, not the page and its 500 rows.
+        Extract code used once only when it has its own state. In a child, a keystroke re-renders
+        the child, not the page and its 500 rows.
       </>
     ),
     bad: {
@@ -148,13 +148,13 @@ const LESSONS: Lesson[] = [
     title: "Lowest common ancestor",
     body: (
       <>
-        When a second file needs it, move it up to the nearest folder both callers share. Its path
-        then says who owns it.
+        When a second file needs it, move it up to the nearest folder both callers share. The path
+        then names its owner.
       </>
     ),
     extra: (
       <Tip>
-        Name folders for what they hold, like <Code>routes/</Code> or <Code>controllers/</Code>. Not{" "}
+        Name folders for what they hold, like <Code>routes/</Code> or <Code>controllers/</Code>, not{" "}
         <Code>features/</Code>.
       </Tip>
     ),
@@ -256,8 +256,7 @@ const LEVELS: Level[] = [
     name: "One caller",
     prompt: (
       <>
-        <Code>formatDate()</Code> is called once, by <Code>user-profile.tsx</Code>. Where does it
-        live?
+        Only <Code>user-profile.tsx</Code> calls <Code>formatDate()</Code>. Where does it live?
       </>
     ),
     piece: "formatDate()",
@@ -315,7 +314,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "folder",
           label: "+ user-profile/ index, types, styles, hooks",
-          note: "Five files for one component: five tabs open to read one idea.",
+          note: "Five files for one component, so five tabs to read it.",
           cost: ["5 files", "4 imports"],
         },
       },
@@ -325,7 +324,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "file",
           label: "↳ inside user-profile.tsx",
-          note: "One file holds the whole component. Open it and everything is there.",
+          note: "One file holds the whole component.",
           cost: ["1 file", "0 imports"],
         },
       },
@@ -334,7 +333,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "kinds",
           label: "+ types/, styles/, hooks/",
-          note: "Sorted by kind, the component's parts now live in four folders.",
+          note: "Sorted by kind, one component now spans four folders.",
           cost: ["4 folders", "3 imports"],
         },
       },
@@ -344,8 +343,8 @@ const LEVELS: Level[] = [
     name: "A search box",
     prompt: (
       <>
-        A search box keeps what you type in <Code>useState</Code>, and each keystroke re-renders
-        whatever owns that state. Where should it live?
+        A search box keeps its text in <Code>useState</Code>. Each keystroke re-renders whatever
+        owns that state. Where does it live?
       </>
     ),
     piece: "useState(query)",
@@ -357,7 +356,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "store",
           label: "+ search-store.ts",
-          note: "A global store for one input's text: a new file, a subscription, and the state still far from its input.",
+          note: "A global store for one input's text adds a file and a subscription, and keeps the state far from its input.",
           cost: ["+1 file", "global"],
         },
       },
@@ -377,7 +376,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "child",
           label: "+ new <SearchInput>",
-          note: "Only SearchInput re-renders as you type. Worth a component even though it's used once.",
+          note: "Only SearchInput re-renders as you type. Worth a component, even if used once.",
           cost: ["1 render per key"],
         },
       },
@@ -387,8 +386,8 @@ const LEVELS: Level[] = [
     name: "Two callers",
     prompt: (
       <>
-        <Code>useCart()</Code> is now called by <Code>cart/summary.tsx</Code> and{" "}
-        <Code>checkout/pay-button.tsx</Code>. Where does it move?
+        <Code>cart/summary.tsx</Code> and <Code>checkout/pay-button.tsx</Code> now both call{" "}
+        <Code>useCart()</Code>. Where does it move?
       </>
     ),
     piece: "useCart()",
@@ -434,8 +433,7 @@ const LEVELS: Level[] = [
     name: "Twelve callers",
     prompt: (
       <>
-        <Code>button.tsx</Code> is used by twelve pages, from settings to checkout. Where does it
-        go?
+        Twelve pages use <Code>button.tsx</Code>. Where does it go?
       </>
     ),
     piece: "button.tsx",
@@ -482,7 +480,7 @@ export function ProximityPrinciple() {
       lead={
         <>
           Five placements, each with the wrong spot and the right one side by side in a real tree.
-          Then a mini quiz where you carry the code there yourself.
+          Then a mini quiz where you place the code yourself.
         </>
       }
       learn={{
@@ -500,8 +498,8 @@ export function ProximityPrinciple() {
       quiz={{
         intro: (
           <>
-            Five pieces of code, five trees. Drag each piece to where it lives, or tap it and then
-            tap a spot. A wrong spot tells you what it would cost.
+            Drag each piece to where it lives, or tap it, then tap a spot. A wrong spot shows its
+            cost.
           </>
         ),
         levels: LEVELS,

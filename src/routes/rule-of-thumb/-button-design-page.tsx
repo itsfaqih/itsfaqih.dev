@@ -869,7 +869,7 @@ function DeleteDemo({ careful }: { careful: boolean }) {
         {step === "deleted" ? (
           <>
             <span {...copy}>
-              <b {...stylex.props(styles.projectName, styles.projectGone)}>Moonbase is gone</b>
+              <b {...stylex.props(styles.projectName, styles.projectGone)}>Moonbase deleted</b>
               <small {...stylex.props(styles.projectMeta)}>214 files deleted</small>
             </span>
             <button
@@ -886,7 +886,7 @@ function DeleteDemo({ careful }: { careful: boolean }) {
             <span {...copy}>
               <b {...stylex.props(styles.projectName)}>Delete Moonbase?</b>
               <small {...stylex.props(styles.projectMeta)}>
-                Its 214 files go too. This can't be undone.
+                Its 214 files go too. You can't undo this.
               </small>
             </span>
             <span {...stylex.props(styles.row, styles.projectRow, styles.stepIn)}>
@@ -1006,9 +1006,8 @@ const LESSONS: Lesson[] = [
     title: "Give every state a look",
     body: (
       <>
-        Hover, press and keyboard focus each need their own look. Without them a click feels like it
-        missed, and a keyboard user can't see where they are. Hover both, press both, then{" "}
-        <Kbd>Tab</Kbd> to them.
+        Without a look for hover, press and focus, a click feels like it missed and a keyboard user
+        can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.
       </>
     ),
     bad: {
@@ -1026,9 +1025,8 @@ const LESSONS: Lesson[] = [
     title: "Hold the width while it works",
     body: (
       <>
-        Pending gets a state too. Stop taking clicks the moment it's pressed, say what it's doing,
-        then say it worked. Stack the labels in one cell so the button keeps its size, and press the
-        left one a few times.
+        Stop taking clicks the moment it's pressed, say what it's doing, then say it worked. Stack
+        the labels in one grid cell so the width holds. Press the left one a few times.
       </>
     ),
     bad: {
@@ -1047,7 +1045,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A disabled button that only fades leaves people guessing. Show the no-entry cursor, keep the
-        label readable, and put the reason in a tooltip. Type a title and both come on.
+        label readable, and put the reason in a tooltip. Type a title to enable both.
       </>
     ),
     bad: {
@@ -1065,8 +1063,8 @@ const LESSONS: Lesson[] = [
     title: "One filled button per screen",
     body: (
       <>
-        Weight tells people where to go next. Fill the main action in the brand colour, tint the
-        supporting one, and leave Cancel as text. Keep red for actions that destroy something.
+        Visual weight shows people the next step. Fill the main action in the brand colour, tint the
+        supporting one, and leave Cancel as text. Keep red for destructive actions.
       </>
     ),
     extra: <LessonToggle label="Squint" name="squint" />,
@@ -1085,8 +1083,8 @@ const LESSONS: Lesson[] = [
     title: "Guard the destructive action",
     body: (
       <>
-        Delete should never be one stray click. Tint the trigger red, then confirm with a filled red
-        button that names what goes. Focus lands on Cancel, the safe answer.
+        One stray click should never delete anything. Tint the trigger red, then confirm with a
+        filled red button that names what goes. Focus lands on Cancel, the safe answer.
       </>
     ),
     bad: {
@@ -1104,8 +1102,8 @@ const LESSONS: Lesson[] = [
     title: "Pad the icon side less",
     body: (
       <>
-        An icon carries white space inside its own box, so equal padding makes its side look wider.
-        Take 4px off the icon's side and the space around the content looks even.
+        An icon has white space inside its own box, so equal padding makes its side look wider. Take
+        4px off that side and the spacing looks even.
       </>
     ),
     extra: <LessonToggle label="Show padding" name="pads" />,
@@ -1124,10 +1122,9 @@ const LESSONS: Lesson[] = [
     title: "Fix the size of an icon-only button",
     body: (
       <>
-        With no label, padding decides the size, so the button comes out wider than it is tall and
-        changes with every icon. Give it a fixed width and height, the same as its neighbours, and
-        centre the icon. With no text to read, it also needs an <Code>aria-label</Code> and a
-        tooltip.
+        With no label, padding sets the size, so the button comes out wider than it is tall and
+        changes with every icon. Make it a fixed square as tall as its neighbours, and centre the
+        icon. With no text to read, it also needs an <Code>aria-label</Code> and a tooltip.
       </>
     ),
     bad: {
@@ -1147,10 +1144,10 @@ const CHEAT_SHEET = [
   ["Any button", "A look for hover, press and focus, in 100 to 200ms"],
   ["Waiting on a request", "Stop clicks, keep the width, say Saving… then Saved"],
   ["Not available yet", "cursor: not-allowed and a tooltip that says why"],
-  ["Picking a variant", "One filled per screen, tinted to support, text to skip"],
+  ["Picking a variant", "One filled per screen, tinted for secondary, text for Cancel"],
   ["It deletes something", "Red, behind a confirm that names what goes"],
   ["An icon beside the label", "4px less padding on the icon's side"],
-  ["An icon with no label", "A fixed square, with an aria-label and a tooltip"],
+  ["An icon with no label", "A fixed square with an aria-label and a tooltip"],
 ] as const;
 
 const LEVELS: Level[] = [
@@ -1201,8 +1198,8 @@ const LEVELS: Level[] = [
     name: "Remove a teammate",
     prompt: (
       <>
-        Each member row on the team page can remove that person's access. You can invite them back
-        later. Which button goes in the row?
+        Each row on the team page can remove that member's access. You can invite them back later.
+        Which button goes in the row?
       </>
     ),
     piece: "Remove access",
@@ -1215,7 +1212,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "filled",
           label: "+ filled red, then a confirm",
-          note: "Filled red is for the one heavy delete, like Delete project. On every row it shouts over the whole page.",
+          note: "Filled red is for a delete you can't undo, like Delete project. On every row, it outweighs the rest of the page.",
           cost: ["red on 12 rows"],
         },
       },
@@ -1233,7 +1230,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "tint",
           label: "+ tinted red, then a confirm",
-          note: "A moderate warning for an action you can undo: tinted red, and a confirm that names Dana.",
+          note: "You can undo it, so a milder warning fits. Tint it red and use a confirm that names Dana.",
           cost: ["2 clicks", "names who"],
         },
       },
@@ -1276,7 +1273,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "after",
           label: "+ after the response",
-          note: "The whole wait looks like nothing happened, then it jumps straight to Saved.",
+          note: "Nothing seems to happen for the whole wait, then it jumps to Saved.",
           cost: ["2 requests", "1.2s silent"],
         },
       },
@@ -1357,7 +1354,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "off",
           label: "+ disabled, no title yet",
-          note: "The no-entry sign as you arrive, and a tooltip that says to add a title first.",
+          note: "It shows the no-entry sign on hover, and a tooltip says to add a title first.",
           cost: ["1 reason shown"],
         },
       },
@@ -1370,17 +1367,17 @@ export function ButtonDesign() {
     <RuleLanding
       lead={
         <>
-          Seven buttons, each built the quick way and the careful way, side by side and live. Hover
-          them, press them, tab to them. Then a mini quiz where you put each piece where it belongs.
+          Seven buttons, each built the quick way and the careful way, side by side. Hover, press
+          and tab to them, then place the pieces in a mini quiz.
         </>
       }
       learn={{
         title: "Every press gets an answer",
         intro: (
           <>
-            A button promises that something will happen, and its states keep that promise. Each
-            example builds the same button twice: on the left the way it often ships, on the right
-            the way the rule builds it. They're real, so press them.
+            A button promises something will happen, and its states keep that promise. Each example
+            builds one button twice, on the left as it often ships and on the right by the rule.
+            Both are live.
           </>
         ),
       }}
@@ -1389,8 +1386,8 @@ export function ButtonDesign() {
       quiz={{
         intro: (
           <>
-            Five buttons, five layouts. Drag each piece to where it belongs, or tap it and then tap
-            a spot. A wrong spot tells you what it would cost.
+            Drag each piece to where it belongs, or tap it, then tap a spot. A wrong spot shows what
+            it would cost.
           </>
         ),
         levels: LEVELS,

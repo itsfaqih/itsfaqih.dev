@@ -966,7 +966,7 @@ function StatesDemo({ careful }: { careful: boolean }) {
     const say = {
       empty: {
         title: "No users yet",
-        hint: "Invite your first teammate.",
+        hint: "Add your first teammate.",
         act: "Add user",
         run: () => set({ users: [{ name: "Dana Whitfield", role: "Admin" }], query: "" }),
       },
@@ -1412,12 +1412,12 @@ function UrlDemo({ careful }: { careful: boolean }) {
 
 const LESSONS: Lesson[] = [
   {
-    title: "Line numbers up on the right",
+    title: "Right-align numbers",
     body: (
       <>
-        People compare numbers by their last digits. Right-align the column, set{" "}
-        <Code>tabular-nums</Code> so every digit is the same width, and format with{" "}
-        <Code>toLocaleString()</Code>. The figures below are live. Watch the right edge.
+        People compare numbers by their last digits. Set <Code>tabular-nums</Code> so every digit is
+        the same width, and format with <Code>toLocaleString()</Code>. These figures are live. Watch
+        the right edge.
       </>
     ),
     extra: <LiveSwitch />,
@@ -1436,9 +1436,9 @@ const LESSONS: Lesson[] = [
     title: "Give every state a next step",
     body: (
       <>
-        A table spends real time loading, empty, broken or searched down to nothing. Draw each one.
-        Skeleton rows keep the shape while it loads, and every blank says why and what to do next.
-        Pick a state, search, then press the buttons.
+        A table is often loading, empty, failed or showing no matches. Draw each one. Skeleton rows
+        keep the shape while it loads, and every blank says why and what to do next. Pick a state,
+        search, then press the buttons.
       </>
     ),
     extra: <StateSwitch />,
@@ -1457,9 +1457,8 @@ const LESSONS: Lesson[] = [
     title: "Put actions in a fixed last column",
     body: (
       <>
-        Row actions go in the last column, right-aligned, at a fixed width, so Edit sits in the same
-        place on every row. Icon buttons save the room, and a tooltip names each one. Hover the
-        rows, then delete one.
+        Give the column a fixed width and right-align it, so Edit sits in the same place on every
+        row. Icon buttons save room, and a tooltip names each one. Hover the rows, then delete one.
       </>
     ),
     bad: {
@@ -1477,8 +1476,8 @@ const LESSONS: Lesson[] = [
     title: "No pager for one page",
     body: (
       <>
-        A pager earns its place when there's a second page. With one page it's a row of dead arrows,
-        and under an empty table it counts pages of nothing. Filter the list and watch both.
+        With one page, a pager is a row of dead arrows. Under an empty table, it reads Page 1 of 0.
+        Filter the list and watch both.
       </>
     ),
     extra: <FilterSwitch />,
@@ -1488,7 +1487,7 @@ const LESSONS: Lesson[] = [
       view: <PagerDemo careful={false} />,
     },
     good: {
-      label: "Past page 1",
+      label: "Only with 2+ pages",
       costs: ["0 dead controls"],
       view: <PagerDemo careful />,
     },
@@ -1497,8 +1496,8 @@ const LESSONS: Lesson[] = [
     title: "Keep the page in the URL",
     body: (
       <>
-        Store the page in the address as <Code>?page=2</Code>. Then a reload, the Back button and a
-        link you send all land where you were. Each table below starts on page 2. Reload both.
+        With <Code>?page=2</Code> in the address, a reload, the Back button and a shared link all
+        land where you were. Both tables start on page 2. Reload each.
       </>
     ),
     bad: {
@@ -1517,8 +1516,8 @@ const LESSONS: Lesson[] = [
 const CHEAT_SHEET = [
   ["A column of numbers", "Right-aligned, tabular-nums, toLocaleString()"],
   ["Money in a finance view", "A monospace face lines up even better"],
-  ["Rows on their way", "Skeleton rows at the real row height"],
-  ["Empty, failed or no match", "Say which, with one way forward: Add, Retry, Clear search"],
+  ["Rows still loading", "Skeleton rows at the real row height"],
+  ["Empty, failed or no match", "Say which, with one next step: Add, Retry, Clear search"],
   ["Row actions", "Icon buttons with tooltips in a fixed last column"],
   ["One page, or none", "No pager"],
   ["The current page", "In the URL, as ?page=2"],
@@ -1542,7 +1541,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "first",
           label: "+ <td> first",
-          note: "The row now opens with buttons, and every name starts one column later than you read it.",
+          note: "The row now opens with buttons, which push every name one column right.",
           cost: ["names pushed right"],
         },
       },
@@ -1551,8 +1550,8 @@ const LEVELS: Level[] = [
         depth: 1,
         slot: {
           id: "name",
-          label: "+ inside the name cell, after the text",
-          note: "Each name is a different length, so Edit lands somewhere new on every row.",
+          label: "+ in the name cell, after the text",
+          note: "Names differ in length, so Edit lands somewhere new on every row.",
           cost: ["a new x per row"],
         },
       },
@@ -1587,7 +1586,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "api",
           label: "+ in getRevenue(), on the server",
-          note: 'Every MRR arrives as a string like "12,500.00", so b.mrr - a.mrr is NaN and the sort stops working.',
+          note: 'Every MRR arrives as a string like "12,500.00", so b.mrr - a.mrr is NaN and the sort breaks.',
           cost: ["NaN sort", "strings in state"],
         },
       },
@@ -1597,7 +1596,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "sort",
           label: "+ in the sort, as the key",
-          note: 'Sorted as text, "9,000.00" ranks above "12,500.00", because 9 beats 1.',
+          note: 'As text, "9,000.00" ranks above "12,500.00", because "9" comes after "1".',
           cost: ["9,000 > 12,500"],
         },
       },
@@ -1617,7 +1616,8 @@ const LEVELS: Level[] = [
     name: "Nothing to show",
     prompt: (
       <>
-        The users table has three ways to come up empty. Which one gets the <b>Add user</b> button?
+        The users table can show no rows for three reasons. Which one gets the <b>Add user</b>
+        button?
       </>
     ),
     piece: "Add user",
@@ -1630,7 +1630,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "error",
           label: "+ its button",
-          note: "The list failed to load. It isn't empty. Add user hides the failure, and Retry is what helps.",
+          note: "The list failed to load. It isn't empty. Add user hides the failure. Retry helps.",
           cost: ["hides the error", "0 retries"],
         },
       },
@@ -1640,7 +1640,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "empty",
           label: "+ its button",
-          note: "Nothing here yet, so the next step is adding the first one.",
+          note: "Nothing here yet, so the next step is adding the first user.",
           cost: ["1 next step"],
         },
       },
@@ -1650,8 +1650,8 @@ const LEVELS: Level[] = [
         slot: {
           id: "search",
           label: "+ its button",
-          note: "They already have users. The search hid them, so Clear search is the way back.",
-          cost: ["wrong way out", "duplicate users"],
+          note: "The users exist. The search hid them, so Clear search brings them back.",
+          cost: ["wrong next step", "duplicate users"],
         },
       },
     ],
@@ -1684,7 +1684,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "31",
           label: "+ pager",
-          note: "The last 6 rows need a second page, so this is the one list that needs a pager.",
+          note: "The last 6 rows go on page 2, so only this list needs a pager.",
           cost: ["2 pages"],
         },
       },
@@ -1717,7 +1717,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "state",
           label: "+ useState()",
-          note: "Reload or press Back and you're on page 1 again. The link you sent opens on page 1 too.",
+          note: "Reload or press Back and you're on page 1. The link you sent opens on page 1 too.",
           cost: ["reload → page 1"],
         },
       },
@@ -1755,17 +1755,16 @@ export function TableDesign() {
         costsStyle={styles.costs}
         lead={
           <>
-            Five tables, each built the usual way and the careful way side by side, and every one of
-            them works. Then a mini quiz where you put each piece where it belongs.
+            Five tables, each built the usual way and the careful way, side by side. All of them
+            work. Then a mini quiz where you place each piece.
           </>
         }
         learn={{
           title: "Tables get scanned, not read",
           intro: (
             <>
-              People run their eyes down a column to find one value. Each example shows the same
-              table twice. The left one is how tables tend to ship, and the right one follows the
-              rule. Click both.
+              People run their eyes down a column to find one value. Each example shows one table
+              twice. Left is how tables usually ship. Right follows the rule. Click both.
             </>
           ),
         }}
@@ -1774,8 +1773,8 @@ export function TableDesign() {
         quiz={{
           intro: (
             <>
-              Five tables, five pieces. Drag each piece to where it belongs, or tap it and then tap
-              a spot. A wrong spot tells you what it would cost.
+              Five tables, five pieces. Drag each piece to where it belongs, or tap it, then tap a
+              spot. A wrong spot shows what it would cost.
             </>
           ),
           levels: LEVELS,

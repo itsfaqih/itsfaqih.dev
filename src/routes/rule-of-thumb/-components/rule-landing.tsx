@@ -268,7 +268,7 @@ function Landing({
             <h2 {...stylex.props(section.title, takeKit.title)}>Take the rule with you</h2>
             <Tone value="take">
               <p {...stylex.props(takeKit.text)}>
-                The whole rule as plain Markdown. Paste it into your <Code>AGENTS.md</Code>
+                The whole rule in Markdown. Paste it into your <Code>AGENTS.md</Code>
                 {` and your agents will ${take}.`}
               </p>
             </Tone>
@@ -968,7 +968,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
               )}
               data-dragging={dragging || undefined}
               aria-pressed={picked}
-              aria-label={`${level.piece}. ${picked ? `Picked up: choose a spot in the ${board}.` : "Pick up"}`}
+              aria-label={`${level.piece}. ${picked ? `Picked up. Choose a spot in the ${board}.` : "Pick up"}`}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={(event) => endDrag(event, false)}
@@ -982,11 +982,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
             </button>
           )}
           <span {...stylex.props(quizKit.trayNote)}>
-            {cleared
-              ? "In its place."
-              : picked
-                ? "Now pick a spot. Esc puts it back."
-                : "Your piece"}
+            {cleared ? "In its place." : picked ? "Choose a spot. Esc puts it back." : "Your piece"}
           </span>
         </div>
       </div>

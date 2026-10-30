@@ -1339,9 +1339,9 @@ const LESSONS: Lesson[] = [
     title: "Start fetching early",
     body: (
       <>
-        Fetch in the route loader, not in a component. A fetch in <Code>useEffect</Code> waits for
-        the page's code to load and render first. A loader starts it with the navigation, so the two
-        run side by side. Await what the page needs and stream the rest.
+        Fetch in the route loader, not in a component. A fetch in <Code>useEffect</Code> waits until
+        the page's code loads and renders. A loader starts it with the navigation, so it runs while
+        the code loads. Await what the page needs and stream the rest.
       </>
     ),
     bad: {
@@ -1359,8 +1359,8 @@ const LESSONS: Lesson[] = [
     title: "Keep stale data on screen",
     body: (
       <>
-        When you refetch data you already have, leave it where it is. Show a small spinner while the
-        request runs, then swap the new value in place. Press Refetch on both.
+        When you refetch data you already have, show a small spinner beside it and swap the new
+        value in place. Press Refetch on both.
       </>
     ),
     bad: {
@@ -1378,8 +1378,8 @@ const LESSONS: Lesson[] = [
     title: "Wait before the skeleton",
     body: (
       <>
-        Most replies are quick. Show loading UI only once a request has run past 200ms, so a fast
-        reply swaps straight in instead of flashing a skeleton for a few frames.
+        Most replies are quick. Show loading UI only after 200ms, so a fast reply appears without a
+        skeleton flash.
       </>
     ),
     bad: {
@@ -1397,9 +1397,9 @@ const LESSONS: Lesson[] = [
     title: "Errors where the data was",
     body: (
       <>
-        Put the error in the spot the data would have filled, and give it a Retry button. A toast
-        fades before anyone reads it and leaves an empty card behind. Log every failure so you hear
-        about it before your users tell you.
+        Show the error where the data would go, with a Retry button. A toast fades before anyone
+        reads it and leaves an empty card. Log every failure so you hear about it before your users
+        do.
       </>
     ),
     bad: {
@@ -1417,15 +1417,15 @@ const LESSONS: Lesson[] = [
     title: "Parse at the boundary",
     body: (
       <>
-        Data from an API is a guess until you check it. Parse it right after <Code>fetch()</Code>,
-        give optional fields a fallback, and the rest of your code gets real types. Skip it and a
-        missing field crashes far from where it came in.
+        API data is a guess until you check it. Parse it right after <Code>fetch()</Code> and give
+        optional fields a fallback, so the rest of your code gets real types. Skip it, and a missing
+        field crashes far from where it came in.
       </>
     ),
     extra: (
       <Tip>
         When a required field fails, show a plain message and log the details. Update the schema
-        when the API changes; it documents the API too.
+        when the API changes. It documents the API too.
       </Tip>
     ),
     bad: {
@@ -1443,8 +1443,8 @@ const LESSONS: Lesson[] = [
     title: "Persist what can't mislead",
     body: (
       <>
-        A cache saved to disk is old the next time it opens. Persist history, settings and static
-        content, and show when it was updated. Never persist balances, prices or stock counts: a
+        A disk cache is already old when the app next opens. Persist history, settings and static
+        content, and show when it was updated. Never persist balances, prices or stock counts. A
         stale number there leads to a wrong decision.
       </>
     ),
@@ -1471,10 +1471,10 @@ const LESSONS: Lesson[] = [
 const TLDR = [
   ["SEO or first paint matters", "Render it on the server. Behind a login, an SPA is fine"],
   ["Data a route needs", "Start it in the loader, batch it, stream the rest"],
-  ["Refetching data you have", "Keep it on screen, spin small"],
-  ["A reply that may be quick", "Loading UI only after 200ms"],
-  ["A request that fails", "The error in its place, with Retry. Log it"],
-  ["Updates within a second", "A WebSocket. Every 30s or slower: polling"],
+  ["Refetching data you have", "Keep it on screen with a small spinner"],
+  ["A reply that may be quick", "Show loading UI only after 200ms"],
+  ["A request that fails", "Show the error in place, with Retry. Log it"],
+  ["Updates within a second", "Use a WebSocket. At 30s or slower, poll"],
   ["Anything from an API", "Parse it where it arrives"],
 ] as const;
 
@@ -1503,7 +1503,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "now",
           label: "show it at once",
-          note: "Most replies land at 80ms, so the spinner blinks on and off on almost every click.",
+          note: "Most replies land at 80ms, so the spinner flashes on almost every click.",
           cost: ["flashes 80ms", "most clicks"],
         },
       },
@@ -1522,7 +1522,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "late",
           label: "show it at 1s, if still waiting",
-          note: "A slow reply sits for a full second with no sign the click did anything.",
+          note: "A slow reply sits for a full second with no sign the click worked.",
           cost: ["1s of nothing"],
         },
       },
@@ -1533,7 +1533,7 @@ const LEVELS: Level[] = [
     name: "Back to the tab",
     prompt: (
       <>
-        You switch back to a tab of prices loaded 5 minutes ago. They refetch on focus. What do the
+        You return to a tab of prices loaded 5 minutes ago. They refetch on focus. What do the
         cached prices do while it runs?
       </>
     ),
@@ -1555,7 +1555,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "stay",
           label: "stay, with a small spinner beside them",
-          note: "You read them at once, and the fresh numbers swap in place when they land.",
+          note: "You can read them at once. Fresh numbers swap in place when they land.",
           cost: ["0ms blank", "1 quiet update"],
         },
       },
@@ -1588,7 +1588,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "loader",
           label: "in the route loader",
-          note: "It starts with the navigation and runs while the page's code loads. One request for the list.",
+          note: "It starts with the navigation, while the page's code loads. One request for the list.",
           cost: ["data at 500ms", "1 request"],
         },
       },
@@ -1608,7 +1608,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "rows",
           label: "in useEffect in each <OrderRow>",
-          note: "Twenty requests where one would do, each after its row has rendered.",
+          note: "Twenty requests where one would do, each after its row renders.",
           cost: ["20 requests", "+320ms"],
         },
       },
@@ -1633,7 +1633,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "page",
           label: "an error page instead of the dashboard",
-          note: "Four good cards are thrown away for one bad one, and nothing retries in place.",
+          note: "One bad card throws away four good ones, and nothing retries in place.",
           cost: ["4 cards lost"],
         },
       },
@@ -1642,7 +1642,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "inline",
           label: "inside the revenue card",
-          note: "It sits where the chart would be, the other four stay, and one tap retries. Log it as well.",
+          note: "It sits where the chart would be. The other four stay, and one tap retries. Log it too.",
           cost: ["1 tap to recover", "4 cards kept"],
         },
       },
@@ -1651,8 +1651,8 @@ const LEVELS: Level[] = [
         slot: {
           id: "toast",
           label: "a toast: Something went wrong",
-          note: "It fades in 4s, doesn't say which card, and the revenue card stays empty.",
-          cost: ["gone in 4s", "0 retries"],
+          note: "It fades in 3s, doesn't say which card, and the revenue card stays empty.",
+          cost: ["gone in 3s", "0 retries"],
         },
       },
     ],
@@ -1669,7 +1669,7 @@ const LEVELS: Level[] = [
     answer: "history",
     rows: [
       { depth: 0, text: at("Day 1", "The app loads and saves its cache") },
-      { depth: 0, text: at("Day 2", "You spend $1,830 on your laptop") },
+      { depth: 0, text: at("Day 2", "You spend $1,830 on a laptop") },
       { depth: 0, text: at("Day 3", "You open the app, no signal") },
       {
         depth: 1,
@@ -1707,8 +1707,8 @@ export function DataLoading() {
     <RuleLanding
       lead={
         <>
-          Six loading moments, each running the wrong way and the right way side by side. Then a
-          mini quiz where you place each one on a request timeline.
+          Six loading moments, run the wrong way and the right way side by side. Then a mini quiz on
+          a request timeline.
         </>
       }
       learn={{
@@ -1716,8 +1716,8 @@ export function DataLoading() {
         intro: (
           <>
             People judge loading by what they see while they wait. Each example runs the same
-            request twice: on the left the way it often gets built, on the right the way the rule
-            builds it. Press the buttons on both.
+            request twice, the common way on the left and the rule's way on the right. Press the
+            buttons on both.
           </>
         ),
       }}
@@ -1726,8 +1726,8 @@ export function DataLoading() {
       quiz={{
         intro: (
           <>
-            Five requests, five timelines. Drag each piece to where it belongs, or tap it and then
-            tap a spot. A wrong spot tells you what it would cost.
+            Five requests, five timelines. Drag each piece into place, or tap it, then tap a spot. A
+            wrong spot shows what it would cost.
           </>
         ),
         levels: LEVELS,

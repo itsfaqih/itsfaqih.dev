@@ -1443,9 +1443,9 @@ const LESSONS: Lesson[] = [
     title: "Keep focus inside",
     body: (
       <>
-        When a dialog opens, focus moves into it. <Kbd>Tab</Kbd> goes round its controls and never
-        reaches the page behind, which is inert. When it closes, focus goes back to the button that
-        opened it. Press Tab in both.
+        When a dialog opens, focus moves into it. <Kbd>Tab</Kbd> cycles its controls and never
+        reaches the inert page behind. On close, focus returns to the button that opened it. Press
+        Tab in both.
       </>
     ),
     bad: {
@@ -1506,9 +1506,9 @@ const LESSONS: Lesson[] = [
     title: "Ask before you drop a draft",
     body: (
       <>
-        A click outside is often a slip. Once a form has input, the backdrop stops closing it. The
-        dialog shakes instead, and <Kbd>Esc</Kbd> or × asks before it throws the draft away. Click
-        the dim area in both.
+        A click outside is often a slip. Once a form has input, that click shakes the dialog instead
+        of closing it, and <Kbd>Esc</Kbd> or × asks before discarding the draft. Click the dim area
+        in both.
       </>
     ),
     bad: {
@@ -1526,9 +1526,9 @@ const LESSONS: Lesson[] = [
     title: "Lock the page behind",
     body: (
       <>
-        While the dialog is up, the page under it stays still. Set <Code>overflow: hidden</Code> on
-        the body, and keep the scrollbar's room with <Code>scrollbar-gutter: stable</Code> so
-        nothing shifts. Open Share, then scroll.
+        Set <Code>overflow: hidden</Code> on the body so the page under the dialog stays still. Add{" "}
+        <Code>scrollbar-gutter: stable</Code> so nothing shifts when the scrollbar hides. Open
+        Share, then scroll.
       </>
     ),
     bad: {
@@ -1547,7 +1547,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         A screen reader needs to hear that a dialog opened and what it's called. Give it{" "}
-        <Code>role="dialog"</Code>, and point <Code>aria-labelledby</Code> at the title and{" "}
+        <Code>role="dialog"</Code>, point <Code>aria-labelledby</Code> at the title and{" "}
         <Code>aria-describedby</Code> at the text. On a real page add <Code>aria-modal="true"</Code>
         , or use <Code>&lt;dialog&gt;</Code> with <Code>showModal()</Code>.
       </>
@@ -1567,7 +1567,7 @@ const LESSONS: Lesson[] = [
 
 const CHEAT_SHEET = [
   ["It opens", "Focus the first field, or Cancel if it destroys something"],
-  ["While it's open", "Tab goes round inside. The page behind is inert and still"],
+  ["While it's open", "Tab cycles inside. The page behind is inert and still"],
   ["Escape", "Closes it, every time"],
   ["A click outside", "Closes an info dialog. A form with input shakes or asks"],
   ["It closes", "Focus goes back to the button that opened it"],
@@ -1592,7 +1592,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "trigger",
           label: "<button> Delete project",
-          note: "Focus stays behind the scrim. Tab walks the page, and Enter opens the dialog again.",
+          note: "Focus stays behind the scrim. Tab moves through the page, and Enter reopens the dialog.",
           cost: ["focus behind", "Enter reopens"],
         },
       },
@@ -1622,8 +1622,7 @@ const LEVELS: Level[] = [
     name: "Add a contact",
     prompt: (
       <>
-        <b>Add contact</b> has a Name field and an Email field. When it opens, where does focus
-        land?
+        <b>Add contact</b> has Name and Email fields. When it opens, where does focus land?
       </>
     ),
     piece: "autoFocus",
@@ -1662,9 +1661,7 @@ const LEVELS: Level[] = [
   },
   {
     name: "A click outside",
-    prompt: (
-      <>Three dialogs, three screens. Which one closes when you click the dim page around it?</>
-    ),
+    prompt: <>Three dialogs. Which one closes when you click the dim page around it?</>,
     piece: "close()",
     answer: "news",
     rows: [
@@ -1683,7 +1680,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "news",
           label: "What's new, nothing to fill in",
-          note: "Nothing to lose, so a click outside just closes it.",
+          note: "Nothing to lose, so a click outside closes it.",
           cost: ["0 lost", "1 click out"],
         },
       },
@@ -1725,7 +1722,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "trigger",
           label: "<button> Edit profile",
-          note: "They land where they left, and one Tab carries on down the page.",
+          note: "They land where they left off, and one Tab continues down the page.",
           cost: ["0 Tabs back"],
         },
       },
@@ -1734,7 +1731,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "next",
           label: "<button> Change password",
-          note: "Close, but it's a control they didn't pick. A screen reader announces it out of nowhere.",
+          note: "Close, but they never picked it, so a screen reader announces it without warning.",
           cost: ["1 stop off", "lost place"],
         },
       },
@@ -1745,7 +1742,7 @@ const LEVELS: Level[] = [
     prompt: (
       <>
         <b>Share</b> opens over a long article. Where does <Code>overflow: hidden</Code> go so the
-        article stays put?
+        article stays still?
       </>
     ),
     piece: "overflow: hidden",
@@ -1756,7 +1753,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "body",
           label: "<body>",
-          note: "The page stops while the dialog is up. Add scrollbar-gutter: stable so it doesn't shift.",
+          note: "The page stops while the dialog is open. Add scrollbar-gutter: stable so it doesn't shift.",
           cost: ["0px moved", "0px shift"],
         },
       },
@@ -1788,8 +1785,8 @@ export function DialogDesign() {
     <RuleLanding
       lead={
         <>
-          Six dialogs, each built the leaky way and the sealed way, side by side and live. Open
-          them, press Tab, press Escape. Then a mini quiz where you put each piece where it belongs.
+          Six live dialogs, each built leaky and sealed, side by side. Open them, press Tab, press
+          Escape. Then a mini quiz on where each piece goes.
         </>
       }
       learn={{
@@ -1797,8 +1794,8 @@ export function DialogDesign() {
         intro: (
           <>
             A dialog takes over the screen, so it owes people a way through and a way out. Each
-            example builds the same dialog twice: on the left the way it often ships, on the right
-            the way the rule builds it. Each one opens in its own small window, so use the keys.
+            example builds one dialog twice. The left is how it often ships, the right follows the
+            rule. The dialogs open inside their own small window, so use the keys.
           </>
         ),
       }}
@@ -1807,8 +1804,8 @@ export function DialogDesign() {
       quiz={{
         intro: (
           <>
-            Five dialogs, five screens. Drag each piece to where it belongs, or tap it and then tap
-            a spot. A wrong spot tells you what it would cost.
+            Five dialogs. Drag each piece to where it belongs, or tap it, then tap a spot. A wrong
+            spot shows what it would cost.
           </>
         ),
         levels: LEVELS,

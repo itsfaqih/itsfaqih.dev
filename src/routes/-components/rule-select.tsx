@@ -148,7 +148,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
             </div>
             <RuleThumb style={[styles.thumb, styles.panelThumb]} />
             <h3 {...stylex.props(styles.title, styles.standby)}>Pick a rule</h3>
-            <p {...stylex.props(styles.blurb)}>Hover or focus a tile to preview it here.</p>
+            <p {...stylex.props(styles.blurb)}>Hover or focus a rule to preview it.</p>
             <dl {...stylex.props(styles.facts)}>
               <div {...stylex.props(styles.fact)}>
                 <dt {...stylex.props(styles.term)}>TOPIC</dt>
@@ -239,7 +239,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
         </div>
         {matches.length === 0 && (
           <p {...stylex.props(styles.empty)}>
-            No rule matches “{query.trim()}”{category !== "All" ? ` in ${category}` : ""} yet.
+            No rules match “{query.trim()}”{category !== "All" ? ` in ${category}` : ""}.
           </p>
         )}
       </div>
