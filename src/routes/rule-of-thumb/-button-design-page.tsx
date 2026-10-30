@@ -1006,8 +1006,8 @@ const LESSONS: Lesson[] = [
     title: "Give every state a look",
     body: (
       <>
-        Give hover, press and focus a look, or a click feels like it missed and a keyboard user
-        can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.
+        Give hover, press and focus a look. If nothing changes, a click feels like it missed and a
+        keyboard user can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.
       </>
     ),
     bad: {

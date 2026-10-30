@@ -1418,8 +1418,8 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         API data is a guess until you check it. Parse it right after <Code>fetch()</Code> and give
-        optional fields a fallback, so the rest of your code gets real types. Skip it, and a missing
-        field crashes far from where it came in.
+        optional fields a fallback, so the rest of your code gets real types. If you skip it, a
+        missing field crashes far from where it came in.
       </>
     ),
     extra: (

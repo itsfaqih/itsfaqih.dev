@@ -1713,7 +1713,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "state",
           label: "+ useState()",
-          note: "Reload or press Back and you're on page 1. The link you sent opens on page 1 too.",
+          note: "If you reload or press Back, you're on page 1. The link you sent opens on page 1 too.",
           cost: ["reload → page 1"],
         },
       },

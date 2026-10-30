@@ -899,8 +899,8 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day
-        before, so send that moment. Midnight with no zone queries 07:00 to 07:00 her time: orders
-        before 07:00 go missing, and the next morning's show up.
+        before, so send that moment. If you send midnight with no zone, the query runs 07:00 to
+        07:00 her time, so orders before 07:00 go missing and the next morning's show up.
       </>
     ),
     bad: {

@@ -68,8 +68,8 @@ const LESSONS: Lesson[] = [
     title: "Prefer fewer files",
     body: (
       <>
-        Keep one component in one file. Split its types, styles and hook into a folder, and reading
-        it takes five tabs.
+        Keep one component in one file. If you split its types, styles and hook into a folder,
+        reading it takes five tabs.
       </>
     ),
     bad: {

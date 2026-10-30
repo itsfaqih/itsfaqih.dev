@@ -750,9 +750,9 @@ const LESSONS: Lesson[] = [
     title: "Tell missing from empty",
     body: (
       <>
-        Read <Code>undefined</Code> as nobody gave a value. Read <Code>null</Code> as someone
-        checked and the answer is nothing. Ana skipped the phone question. Bo said he has no phone.
-        Send both as <Code>null</Code> and no code can tell them apart.
+        Read <Code>undefined</Code> to mean nobody gave a value. Read <Code>null</Code> to mean
+        someone checked and found nothing. Ana skipped the phone question. Bo said he has no phone.
+        If you send both as <Code>null</Code>, no code can tell them apart.
       </>
     ),
     bad: {
@@ -788,8 +788,8 @@ const LESSONS: Lesson[] = [
     title: "Mark optional with ?:",
     body: (
       <>
-        Leave a skipped value <Code>undefined</Code>. Type it with <Code>?:</Code> and callers can
-        leave it out. Type it <Code>| null</Code> and callers with no value must pass{" "}
+        Leave a skipped value <Code>undefined</Code>. If you type it with <Code>?:</Code>, callers
+        can leave it out. If you type it <Code>| null</Code>, callers with no value must pass{" "}
         <Code>null</Code>.
       </>
     ),
@@ -847,8 +847,8 @@ const LESSONS: Lesson[] = [
     title: "Leave untouched fields out",
     body: (
       <>
-        A PATCH changes only the fields it carries. Fill a draft with <Code>null</Code> and every
-        untouched field goes out as a clear. Start it empty so only the changes go out.
+        A PATCH changes only the fields it carries. If you fill a draft with <Code>null</Code>,
+        every untouched field goes out as a clear. Start it empty so only the changes go out.
       </>
     ),
     bad: {
@@ -867,7 +867,7 @@ const LESSONS: Lesson[] = [
     body: (
       <>
         <Code>?:</Code> lets a caller skip a field silently. When every caller must decide, make it
-        required and nullable. Forgetting it becomes a type error, and "nobody" is a{" "}
+        required and nullable. A caller who leaves it out gets a type error, and "nobody" is a{" "}
         <Code>null</Code> someone wrote on purpose.
       </>
     ),
@@ -1074,7 +1074,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "bo",
           label: blank('["bo@x.io",'),
-          note: "Cache null: you checked and nobody has it, so the next lookup is skipped.",
+          note: "Cache null to record that nobody has it, so the next lookup is skipped.",
           cost: ["1 lookup saved"],
         },
       },
