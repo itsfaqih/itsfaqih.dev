@@ -328,8 +328,6 @@ const config = defineConfig({
       cssInjectionTarget: (filepath) => /(?:^|\/)styles-[\w-]+\.css$/.test(filepath),
       // Ship oklch() and oklab() as written, like the plain CSS. Lowered to lab(), they shade
       // anti-aliased edges one step differently.
-      // StyleX appends after Vite's minify pass. Unminified, its url()s stay quoted, and
-      // inlineAssetsBeforeApp then skips the cursors.
       lightningcssOptions: { exclude: Features.OklabColors, minify: true },
     }),
     tanstackStart({
