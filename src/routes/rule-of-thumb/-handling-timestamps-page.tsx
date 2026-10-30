@@ -514,7 +514,8 @@ function Readers({ readings, utc }: { readings: Reading[]; utc: Wall }) {
               <span {...stylex.props(styles.date)}>{dayOf(reading.shown)}</span>
               {off && (
                 <span {...stylex.props(styles.should)}>
-                  <span {...stylex.props(arcade.srOnly)}>{off}, </span>should be {timeOf(reading.truth)}
+                  <span {...stylex.props(arcade.srOnly)}>{off}, </span>should be{" "}
+                  {timeOf(reading.truth)}
                 </span>
               )}
             </span>

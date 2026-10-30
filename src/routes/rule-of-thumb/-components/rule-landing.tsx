@@ -126,7 +126,11 @@ function Landing({
   const next = VISIBLE_GUIDELINES[at + 1];
 
   return (
-    <div ref={rootRef} className={`arc ${stylex.props(arcade.root, shell.root, reveal).className}`} style={hue}>
+    <div
+      ref={rootRef}
+      className={`arc ${stylex.props(arcade.root, shell.root, reveal).className}`}
+      style={hue}
+    >
       <div {...stylex.props(shell.ground)} aria-hidden="true" />
       <IslandActivity>
         <span {...stylex.props(styles.activity)} style={hue}>
@@ -178,15 +182,17 @@ function Landing({
             </span>
           </h1>
           <p {...stylex.props(shell.claim, shell.in, shell.second)}>{rule.claim}</p>
-          <p {...stylex.props(heroType.lead, shell.lead, shell.in, shell.third)}>
-            {lead}
-          </p>
+          <p {...stylex.props(heroType.lead, shell.lead, shell.in, shell.third)}>{lead}</p>
         </div>
         <Cover rule={rule} entering={!morphed} />
       </header>
 
       <div {...stylex.props(arcade.wrap)}>
-        <section id="learn" aria-labelledby="learn-title" {...stylex.props(section.block, lessonKit.section)}>
+        <section
+          id="learn"
+          aria-labelledby="learn-title"
+          {...stylex.props(section.block, lessonKit.section)}
+        >
           <div {...stylex.props(lessonKit.secHead, shell.rev)} data-rev>
             <h2
               id="learn-title"
@@ -218,7 +224,11 @@ function Landing({
           </div>
         </section>
 
-        <section id="quiz" aria-labelledby="quiz-title" {...stylex.props(section.block, quizKit.section)}>
+        <section
+          id="quiz"
+          aria-labelledby="quiz-title"
+          {...stylex.props(section.block, quizKit.section)}
+        >
           <div {...stylex.props(quizKit.head, shell.rev)} data-rev>
             <div {...stylex.props(veil.soft, lessonKit.headItem, quizKit.headCopy)}>
               <h2 id="quiz-title" {...stylex.props(section.title, lessonKit.secTitle)}>
@@ -264,7 +274,12 @@ function Landing({
             </Tone>
             <div {...stylex.props(heroType.acts, takeKit.acts)}>
               <CopyMarkdown url={markdownUrl} />
-              <a {...stylex.props(button.base, button.soft)} href={markdownUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                {...stylex.props(button.base, button.soft)}
+                href={markdownUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View .md
               </a>
             </div>
@@ -310,7 +325,13 @@ function PagerCard({
     <Link
       to={rule.href}
       preload="intent"
-      {...stylex.props(reticle.card, reticle.aim, hoverHold.lift, pager.card, direction === "Next" && pager.next)}
+      {...stylex.props(
+        reticle.card,
+        reticle.aim,
+        hoverHold.lift,
+        pager.card,
+        direction === "Next" && pager.next,
+      )}
       style={{ "--c": colorOf(rule.label) }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
@@ -1074,7 +1095,11 @@ function useTitleSwap(titleRef: RefObject<HTMLElement | null>, slot: HTMLElement
     const label = slot?.parentElement;
     if (!title || !label) return;
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry) label.toggleAttribute("data-swap", !entry.isIntersecting && entry.boundingClientRect.top < 0);
+      if (entry)
+        label.toggleAttribute(
+          "data-swap",
+          !entry.isIntersecting && entry.boundingClientRect.top < 0,
+        );
     });
     observer.observe(title);
     return () => {

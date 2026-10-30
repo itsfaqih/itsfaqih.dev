@@ -307,7 +307,9 @@ function Checked({ lines }: { lines: Line[] }) {
               <span
                 className={`ts-out ${stylex.props(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes, phase === "idle" && styles.unrun).className}`}
               >
-                <span {...stylex.props(arcade.srOnly)}>{line.note.error ? "error: " : "gives "}</span>
+                <span {...stylex.props(arcade.srOnly)}>
+                  {line.note.error ? "error: " : "gives "}
+                </span>
                 {line.note.text}
               </span>
             )}

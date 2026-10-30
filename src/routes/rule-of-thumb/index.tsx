@@ -39,11 +39,18 @@ function RuleOfThumbsIndex() {
               {RULES.length} rules · {TOPICS.length} topics
             </span>
           </div>
-          <h1 data-cut {...stylex.props(loadIn.veil, veil.soft, veil.fit, heroType.title, styles.title)}>
-            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Rule of Thumb</span>
+          <h1
+            data-cut
+            {...stylex.props(loadIn.veil, veil.soft, veil.fit, heroType.title, styles.title)}
+          >
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              Rule of Thumb
+            </span>
           </h1>
           <p data-cut {...stylex.props(loadIn.veil, veil.soft, veil.fit, styles.lede)}>
-            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>{LEDE}</span>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              {LEDE}
+            </span>
           </p>
         </div>
         <div {...stylex.props(styles.body)}>

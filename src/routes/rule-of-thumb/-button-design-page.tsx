@@ -991,12 +991,7 @@ function IconKeysDemo({ careful }: { careful: boolean }) {
             </span>
           </span>
         ) : (
-          <button
-            key={label}
-            type="button"
-            {...stylex.props(key, styles.wide)}
-            aria-label={label}
-          >
+          <button key={label} type="button" {...stylex.props(key, styles.wide)} aria-label={label}>
             <Icon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
             <Ruler width={52} />
           </button>
@@ -1109,8 +1104,8 @@ const LESSONS: Lesson[] = [
     title: "Pad the icon side less",
     body: (
       <>
-        An icon carries white space inside its own box, so equal padding makes its side look
-        wider. Take 4px off the icon's side and the space around the content looks even.
+        An icon carries white space inside its own box, so equal padding makes its side look wider.
+        Take 4px off the icon's side and the space around the content looks even.
       </>
     ),
     extra: <LessonToggle label="Show padding" name="pads" />,

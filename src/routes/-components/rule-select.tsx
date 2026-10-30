@@ -37,9 +37,9 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
       }),
     [rules],
   );
-  const matches = (normalizedQuery ? fuse.search(normalizedQuery).map(({ item }) => item) : rules).filter(
-    (rule) => category === "All" || rule.label === category,
-  );
+  const matches = (
+    normalizedQuery ? fuse.search(normalizedQuery).map(({ item }) => item) : rules
+  ).filter((rule) => category === "All" || rule.label === category);
   const selected = matches.find((rule) => rule.id === selectedId);
 
   useEffect(() => {
@@ -66,7 +66,12 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
       const from = tile.getBoundingClientRect();
       const to = panel.getBoundingClientRect();
       const corners = ({ left, top, right, bottom }: DOMRect): Point[] => {
-        const [x0, y0, x1, y1] = [left - box.left, top - box.top, right - box.left, bottom - box.top];
+        const [x0, y0, x1, y1] = [
+          left - box.left,
+          top - box.top,
+          right - box.left,
+          bottom - box.top,
+        ];
         return [
           [x0, y0],
           [x1, y0],
@@ -74,7 +79,10 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
           [x0, y1],
         ];
       };
-      const lens: Point = [from.left + from.width / 2 - box.left, from.top + from.height / 2 - box.top];
+      const lens: Point = [
+        from.left + from.width / 2 - box.left,
+        from.top + from.height / 2 - box.top,
+      ];
       const reach = Math.max(...corners(to).map(([x, y]) => Math.hypot(x - lens[0], y - lens[1])));
       beam.style.clipPath = `polygon(${hull([...corners(from), ...corners(to)])
         .map(([x, y]) => `${x}px ${y}px`)
@@ -113,7 +121,13 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               <span>No.{ruleNumber(selected)}</span>
               <span>{selected.label.toUpperCase()}</span>
             </div>
-            <RuleThumb key={selected.id} rule={selected} play at="panel" style={[styles.thumb, styles.panelThumb]} />
+            <RuleThumb
+              key={selected.id}
+              rule={selected}
+              play
+              at="panel"
+              style={[styles.thumb, styles.panelThumb]}
+            />
             <h3 {...stylex.props(styles.title)}>
               <ScrambleText text={selected.title} />
               <span {...stylex.props(arcade.srOnly)}>{selected.title}</span>
@@ -243,7 +257,8 @@ type Point = [x: number, y: number];
 
 function hull(points: Point[]) {
   const sorted = [...points].sort(([ax, ay], [bx, by]) => ax - bx || ay - by);
-  const turn = ([ox, oy]: Point, [ax, ay]: Point, [bx, by]: Point) => (ax - ox) * (by - oy) - (ay - oy) * (bx - ox);
+  const turn = ([ox, oy]: Point, [ax, ay]: Point, [bx, by]: Point) =>
+    (ax - ox) * (by - oy) - (ay - oy) * (bx - ox);
   const chain = (list: Point[]) => {
     const kept: Point[] = [];
     for (const point of list) {
@@ -550,7 +565,11 @@ const styles = stylex.create({
     opacity: { default: null, [WAITING]: 0, [DIMMED]: 0.25 },
     transform: {
       default: null,
-      ":is([data-on])": { default: "translateY(-4px)", ":active": "translateY(3px)", [REDUCE]: "none" },
+      ":is([data-on])": {
+        default: "translateY(-4px)",
+        ":active": "translateY(3px)",
+        [REDUCE]: "none",
+      },
     },
     boxShadow: {
       default: `${TILE_TOP}, ${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
