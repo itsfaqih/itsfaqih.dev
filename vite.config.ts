@@ -84,8 +84,9 @@ function rehypeHighlightCode() {
 }
 
 async function inlineAssetsBeforeApp(css: string, outDir: string) {
-  for (const [url, asset] of css.matchAll(
-    /url\((\/(?:fonts\/[^)]+-core\.woff2|cursors\/[^)#]+\.svg))\)/g,
+  // Quoted or not: StyleX's sheet is printed after Vite's minify pass.
+  for (const [url, , asset] of css.matchAll(
+    /url\((["']?)(\/(?:fonts\/[^)"']+-core\.woff2|cursors\/[^)#"']+\.svg))\1\)/g,
   )) {
     const data = (await readFile(path.join(outDir, asset!))).toString("base64");
     const mime = asset!.endsWith(".svg") ? "image/svg+xml" : "font/woff2";
