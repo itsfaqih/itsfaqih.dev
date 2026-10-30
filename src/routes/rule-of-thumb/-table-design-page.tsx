@@ -1410,7 +1410,7 @@ function UrlDemo({ careful }: { careful: boolean }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Right-align numbers",
     body: (
@@ -1513,7 +1513,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const CHEAT_SHEET = [
+export const TLDR = [
   ["A column of numbers", "Right-align it, set tabular-nums, call toLocaleString()"],
   ["Money in a finance view", "Use a monospace face"],
   ["Rows still loading", "Draw skeleton rows at the real row height"],
@@ -1760,7 +1760,7 @@ export function TableDesign() {
           intro: <>Make each column easy to run an eye down, since people scan for one value.</>,
         }}
         lessons={LESSONS}
-        tldr={CHEAT_SHEET}
+        tldr={TLDR}
         quiz={{
           intro: <>Place each piece. A wrong spot shows what it costs.</>,
           levels: LEVELS,

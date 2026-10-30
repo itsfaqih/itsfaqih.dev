@@ -1438,7 +1438,7 @@ function NameDemo({ sealed }: { sealed: boolean }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Keep focus inside",
     body: (
@@ -1565,7 +1565,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const CHEAT_SHEET = [
+export const TLDR = [
   ["It opens", "Focus the first field, or Cancel if it destroys something"],
   ["While it's open", "Cycle Tab inside. Keep the page behind inert and still"],
   ["Escape", "Close it, every time"],
@@ -1791,7 +1791,7 @@ export function DialogDesign() {
         intro: <>Give a dialog a way through and a way out, since it takes over the screen.</>,
       }}
       lessons={LESSONS}
-      tldr={CHEAT_SHEET}
+      tldr={TLDR}
       quiz={{
         intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,

@@ -768,7 +768,7 @@ const serverString = (() => {
   return `${at.getUTCMonth() + 1}/${at.getUTCDate()}/${at.getUTCFullYear()}, ${timeOf(SERVER_WALL, true)}`;
 })();
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Store the moment in UTC",
     body: (
@@ -916,7 +916,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const TLDR = [
+export const TLDR = [
   ["Saving a timestamp", "Store UTC, with no offset column"],
   ["Returning one from the API", "Return ISO 8601 ending in Z"],
   ["Showing it to someone", "Format it in their browser"],

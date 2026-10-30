@@ -1334,7 +1334,7 @@ function WalletView({ careful }: { careful: boolean }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Start fetching early",
     body: (
@@ -1468,7 +1468,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const TLDR = [
+export const TLDR = [
   ["SEO or first paint matters", "Render it on the server. Behind a login, an SPA is fine"],
   ["Data a route needs", "Start it in the loader, batch it, stream the rest"],
   ["Refetching data you have", "Keep it on screen with a small spinner"],

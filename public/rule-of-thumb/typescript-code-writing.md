@@ -1,163 +1,167 @@
 # TypeScript Guidelines
 
-Patterns for writing clean, robust, and maintainable TypeScript.  
-**Strict defaults, explicit intent.**
+Write types precise enough that the compiler catches a mistake where you made it.
 
-## Exports & Functions
+Prefer named exports, unions and typed edges. Turn on the strict flags. Make a typo fail where you wrote it, not in a caller.
 
-Consistent module structure makes code easier to navigate and refactor.
+## Name it once
 
-### Prefer Named Exports
+Export each function by name, with the `function` keyword. A default export takes whatever name each importer gives it, so a typo compiles and the stack trace says `default`. Keep arrow functions for callbacks.
 
-Named exports ensure consistent naming across the codebase and work better with auto-imports/refactoring tools. Avoid default exports.
+Bad (Default export):
 
-### Use "function" keyword
-
-Use the function keyword for top-level functions. It hoists, provides better stack traces, and distinguishes them from variables. Reserve arrow functions for callbacks or nested logic.
-
-#### Named Exports vs Default
-
-```tsx
-// ❌ Avoid this
-export default function(items: Item[]) { ... }
-// or
-const calculateTotal = (items: Item[]) => { ... };
-export default calculateTotal;
-
-// ✅ Do this
-export function calculateTotal(items: Item[]) {
-  return items.reduce((sum, item) => sum + item.price, 0);
-}
+```ts
+// cart.ts
+export default function (items: Item[]) {…} // stack trace: at default
+// receipt.tsx
+import calcTotl from "./cart"; // 0 errors
 ```
 
-Named exports prevent "magic naming" when importing and make re-exports cleaner.
+Good (By name):
 
-## Type Definitions
+```ts
+// cart.ts
+export function calculateTotal(items: Item[]) {…} // stack trace: at calculateTotal
+// receipt.tsx
+import { calculateTotl } from "./cart"; // TS2724: did you mean 'calculateTotal'?
+```
 
-How to define data shapes relative to flexibility and performance.
+## Extend with interface
 
-### Use "type" by default
+Use `type` for shapes, unions and aliases. To build one shape on another, use `interface … extends`. A clash then fails at the declaration, in plain words. With `&`, the clash compiles, the field becomes `never`, and the error shows up at the first object of that type.
 
-Use "type" for most definitions (unions, primitives, simple objects). Use "interface" specifically when you need to **extend** other types (to avoid intersection performance issues) or for declaration merging.
+Bad (User & {…}):
 
-### Unions over Enums
+```ts
+type User = { id: string; name: string };
+type Admin = User & { id: number }; // id: never, 0 errors
+const ana: Admin = { id: 1, name: "Ana" }; // TS2322: 'number' is not assignable to 'never'
+```
 
-Avoid enums as they emit runtime code and reduce interoperability. String literal unions are simpler, purely type-level, and compatible with modern Node.js type-stripping.
+Good (extends User):
 
-### Infer when possible
-
-Use inference to reduce noise. Only annotate explicitly when documenting intent or enforcing contracts.
-
-#### Type vs Interface
-
-```tsx
-// ✅ Use type for simple objects
-type User = {
-  id: string;
-  name: string;
-}
-
-// ❌ Avoid intersection for extension
-type Admin = User & {
-  permissions: string[];
-}
-
-// ✅ Use interface for extension
+```ts
+type User = { id: string; name: string };
 interface Admin extends User {
-  permissions: string[];
+  // TS2430: incorrectly extends 'User'
+  id: number;
 }
 ```
 
-#### Types vs Enums
+## Use unions, not enums
 
-```tsx
-// ❌ Avoid this
-enum UserRoleEnum {
+Write a string union, which is only a type. A string enum is a runtime object. It rejects the plain string it stands for, adds JavaScript to your bundle, and won't run under Node's type stripping.
+
+Bad (enum Role):
+
+```ts
+enum Role {
   Admin = "ADMIN",
-  Editor = "EDITOR",
-  Viewer = "VIEWER"
-}
-
-// ✅ Do this
-type UserRole = "ADMIN" | "EDITOR" | "VIEWER";
-const UserRoleEnum = {
-  Admin: "ADMIN",
-  Editor: "EDITOR",
-  Viewer: "VIEWER"
-} as const
+  Viewer = "VIEWER",
+} // emits a runtime object
+function setRole(role: Role) {}
+setRole("ADMIN"); // TS2345: '"ADMIN"' is not a 'Role'
 ```
 
-String literal unions are simpler and don't emit runtime code.
+Good (String union):
 
-#### Type Inference
+```ts
+type Role = "ADMIN" | "VIEWER"; // 0 lines of JS
+function setRole(role: Role) {}
+setRole("ADMIN"); // 0 errors
+setRole("ADMN"); // TS2345
+```
 
-```tsx
-// ❌ Avoid unnecessary explicit typing
-const x: number = 5; // it's a constant, it's not going to change to other types
-const items: string[] = ["a", "b", "c"];
+If you need the values at runtime too, freeze the list with `as const` and derive the type from it:
 
-// ✅ Do this - let TypeScript infer
-const y = 5; // inferred as number
-const items = ["a", "b", "c"]; // inferred as string[]
+```ts
+const ROLES = ["ADMIN", "VIEWER"] as const;
+type Role = (typeof ROLES)[number]; // "ADMIN" | "VIEWER"
+```
 
-// ✅ Annotate when enforcing a contract
-function getUser(): User { // explicit return type documents intent
-  return { id: "1", name: "Alice" };
+## Infer inside, annotate the edges
+
+Let TypeScript infer locals. A label on a local only widens it. Annotate where a contract starts: a return type, a public API. Then a typo fails where you wrote it, not in a caller.
+
+Bad (Label locals):
+
+```ts
+const role: string = "ADMIN";
+setRole(role); // TS2345: 'string' is not a 'Role'
+function getUser() {
+  return { id: "1", nmae: "Ana" }; // 0 errors
+}
+getUser().name; // TS2339 at the caller
+```
+
+Good (Label edges):
+
+```ts
+const role = "ADMIN"; // role: "ADMIN"
+setRole(role); // 0 errors
+function getUser(): User {
+  return { id: "1", nmae: "Ana" }; // TS2353: 'nmae' is not in 'User'
 }
 ```
 
-Only add type annotations when they add value - for function signatures, public APIs, or to catch errors.
+## Take one options object
 
-## Function Parameters
+Past two parameters, take one object. Four positional arguments say nothing at the call, and two strings can swap with no error. Named keys can't swap, label each value, and take a new optional field without breaking a caller.
 
-Managing arguments for readability and extensibility.
+Bad (4 arguments):
 
-### Use Option Objects
-
-When a function takes more than two parameters, combine them into a single object argument. This improves readability (named args) and makes adding new optional parameters non-breaking.
-
-#### Object Parameters
-
-```tsx
-// ❌ Avoid this
-function createUser(name: string, email: string, role: string, isActive: boolean) { ... }
-
-createUser("Alice", "alice@example.com", "admin", true); // what is "true"?
-
-// ✅ Do this
-type CreateUserOptions = {
-  name: string;
-  email: string;
-  role?: "admin" | "user";
-  isActive?: boolean;
-}
-
-function createUser(options: CreateUserOptions) { ... }
-
-createUser({
-  name: "Alice",
-  email: "alice@example.com",
-  role: "admin"
-  // arguments are clear and order-independent
-});
+```ts
+function createUser(name: string, email: string, role: string, active: boolean) {}
+createUser("ana@x.io", "Ana", "admin", true); // 0 errors, name and email swapped
 ```
 
-Positional arguments become confusing easily.
+Good ({ options }):
 
-## Strictness & Config
+```ts
+function createUser(options: { name: string; email: string; role?: "admin" | "user" }) {}
+createUser({ email: "ana@x.io", name: "Ana" }); // 0 errors, any order
+createUser({ name, email, role: "admn" }); // TS2820: did you mean '"admin"'?
+```
 
-The foundation of a safe codebase.
+## Turn the flags on
 
-### Must-Have Flags
+Enable `noUncheckedIndexedAccess`, which types every index read as possibly `undefined`. Under `strict` alone, `users[0]` still reads as a `User` on an empty list.
 
-- **`"strict": true`**: Enables strictNullChecks, noImplicitAny, etc.
-- **`"noUncheckedIndexedAccess": true`**: Forces you to check if array access / index signature is defined.
-- **`"verbatimModuleSyntax": true`**: Enforces consistent imports/exports and ESM compatibility.
+Add `verbatimModuleSyntax` too, so a type import must say `import type`. Write ESM only: `import` and `export`, never `require`.
 
-### Module System
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true
+  }
+}
+```
 
-Use **ESM (ECMAScript Modules)** exclusively.
+Bad (strict only):
 
-- ✓ import / export syntax
-- ✗ require() / module.exports
-- ✓ Top-level await support
+```ts
+const first = users[0]; // first: User
+first.name.toUpperCase(); // TypeError at runtime when users is []
+```
+
+Good (+ noUnchecked…):
+
+```ts
+const first = users[0]; // first: User | undefined
+first.name.toUpperCase(); // TS18048: 'first' is possibly 'undefined'
+first?.name ?? "No users yet"; // 0 errors
+```
+
+## TL;DR
+
+| Situation                  | Do this                                                               |
+| -------------------------- | --------------------------------------------------------------------- |
+| A function other files use | Use export function name()                                            |
+| A shape, a union, an alias | Use type                                                              |
+| One shape built on another | Use interface … extends                                               |
+| A fixed set of values      | Use a string union, not an enum                                       |
+| A local value              | Infer it. Annotate returns and APIs.                                  |
+| Three or more parameters   | Take one options object                                               |
+| A new tsconfig             | Enable strict, noUncheckedIndexedAccess, verbatimModuleSyntax and ESM |

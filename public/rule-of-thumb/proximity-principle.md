@@ -1,74 +1,162 @@
-# The Proximity Principle
+# Proximity Principle
 
-A visual guide to structuring code and files. Less jumping, more shipping.
+Keep code next to the code that uses it.
 
-## The Core Principles
+Start inline. Extract only when a second caller, or its own state, demands it. Move code only as far as its callers need.
 
-1.  **Colocate**: Put related code as close as possible to where it's used.
-2.  **Inline First**: Don't extract until code is reused. Keep it inline by default.
-3.  **Lowest Common Ancestor**: When sharing code, place it at the nearest common parent directory.
-4.  **Prefer Fewer Files**: One file with related code beats many files requiring imports.
+## Inline it first
 
-## Don't Abstract Prematurely
+Keep code used once where it's used. A helper in `utils/` with one caller adds a file and an import, and shares nothing.
 
-If code is only used once, keep it inline. Abstraction adds complexity.
+Bad: In utils/ (2 files, 1 import)
 
-- **Bad**: Creating `utils/date.ts` for a function used once in `UserProfile.tsx`.
-- **Good**: Defining the function inside `UserProfile.tsx` or using it inline.
+```text
+src/
+  routes/profile/
+    user-profile.tsx      calls formatDate()
+  utils/
+    format-date.ts        export function formatDate()
+```
 
-## Exception: React State Isolation
-
-Extract a child component when it has its own state — even if only used once. This prevents the parent from re-rendering when the child's state changes.
+Good: Inline (1 file, 0 imports)
 
 ```tsx
-// Good - child state doesn't re-render parent
-function SearchInput({ onSearch }) {
-  const [query, setQuery] = useState(""); // Only SearchInput re-renders
-  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+// src/routes/profile/user-profile.tsx
+function formatDate(date: Date) {
+  return date.toLocaleDateString();
+}
+
+export function UserProfile({ user }: { user: User }) {
+  return <p>Joined {formatDate(user.joinedAt)}</p>;
 }
 ```
 
-## Prefer Fewer Files
+## Prefer fewer files
 
-Splitting code across many files increases cognitive load. Keep related code together.
+Keep one component in one file. If you split its types, styles and hook into a folder, reading it takes five tabs.
 
-- **Bad**: `UserProfile/` folder with `index.tsx`, `UserProfile.tsx`, `styles.ts`, `types.ts`, `hooks.ts`. (5 files for one component).
-- **Good**: `user-profile.tsx`. One file. Everything related is together.
+Bad: A folder (5 files, 4 imports)
 
-## Extract Only When Reused
+```text
+routes/profile/
+  user-profile/
+    index.tsx
+    user-profile.tsx
+    types.ts
+    styles.ts
+    hooks.ts
+```
 
-Only move code to a separate file when it's needed in multiple files.
+Good: One file (1 file, 0 imports)
 
-1.  **Code used once**: Keep inline.
-2.  **Code reused in same file**: Extract to function in same file.
-3.  **Code reused across files**: Extract to lowest common ancestor.
+```text
+routes/profile/
+  user-profile.tsx        type Profile, const styles, function useProfile(), UserProfile
+```
 
-## Lowest Common Ancestor
+## Give state its own component
 
-When you do share code, place it at the nearest common parent. This makes it clear which scope the utility belongs to.
+Extract code used once only when it has its own state. In a child, a keystroke re-renders the child, not the page and its 500 rows.
 
-> **Tip**: Avoid generic directory names like `features/`. Use specific names that describe what the directory contains: `pages/`, `routes/`, `controllers/`, etc.
+Bad: In the page (501 renders per key)
 
-## Exception: Global Code
+```tsx
+function OrderPage() {
+  const [query, setQuery] = useState(""); // each keystroke re-renders OrderPage and OrderList
+  return (
+    <>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <OrderList /> {/* 500 rows */}
+    </>
+  );
+}
+```
 
-For something that we can expect to be used globally (e.g. a button component) or used almost everywhere, it's better to put them in a "type" directory (e.g. `components/`, `schemas/`).
+Good: In a child (1 render per key)
 
-- **Bad**: Placing `button.tsx` inside `pages/` at the lowest ancestor — it doesn't belong to any page.
-- **Good**: Placing `button.tsx` in `components/`. Globally used code lives in a type directory. Clear intent, easy to find.
+```tsx
+function SearchInput({ onSearch }: { onSearch: (query: string) => void }) {
+  const [query, setQuery] = useState(""); // only SearchInput re-renders
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSearch(query);
+      }}
+    >
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+    </form>
+  );
+}
 
-## File Suffixes
+function OrderPage() {
+  return (
+    <>
+      <SearchInput onSearch={search} />
+      <OrderList /> {/* 500 rows */}
+    </>
+  );
+}
+```
 
-When organizing by type at scale, use suffixes for discoverability (Ctrl+P).
+## Use the lowest common ancestor
 
-- `user.schema.ts`
-- `use-auth.hook.ts`
-- `dashboard.page.tsx`
+When a second file needs it, move it up to the nearest folder both callers share. The path then names its owner.
 
-## Quick Reference
+Name folders for what they hold, like `routes/` or `controllers/`, not `features/`.
 
-- **Code used once** -> Keep it inline
-- **Code is too long** -> Extract to function, keep in file
-- **Code reused in same file** -> Extract to function, keep in file
-- **Code reused across files** -> Extract to lowest common ancestor
-- **Code used globally / almost everywhere** -> Put in a type directory (e.g. components/, schemas/)
-- **React: Child has own state** -> Extract to component
+Bad: In hooks/ (2 hops each, owner unclear)
+
+```text
+src/
+  hooks/
+    use-cart.ts
+  routes/shop/
+    cart/summary.tsx          calls useCart()
+    checkout/pay-button.tsx   calls useCart()
+```
+
+Good: In routes/shop/ (1 hop each, owner: shop)
+
+```text
+src/
+  routes/shop/
+    use-cart.ts
+    cart/summary.tsx          calls useCart()
+    checkout/pay-button.tsx   calls useCart()
+```
+
+## Give global code a type folder
+
+Code used almost everywhere, like a button, belongs to no page. Give it a folder named for its type, and a suffix so `⌘P` finds it: `user.schema.ts`, `use-auth.hook.ts`, `dashboard.page.tsx`.
+
+Bad: In settings/ (11 cross-imports)
+
+```text
+src/
+  routes/
+    settings/
+      button.tsx
+    checkout/, … 10 more pages               import ../settings/button
+```
+
+Good: In components/ (1 obvious home)
+
+```text
+src/
+  components/
+    button.tsx
+  routes/
+    settings/, checkout/, … 10 more pages    import components/button
+```
+
+## TL;DR
+
+| Situation                  | Do this                               |
+| -------------------------- | ------------------------------------- |
+| Code used once             | Keep it inline                        |
+| Code too long              | Extract a function, same file         |
+| Reused in the same file    | Extract a function, same file         |
+| Reused across files        | Move it to the lowest common ancestor |
+| Used almost everywhere     | Use a type folder, like components/   |
+| A child with its own state | Give it its own component             |

@@ -1,154 +1,235 @@
 # Button Design
 
-The details that make buttons feel tangible and responsive. Don't settle for browser defaults.
+Make a button show what it does and what it's doing.
 
-## The Essential States
+Style every state, hold the width while it works, and confirm anything destructive. Give each state, wait and refusal a visible change, so no press feels lost.
 
-A well-designed button handles these six states seamlessly:
+## Give every state a look
 
-1.  **Idle State**: The default resting state. Clearly clickable with valid contrast. Use `cursor: default`.
-2.  **Hover State**: Provides feedback when cursor is over the button. Signals interactivity.
-3.  **Focus State**: Shows when the button is focused via keyboard navigation. Essential for accessibility.
-4.  **Pressing State**: Visual feedback on press. Scale-down or click effect.
-5.  **Pending State**: Shows progress while waiting. Prevents double-clicks. Use `cursor: wait`.
-6.  **Disabled State**: Indicates unavailable action. Reduced opacity and no pointer events. Use `cursor: not-allowed`.
-7.  **Cursor**: Use `cursor: default` for buttons (actions) and `cursor: pointer` for links (navigation).
+Give hover, press and focus a look. If nothing changes, a click feels like it missed and a keyboard user can't see where they are. Animate each change in 100 to 200ms, and draw the focus ring on `:focus-visible` so it shows for the keyboard only.
 
-## Disabled State UX
+Bad (One look):
 
-When a button is disabled, the cursor should immediately change to indicate the action is forbidden (`cursor: not-allowed`).
-Consider adding a tooltip explaining _why_ it is disabled.
+```css
+button {
+  transition: none;
+}
+button:focus-visible {
+  outline: none;
+}
+```
 
-## Code Implementation
+Good (Four looks):
 
-A robust implementation handles all states in a unified component:
+```css
+button {
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+button:hover {
+  background-color: var(--button-hover);
+}
+button:active {
+  transform: translateY(2px) scale(0.97);
+}
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active {
+    transform: none;
+  }
+}
+```
+
+## Hold the width while it works
+
+Stop taking clicks the moment it's pressed, say what it's doing, then say it worked. Stack the labels in one grid cell so the width holds. Show `cursor: wait` while the request runs, and return to the idle label after a second or so.
+
+Bad (Swaps the label):
+
+```tsx
+<button onClick={save}>{pending ? "Saving…" : "Save"}</button>
+```
+
+Good (Stack the labels):
 
 ```tsx
 <button
-  disabled={isPending || isDisabled}
-  className={cn(
-    // Base styles
-    "px-6 py-3 rounded-xl font-medium transition-all",
-    // Hover
-    "hover:bg-zinc-500/5 hover:shadow-lg",
-    // Focus (keyboard navigation)
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-    "focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    // Active/Press
-    "active:scale-95",
-    // Pending/Disabled
-    isPending ? "cursor-wait" : isDisabled ? "cursor-not-allowed opacity-60" : "cursor-default",
-  )}
+  type="button"
+  className="save"
+  data-phase={phase}
+  aria-disabled={phase !== "idle" || undefined}
+  onClick={() => phase === "idle" && save()}
 >
-  {isPending ? <Loader2 className="animate-spin" /> : "Submit"}
+  <span aria-hidden={phase !== "idle" || undefined}>Save</span>
+  <span aria-hidden={phase !== "pending" || undefined}>
+    <Spinner /> Saving…
+  </span>
+  <span aria-hidden={phase !== "done" || undefined}>
+    <Check /> Saved
+  </span>
 </button>
 ```
 
-## Button Variants
+```css
+.save {
+  display: inline-grid;
+}
+.save > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+}
+.save > span[aria-hidden] {
+  visibility: hidden;
+}
+.save[data-phase="pending"] {
+  cursor: wait;
+}
+```
 
-Different actions require different visual weights. Use the right variant to guide users through your interface.
+## Say why it's off
 
-### Primary (Filled)
+A disabled button that only fades leaves people guessing. Show the no-entry cursor (`cursor: not-allowed`), keep the label readable, and put the reason in a tooltip. Use `aria-disabled="true"` in place of `disabled` so the button still takes hover and focus and can show its tooltip. Dim the text colour and leave `opacity` at 1.
 
-Solid, high-contrast buttons that demand immediate attention.
+Bad (Just faded):
 
-**When to use:**
-- Main call-to-action per screen/section
-- Actions that complete a workflow: "Submit", "Save", "Confirm"
-- Use **Brand** for the primary CTA
-- Use **Neutral** for important but non-primary actions like "Cancel" or "Back"
+```tsx
+<button disabled={!title} style={{ opacity: 0.35 }}>
+  Publish
+</button>
+```
 
-**Examples:** Submit form, Create account, Checkout, Confirm purchase
+Good (Say why):
 
-### Secondary (Tinted)
+```tsx
+<button
+  type="button"
+  aria-disabled={!title || undefined}
+  aria-describedby={title ? undefined : "publish-why"}
+  onClick={() => title && publish()}
+>
+  Publish
+</button>;
+{
+  !title && (
+    <span role="tooltip" id="publish-why">
+      Add a title first
+    </span>
+  );
+}
+```
 
-Light background with subtle tint. Visible but doesn't compete with primary.
+## Fill one button per screen
 
-**When to use:**
-- Supporting actions that need visibility without dominance
-- Card actions and toolbar buttons
-- When multiple actions have similar importance
-- Alternative actions: "Edit", "View Details", "Share"
+Visual weight shows people the next step. Fill the main action in the brand colour, tint the supporting one, and leave Cancel as text. Keep red for destructive actions.
 
-**Examples:** Edit profile, View report, Export data, Refresh
+A tint is the brand colour at low strength, such as `background: color-mix(in srgb, var(--brand) 18%, transparent)`. A text button has `background: transparent` until hover.
 
-### Tertiary (Minimal)
+Bad (All filled):
 
-Transparent background, text only. Minimal visual weight.
+```html
+<button class="filled">Cancel</button>
+<button class="filled">Save draft</button>
+<button class="filled red">Publish</button>
+```
 
-**When to use:**
-- Low-priority actions that shouldn't distract
-- Repeated actions in lists or tables
-- Dismissive actions: "Skip", "Dismiss", "Maybe later"
-- Inline links styled as buttons
+Good (Fill, tint, text):
 
-**Examples:** Skip intro, Learn more, Show less, Clear filters
+```html
+<button class="text">Cancel</button>
+<button class="tinted">Save draft</button>
+<button class="filled">Publish</button>
+```
 
-### Quick Reference
+## Guard the destructive action
 
-| Level | Visual Weight | Use For |
-|-------|---------------|---------|
-| Primary (Filled) | High | Main CTA, final actions |
-| Secondary (Tinted) | Medium | Supporting actions, cards |
-| Tertiary (Minimal) | Low | Skip, dismiss, inline actions |
+Never let one stray click delete anything. Tint the trigger red, then confirm with a filled red button that names what goes. Land focus on Cancel, the safe answer.
 
-### Destructive Actions
+Bad (One click):
 
-- **Destructive (Filled)**: High-impact negative actions (e.g., "Delete Project"). Use Red sparingly.
-- **Secondary Destructive**: Moderate warnings (e.g., "Remove Access").
-- **Tertiary Destructive**: Low-priority negative actions (e.g., "Unsubscribe").
+```tsx
+<button className="filled red" onClick={deleteProject}>
+  Delete project
+</button>
+```
 
-**⚠️ Avoid Red for Primary Actions**: Reserve red for destructive actions only. Using red for a "Confirm" button creates cognitive friction as users are trained to associate red with danger.
+Good (Confirm by name):
 
-## Icon Integration
+```tsx
+<button className="tinted red" onClick={() => setConfirming(true)}>
+  Delete project
+</button>;
+{
+  confirming && (
+    <div>
+      <p>
+        <b>Delete Moonbase?</b> Its 214 files go too. You can't undo this.
+      </p>
+      <button className="text" autoFocus onClick={() => setConfirming(false)}>
+        Cancel
+      </button>
+      <button className="filled red" onClick={deleteProject}>
+        Delete project
+      </button>
+    </div>
+  );
+}
+```
 
-### Leading Icons
+## Pad the icon side less
 
-Use for:
+Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.
 
-- **Back/Return actions** (ArrowLeft)
-- **Confirmation actions** (Check)
-- **Add/Create actions** (Plus)
-- **Feature emphasis** (Sparkles)
+Bad (Even padding):
 
-_Padding tip_: Apply `pl-2 pr-3` for optical balance when using a leading icon.
+```tsx
+<button className="px-4"><Plus /> New project</button>
+<button className="px-4">Continue <ArrowRight /></button>
+```
 
-### Trailing Icons
+Good (Optical padding):
 
-Use for:
+```tsx
+<button className="pl-3 pr-4"><Plus /> New project</button>
+<button className="pl-4 pr-3">Continue <ArrowRight /></button>
+```
 
-- **Forward/Next actions** ("Continue" -> ArrowRight)
-- **External links** (ArrowUpRight)
-- **Dropdown triggers** (ChevronDown)
-- **Download actions** (Download)
+## Fix the size of an icon-only button
 
-_Padding tip_: Apply `pl-3 pr-2` for optical balance.
+With no label, padding sets the size, so the button comes out wider than it is tall and changes with every icon. Make it a fixed square as tall as its neighbours, and centre the icon. With no text to read, add an `aria-label` and a tooltip that shows on hover and on keyboard focus.
 
-### Icon-Only Buttons
+Bad (Sized by padding):
 
-Use for:
+```tsx
+<button className="h-9 px-4.5">
+  <Gear />
+</button>
+```
 
-- **Toolbars & action bars** (Settings)
-- **Repeated actions** (Delete, Edit)
-- **Mobile interfaces** (Search)
+Good (Fixed square):
 
-**Requirements**:
+```tsx
+<button className="size-9 p-0 inline-grid place-items-center" aria-label="Settings">
+  <Gear aria-hidden="true" />
+</button>
+<span role="tooltip">Settings</span>
+```
 
-1.  **Tooltip** is mandatory to explain the action.
-2.  **aria-label** is required for accessibility.
-3.  **Square aspect ratio** (e.g., `size-8.5 p-0`).
+## TL;DR
 
-## Best Practices
-
-- **Keep transitions snappy**: Use 100-200ms.
-- **Prevent double-clicks**: Disable during pending.
-- **Update text**: "Submit" -> "Processing..." -> "Done!".
-- **Show success**: Briefly show a success state before resetting.
-- **Maintain contrast**: Ensure readability even when disabled.
-
-## Why It Matters
-
-- **Reduces uncertainty**: Users know their action was registered.
-- **Prevents errors**: Block double-submissions.
-- **Feels premium**: Polished interactions build trust.
-- **Improves accessibility**: Clear states help everyone.
+| Situation                | Do this                                                   |
+| ------------------------ | --------------------------------------------------------- |
+| Any button               | Give hover, press and focus a look, in 100 to 200ms       |
+| Waiting on a request     | Stop clicks, keep the width, say Saving… then Saved       |
+| Not available yet        | Set cursor: not-allowed and add a tooltip that says why   |
+| Picking a variant        | Fill one per screen, tint the secondary, make Cancel text |
+| It deletes something     | Make it red, behind a confirm that names what goes        |
+| An icon beside the label | Take 4px off the icon's side                              |
+| An icon with no label    | Make it a fixed square with an aria-label and a tooltip   |

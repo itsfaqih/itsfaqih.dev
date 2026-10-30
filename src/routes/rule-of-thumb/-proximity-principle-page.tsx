@@ -25,7 +25,7 @@ const styles = stylex.create({
   },
 });
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Inline it first",
     body: (
@@ -242,7 +242,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const CHEAT_SHEET = [
+export const TLDR = [
   ["Code used once", "Keep it inline"],
   ["Code too long", "Extract a function, same file"],
   ["Reused in the same file", "Extract a function, same file"],
@@ -483,7 +483,7 @@ export function ProximityPrinciple() {
         intro: <>Move code only as far as its callers need.</>,
       }}
       lessons={LESSONS}
-      tldr={CHEAT_SHEET}
+      tldr={TLDR}
       quiz={{
         intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,

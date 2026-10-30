@@ -700,9 +700,9 @@ function RenameDemo({ way }: { way: Way }) {
         lines={
           way === "bad"
             ? [
-                { c: "const draft = { title: null,", hot: true },
+                { c: "const draft = { title: input.value,", hot: true },
                 { c: "  assignee: null, due: null }", hot: true },
-                { c: "draft.title = input.value" },
+                { c: "" },
                 { c: 'patch("/tasks/12", draft)' },
               ]
             : [
@@ -745,7 +745,7 @@ function RenameDemo({ way }: { way: Way }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Tell missing from empty",
     body: (
@@ -943,7 +943,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const TLDR = [
+export const TLDR = [
   ["Declared, not assigned yet", "Leave it undefined"],
   ["An argument the caller may skip", "Type it name?: string"],
   ["The user cleared a field", "Set it to null"],

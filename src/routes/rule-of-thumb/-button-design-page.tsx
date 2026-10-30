@@ -1001,7 +1001,7 @@ function IconKeysDemo({ careful }: { careful: boolean }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Give every state a look",
     body: (
@@ -1140,7 +1140,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const CHEAT_SHEET = [
+export const TLDR = [
   ["Any button", "Give hover, press and focus a look, in 100 to 200ms"],
   ["Waiting on a request", "Stop clicks, keep the width, say Saving… then Saved"],
   ["Not available yet", "Set cursor: not-allowed and add a tooltip that says why"],
@@ -1373,7 +1373,7 @@ export function ButtonDesign() {
         intro: <>Give each state, wait and refusal a visible change, so no press feels lost.</>,
       }}
       lessons={LESSONS}
-      tldr={CHEAT_SHEET}
+      tldr={TLDR}
       quiz={{
         intro: <>Place each piece. A wrong spot shows what it costs.</>,
         levels: LEVELS,

@@ -337,7 +337,7 @@ function Checked({ lines }: { lines: Line[] }) {
   );
 }
 
-const LESSONS: Lesson[] = [
+export const LESSONS: Lesson[] = [
   {
     title: "Name it once",
     body: (
@@ -656,7 +656,7 @@ const LESSONS: Lesson[] = [
   },
 ];
 
-const TLDR = [
+export const TLDR = [
   ["A function other files use", "Use export function name()"],
   ["A shape, a union, an alias", "Use type"],
   ["One shape built on another", "Use interface … extends"],
