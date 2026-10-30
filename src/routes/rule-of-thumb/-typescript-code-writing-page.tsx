@@ -733,7 +733,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "roles",
           label: blank('const ROLES = ["ADMIN", "EDITOR"]'),
-          note: "ROLES becomes a readonly tuple, so Role is the union. No enum, no extra JavaScript.",
+          note: "ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
           cost: ["Role: 2 members", "0 enum lines"],
         },
       },

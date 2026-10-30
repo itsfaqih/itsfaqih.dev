@@ -1643,7 +1643,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "name",
           label: "<input> Name",
-          note: "They start typing at once. No click, no Tab.",
+          note: "They start typing at once, with no click or Tab.",
           cost: ["0 clicks"],
         },
       },

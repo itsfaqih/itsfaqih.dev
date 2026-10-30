@@ -280,7 +280,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "inline",
           label: "↳ inline, above UserProfile()",
-          note: "Used once, so it stays where it's used. Nothing to import, nothing to open.",
+          note: "Used once, so it stays where it's used, with nothing to import or open.",
           cost: ["0 files", "0 imports"],
         },
       },

@@ -1630,7 +1630,7 @@ const LEVELS: Level[] = [
         slot: {
           id: "error",
           label: "+ its button",
-          note: "The list failed to load. It isn't empty. Add user hides the failure. Retry helps.",
+          note: "The list failed to load, so it isn't empty. Add user hides the failure, and Retry helps.",
           cost: ["hides the error", "0 retries"],
         },
       },
