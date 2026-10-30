@@ -1,3 +1,7 @@
+// The home page's side projects, the header link to them, and the stack's Project filter are
+// hidden for now. The stack still lists every tool.
+export const SHOW_PROJECTS = false;
+
 export const SLIDES: {
   tab: string;
   ticker: string;

@@ -14,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { compactBox, IslandActivity } from "../../../components/header";
+import { IslandActivity } from "../../../components/header";
 import {
   colorOf,
   PUBLISHED_GUIDELINES,
@@ -29,6 +29,7 @@ import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
 import { button } from "../../../components/button";
+import { hoverHold } from "../../../components/hover-hold";
 import { section, veil } from "../../-components/section";
 import { arcade } from "../../../components/arcade";
 
@@ -108,7 +109,7 @@ function Landing({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useTitleFit(titleRef);
-  useTitleDock(rootRef, titleRef, slot);
+  useTitleSwap(titleRef, slot);
   const hue = { "--c": colorOf(rule.label) };
   const number = ruleNumber(rule);
 
@@ -151,20 +152,21 @@ function Landing({
         </span>
       </IslandActivity>
       <header {...stylex.props(arcade.wrap, shell.titleScreen)}>
-        <div {...stylex.props(shell.heroCopy)}>
-          <div {...stylex.props(shell.crumbRow)}>
-            <nav
-              {...stylex.props(heroType.tag, shell.crumb, shell.in, shell.first)}
-              aria-label="Breadcrumb"
-            >
-              <Link to="/rule-of-thumb" {...stylex.props(shell.crumbLink)}>
-                ← All rules
-              </Link>
-              {number && <span {...stylex.props(shell.crumbTag)}>No.{number}</span>}
-              <span {...stylex.props(shell.crumbTag)}>{rule.label}</span>
-            </nav>
-            <ShareButton data={share} />
-          </div>
+        {/* Spans both columns, so Share sits over the cover's right edge. */}
+        <div {...stylex.props(shell.crumbRow)}>
+          <nav
+            {...stylex.props(heroType.tag, veil.dense, shell.crumb, shell.in, shell.first)}
+            aria-label="Breadcrumb"
+          >
+            <Link to="/rule-of-thumb" {...stylex.props(shell.crumbLink)}>
+              ← All rules
+            </Link>
+            {number && <span {...stylex.props(shell.crumbTag)}>No.{number}</span>}
+            <span {...stylex.props(shell.crumbTag)}>{rule.label}</span>
+          </nav>
+          <ShareButton data={share} />
+        </div>
+        <div {...stylex.props(veil.soft, shell.heroCopy)}>
           <h1 ref={titleRef} {...stylex.props(heroType.title, shell.title)}>
             {head && (
               <>
@@ -226,7 +228,7 @@ function Landing({
                 <p {...stylex.props(lessonKit.secText)}>{quiz.intro}</p>
               </Tone>
             </div>
-            <div {...stylex.props(lessonKit.headItem, quizKit.score)}>
+            <div {...stylex.props(lessonKit.headItem, veil.dense, quizKit.score)}>
               <span>
                 {clearedCount(results)}/{levels.length} cleared
               </span>
@@ -308,7 +310,7 @@ function PagerCard({
     <Link
       to={rule.href}
       preload="intent"
-      {...stylex.props(reticle.card, reticle.aim, pager.card, direction === "Next" && pager.next)}
+      {...stylex.props(reticle.card, reticle.aim, hoverHold.lift, pager.card, direction === "Next" && pager.next)}
       style={{ "--c": colorOf(rule.label) }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
@@ -1049,7 +1051,10 @@ function useTitleFit(titleRef: RefObject<HTMLElement | null>) {
     if (!title || !column) return;
     const fit = () => {
       title.style.removeProperty("--fit");
+      // The root's break-word would split a long word instead of letting it overflow, hiding it here.
+      title.style.overflowWrap = "normal";
       const width = title.scrollWidth;
+      title.style.removeProperty("overflow-wrap");
       if (width <= column.clientWidth) return;
       const size = parseFloat(getComputedStyle(title).fontSize);
       title.style.setProperty("--fit", `${Math.floor((size * column.clientWidth) / width)}px`);
@@ -1062,56 +1067,21 @@ function useTitleFit(titleRef: RefObject<HTMLElement | null>) {
   }, [titleRef]);
 }
 
-function useTitleDock(
-  rootRef: RefObject<HTMLElement | null>,
-  titleRef: RefObject<HTMLElement | null>,
-  slot: HTMLElement | null,
-) {
-  useLayoutEffect(() => {
-    const root = rootRef.current;
+// The island trades the page's tags for its title once the heading has scrolled out of view.
+function useTitleSwap(titleRef: RefObject<HTMLElement | null>, slot: HTMLElement | null) {
+  useEffect(() => {
     const title = titleRef.current;
     const label = slot?.parentElement;
-    if (!root || !title || !slot || !label) return;
-    const flies = CSS.supports("animation-timeline: scroll()") && !reducedMotion();
-    let land = Infinity;
-
-    const dock = () => {
-      const docked = scrollY >= land;
-      root.toggleAttribute("data-docked", docked);
-      label.toggleAttribute("data-swap", docked);
-    };
-
-    const measure = () => {
-      title.style.animation = "none";
-      const from = title.getBoundingClientRect();
-      title.style.removeProperty("animation");
-      const to = compactBox(slot);
-      const end = Math.max(1, from.top + scrollY + from.height / 2 - (to.top + to.height / 2));
-      const scale =
-        parseFloat(getComputedStyle(slot).fontSize) / parseFloat(getComputedStyle(title).fontSize);
-      root.style.setProperty("--dock-end", `${end}px`);
-      root.style.setProperty("--dock-x", `${to.left - from.left}px`);
-      root.style.setProperty("--dock-k", scale.toFixed(4));
-      land = flies ? end * 0.96 : from.bottom + scrollY - to.bottom;
-      dock();
-    };
-
-    measure();
-    const resize = new ResizeObserver(measure);
-    resize.observe(title.closest("header") ?? title);
-    resize.observe(label);
-    const bar = slot.closest(".arc-bar");
-    if (bar) resize.observe(bar);
-    bar?.addEventListener("animationend", measure);
-    void document.fonts.ready.then(measure);
-    addEventListener("scroll", dock, { passive: true });
+    if (!title || !label) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry) label.toggleAttribute("data-swap", !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    observer.observe(title);
     return () => {
-      resize.disconnect();
-      bar?.removeEventListener("animationend", measure);
-      removeEventListener("scroll", dock);
-      root.removeAttribute("data-docked");
+      observer.disconnect();
+      label.removeAttribute("data-swap");
     };
-  }, [rootRef, titleRef, slot]);
+  }, [titleRef, slot]);
 }
 
 function CopyMarkdown({ url }: { url: string }) {
@@ -1174,11 +1144,6 @@ function useReveal(rootRef: RefObject<HTMLElement | null>) {
 }
 
 const enter = stylex.keyframes({ from: { opacity: 0.01, translate: "0 12px" } });
-const dockSlide = stylex.keyframes({ to: { translate: "var(--dock-x,0px) 0" } });
-const dockShrink = stylex.keyframes({
-  "90%": { opacity: 1 },
-  to: { scale: "var(--dock-k,1)", opacity: 0 },
-});
 
 const said = stylex.keyframes({ from: { opacity: 0, translate: "0 6px" } });
 const pop = stylex.keyframes({ "40%": { scale: 1.2 } });
@@ -1199,8 +1164,6 @@ const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
 const COMPACT = ':is(:root:has(.arc-bar[data-mode="compact"]) *)';
 const RULE_OPEN = ":is(html:active-view-transition-type(rule-open) *)";
-const DOCKS = "@supports (animation-timeline: scroll())";
-const MOVES = "@media (prefers-reduced-motion: no-preference)";
 const NARROW = "@media (max-width: 480px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
@@ -1228,8 +1191,10 @@ const shell = stylex.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: { default: "16px", [TINY]: "6px" },
+    gridColumn: "1 / -1",
     justifySelf: "stretch",
-    marginBottom: "8px",
+    // Stacked, the rows' gap opens for the cover; the crumbs keep closer to the title.
+    marginBottom: { default: 0, [STACKED]: "-16px" },
     opacity: { default: null, [COMPACT]: 0 },
     filter: { default: null, [COMPACT]: { default: "blur(4px)", [REDUCE]: "none" } },
     visibility: { default: null, [COMPACT]: "hidden" },
@@ -1244,12 +1209,10 @@ const shell = stylex.create({
     fontSize: "0.875rem",
     color: palette["--dim"],
     whiteSpace: "nowrap",
-    backgroundColor: palette["--veil-dense"],
-    boxShadow: palette["--veil-dense-edge"],
-    borderRadius: "12px",
     "::before": { display: "none" },
   },
   crumbLink: {
+    userSelect: "none",
     marginBlock: "-12px",
     paddingBlock: "12px",
     color: { default: null, ":hover": palette["--text"] },
@@ -1281,7 +1244,9 @@ const shell = stylex.create({
       default: "minmax(0, 1.15fr) minmax(0, 1fr)",
       [STACKED]: "minmax(0, 1fr)",
     },
-    gap: { default: "56px", [STACKED]: "40px" },
+    gridTemplateRows: { default: "auto 1fr", [STACKED]: "auto" },
+    columnGap: "56px",
+    rowGap: { default: "24px", [STACKED]: "40px" },
     alignItems: "center",
     minHeight: { default: "calc(100svh - 72px)", [STACKED]: 0 },
     paddingTop: { default: "48px", [STACKED]: "40px" },
@@ -1292,12 +1257,8 @@ const shell = stylex.create({
     gridTemplateColumns: "minmax(0, 1fr)",
     gap: "16px",
     justifyItems: "start",
-    backgroundColor: palette["--veil"],
-    boxShadow: palette["--veil-edge"],
-    borderRadius: "16px",
   },
-  // useTitleFit caps the size with --fit; useTitleDock sets --dock-x, --dock-k and --dock-end, and
-  // the heading flies onto the island's label as the page scrolls.
+  // useTitleFit caps the size with --fit.
   title: {
     width: "fit-content",
     maxWidth: "100%",
@@ -1308,32 +1269,6 @@ const shell = stylex.create({
     fontFamily: fonts["--display"],
     letterSpacing: "-0.05em",
     viewTransitionName: { default: null, [RULE_OPEN]: "rule-title" },
-    position: { default: null, [DOCKS]: { default: null, [MOVES]: "relative" } },
-    zIndex: { default: null, [DOCKS]: { default: null, [MOVES]: 41 } },
-    transformOrigin: { default: null, [DOCKS]: { default: null, [MOVES]: "0 50%" } },
-    animationName: {
-      default: null,
-      [DOCKS]: { default: null, [MOVES]: `${dockSlide}, ${dockShrink}` },
-    },
-    animationDuration: { default: null, [DOCKS]: { default: null, [MOVES]: "auto, auto" } },
-    animationTimingFunction: {
-      default: null,
-      [DOCKS]: { default: null, [MOVES]: "cubic-bezier(0.5, 0, 0.75, 0), linear" },
-    },
-    animationDelay: { default: null, [DOCKS]: { default: null, [MOVES]: "0s, 0s" } },
-    animationIterationCount: { default: null, [DOCKS]: { default: null, [MOVES]: "1, 1" } },
-    animationDirection: { default: null, [DOCKS]: { default: null, [MOVES]: "normal, normal" } },
-    animationFillMode: { default: null, [DOCKS]: { default: null, [MOVES]: "both, both" } },
-    animationPlayState: { default: null, [DOCKS]: { default: null, [MOVES]: "running, running" } },
-    animationTimeline: {
-      default: null,
-      [DOCKS]: { default: null, [MOVES]: "scroll(root), scroll(root)" },
-    },
-    animationRangeStart: { default: null, [DOCKS]: { default: null, [MOVES]: "0px" } },
-    animationRangeEnd: {
-      default: null,
-      [DOCKS]: { default: null, [MOVES]: "var(--dock-end, 100vh)" },
-    },
   },
   titleLine: {
     display: "block",
@@ -1762,9 +1697,6 @@ const quizKit = stylex.create({
     flexWrap: { default: null, [PHONE]: "wrap" },
     gap: "14px",
     alignItems: "center",
-    borderRadius: "12px",
-    backgroundColor: palette["--veil-dense"],
-    boxShadow: palette["--veil-dense-edge"],
     fontWeight: 700,
     fontSize: "13px",
     lineHeight: "normal",
@@ -2348,7 +2280,7 @@ const cover = stylex.create({
 });
 
 // The live activity this page lends the header island: a back link, a label that trades the
-// page's tags for its title once the heading docks (useTitleDock sets data-swap), and Share.
+// page's tags for its title once the heading leaves the viewport (useTitleSwap), and Share.
 const styles = stylex.create({
   activity: {
     display: "flex",
@@ -2356,6 +2288,7 @@ const styles = stylex.create({
     gap: "2px",
   },
   action: {
+    userSelect: "none",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2402,7 +2335,7 @@ const styles = stylex.create({
   },
   // A long rule title would push the island past the screen on narrow phones: the label takes what
   // is left after the back link, Share, the tools, the menu and the island's padding, and ends in an
-  // ellipsis. compactBox reads the capped width, so the title still docks onto it.
+  // ellipsis.
   label: {
     display: "grid",
     maxWidth: { default: null, [NARROW]: "calc(100vw - 206px)" },

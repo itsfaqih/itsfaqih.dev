@@ -49,8 +49,8 @@ export function Hero({ introDone }: { introDone: boolean }) {
   return (
     <div {...stylex.props(styles.root)}>
       <div {...stylex.props(veil.soft)}>
-        <div {...stylex.props(loadIn.piece, veil.dense, heroType.tag)} data-cut>
-          Full-stack engineer · Yogyakarta
+        <div {...stylex.props(loadIn.veil, veil.dense, heroType.tag)} data-cut>
+          <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Full-stack engineer · Indonesia</span>
         </div>
         <h1 data-cut {...stylex.props(loadIn.piece, heroType.title, styles.title)}>
           <span {...stylex.props(styles.line)}>I build</span>
@@ -240,6 +240,7 @@ const styles = stylex.create({
   // A mouse whose wheel rolls down, rests, and rolls again, on the button row at button height.
   // The loop rides on the wheel, since [data-cut] owns the link's animation.
   cue: {
+    userSelect: "none",
     display: "inline-flex",
     alignItems: "center",
     gap: "12px",

@@ -92,6 +92,24 @@ const PIXEL_ART = {
       "KKKKKKK",
     ],
   },
+  forbid: {
+    hot: [6.5, 6.5],
+    rows: [
+      "...KKKKKKK...",
+      "..KKFFFFFKK..",
+      ".KKFFFFFFFKK.",
+      "KKFFFKKKFFFKK",
+      "KFFFFFKKKFFFK",
+      "KFFKFFFKKKFFK",
+      "KFFKKFFFKKFFK",
+      "KFFKKKFFFKFFK",
+      "KFFFKKKFFFFFK",
+      "KKFFFKKKFFFKK",
+      ".KKFFFFFFFKK.",
+      "..KKFFFFFKK..",
+      "...KKKKKKK...",
+    ],
+  },
 } as const;
 
 type Glyph = keyof typeof PIXEL_ART;
@@ -117,6 +135,7 @@ const PATHS = {
   grab: pathsOf(PIXEL_ART.grab),
   grabbing: pathsOf(PIXEL_ART.grabbing),
   text: pathsOf(PIXEL_ART.text),
+  forbid: pathsOf(PIXEL_ART.forbid),
 } satisfies Record<Glyph, ReturnType<typeof pathsOf>>;
 
 const isGlyph = (name: string | undefined): name is Glyph => !!name && name in PIXEL_ART;
@@ -132,6 +151,7 @@ function modeOf(cursor: string): Mode {
   if (isGlyph(marker)) return marker;
   if (cursor === "pointer") return "point";
   if (cursor === "text") return "text";
+  if (cursor === "not-allowed") return "forbid";
   if (cursor === "default" || cursor === "auto" || cursor === "none") return "arrow";
   return "native";
 }
@@ -150,7 +170,7 @@ function overText(el: Element, x: number, y: number) {
   );
 }
 
-/** The site's cursor: a pixel arrow, hand or I-beam in ink over a halftone plate printed out of register. */
+/** The site's cursor: a pixel arrow, hand, I-beam or no-entry sign in ink over a halftone plate printed out of register. */
 export function PrintCursor() {
   const root = useRef<HTMLDivElement>(null);
   const plateRef = useRef<SVGGElement>(null);

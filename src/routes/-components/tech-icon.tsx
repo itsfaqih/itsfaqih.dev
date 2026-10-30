@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useId } from "react";
 import {
   siAdonisjs,
   siApache,
@@ -9,6 +9,7 @@ import {
   siBun,
   siClaudecode,
   siCss,
+  siCypress,
   siDocker,
   siDrizzle,
   siEffect,
@@ -56,6 +57,7 @@ import {
   siZod,
 } from "simple-icons";
 import { palette } from "../../theme.stylex";
+import { TECH_LOGOS } from "./tech-logos";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
 const MARKS = new Map<string, Mark>(Object.entries({
@@ -67,6 +69,7 @@ const MARKS = new Map<string, Mark>(Object.entries({
   Bun: siBun,
   "Claude Code": siClaudecode,
   CSS: siCss,
+  Cypress: siCypress,
   Docker: siDocker,
   Drizzle: siDrizzle,
   Effect: siEffect,
@@ -146,38 +149,88 @@ const PANEL = { dark: toRgb("17171f"), light: toRgb("ffffff") };
 const GRAYSCALE_MAX_SPREAD = 40;
 const NON_TEXT_MIN_CONTRAST = 3;
 
-function brandFor(hex: string, theme: keyof typeof PANEL) {
+/** A brand colour (hex without #) for a theme: greys take the text colour, and a colour short of
+ * minContrast against the panel moves away from it until it gets there. */
+export function brandFor(hex: string, theme: keyof typeof PANEL, minContrast = NON_TEXT_MIN_CONTRAST) {
   const rgb = toRgb(hex);
   const spread = Math.max(rgb.r, rgb.g, rgb.b) - Math.min(rgb.r, rgb.g, rgb.b);
   if (spread < GRAYSCALE_MAX_SPREAD) return "var(--text)";
   const toward = theme === "dark" ? 255 : 0;
   let mixed = rgb;
-  for (let t = 0; contrast(mixed, PANEL[theme]) < NON_TEXT_MIN_CONTRAST && t <= 1; t += 0.05) {
+  for (let t = 0; contrast(mixed, PANEL[theme]) < minContrast && t <= 1; t += 0.05) {
     mixed = mix(rgb, toward, t);
   }
   return toHex(mixed);
 }
 
+// The outline a badge lights up in: the logo's colours around a conic gradient, each where it sits
+// in the logo, or the one brand colour of a single-colour mark. light-dark() follows the theme.
+function ringOf(name: string, brand: { "--brand-dark": string; "--brand-light": string }) {
+  const stops = TECH_LOGOS.get(name)?.ring ?? [];
+  if (stops.length < 2) {
+    const tone = stops[0]?.[0] ?? `light-dark(${brand["--brand-light"]}, ${brand["--brand-dark"]})`;
+    return `linear-gradient(${tone}, ${tone})`;
+  }
+  const from = stops[0]?.[1] ?? 0;
+  const around = stops.map(([tone, at]) => `${tone} ${at - from}deg`);
+  return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${stops[0]?.[0]} 360deg)`;
+}
+
 const BRANDS = new Map<string, CSSProperties>(
-  [...MARKS].flatMap(([name, { hex }]) =>
-    hex
-      ? [[name, { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") }]]
-      : [],
-  ),
+  [...MARKS].flatMap(([name, { hex }]) => {
+    if (!hex) return [];
+    const brand = { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
+    return [[name, { ...brand, "--ring": ringOf(name, brand) }]];
+  }),
 );
 
 export function techBrand(name: string) {
   return BRANDS.get(name);
 }
 
-/** A tool's mark: one colour, a touch dimmer than the label. `style` lights it in context. */
+/**
+ * A tool's one-colour mark (drawn from its logo where simple-icons draws another shape), which
+ * `style` can tint, over its logo in its own colours: the logo
+ * themed by scripts/tech-logos.py, or the mark in its brand colour where there is no such logo.
+ * The colours show while an ancestor sets --lit to 1 (iconLit), and the mark fades out for them.
+ * A logo wider than it is tall (the VoidZero marks in their parentheses) widens the icon to fit.
+ */
 export function TechIcon({ name, style }: { name: string; style?: stylex.StyleXStyles }) {
+  const suffix = useId().replace(/[^\w-]/g, "");
   const mark = MARKS.get(name);
   if (!mark) return null;
+  const logo = TECH_LOGOS.get(name);
+  const path = <path d={mark.path} fillRule={mark.evenOdd ? "evenodd" : undefined} />;
+  const [, , width = 1, height = 1] = logo?.viewBox.split(" ").map(Number) ?? [];
   return (
-    <svg {...stylex.props(styles.mark, style)} viewBox={mark.viewBox ?? "0 0 24 24"} aria-hidden="true">
-      <path d={mark.path} fillRule={mark.evenOdd ? "evenodd" : undefined} />
-    </svg>
+    <span
+      {...stylex.props(icon.pair, style)}
+      style={width > height ? { "--wide": width / height } : undefined}
+      aria-hidden="true"
+    >
+      {logo?.flat ? (
+        <svg
+          {...stylex.props(icon.flat)}
+          viewBox={logo.viewBox}
+          dangerouslySetInnerHTML={{ __html: logo.flat.replaceAll("$", suffix) }}
+        />
+      ) : (
+        <svg {...stylex.props(icon.flat)} viewBox={mark.viewBox ?? "0 0 24 24"}>
+          {path}
+        </svg>
+      )}
+      {logo ? (
+        <svg
+          {...stylex.props(icon.lit)}
+          viewBox={logo.viewBox}
+          dangerouslySetInnerHTML={{ __html: logo.body.replaceAll("$", suffix) }}
+        />
+      ) : (
+        <svg {...stylex.props(icon.lit, styles.brand)} viewBox={mark.viewBox ?? "0 0 24 24"}>
+          {path}
+        </svg>
+      )}
+    </span>
   );
 }
 
@@ -190,8 +243,8 @@ const BRAND = {
 };
 
 /**
- * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, the colour the badge
- * lights up in on hover. Pair either with techBrand(name) as the inline style.
+ * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, a single-colour mark's
+ * colour. Pair either with techBrand(name) as the inline style, which also carries --ring.
  */
 export const techBadge = stylex.create({
   badge: {
@@ -204,15 +257,50 @@ export const techBadge = stylex.create({
   brand: BRAND,
 });
 
-const styles = stylex.create({
-  mark: {
+const FADE = {
+  transitionProperty: "opacity",
+  transitionDuration: "120ms",
+  transitionTimingFunction: "ease",
+};
+
+/** The two layers of a TechIcon or CompanyLogo: `flat`, the one-colour mark, and `lit`, the colours. */
+export const icon = stylex.create({
+  pair: {
     flex: "none",
-    width: "1.15em",
+    display: "inline-grid",
+    width: "calc(1.15em * var(--wide, 1))",
     height: "1.15em",
+    color: palette["--dim"],
+  },
+  flat: {
+    gridArea: "1 / 1",
+    width: "100%",
+    height: "100%",
     fill: "currentColor",
-    color: palette["--mute"],
-    transitionProperty: "color",
-    transitionDuration: "120ms",
-    transitionTimingFunction: "ease",
+    opacity: "calc(1 - var(--lit, 0))",
+    ...FADE,
+  },
+  lit: {
+    gridArea: "1 / 1",
+    width: "100%",
+    height: "100%",
+    opacity: "var(--lit, 0)",
+    ...FADE,
+  },
+});
+
+/** Lights the icons inside: set it on a badge under the pointer, focused, pressed or open. */
+export const iconLit = stylex.create({
+  on: {
+    "--lit": "1",
+  },
+  hover: {
+    "--lit": { default: null, ":hover": "1", ":focus-visible": "1" },
+  },
+});
+
+const styles = stylex.create({
+  brand: {
+    fill: `var(--brand, ${palette["--mute"]})`,
   },
 });

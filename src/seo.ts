@@ -101,7 +101,7 @@ function structuredData(page: SharedPage, url: string, image: string) {
         "@type": "Person",
         ...AUTHOR,
         worksFor: { "@type": "Organization", name: "EvidenceCare" },
-        address: { "@type": "PostalAddress", addressLocality: "Yogyakarta", addressCountry: "ID" },
+        address: { "@type": "PostalAddress", addressCountry: "ID" },
       },
     ],
   };

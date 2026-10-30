@@ -3,11 +3,12 @@ import { cursors, fonts, palette } from "../theme.stylex";
 
 /**
  * The arcade's keys: a chunky button that sits on a hard drop shadow and presses down into it.
- * Every key takes `base`, then `go` (the accent) or `soft` (a quiet panel), and `sm` for the small
- * size. A caller's own style goes last, so its values win.
+ * Every key takes `base`, then `go` (the accent), `hue` (its own --c) or `soft` (a quiet panel),
+ * and `sm` for the small size. A caller's own style goes last, so its values win.
  */
 export const button = stylex.create({
   base: {
+    userSelect: "none",
     position: "relative",
     display: "inline-flex",
     alignItems: "center",
@@ -35,6 +36,15 @@ export const button = stylex.create({
       default: `0 4px 0 ${palette["--go-shadow"]}`,
       ":active": `0 2px 0 ${palette["--go-shadow"]}`,
     },
+  },
+  hue: {
+    "--key": "color-mix(in oklab, var(--c) 62%, #000)",
+    backgroundColor: {
+      default: "var(--c)",
+      ":hover": "color-mix(in oklab, var(--c) 72%, #fff)",
+    },
+    color: "var(--on-c)",
+    boxShadow: { default: "0 4px 0 var(--key)", ":active": "0 2px 0 var(--key)" },
   },
   soft: {
     backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },

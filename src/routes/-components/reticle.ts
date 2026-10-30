@@ -16,6 +16,7 @@ const AWAY = "scale(1.08)";
  */
 export const reticle = stylex.create({
   card: {
+    userSelect: "none",
     // A lifted card sits on its key: a darker shade of its own hue.
     "--key": `color-mix(in oklab, ${HUE} ${palette["--key-mix"]}, #000)`,
     "::after": {

@@ -31,7 +31,7 @@ export const section = stylex.create({
     display: "block",
     font: `500 13px ${fonts["--display"]}`,
     letterSpacing: 0,
-    color: `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
+    color: `color-mix(in oklab, var(--c) ${palette["--eyebrow-mix"]}, #000)`,
     marginBottom: "10px",
   },
   // Its own block, so it can glitch in apart from the eyebrow above it.
@@ -45,21 +45,42 @@ export const section = stylex.create({
 });
 
 /**
- * Copy that sits straight on the dot field, with no card under it, rests on a veil: a soft patch
- * of page colour whose edge feathers out into the dots, so they never run through the words.
- * `dense` is for small text, whose thin strokes the dots break up more easily; `fit` hugs the
- * veil to the words on a block element.
+ * Copy that sits straight on the dither, with no card under it, rests on a veil: a blurred,
+ * rounded patch of page colour drawn behind the words, so the dither never runs through them.
+ * `dense` is for small text, whose thin strokes the dither breaks up more easily; `fit` hugs the
+ * veil to the words on a block element. The patch is an ::after at z-index -1, and the veil
+ * isolates so it stays above the backdrop.
  */
+const patch = {
+  content: '""',
+  position: "absolute",
+  zIndex: -1,
+  pointerEvents: "none",
+} as const;
+
 export const veil = stylex.create({
   soft: {
-    backgroundColor: palette["--veil"],
-    boxShadow: palette["--veil-edge"],
-    borderRadius: "16px",
+    position: "relative",
+    isolation: "isolate",
+    "::after": {
+      ...patch,
+      // Grows and rounds with the block, so a tall one turns into a blob rather than a card.
+      inset: "calc(-16px - 8%) calc(-20px - 8%)",
+      borderRadius: "30%",
+      backgroundColor: palette["--veil"],
+      filter: "blur(18px)",
+    },
   },
   dense: {
-    backgroundColor: palette["--veil-dense"],
-    boxShadow: palette["--veil-dense-edge"],
-    borderRadius: "12px",
+    position: "relative",
+    isolation: "isolate",
+    "::after": {
+      ...patch,
+      inset: "-12px -20px",
+      borderRadius: "999px",
+      backgroundColor: palette["--veil-dense"],
+      filter: "blur(10px)",
+    },
   },
   fit: {
     width: "fit-content",

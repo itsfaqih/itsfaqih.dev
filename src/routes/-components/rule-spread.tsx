@@ -229,25 +229,29 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
           </div>
         ))}
       </div>
-      <div {...stylex.props(loadIn.piece, styles.nav)} data-cut>
-        <span {...stylex.props(arcade.srOnly, veil.dense)} aria-live="polite">
+      <div {...stylex.props(styles.nav)}>
+        <span {...stylex.props(arcade.srOnly)} aria-live="polite">
           {rule.title}
         </span>
         <button
           type="button"
-          {...stylex.props(styles.step)}
+          {...stylex.props(loadIn.piece, styles.step)}
+          data-cut
           aria-label="Previous rule"
           disabled={active === 0}
           onClick={() => goTo(active - 1)}
         >
           ←
         </button>
-        <span {...stylex.props(veil.dense)}>
-          <SlideNumber value={active + 1} /> / {pad(rules.length)}
+        <span {...stylex.props(loadIn.veil, veil.dense)} data-cut>
+          <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+            <SlideNumber value={active + 1} /> / {pad(rules.length)}
+          </span>
         </span>
         <button
           type="button"
-          {...stylex.props(styles.step)}
+          {...stylex.props(loadIn.piece, styles.step)}
+          data-cut
           aria-label="Next rule"
           disabled={active === last}
           onClick={() => goTo(active + 1)}
@@ -453,8 +457,9 @@ const styles = stylex.create({
     borderWidth: "2px",
     borderStyle: "solid",
     borderColor: { default: palette["--hair"], ":hover:not(:disabled)": palette["--hair-hover"] },
-    backgroundColor: palette["--panel"],
-    color: palette["--text"],
+    // Disabled at either end, the key goes gray and flat rather than see-through.
+    backgroundColor: { default: palette["--panel"], ":disabled": palette["--panel-2"] },
+    color: { default: palette["--text"], ":disabled": palette["--mute"] },
     fontWeight: 700,
     fontSize: "16px",
     lineHeight: "normal",
@@ -464,19 +469,19 @@ const styles = stylex.create({
     boxShadow: {
       default: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
       ":active:not(:disabled)": `${palette["--raise"]}, 0 1px 0 ${palette["--drop-ink"]}`,
+      ":disabled": `0 3px 0 ${palette["--drop-ink"]}`,
     },
     transform: { default: null, ":active:not(:disabled)": "translateY(2px)" },
-    opacity: { default: null, ":disabled": 0.35 },
-    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor"] },
+    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     outlineWidth: { default: null, ":focus-visible": "3px" },
     outlineStyle: { default: null, ":focus-visible": "solid" },
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "2px" },
-    transitionProperty: "transform, box-shadow, border-color, opacity",
-    transitionDuration: "100ms, 100ms, 120ms, 120ms",
-    transitionTimingFunction: "ease, ease, ease, ease",
-    transitionDelay: "0s, 0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal, normal",
+    transitionProperty: "transform, box-shadow, border-color, background-color, color",
+    transitionDuration: "100ms, 100ms, 120ms, 120ms, 120ms",
+    transitionTimingFunction: "ease, ease, ease, ease, ease",
+    transitionDelay: "0s, 0s, 0s, 0s, 0s",
+    transitionBehavior: "normal, normal, normal, normal, normal",
   },
 });
 

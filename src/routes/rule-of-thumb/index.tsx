@@ -34,14 +34,16 @@ function RuleOfThumbsIndex() {
       <Backdrop />
       <div {...stylex.props(arcade.wrap)}>
         <div {...stylex.props(styles.head)}>
-          <div {...stylex.props(loadIn.piece, veil.dense, veil.fit, heroType.tag)} data-cut>
-            {RULES.length} rules · {TOPICS.length} topics
+          <div {...stylex.props(loadIn.veil, veil.dense, veil.fit, heroType.tag)} data-cut>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              {RULES.length} rules · {TOPICS.length} topics
+            </span>
           </div>
-          <h1 data-cut {...stylex.props(loadIn.piece, veil.soft, veil.fit, heroType.title, styles.title)}>
-            Rule of Thumb
+          <h1 data-cut {...stylex.props(loadIn.veil, veil.soft, veil.fit, heroType.title, styles.title)}>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Rule of Thumb</span>
           </h1>
-          <p data-cut {...stylex.props(loadIn.piece, veil.soft, veil.fit, styles.lede)}>
-            {LEDE}
+          <p data-cut {...stylex.props(loadIn.veil, veil.soft, veil.fit, styles.lede)}>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>{LEDE}</span>
           </p>
         </div>
         <div {...stylex.props(styles.body)}>

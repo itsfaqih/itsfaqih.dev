@@ -9,6 +9,7 @@ const REVEAL_PX = 32;
 const LINGER_MS = 900;
 const MIN_THUMB_PX = 40;
 const PAGE_SHARE = 0.9;
+const EYEBROW_LINE = 0.6;
 
 export function PageScrollbar() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -40,12 +41,26 @@ export function PageScrollbar() {
       thumb.style.height = `${thumbHeight}px`;
       thumb.style.transform = `translateY(${thumbTop}px)`;
 
-      const middle = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
-      const host = middle?.closest<HTMLElement>("[style*='--c']");
+      const host = hueHost();
       const hue = host && getComputedStyle(host).getPropertyValue("--c").trim();
       const gold = getComputedStyle(html).getPropertyValue("--go").trim();
       track.style.setProperty("--sb-hue", hue && hue !== gold ? hue : "var(--go)");
       track.toggleAttribute("data-gold", !hue || hue === gold);
+    };
+    // A page with section eyebrows takes the hue of the section being read: the last eyebrow above
+    // the screen's lower part, or the last on screen once the page bottoms out. Other pages take the
+    // hue of what sits mid-screen.
+    const hueHost = () => {
+      const eyebrows = document.querySelectorAll<HTMLElement>("[data-eyebrow]");
+      if (!eyebrows.length) {
+        const middle = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+        return middle?.closest<HTMLElement>("[style*='--c']");
+      }
+      const line = scrollY >= travel() - 1 ? innerHeight : innerHeight * EYEBROW_LINE;
+      let current: HTMLElement | null = null;
+      for (const eyebrow of eyebrows)
+        if (eyebrow.getBoundingClientRect().top < line) current = eyebrow;
+      return current;
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(layout);
@@ -143,7 +158,7 @@ export function PageScrollbar() {
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-// One bar in the hue of what sits mid-screen, no track, shown while scrolling or within reach.
+// One bar in the hue of the section being read, no track, shown while scrolling or within reach.
 // The handlers above set data-shown, data-gold and data-dragging on the track.
 const styles = stylex.create({
   track: {
@@ -169,7 +184,7 @@ const styles = stylex.create({
       [stylex.when.ancestor(":is([data-shown]:hover, [data-dragging])")]: "5px",
     },
     backgroundColor: {
-      default: `color-mix(in oklab, var(--sb-hue) ${palette["--ink-mix"]}, #000)`,
+      default: `color-mix(in oklab, var(--sb-hue) ${palette["--eyebrow-mix"]}, #000)`,
       [stylex.when.ancestor("[data-gold]")]: palette["--go-ink"],
       "@media (forced-colors: active)": {
         default: "CanvasText",

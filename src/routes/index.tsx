@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
-import { SLIDES } from "../data/home";
+import { SHOW_PROJECTS, SLIDES } from "../data/home";
 import { Backdrop } from "./-components/backdrop";
 import { ExperienceList, type Job } from "./-components/experience-list";
 import { Hero } from "./-components/hero/hero";
@@ -16,6 +16,7 @@ import { LINKS, pageHead } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
 import { button } from "../components/button";
 import { section, veil } from "./-components/section";
+import { hoverHold } from "../components/hover-hold";
 import { loadIn } from "../components/load-in";
 import { arcade } from "../components/arcade";
 
@@ -24,9 +25,9 @@ export const Route = createFileRoute("/")({
   head: () =>
     pageHead({
       path: "/",
-      title: "Faqih Muntashir · Full-Stack Engineer in Yogyakarta",
+      title: "Faqih Muntashir · Full-Stack Engineer in Indonesia",
       description:
-        "Full-stack engineer in Yogyakarta with 5+ years on web products: frontends, backends, and agent tooling. Now building healthcare software at EvidenceCare.",
+        "Full-stack engineer in Indonesia with 5+ years on web products: frontends, backends, and agent tooling. Now building healthcare software at EvidenceCare.",
       type: "website",
     }),
 });
@@ -214,7 +215,7 @@ const STACK_GROUPS: StackGroup[] = [
   },
   {
     label: "Testing and quality",
-    tools: ["Vitest", "Jest", "Playwright", "MSW", "Storybook", "Biome", "Oxlint", "Oxfmt"],
+    tools: ["Vitest", "Jest", "Playwright", "Cypress", "MSW", "Storybook", "Biome", "Oxlint", "Oxfmt"],
   },
   {
     label: "DevOps and infrastructure",
@@ -239,7 +240,7 @@ const STACK_GROUPS: StackGroup[] = [
   { label: "Email and templating", tools: ["Mailjet", "Maizzle", "EJS"] },
   {
     label: "AI tools",
-    tools: ["Claude Code", "OpenAI Codex", "OpenCode", "OpenRouter", "Hermes"],
+    tools: ["Claude Code", "OpenAI Codex", "OpenCode", "T3 Code", "OpenRouter", "Hermes"],
   },
 ];
 
@@ -248,7 +249,7 @@ const STACK_SOURCES = [
     use: { kind: "work" as const, name: job.company, detail: `${job.role} · ${job.years}` },
     stack: job.stack,
   })),
-  ...[...PROJECTS, THIS_SITE].map((project) => ({
+  ...(SHOW_PROJECTS ? [...PROJECTS, THIS_SITE] : []).map((project) => ({
     use: { kind: "project" as const, name: project.title, detail: project.summary },
     stack: project.stack,
   })),
@@ -264,7 +265,7 @@ function Index() {
 
   return (
     <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>
-      <Backdrop />
+      <Backdrop aurora />
       <Intro onDone={setIntroDone} />
 
       <div {...stylex.props(arcade.wrap)}>
@@ -285,12 +286,14 @@ function Index() {
         <section id="rules" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--cw)" }}>
-                Writing
+              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--cw)" }}>
+                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Writing</span>
               </small>
               <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Rule of Thumb</span>
             </h2>
-            <p {...stylex.props(loadIn.piece, section.blurb, veil.dense)} data-cut>Opinions I've earned from my experience</p>
+            <p {...stylex.props(loadIn.veil, section.blurb, veil.dense)} data-cut>
+              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Opinions I've earned from my experience</span>
+            </p>
           </div>
           <RuleSpread rules={VISIBLE_GUIDELINES} />
         </section>
@@ -298,8 +301,8 @@ function Index() {
         <section id="work" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ux)" }}>
-                Experience
+              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ux)" }}>
+                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Experience</span>
               </small>
               <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Where I've worked</span>
             </h2>
@@ -309,11 +312,11 @@ function Index() {
 
         <StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />
 
-        <section id="projects" {...stylex.props(section.block)}>
+        {SHOW_PROJECTS && <section id="projects" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ts)" }}>
-                Side projects
+              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ts-deep)" }}>
+                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Side projects</span>
               </small>
               <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Projects</span>
             </h2>
@@ -322,7 +325,7 @@ function Index() {
             {PROJECTS.map((project) => (
               <a
                 key={project.title}
-                {...stylex.props(loadIn.piece, reticle.card, reticle.aim, styles.project)}
+                {...stylex.props(loadIn.piece, reticle.card, reticle.aim, hoverHold.lift, styles.project)}
                 data-cut
                 href={project.href}
                 target="_blank"
@@ -335,17 +338,17 @@ function Index() {
               </a>
             ))}
           </div>
-        </section>
+        </section>}
 
         <div id="contact" {...stylex.props(loadIn.piece, styles.contact)} data-cut>
           <h2 {...stylex.props(section.title)}>
-            <small {...stylex.props(loadIn.piece, section.eyebrow)} data-cut style={{ "--c": "var(--ax)" }}>
+            <small {...stylex.props(loadIn.piece, section.eyebrow)} data-cut data-eyebrow style={{ "--c": "var(--ax)" }}>
               Contact
             </small>
             <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Ready to bring the next level of care to your product?</span>
           </h2>
           <div {...stylex.props(loadIn.piece, heroType.acts)} data-cut style={{ marginTop: 24 }}>
-            <a {...stylex.props(button.base, button.go)} href={`mailto:${LINKS.email}`}>
+            <a {...stylex.props(button.base, button.hue)} href={`mailto:${LINKS.email}`}>
               {`Email ${LINKS.email}`}
             </a>
             <a
@@ -359,29 +362,33 @@ function Index() {
           </div>
         </div>
 
-        <footer {...stylex.props(loadIn.piece, styles.footer)} data-cut>
-          <span {...stylex.props(veil.dense)}>© 2026 Faqih Muntashir</span>
-          <span {...stylex.props(veil.dense)}>
-            <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
-              GitHub
-            </a>{" "}
-            ·{" "}
-            <a
-              {...stylex.props(styles.footerLink)}
-              href={LINKS.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              LinkedIn
-            </a>{" "}
-            ·{" "}
-            <a {...stylex.props(styles.footerLink)} href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
-              Dribbble
-            </a>{" "}
-            ·{" "}
-            <a {...stylex.props(styles.footerLink)} href="https://medium.com/@itsfaqih" target="_blank" rel="noopener noreferrer">
-              Medium
-            </a>
+        <footer {...stylex.props(styles.footer)}>
+          <span {...stylex.props(loadIn.veil, veil.dense)} data-cut>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>© 2026 Faqih Muntashir</span>
+          </span>
+          <span {...stylex.props(loadIn.veil, veil.dense)} data-cut>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
+                GitHub
+              </a>{" "}
+              ·{" "}
+              <a
+                {...stylex.props(styles.footerLink)}
+                href={LINKS.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                LinkedIn
+              </a>{" "}
+              ·{" "}
+              <a {...stylex.props(styles.footerLink)} href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
+                Dribbble
+              </a>{" "}
+              ·{" "}
+              <a {...stylex.props(styles.footerLink)} href="https://medium.com/@itsfaqih" target="_blank" rel="noopener noreferrer">
+                Medium
+              </a>
+            </span>
           </span>
         </footer>
       </div>
@@ -478,7 +485,9 @@ const styles = stylex.create({
     margin: 0,
     fontSize: "14px",
   },
+  // Purple, the hue of its eyebrow; the email key inherits it as --c.
   contact: {
+    "--c": palette["--ax"],
     marginTop: "24px",
     marginInline: 0,
     marginBottom: "48px",
@@ -487,8 +496,8 @@ const styles = stylex.create({
     backgroundColor: palette["--panel"],
     borderWidth: "2px",
     borderStyle: "solid",
-    borderColor: palette["--go"],
-    boxShadow: `${palette["--raise"]}, 0 5px 0 ${palette["--go-shadow"]}`,
+    borderColor: "var(--c)",
+    boxShadow: `${palette["--raise"]}, 0 5px 0 color-mix(in oklab, var(--c) 62%, #000)`,
   },
   footer: {
     fontSize: "13px",

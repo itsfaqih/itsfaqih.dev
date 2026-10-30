@@ -6,7 +6,7 @@ const HUES = [
   ["#e0389f", "#ff6ad5"],
   ["#e38a00", "#ffb02e"],
   ["#2aa816", "#7dff6a"],
-  ["#7650ee", "#9d7bff"],
+  ["#815efc", "#bca2ff"],
 ] as const;
 const STEP_MS = 2000;
 

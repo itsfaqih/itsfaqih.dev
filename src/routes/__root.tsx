@@ -42,7 +42,12 @@ export const Route = createRootRoute({
     ],
     scripts:
       process.env.NODE_ENV === "development"
-        ? [{ src: "//unpkg.com/react-grab/dist/index.global.js", crossOrigin: "anonymous" }]
+        ? [
+            { src: "//unpkg.com/react-grab/dist/index.global.js", crossOrigin: "anonymous" },
+            // Re-fetches /virtual:stylex.css whenever a newly transformed module (a lazily
+            // loaded route, an HMR edit) adds rules; without it the sheet stays as first served.
+            { type: "module", src: "/@id/virtual:stylex:css-only" },
+          ]
         : [],
   }),
 

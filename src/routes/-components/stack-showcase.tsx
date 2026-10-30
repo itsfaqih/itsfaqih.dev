@@ -12,8 +12,10 @@ import {
 } from "react";
 import { fonts, motion, palette } from "../../theme.stylex";
 import { chips } from "./chips";
-import { TechIcon, techBadge, techBrand } from "./tech-icon";
+import { CompanyLogo, ringOf } from "./company-logo";
+import { iconLit, TechIcon, techBadge, techBrand } from "./tech-icon";
 import { section, veil } from "./section";
+import { hoverHold } from "../../components/hover-hold";
 import { loadIn } from "../../components/load-in";
 
 export type StackGroup = { label: string; tools: string[] };
@@ -42,6 +44,9 @@ export function StackShowcase({
 }) {
   const [peek, setPeek] = useState<Peek | null>(null);
   const [usedAt, setUsedAt] = useState<string | null>(null);
+  // The groups glitch in once, on first sight. After the first filter, badges and groups that
+  // come back slide in instead (FILTER_MOTION), so they drop their cut-in.
+  const [filtered, setFiltered] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const hideTimer = useRef(0);
@@ -64,6 +69,7 @@ export function StackShowcase({
     startTransition(() => {
       addTransitionType(STACK_FILTER);
       setUsedAt(name);
+      setFiltered(true);
     });
   };
   const placesOf = (kind: StackUse["kind"]) =>
@@ -88,8 +94,8 @@ export function StackShowcase({
     <section ref={sectionRef} id="stack" {...stylex.props(section.block, styles.section)}>
       <div {...stylex.props(section.head)}>
         <h2 {...stylex.props(section.title, veil.soft)}>
-          <small {...stylex.props(loadIn.piece, section.eyebrow, veil.dense, veil.fit)} data-cut style={{ "--c": "var(--ar)" }}>
-            Tools I use
+          <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ar)" }}>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Tools I use</span>
           </small>
           <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Stack</span>
         </h2>
@@ -113,10 +119,10 @@ export function StackShowcase({
             </button>
           </div>
         </div>
-        {FILTER_ROWS.map((row) => (
+        {FILTER_ROWS.filter((row) => placesOf(row.kind).length > 0).map((row) => (
           <div key={row.kind} {...stylex.props(styles.row)}>
-            <h3 {...stylex.props(loadIn.piece, veil.dense, styles.rowLabel)} data-cut>
-              {row.label}
+            <h3 {...stylex.props(loadIn.veil, veil.dense, styles.rowLabel)} data-cut>
+              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>{row.label}</span>
             </h3>
             <div
               {...stylex.props(chips.group, styles.chips)}
@@ -127,13 +133,17 @@ export function StackShowcase({
                 <button
                   key={name}
                   type="button"
-                  {...stylex.props(loadIn.piece, chips.chip)}
+                  {...stylex.props(loadIn.piece, chips.chip, row.kind === "work" && styles.ringChip)}
                   data-cut
                   aria-pressed={usedAt === name}
-                  style={{ "--c": row.color }}
+                  style={{ "--c": row.color, ...(row.kind === "work" ? ringOf(name) : undefined) }}
                   onClick={() => pick(usedAt === name ? null : name)}
                 >
-                  <i {...stylex.props(chips.dot)} />
+                  {row.kind === "work" ? (
+                    <CompanyLogo name={name} style={styles.chipLogo} />
+                  ) : (
+                    <i {...stylex.props(chips.dot)} />
+                  )}
                   {name}
                   <b {...stylex.props(chips.count, usedAt === name && chips.countOn)}>
                     {allTools.filter((tool) => isUsedAt(tool, name)).length}
@@ -149,15 +159,17 @@ export function StackShowcase({
         {shownGroups.map((group) => (
           <ViewTransition key={group.label} {...FILTER_MOTION}>
             <div {...stylex.props(styles.group)}>
-              <h3 {...stylex.props(loadIn.piece, veil.dense, styles.groupLabel)} data-cut>
-                {group.label}
+              <h3 {...stylex.props(!filtered && loadIn.veil, veil.dense, styles.groupLabel)} data-cut={!filtered || undefined}>
+                <span {...stylex.props(!filtered && loadIn.piece, loadIn.words)} data-cut={!filtered || undefined}>
+                  {group.label}
+                </span>
               </h3>
               <ul {...stylex.props(styles.tools)}>
                 {group.tools.map((tool) => (
                   <ViewTransition key={tool} {...FILTER_MOTION}>
                     <li
-                      {...stylex.props(loadIn.piece, techBadge.badge, styles.tool)}
-                      data-cut
+                      {...stylex.props(!filtered && loadIn.piece, techBadge.badge, iconLit.hover, hoverHold.lift, styles.tool)}
+                      data-cut={!filtered || undefined}
                       tabIndex={0}
                       aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
                       style={techBrand(tool)}
@@ -167,7 +179,7 @@ export function StackShowcase({
                       onBlur={hide}
                       onKeyDown={(event) => event.key === "Escape" && event.currentTarget.blur()}
                     >
-                      <TechIcon name={tool} style={styles.toolMark} />
+                      <TechIcon name={tool} />
                       {tool}
                     </li>
                   </ViewTransition>
@@ -183,11 +195,11 @@ export function StackShowcase({
           ref={cardRef}
           id={PEEK_ID}
           role="tooltip"
-          {...stylex.props(techBadge.brand, styles.peek)}
+          {...stylex.props(techBadge.brand, iconLit.on, styles.peek)}
           style={techBrand(peek.tool)}
         >
           <header {...stylex.props(styles.peekHead)}>
-            <TechIcon name={peek.tool} style={styles.peekMark} />
+            <TechIcon name={peek.tool} />
             {peek.tool}
             <small {...stylex.props(styles.peekGroup)}>{groupOf(peek.tool)}</small>
           </header>
@@ -204,6 +216,7 @@ export function StackShowcase({
 
 const FILTER_MOTION = {
   default: "none",
+  enter: { [STACK_FILTER]: "stack-in", default: "none" },
   update: { [STACK_FILTER]: "stack-move", default: "none" },
   exit: { [STACK_FILTER]: "stack-out", default: "none" },
 } as const;
@@ -248,6 +261,11 @@ function usePlaceCard(
 }
 
 const STACKED = "@media (max-width: 960px)";
+const LIGHT = ":is(.light *)";
+// The panel over a tool's --ring (from techBrand), which shows in the border; a tool with no brand
+// colour gets the hairline.
+const TOOL_RING = `linear-gradient(${palette["--panel"]}, ${palette["--panel"]}), var(--ring, linear-gradient(${palette["--hair"]}, ${palette["--hair"]}))`;
+const WASH = `color-mix(in srgb, ${palette["--panel"]} 86%, transparent)`;
 
 const peekIn = stylex.keyframes({
   from: { opacity: 0, transform: "scale(0.96)" },
@@ -279,6 +297,23 @@ const styles = stylex.create({
   chips: {
     marginBottom: "8px",
   },
+  chipLogo: {
+    width: "16px",
+    height: "16px",
+  },
+  // A pressed company chip takes its logo's colours (ringOf): the ring on its rim, and a wash of
+  // the same ring inside, over the panel. Its logo lights while pressed or under the pointer.
+  ringChip: {
+    "--lit": { default: null, ":hover": "1", ":focus-visible": "1", ':is([aria-pressed="true"])': "1" },
+    "--ring": { default: "var(--ring-dark)", [LIGHT]: "var(--ring-light)" },
+    borderColor: { default: palette["--hair"], ':is([aria-pressed="true"])': "transparent" },
+    backgroundImage: {
+      default: null,
+      ':is([aria-pressed="true"])': `linear-gradient(${WASH}, ${WASH}), var(--ring), var(--ring)`,
+    },
+    backgroundClip: "padding-box, padding-box, border-box",
+    backgroundOrigin: "border-box",
+  },
   groups: {
     borderTopWidth: "2px",
     borderTopStyle: "solid",
@@ -309,21 +344,23 @@ const styles = stylex.create({
     padding: 0,
     listStyle: "none",
   },
-  // A [data-cut] piece: hover and focus key on pseudo-classes, so its class list never changes.
+  // Hover and focus key on pseudo-classes, so a [data-cut] badge's class list never changes
+  // while its cut-in plays.
   tool: {
     paddingTop: "8px",
     paddingRight: "14px",
     paddingBottom: "8px",
     paddingLeft: "11px",
     borderRadius: "999px",
-    backgroundColor: palette["--panel"],
     borderWidth: "2px",
     borderStyle: "solid",
-    borderColor: {
-      default: palette["--hair"],
-      ":hover": "var(--brand)",
-      ":focus-visible": "var(--brand)",
-    },
+    backgroundColor: palette["--panel"],
+    // Under the pointer and keyboard focus the hairline gives way to the logo's ring. The ring is
+    // drawn only then: under the hairline, its colour would fringe the rounded edge.
+    borderColor: { default: palette["--hair"], ":hover": "transparent", ":focus-visible": "transparent" },
+    backgroundImage: { default: null, ":hover": TOOL_RING, ":focus-visible": TOOL_RING },
+    backgroundClip: "padding-box, border-box",
+    backgroundOrigin: "border-box",
     font: `500 13px ${fonts["--display"]}`,
     color: palette["--text"],
     transform: { default: null, ":hover": "translateY(-3px)", ":focus-visible": "translateY(-3px)" },
@@ -335,10 +372,6 @@ const styles = stylex.create({
     transitionDelay: "0s, 0s",
     transitionBehavior: "normal, normal",
   },
-  // A badge lights its mark in its tool's own colour under the pointer and keyboard focus.
-  toolMark: {
-    color: { default: palette["--mute"], ":is(:hover > *, :focus-visible > *)": "var(--brand)" },
-  },
   // The card that peeks out of a badge, placed above it or below by usePlaceCard.
   peek: {
     position: "absolute",
@@ -348,10 +381,12 @@ const styles = stylex.create({
     paddingInline: "16px",
     paddingBottom: "16px",
     borderRadius: "16px",
-    backgroundColor: palette["--panel"],
     borderWidth: "2px",
     borderStyle: "solid",
-    borderColor: "var(--brand)",
+    borderColor: "transparent",
+    backgroundImage: TOOL_RING,
+    backgroundClip: "padding-box, border-box",
+    backgroundOrigin: "border-box",
     boxShadow: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
     pointerEvents: "none",
     transformOrigin: {
@@ -370,9 +405,6 @@ const styles = stylex.create({
     gap: "2px 8px",
     font: `700 15px ${fonts["--display"]}`,
     color: palette["--text"],
-  },
-  peekMark: {
-    color: "var(--brand)",
   },
   peekGroup: {
     flexBasis: "100%",

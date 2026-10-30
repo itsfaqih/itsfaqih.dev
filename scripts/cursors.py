@@ -88,6 +88,22 @@ KFFFFFK
 KKKKKKK
 """
 
+FORBID = """
+...KKKKKKK...
+..KKFFFFFKK..
+.KKFFFFFFFKK.
+KKFFFKKKFFFKK
+KFFFFFKKKFFFK
+KFFKFFFKKKFFK
+KFFKKFFFKKFFK
+KFFKKKFFFKFFK
+KFFFKKKFFFFFK
+KKFFFKKKFFFKK
+.KKFFFFFFFKK.
+..KKFFFFFKK..
+...KKKKKKK...
+"""
+
 
 def rects(rows: list[str], keep: str) -> str:
     return "".join(
@@ -113,5 +129,5 @@ def svg(art: str) -> str:
 
 out = Path(__file__).resolve().parent.parent / "public" / "cursors"
 out.mkdir(exist_ok=True)
-for name, art in {"arrow": ARROW, "point": POINT, "grab": GRAB, "grabbing": GRABBING, "text": TEXT}.items():
+for name, art in {"arrow": ARROW, "point": POINT, "grab": GRAB, "grabbing": GRABBING, "text": TEXT, "forbid": FORBID}.items():
     (out / f"{name}.svg").write_text(svg(art))

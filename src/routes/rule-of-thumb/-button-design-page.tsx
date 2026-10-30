@@ -2,6 +2,7 @@ import {
   ArrowRightIcon,
   CheckIcon,
   CircleNotchIcon,
+  BellIcon,
   GearSixIcon,
   PlusIcon,
 } from "@phosphor-icons/react";
@@ -150,6 +151,8 @@ const styles = stylex.create({
     paddingLeft: { default: "16px", [PHONE]: "8px" },
     borderRadius: "12px",
     backgroundColor: `color-mix(in srgb, ${palette["--panel-2"]} 60%, transparent)`,
+    // Pictures of buttons, so their labels select no more than a real button's do.
+    userSelect: "none",
   },
   specimen: {
     display: "grid",
@@ -294,7 +297,7 @@ const styles = stylex.create({
     "--face": palette["--panel-2"],
     boxShadow: `0 4px 0 ${palette["--drop-ink"]}`,
     color: palette["--dim"],
-    cursor: "not-allowed",
+    cursor: cursors["--cursor-forbid"],
   },
   faded: {
     opacity: 0.35,
@@ -458,6 +461,8 @@ const styles = stylex.create({
     gap: "14px",
     justifyContent: "center",
     alignItems: "center",
+    // Room for the rulers under the keys.
+    paddingBottom: "26px",
   },
   lead: {
     "--pl": "12px",
@@ -468,18 +473,6 @@ const styles = stylex.create({
   even: {
     "--pl": "16px",
     "--pr": "16px",
-    display: "inline-block",
-    lineHeight: "38px",
-  },
-  evenIcon: {
-    display: "inline",
-    verticalAlign: "baseline",
-  },
-  evenLeadIcon: {
-    marginRight: "8px",
-  },
-  evenTrailIcon: {
-    marginLeft: "8px",
   },
   square: {
     "--pl": "0px",
@@ -489,6 +482,45 @@ const styles = stylex.create({
   wide: {
     "--pl": "18px",
     "--pr": "18px",
+  },
+  dims: {
+    position: "absolute",
+    top: "calc(100% + 10px)",
+    right: 0,
+    left: 0,
+    fontWeight: 500,
+    fontSize: "10px",
+    lineHeight: 1,
+    fontFamily: fonts["--mono"],
+    color: palette["--focus"],
+    pointerEvents: "none",
+    userSelect: "none",
+  },
+  // A dimension line: a tick at each end joined by a rule, with its length under it.
+  dim: {
+    position: "absolute",
+    top: 0,
+    display: "flex",
+    justifyContent: "center",
+    paddingTop: "11px",
+    whiteSpace: "nowrap",
+    backgroundImage:
+      "linear-gradient(currentcolor, currentcolor), linear-gradient(currentcolor, currentcolor), linear-gradient(currentcolor, currentcolor)",
+    backgroundPosition: "left top, right top, 0 3px",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "1px 7px, 1px 7px, 100% 1px",
+  },
+  dimLeft: {
+    left: 0,
+    width: "var(--pl)",
+  },
+  dimRight: {
+    right: 0,
+    width: "var(--pr)",
+  },
+  dimAll: {
+    right: 0,
+    left: 0,
   },
   pads: {
     "::before": {
@@ -896,51 +928,79 @@ function DeleteDemo({ careful }: { careful: boolean }) {
   );
 }
 
+/** Dimension lines under a key: its two paddings, or its whole width. */
+function Ruler({ pads, width }: { pads?: [left: number, right: number]; width?: number }) {
+  return (
+    <span aria-hidden="true" {...stylex.props(styles.dims)}>
+      {pads ? (
+        <>
+          <span {...stylex.props(styles.dim, styles.dimLeft)}>{pads[0]}</span>
+          <span {...stylex.props(styles.dim, styles.dimRight)}>{pads[1]}</span>
+        </>
+      ) : (
+        <span {...stylex.props(styles.dim, styles.dimAll)}>{width}</span>
+      )}
+    </span>
+  );
+}
+
 function IconsDemo({ careful }: { careful: boolean }) {
-  const tipId = useId();
   const key = [styles.key, styles.sm, styles.live];
   const pad = [styles.pads, !careful && styles.even];
-  const icon = [styles.icon, !careful && styles.evenIcon];
+  const near = careful ? 12 : 16;
   return (
     <div {...stylex.props(styles.stage, styles.icons)}>
       <button type="button" {...stylex.props(key, styles.tint, styles.lead, pad)} data-pad="lead">
-        <PlusIcon
-          weight="bold"
-          aria-hidden="true"
-          {...stylex.props(icon, !careful && styles.evenLeadIcon)}
-        />
+        <PlusIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
         New project
+        <Ruler pads={[near, 16]} />
       </button>
       <button type="button" {...stylex.props(key, styles.trail, pad)} data-pad="trail">
         Continue
-        <ArrowRightIcon
-          weight="bold"
-          aria-hidden="true"
-          {...stylex.props(icon, !careful && styles.evenTrailIcon)}
-        />
+        <ArrowRightIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
+        <Ruler pads={[16, near]} />
       </button>
-      {careful ? (
-        <span {...stylex.props(styles.tip)}>
-          <button
-            type="button"
-            {...stylex.props(key, styles.plain, styles.square, stylex.defaultMarker())}
-            aria-label="Settings"
-            aria-describedby={tipId}
-          >
-            <GearSixIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
-          </button>
-          <span role="tooltip" id={tipId} {...stylex.props(styles.tooltip)}>
-            Settings
+    </div>
+  );
+}
+
+const TOOLS = [
+  { label: "Settings", Icon: GearSixIcon },
+  { label: "Notifications", Icon: BellIcon },
+];
+
+function IconKeysDemo({ careful }: { careful: boolean }) {
+  const tipId = useId();
+  const key = [styles.key, styles.sm, styles.live, styles.plain];
+  return (
+    <div {...stylex.props(styles.stage, styles.icons)}>
+      {TOOLS.map(({ label, Icon }) =>
+        careful ? (
+          <span key={label} {...stylex.props(styles.tip)}>
+            <button
+              type="button"
+              {...stylex.props(key, styles.square, stylex.defaultMarker())}
+              aria-label={label}
+              aria-describedby={`${tipId}-${label}`}
+            >
+              <Icon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
+              <Ruler width={38} />
+            </button>
+            <span role="tooltip" id={`${tipId}-${label}`} {...stylex.props(styles.tooltip)}>
+              {label}
+            </span>
           </span>
-        </span>
-      ) : (
-        <button
-          type="button"
-          {...stylex.props(key, styles.plain, styles.wide)}
-          aria-label="Settings"
-        >
-          <GearSixIcon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
-        </button>
+        ) : (
+          <button
+            key={label}
+            type="button"
+            {...stylex.props(key, styles.wide)}
+            aria-label={label}
+          >
+            <Icon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
+            <Ruler width={52} />
+          </button>
+        ),
       )}
     </div>
   );
@@ -1049,21 +1109,41 @@ const LESSONS: Lesson[] = [
     title: "Pad the icon side less",
     body: (
       <>
-        An icon carries white space inside its own box, so equal padding looks lopsided. Take 4px
-        off the icon's side and centre it on the text. An icon with no label is square, and needs an{" "}
-        <Code>aria-label</Code> and a tooltip.
+        An icon carries white space inside its own box, so equal padding makes its side look
+        wider. Take 4px off the icon's side and the space around the content looks even.
       </>
     ),
     extra: <LessonToggle label="Show padding" name="pads" />,
     bad: {
       label: "Even padding",
-      costs: ["16 | 16px", "icon 4px up", "no tooltip"],
+      costs: ["16 | 16px", "icon side looks wider"],
       view: <IconsDemo careful={false} />,
     },
     good: {
       label: "Optical padding",
-      costs: ["12 | 16px", "centred", "38 × 38"],
+      costs: ["12 | 16px", "looks even"],
       view: <IconsDemo careful />,
+    },
+  },
+  {
+    title: "Fix the size of an icon-only button",
+    body: (
+      <>
+        With no label, padding decides the size, so the button comes out wider than it is tall and
+        changes with every icon. Give it a fixed width and height, the same as its neighbours, and
+        centre the icon. With no text to read, it also needs an <Code>aria-label</Code> and a
+        tooltip.
+      </>
+    ),
+    bad: {
+      label: "Sized by padding",
+      costs: ["52 × 38", "no tooltip"],
+      view: <IconKeysDemo careful={false} />,
+    },
+    good: {
+      label: "Fixed square",
+      costs: ["38 × 38", "aria-label + tooltip"],
+      view: <IconKeysDemo careful />,
     },
   },
 ];
@@ -1075,7 +1155,7 @@ const CHEAT_SHEET = [
   ["Picking a variant", "One filled per screen, tinted to support, text to skip"],
   ["It deletes something", "Red, behind a confirm that names what goes"],
   ["An icon beside the label", "4px less padding on the icon's side"],
-  ["An icon with no label", "Square, with an aria-label and a tooltip"],
+  ["An icon with no label", "A fixed square, with an aria-label and a tooltip"],
 ] as const;
 
 const LEVELS: Level[] = [
@@ -1295,7 +1375,7 @@ export function ButtonDesign() {
     <RuleLanding
       lead={
         <>
-          Six buttons, each built the quick way and the careful way, side by side and live. Hover
+          Seven buttons, each built the quick way and the careful way, side by side and live. Hover
           them, press them, tab to them. Then a mini quiz where you put each piece where it belongs.
         </>
       }

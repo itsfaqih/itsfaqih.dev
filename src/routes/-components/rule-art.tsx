@@ -465,7 +465,7 @@ const screen = stylex.create({
     "--ux": { default: null, [LIGHT]: "#e0389f" },
     "--ar": { default: null, [LIGHT]: "#e38a00" },
     "--ts": { default: null, [LIGHT]: "#2aa816" },
-    "--ax": { default: null, [LIGHT]: "#7650ee" },
+    "--ax": { default: null, [LIGHT]: "#815efc" },
     "--go": { default: null, [LIGHT]: "#c99a00" },
     position: "relative",
     aspectRatio: "16 / 10",

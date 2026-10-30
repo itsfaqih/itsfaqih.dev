@@ -420,7 +420,7 @@ const styles = stylex.create({
     backgroundPosition: { default: "0px 0px", ":hover": "initial" },
     color: { default: palette["--dim"], ":hover": "var(--c-ink)" },
     opacity: { default: null, ":disabled": 0.4 },
-    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor"] },
+    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
   },
   iconPressed: {
@@ -567,7 +567,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: { default: palette["--dim"], ":hover:enabled": palette["--text"] },
     opacity: { default: null, ":disabled": 0.35 },
-    cursor: { default: cursors["--cursor-point"], ":disabled": "not-allowed" },
+    cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
   },
   pageOn: {

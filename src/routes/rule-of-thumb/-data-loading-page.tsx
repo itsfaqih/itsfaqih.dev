@@ -81,7 +81,7 @@ const styles = stylex.create({
   },
   ctlButton: {
     opacity: { default: null, ":disabled": 0.55 },
-    cursor: { default: null, ":disabled": cursors["--cursor"] },
+    cursor: { default: null, ":disabled": cursors["--cursor-forbid"] },
   },
   note: {
     display: "inline-flex",

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { TechIcon, techBadge, techBrand } from "./tech-icon";
+import { CompanyLogo } from "./company-logo";
+import { iconLit, TechIcon, techBadge, techBrand } from "./tech-icon";
 import { loadIn } from "../../components/load-in";
 
 export type Job = {
@@ -45,20 +46,25 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
       if (from === undefined || Math.abs(from - to) < 0.5) return;
       row.animate([{ transform: `translateY(${from - to}px)` }, { transform: "none" }], glide);
     });
+    // A badge leaves its old spot all at once, before the achievements start in that spot (140ms),
+    // and only its arrival in the new spot is staggered.
     after.pills.forEach((to, pill) => {
       const from = before.pills.get(pill);
       if (!from) return;
       const dx = from.xInRow - to.xInRow;
       const dy = from.yInRow - to.yInRow;
       if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+      const duration = PILL_OUT + to.order * 18 + PILL_IN;
+      const gone = PILL_OUT / duration;
+      const back = (duration - PILL_IN) / duration;
       pill.animate(
         [
-          { offset: 0, opacity: 1, transform: `translate(${dx}px, ${dy}px)`, easing: "ease-in" },
-          { offset: 0.38, opacity: 0, transform: `translate(${dx}px, ${dy - 10}px)` },
-          { offset: 0.38, opacity: 0, transform: "translateX(-18px)", easing: glide.easing },
+          { offset: 0, opacity: 1, transform: `translate(${dx}px, ${dy}px)`, easing: OUT },
+          { offset: gone, opacity: 0, transform: `translate(${dx}px, ${dy - 6}px)` },
+          { offset: back, opacity: 0, transform: "translateX(-18px)", easing: glide.easing },
           { offset: 1, opacity: 1, transform: "none" },
         ],
-        { duration: 520, delay: to.order * 18, fill: "backwards" },
+        { duration },
       );
     });
   }, [open]);
@@ -77,13 +83,14 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
           >
             <button
               type="button"
-              {...stylex.props(styles.head, !isOpen && styles.headCover)}
+              {...stylex.props(styles.head, iconLit.hover, !isOpen && styles.headCover)}
               aria-expanded={isOpen}
               aria-controls={panelId}
               onClick={() => toggle(index)}
             >
               <span {...stylex.props(styles.years)}>{job.years}</span>
-              <h3 {...stylex.props(styles.company)}>
+              <h3 {...stylex.props(styles.company, isOpen && iconLit.on)}>
+                <CompanyLogo name={job.company} style={styles.logo} />
                 {job.company}
                 <small {...stylex.props(styles.role)}>{job.role}</small>
               </h3>
@@ -139,6 +146,10 @@ function snapshotOf(list: HTMLElement): Snapshot {
   return { height: list.getBoundingClientRect().height, rows, pills };
 }
 
+// A badge fades out of its old spot fast and settles into its new one slower.
+const PILL_OUT = 110;
+const PILL_IN = 320;
+const OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const STACKED = "@media (max-width: 960px)";
 const LIGHT = ":is(.light *)";
 
@@ -223,13 +234,23 @@ const styles = stylex.create({
     font: `500 12px ${fonts["--display"]}`,
     color: palette["--go-ink"],
   },
+  // The logo leads the name; the role runs under both.
   company: {
     gridArea: "2 / 1",
+    display: "grid",
+    gridTemplateColumns: "auto 1fr",
+    columnGap: "8px",
+    alignItems: "center",
     margin: 0,
     font: `700 18px/1.2 ${fonts["--display"]}`,
     color: palette["--text"],
   },
+  logo: {
+    width: "22px",
+    height: "22px",
+  },
   role: {
+    gridColumn: "1 / -1",
     display: "block",
     font: `400 13px ${fonts["--sans"]}`,
     color: palette["--mute"],
@@ -290,18 +311,19 @@ const styles = stylex.create({
     transitionTimingFunction: "ease",
   },
   // A closed row lifts its badges' rims and marks together under the pointer; an open row lights
-  // the badge under the pointer in its tool's own colour.
+  // the badge under the pointer in its tool's own colours.
   pillClosed: {
     borderColor: { default: palette["--hair"], [stylex.when.ancestor(":hover")]: palette["--hair-hover"] },
   },
   pillOpen: {
+    "--lit": { default: null, ":hover": "1" },
     borderColor: { default: palette["--hair"], ":hover": "var(--brand)" },
   },
   markClosed: {
     color: { default: palette["--mute"], [stylex.when.ancestor(":hover")]: palette["--dim"] },
   },
   markOpen: {
-    color: { default: palette["--dim"], ":is(:hover > *)": "var(--brand)" },
+    color: palette["--dim"],
   },
   body: {
     gridArea: { default: "1 / 2 / span 2", [STACKED]: "auto" },
@@ -333,7 +355,7 @@ const styles = stylex.create({
       width: "8px",
       height: "8px",
       borderRadius: "2px",
-      backgroundColor: palette["--ts"],
+      backgroundColor: palette["--ts-deep"],
     },
   },
 });

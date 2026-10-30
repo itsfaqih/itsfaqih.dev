@@ -22,12 +22,16 @@ export const palette = stylex.defineVars({
   "--ux": "#ff6ad5",
   "--ar": "#ffb02e",
   "--ts": "#7dff6a",
-  "--ax": "#9d7bff",
+  "--ax": "#bca2ff",
   "--go": "#ffe14d",
+  // The green is the palette's lightest hue, so on a light ground its marks take a deeper shade.
+  "--ts-deep": "var(--ts)",
   // Accent text and focus rings darken toward black by --ink-mix, which is 100% (no change) in
   // dark and lower in light, so the same hue reads on either ground.
   "--ink-mix": "100%",
   "--go-ink": "color-mix(in oklab, var(--go) var(--ink-mix), #000)",
+  // Eyebrows are short and bold enough to keep more of their hue than body accents.
+  "--eyebrow-mix": "100%",
   "--focus": "var(--go-ink)",
   "--on-accent": "#111",
   "--go-hover": "#fff07a",
@@ -37,12 +41,10 @@ export const palette = stylex.defineVars({
   "--soft-hover": "#2a2a38",
   "--hair-hover": "#3a3a4c",
   "--scan": "rgb(0 0 0 / 0.18)",
-  // Text that sits straight on the dot field gets a patch of page colour under it (see veil in routes/-components/section.ts).
+  // Text that sits straight on the dither gets a patch of page colour under it (see veil in routes/-components/section.ts).
   "--veil": "color-mix(in srgb, var(--bg) 72%, transparent)",
-  "--veil-edge": "0 0 24px 12px var(--veil)",
-  // Small text has thin strokes the dots break up easily, so its veil is denser and reaches further.
+  // Small text has thin strokes the dither breaks up easily, so its veil is denser.
   "--veil-dense": "color-mix(in srgb, var(--bg) 90%, transparent)",
-  "--veil-dense-edge": "0 0 28px 18px var(--veil-dense)",
   "--dot": "#2e2e3c",
   "--lift": "rgb(0 0 0 / 0.4)",
   // Game panels: a raised body (top highlight, bottom shade, hard drop) and sunken wells.
@@ -90,4 +92,5 @@ export const cursors = stylex.defineVars({
   "--cursor-grab": 'url("/cursors/grab.svg") 12 14, grab',
   "--cursor-grabbing": 'url("/cursors/grabbing.svg") 12 8, grabbing',
   "--cursor-text": 'url("/cursors/text.svg") 7 13, text',
+  "--cursor-forbid": 'url("/cursors/forbid.svg") 13 13, not-allowed',
 });

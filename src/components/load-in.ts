@@ -87,6 +87,11 @@ const fadeIn = stylex.keyframes({
   to: { opacity: 1, transform: "translateY(0)" },
 });
 
+// A veil only fades, so the patch of page colour under a piece's words never tears with them.
+const veilIn = stylex.keyframes({
+  from: { opacity: 0 },
+});
+
 // Filtered tiles deal instead of glitching, since a new filter deals a fresh hand.
 const deal = stylex.keyframes({
   from: { opacity: 0, transform: "scale(0.6) rotate(-6deg)" },
@@ -101,8 +106,10 @@ const deal = stylex.keyframes({
  * everything sits at rest; with reduced motion a piece only fades up. A piece under [data-loop]
  * pauses while useCutIns marks it .paused, except for that fade.
  *
- * `deal` swaps the glitch for a dealt card, on the rule tiles. `islandPart` plays the glitch on
- * the header island's parts once the page is ready, staggered across the island.
+ * `deal` swaps the glitch for a dealt card, on the rule tiles. `veil` is for a [data-cut] that
+ * wears a veil (see section.ts): it fades up while its words, a `piece` composed with `words`
+ * inside it, glitch in. `islandPart` plays the glitch on the header island's parts once the page
+ * is ready, staggered across the island.
  */
 export const loadIn = stylex.create({
   piece: {
@@ -153,6 +160,17 @@ export const loadIn = stylex.create({
       default: null,
       [IN]: { default: "backwards", [REDUCE]: "backwards !important" },
     },
+  },
+  veil: {
+    opacity: { default: null, [WAITING]: 0 },
+    animationName: { default: null, [IN]: { default: veilIn, [HELD]: "none" } },
+    animationDuration: { default: null, [IN]: { default: "200ms", [HELD]: "0s" } },
+    animationTimingFunction: { default: null, [IN]: motion["--out"] },
+    animationDelay: { default: null, [IN]: { default: STAGGER, [HELD]: "0s", [REDUCE]: "0s" } },
+    animationFillMode: { default: null, [IN]: "backwards" },
+  },
+  words: {
+    display: "block",
   },
   islandPart: {
     opacity: { default: null, [BOOTING]: 0 },

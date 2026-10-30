@@ -7,6 +7,17 @@
 /* Global: html-level rules, view transitions and the reduced-motion blanket. */
 @import "./arcade.css";
 
+/* Global: no class reaches every button. A press is never a text selection, so a button's label,
+   and everything inside it, stays unselectable; links styled as buttons or cards opt in with
+   userSelect in their own StyleX. Layered so a component can still allow selection. */
+@layer base {
+  :is(button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="switch"], summary),
+  :is(button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="switch"], summary) * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 /* Global: Tailwind's preflight, the element defaults every page was laid out against, which no
    class can reach. Layered so that any unlayered rule wins. */
 @layer base {

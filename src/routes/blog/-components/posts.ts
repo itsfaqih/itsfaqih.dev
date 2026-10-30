@@ -8,7 +8,7 @@ export const BLOG_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
 });
 
 export const BLOG_DESCRIPTION =
-  "Notes and tutorials on web development by Faqih Muntashir, a full-stack engineer in Yogyakarta.";
+  "Notes and tutorials on web development by Faqih Muntashir, a full-stack engineer in Indonesia.";
 
 const modules = import.meta.glob<{
   default: MDXContent;

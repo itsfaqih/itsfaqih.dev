@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } fro
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
+import { SHOW_PROJECTS } from "../data/home";
 import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { button } from "./button";
@@ -16,6 +17,16 @@ const emit = () => listeners.forEach((listener) => listener());
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
+}
+
+// Stable, so a Header re-render doesn't detach the host and remount the page's portal.
+function hostActivity(node: HTMLDivElement | null) {
+  activityHost = node;
+  emit();
+  return () => {
+    activityHost = null;
+    emit();
+  };
 }
 
 export function IslandActivity({ children }: { children: ReactNode }) {
@@ -33,32 +44,6 @@ export function IslandActivity({ children }: { children: ReactNode }) {
     };
   }, []);
   return host ? createPortal(children, host) : null;
-}
-
-export function compactBox(element: HTMLElement) {
-  const island = element.closest<HTMLElement>(".island");
-  const bar = island?.parentElement;
-  const row = element.closest<HTMLElement>(".row");
-  if (!island || !bar || !row) return element.getBoundingClientRect();
-  const pad = parseFloat(getComputedStyle(island).paddingLeft);
-  let width = pad * 2;
-  let before = 0;
-  for (const seg of island.querySelectorAll<HTMLElement>(
-    ':scope > [data-compact="live"], :scope > [data-compact="always"]',
-  )) {
-    if (seg.contains(row)) before = width - pad * 2;
-    width += seg.querySelector<HTMLElement>(".row")?.offsetWidth ?? 0;
-  }
-  // Not offsetLeft: a folded row is blurred, which makes it the offsetParent in some browsers.
-  const scale = island.getBoundingClientRect().width / island.offsetWidth || 1;
-  const inRow = (element.getBoundingClientRect().left - row.getBoundingClientRect().left) / scale;
-  const barBox = bar.getBoundingClientRect();
-  return new DOMRect(
-    barBox.left + (barBox.width - width) / 2 + pad + before + inRow,
-    barBox.top + (island.offsetHeight - element.offsetHeight) / 2,
-    element.offsetWidth,
-    element.offsetHeight,
-  );
 }
 
 type SegProps = {
@@ -166,22 +151,8 @@ export function Header() {
             FAQIH
           </Link>
         </Seg>
-        <Seg on={full} style={styles.wideOnlySeg}>
-          <span {...stylex.props(styles.where)}>
-            Yogyakarta · <JakartaClock />
-          </span>
-        </Seg>
         <Seg on={compact && live} compact="live">
-          <div
-            ref={(node) => {
-              activityHost = node;
-              emit();
-              return () => {
-                activityHost = null;
-                emit();
-              };
-            }}
-          />
+          <div ref={hostActivity} />
         </Seg>
         <Seg on={full}>
           <nav aria-label="Main" {...stylex.props(styles.nav)}>
@@ -200,14 +171,16 @@ export function Header() {
             >
               Experience
             </Link>
-            <Link
-              to="/"
-              hash="projects"
-              activeOptions={{ includeHash: true }}
-              {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
-            >
-              Projects
-            </Link>
+            {SHOW_PROJECTS && (
+              <Link
+                to="/"
+                hash="projects"
+                activeOptions={{ includeHash: true }}
+                {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
+              >
+                Projects
+              </Link>
+            )}
           </nav>
         </Seg>
         <Seg on compact="always" style={styles.toolsSeg}>
@@ -266,24 +239,6 @@ export function Header() {
       </header>
     </div>
   );
-}
-
-function JakartaClock() {
-  const [time, setTime] = useState("--:--");
-
-  useEffect(() => {
-    const format = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Jakarta",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const tick = () => setTime(format.format(new Date()));
-    tick();
-    const id = setInterval(tick, 15_000);
-    return () => clearInterval(id);
-  }, []);
-
-  return <time>{time}</time>;
 }
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -398,20 +353,15 @@ const styles = stylex.create({
     visibility: { default: null, [NARROW]: "hidden" },
     transition: { default: ROW_IN, [NARROW]: `${ROW_OUT}, visibility 0s 120ms` },
   },
-  wideOnlySeg: {
-    display: { default: "grid", [TABLET]: "none" },
-  },
   wideOnly: {
     display: { default: null, [TABLET]: "none" },
   },
-  // Unlike the folding segments, the tools sit in a flex row, and the 12px bottom margin lifts the
-  // buttons 6px within the island.
+  // Unlike the folding segments, the tools sit in a flex row.
   toolsSeg: {
     display: "flex",
     flexWrap: "wrap",
     alignItems: "center",
     gap: "10px",
-    marginBottom: "12px",
   },
   // Narrow phones: the hero's contact button sits right below, so the island drops its copy.
   connectSeg: {
@@ -422,30 +372,27 @@ const styles = stylex.create({
   },
   connect: {
     flex: "none",
+    height: "32px",
+    paddingInline: "12px",
     whiteSpace: "nowrap",
     borderRadius: "999px",
-    paddingInline: { default: null, [TABLET]: "12px" },
   },
   ring: {
     outline: { default: null, ":focus-visible": `2px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "-2px" },
   },
   brand: {
+    userSelect: "none",
     padding: { default: "0 8px 0 12px", [PHONE]: "0 6px 0 10px", [NARROW]: "0 4px 0 10px" },
     fontWeight: 900,
     color: palette["--text"],
-  },
-  where: {
-    padding: "0 8px",
-    color: palette["--mute"],
-    whiteSpace: "nowrap",
-    fontVariantNumeric: "tabular-nums",
   },
   nav: {
     display: "flex",
     gap: "2px",
   },
   navLink: {
+    userSelect: "none",
     whiteSpace: "nowrap",
     padding: { default: "8px 12px", [TABLET]: "8px" },
     borderRadius: "999px",

@@ -44,6 +44,10 @@ html {
 ) {
   cursor: var(--cursor-point);
 }
+/* Global: zero-specificity cursor default for every disabled control, as above. */
+:where(button:disabled, input:disabled, select:disabled, textarea:disabled) {
+  cursor: var(--cursor-forbid);
+}
 /* Global: zero-specificity cursor defaults for every text field, as above. */
 :where(
   input:not(
@@ -70,6 +74,7 @@ html.cur-on {
   --cursor-grab: url("/cursors/none.svg#grab") 0 0, none;
   --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
   --cursor-text: url("/cursors/none.svg#text") 0 0, none;
+  --cursor-forbid: url("/cursors/none.svg#forbid") 0 0, none;
 }
 /* Global: keys on a class a script sets on html.
    page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
@@ -173,7 +178,8 @@ html:active-view-transition-type(page-fade)::view-transition-new(root) {
   animation: vt-fade-in 240ms 120ms ease-out both;
 }
 
-/* Filtering the stack: badges the filter keeps glide to their new places and dropped ones fade.
+/* Filtering the stack: badges the filter keeps glide to their new places, new ones slide up and
+   dropped ones fade.
    The root stays live, so chips and hover states keep rendering while the badges move. */
 html:active-view-transition-type(stack-filter)::view-transition {
   pointer-events: none;
@@ -191,6 +197,15 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 ::view-transition-old(.stack-out) {
   animation: stack-out 160ms ease-out both;
 }
+::view-transition-new(.stack-in) {
+  animation: stack-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes stack-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
 @keyframes stack-out {
   to {
     opacity: 0;
@@ -199,7 +214,8 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(.stack-move),
-  ::view-transition-old(.stack-out) {
+  ::view-transition-old(.stack-out),
+  ::view-transition-new(.stack-in) {
     animation-duration: 0s;
   }
 }

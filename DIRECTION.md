@@ -271,7 +271,7 @@ All card motion uses the existing tokens `--snap` and `--out`, plus `ease` for c
 What stays still: reading panels (code, verdicts, tips, demos) get the bevel and drop but no lift, because nobody picks them. The existing small hover nudge on tip slots stays.
 
 ### Shader
-None. The site already has a dot-matrix backdrop, and a dither inside cards would compete with code and demos that people read.
+None. The site already has a dithered dot-matrix backdrop, and a dither inside cards would compete with code and demos that people read.
 
 ### Moves
 - `skeuomorphic-hardware-controls`: raised panels and sunken wells make the cards look like hardware.
