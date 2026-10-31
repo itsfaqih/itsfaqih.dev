@@ -11,7 +11,7 @@ import {
   TABBED,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
-import { button } from "../../components/button";
+import { button, buttonVariant } from "../../components/button";
 import { arcade } from "../../components/arcade";
 
 type Tone = "no" | "yes";
@@ -104,12 +104,12 @@ const styles = stylex.create({
     backgroundColor: {
       default: null,
       [stylex.when.ancestor('[data-side="bad"]')]:
-        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+        `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${palette["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -141,8 +141,8 @@ const styles = stylex.create({
     },
   },
   outNo: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   outYes: {
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
@@ -240,10 +240,13 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${kit["--no"]} 18%, transparent)` },
+      ":hover": {
+        default: null,
+        [HOVER]: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
+      },
     },
     fontSize: "12px",
-    color: { default: palette["--dim"], ":hover": { default: null, [HOVER]: kit["--no-ink"] } },
+    color: { default: palette["--dim"], ":hover": { default: null, [HOVER]: palette["--no-ink"] } },
     cursor: cursors["--cursor-point"],
     transform: { default: null, ":active": "scale(0.92)" },
     outlineWidth: { default: null, ":focus-visible": "3px" },
@@ -363,7 +366,7 @@ const styles = stylex.create({
   },
   cellLost: {
     "::after": {
-      backgroundColor: `color-mix(in srgb, ${kit["--no"]} 24%, transparent)`,
+      backgroundColor: `color-mix(in srgb, ${palette["--no"]} 24%, transparent)`,
     },
   },
   flashing: {
@@ -394,7 +397,7 @@ const styles = stylex.create({
     overflowWrap: "anywhere",
   },
   valueLost: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   landing: {
     animationName: { default: null, [MOTION]: land },
@@ -404,9 +407,9 @@ const styles = stylex.create({
     animationFillMode: { default: null, [MOTION]: "both" },
   },
   nulLost: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 18%, transparent)`,
-    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${kit["--no"]} 70%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${palette["--no"]} 70%, transparent)`,
+    color: palette["--no-ink"],
   },
   tag: {
     justifySelf: "start",
@@ -423,8 +426,8 @@ const styles = stylex.create({
     color: kit["--yes-ink"],
   },
   tagLost: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   boardCode: {
     whiteSpace: "pre-wrap",
@@ -678,7 +681,7 @@ function ClearDemo({ way }: { way: Way }) {
         {cleared && (
           <button
             type="button"
-            {...stylex.props(button.base, button.soft, button.sm, styles.again)}
+            {...stylex.props(button.base, buttonVariant["primary-neutral"], button.sm, styles.again)}
             disabled={save.phase === "sent"}
             onClick={save.reset}
           >
@@ -738,7 +741,7 @@ function RenameDemo({ way }: { way: Way }) {
         </label>
         <button
           type="button"
-          {...stylex.props(button.base, button.soft, button.sm, styles.again)}
+          {...stylex.props(button.base, buttonVariant["primary-neutral"], button.sm, styles.again)}
           disabled={save.phase === "sent"}
           onClick={saved ? save.reset : save.send}
         >

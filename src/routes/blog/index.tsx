@@ -4,7 +4,7 @@ import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts } from "./-component
 import { PageContainer } from "../../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
 import { pageHead } from "../../seo";
-import { palette, transitions } from "../../theme.stylex";
+import { motion, palette } from "../../theme.stylex";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogIndex,
@@ -98,6 +98,7 @@ function BlogIndex() {
 }
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
 const styles = stylex.create({
   page: {
@@ -168,10 +169,10 @@ const styles = stylex.create({
   },
   postLink: {
     display: "block",
-    scale: { default: null, ":active": 0.99 },
-    transitionProperty: transitions.transform,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    scale: { default: null, ":active": { default: 0.99, [REDUCE]: null } },
+    transitionProperty: "scale",
+    transitionDuration: { default: motion["--t-moderate-exit"], ":active": motion["--t-moderate"] },
+    transitionTimingFunction: { default: motion["--exit"], ":active": motion["--moderate"] },
   },
   card: {
     padding: "1.25rem",
@@ -182,9 +183,15 @@ const styles = stylex.create({
       ":hover": { default: null, [HOVER]: palette["--muted-foreground"] },
     },
     borderRadius: "1rem",
-    transitionProperty: "all",
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.3s",
+    transitionProperty: "border-color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+    },
   },
   cardRow: {
     display: "flex",
@@ -207,9 +214,6 @@ const styles = stylex.create({
     fontSize: { default: "1.125rem", "@media (min-width: 40rem)": "1.25rem" },
     lineHeight: "1.75rem",
     fontWeight: 700,
-    transitionProperty: transitions.colors,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
   },
   summary: {
     // -webkit-box with no -webkit-line-clamp, so it clamps nothing.
@@ -226,19 +230,22 @@ const styles = stylex.create({
     padding: "0.75rem",
     borderRadius: "0.75rem",
     backgroundColor: palette["--card"],
-    transitionProperty: transitions.colors,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
   },
   arrow: {
     color: palette["--muted-foreground"],
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "0.25rem 0", [REDUCE]: null } },
     },
-    transitionProperty: "all",
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    transitionProperty: "translate",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--t-moderate"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--moderate"] },
+    },
   },
   footer: {
     marginTop: "2rem",
@@ -256,18 +263,32 @@ const styles = stylex.create({
       ":hover": { default: null, [HOVER]: palette["--text"] },
       ":active": palette["--text"],
     },
-    transitionProperty: transitions.colors,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    transitionProperty: "color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   backArrow: {
     rotate: "180deg",
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "-0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "-0.25rem 0", [REDUCE]: null } },
     },
-    transitionProperty: transitions.transform,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    transitionProperty: "translate",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--t-moderate"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--moderate"] },
+    },
   },
 });

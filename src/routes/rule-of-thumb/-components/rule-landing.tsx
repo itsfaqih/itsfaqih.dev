@@ -29,7 +29,7 @@ import { isOpeningRule, isTransitioning, RuleThumb, useRuleOpen } from "../../-c
 import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
-import { button } from "../../../components/button";
+import { button, buttonVariant } from "../../../components/button";
 import { hoverHold } from "../../../components/hover-hold";
 import { section, veil } from "../../-components/section";
 import { arcade } from "../../../components/arcade";
@@ -247,7 +247,7 @@ function Landing({
             <div {...stylex.props(heroType.acts, takeKit.acts)}>
               <CopyMarkdown url={markdownUrl} />
               <a
-                {...stylex.props(button.base, button.soft)}
+                {...stylex.props(button.base, buttonVariant["secondary-brand"])}
                 href={markdownUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1520,11 +1520,7 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   if (inIsland) {
     return (
       <button type="button" onClick={share} {...stylex.props(styles.action)}>
-        {copied ? (
-          <CheckIcon size={16} weight="bold" aria-hidden="true" />
-        ) : (
-          <ShareNetworkIcon size={16} weight="bold" aria-hidden="true" />
-        )}
+        <ShareGlyph copied={copied} />
         <span {...stylex.props(arcade.srOnly)} aria-live="polite">
           {label}
         </span>
@@ -1534,18 +1530,31 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   return (
     <button
       type="button"
-      {...stylex.props(button.base, button.soft, button.sm, shell.share, shell.in, shell.first)}
+      {...stylex.props(button.base, buttonVariant["tertiary-neutral"], button.sm, button.iconStart, shell.share, shell.in, shell.first)}
       onClick={share}
     >
-      {copied ? (
-        <CheckIcon weight="bold" aria-hidden="true" {...stylex.props(shell.shareIcon)} />
-      ) : (
-        <ShareNetworkIcon weight="bold" aria-hidden="true" {...stylex.props(shell.shareIcon)} />
-      )}
+      <ShareGlyph copied={copied} />
       <span aria-live="polite" {...stylex.props(shell.shareLabel)}>
         {label}
       </span>
     </button>
+  );
+}
+
+function ShareGlyph({ copied }: { copied: boolean }) {
+  return (
+    <span aria-hidden="true" {...stylex.props(glyphSwap.cell)}>
+      <ShareNetworkIcon
+        size={16}
+        weight="bold"
+        {...stylex.props(glyphSwap.glyph, copied ? glyphSwap.hidden : glyphSwap.shown)}
+      />
+      <CheckIcon
+        size={16}
+        weight="bold"
+        {...stylex.props(glyphSwap.glyph, copied ? glyphSwap.shown : glyphSwap.hidden)}
+      />
+    </span>
   );
 }
 
@@ -1609,7 +1618,7 @@ function CopyMarkdown({ url }: { url: string }) {
   }
 
   return (
-    <button type="button" {...stylex.props(button.base, button.go)} onClick={handleCopy}>
+    <button type="button" {...stylex.props(button.base, buttonVariant["primary-brand"])} onClick={handleCopy}>
       {copied ? "Copied" : "Copy as Markdown"}
     </button>
   );
@@ -1667,6 +1676,9 @@ const burst = stylex.keyframes({
   to: { transform: "translate(64px) scale(0)", opacity: 0 },
 });
 
+// The miss shake is a four-beat wobble, not a state change, so it keeps its own length.
+const SHAKE_TIME = "320ms";
+
 const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
@@ -1720,19 +1732,27 @@ const shell = stylex.create({
       ":hover": { default: null, [HOVER]: palette["--text"] },
       ":active": palette["--text"],
     },
-    transition: "color 120ms ease",
+    transitionProperty: "color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   crumbTag: {
     fontWeight: 700,
     color: "var(--c-ink)",
   },
+  // On a phone the label hides, so the key turns into a square around its icon.
   share: {
-    justifyContent: { default: null, [PHONE]: "center" },
     width: { default: null, [PHONE]: "38px" },
-  },
-  shareIcon: {
-    width: "16px",
-    height: "16px",
+    paddingInlineStart: { default: null, [PHONE]: 0 },
+    paddingInlineEnd: { default: null, [PHONE]: 0 },
   },
   shareLabel: {
     position: { default: null, [PHONE]: "absolute" },
@@ -1830,6 +1850,33 @@ const shell = stylex.create({
       [stylex.when.ancestor("[data-rev-on]", reveal)]:
         `opacity ${motion["--t-panel"]} ${motion["--out"]}, translate ${motion["--t-panel"]} ${motion["--out"]}`,
     },
+  },
+});
+
+// The arriving glyph takes the whole fast tier and the leaving one its exit, so an appear always
+// outlasts a disappear. Both are tweens: a spring would settle early and invert that order.
+const glyphSwap = stylex.create({
+  cell: {
+    display: "inline-grid",
+    flexShrink: 0,
+  },
+  glyph: {
+    gridArea: "1 / 1",
+    transitionProperty: "opacity, scale, filter",
+  },
+  shown: {
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: "ease-out",
+  },
+  hidden: {
+    opacity: 0,
+    scale: 0.6,
+    filter: "blur(4px)",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: "ease-in",
   },
 });
 
@@ -2057,9 +2104,9 @@ const lessonKit = stylex.create({
     fontSize: "11px",
   },
   bad: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
     backgroundPosition: "initial",
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   good: {
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
@@ -2098,7 +2145,15 @@ const lessonKit = stylex.create({
     whiteSpace: { default: "nowrap", [PHONE]: "normal" },
     textWrap: { default: null, [PHONE]: "balance" },
     cursor: cursors["--cursor-point"],
-    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
+    transitionProperty: "background-color, color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":is([aria-pressed='true'])": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":is([aria-pressed='true'])": motion["--fast"],
+    },
   },
   costs: {
     display: "flex",
@@ -2120,8 +2175,8 @@ const lessonKit = stylex.create({
     animationTimingFunction: { default: null, [TAB]: motion["--out"] },
   },
   badCost: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   goodCost: {
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
@@ -2209,17 +2264,17 @@ const tree = stylex.create({
     backgroundColor: {
       default: "var(--c)",
       [stylex.when.ancestor(BAD_PANE)]:
-        `color-mix(in srgb, ${kit["--no"]} 22%, ${palette["--panel-2"]})`,
+        `color-mix(in srgb, ${palette["--no"]} 22%, ${palette["--panel-2"]})`,
     },
     boxShadow: {
       default: "0 3px 0 var(--key-c)",
       [stylex.when.ancestor(BAD_PANE)]:
-        `0 3px 0 color-mix(in srgb, ${kit["--no"]} 40%, ${palette["--drop-ink"]})`,
+        `0 3px 0 color-mix(in srgb, ${palette["--no"]} 40%, ${palette["--drop-ink"]})`,
     },
     fontWeight: 600,
     color: {
       default: "var(--on-c)",
-      [stylex.when.ancestor(BAD_PANE)]: kit["--no-ink"],
+      [stylex.when.ancestor(BAD_PANE)]: palette["--no-ink"],
     },
   },
   calls: {
@@ -2334,8 +2389,8 @@ const quizKit = stylex.create({
     backgroundColor: palette["--panel-2"],
   },
   sayNo: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   sayYes: {
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
@@ -2347,8 +2402,8 @@ const quizKit = stylex.create({
     color: palette["--dim"],
     textWrap: "pretty",
     animationName: { default: said, [REDUCE]: "none" },
-    animationDuration: { default: "150ms", [REDUCE]: "0s" },
-    animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+    animationDuration: { default: motion["--t-moderate"], [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--moderate"], [REDUCE]: "ease" },
   },
   saidToned: {
     color: "inherit",
@@ -2393,7 +2448,9 @@ const quizKit = stylex.create({
     textAlign: "left",
     overflowWrap: "anywhere",
     textWrap: "pretty",
-    transition: `border-color ${kit["--t-fb"]} ease, background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, opacity ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
+    transitionProperty: "border-color, background-color, color, opacity, transform",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: motion["--exit"],
   },
   slotAfterLead: {
     flexBasis: "7em",
@@ -2421,6 +2478,16 @@ const quizKit = stylex.create({
       default: null,
       ":focus-visible": { default: "scale(1.03)", [REDUCE]: "none" },
     },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":focus-visible": motion["--t-fast"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":focus-visible": motion["--fast"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+    },
   },
   slotNear: {
     borderStyle: "solid",
@@ -2428,38 +2495,42 @@ const quizKit = stylex.create({
     backgroundColor: ON_TINT,
     backgroundPosition: "initial",
     transform: { default: "scale(1.03)", [REDUCE]: "none" },
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: motion["--fast"],
   },
   slotMiss: {
-    borderColor: kit["--no"],
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+    borderColor: palette["--no"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
     backgroundPosition: "initial",
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
     animationName: { default: shake, [REDUCE]: "none" },
-    animationDuration: { default: "320ms", [REDUCE]: "0s" },
+    animationDuration: { default: SHAKE_TIME, [REDUCE]: "0s" },
     animationTimingFunction: { default: motion["--cut"], [REDUCE]: "ease" },
   },
   // A missed slot that takes the piece again: hover and focus still outrank the miss tint.
   slotMissOpen: {
     borderColor: {
-      default: kit["--no"],
+      default: palette["--no"],
       ":focus-visible": ON,
       ":hover": { default: null, [HOVER]: ON },
     },
     backgroundColor: {
-      default: `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+      default: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
       ":focus-visible": ON_TINT,
       ":hover": { default: null, [HOVER]: ON_TINT },
     },
     backgroundPosition: "initial",
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
     animationName: { default: shake, [REDUCE]: "none" },
-    animationDuration: { default: "320ms", [REDUCE]: "0s" },
+    animationDuration: { default: SHAKE_TIME, [REDUCE]: "0s" },
     animationTimingFunction: { default: motion["--cut"], [REDUCE]: "ease" },
   },
   slotOff: {
     borderColor: "transparent",
     opacity: 0.4,
     textDecoration: "line-through",
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: motion["--fast"],
   },
   slotSeat: {
     paddingBlock: "4px",
@@ -2468,6 +2539,8 @@ const quizKit = stylex.create({
     borderColor: kit["--yes-ink"],
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 10%, transparent)`,
     backgroundPosition: "initial",
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: motion["--fast"],
   },
   tray: {
     display: "flex",
@@ -2511,16 +2584,22 @@ const quizKit = stylex.create({
     cursor: cursors["--cursor-grab"],
     touchAction: "none",
     userSelect: "none",
-    transition: `box-shadow ${kit["--t-fb"]} ${motion["--out"]}, translate ${kit["--t-fb"]} ${motion["--out"]}`,
+    transitionProperty: "box-shadow, translate",
+    transitionDuration: motion["--t-moderate-exit"],
+    transitionTimingFunction: motion["--exit"],
   },
   picked: {
     translate: "0 -4px",
     boxShadow: `0 8px 0 var(--key-c), 0 14px 28px ${palette["--lift"]}`,
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
   },
   dragging: {
     zIndex: 30,
     boxShadow: `0 10px 0 var(--key-c), 0 20px 36px ${palette["--lift"]}`,
     cursor: cursors["--cursor-grabbing"],
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
   },
   seated: {
     height: "30px",
@@ -2633,9 +2712,8 @@ const pager = stylex.create({
     },
     transform: {
       default: null,
-      // Reduced motion stills only the press; hover and focus keep their lift.
-      ":hover": { default: null, [HOVER]: LIFTED },
-      ":focus-visible": LIFTED,
+      ":hover": { default: null, [HOVER]: { default: LIFTED, [REDUCE]: "none" } },
+      ":focus-visible": { default: LIFTED, [REDUCE]: "none" },
       ":active": {
         default: PRESSED,
         [REDUCE]: "none",
@@ -2647,10 +2725,20 @@ const pager = stylex.create({
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "3px" },
     transitionProperty: "transform, box-shadow, border-color",
-    transitionDuration: { default: "220ms, 220ms, 120ms", ":active": "100ms" },
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-moderate"] },
+      ":focus-visible": motion["--t-moderate"],
+      ":active": motion["--t-moderate"],
+    },
     transitionDelay: "0s, 0s, 0s",
     transitionBehavior: "normal, normal, normal",
-    transitionTimingFunction: `${motion["--snap"]}, ${motion["--snap"]}, ease`,
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--moderate"] },
+      ":focus-visible": motion["--moderate"],
+      ":active": motion["--moderate"],
+    },
   },
   next: {
     flexDirection: "row-reverse",
@@ -2831,7 +2919,17 @@ const styles = stylex.create({
     cursor: cursors["--cursor-point"],
     outline: { default: null, ":focus-visible": `2px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "-2px" },
-    transition: "background-color 120ms ease, color 120ms ease",
+    transitionProperty: "background-color, color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   // Phones: the back link keeps its name for screen readers and shows only the arrow.
   back: {
@@ -2860,7 +2958,7 @@ const styles = stylex.create({
     minWidth: { default: null, [NARROW]: 0 },
     overflow: { default: null, [NARROW]: "hidden" },
     textOverflow: { default: null, [NARROW]: "ellipsis" },
-    transition: `opacity 200ms ${motion["--out"]}, filter 200ms ${motion["--out"]}, translate 200ms ${motion["--out"]}`,
+    transitionProperty: "opacity, filter, translate",
   },
   tags: {
     display: "flex",
@@ -2874,6 +2972,14 @@ const styles = stylex.create({
     translate: {
       default: null,
       [stylex.when.ancestor("[data-swap]")]: { default: "0 -6px", [REDUCE]: "none" },
+    },
+    transitionDuration: {
+      default: motion["--t-fast"],
+      [stylex.when.ancestor("[data-swap]")]: motion["--t-fast-exit"],
+    },
+    transitionTimingFunction: {
+      default: "ease-out",
+      [stylex.when.ancestor("[data-swap]")]: "ease-in",
     },
   },
   title: {
@@ -2889,6 +2995,14 @@ const styles = stylex.create({
       default: "0 6px",
       [stylex.when.ancestor("[data-swap]")]: { default: "0 0", [REDUCE]: "none" },
       [REDUCE]: "none",
+    },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      [stylex.when.ancestor("[data-swap]")]: motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: "ease-in",
+      [stylex.when.ancestor("[data-swap]")]: "ease-out",
     },
   },
 });

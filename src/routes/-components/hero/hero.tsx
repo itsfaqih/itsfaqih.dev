@@ -5,7 +5,7 @@ import { useMediaQuery } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { heroType } from "../hero-type";
 import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
-import { button } from "../../../components/button";
+import { button, buttonVariant } from "../../../components/button";
 import { veil } from "../section";
 import { loadIn } from "../../../components/load-in";
 
@@ -94,7 +94,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
         </p>
         <div {...stylex.props(heroType.acts)}>
           <a
-            {...stylex.props(loadIn.piece, button.base, button.go, styles.go)}
+            {...stylex.props(loadIn.piece, button.base, buttonVariant["primary-brand"], styles.go)}
             href="#contact"
             data-cut
             style={{ "--c": current.color }}
@@ -152,7 +152,12 @@ export function Hero({ introDone }: { introDone: boolean }) {
             aria-label={userPaused ? "Play" : "Pause"}
             onClick={() => setPausedByUser(!userPaused)}
           >
-            {userPaused ? "▶" : "❚❚"}
+            <span aria-hidden="true" {...stylex.props(styles.glyph, !userPaused && styles.glyphOff)}>
+              ▶
+            </span>
+            <span aria-hidden="true" {...stylex.props(styles.glyph, userPaused && styles.glyphOff)}>
+              ❚❚
+            </span>
           </button>
         </div>
       </div>
@@ -164,6 +169,8 @@ const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const FOCUS_RING = `3px solid ${palette["--focus"]}`;
+// The leaving phrase stays visible until its fade ends.
+const PHRASE_OUT = "160ms";
 
 const slash = stylex.keyframes({
   "0%": { clipPath: "polygon(0 0,0 0,-20% 100%,-20% 100%)", transform: "translate(-16px)" },
@@ -218,9 +225,9 @@ const styles = stylex.create({
     opacity: 0,
     visibility: "hidden",
     transitionProperty: "opacity, visibility",
-    transitionDuration: "160ms, 0s",
+    transitionDuration: `${PHRASE_OUT}, 0s`,
     transitionTimingFunction: "ease, ease",
-    transitionDelay: "0s, 160ms",
+    transitionDelay: `0s, ${PHRASE_OUT}`,
     transitionBehavior: "normal, normal",
   },
   phraseOn: {
@@ -248,16 +255,22 @@ const styles = stylex.create({
     },
     textUnderlineOffset: "4px",
     transitionProperty: "text-decoration-color",
-    transitionDuration: "120ms",
-    transitionTimingFunction: "ease",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   // The button wears the slide's hue. The hue eases slower than a hover would, so hover moves to a
   // brightness filter on its own quick timing.
   go: {
     "--key": "color-mix(in oklab, var(--c) 70%, #000)",
     backgroundColor: "var(--c)",
-    color: "var(--on-c)",
-    boxShadow: { default: "0 4px 0 var(--key)", ":active": "0 2px 0 var(--key)" },
     filter: { default: null, ":hover": { default: null, [HOVER]: "brightness(1.08)" } },
     transitionProperty: "transform, background-color, box-shadow, filter",
     transitionDuration: "150ms, 280ms, 280ms, 120ms",
@@ -286,8 +299,16 @@ const styles = stylex.create({
     textDecorationLine: "none",
     cursor: cursors["--cursor-point"],
     transitionProperty: "color",
-    transitionDuration: "120ms",
-    transitionTimingFunction: "ease",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
     outline: { default: null, ":focus-visible": FOCUS_RING },
     outlineOffset: { default: null, ":focus-visible": "3px" },
   },
@@ -358,8 +379,14 @@ const styles = stylex.create({
     },
     overflow: "hidden",
     transitionProperty: "background-color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--fast"] },
+    },
   },
   // The current slide's bar fills over its run; --ms is the run's length.
   barOn: {
@@ -398,5 +425,20 @@ const styles = stylex.create({
     flex: "none",
     outline: { default: null, ":focus-visible": FOCUS_RING },
     outlineOffset: { default: null, ":focus-visible": "3px" },
+  },
+  // Play and pause share one cell and cross-fade: the arriving glyph on the fast tier, the leaving
+  // one on its quicker exit, so the slot never resizes.
+  glyph: {
+    gridArea: "1 / 1",
+    transitionProperty: "opacity, transform, filter",
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: "ease-out",
+  },
+  glyphOff: {
+    opacity: 0,
+    transform: { default: "scale(0.6)", [REDUCE]: "none" },
+    filter: "blur(4px)",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: "ease-in",
   },
 });

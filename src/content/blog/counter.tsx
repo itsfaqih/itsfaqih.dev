@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { transitions } from "../../theme.stylex";
+import { motion } from "../../theme.stylex";
 import { useState } from "react";
 import { PlusIcon, MinusIcon } from "@phosphor-icons/react";
 
@@ -37,6 +37,7 @@ const zinc600 = "lab(35.1166% 1.78212 -6.1173)";
 const zinc400 = "lab(65.6464% 1.53497 -5.42429)";
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
 const styles = stylex.create({
   counter: {
@@ -54,10 +55,18 @@ const styles = stylex.create({
   button: {
     padding: "0.5rem",
     borderRadius: "0.375rem",
-    scale: { default: null, ":active": "95% 95%" },
-    transitionProperty: "all",
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.2s",
+    scale: { default: null, ":active": { default: "95% 95%", [REDUCE]: null } },
+    transitionProperty: "scale, color, background-color",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-moderate"] },
+      ":active": motion["--t-moderate"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--moderate"] },
+      ":active": motion["--moderate"],
+    },
   },
   decrease: {
     color: {

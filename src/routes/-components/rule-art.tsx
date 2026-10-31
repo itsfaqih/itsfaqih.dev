@@ -550,6 +550,8 @@ const screen = stylex.create({
 });
 
 const IO = "cubic-bezier(0.645, 0.045, 0.355, 1)";
+// The length of one thumbnail loop.
+const LOOP = "4.4s";
 
 // What every art draws with, and the beat each part of it keeps while the art plays.
 const draw = stylex.create({
@@ -574,7 +576,7 @@ const draw = stylex.create({
     transformBox: "fill-box",
   },
   play: {
-    animationDuration: "4.4s",
+    animationDuration: LOOP,
     animationTimingFunction: IO,
     animationIterationCount: "infinite",
   },
@@ -965,7 +967,7 @@ const glyph = stylex.create({
   },
   float: {
     animationName: glFloat,
-    animationDuration: "4.4s",
+    animationDuration: LOOP,
     animationTimingFunction: "ease-in-out",
     animationIterationCount: "infinite",
   },

@@ -17,6 +17,7 @@ import {
 import { colorOf, VISIBLE_GUIDELINES } from "../data/guidelines";
 import { LINKS } from "../seo";
 import { RuleIcon } from "./rule-icon";
+import { fluidHover, placeHighlight } from "./fluid-hover";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 
 type CommandItem = {
@@ -110,7 +111,8 @@ export function CommandPalette() {
     if (!(ghost instanceof HTMLElement)) return;
     for (const element of ghost.querySelectorAll("[id]")) element.removeAttribute("id");
     ghost.className =
-      stylex.props(toward === "left" ? styles.toLeft : styles.toRight).className ?? "";
+      stylex.props(fluidHover.group, toward === "left" ? styles.toLeft : styles.toRight)
+        .className ?? "";
     ghost.style.cssText = `position: absolute; top: ${level.offsetTop - list.scrollTop}px; left: ${level.offsetLeft}px; width: ${level.offsetWidth}px`;
     ghost.addEventListener("animationend", () => ghost.remove(), { once: true });
     ghosts.replaceChildren(ghost);
@@ -175,7 +177,16 @@ export function CommandPalette() {
       id: "copy-email",
       label: "Copy Email",
       description: `Copy ${LINKS.email} to clipboard`,
-      icon: copied ? <CheckIcon size={18} /> : <EnvelopeIcon size={18} />,
+      icon: (
+        <>
+          <span {...stylex.props(styles.glyph, copied && styles.glyphOff)}>
+            <EnvelopeIcon size={18} />
+          </span>
+          <span {...stylex.props(styles.glyph, !copied && styles.glyphOff)}>
+            <CheckIcon size={18} />
+          </span>
+        </>
+      ),
       category: "action",
       keywords: ["email", "contact", "mail", "clipboard"],
       action: async () => {
@@ -288,6 +299,22 @@ export function CommandPalette() {
       .getElementById(`cmd-option-${highlightedItem.id}`)
       ?.scrollIntoView({ block: "nearest" });
   }, [highlightedItem]);
+
+  // One fill follows the highlighted option, whether the pointer or the arrow keys moved it, and
+  // springs between options instead of blinking (fluid-hover.ts). Rows can shift on any render, so
+  // it is placed after every one. A fresh fill fades in where it lands instead of sliding there.
+  const highlightRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const highlight = highlightRef.current;
+    if (!highlight) return;
+    const option =
+      highlightedItem && document.getElementById(`cmd-option-${highlightedItem.id}`);
+    if (!option) {
+      highlight.removeAttribute("data-on");
+      return;
+    }
+    placeHighlight(highlight, { y: option.offsetTop, h: option.offsetHeight });
+  });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -436,11 +463,17 @@ export function CommandPalette() {
                     ref={fitLevel}
                     role="presentation"
                     {...stylex.props(
+                      fluidHover.group,
                       step && styles.level,
                       step === "in" && styles.fromRight,
                       step === "out" && styles.fromLeft,
                     )}
                   >
+                    <span
+                      ref={highlightRef}
+                      aria-hidden="true"
+                      {...stylex.props(fluidHover.highlight, styles.highlight)}
+                    />
                     {flatItems.length === 0 ? (
                       <div {...stylex.props(styles.empty)}>
                         No results for &quot;{inputValue}&quot;
@@ -633,7 +666,7 @@ const SPREAD = "cubic-bezier(0.15, 0.85, 0.3, 1)";
 // spills about 7% past the panel's edges and draws back.
 const SPILL =
   "linear(0, 0.156, 0.326, 0.492, 0.642, 0.77, 0.873, 0.951, 1.007, 1.043, 1.064, 1.072, 1.072, 1.066, 1.057, 1.047, 1.036, 1.026, 1.017, 1.01, 1.005, 1.001, 0.998, 0.996, 0.996, 0.995, 0.996, 0.996, 0.997, 0.997, 0.998, 0.999, 1)";
-// Stages at 36, 72, 132, 156 and 216ms of T_IN, leaving the spill the last 224ms.
+// Stages at 8, 16, 30, 35 and 49% of T_IN, leaving the spill the rest.
 const pourIn = stylex.keyframes({
   "0%": { ...IN_ISLAND, opacity: 0, animationTimingFunction: SETTLE },
   "8.18%": { opacity: 1 },
@@ -656,6 +689,11 @@ const T_IN = "440ms";
 const T_OUT = "240ms";
 // When the closing drop reaches the island (70% of T_OUT) and starts filling it out.
 const ISLAND_HOME_MS = 170;
+// The content and then the shadow come in as the drop nears the panel's full size.
+const CONTENT_IN = `calc(${T_IN} * 0.45)`;
+const SHADOW_IN = `calc(${T_IN} * 0.73)`;
+const FAST_IN = `${motion["--t-fast"]} ${motion["--fast"]}`;
+const FAST_OUT = `${motion["--t-fast-exit"]} ${motion["--exit"]}`;
 // The panel itself wears the drop's shape from the splash on, in its own coordinates, so the
 // content fading in never shows past the drop's edge. Its ground stays clear while the drop shapes
 // it, and fills in on the last frame, where the drop is exactly the panel and gives way.
@@ -681,10 +719,8 @@ const drain = stylex.keyframes({
   "100%": { clipPath: "inset(0 calc(50% - 22px) calc(100% - 44px) calc(50% - 22px) round 22px)" },
 });
 
-// How far, how long and on what curve a level slides as the palette moves between levels.
+// How far a level slides as the palette moves between levels.
 const SLIDE = "30%";
-const SLIDE_MS = 220;
-const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 // The list's own vertical padding, added to its level's height. Kept in step with styles.list.
 const LIST_PADDING = 12;
@@ -706,7 +742,10 @@ const styles = stylex.create({
     backdropFilter: "blur(6px)",
     zIndex: 100,
     opacity: { default: null, [STARTING]: 0, [LEAVING]: 0 },
-    transition: "opacity 120ms ease",
+    transition: {
+      default: `opacity ${motion["--t-slow"]} ${motion["--slow"]}`,
+      [LEAVING]: `opacity ${motion["--t-slow-exit"]} ${motion["--exit"]}`,
+    },
   },
   // Base UI unmounts the palette once the stage's own transitions end, so a pour out holds the
   // stage until the drop is back in the island.
@@ -719,8 +758,14 @@ const styles = stylex.create({
     opacity: { default: null, [STARTING]: { default: null, [REDUCE]: 0 }, [LEAVING]: 0 },
     transition: {
       default: null,
-      ":not([data-ending-style])": { default: null, [REDUCE]: "opacity 150ms ease" },
-      [LEAVING]: { default: `opacity 1ms linear ${T_OUT}`, [REDUCE]: "opacity 150ms ease" },
+      ":not([data-ending-style])": {
+        default: null,
+        [REDUCE]: `opacity ${motion["--t-slow"]} ${motion["--slow"]}`,
+      },
+      [LEAVING]: {
+        default: `opacity 1ms linear ${T_OUT}`,
+        [REDUCE]: `opacity ${motion["--t-slow-exit"]} ${motion["--exit"]}`,
+      },
     },
   },
   drop: {
@@ -753,8 +798,8 @@ const styles = stylex.create({
       opacity: { default: null, [IN_STARTING]: 0, [POURING_OUT]: 0 },
       transition: {
         default: null,
-        [POURING_IN]: { default: `opacity 160ms ease 320ms`, [REDUCE]: null },
-        [POURING_OUT]: "opacity 50ms ease",
+        [POURING_IN]: { default: `opacity ${FAST_IN} ${SHADOW_IN}`, [REDUCE]: null },
+        [POURING_OUT]: `opacity ${FAST_OUT}`,
       },
     },
   },
@@ -804,10 +849,10 @@ const styles = stylex.create({
     transition: {
       default: null,
       [POURING_IN]: {
-        default: `opacity 110ms ${motion["--out"]} 200ms, filter 130ms ${motion["--out"]} 200ms`,
+        default: `opacity ${FAST_IN} ${CONTENT_IN}, filter ${FAST_IN} ${CONTENT_IN}`,
         [REDUCE]: null,
       },
-      [POURING_OUT]: "opacity 50ms ease, filter 50ms ease",
+      [POURING_OUT]: `opacity ${FAST_OUT}, filter ${FAST_OUT}`,
     },
   },
   kbd: {
@@ -831,13 +876,17 @@ const styles = stylex.create({
     gridTemplateRows: "0fr",
     opacity: 0,
     transition: {
-      default: `grid-template-rows ${SLIDE_MS}ms ${SLIDE_EASE}, opacity 160ms ease`,
-      [REDUCE]: "opacity 160ms ease",
+      default: `grid-template-rows ${motion["--t-moderate-exit"]} ${motion["--exit"]}, opacity ${FAST_OUT}`,
+      [REDUCE]: `opacity ${FAST_OUT}`,
     },
   },
   crumbOpen: {
     gridTemplateRows: "1fr",
     opacity: 1,
+    transition: {
+      default: `grid-template-rows ${motion["--t-moderate"]} ${motion["--moderate"]}, opacity ${FAST_IN}`,
+      [REDUCE]: `opacity ${FAST_IN}`,
+    },
   },
   crumbClip: {
     minHeight: 0,
@@ -847,8 +896,8 @@ const styles = stylex.create({
   // leaves to the left, and going back runs the other way. A light blur blends the two mid-pass.
   level: {
     animationName: shiftIn,
-    animationDuration: `${SLIDE_MS}ms`,
-    animationTimingFunction: SLIDE_EASE,
+    animationDuration: motion["--t-moderate"],
+    animationTimingFunction: motion["--moderate"],
     animationFillMode: "backwards",
   },
   fromRight: {
@@ -860,15 +909,15 @@ const styles = stylex.create({
   toLeft: {
     "--shift": { default: `-${SLIDE}`, [REDUCE]: "0px" },
     animationName: shiftOut,
-    animationDuration: `${SLIDE_MS}ms`,
-    animationTimingFunction: SLIDE_EASE,
+    animationDuration: motion["--t-moderate-exit"],
+    animationTimingFunction: motion["--exit"],
     animationFillMode: "forwards",
   },
   toRight: {
     "--shift": { default: SLIDE, [REDUCE]: "0px" },
     animationName: shiftOut,
-    animationDuration: `${SLIDE_MS}ms`,
-    animationTimingFunction: SLIDE_EASE,
+    animationDuration: motion["--t-moderate-exit"],
+    animationTimingFunction: motion["--exit"],
     animationFillMode: "forwards",
   },
   // Holds the leaving level, clipped to the list so it never adds scroll.
@@ -919,7 +968,17 @@ const styles = stylex.create({
       ":focus-visible": `2px solid ${palette["--focus"]}`,
     },
     outlineOffset: { default: null, ":focus-visible": "-2px" },
-    transition: "background-color 120ms ease, color 120ms ease",
+    transitionProperty: "background-color, color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   crumbSlash: {
     color: palette["--mute"],
@@ -961,7 +1020,10 @@ const styles = stylex.create({
     overflowX: "hidden",
     transition: {
       default: null,
-      ":has(> [data-shifting])": { default: `height ${SLIDE_MS}ms ${SLIDE_EASE}`, [REDUCE]: null },
+      ":has(> [data-shifting])": {
+        default: `height ${motion["--t-moderate"]} ${motion["--moderate"]}`,
+        [REDUCE]: null,
+      },
     },
     overflowY: "auto",
     overscrollBehavior: "contain",
@@ -976,6 +1038,11 @@ const styles = stylex.create({
     font: `700 11px ${fonts["--display"]}`,
     color: HUE_INK,
   },
+  highlight: {
+    "--w": "100%",
+    borderRadius: "999px",
+    backgroundColor: palette["--panel-2"],
+  },
   // A pill as tall as its icon plus 8px a side, so the highlight's ends run concentric with it.
   item: {
     display: "flex",
@@ -985,11 +1052,11 @@ const styles = stylex.create({
     borderRadius: "999px",
     color: palette["--mute"],
     cursor: cursors["--cursor-point"],
-    transition: "background-color 120ms ease, color 120ms ease",
+    transition: `color ${FAST_OUT}`,
   },
   itemSelected: {
-    backgroundColor: palette["--panel-2"],
     color: palette["--dim"],
+    transition: `color ${FAST_IN}`,
   },
   icon: {
     flex: "none",
@@ -1000,11 +1067,28 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: palette["--panel-2"],
     color: palette["--dim"],
-    transition: "background-color 120ms ease, color 120ms ease",
+    transition: `background-color ${FAST_OUT}, color ${FAST_OUT}`,
   },
   iconSelected: {
     backgroundColor: "var(--c)",
     color: "var(--on-c)",
+    transition: `background-color ${FAST_IN}, color ${FAST_IN}`,
+  },
+  // Envelope and check share the icon's cell and cross-fade: the arriving glyph on the fast tier,
+  // the leaving one on its quicker exit.
+  glyph: {
+    gridArea: "1 / 1",
+    display: "grid",
+    transitionProperty: "opacity, transform, filter",
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: "ease-out",
+  },
+  glyphOff: {
+    opacity: 0,
+    transform: { default: "scale(0.6)", [REDUCE]: "none" },
+    filter: "blur(4px)",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: "ease-in",
   },
   text: {
     flex: 1,

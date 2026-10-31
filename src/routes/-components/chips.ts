@@ -1,7 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
-import { cursors, fonts, palette } from "../../theme.stylex";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
 
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const FAST = motion["--t-fast"];
+const FAST_EXIT = motion["--t-fast-exit"];
+const EXIT = motion["--exit"];
 
 /**
  * Filter chips: a row of pill toggles, each with a dot in its hue (--c), a name and a count. The
@@ -38,16 +42,23 @@ export const chips = stylex.create({
     lineHeight: "normal",
     fontFamily: fonts["--display"],
     cursor: cursors["--cursor-point"],
-    transform: { default: null, ":active": "scale(0.97)" },
+    transform: { default: null, ":active": { default: "scale(0.97)", [REDUCE]: "none" } },
     outlineWidth: { default: null, ":focus-visible": "3px" },
     outlineStyle: { default: null, ":focus-visible": "solid" },
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "3px" },
+    // The colours ride the fast tier and the press the moderate one.
     transitionProperty: "background-color, color, border-color, transform",
-    transitionDuration: "120ms, 120ms, 120ms, 150ms",
-    transitionTimingFunction: "ease, ease, ease, cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-    transitionDelay: "0s, 0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal, normal",
+    transitionDuration: {
+      default: `${FAST_EXIT}, ${FAST_EXIT}, ${FAST_EXIT}, ${motion["--t-moderate-exit"]}`,
+      ':is([aria-pressed="true"])': `${FAST}, ${FAST}, ${FAST}, ${motion["--t-moderate-exit"]}`,
+      ":active": `${FAST_EXIT}, ${FAST_EXIT}, ${FAST_EXIT}, ${motion["--t-moderate"]}`,
+    },
+    transitionTimingFunction: {
+      default: EXIT,
+      ':is([aria-pressed="true"])': `${motion["--fast"]}, ${motion["--fast"]}, ${motion["--fast"]}, ${EXIT}`,
+      ":active": `${EXIT}, ${EXIT}, ${EXIT}, ${motion["--moderate"]}`,
+    },
   },
   dot: {
     width: "8px",

@@ -4,7 +4,7 @@ import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { type Lesson, onceOnScreen, RuleLanding, Tip } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
-import { button } from "../../components/button";
+import { button, buttonVariant } from "../../components/button";
 import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
@@ -34,7 +34,7 @@ const fade = stylex.keyframes({
   from: { opacity: 0 },
 });
 const jump = stylex.keyframes({
-  "from, 40%": { color: kit["--no-ink"] },
+  "from, 40%": { color: palette["--no-ink"] },
 });
 const toastFade = stylex.keyframes({
   "0%, 100%": { opacity: 0 },
@@ -114,7 +114,7 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   offline: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   online: {
     color: kit["--yes-ink"],
@@ -202,7 +202,7 @@ const styles = stylex.create({
   req: {
     backgroundColor: {
       default: "var(--c)",
-      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no"],
+      [stylex.when.ancestor('[data-side="bad"]')]: palette["--no"],
     },
     boxShadow: {
       default: "0 2px 0 var(--key-c)",
@@ -325,7 +325,7 @@ const styles = stylex.create({
   keyReq: {
     backgroundColor: {
       default: "var(--c)",
-      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no"],
+      [stylex.when.ancestor('[data-side="bad"]')]: palette["--no"],
     },
   },
   keyCode: {
@@ -492,7 +492,7 @@ const styles = stylex.create({
     fontSize: "14px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   errorText: {
     fontSize: "13px",
@@ -603,8 +603,8 @@ const styles = stylex.create({
     paddingBlock: "12px",
     paddingInline: "14px",
     borderRadius: "10px",
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 12%, transparent)`,
-    boxShadow: `inset 3px 0 0 ${kit["--no"]}`,
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 12%, transparent)`,
+    boxShadow: `inset 3px 0 0 ${palette["--no"]}`,
     animationName: fade,
     animationDuration: "200ms",
     animationTimingFunction: "ease-out",
@@ -614,12 +614,12 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   crashCode: {
     fontSize: "12px",
     lineHeight: 1.5,
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
     overflowWrap: "anywhere",
   },
   balance: {
@@ -758,7 +758,12 @@ function Controls({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.ctl)}>{children}</div>;
 }
 
-const CTL_BUTTON = stylex.props(button.base, button.soft, button.sm, styles.ctlButton).className;
+const CTL_BUTTON = stylex.props(
+  button.base,
+  buttonVariant["primary-neutral"],
+  button.sm,
+  styles.ctlButton,
+).className;
 
 const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
@@ -1103,7 +1108,12 @@ function TeamView({ inline }: { inline: boolean }) {
               </span>
               <button
                 type="button"
-                {...stylex.props(button.base, button.go, button.sm, styles.errorButton)}
+                {...stylex.props(
+                  button.base,
+                  buttonVariant["primary-brand"],
+                  button.sm,
+                  styles.errorButton,
+                )}
                 onClick={retry}
               >
                 Retry

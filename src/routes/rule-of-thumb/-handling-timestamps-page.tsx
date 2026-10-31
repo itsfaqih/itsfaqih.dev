@@ -51,12 +51,12 @@ const styles = stylex.create({
     backgroundColor: {
       default: null,
       [stylex.when.ancestor('[data-side="bad"]')]:
-        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+        `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${palette["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -118,7 +118,7 @@ const styles = stylex.create({
     color: kit["--yes-ink"],
   },
   off: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   clock: {
     position: "relative",
@@ -167,7 +167,7 @@ const styles = stylex.create({
     backgroundColor: palette["--dim"],
   },
   hourOff: {
-    backgroundColor: kit["--no-ink"],
+    backgroundColor: palette["--no-ink"],
   },
   ghost: {
     backgroundColor: kit["--yes-ink"],
@@ -205,7 +205,7 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     color: {
       default: palette["--text"],
-      [stylex.when.ancestor('[data-side="bad"]')]: kit["--no-ink"],
+      [stylex.when.ancestor('[data-side="bad"]')]: palette["--no-ink"],
     },
   },
   sum: {
@@ -284,8 +284,8 @@ const styles = stylex.create({
     backgroundColor: "color-mix(in srgb, var(--c) 8%, transparent)",
   },
   orderWrong: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 8%, transparent)`,
-    boxShadow: `inset 2px 0 0 ${kit["--no"]}`,
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 8%, transparent)`,
+    boxShadow: `inset 2px 0 0 ${palette["--no"]}`,
   },
   orderId: {
     color: palette["--mute"],
@@ -295,7 +295,7 @@ const styles = stylex.create({
   },
   whenMissed: {
     textDecorationLine: "line-through",
-    textDecorationColor: `color-mix(in srgb, ${kit["--no"]} 60%, transparent)`,
+    textDecorationColor: `color-mix(in srgb, ${palette["--no"]} 60%, transparent)`,
   },
   utc: {
     fontSize: "11px",
@@ -316,8 +316,8 @@ const styles = stylex.create({
     color: kit["--yes-ink"],
   },
   fateWrong: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
 });
 

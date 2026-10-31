@@ -213,8 +213,16 @@ const styles = stylex.create({
     outline: { default: null, ":has(> button:focus-visible)": `2px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":has(> button:focus-visible)": "-2px" },
     transitionProperty: "background-color",
-    transitionDuration: "160ms",
-    transitionTimingFunction: "ease",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":is([data-on])": motion["--t-fast"],
+      ":not([data-on]):hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":is([data-on])": motion["--fast"],
+      ":not([data-on]):hover": { default: null, [HOVER]: motion["--fast"] },
+    },
   },
   // The dates sit over the company and role; the chevron stays at the right.
   head: {
@@ -286,10 +294,8 @@ const styles = stylex.create({
     borderBottomColor: palette["--mute"],
     transform: "translateY(-3px) rotate(45deg)",
     transitionProperty: "transform, border-color",
-    transitionDuration: "220ms, 120ms",
-    transitionTimingFunction: `${motion["--snap"]}, ease`,
-    transitionDelay: "0s, 0s",
-    transitionBehavior: "normal, normal",
+    transitionDuration: `${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}`,
+    transitionTimingFunction: motion["--exit"],
   },
   chevronOpen: {
     borderTopColor: palette["--go-ink"],
@@ -297,6 +303,8 @@ const styles = stylex.create({
     borderBottomColor: palette["--go-ink"],
     borderLeftColor: palette["--go-ink"],
     transform: "translateY(2px) rotate(-135deg)",
+    transitionDuration: `${motion["--t-moderate"]}, ${motion["--t-fast"]}`,
+    transitionTimingFunction: `${motion["--moderate"]}, ${motion["--fast"]}`,
   },
   // Closed: the stack sits on the right. Open: it fills the left column under the head and the
   // achievements take the right column.
@@ -324,8 +332,6 @@ const styles = stylex.create({
     font: `500 12px ${fonts["--display"]}`,
     color: palette["--dim"],
     transitionProperty: "border-color",
-    transitionDuration: "120ms",
-    transitionTimingFunction: "ease",
   },
   // A closed row lifts its badges' rims and marks together under the pointer; an open row lights
   // the badge under the pointer in its tool's own colours.
@@ -334,12 +340,28 @@ const styles = stylex.create({
       default: palette["--hair"],
       [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: palette["--hair-hover"] },
     },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--fast"] },
+    },
   },
   pillOpen: {
     "--lit": { default: null, ":hover": { default: null, [HOVER]: "1" } },
     borderColor: {
       default: palette["--hair"],
       ":hover": { default: null, [HOVER]: "var(--brand)" },
+    },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
     },
   },
   markClosed: {

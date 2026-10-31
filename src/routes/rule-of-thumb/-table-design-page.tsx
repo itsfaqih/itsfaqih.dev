@@ -340,7 +340,7 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   saidError: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   saidHint: {
     fontSize: "13px",
@@ -461,13 +461,13 @@ const styles = stylex.create({
   iconDanger: {
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${kit["--no"]} 14%, transparent)` },
-      ":active": `color-mix(in srgb, ${kit["--no"]} 14%, transparent)`,
+      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${palette["--no"]} 14%, transparent)` },
+      ":active": `color-mix(in srgb, ${palette["--no"]} 14%, transparent)`,
     },
     color: {
       default: palette["--dim"],
-      ":hover": { default: null, [HOVER]: kit["--no-ink"] },
-      ":active": kit["--no-ink"],
+      ":hover": { default: null, [HOVER]: palette["--no-ink"] },
+      ":active": palette["--no-ink"],
     },
   },
   iconGlyph: {
@@ -532,7 +532,7 @@ const styles = stylex.create({
     cursor: cursors["--cursor-point"],
   },
   inlineDelete: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   foot: {
     display: "flex",

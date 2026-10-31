@@ -15,6 +15,7 @@ import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { reducedMotion } from "../hooks/use-media-query";
 import { button } from "./button";
+import { fluidHover, useFluidHover } from "./fluid-hover";
 import { loadIn } from "./load-in";
 import { arcade } from "./arcade";
 
@@ -165,6 +166,7 @@ export function Header() {
   const islandRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const groundRef = useRef<HTMLSpanElement>(null);
+  const hover = useFluidHover();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const live = useSyncExternalStore(
@@ -208,6 +210,8 @@ export function Header() {
   const compact = scrolled && !open;
   const full = !compact;
   useElasticGround(islandRef, groundRef, `${scrolled} ${open} ${live}`);
+  const { clear } = hover;
+  useEffect(clear, [clear, scrolled, open, live]);
 
   return (
     <div
@@ -219,6 +223,7 @@ export function Header() {
       <header
         ref={islandRef}
         className={`island ${stylex.props(styles.island).className}`}
+        {...hover.handlers}
         onClick={(event) => {
           if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
         }}
@@ -245,6 +250,7 @@ export function Header() {
             <Link
               to="/rule-of-thumb"
               activeProps={{ "aria-current": "page" }}
+              data-fluid-item
               {...stylex.props(styles.navLink, styles.ring)}
             >
               Rule of Thumb
@@ -253,6 +259,7 @@ export function Header() {
               to="/"
               hash="work"
               activeOptions={{ includeHash: true }}
+              data-fluid-item
               {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
             >
               Experience
@@ -262,6 +269,7 @@ export function Header() {
                 to="/"
                 hash="projects"
                 activeOptions={{ includeHash: true }}
+                data-fluid-item
                 {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
               >
                 Projects
@@ -274,6 +282,7 @@ export function Header() {
             type="button"
             onClick={openCommandPalette}
             aria-label="Search the site"
+            data-fluid-item
             {...stylex.props(styles.find, styles.ring)}
           >
             <MagnifyingGlassIcon size={16} weight="bold" />
@@ -286,6 +295,7 @@ export function Header() {
               toggleTheme({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
             }}
             aria-label="Switch theme"
+            data-fluid-item
             {...stylex.props(styles.find, styles.ring, styles.iconButton)}
           >
             <SunIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.sunInLight)} />
@@ -296,7 +306,11 @@ export function Header() {
           <Link
             to="/"
             hash="contact"
-            {...stylex.props(button.base, button.go, button.sm, styles.connect)}
+            {...stylex.props(
+              button.base,
+              button.sm,
+              styles.connect,
+            )}
           >
             Connect
           </Link>
@@ -308,6 +322,7 @@ export function Header() {
             className={`find menu ${stylex.props(styles.find, styles.ring, styles.iconButton, styles.menu).className}`}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
+            data-fluid-item
             onClick={() => setOpen((value) => !value)}
           >
             <ListIcon
@@ -323,6 +338,11 @@ export function Header() {
           </button>
         </Seg>
         <span ref={groundRef} aria-hidden="true" {...stylex.props(styles.ground)} />
+        <span
+          ref={hover.highlightRef}
+          aria-hidden="true"
+          {...stylex.props(fluidHover.highlight, styles.highlight)}
+        />
       </header>
     </div>
   );
@@ -341,6 +361,7 @@ const READY = ":is(.js.no-intro *)";
 const WAITING = ":is(.js:not(.no-intro) *)";
 const AWAY = ":is([data-island-away] *)";
 
+const CONNECT_CHIP = `color-mix(in srgb, ${palette["--go"]} 18%, #0a0a0c)`;
 const SPRING = motion["--spring"];
 const FOLD = "560ms";
 
@@ -349,8 +370,8 @@ const islandIn = stylex.keyframes({
   from: { opacity: 0, scale: 0.82 },
 });
 
-const ROW_IN = `opacity 240ms ${motion["--out"]} 40ms, filter 260ms ${motion["--out"]} 40ms`;
-const ROW_OUT = "opacity 120ms ease, filter 120ms ease";
+const ROW_IN = `opacity ${motion["--t-slow"]} ${motion["--slow"]} 40ms, filter ${motion["--t-slow"]} ${motion["--slow"]} 40ms`;
+const ROW_OUT = `opacity ${motion["--t-moderate-exit"]} ${motion["--exit"]}, filter ${motion["--t-moderate-exit"]} ${motion["--exit"]}`;
 
 // A black capsule that floats over every page. At the top it holds the whole nav; once the page
 // scrolls it folds to the brand, or to the live activity a page lends it (IslandActivity), beside
@@ -453,7 +474,7 @@ const styles = stylex.create({
     opacity: { default: 1, [NARROW]: 0 },
     filter: { default: "none", [NARROW]: { default: "blur(4px)", [REDUCE]: "none" } },
     visibility: { default: null, [NARROW]: "hidden" },
-    transition: { default: ROW_IN, [NARROW]: `${ROW_OUT}, visibility 0s 120ms` },
+    transition: { default: ROW_IN, [NARROW]: `${ROW_OUT}, visibility 0s ${motion["--t-moderate-exit"]}` },
   },
   wideOnly: {
     display: { default: null, [TABLET]: "none" },
@@ -472,7 +493,17 @@ const styles = stylex.create({
   connectRow: {
     paddingLeft: { default: "8px", [NARROW]: "4px" },
   },
+  // Dark yellow on the white island; on the black island the same two colours swap places.
   connect: {
+    color: { default: CONNECT_CHIP, [DARK]: palette["--go"] },
+    backgroundColor: {
+      default: palette["--go"],
+      ":hover": { default: null, [HOVER]: palette["--go-hover"] },
+      [DARK]: {
+        default: CONNECT_CHIP,
+        ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${palette["--go"]} 28%, #0a0a0c)` },
+      },
+    },
     flex: "none",
     height: "32px",
     paddingInline: "12px",
@@ -491,7 +522,11 @@ const styles = stylex.create({
   },
   nav: {
     display: "flex",
-    gap: "2px",
+  },
+  // One hover fill for the whole island, painted over the ground and under the items.
+  highlight: {
+    borderRadius: "999px",
+    backgroundColor: palette["--panel-2"],
   },
   navLink: {
     userSelect: "none",
@@ -500,8 +535,6 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: null,
-      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
-      ":active": palette["--panel-2"],
       ":is([aria-current='page'])": palette["--panel-2"],
     },
     color: {
@@ -510,7 +543,9 @@ const styles = stylex.create({
       ":active": palette["--text"],
       ":is([aria-current='page'])": palette["--text"],
     },
-    transition: "background-color 120ms ease, color 120ms ease",
+    transitionProperty: "color",
+    transitionDuration: { default: motion["--t-fast-exit"], ":hover": motion["--t-fast"] },
+    transitionTimingFunction: { default: motion["--exit"], ":hover": motion["--fast"] },
   },
   find: {
     display: "inline-flex",
@@ -524,18 +559,14 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "999px",
+    // A pointer that can hover gets the island's one gliding fill; a touch press lights the button.
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
-      ":active": palette["--panel-2"],
+      ":active": { default: palette["--panel-2"], [HOVER]: "transparent" },
     },
-    // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
-    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
-    backgroundPosition: {
-      default: "0 0",
-      ":hover": { default: null, [HOVER]: "initial" },
-      ":active": "initial",
-    },
+    // `background: none` minifies to a 0 0 position at rest, and the press's background shorthand
+    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so the press sets initial.
+    backgroundPosition: { default: "0 0", ":active": "initial" },
     color: {
       default: palette["--dim"],
       ":hover": { default: null, [HOVER]: palette["--text"] },
@@ -543,7 +574,17 @@ const styles = stylex.create({
     },
     font: "inherit",
     cursor: cursors["--cursor-point"],
-    transition: "background-color 120ms ease, color 120ms ease",
+    transitionProperty: "background-color, color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
   },
   findKey: {
     padding: "1px 6px",
@@ -565,22 +606,37 @@ const styles = stylex.create({
   },
   glyph: {
     gridArea: "1 / 1",
-    transition: `opacity 200ms ${motion["--out"]}, transform 200ms ${motion["--out"]}`,
+    transitionProperty: { default: "opacity, transform, filter", [REDUCE]: "opacity" },
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
   },
+  // Each sets its own timing whole: a later StyleX key replaces the glyph's, conditions and all.
   sunInLight: {
     opacity: { default: null, [LIGHT]: 0 },
     transform: { default: null, [LIGHT]: "rotate(90deg) scale(0.6)" },
+    filter: { default: null, [LIGHT]: "blur(4px)" },
+    transitionDuration: { default: motion["--t-moderate"], [LIGHT]: motion["--t-moderate-exit"] },
+    transitionTimingFunction: { default: motion["--moderate"], [LIGHT]: motion["--exit"] },
   },
   moonInDark: {
     opacity: { default: null, [DARK]: 0 },
     transform: { default: null, [DARK]: "rotate(-90deg) scale(0.6)" },
+    filter: { default: null, [DARK]: "blur(4px)" },
+    transitionDuration: { default: motion["--t-moderate"], [DARK]: motion["--t-moderate-exit"] },
+    transitionTimingFunction: { default: motion["--moderate"], [DARK]: motion["--exit"] },
   },
   turnedRight: {
     opacity: 0,
     transform: "rotate(90deg) scale(0.6)",
+    filter: "blur(4px)",
+    transitionDuration: motion["--t-moderate-exit"],
+    transitionTimingFunction: motion["--exit"],
   },
   turnedLeft: {
     opacity: 0,
     transform: "rotate(-90deg) scale(0.6)",
+    filter: "blur(4px)",
+    transitionDuration: motion["--t-moderate-exit"],
+    transitionTimingFunction: motion["--exit"],
   },
 });

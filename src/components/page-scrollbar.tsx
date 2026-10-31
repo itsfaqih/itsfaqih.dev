@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 import { jumpTo } from "./smooth-scroll";
 import { reducedMotion } from "../hooks/use-media-query";
-import { cursors, palette } from "../theme.stylex";
+import { cursors, motion, palette } from "../theme.stylex";
 
 const REVEAL_PX = 32;
 const LINGER_MS = 900;
@@ -156,7 +156,6 @@ export function PageScrollbar() {
 }
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
-const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 // One bar in the hue of the section being read, no track, shown while scrolling or within reach.
 // The handlers above set data-shown, data-gold and data-dragging on the track.
@@ -196,20 +195,18 @@ const styles = stylex.create({
       default: cursors["--cursor-grab"],
       [stylex.when.ancestor("[data-dragging]")]: cursors["--cursor-grabbing"],
     },
-    transition: {
-      default: `opacity 320ms ${EASE}, width 160ms ${EASE}, background-color 180ms ease`,
-      [REDUCE]: "background-color 180ms ease",
+    // The thumb's width grows in place on a fixed bar, so nothing reflows; reduced motion drops it.
+    transitionProperty: {
+      default: "opacity, width, background-color",
+      [REDUCE]: "opacity, background-color",
     },
     transitionDuration: {
-      default: null,
-      [stylex.when.ancestor("[data-shown]")]: { default: "120ms, 160ms, 180ms", [REDUCE]: "180ms" },
+      default: motion["--t-fast-exit"],
+      [stylex.when.ancestor("[data-shown]")]: motion["--t-fast"],
     },
     transitionTimingFunction: {
-      default: null,
-      [stylex.when.ancestor("[data-shown]")]: {
-        default: `ease-out, ${EASE}, ease`,
-        [REDUCE]: "ease",
-      },
+      default: motion["--exit"],
+      [stylex.when.ancestor("[data-shown]")]: motion["--fast"],
     },
   },
 });

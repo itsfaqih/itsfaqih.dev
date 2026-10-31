@@ -334,6 +334,8 @@ export function PrintCursor() {
   );
 }
 
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+
 // sync() toggles .on and .down on the root and sets data-mode.
 const styles = stylex.create({
   root: {
@@ -371,7 +373,10 @@ const styles = stylex.create({
   body: {
     transformBox: "view-box",
     transformOrigin: "24px 24px",
-    transform: { default: null, [stylex.when.ancestor(":is(.down)")]: "scale(0.88)" },
+    transform: {
+      default: null,
+      [stylex.when.ancestor(":is(.down)")]: { default: "scale(0.88)", [REDUCE]: null },
+    },
     transition: `transform 260ms ${motion["--snap"]}`,
     transitionDuration: { default: null, [stylex.when.ancestor(":is(.down)")]: "15ms" },
     transitionTimingFunction: { default: null, [stylex.when.ancestor(":is(.down)")]: "linear" },

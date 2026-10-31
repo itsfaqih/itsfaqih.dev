@@ -9,7 +9,7 @@ import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor
 import { Drawer } from "vaul";
 import { TableOfContents } from "./-components/table-of-contents";
 import { pageHead } from "../../seo";
-import { palette, transitions } from "../../theme.stylex";
+import { motion, palette } from "../../theme.stylex";
 
 function requirePost(slug: string) {
   const post = getPost(slug);
@@ -146,6 +146,7 @@ const components: MDXComponents = {
 };
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
 const prose = stylex.create({
   p: {
@@ -194,10 +195,18 @@ const styles = stylex.create({
       default: palette["--muted-foreground"],
       ":hover": { default: null, [HOVER]: palette["--text"] },
     },
-    scale: { default: null, ":active": "95% 95%" },
-    transitionProperty: transitions.colors,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    scale: { default: null, ":active": { default: "95% 95%", [REDUCE]: null } },
+    transitionProperty: "color, scale",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-moderate"] },
+      ":active": motion["--t-moderate"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--moderate"] },
+      ":active": motion["--moderate"],
+    },
   },
   backLinkTop: {
     marginBottom: "2rem",
@@ -205,11 +214,17 @@ const styles = stylex.create({
   backArrow: {
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "-0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "-0.25rem 0", [REDUCE]: null } },
     },
-    transitionProperty: transitions.transform,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    transitionProperty: "translate",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--t-moderate"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: motion["--moderate"] },
+    },
   },
   header: {
     marginBottom: "2rem",
@@ -284,13 +299,25 @@ const styles = stylex.create({
     backgroundColor: palette["--text"],
     scale: {
       default: null,
-      ":hover": { default: null, [HOVER]: "105% 105%" },
+      ":hover": { default: null, [HOVER]: { default: "105% 105%", [REDUCE]: null } },
       // Repeated under the media query, which would otherwise let hovering outrank pressing.
-      ":active": { default: "95% 95%", [HOVER]: "95% 95%" },
+      ":active": {
+        default: "95% 95%",
+        [HOVER]: { default: "95% 95%", [REDUCE]: null },
+        [REDUCE]: null,
+      },
     },
-    transitionProperty: "all",
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: "0.15s",
+    transitionProperty: "scale",
+    transitionDuration: {
+      default: motion["--t-moderate-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-moderate"] },
+      ":active": motion["--t-moderate"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--moderate"] },
+      ":active": motion["--moderate"],
+    },
   },
   overlay: {
     position: "fixed",

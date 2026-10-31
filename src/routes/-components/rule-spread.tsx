@@ -319,6 +319,8 @@ const HOVER = "@media (hover: hover) and (pointer: fine)";
 // A press or hover counts only while the deck is not being dragged.
 const STILL = ":not([data-dragging] *)";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
+const PRESSED = `:active${STILL}`;
+const NUDGED = `:is(:hover > * > *)${STILL}`;
 
 /*
  * The cards share one grid cell and take their pose from --d, the card's offset from the centre,
@@ -385,9 +387,9 @@ const styles = stylex.create({
     borderColor: "var(--c)",
     boxShadow: {
       default: `${palette["--raise"]}, 0 6px 0 var(--key)`,
-      [`:active${STILL}`]: `${palette["--raise"]}, 0 3px 0 var(--key)`,
+      [PRESSED]: `${palette["--raise"]}, 0 3px 0 var(--key)`,
     },
-    translate: { default: null, [`:active${STILL}`]: "0 3px" },
+    translate: { default: null, [PRESSED]: { default: "0 3px", [REDUCE]: "none" } },
     color: palette["--text"],
     textDecoration: "none",
     WebkitUserDrag: "none",
@@ -396,10 +398,8 @@ const styles = stylex.create({
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "4px" },
     transitionProperty: "translate, box-shadow",
-    transitionDuration: "100ms, 100ms",
-    transitionTimingFunction: "ease, ease",
-    transitionDelay: "0s, 0s",
-    transitionBehavior: "normal, normal",
+    transitionDuration: { default: motion["--t-moderate-exit"], [PRESSED]: motion["--t-moderate"] },
+    transitionTimingFunction: { default: motion["--exit"], [PRESSED]: motion["--moderate"] },
     // Cards fade into the page under a cover of its colour rather than going see-through, so a
     // card behind never shows through the one in front. With reduced motion the deck jumps to the
     // chosen card, and only the fade eases.
@@ -438,11 +438,17 @@ const styles = stylex.create({
     color: INK,
     translate: {
       default: null,
-      [HOVER]: { default: null, [`:is(:hover > * > *)${STILL}`]: "2px -2px" },
+      [HOVER]: { default: null, [NUDGED]: { default: "2px -2px", [REDUCE]: "none" } },
     },
     transitionProperty: "translate",
-    transitionDuration: "150ms",
-    transitionTimingFunction: motion["--out"],
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      [HOVER]: { default: null, [NUDGED]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [HOVER]: { default: null, [NUDGED]: motion["--fast"] },
+    },
   },
   thumb: {
     borderRadius: "14px",
@@ -503,17 +509,27 @@ const styles = stylex.create({
       ":active:not(:disabled)": `${palette["--raise"]}, 0 1px 0 ${palette["--drop-ink"]}`,
       ":disabled": `0 3px 0 ${palette["--drop-ink"]}`,
     },
-    transform: { default: null, ":active:not(:disabled)": "translateY(2px)" },
+    transform: {
+      default: null,
+      ":active:not(:disabled)": { default: "translateY(2px)", [REDUCE]: "none" },
+    },
     cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     outlineWidth: { default: null, ":focus-visible": "3px" },
     outlineStyle: { default: null, ":focus-visible": "solid" },
     outlineColor: { default: null, ":focus-visible": palette["--focus"] },
     outlineOffset: { default: null, ":focus-visible": "2px" },
+    // The press rides the moderate spring and the rim lights on the fast one.
     transitionProperty: "transform, box-shadow, border-color, background-color, color",
-    transitionDuration: "100ms, 100ms, 120ms, 120ms, 120ms",
-    transitionTimingFunction: "ease, ease, ease, ease, ease",
-    transitionDelay: "0s, 0s, 0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal, normal, normal",
+    transitionDuration: {
+      default: `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}`,
+      ":hover:not(:disabled)": `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}`,
+      ":active:not(:disabled)": `${motion["--t-moderate"]}, ${motion["--t-moderate"]}, ${motion["--t-fast"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}`,
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover:not(:disabled)": `${motion["--exit"]}, ${motion["--exit"]}, ${motion["--fast"]}, ${motion["--exit"]}, ${motion["--exit"]}`,
+      ":active:not(:disabled)": `${motion["--moderate"]}, ${motion["--moderate"]}, ${motion["--fast"]}, ${motion["--exit"]}, ${motion["--exit"]}`,
+    },
   },
 });
 
@@ -547,14 +563,14 @@ const number = stylex.create({
   },
   was: {
     animationName: numOut,
-    animationDuration: "180ms",
-    animationTimingFunction: motion["--out"],
+    animationDuration: motion["--t-moderate-exit"],
+    animationTimingFunction: motion["--exit"],
     animationFillMode: "forwards",
   },
   now: {
     animationName: numIn,
-    animationDuration: "220ms",
-    animationTimingFunction: motion["--out"],
+    animationDuration: motion["--t-moderate"],
+    animationTimingFunction: motion["--moderate"],
     animationFillMode: "backwards",
   },
 });

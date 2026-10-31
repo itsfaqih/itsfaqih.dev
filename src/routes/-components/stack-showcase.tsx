@@ -295,7 +295,11 @@ function usePlaceCard(
 
 const STACKED = "@media (max-width: 960px)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const LIGHT = ":is(.light *)";
+const LIFT = { default: "translateY(-3px)", [REDUCE]: "none" };
+const LIFT_TIME = `${motion["--t-fast"]}, ${motion["--t-moderate"]}`;
+const LIFT_EASE = `${motion["--fast"]}, ${motion["--moderate"]}`;
 // The panel over a tool's --ring (from techBrand), which shows in the border; a tool with no brand
 // colour gets the hairline.
 const TOOL_RING = `linear-gradient(${palette["--panel"]}, ${palette["--panel"]}), var(--ring, linear-gradient(${palette["--hair"]}, ${palette["--hair"]}))`;
@@ -412,16 +416,22 @@ const styles = stylex.create({
     color: palette["--text"],
     transform: {
       default: null,
-      ":hover": { default: null, [HOVER]: "translateY(-3px)" },
-      ":focus-visible": "translateY(-3px)",
+      ":hover": { default: null, [HOVER]: LIFT },
+      ":focus-visible": LIFT,
     },
     outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "2px" },
     transitionProperty: "border-color, transform",
-    transitionDuration: "120ms, 200ms",
-    transitionTimingFunction: `ease, ${motion["--snap"]}`,
-    transitionDelay: "0s, 0s",
-    transitionBehavior: "normal, normal",
+    transitionDuration: {
+      default: `${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}`,
+      ":hover": { default: null, [HOVER]: LIFT_TIME },
+      ":focus-visible": LIFT_TIME,
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: LIFT_EASE },
+      ":focus-visible": LIFT_EASE,
+    },
   },
   // The card that peeks out of a badge, placed above it or below by usePlaceCard.
   peek: {
@@ -446,8 +456,8 @@ const styles = stylex.create({
       ':is([data-side="top"])': "bottom center",
     },
     animationName: peekIn,
-    animationDuration: "180ms",
-    animationTimingFunction: motion["--out"],
+    animationDuration: motion["--t-moderate"],
+    animationTimingFunction: motion["--moderate"],
   },
   peekHead: {
     display: "flex",

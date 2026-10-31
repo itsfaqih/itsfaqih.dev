@@ -111,6 +111,12 @@ html[data-theme-swap]::view-transition-new(root) {
    its centre) while the card's frame swells past the screen edges, and its thumbnail and title fly
    on into the rule page's cover and heading. The names exist only during that transition, so the
    theme switch still reveals the page as one picture. */
+/* Global: the dive's one curve and length, set on html so its view-transition pseudo-elements
+   inherit them. */
+html {
+  --dive-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --dive-time: 620ms;
+}
 html:active-view-transition-type(rule-open) [data-opening] {
   view-transition-name: rule-card;
 }
@@ -132,7 +138,7 @@ html:active-view-transition-type(rule-open) .island {
 ::view-transition-group(rule-thumb),
 ::view-transition-group(rule-title) {
   animation-duration: 520ms;
-  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  animation-timing-function: var(--dive-ease);
 }
 /* The title rewraps at the larger size, so both pictures keep their own shape, pinned top left. */
 ::view-transition-old(rule-title),
@@ -143,14 +149,14 @@ html:active-view-transition-type(rule-open) .island {
 }
 html:active-view-transition-type(rule-open)::view-transition-old(root) {
   transform-origin: var(--open-x, 50%) var(--open-y, 50%);
-  animation: rule-dive-root 620ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation: rule-dive-root var(--dive-time) var(--dive-ease) both;
 }
 html:active-view-transition-type(rule-open)::view-transition-new(root) {
   animation: vt-fade-in 300ms 220ms ease-out both;
 }
 ::view-transition-old(rule-card) {
   animation:
-    rule-dive-card 620ms cubic-bezier(0.32, 0.72, 0, 1) both,
+    rule-dive-card var(--dive-time) var(--dive-ease) both,
     vt-fade-out 260ms 240ms ease-out both;
 }
 /* Both layers cover the screen as they grow, so a blur on either re-rasterises it every frame and

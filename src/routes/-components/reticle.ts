@@ -33,11 +33,10 @@ export const reticle = stylex.create({
       backgroundRepeat: "no-repeat",
       opacity: 0,
       transform: { default: AWAY, [REDUCE]: "none" },
+      // Locks on with the fast spring and lets go on its quicker exit.
       transitionProperty: "opacity, transform",
-      transitionDuration: "120ms, 200ms",
-      transitionTimingFunction: `ease, ${motion["--snap"]}`,
-      transitionDelay: "0s, 0s",
-      transitionBehavior: "normal, normal",
+      transitionDuration: motion["--t-fast-exit"],
+      transitionTimingFunction: motion["--exit"],
     },
   },
   aim: {
@@ -53,6 +52,16 @@ export const reticle = stylex.create({
         [HOVER]: { default: null, ":hover": "none" },
         [REDUCE]: "none",
       },
+      transitionDuration: {
+        default: motion["--t-fast-exit"],
+        ":focus-visible": motion["--t-fast"],
+        [HOVER]: { default: null, ":hover": motion["--t-fast"] },
+      },
+      transitionTimingFunction: {
+        default: motion["--exit"],
+        ":focus-visible": motion["--fast"],
+        [HOVER]: { default: null, ":hover": motion["--fast"] },
+      },
     },
   },
   // The card is picked while it carries data-on. An attribute rather than a conditional style, so
@@ -61,6 +70,8 @@ export const reticle = stylex.create({
     "::after": {
       opacity: { default: 0, ":is([data-on])": 1 },
       transform: { default: AWAY, ":is([data-on])": "none", [REDUCE]: "none" },
+      transitionDuration: { default: motion["--t-fast-exit"], ":is([data-on])": motion["--t-fast"] },
+      transitionTimingFunction: { default: motion["--exit"], ":is([data-on])": motion["--fast"] },
     },
   },
 });

@@ -90,7 +90,7 @@ const styles = stylex.create({
     backgroundColor: palette["--panel-2"],
   },
   gone: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 14%, ${palette["--panel-2"]})`,
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 14%, ${palette["--panel-2"]})`,
   },
   strong: {
     fontWeight: 700,
@@ -99,7 +99,7 @@ const styles = stylex.create({
     fontFamily: fonts["--display"],
   },
   goneName: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   price: {
     fontWeight: 600,
@@ -403,11 +403,11 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   red: {
-    "--c": kit["--no"],
+    "--c": palette["--no"],
   },
   redTint: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   close: {
     display: "grid",
@@ -465,7 +465,7 @@ const styles = stylex.create({
     zIndex: 3,
     "::after": {
       borderStyle: "dashed",
-      borderColor: kit["--no"],
+      borderColor: palette["--no"],
     },
   },
   bar: {
@@ -526,7 +526,7 @@ const styles = stylex.create({
     color: palette["--dim"],
   },
   readNo: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   readYes: {
     color: kit["--yes-ink"],
@@ -1119,7 +1119,7 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
     if (!dialog) return;
     if (reducedMotion()) {
       dialog.animate(
-        [{ boxShadow: `0 0 0 2px ${kit["--no"]}` }, { boxShadow: "0 0 0 2px transparent" }],
+        [{ boxShadow: `0 0 0 2px ${palette["--no"]}` }, { boxShadow: "0 0 0 2px transparent" }],
         {
           duration: 480,
           easing: "ease-out",

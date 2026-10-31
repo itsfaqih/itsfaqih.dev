@@ -56,7 +56,7 @@ import {
   siXyflow,
   siZod,
 } from "simple-icons";
-import { palette } from "../../theme.stylex";
+import { motion, palette } from "../../theme.stylex";
 import { TECH_LOGOS } from "./tech-logos";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
@@ -269,10 +269,11 @@ export const techBadge = stylex.create({
   brand: BRAND,
 });
 
+// The layer arriving takes the fast tier and the one leaving its quicker exit, picked by --lit.
+const FADE_GAP = `(${motion["--t-fast"]} - ${motion["--t-fast-exit"]})`;
 const FADE = {
   transitionProperty: "opacity",
-  transitionDuration: "120ms",
-  transitionTimingFunction: "ease",
+  transitionTimingFunction: motion["--exit"],
 };
 
 /** The two layers of a TechIcon or CompanyLogo: `flat`, the one-colour mark, and `lit`, the colours. */
@@ -291,6 +292,7 @@ export const icon = stylex.create({
     fill: "currentColor",
     opacity: "calc(1 - var(--lit, 0))",
     ...FADE,
+    transitionDuration: `calc(${motion["--t-fast"]} - var(--lit, 0) * ${FADE_GAP})`,
   },
   lit: {
     gridArea: "1 / 1",
@@ -298,6 +300,7 @@ export const icon = stylex.create({
     height: "100%",
     opacity: "var(--lit, 0)",
     ...FADE,
+    transitionDuration: `calc(${motion["--t-fast-exit"]} + var(--lit, 0) * ${FADE_GAP})`,
   },
 });
 

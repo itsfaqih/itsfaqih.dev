@@ -12,7 +12,7 @@ import {
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import { Kbd, type Lesson, RuleLanding } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
-import { button } from "../../components/button";
+import { button, buttonVariant } from "../../components/button";
 
 const TABLET = "@media (max-width: 820px)";
 const PHONE = "@media (max-width: 640px)";
@@ -94,7 +94,7 @@ const styles = stylex.create({
     fontSize: "12px",
   },
   red: {
-    "--c": kit["--no"],
+    "--c": palette["--no"],
   },
   tint: {
     "--face": "color-mix(in srgb, var(--c) 18%, transparent)",
@@ -374,7 +374,7 @@ const styles = stylex.create({
     boxShadow: `0 0 0 1px ${palette["--hair"]}`,
   },
   confirm: {
-    boxShadow: `0 0 0 1.5px color-mix(in srgb, ${kit["--no"]} 55%, transparent)`,
+    boxShadow: `0 0 0 1.5px color-mix(in srgb, ${palette["--no"]} 55%, transparent)`,
   },
   deleted: {
     backgroundColor: "transparent",
@@ -423,7 +423,7 @@ const styles = stylex.create({
     position: "absolute",
     inset: 0,
     zIndex: -1,
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 34%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 34%, transparent)`,
     transformOrigin: "left center",
     transform: "scaleX(0)",
     transition: `transform 200ms ${motion["--out"]}`,
@@ -437,7 +437,7 @@ const styles = stylex.create({
     insetInline: 0,
     bottom: 0,
     height: "3px",
-    backgroundColor: kit["--no"],
+    backgroundColor: palette["--no"],
     transformOrigin: "left center",
     animationName: drain,
     animationDuration: `${UNDO_MS}ms`,
@@ -460,7 +460,7 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   projectGone: {
-    color: kit["--no-ink"],
+    color: palette["--no-ink"],
   },
   projectMeta: {
     fontSize: "13px",
@@ -751,7 +751,7 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
     <button
       data-hint
       type="button"
-      {...stylex.props(button.base, button.soft, button.sm, styles.toggle)}
+      {...stylex.props(button.base, buttonVariant["primary-neutral"], button.sm, styles.toggle)}
       data-toggle={name}
       aria-pressed={on}
       onClick={() => setOn((value) => !value)}

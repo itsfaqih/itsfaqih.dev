@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { palette, transitions } from "../../../theme.stylex";
+import { motion, palette } from "../../../theme.stylex";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 type TableOfContentsProps = {
@@ -115,7 +115,12 @@ export function TableOfContents({ onLinkClick }: TableOfContentsProps) {
                 onLinkClick?.();
               }}
             >
-              {heading.text}
+              <span {...stylex.props(styles.label)}>
+                <span {...stylex.props(styles.layer)}>{heading.text}</span>
+                <span aria-hidden="true" {...stylex.props(styles.layer, styles.ghost)}>
+                  {heading.text}
+                </span>
+              </span>
             </a>
           </li>
         ))}
@@ -151,24 +156,24 @@ const styles = stylex.create({
       },
     },
     transitionProperty: "opacity",
-    transitionTimingFunction: transitions.ease,
     transitionDuration: {
-      default: "0.25s",
-      ":hover": { default: null, [HOVER]: "0s" },
+      default: motion["--t-fast-exit"],
+      [stylex.when.ancestor(":has(a:hover)")]: { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      [stylex.when.ancestor(":has(a:hover)")]: { default: null, [HOVER]: motion["--fast"] },
     },
   },
   link: {
     display: "block",
     paddingBlock: { default: "0.75rem", "@media (min-width: 64rem)": "0.375rem" },
-    transitionProperty: transitions.colors,
-    transitionTimingFunction: transitions.ease,
-    transitionDuration: {
-      default: "1s",
-      ":hover": { default: null, [HOVER]: "0s" },
-    },
+    transitionProperty: "color, font-weight",
   },
   active: {
     fontWeight: 500,
+    transitionDuration: motion["--t-fast"],
+    transitionTimingFunction: motion["--fast"],
   },
   idle: {
     color: {
@@ -176,5 +181,26 @@ const styles = stylex.create({
       ":hover": { default: null, [HOVER]: palette["--text"] },
       ":active": palette["--text"],
     },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+      ":active": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+      ":active": motion["--fast"],
+    },
+  },
+  // The active entry turns 500: a hidden copy holds that width, so the bolder text never rewraps.
+  label: {
+    display: "grid",
+  },
+  layer: {
+    gridArea: "1 / 1",
+  },
+  ghost: {
+    visibility: "hidden",
+    fontWeight: 500,
   },
 });

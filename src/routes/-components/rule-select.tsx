@@ -345,6 +345,12 @@ const DIMMED_FOCUS = ":not([data-on]):is(:focus-within > *):not(:is(.js *):not(.
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
 const PANEL_SHADOW = `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`;
 const TILE_TOP = "inset 0 4px 0 var(--c)";
+// Per tile: opacity (the dim), transform, border-color, box-shadow (the lift onto its key).
+const TILE_LEAVE = `${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}`;
+const TILE_PICK = `${motion["--t-fast"]}, ${motion["--t-moderate"]}, ${motion["--t-fast"]}, ${motion["--t-moderate"]}`;
+const TILE_PICK_EASE = `${motion["--fast"]}, ${motion["--moderate"]}, ${motion["--fast"]}, ${motion["--moderate"]}`;
+const TILE_DIM = `${motion["--t-fast"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}`;
+const TILE_DIM_EASE = `${motion["--fast"]}, ${motion["--exit"]}, ${motion["--exit"]}, ${motion["--exit"]}`;
 const LENS = (near: string, far: string) =>
   `radial-gradient(circle at var(--lens-x) var(--lens-y), ${near}, ${far} var(--reach))`;
 
@@ -397,10 +403,8 @@ const styles = stylex.create({
     },
     overflow: "hidden",
     transitionProperty: "border-color, box-shadow",
-    transitionDuration: "150ms, 180ms",
-    transitionTimingFunction: "ease, ease",
-    transitionDelay: "0s, 0s",
-    transitionBehavior: "normal, normal",
+    transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit] > *)": motion["--t-fast"] },
+    transitionTimingFunction: { default: motion["--exit"], ":is([data-lit] > *)": motion["--fast"] },
   },
   plate: {
     fontWeight: 700,
@@ -422,8 +426,8 @@ const styles = stylex.create({
     marginBlock: "12px 16px",
     marginInline: 0,
     animationName: enter,
-    animationDuration: "380ms",
-    animationTimingFunction: motion["--snap"],
+    animationDuration: motion["--t-slow"],
+    animationTimingFunction: motion["--slow"],
   },
   // The description gets a fixed three-line slot, so a longer blurb never changes the panel's
   // height. The title takes only the lines it needs.
@@ -594,12 +598,17 @@ const styles = stylex.create({
     outlineOffset: { default: null, ":focus-visible": "3px" },
     transitionProperty: "opacity, transform, border-color, box-shadow",
     transitionDuration: {
-      default: "160ms, 220ms, 120ms, 160ms",
-      ":is([data-on])": { default: null, ":active": "100ms" },
+      default: TILE_LEAVE,
+      ":is([data-on])": TILE_PICK,
+      [DIMMED_FOCUS]: TILE_DIM,
+      [HOVER]: { default: null, [DIMMED_HOVER]: TILE_DIM },
     },
-    transitionTimingFunction: `ease, ${motion["--snap"]}, ease, ease`,
-    transitionDelay: "0s, 0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal, normal",
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":is([data-on])": TILE_PICK_EASE,
+      [DIMMED_FOCUS]: TILE_DIM_EASE,
+      [HOVER]: { default: null, [DIMMED_HOVER]: TILE_DIM_EASE },
+    },
     // A lit tile turns into the projector's lens: its face fills with its hue under the halftone
     // screen, and the beam carries the light from it onto the panel, which shows what it projects.
     "::before": {
@@ -612,8 +621,8 @@ const styles = stylex.create({
       ...halftoneOverHue,
       opacity: { default: 0, ":is([data-lit])": 1 },
       transitionProperty: "opacity",
-      transitionDuration: "120ms",
-      transitionTimingFunction: "ease",
+      transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit])": motion["--t-fast"] },
+      transitionTimingFunction: { default: motion["--exit"], ":is([data-lit])": motion["--fast"] },
     },
   },
   number: {
@@ -664,8 +673,8 @@ const styles = stylex.create({
     mixBlendMode: { default: "screen", [LIGHT]: "multiply" },
     opacity: { default: 0, ":is([data-lit] > *)": 1 },
     transitionProperty: "opacity",
-    transitionDuration: "180ms",
-    transitionTimingFunction: "ease",
+    transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit] > *)": motion["--t-fast"] },
+    transitionTimingFunction: { default: motion["--exit"], ":is([data-lit] > *)": motion["--fast"] },
     animationName: { default: null, ":is([data-lit] > *)": beamOn },
     animationDuration: { default: null, ":is([data-lit] > *)": "260ms" },
     animationTimingFunction: { default: null, ":is([data-lit] > *)": "steps(1)" },

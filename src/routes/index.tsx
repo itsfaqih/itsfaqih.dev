@@ -14,7 +14,7 @@ import { StackShowcase, type StackGroup } from "./-components/stack-showcase";
 import { useCutIns } from "./-components/use-cut-ins";
 import { LINKS, pageHead } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
-import { button } from "../components/button";
+import { button, buttonVariant } from "../components/button";
 import { section, veil } from "./-components/section";
 import { hoverHold } from "../components/hover-hold";
 import { loadIn } from "../components/load-in";
@@ -414,11 +414,11 @@ function Index() {
             </span>
           </h2>
           <div {...stylex.props(loadIn.piece, heroType.acts)} data-cut style={{ marginTop: 24 }}>
-            <a {...stylex.props(button.base, button.hue)} href={`mailto:${LINKS.email}`}>
+            <a {...stylex.props(button.base, buttonVariant["primary-brand"])} href={`mailto:${LINKS.email}`}>
               {`Email ${LINKS.email}`}
             </a>
             <a
-              {...stylex.props(button.base, button.soft)}
+              {...stylex.props(button.base, buttonVariant["secondary-brand"])}
               href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
@@ -483,6 +483,9 @@ const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const LIFT = "translateY(-4px) rotate(-1deg)";
+// The lift and press ride the moderate spring and the rim the fast one; they leave on the exits.
+const LIFT_TIME = `${motion["--t-moderate"]}, ${motion["--t-moderate"]}, ${motion["--t-fast"]}`;
+const LIFT_EASE = `${motion["--moderate"]}, ${motion["--moderate"]}, ${motion["--fast"]}`;
 
 const marquee = stylex.keyframes({ to: { transform: "translate(-50%)" } });
 
@@ -557,10 +560,18 @@ const styles = stylex.create({
     outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "3px" },
     transitionProperty: "transform, box-shadow, border-color",
-    transitionDuration: { default: "220ms, 220ms, 120ms", ":active": "100ms" },
-    transitionTimingFunction: `${motion["--snap"]}, ${motion["--snap"]}, ease`,
-    transitionDelay: "0s, 0s, 0s",
-    transitionBehavior: "normal, normal, normal",
+    transitionDuration: {
+      default: `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}`,
+      ":hover": { default: null, [HOVER]: LIFT_TIME },
+      ":focus-visible": LIFT_TIME,
+      ":active": LIFT_TIME,
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: LIFT_EASE },
+      ":focus-visible": LIFT_EASE,
+      ":active": LIFT_EASE,
+    },
   },
   projectKind: {
     font: `700 11px ${fonts["--display"]}`,

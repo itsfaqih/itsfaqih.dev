@@ -13,7 +13,7 @@ import {
   Tip,
 } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
-import { button } from "../../components/button";
+import { button, buttonVariant } from "../../components/button";
 import { arcade } from "../../components/arcade";
 
 type Tone = "no" | "yes";
@@ -59,12 +59,12 @@ const styles = stylex.create({
     backgroundColor: {
       default: null,
       [stylex.when.ancestor('[data-side="bad"]')]:
-        `color-mix(in srgb, ${kit["--no"]} 10%, transparent)`,
+        `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
       [stylex.when.ancestor('[data-side="good"]')]: "color-mix(in srgb, var(--c) 10%, transparent)",
     },
     boxShadow: {
       default: null,
-      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${kit["--no"]}`,
+      [stylex.when.ancestor('[data-side="bad"]')]: `inset 2px 0 0 ${palette["--no"]}`,
       [stylex.when.ancestor('[data-side="good"]')]: "inset 2px 0 0 var(--c)",
     },
   },
@@ -97,8 +97,8 @@ const styles = stylex.create({
     },
   },
   outNo: {
-    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
-    color: kit["--no-ink"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
   },
   outYes: {
     backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
@@ -111,7 +111,7 @@ const styles = stylex.create({
     bottom: "-3px",
     left: 0,
     height: "4px",
-    backgroundColor: kit["--no"],
+    backgroundColor: palette["--no"],
     transformOrigin: "left",
     pointerEvents: "none",
     maskImage:
@@ -322,7 +322,7 @@ function Checked({ lines }: { lines: Line[] }) {
         </span>
         <button
           type="button"
-          {...stylex.props(button.base, button.soft, button.sm, styles.run)}
+          {...stylex.props(button.base, buttonVariant["primary-neutral"], button.sm, styles.run)}
           disabled={phase === "run"}
           onClick={() => {
             touched.current = true;
