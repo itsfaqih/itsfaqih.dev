@@ -36,6 +36,8 @@ const zinc700 = "lab(26.8019% 1.35387 -4.68303)";
 const zinc600 = "lab(35.1166% 1.78212 -6.1173)";
 const zinc400 = "lab(65.6464% 1.53497 -5.42429)";
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 const styles = stylex.create({
   counter: {
     display: "inline-flex",
@@ -60,18 +62,18 @@ const styles = stylex.create({
   decrease: {
     color: {
       default: zinc400,
-      ":hover": { default: null, "@media (hover: hover)": "#fff" },
+      ":hover": { default: null, [HOVER]: "#fff" },
     },
     backgroundColor: {
       default: null,
-      ":hover": { default: null, "@media (hover: hover)": zinc700 },
+      ":hover": { default: null, [HOVER]: zinc700 },
     },
   },
   increase: {
     color: "#fff",
     backgroundColor: {
       default: zinc700,
-      ":hover": { default: null, "@media (hover: hover)": zinc600 },
+      ":hover": { default: null, [HOVER]: zinc600 },
     },
   },
   display: {

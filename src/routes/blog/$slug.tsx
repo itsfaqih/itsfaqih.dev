@@ -145,6 +145,8 @@ const components: MDXComponents = {
   pre: MarkdownCodeBlock,
 };
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 const prose = stylex.create({
   p: {
     marginTop: { default: "1.25em", ":first-child": 0, ":is(h2 + *)": 0 },
@@ -165,7 +167,7 @@ const prose = stylex.create({
 const styles = stylex.create({
   page: {
     position: "relative",
-    minHeight: "100vh",
+    minHeight: "100svh",
   },
   shell: {
     position: "relative",
@@ -190,7 +192,7 @@ const styles = stylex.create({
     gap: "0.5rem",
     color: {
       default: palette["--muted-foreground"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
     },
     scale: { default: null, ":active": "95% 95%" },
     transitionProperty: transitions.colors,
@@ -203,7 +205,7 @@ const styles = stylex.create({
   backArrow: {
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "-0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "-0.25rem 0" },
     },
     transitionProperty: transitions.transform,
     transitionTimingFunction: transitions.ease,
@@ -272,8 +274,8 @@ const styles = stylex.create({
   },
   tocButton: {
     position: "fixed",
-    right: "1.5rem",
-    bottom: "1.5rem",
+    right: "calc(1.5rem + env(safe-area-inset-right, 0px))",
+    bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
     zIndex: 50,
     display: { default: null, "@media (min-width: 64rem)": "none" },
     padding: "1rem",
@@ -282,9 +284,9 @@ const styles = stylex.create({
     backgroundColor: palette["--text"],
     scale: {
       default: null,
-      ":hover": { default: null, "@media (hover: hover)": "105% 105%" },
+      ":hover": { default: null, [HOVER]: "105% 105%" },
       // Repeated under the media query, which would otherwise let hovering outrank pressing.
-      ":active": { default: "95% 95%", "@media (hover: hover)": "95% 95%" },
+      ":active": { default: "95% 95%", [HOVER]: "95% 95%" },
     },
     transitionProperty: "all",
     transitionTimingFunction: transitions.ease,
@@ -304,7 +306,7 @@ const styles = stylex.create({
     zIndex: 50,
     display: "flex",
     flexDirection: "column",
-    maxHeight: "85vh",
+    maxHeight: "85dvh",
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderColor: palette["--border"],
@@ -318,7 +320,9 @@ const styles = stylex.create({
     flex: "1",
     flexDirection: "column",
     minHeight: 0,
-    padding: "1rem",
+    paddingTop: "1rem",
+    paddingInline: "1rem",
+    paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     backgroundColor: palette["--bg"],
@@ -351,5 +355,6 @@ const styles = stylex.create({
   drawerScroll: {
     flex: "1",
     overflowY: "auto",
+    overscrollBehavior: "contain",
   },
 });

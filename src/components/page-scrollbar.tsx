@@ -165,7 +165,7 @@ const styles = stylex.create({
     "--sb-hue": palette["--go"],
     position: "fixed",
     top: 0,
-    right: 0,
+    right: "env(safe-area-inset-right, 0px)",
     bottom: 0,
     zIndex: 2147483646,
     width: "24px",

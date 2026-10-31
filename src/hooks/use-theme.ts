@@ -16,6 +16,11 @@ function applyThemeClass(theme: Theme) {
   const root = window.document.documentElement;
   root.classList.remove(...THEME_CLASSES.light, ...THEME_CLASSES.dark);
   root.classList.add(...THEME_CLASSES[theme]);
+  // The metas' media queries follow the system, which a saved choice can contradict (see the
+  // inline script in __root.tsx).
+  for (const meta of root.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+    meta.media = meta.dataset.theme === theme ? "all" : "not all";
+  }
 }
 
 function subscribe(onStoreChange: () => void) {

@@ -1,10 +1,20 @@
+export type RuleId =
+  | "proximity-principle"
+  | "typescript-code-writing"
+  | "button-design"
+  | "table-design"
+  | "dialog-design"
+  | "form-submission"
+  | "data-loading"
+  | "handling-timestamps"
+  | "null-vs-undefined";
+
 type GuidelineBase = {
-  id: string;
+  id: RuleId;
   label: string;
   title: string;
   description: string;
   hidden?: boolean;
-  interactive?: boolean;
 };
 
 type PublishedEntry = GuidelineBase & {
@@ -28,7 +38,6 @@ const ENTRIES: Entry[] = [
     headTitle: "Proximity Principle: Keep Code Next to the Code That Uses It",
     claim: "Keep code next to the code that uses it.",
     coverTag: "FAR → NEAR",
-    interactive: true,
   },
   {
     id: "typescript-code-writing",
@@ -48,7 +57,6 @@ const ENTRIES: Entry[] = [
     headTitle: "Button Design: States, Hover, Variants, and Icon Alignment",
     claim: "Make a button show what it does and what it's doing.",
     coverTag: "SILENT → TACTILE",
-    interactive: true,
   },
   {
     id: "table-design",
@@ -82,11 +90,10 @@ const ENTRIES: Entry[] = [
     id: "data-loading",
     label: "Architecture",
     title: "Data Loading",
-    description: "SSR, loaders, SWR, and error handling",
+    description: "Server rendering, early fetches, stale data, and errors",
     headTitle: "Data Loading: SSR, Loaders, SWR, and Never a Blank Screen",
     claim: "Fetch early, show what you have, and never blank the screen.",
     coverTag: "BLANK → INSTANT",
-    interactive: true,
   },
   {
     id: "handling-timestamps",

@@ -94,13 +94,23 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
                 {job.company}
                 <small {...stylex.props(styles.role)}>{job.role}</small>
               </h3>
-              <span {...stylex.props(styles.chevron, isOpen && styles.chevronOpen)} aria-hidden="true" />
+              <span
+                {...stylex.props(styles.chevron, isOpen && styles.chevronOpen)}
+                aria-hidden="true"
+              />
             </button>
-            <ul {...stylex.props(styles.stack, isOpen && styles.stackOpen)} aria-label={`${job.company} stack`}>
+            <ul
+              {...stylex.props(styles.stack, isOpen && styles.stackOpen)}
+              aria-label={`${job.company} stack`}
+            >
               {job.stack.map((tool) => (
                 <li
                   key={tool}
-                  {...stylex.props(techBadge.badge, styles.pill, isOpen ? styles.pillOpen : styles.pillClosed)}
+                  {...stylex.props(
+                    techBadge.badge,
+                    styles.pill,
+                    isOpen ? styles.pillOpen : styles.pillClosed,
+                  )}
                   style={techBrand(tool)}
                 >
                   <TechIcon name={tool} style={isOpen ? styles.markOpen : styles.markClosed} />
@@ -151,6 +161,7 @@ const PILL_OUT = 110;
 const PILL_IN = 320;
 const OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const STACKED = "@media (max-width: 960px)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const LIGHT = ":is(.light *)";
 
 const listIn = stylex.keyframes({
@@ -186,11 +197,17 @@ const styles = stylex.create({
     backgroundColor: {
       default: palette["--panel"],
       ":is([data-on])": palette["--panel-2"],
-      ":not([data-on]):hover": `color-mix(in srgb, ${palette["--panel-2"]} 55%, transparent)`,
+      ":not([data-on]):hover": {
+        default: null,
+        [HOVER]: `color-mix(in srgb, ${palette["--panel-2"]} 55%, transparent)`,
+      },
       [LIGHT]: {
         default: palette["--bg"],
         ":is([data-on])": palette["--panel"],
-        ":not([data-on]):hover": `color-mix(in srgb, ${palette["--panel-2"]} 55%, ${palette["--bg"]})`,
+        ":not([data-on]):hover": {
+          default: null,
+          [HOVER]: `color-mix(in srgb, ${palette["--panel-2"]} 55%, ${palette["--bg"]})`,
+        },
       },
     },
     outline: { default: null, ":has(> button:focus-visible)": `2px solid ${palette["--focus"]}` },
@@ -313,14 +330,23 @@ const styles = stylex.create({
   // A closed row lifts its badges' rims and marks together under the pointer; an open row lights
   // the badge under the pointer in its tool's own colours.
   pillClosed: {
-    borderColor: { default: palette["--hair"], [stylex.when.ancestor(":hover")]: palette["--hair-hover"] },
+    borderColor: {
+      default: palette["--hair"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: palette["--hair-hover"] },
+    },
   },
   pillOpen: {
-    "--lit": { default: null, ":hover": "1" },
-    borderColor: { default: palette["--hair"], ":hover": "var(--brand)" },
+    "--lit": { default: null, ":hover": { default: null, [HOVER]: "1" } },
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": { default: null, [HOVER]: "var(--brand)" },
+    },
   },
   markClosed: {
-    color: { default: palette["--mute"], [stylex.when.ancestor(":hover")]: palette["--dim"] },
+    color: {
+      default: palette["--mute"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: palette["--dim"] },
+    },
   },
   markOpen: {
     color: palette["--dim"],

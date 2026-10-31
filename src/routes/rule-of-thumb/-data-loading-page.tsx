@@ -2,15 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import {
-  Code,
-  type Lesson,
-  LessonText,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-  Tip,
-} from "./-components/rule-landing";
+import { type Lesson, onceOnScreen, RuleLanding, Tip } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 import { button } from "../../components/button";
 import { arcade } from "../../components/arcade";
@@ -50,17 +42,6 @@ const toastFade = stylex.keyframes({
 });
 
 const styles = stylex.create({
-  stores: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "6px",
-  },
-  store: {
-    paddingBlock: "4px",
-    paddingInline: "8px",
-    fontSize: "13px",
-    color: "var(--c-ink)",
-  },
   view: {
     display: "grid",
     gridTemplateRows: "1fr auto",
@@ -790,7 +771,7 @@ const SWEEP = 1600;
 const LATE: Waterfall = {
   bars: [
     { label: "app.js", from: 0, to: 300, kind: "code" },
-    { label: "<Orders>", from: 300, to: 330, kind: "render" },
+    { label: "render orders", from: 300, to: 330, kind: "render" },
     { label: "GET /orders", from: 330, to: 820, kind: "req" },
   ],
   paint: 840,
@@ -800,7 +781,7 @@ const EARLY: Waterfall = {
   bars: [
     { label: "app.js", from: 0, to: 300, kind: "code" },
     { label: "GET /orders", from: 0, to: 500, kind: "req" },
-    { label: "<Orders>", from: 500, to: 520, kind: "render" },
+    { label: "render orders", from: 500, to: 520, kind: "render" },
     { label: "GET /reviews", from: 0, to: 880, kind: "defer" },
   ],
   paint: 520,
@@ -889,6 +870,7 @@ function WaterfallView({ bars, paint }: Waterfall) {
           )}
         </span>
         <button
+          data-hint
           type="button"
           className={CTL_BUTTON}
           onClick={() => setSweep({ state: "run", n: run + 1 })}
@@ -945,7 +927,13 @@ function RevenueCard({ swr }: { swr: boolean }) {
       </div>
       <Controls>
         <span {...stylex.props(styles.note)}>Refetch takes 900ms</span>
-        <button type="button" className={CTL_BUTTON} disabled={card.fetching} onClick={refetch}>
+        <button
+          data-hint
+          type="button"
+          className={CTL_BUTTON}
+          disabled={card.fetching}
+          onClick={refetch}
+        >
           Refetch
         </button>
       </Controls>
@@ -1032,6 +1020,7 @@ function InboxView({ delay }: { delay: boolean }) {
         <span {...stylex.props(styles.note)}>Server replies in</span>
         <span {...stylex.props(styles.pair)}>
           <button
+            data-hint
             type="button"
             className={CTL_BUTTON}
             disabled={inbox.phase === "wait"}
@@ -1133,7 +1122,13 @@ function TeamView({ inline }: { inline: boolean }) {
       </div>
       <Controls>
         <span {...stylex.props(styles.note)}>The next request fails</span>
-        <button type="button" className={CTL_BUTTON} disabled={team === "loading"} onClick={fail}>
+        <button
+          data-hint
+          type="button"
+          className={CTL_BUTTON}
+          disabled={team === "loading"}
+          onClick={fail}
+        >
           Fail a request
         </button>
       </Controls>
@@ -1200,7 +1195,7 @@ function ParseView({ parse }: { parse: boolean }) {
             {"const user = "}
             <mark {...stylex.props(styles.mark)}>User.parse</mark>
             {"(await res.json());\n"}
-            <span {...stylex.props(styles.comment)}>{'// city: z.string().catch("Unknown")'}</span>
+            <span {...stylex.props(styles.comment)}>{'// a missing city becomes "Unknown"'}</span>
           </>
         ) : (
           <>
@@ -1231,7 +1226,13 @@ function ParseView({ parse }: { parse: boolean }) {
       </div>
       <Controls>
         <span {...stylex.props(styles.note)}>The API left out city</span>
-        <button type="button" className={CTL_BUTTON} disabled={fetching} onClick={fetchUser}>
+        <button
+          data-hint
+          type="button"
+          className={CTL_BUTTON}
+          disabled={fetching}
+          onClick={fetchUser}
+        >
           Fetch /users/1
         </button>
       </Controls>
@@ -1322,6 +1323,7 @@ function WalletView({ careful }: { careful: boolean }) {
       <Controls>
         <span {...stylex.props(styles.note)}>Opened from cache</span>
         <button
+          data-hint
           type="button"
           className={CTL_BUTTON}
           disabled={signal === "connecting"}
@@ -1334,26 +1336,70 @@ function WalletView({ careful }: { careful: boolean }) {
   );
 }
 
+const at = (ms: string, text: string) => (
+  <>
+    <time {...stylex.props(styles.time)}>{ms}</time>
+    {text}
+  </>
+);
+
 export const LESSONS: Lesson[] = [
   {
     title: "Start fetching early",
     body: (
       <>
-        Fetch in the route loader, not in a component. A fetch in <Code>useEffect</Code> waits until
-        the page's code loads and renders. A loader starts it with the navigation, so it runs while
-        the code loads. Await what the page needs and stream the rest.
+        Fetch on navigation, not on render. A fetch that starts when the page renders waits for the
+        page's code to load and render first. Start it as the user navigates, so it runs while the
+        code loads. Wait for what the page needs and stream the rest.
       </>
     ),
     bad: {
-      label: "In useEffect",
+      label: "Fetch on render",
       costs: ["data at 840ms", "1 waterfall"],
       view: <WaterfallView {...LATE} />,
     },
     good: {
-      label: "Fetch in the loader",
+      label: "Fetch on navigation",
       costs: ["data at 520ms", "0 waterfalls"],
       view: <WaterfallView {...EARLY} />,
     },
+    levels: [
+      {
+        name: "Twenty orders",
+        prompt: <>The orders page lists 20 orders, one row each. Place the request.</>,
+        piece: "request orders",
+        answer: "loader",
+        rows: [
+          { depth: 0, text: at("0ms", "You click Orders") },
+          {
+            depth: 1,
+            slot: {
+              id: "loader",
+              label: "as you navigate",
+              note: "Start it with the navigation, while the page's code loads. One request covers the list.",
+            },
+          },
+          { depth: 0, text: at("300ms", "Code loaded, the page renders") },
+          {
+            depth: 1,
+            slot: {
+              id: "effect",
+              label: "after the page renders",
+              note: "It waits for the code and the first render, so the data shows 300ms later than it could.",
+            },
+          },
+          { depth: 0, text: at("320ms", "Each row renders") },
+          {
+            depth: 1,
+            slot: {
+              id: "rows",
+              label: "after each row renders",
+              note: "Twenty requests where one would do, each after its row renders.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Keep stale data on screen",
@@ -1373,6 +1419,47 @@ export const LESSONS: Lesson[] = [
       costs: ["0ms blank", "1 quiet update"],
       view: <RevenueCard swr />,
     },
+    levels: [
+      {
+        name: "Back to the tab",
+        prompt: (
+          <>
+            You return to a tab of prices loaded 5 minutes ago. They refetch on focus. Place the
+            cached prices.
+          </>
+        ),
+        piece: "cached prices",
+        answer: "stay",
+        rows: [
+          { depth: 0, text: at("0ms", "The tab gets focus, refetch starts") },
+          {
+            depth: 1,
+            slot: {
+              id: "blank",
+              label: "make way for a full spinner",
+              note: "Prices you could have read vanish for 600ms, then come back a little different.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "stay",
+              label: "stay, with a small spinner beside them",
+              note: "Keep them readable. Fresh numbers swap in place when they land.",
+            },
+          },
+          { depth: 0, text: at("600ms", "Fresh prices arrive") },
+          {
+            depth: 1,
+            slot: {
+              id: "keep",
+              label: "stay until the next page load",
+              note: "The fresh prices arrive and nobody sees them. The cache never revalidates.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Wait before the skeleton",
@@ -1392,6 +1479,43 @@ export const LESSONS: Lesson[] = [
       costs: ["0 flashes"],
       view: <InboxView delay />,
     },
+    levels: [
+      {
+        name: "A quick reply",
+        prompt: <>Most replies to this list land in 80ms. A few take 2s. Place the spinner.</>,
+        piece: "spinner",
+        answer: "delay",
+        rows: [
+          { depth: 0, text: at("0ms", "You press Refresh") },
+          {
+            depth: 1,
+            slot: {
+              id: "now",
+              label: "show it at once",
+              note: "Most replies land at 80ms, so the spinner flashes on almost every click.",
+            },
+          },
+          { depth: 0, text: at("80ms", "Most replies land") },
+          {
+            depth: 1,
+            slot: {
+              id: "delay",
+              label: "show it at 200ms, if still waiting",
+              note: "Wait 200ms. Quick replies never show it. Slow ones get it when the wait is real.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "late",
+              label: "show it at 1s, if still waiting",
+              note: "A slow reply sits for a full second with no sign the click worked.",
+            },
+          },
+          { depth: 0, text: at("2000ms", "A slow reply lands") },
+        ],
+      },
+    ],
   },
   {
     title: "Errors where the data was",
@@ -1412,14 +1536,55 @@ export const LESSONS: Lesson[] = [
       costs: ["1 tap to recover", "logged"],
       view: <TeamView inline />,
     },
+    levels: [
+      {
+        name: "One card fails",
+        prompt: (
+          <>
+            A dashboard loads five cards, and the revenue card fails to load. Place what people see.
+          </>
+        ),
+        piece: "error + Retry",
+        answer: "inline",
+        rows: [
+          { depth: 0, text: at("0ms", "The dashboard opens") },
+          { depth: 0, text: at("400ms", "Four cards load") },
+          { depth: 0, text: at("420ms", "Revenue fails to load") },
+          {
+            depth: 1,
+            slot: {
+              id: "page",
+              label: "an error page instead of the dashboard",
+              note: "One bad card throws away four good ones, and nothing retries in place.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "inline",
+              label: "inside the revenue card",
+              note: "Put it where the chart would be. The other four stay, and one tap retries. Log it too.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "toast",
+              label: "a toast: Something went wrong",
+              note: "It fades in 3s, doesn't say which card, and the revenue card stays empty.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Parse at the boundary",
     body: (
       <>
-        API data is a guess until you check it. Parse it right after <Code>fetch()</Code> and give
-        optional fields a fallback, so the rest of your code gets real types. If you skip it, a
-        missing field crashes far from where it came in.
+        API data is a guess until you check it. Parse it as soon as it arrives and give optional
+        fields a fallback, so the rest of your code gets real types. If you skip it, a missing field
+        crashes far from where it came in.
       </>
     ),
     extra: (
@@ -1438,6 +1603,48 @@ export const LESSONS: Lesson[] = [
       costs: ["0 crashes", "1 fallback"],
       view: <ParseView parse />,
     },
+    levels: [
+      {
+        name: "A missing field",
+        prompt: (
+          <>
+            The server sometimes leaves out the user's photo, and the avatar reads it two screens
+            deep. Place the check.
+          </>
+        ),
+        piece: "check the shape",
+        answer: "fetch",
+        rows: [
+          { depth: 0, text: at("0ms", "The user arrives from the server") },
+          {
+            depth: 1,
+            slot: {
+              id: "fetch",
+              label: "as soon as it arrives",
+              note: "Check it here. A missing photo gets its fallback once, and everything after can trust the data.",
+            },
+          },
+          { depth: 0, text: at("40ms", "The profile page renders") },
+          {
+            depth: 1,
+            slot: {
+              id: "page",
+              label: "in the profile page",
+              note: "The data got this far unchecked, and every other screen that loads a user skips the check.",
+            },
+          },
+          { depth: 0, text: at("42ms", "The avatar reads the photo") },
+          {
+            depth: 1,
+            slot: {
+              id: "avatar",
+              label: "in the avatar, as a fallback",
+              note: "The fallback hides the gap two screens from where it came in, and every other reader still trusts it.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Persist what can't mislead",
@@ -1447,13 +1654,6 @@ export const LESSONS: Lesson[] = [
         content, and show when it was updated. Never persist balances, prices or stock counts. A
         stale number there leads to a wrong decision.
       </>
-    ),
-    extra: (
-      <LessonText style={styles.stores}>
-        <Code style={styles.store}>localStorage · ~5MB, sync</Code>
-        <Code style={styles.store}>IndexedDB · large, async</Code>
-        <Code style={styles.store}>PGlite · SQL + sync</Code>
-      </LessonText>
     ),
     bad: {
       label: "Persist all",
@@ -1465,248 +1665,67 @@ export const LESSONS: Lesson[] = [
       costs: ["balance always live", "history dated"],
       view: <WalletView careful />,
     },
+    levels: [
+      {
+        name: "Offline on day 3",
+        prompt: (
+          <>
+            A banking app persists its cache. On day 3 you open it with no signal. Place what it may
+            show from the cache.
+          </>
+        ),
+        piece: "from cache",
+        answer: "history",
+        rows: [
+          { depth: 0, text: at("Day 1", "The app loads and saves its cache") },
+          { depth: 0, text: at("Day 2", "You spend $1,830 on a laptop") },
+          { depth: 0, text: at("Day 3", "You open the app, no signal") },
+          {
+            depth: 1,
+            slot: {
+              id: "balance",
+              label: "Balance: $2,140",
+              note: "It's $310 now. You'd plan with $1,830 you no longer have.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "history",
+              label: "Last week's payments, updated 2 days ago",
+              note: "Persist it with the date. Past payments don't change.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "rate",
+              label: "1 USD = 16,240 IDR",
+              note: "Rates move by the minute. A two-day-old rate prices every transfer wrong.",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 
 export const TLDR = [
-  ["SEO or first paint matters", "Render it on the server. Behind a login, an SPA is fine"],
-  ["Data a route needs", "Start it in the loader, batch it, stream the rest"],
+  ["SEO or first paint matters", "Render it on the server. Behind a login, the browser is fine"],
+  ["Data a page needs", "Start it on navigation, batch it, stream the rest"],
   ["Refetching data you have", "Keep it on screen with a small spinner"],
   ["A reply that may be quick", "Show loading UI only after 200ms"],
   ["A request that fails", "Show the error in place, with Retry. Log it"],
-  ["Updates within a second", "Use a WebSocket. At 30s or slower, poll"],
+  ["Updates within a second", "Push them over a live connection. At 30s or slower, poll"],
   ["Anything from an API", "Parse it where it arrives"],
 ] as const;
-
-const at = (ms: string, text: string) => (
-  <>
-    <time {...stylex.props(styles.time)}>{ms}</time>
-    {text}
-  </>
-);
-
-const LEVELS: Level[] = [
-  {
-    name: "A quick reply",
-    prompt: (
-      <>
-        Most replies to this list land in 80ms. A few take 2s. Place the{" "}
-        <Code>&lt;Spinner /&gt;</Code>.
-      </>
-    ),
-    piece: "<Spinner />",
-    answer: "delay",
-    rows: [
-      { depth: 0, text: at("0ms", "You press Refresh") },
-      {
-        depth: 1,
-        slot: {
-          id: "now",
-          label: "show it at once",
-          note: "Most replies land at 80ms, so the spinner flashes on almost every click.",
-          cost: ["flashes 80ms", "most clicks"],
-        },
-      },
-      { depth: 0, text: at("80ms", "Most replies land") },
-      {
-        depth: 1,
-        slot: {
-          id: "delay",
-          label: "show it at 200ms, if still waiting",
-          note: "Wait 200ms. Quick replies never show it. Slow ones get it when the wait is real.",
-          cost: ["0 flashes"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "late",
-          label: "show it at 1s, if still waiting",
-          note: "A slow reply sits for a full second with no sign the click worked.",
-          cost: ["1s of nothing"],
-        },
-      },
-      { depth: 0, text: at("2000ms", "A slow reply lands") },
-    ],
-  },
-  {
-    name: "Back to the tab",
-    prompt: (
-      <>
-        You return to a tab of prices loaded 5 minutes ago. They refetch on focus. Place the cached
-        prices.
-      </>
-    ),
-    piece: "cached prices",
-    answer: "stay",
-    rows: [
-      { depth: 0, text: at("0ms", "The tab gets focus, refetch starts") },
-      {
-        depth: 1,
-        slot: {
-          id: "blank",
-          label: "make way for a full spinner",
-          note: "Prices you could have read vanish for 600ms, then come back a little different.",
-          cost: ["blank 600ms"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "stay",
-          label: "stay, with a small spinner beside them",
-          note: "Keep them readable. Fresh numbers swap in place when they land.",
-          cost: ["0ms blank", "1 quiet update"],
-        },
-      },
-      { depth: 0, text: at("600ms", "Fresh prices arrive") },
-      {
-        depth: 1,
-        slot: {
-          id: "keep",
-          label: "stay until the next page load",
-          note: "The fresh prices arrive and nobody sees them. The cache never revalidates.",
-          cost: ["stale until reload"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Twenty orders",
-    prompt: (
-      <>
-        The orders page lists 20 orders, one <Code>&lt;OrderRow&gt;</Code> each. Place the fetch.
-      </>
-    ),
-    piece: "fetch(orders)",
-    answer: "loader",
-    rows: [
-      { depth: 0, text: at("0ms", "You click Orders") },
-      {
-        depth: 1,
-        slot: {
-          id: "loader",
-          label: "in the route loader",
-          note: "Start it with the navigation, while the page's code loads. One request covers the list.",
-          cost: ["data at 500ms", "1 request"],
-        },
-      },
-      { depth: 0, text: at("300ms", "Code loaded, <Orders> renders") },
-      {
-        depth: 1,
-        slot: {
-          id: "effect",
-          label: "in useEffect in <Orders>",
-          note: "It waits for the code and the first render, so the data shows 300ms later than it could.",
-          cost: ["+300ms", "1 waterfall"],
-        },
-      },
-      { depth: 0, text: at("320ms", "Each <OrderRow> renders") },
-      {
-        depth: 1,
-        slot: {
-          id: "rows",
-          label: "in useEffect in each <OrderRow>",
-          note: "Twenty requests where one would do, each after its row renders.",
-          cost: ["20 requests", "+320ms"],
-        },
-      },
-    ],
-  },
-  {
-    name: "One card fails",
-    prompt: (
-      <>
-        A dashboard loads five cards. <Code>GET /revenue</Code> fails with a 500. Place what the
-        user sees.
-      </>
-    ),
-    piece: "error + Retry",
-    answer: "inline",
-    rows: [
-      { depth: 0, text: at("0ms", "The dashboard opens") },
-      { depth: 0, text: at("400ms", "Four cards load") },
-      { depth: 0, text: at("420ms", "GET /revenue → 500") },
-      {
-        depth: 1,
-        slot: {
-          id: "page",
-          label: "an error page instead of the dashboard",
-          note: "One bad card throws away four good ones, and nothing retries in place.",
-          cost: ["4 cards lost"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "inline",
-          label: "inside the revenue card",
-          note: "Put it where the chart would be. The other four stay, and one tap retries. Log it too.",
-          cost: ["1 tap to recover", "4 cards kept"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "toast",
-          label: "a toast: Something went wrong",
-          note: "It fades in 3s, doesn't say which card, and the revenue card stays empty.",
-          cost: ["gone in 3s", "0 retries"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Offline on day 3",
-    prompt: (
-      <>
-        A banking app persists its cache. On day 3 you open it with no signal. Place what it may
-        show from the cache.
-      </>
-    ),
-    piece: "from cache",
-    answer: "history",
-    rows: [
-      { depth: 0, text: at("Day 1", "The app loads and saves its cache") },
-      { depth: 0, text: at("Day 2", "You spend $1,830 on a laptop") },
-      { depth: 0, text: at("Day 3", "You open the app, no signal") },
-      {
-        depth: 1,
-        slot: {
-          id: "balance",
-          label: "Balance: $2,140",
-          note: "It's $310 now. You'd plan with $1,830 you no longer have.",
-          cost: ["$1,830 off"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "history",
-          label: "Last week's payments, updated 2 days ago",
-          note: "Persist it with the date. Past payments don't change.",
-          cost: ["safe to persist", "dated"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "rate",
-          label: "1 USD = 16,240 IDR",
-          note: "Rates move by the minute. A two-day-old rate prices every transfer wrong.",
-          cost: ["2 days stale"],
-        },
-      },
-    ],
-  },
-];
 
 export function DataLoading() {
   return (
     <RuleLanding
       lead={
         <>
-          Start requests in the loader and keep stale data on screen. Show a skeleton only after
+          Start requests on navigation and keep stale data on screen. Show a skeleton only after
           200ms.
         </>
       }
@@ -1716,11 +1735,7 @@ export function DataLoading() {
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "timeline",
-      }}
+      board="timeline"
       take="load data the same way"
     />
   );

@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { colorOf } from "../../data/guidelines";
+import { useRouter } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { colorOf, VISIBLE_GUIDELINES } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { fonts, motion, palette } from "../../theme.stylex";
@@ -48,6 +49,20 @@ export function useRuleOpen() {
   const panel = useRef<HTMLElement>(null);
   const [opening, setOpening] = useState<{ rule: string; inPanel: boolean } | null>(null);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const router = useRouter();
+  // The dive holds the old page frozen until the new one renders, so a rule whose code is still
+  // downloading opens late. Fetch every rule up front, once the page has settled.
+  useEffect(() => {
+    const preload = () => {
+      for (const rule of VISIBLE_GUIDELINES) void router.preloadRoute({ to: rule.href });
+    };
+    if (typeof requestIdleCallback === "undefined") {
+      const timer = setTimeout(preload, 600);
+      return () => clearTimeout(timer);
+    }
+    const idle = requestIdleCallback(preload, { timeout: 1500 });
+    return () => cancelIdleCallback(idle);
+  }, [router]);
   return {
     panelProps: { ref: panel, "data-opening": opening?.inPanel ? "" : undefined },
     linkProps: (rule: Guideline) => ({
@@ -66,8 +81,16 @@ export function useRuleOpen() {
 }
 
 export function isOpeningRule() {
+  return matchesRoot(`:active-view-transition-type(${RULE_OPEN})`);
+}
+
+export function isTransitioning() {
+  return matchesRoot(":active-view-transition");
+}
+
+function matchesRoot(selector: string) {
   try {
-    return document.documentElement.matches(`:active-view-transition-type(${RULE_OPEN})`);
+    return document.documentElement.matches(selector);
   } catch {
     return false;
   }

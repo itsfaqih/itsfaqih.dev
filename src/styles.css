@@ -11,10 +11,50 @@
    and everything inside it, stays unselectable; links styled as buttons or cards opt in with
    userSelect in their own StyleX. Layered so a component can still allow selection. */
 @layer base {
-  :is(button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="switch"], summary),
-  :is(button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="switch"], summary) * {
+  :is(
+    button,
+    [role="button"],
+    [role="tab"],
+    [role="option"],
+    [role="menuitem"],
+    [role="switch"],
+    summary
+  ),
+  :is(
+      button,
+      [role="button"],
+      [role="tab"],
+      [role="option"],
+      [role="menuitem"],
+      [role="switch"],
+      summary
+    )
+    * {
     -webkit-user-select: none;
     user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Global: no class reaches every control. A control never double-tap zooms, so the browser fires
+   its click without waiting for a second tap; pinch zoom still works. Layered so a component's
+   own touch-action, such as a drag surface's none, wins. */
+@layer base {
+  :is(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    summary,
+    [role="button"],
+    [role="tab"],
+    [role="option"],
+    [role="menuitem"],
+    [role="switch"]
+  ) {
+    touch-action: manipulation;
   }
 }
 

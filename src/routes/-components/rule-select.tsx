@@ -166,6 +166,9 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               ref={searchRef}
               {...stylex.props(styles.input)}
               type="search"
+              enterKeyHint="search"
+              autoCapitalize="none"
+              autoCorrect="off"
               placeholder="button, cache, null…"
               aria-label="Search rules"
               value={query}
@@ -228,9 +231,7 @@ export function RuleSelect({ rules }: { rules: PublishedGuideline[] }) {
               <RuleThumb rule={rule} play={rule === selected} />
               <span {...stylex.props(styles.number)}>
                 <span>{ruleNumber(rule)}</span>
-                <span aria-label={rule.interactive ? "Has demos" : undefined}>
-                  {rule.interactive ? "▶" : ""}
-                </span>
+                <span aria-label="Has demos">▶</span>
               </span>
               {/* .t names the title for the rule-open view transition in arcade.css. */}
               <span className={`t ${stylex.props(styles.tileTitle).className}`}>{rule.title}</span>
@@ -332,12 +333,15 @@ function ScrambleText({ text }: { text: string }) {
 
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 const LIGHT = ":is(.light *)";
 // A tile waiting for its cut-in, or inside a piece still waiting, stays hidden (loadIn.piece).
 const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
 // The grid's pointer or focus is on a tile's parent; the other tiles dim, except any still
 // waiting for its own cut-in.
-const DIMMED = ":not([data-on]):is(:hover > *, :focus-within > *):not(:is(.js *):not(.in))";
+const DIMMED_HOVER = ":not([data-on]):is(:hover > *):not(:is(.js *):not(.in))";
+const DIMMED_FOCUS = ":not([data-on]):is(:focus-within > *):not(:is(.js *):not(.in))";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
 const PANEL_SHADOW = `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`;
 const TILE_TOP = "inset 0 4px 0 var(--c)";
@@ -524,7 +528,8 @@ const styles = stylex.create({
     backgroundPosition: "0 0",
     color: palette["--text"],
     fontWeight: 400,
-    fontSize: "15px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "15px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
   },
@@ -562,7 +567,12 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: { default: "10px", [STACKED]: "18px" },
-    opacity: { default: null, [WAITING]: 0, [DIMMED]: 0.25 },
+    opacity: {
+      default: null,
+      [WAITING]: 0,
+      [DIMMED_FOCUS]: 0.25,
+      [HOVER]: { default: null, [DIMMED_HOVER]: 0.25 },
+    },
     transform: {
       default: null,
       ":is([data-on])": {

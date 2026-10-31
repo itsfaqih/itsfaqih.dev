@@ -2,21 +2,20 @@
 
 Use undefined for a value nobody gave, and null for one emptied on purpose.
 
-Send `null` to clear a field. Leave a field out to keep it.
+## TL;DR
+
+| Situation                        | Do this                     |
+| -------------------------------- | --------------------------- |
+| Declared, not assigned yet       | Leave it undefined          |
+| An argument the caller may skip  | Type it name?: string       |
+| The user cleared a field         | Set it to null              |
+| A field the user didn't touch    | Leave it out of the request |
+| A field every caller must decide | Type it T \| null, not ?:   |
+| A lookup that found nothing      | Return null                 |
 
 ## Tell missing from empty
 
-Read `undefined` to mean nobody gave a value. Read `null` to mean someone checked and found nothing. Ana skipped the phone question. Bo said he has no phone. If you send both as `null`, no code can tell them apart.
-
-Bad (Both null):
-
-```ts
-const ask = (u: User) => u.phone === null;
-ask({ name: "Ana", phone: null }); // true
-ask({ name: "Bo", phone: null }); // true: Bo gets asked for a phone he does not have
-```
-
-Good (Keep them apart):
+Read `undefined` as nobody gave a value, and `null` as someone checked and found nothing. Ana skipped the phone question, so her phone is `undefined`. Bo said he has no phone, so his is `null`. Kept apart, the two let code ask Ana again and leave Bo alone.
 
 ```ts
 const ask = (u: User) => u.phone === undefined;
@@ -26,19 +25,7 @@ ask({ name: "Bo", phone: null }); // false
 
 ## Mark optional with ?:
 
-Leave a skipped value `undefined`. If you type it with `?:`, callers can leave it out. If you type it `| null`, callers with no value must pass `null`.
-
-Bad (string | null):
-
-```ts
-function welcome(name: string | null) {
-  return `Hi, ${name ?? "guest"}`;
-}
-welcome(); // TS2554: Expected 1 argument
-welcome(null); // "Hi, guest"
-```
-
-Good (name?: string):
+Leave a skipped value `undefined`, and type it with `?:`, so callers can leave it out. A `| null` type makes every caller with no value pass `null`.
 
 ```ts
 function welcome(name?: string) {
@@ -50,16 +37,7 @@ welcome("Ana"); // "Hi, Ana"
 
 ## Clear with null
 
-When the user empties a field, send `null`. JSON drops keys set to `undefined`, so that clear never reaches the server.
-
-Bad (= undefined):
-
-```ts
-changes.reviewer = undefined;
-patch("/tasks/12", changes); // body: {}, the reviewer stays
-```
-
-Good (= null):
+When the user empties a field, send `null`. JSON drops keys set to `undefined`, so only `null` carries the clear to the server.
 
 ```ts
 changes.reviewer = null;
@@ -68,16 +46,7 @@ patch("/tasks/12", changes); // body: { "reviewer": null }, the reviewer is remo
 
 ## Leave untouched fields out
 
-A PATCH changes only the fields it carries. If you fill a draft with `null`, every untouched field goes out as a clear. Start it empty so only the changes go out.
-
-Bad (Every field):
-
-```ts
-const draft = { title: input.value, assignee: null, due: null };
-patch("/tasks/12", draft); // wipes assignee and due
-```
-
-Good (Only changes):
+A PATCH changes only the fields it carries. Start the draft empty and add only what changed, so untouched fields keep their values.
 
 ```ts
 const draft: Partial<Task> = {};
@@ -87,19 +56,7 @@ patch("/tasks/12", draft); // body: { "title": "Ship v2" }
 
 ## Force the decision
 
-`?:` lets a caller skip a field silently. When every caller must decide, make it required and nullable. A caller who leaves it out gets a type error, and "nobody" is a `null` someone wrote on purpose.
-
-Bad (assignee?: User):
-
-```ts
-type Task = {
-  title: string;
-  assignee?: User;
-};
-save({ title }); // 0 errors; shows "Unassigned", and nobody chose it
-```
-
-Good (User | null):
+When every caller must decide, make the field required and nullable. A caller who leaves it out gets a type error, and "nobody" is a `null` someone wrote on purpose. A `?:` field lets a caller skip it silently.
 
 ```ts
 type Task = {
@@ -112,31 +69,11 @@ save({ title, assignee: null }); // 0 errors
 
 ## Return null for not found
 
-Return `null` from a lookup that finds nothing. `Map.get` returns `undefined`, and `JSON.stringify` turns that into no body.
-
-Bad (res.json(user)):
+Return `null` from a lookup that finds nothing. `Map.get` returns `undefined`, which `JSON.stringify` turns into an empty body the client fails to parse.
 
 ```ts
 const user = users.get(email); // undefined
-res.json(user); // body: 0 bytes
-// client: await r.json() throws SyntaxError: Unexpected end of JSON input
+JSON.stringify(user); // undefined, 0 bytes: JSON.parse throws a SyntaxError
+const body = JSON.stringify(user ?? null); // "null", 4 bytes
+JSON.parse(body); // null, so show "No such user"
 ```
-
-Good (user ?? null):
-
-```ts
-const user = users.get(email); // undefined
-res.json(user ?? null); // body: null
-// client: await r.json() returns null, so show "No such user"
-```
-
-## TL;DR
-
-| Situation                        | Do this                     |
-| -------------------------------- | --------------------------- |
-| Declared, not assigned yet       | Leave it undefined          |
-| An argument the caller may skip  | Type it name?: string       |
-| The user cleared a field         | Set it to null              |
-| A field the user didn't touch    | Leave it out of the request |
-| A field every caller must decide | Type it T \| null, not ?:   |
-| A lookup that found nothing      | Return null                 |

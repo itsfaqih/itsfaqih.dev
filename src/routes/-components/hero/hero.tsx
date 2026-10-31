@@ -50,7 +50,9 @@ export function Hero({ introDone }: { introDone: boolean }) {
     <div {...stylex.props(styles.root)}>
       <div {...stylex.props(veil.soft)}>
         <div {...stylex.props(loadIn.veil, veil.dense, heroType.tag)} data-cut>
-          <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Full-stack engineer · Indonesia</span>
+          <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+            Full-stack engineer · Indonesia
+          </span>
         </div>
         <h1 data-cut {...stylex.props(loadIn.piece, heroType.title, styles.title)}>
           <span {...stylex.props(styles.line)}>I build</span>
@@ -60,7 +62,11 @@ export function Hero({ introDone }: { introDone: boolean }) {
               return (
                 <span
                   key={item.tab}
-                  {...stylex.props(styles.phrase, on && styles.phraseOn, on && introDone && slide.run > 0 && styles.slash)}
+                  {...stylex.props(
+                    styles.phrase,
+                    on && styles.phraseOn,
+                    on && introDone && slide.run > 0 && styles.slash,
+                  )}
                   style={{ "--c": item.color }}
                   aria-hidden={on ? undefined : true}
                 >
@@ -76,7 +82,12 @@ export function Hero({ introDone }: { introDone: boolean }) {
         <p {...stylex.props(loadIn.piece, heroType.lead)} data-cut>
           I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
           lately the agent tooling around them. Right now I'm building healthcare software at{" "}
-          <a {...stylex.props(styles.leadLink)} href="https://evidence.care" target="_blank" rel="noopener noreferrer">
+          <a
+            {...stylex.props(styles.leadLink)}
+            href="https://evidence.care"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             EvidenceCare
           </a>
           .
@@ -100,7 +111,12 @@ export function Hero({ introDone }: { introDone: boolean }) {
       </div>
 
       <div {...stylex.props(loadIn.piece, styles.bench)} data-cut style={{ "--c": current.color }}>
-        <HeroPrints index={slide.index} restartKey={slide.run} playing={introDone} held={userPaused} />
+        <HeroPrints
+          index={slide.index}
+          restartKey={slide.run}
+          playing={introDone}
+          held={userPaused}
+        />
         <div {...stylex.props(styles.controls)}>
           <div {...stylex.props(styles.pips)} role="group" aria-label="What I build">
             {SLIDES.map((item, index) => {
@@ -120,7 +136,11 @@ export function Hero({ introDone }: { introDone: boolean }) {
                 >
                   <i
                     key={on ? slide.run : "idle"}
-                    {...stylex.props(styles.bar, on && styles.barOn, on && userPaused && styles.barHeld)}
+                    {...stylex.props(
+                      styles.bar,
+                      on && styles.barOn,
+                      on && userPaused && styles.barHeld,
+                    )}
                   />
                 </button>
               );
@@ -142,6 +162,7 @@ export function Hero({ introDone }: { introDone: boolean }) {
 
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const FOCUS_RING = `3px solid ${palette["--focus"]}`;
 
 const slash = stylex.keyframes({
@@ -177,7 +198,10 @@ const styles = stylex.create({
   // follows the column to fit the longest one, "agentic setups that" at 12.2em: two columns share
   // (100vw - 112px) at 1 : 1.05 up to the 1200px wrap; one column is 100vw - 36px.
   title: {
-    fontSize: { default: "clamp(28px, 3.9vw - 5px, 43px)", [STACKED]: "clamp(26px, 8vw - 4px, 44px)" },
+    fontSize: {
+      default: "clamp(28px, 3.9vw - 5px, 43px)",
+      [STACKED]: "clamp(26px, 8vw - 4px, 44px)",
+    },
   },
   line: {
     display: "block",
@@ -217,7 +241,11 @@ const styles = stylex.create({
   leadLink: {
     color: palette["--text"],
     textDecorationLine: "underline",
-    textDecorationColor: { default: palette["--hair"], ":hover": palette["--go-ink"] },
+    textDecorationColor: {
+      default: palette["--hair"],
+      ":hover": { default: null, [HOVER]: palette["--go-ink"] },
+      ":active": palette["--go-ink"],
+    },
     textUnderlineOffset: "4px",
     transitionProperty: "text-decoration-color",
     transitionDuration: "120ms",
@@ -230,7 +258,7 @@ const styles = stylex.create({
     backgroundColor: "var(--c)",
     color: "var(--on-c)",
     boxShadow: { default: "0 4px 0 var(--key)", ":active": "0 2px 0 var(--key)" },
-    filter: { default: null, ":hover": "brightness(1.08)" },
+    filter: { default: null, ":hover": { default: null, [HOVER]: "brightness(1.08)" } },
     transitionProperty: "transform, background-color, box-shadow, filter",
     transitionDuration: "150ms, 280ms, 280ms, 120ms",
     transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94), ease, ease, ease",
@@ -250,7 +278,11 @@ const styles = stylex.create({
     paddingInline: "6px",
     borderRadius: "12px",
     font: `700 14px ${fonts["--display"]}`,
-    color: { default: palette["--dim"], ":hover": palette["--text"] },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
+    },
     textDecorationLine: "none",
     cursor: cursors["--cursor-point"],
     transitionProperty: "color",
@@ -320,7 +352,10 @@ const styles = stylex.create({
     display: "block",
     height: "4px",
     borderRadius: "2px",
-    backgroundColor: { default: palette["--hair"], [stylex.when.ancestor(":hover")]: palette["--mute"] },
+    backgroundColor: {
+      default: palette["--hair"],
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: palette["--mute"] },
+    },
     overflow: "hidden",
     transitionProperty: "background-color",
     transitionDuration: "150ms",

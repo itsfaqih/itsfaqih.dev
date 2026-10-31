@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { motion, palette } from "../../theme.stylex";
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const HUE = `var(--c, ${palette["--go"]})`;
 const INK = `color-mix(in oklab, ${HUE} ${palette["--ink-mix"]}, #000)`;
 const LEG = "12px";
@@ -44,12 +45,12 @@ export const reticle = stylex.create({
       opacity: {
         default: 0,
         ":focus-visible": 1,
-        "@media (hover: hover)": { default: null, ":hover": 1 },
+        [HOVER]: { default: null, ":hover": 1 },
       },
       transform: {
         default: AWAY,
         ":focus-visible": "none",
-        "@media (hover: hover)": { default: null, ":hover": "none" },
+        [HOVER]: { default: null, ":hover": "none" },
         [REDUCE]: "none",
       },
     },

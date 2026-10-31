@@ -124,6 +124,8 @@ export function TableOfContents({ onLinkClick }: TableOfContentsProps) {
   );
 }
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 const styles = stylex.create({
   title: {
     marginBottom: "1rem",
@@ -142,14 +144,17 @@ const styles = stylex.create({
     overflow: "hidden",
     opacity: {
       default: null,
-      ":hover": { default: null, "@media (hover: hover)": 1 },
-      [stylex.when.ancestor(":has(a:hover)")]: { default: null, ":not(:hover)": 0.5 },
+      ":hover": { default: null, [HOVER]: 1 },
+      [stylex.when.ancestor(":has(a:hover)")]: {
+        default: null,
+        ":not(:hover)": { default: null, [HOVER]: 0.5 },
+      },
     },
     transitionProperty: "opacity",
     transitionTimingFunction: transitions.ease,
     transitionDuration: {
       default: "0.25s",
-      ":hover": { default: null, "@media (hover: hover)": "0s" },
+      ":hover": { default: null, [HOVER]: "0s" },
     },
   },
   link: {
@@ -159,7 +164,7 @@ const styles = stylex.create({
     transitionTimingFunction: transitions.ease,
     transitionDuration: {
       default: "1s",
-      ":hover": { default: null, "@media (hover: hover)": "0s" },
+      ":hover": { default: null, [HOVER]: "0s" },
     },
   },
   active: {
@@ -168,7 +173,8 @@ const styles = stylex.create({
   idle: {
     color: {
       default: palette["--muted-foreground"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
     },
   },
 });

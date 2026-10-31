@@ -63,7 +63,15 @@ const EXPERIENCE: Job[] = [
     years: "2023 → 2024",
     company: "Vestis Labs",
     role: "Full Stack Engineer",
-    stack: ["React", "TypeScript", "Next.js", "TanStack Router", "Express", "MongoDB", "Tailwind CSS"],
+    stack: [
+      "React",
+      "TypeScript",
+      "Next.js",
+      "TanStack Router",
+      "Express",
+      "MongoDB",
+      "Tailwind CSS",
+    ],
     achievements: [
       "Simplified more than 80% of the code structure by co-locating related code and removing unnecessary abstractions.",
       "Overhauled the website's UI design for consistency and clarity.",
@@ -215,7 +223,17 @@ const STACK_GROUPS: StackGroup[] = [
   },
   {
     label: "Testing and quality",
-    tools: ["Vitest", "Jest", "Playwright", "Cypress", "MSW", "Storybook", "Biome", "Oxlint", "Oxfmt"],
+    tools: [
+      "Vitest",
+      "Jest",
+      "Playwright",
+      "Cypress",
+      "MSW",
+      "Storybook",
+      "Biome",
+      "Oxlint",
+      "Oxfmt",
+    ],
   },
   {
     label: "DevOps and infrastructure",
@@ -265,7 +283,7 @@ function Index() {
 
   return (
     <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>
-      <Backdrop aurora />
+      <Backdrop tide />
       <Intro onDone={setIntroDone} />
 
       <div {...stylex.props(arcade.wrap)}>
@@ -275,7 +293,11 @@ function Index() {
       <div {...stylex.props(loadIn.piece, styles.ticker)} data-loop data-cut aria-hidden="true">
         <div {...stylex.props(styles.tickerTrack, styles.pausable)}>
           {TICKER_RUN.map(({ ticker, color }, index) => (
-            <span key={index} {...stylex.props(styles.tickerTile, styles.pausable)} style={{ "--c": color }}>
+            <span
+              key={index}
+              {...stylex.props(styles.tickerTile, styles.pausable)}
+              style={{ "--c": color }}
+            >
               {ticker} ★
             </span>
           ))}
@@ -286,13 +308,24 @@ function Index() {
         <section id="rules" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--cw)" }}>
-                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Writing</span>
+              <small
+                {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)}
+                data-cut
+                data-eyebrow
+                style={{ "--c": "var(--cw)" }}
+              >
+                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+                  Writing
+                </span>
               </small>
-              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Rule of Thumb</span>
+              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>
+                Rule of Thumb
+              </span>
             </h2>
             <p {...stylex.props(loadIn.veil, section.blurb, veil.dense)} data-cut>
-              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Opinions I've earned from my experience</span>
+              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+                Opinions I've earned from my experience
+              </span>
             </p>
           </div>
           <RuleSpread rules={VISIBLE_GUIDELINES} />
@@ -301,10 +334,19 @@ function Index() {
         <section id="work" {...stylex.props(section.block)}>
           <div {...stylex.props(section.head)}>
             <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ux)" }}>
-                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Experience</span>
+              <small
+                {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)}
+                data-cut
+                data-eyebrow
+                style={{ "--c": "var(--ux)" }}
+              >
+                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+                  Experience
+                </span>
               </small>
-              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Where I've worked</span>
+              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>
+                Where I've worked
+              </span>
             </h2>
           </div>
           <ExperienceList jobs={EXPERIENCE} />
@@ -312,40 +354,64 @@ function Index() {
 
         <StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />
 
-        {SHOW_PROJECTS && <section id="projects" {...stylex.props(section.block)}>
-          <div {...stylex.props(section.head)}>
-            <h2 {...stylex.props(section.title, veil.soft)}>
-              <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ts-deep)" }}>
-                <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Side projects</span>
-              </small>
-              <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Projects</span>
-            </h2>
-          </div>
-          <div {...stylex.props(styles.projects)}>
-            {PROJECTS.map((project) => (
-              <a
-                key={project.title}
-                {...stylex.props(loadIn.piece, reticle.card, reticle.aim, hoverHold.lift, styles.project)}
-                data-cut
-                href={project.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ "--c": project.color }}
-              >
-                <small {...stylex.props(styles.projectKind)}>{project.kind}</small>
-                <h3 {...stylex.props(styles.projectTitle)}>{project.title}</h3>
-                <p {...stylex.props(styles.projectSummary)}>{project.summary}</p>
-              </a>
-            ))}
-          </div>
-        </section>}
+        {SHOW_PROJECTS && (
+          <section id="projects" {...stylex.props(section.block)}>
+            <div {...stylex.props(section.head)}>
+              <h2 {...stylex.props(section.title, veil.soft)}>
+                <small
+                  {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)}
+                  data-cut
+                  data-eyebrow
+                  style={{ "--c": "var(--ts-deep)" }}
+                >
+                  <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+                    Side projects
+                  </span>
+                </small>
+                <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>
+                  Projects
+                </span>
+              </h2>
+            </div>
+            <div {...stylex.props(styles.projects)}>
+              {PROJECTS.map((project) => (
+                <a
+                  key={project.title}
+                  {...stylex.props(
+                    loadIn.piece,
+                    reticle.card,
+                    reticle.aim,
+                    hoverHold.lift,
+                    styles.project,
+                  )}
+                  data-cut
+                  href={project.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ "--c": project.color }}
+                >
+                  <small {...stylex.props(styles.projectKind)}>{project.kind}</small>
+                  <h3 {...stylex.props(styles.projectTitle)}>{project.title}</h3>
+                  <p {...stylex.props(styles.projectSummary)}>{project.summary}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div id="contact" {...stylex.props(loadIn.piece, styles.contact)} data-cut>
           <h2 {...stylex.props(section.title)}>
-            <small {...stylex.props(loadIn.piece, section.eyebrow)} data-cut data-eyebrow style={{ "--c": "var(--ax)" }}>
+            <small
+              {...stylex.props(loadIn.piece, section.eyebrow)}
+              data-cut
+              data-eyebrow
+              style={{ "--c": "var(--ax)" }}
+            >
               Contact
             </small>
-            <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Ready to bring the next level of care to your product?</span>
+            <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>
+              Ready to bring the next level of care to your product?
+            </span>
           </h2>
           <div {...stylex.props(loadIn.piece, heroType.acts)} data-cut style={{ marginTop: 24 }}>
             <a {...stylex.props(button.base, button.hue)} href={`mailto:${LINKS.email}`}>
@@ -364,11 +430,18 @@ function Index() {
 
         <footer {...stylex.props(styles.footer)}>
           <span {...stylex.props(loadIn.veil, veil.dense)} data-cut>
-            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>© 2026 Faqih Muntashir</span>
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              © 2026 Faqih Muntashir
+            </span>
           </span>
           <span {...stylex.props(loadIn.veil, veil.dense)} data-cut>
             <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
-              <a {...stylex.props(styles.footerLink)} href={LINKS.github} target="_blank" rel="noopener noreferrer">
+              <a
+                {...stylex.props(styles.footerLink)}
+                href={LINKS.github}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 GitHub
               </a>{" "}
               ·{" "}
@@ -381,11 +454,21 @@ function Index() {
                 LinkedIn
               </a>{" "}
               ·{" "}
-              <a {...stylex.props(styles.footerLink)} href={LINKS.dribbble} target="_blank" rel="noopener noreferrer">
+              <a
+                {...stylex.props(styles.footerLink)}
+                href={LINKS.dribbble}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Dribbble
               </a>{" "}
               ·{" "}
-              <a {...stylex.props(styles.footerLink)} href="https://medium.com/@itsfaqih" target="_blank" rel="noopener noreferrer">
+              <a
+                {...stylex.props(styles.footerLink)}
+                href="https://medium.com/@itsfaqih"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Medium
               </a>
             </span>
@@ -398,6 +481,7 @@ function Index() {
 
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const LIFT = "translateY(-4px) rotate(-1deg)";
 
 const marquee = stylex.keyframes({ to: { transform: "translate(-50%)" } });
@@ -446,21 +530,29 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: palette["--hair"],
-      ":hover": "var(--c)",
+      ":hover": { default: null, [HOVER]: "var(--c)" },
       ":focus-visible": "var(--c)",
       ":active": "var(--c)",
     },
     boxShadow: {
       default: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
-      ":hover": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":hover": { default: null, [HOVER]: `${palette["--raise"]}, 0 8px 0 var(--key)` },
       ":focus-visible": `${palette["--raise"]}, 0 8px 0 var(--key)`,
-      ":active": `${palette["--raise"]}, 0 1px 0 var(--key)`,
+      // Repeated under the media query, which would otherwise let hovering outrank pressing.
+      ":active": {
+        default: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+        [HOVER]: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+      },
     },
     transform: {
       default: null,
-      ":hover": { default: LIFT, [REDUCE]: "none" },
+      ":hover": { default: null, [HOVER]: { default: LIFT, [REDUCE]: "none" } },
       ":focus-visible": { default: LIFT, [REDUCE]: "none" },
-      ":active": { default: "translateY(3px)", [REDUCE]: "none" },
+      ":active": {
+        default: "translateY(3px)",
+        [REDUCE]: "none",
+        [HOVER]: { default: "translateY(3px)", [REDUCE]: "none" },
+      },
     },
     outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "3px" },
@@ -509,6 +601,10 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   footerLink: {
-    color: { default: null, ":hover": palette["--text"] },
+    color: {
+      default: null,
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
+    },
   },
 });

@@ -94,10 +94,19 @@ export function StackShowcase({
     <section ref={sectionRef} id="stack" {...stylex.props(section.block, styles.section)}>
       <div {...stylex.props(section.head)}>
         <h2 {...stylex.props(section.title, veil.soft)}>
-          <small {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)} data-cut data-eyebrow style={{ "--c": "var(--ar)" }}>
-            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>Tools I use</span>
+          <small
+            {...stylex.props(loadIn.veil, section.eyebrow, veil.dense, veil.fit)}
+            data-cut
+            data-eyebrow
+            style={{ "--c": "var(--ar)" }}
+          >
+            <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+              Tools I use
+            </span>
           </small>
-          <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>Stack</span>
+          <span {...stylex.props(loadIn.piece, section.titleText)} data-cut>
+            Stack
+          </span>
         </h2>
       </div>
 
@@ -115,14 +124,18 @@ export function StackShowcase({
             >
               <i {...stylex.props(chips.dot)} />
               All
-              <b {...stylex.props(chips.count, usedAt === null && chips.countOn)}>{allTools.length}</b>
+              <b {...stylex.props(chips.count, usedAt === null && chips.countOn)}>
+                {allTools.length}
+              </b>
             </button>
           </div>
         </div>
         {FILTER_ROWS.filter((row) => placesOf(row.kind).length > 0).map((row) => (
           <div key={row.kind} {...stylex.props(styles.row)}>
             <h3 {...stylex.props(loadIn.veil, veil.dense, styles.rowLabel)} data-cut>
-              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>{row.label}</span>
+              <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
+                {row.label}
+              </span>
             </h3>
             <div
               {...stylex.props(chips.group, styles.chips)}
@@ -133,7 +146,11 @@ export function StackShowcase({
                 <button
                   key={name}
                   type="button"
-                  {...stylex.props(loadIn.piece, chips.chip, row.kind === "work" && styles.ringChip)}
+                  {...stylex.props(
+                    loadIn.piece,
+                    chips.chip,
+                    row.kind === "work" && styles.ringChip,
+                  )}
                   data-cut
                   aria-pressed={usedAt === name}
                   style={{ "--c": row.color, ...(row.kind === "work" ? ringOf(name) : undefined) }}
@@ -159,8 +176,14 @@ export function StackShowcase({
         {shownGroups.map((group) => (
           <ViewTransition key={group.label} {...FILTER_MOTION}>
             <div {...stylex.props(styles.group)}>
-              <h3 {...stylex.props(!filtered && loadIn.veil, veil.dense, styles.groupLabel)} data-cut={!filtered || undefined}>
-                <span {...stylex.props(!filtered && loadIn.piece, loadIn.words)} data-cut={!filtered || undefined}>
+              <h3
+                {...stylex.props(!filtered && loadIn.veil, veil.dense, styles.groupLabel)}
+                data-cut={!filtered || undefined}
+              >
+                <span
+                  {...stylex.props(!filtered && loadIn.piece, loadIn.words)}
+                  data-cut={!filtered || undefined}
+                >
                   {group.label}
                 </span>
               </h3>
@@ -168,12 +191,20 @@ export function StackShowcase({
                 {group.tools.map((tool) => (
                   <ViewTransition key={tool} {...FILTER_MOTION}>
                     <li
-                      {...stylex.props(!filtered && loadIn.piece, techBadge.badge, iconLit.hover, hoverHold.lift, styles.tool)}
+                      {...stylex.props(
+                        !filtered && loadIn.piece,
+                        techBadge.badge,
+                        iconLit.hover,
+                        hoverHold.lift,
+                        styles.tool,
+                      )}
                       data-cut={!filtered || undefined}
                       tabIndex={0}
                       aria-describedby={peek?.tool === tool ? PEEK_ID : undefined}
                       style={techBrand(tool)}
-                      onPointerEnter={(event) => fromMouse(event) && show(tool, event.currentTarget)}
+                      onPointerEnter={(event) =>
+                        fromMouse(event) && show(tool, event.currentTarget)
+                      }
                       onPointerLeave={(event) => fromMouse(event) && hide()}
                       onFocus={(event) => show(tool, event.currentTarget)}
                       onBlur={hide}
@@ -204,7 +235,9 @@ export function StackShowcase({
             <small {...stylex.props(styles.peekGroup)}>{groupOf(peek.tool)}</small>
           </header>
           {peekUses.length === 0 && (
-            <p {...stylex.props(styles.peekNote)}>Not part of a role or project listed on this site.</p>
+            <p {...stylex.props(styles.peekNote)}>
+              Not part of a role or project listed on this site.
+            </p>
           )}
           {work.length > 0 && <UseList title="Work" uses={work} />}
           {projects.length > 0 && <UseList title="Projects" uses={projects} />}
@@ -261,6 +294,7 @@ function usePlaceCard(
 }
 
 const STACKED = "@media (max-width: 960px)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const LIGHT = ":is(.light *)";
 // The panel over a tool's --ring (from techBrand), which shows in the border; a tool with no brand
 // colour gets the hairline.
@@ -304,7 +338,12 @@ const styles = stylex.create({
   // A pressed company chip takes its logo's colours (ringOf): the ring on its rim, and a wash of
   // the same ring inside, over the panel. Its logo lights while pressed or under the pointer.
   ringChip: {
-    "--lit": { default: null, ":hover": "1", ":focus-visible": "1", ':is([aria-pressed="true"])': "1" },
+    "--lit": {
+      default: null,
+      ":hover": { default: null, [HOVER]: "1" },
+      ":focus-visible": "1",
+      ':is([aria-pressed="true"])': "1",
+    },
     "--ring": { default: "var(--ring-dark)", [LIGHT]: "var(--ring-light)" },
     borderColor: { default: palette["--hair"], ':is([aria-pressed="true"])': "transparent" },
     backgroundImage: {
@@ -357,13 +396,25 @@ const styles = stylex.create({
     backgroundColor: palette["--panel"],
     // Under the pointer and keyboard focus the hairline gives way to the logo's ring. The ring is
     // drawn only then: under the hairline, its colour would fringe the rounded edge.
-    borderColor: { default: palette["--hair"], ":hover": "transparent", ":focus-visible": "transparent" },
-    backgroundImage: { default: null, ":hover": TOOL_RING, ":focus-visible": TOOL_RING },
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": { default: null, [HOVER]: "transparent" },
+      ":focus-visible": "transparent",
+    },
+    backgroundImage: {
+      default: null,
+      ":hover": { default: null, [HOVER]: TOOL_RING },
+      ":focus-visible": TOOL_RING,
+    },
     backgroundClip: "padding-box, border-box",
     backgroundOrigin: "border-box",
     font: `500 13px ${fonts["--display"]}`,
     color: palette["--text"],
-    transform: { default: null, ":hover": "translateY(-3px)", ":focus-visible": "translateY(-3px)" },
+    transform: {
+      default: null,
+      ":hover": { default: null, [HOVER]: "translateY(-3px)" },
+      ":focus-visible": "translateY(-3px)",
+    },
     outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
     outlineOffset: { default: null, ":focus-visible": "2px" },
     transitionProperty: "border-color, transform",

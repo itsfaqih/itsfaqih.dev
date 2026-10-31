@@ -39,6 +39,11 @@ export const palette = stylex.defineVars({
   "--no-shadow": "#a3283a",
   "--drop-ink": "#0a0a0e",
   "--soft-hover": "#2a2a38",
+  // A soft key sits a step above --panel-2 on a side of its own, since --drop-ink is all but the
+  // page itself in dark and the key's edge would vanish into it.
+  "--soft-key": "#3a3a4c",
+  "--soft-key-hover": "#444458",
+  "--soft-key-drop": "#202029",
   "--hair-hover": "#3a3a4c",
   "--scan": "rgb(0 0 0 / 0.18)",
   // Text that sits straight on the dither gets a patch of page colour under it (see veil in routes/-components/section.ts).
@@ -72,6 +77,9 @@ export const motion = stylex.defineVars({
   "--cut": "cubic-bezier(0.83, 0, 0.17, 1)",
   "--out": "cubic-bezier(0.16, 1, 0.3, 1)",
   "--snap": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  // A sampled spring (damping 0.72), about 4% past and back: the header island's fold.
+  "--spring":
+    "linear(0, 0.034, 0.12, 0.234, 0.359, 0.484, 0.601, 0.705, 0.793, 0.865, 0.922, 0.965, 0.996, 1.017, 1.03, 1.036, 1.038, 1.037, 1.034, 1.03, 1.025, 1.02, 1.016, 1.012, 1.008, 1.005, 1.003, 1.001, 1, 0.999, 0.999, 0.999, 0.999)",
   // Entrance timing: one step between items, one length for small pops, one for panels.
   "--t-step": "40ms",
   "--t-pop": "420ms",
@@ -80,17 +88,18 @@ export const motion = stylex.defineVars({
 
 /** The blog's transitions. */
 export const transitions = stylex.defineConsts({
-  colors: "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke",
+  colors:
+    "color, background-color, border-color, outline-color, text-decoration-color, fill, stroke",
   transform: "transform, translate, scale, rotate",
   ease: "cubic-bezier(0.4, 0, 0.2, 1)",
 });
 
-/** Pixel cursors from scripts/cursors.py, shown until the print cursor takes over. Each falls back to its system cursor. */
+/** The system cursors, shown until the print cursor takes over (print-cursor.tsx). */
 export const cursors = stylex.defineVars({
-  "--cursor": 'url("/cursors/arrow.svg") 0 0, auto',
-  "--cursor-point": 'url("/cursors/point.svg") 8 0, pointer',
-  "--cursor-grab": 'url("/cursors/grab.svg") 12 14, grab',
-  "--cursor-grabbing": 'url("/cursors/grabbing.svg") 12 8, grabbing',
-  "--cursor-text": 'url("/cursors/text.svg") 7 13, text',
-  "--cursor-forbid": 'url("/cursors/forbid.svg") 13 13, not-allowed',
+  "--cursor": "auto",
+  "--cursor-point": "pointer",
+  "--cursor-grab": "grab",
+  "--cursor-grabbing": "grabbing",
+  "--cursor-text": "text",
+  "--cursor-forbid": "not-allowed",
 });

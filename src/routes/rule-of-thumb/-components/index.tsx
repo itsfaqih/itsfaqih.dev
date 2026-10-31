@@ -7,7 +7,7 @@ export function ruleHead(id: string) {
   return pageHead({
     path: rule.href,
     title: rule.headTitle,
-    description: `${rule.claim} ${rule.description}${rule.interactive ? ", with live demos" : ""}.`,
+    description: `${rule.claim} ${rule.description}, with live demos.`,
     type: "article",
     headline: rule.title,
     schema: "Article",

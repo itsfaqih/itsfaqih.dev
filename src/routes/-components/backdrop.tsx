@@ -26,75 +26,37 @@ const TRAIL_DELAY = 180;
 const TRAIL_MS = 1000;
 const TRAIL_STEP = 8;
 const TRAIL_MAX = 80;
-// Auroras drift in the page's empty places, each a curtain of dots dithered between two hues. Once
-// born they stay, and the page fills with up to AURORA_COUNT per screen as it is scrolled.
-const AURORA_COUNT = 5;
-// Each aurora takes the longest length its empty place has room for.
-const AURORA_LONG = [120, 360] as const;
-const AURORA_LONG_STEP = 20;
-const AURORA_SHORT = [22, 38] as const;
-const AURORA_FADE_IN = 1500;
-// Only for an aurora that content has since moved onto, as when a section expands or the page resizes.
-const AURORA_FADE_OUT = 2000;
-const AURORA_SPAWN_MS = [700, 2300] as const;
-const AURORA_DRIFT = 8;
-const AURORA_TILT = 0.08;
-const AURORA_WAVE = 0.3;
-const AURORA_MARGIN = 10;
-// Above 1, an aurora's colour and swell thin out toward its edges sooner.
-const AURORA_EDGE = 2.2;
-const AURORA_LIFT = 0.35;
-const AURORA_ALPHA = 0.9;
-// Below the fixed header, which would cover an aurora born under it.
-const HEADER_CLEAR = 96;
-const CONTENT =
-  "h1, h2, h3, h4, p, li, a, button, img, svg, canvas, video, pre, table, header, footer, [data-cut]";
+// The tide: three slow waves cross the page, and the dots under their sum swell like a print's
+// screen under shifting ink. Each wave is [x frequency, y frequency, speed], per px and per second.
+const TIDE_WAVES = [
+  [0.0065, 0, 0.55],
+  [0, 0.0085, -0.42],
+  [0.0029, -0.0038, 0.31],
+] as const;
+// Dots swell above the tide's middle; only the crests, its top quarter, take a tint.
+const TIDE_SWELL = 0.5;
+const TIDE_CREST = 0.76;
+const TIDE_LIFT = 0.6;
+const TIDE_ALPHA = 0.6;
+// Crests dither from --cw at the left edge to --ax at the right.
+const TIDE_HUES = [1 + PALETTE.indexOf("--cw"), 1 + PALETTE.indexOf("--ax")] as const;
+// Lit dots are filled in this many alpha steps, so a frame fills a few paths rather than one per dot.
+const TINT_STEPS = 12;
 
 type Box = { left: number; right: number; top: number; bottom: number };
-type Aurora = {
-  x: number;
-  pageY: number;
-  long: number;
-  short: number;
-  angle: number;
-  hues: [number, number];
-  born: number;
-  covered?: boolean;
-  leaving?: number;
-  seed: number;
-};
 
 /** Whether grid step (p, q) holds a dot of the turned screen. */
 const onScreen = (p: number, q: number) => (3 * p + q) % 10 === 0;
-/** Whether an element floats over the page (fixed or sticky), so it covers nothing for good. */
-const floats = (node: Element) => {
-  for (let at: Element | null = node; at && at !== document.body; at = at.parentElement) {
-    const { position } = getComputedStyle(at);
-    if (position === "fixed" || position === "sticky") return true;
-  }
-  return false;
-};
-const between = ([low, high]: readonly [number, number]) => low + Math.random() * (high - low);
-const overlaps = (a: Box, b: Box) =>
-  a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-/** A steady 0..1 per dot of the page, for dithering an aurora's two hues. */
+/** A steady 0..1 per dot of the page, for dithering the tide's two hues. */
 const grain = (p: number, pageQ: number) => {
   const hash = Math.sin(p * 127.1 + pageQ * 311.7) * 43_758.5453;
   return hash - Math.floor(hash);
 };
 
-/** The page box an aurora can reach as it drifts, tilts and waves. */
-const reachOf = ({ x, pageY, long, short, angle }: Aurora): Box => {
-  const along = long + AURORA_DRIFT + AURORA_MARGIN;
-  const across = short * (1 + AURORA_WAVE) + long * AURORA_TILT + AURORA_DRIFT + AURORA_MARGIN;
-  const [width, height] = angle === 0 ? [along, across] : [across, along];
-  return { left: x - width, right: x + width, top: pageY - height, bottom: pageY + height };
-};
-
-export function Backdrop({ aurora = false }: { aurora?: boolean }) {
+export function Backdrop({ tide = false }: { tide?: boolean }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const liven = useCallback((element: HTMLDivElement) => animateDots(element, aurora), [aurora]);
+  const liven = useCallback((element: HTMLDivElement) => animateDots(element, tide), [tide]);
 
   if (!mounted) return null;
   return createPortal(
@@ -131,7 +93,7 @@ const styles = stylex.create({
   },
 });
 
-function animateDots(element: HTMLDivElement, withAurora: boolean) {
+function animateDots(element: HTMLDivElement, withTide: boolean) {
   const grid = element.querySelector("i");
   const canvas = element.querySelector("canvas");
   const context = canvas?.getContext("2d");
@@ -202,10 +164,14 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
   let trail: { x: number; pageY: number; at: number }[] = [];
-  let presses: { x: number; pageY: number; to: { x: number; pageY: number }; start: number; end?: number }[] = [];
+  let presses: {
+    x: number;
+    pageY: number;
+    to: { x: number; pageY: number };
+    start: number;
+    end?: number;
+  }[] = [];
   let drawn = performance.now();
-  let auroras: Aurora[] = [];
-  let nextAurora = performance.now() + between(AURORA_SPAWN_MS);
   let frame = 0;
 
   // Each dot keeps its hue while the page scrolls, keyed by its place on the turned screen.
@@ -219,60 +185,6 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
   const prune = (now: number) => {
     trail = trail.filter((point) => now - point.at < TRAIL_MS);
     presses = presses.filter((press) => press.end === undefined || now - press.end < PRESS_RELEASE);
-    auroras = auroras.filter((aurora) => aurora.leaving === undefined || now - aurora.leaving < AURORA_FADE_OUT);
-  };
-
-  /**
-   * Sends off the auroras that content now covers, then starts one at a random spot in view that no
-   * content or other aurora covers, while the view holds fewer than AURORA_COUNT.
-   */
-  const spawn = (now: number) => {
-    const width = document.documentElement.clientWidth;
-    const content: (Box & { node: Element })[] = [];
-    for (const node of document.querySelectorAll(CONTENT)) {
-      if (element.contains(node)) continue;
-      const box = node.getBoundingClientRect();
-      if (!box.width || !box.height) continue;
-      content.push({ node, left: box.left, right: box.right, top: box.top + scrollY, bottom: box.bottom + scrollY });
-    }
-    const staying = auroras.filter((aurora) => aurora.leaving === undefined);
-    for (const aurora of staying) {
-      const reach = reachOf(aurora);
-      // Covered on two checks running, so a passing cut-in glitch does not count.
-      const covered =
-        reach.left < 0 ||
-        reach.right > width ||
-        content.some((box) => overlaps(box, reach) && !floats(box.node));
-      if (covered && aurora.covered) aurora.leaving = now;
-      aurora.covered = covered;
-    }
-    const view = { left: 0, right: width, top: scrollY, bottom: scrollY + innerHeight };
-    const kept = staying.filter((aurora) => aurora.leaving === undefined);
-    if (kept.filter((aurora) => overlaps(reachOf(aurora), view)).length >= AURORA_COUNT) return;
-    const taken = [...content, ...kept.map(reachOf)];
-    const fits = (aurora: Aurora) => {
-      const reach = reachOf(aurora);
-      if (reach.left < 0 || reach.right > width || reach.top < scrollY + HEADER_CLEAR) return false;
-      return reach.bottom <= scrollY + innerHeight && !taken.some((box) => overlaps(box, reach));
-    };
-    for (let attempt = 0; attempt < 80; attempt++) {
-      const first = Math.floor(Math.random() * PALETTE.length);
-      const second = (first + 1 + Math.floor(Math.random() * (PALETTE.length - 1))) % PALETTE.length;
-      const aurora: Aurora = {
-        x: Math.random() * width,
-        pageY: scrollY + HEADER_CLEAR + Math.random() * (innerHeight - HEADER_CLEAR),
-        long: AURORA_LONG[1],
-        short: between(AURORA_SHORT),
-        angle: Math.random() < 0.5 ? 0 : Math.PI / 2,
-        hues: [1 + first, 1 + second],
-        born: now,
-        seed: Math.random() * 100,
-      };
-      while (aurora.long > AURORA_LONG[0] && !fits(aurora)) aurora.long -= AURORA_LONG_STEP;
-      if (!fits(aurora)) continue;
-      auroras.push(aurora);
-      return;
-    }
   };
 
   const draw = (now = performance.now()) => {
@@ -311,41 +223,26 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
       };
     });
     const time = now / 1000;
-    const view = { left: 0, right: innerWidth, top: scrollY, bottom: scrollY + innerHeight };
-    const curtains = auroras.filter((aurora) => overlaps(reachOf(aurora), view)).map((aurora) => {
-      const age = now - aurora.born;
-      const gone = aurora.leaving === undefined ? 0 : (now - aurora.leaving) / AURORA_FADE_OUT;
-      const angle = aurora.angle + Math.sin(time * 0.4 + aurora.seed) * AURORA_TILT;
-      const reach = reachOf(aurora);
-      return {
-        ...aurora,
-        x: aurora.x + Math.sin(time * 0.31 + aurora.seed) * AURORA_DRIFT,
-        y: aurora.pageY - scrollY + Math.cos(time * 0.23 + aurora.seed * 1.7) * AURORA_DRIFT,
-        cos: Math.cos(angle),
-        sin: Math.sin(angle),
-        strength: Math.max(0, Math.min(1, age / AURORA_FADE_IN, 1 - gone)),
-        sway: Math.sin(time * 0.5 + aurora.seed) * 0.3,
-        box: { ...reach, top: reach.top - scrollY, bottom: reach.bottom - scrollY },
-      };
-    });
+    const tiding = withTide && !still.matches;
+    const width = document.documentElement.clientWidth;
+    const phases = TIDE_WAVES.map(([, , speed]) => time * speed);
 
     // Presses and the trail move dots off their places, so the canvas then draws the whole screen
-    // in place of the grid. Otherwise it draws only the boxes the auroras fall in, and a dot in more
-    // than one is drawn by the first.
+    // in place of the grid. The tide only swells dots, so it draws them over the grid.
     const moving = grips.length > 0 || sparks.length > 0;
     grid.style.visibility = moving ? "hidden" : "";
-    const regions: Box[] = moving
-      ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }]
-      : curtains.map(({ box }) => box);
+    const regions: Box[] =
+      moving || tiding ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }] : [];
     const trailBox: Box = {
       left: Math.min(...sparks.map(({ x }) => x)) - TRAIL_PULL_RADIUS,
       right: Math.max(...sparks.map(({ x }) => x)) + TRAIL_PULL_RADIUS,
       top: Math.min(...sparks.map(({ y }) => y)) - TRAIL_PULL_RADIUS,
       bottom: Math.max(...sparks.map(({ y }) => y)) + TRAIL_PULL_RADIUS,
     };
-    // Resting dots go in one path, filled once under the lit ones.
-    const resting = new Path2D();
-    const lit: { x: number; y: number; radius: number; tint: number; hue: number }[] = [];
+    // Every drawn dot goes in one path of the theme's --dot; tints go on top, one path per hue and
+    // alpha step.
+    const base = new Path2D();
+    const tints = new Map<number, Path2D>();
 
     regions.forEach((region, index) => {
       const earlier = regions.slice(0, index);
@@ -360,7 +257,8 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
         for (let p = firstP + offset; p * U <= lastX; p += 10) {
           const x = p * U + U / 2;
           const y = q * U + U / 2 - shift;
-          const inside = (box: Box) => x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+          const inside = (box: Box) =>
+            x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
           if (earlier.some(inside)) continue;
 
           let trailed = 0;
@@ -373,7 +271,8 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
               const distance = Math.hypot(spark.x - x, spark.y - y);
               if (distance < spark.radius)
                 trailed = Math.max(trailed, (1 - distance / spark.radius) ** 2 * spark.life);
-              const drawn = distance < spark.reach ? (1 - distance / spark.reach) ** 1.5 * spark.life : 0;
+              const drawn =
+                distance < spark.reach ? (1 - distance / spark.reach) ** 1.5 * spark.life : 0;
               if (drawn > pull) {
                 pull = drawn;
                 toward = spark;
@@ -392,60 +291,60 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
             dotX += (grip.x - x) * pull;
             dotY += (grip.y - y) * pull;
           }
-          let shimmer = 0;
-          let shimmerHue = 0;
-          for (const curtain of curtains) {
-            const dx = x - curtain.x;
-            const dy = y - curtain.y;
-            const u = (dx * curtain.cos + dy * curtain.sin) / curtain.long;
-            const across = -dx * curtain.sin + dy * curtain.cos;
-            const wave = Math.sin(u * 2.4 + time * 0.9 + curtain.seed) * curtain.short * AURORA_WAVE;
-            const v = (across - wave) / curtain.short;
-            const fall = 1 - (u * u + v * v);
-            if (fall <= 0) continue;
-            const strength = fall ** AURORA_EDGE * curtain.strength;
-            if (strength <= shimmer) continue;
-            shimmer = strength;
-            shimmerHue = curtain.hues[grain(p, pageQ) < (u + 1) / 2 + curtain.sway ? 1 : 0];
+          let swell = 0;
+          let crest = 0;
+          if (tiding) {
+            const pageY = y + scrollY;
+            const sum = TIDE_WAVES.reduce(
+              (total, [fx, fy], index) => total + Math.sin(x * fx + pageY * fy + phases[index]!),
+              0,
+            );
+            const level = (sum + TIDE_WAVES.length) / (2 * TIDE_WAVES.length);
+            swell = Math.max(0, (level - TIDE_SWELL) / (1 - TIDE_SWELL));
+            crest = Math.max(0, (level - TIDE_CREST) / (1 - TIDE_CREST)) ** 1.5;
           }
 
-          const lift = Math.min(1, Math.max(trailed, gripped, shimmer * AURORA_LIFT));
-          const tint = Math.min(1, Math.max(trailed * 1.6, gripped * 1.6, shimmer * AURORA_ALPHA));
-          if (tint < 0.01) {
+          const lift = Math.min(1, Math.max(trailed, gripped, swell * swell * TIDE_LIFT));
+          const tint = Math.min(1, Math.max(trailed * 1.6, gripped * 1.6, crest * TIDE_ALPHA));
+          if (tint < 0.01 && lift < 0.02) {
             if (!moving) continue;
-            resting.moveTo(dotX + DOT, dotY);
-            resting.arc(dotX, dotY, DOT, 0, Math.PI * 2);
+            base.moveTo(dotX + DOT, dotY);
+            base.arc(dotX, dotY, DOT, 0, Math.PI * 2);
             continue;
           }
-          const hue = shimmer > Math.max(trailed, gripped) ? shimmerHue : hueOf(p, pageQ);
-          lit.push({ x: dotX, y: dotY, radius: DOT + lift * DOT_LIFT, tint, hue });
+          const radius = DOT + lift * DOT_LIFT;
+          base.moveTo(dotX + radius, dotY);
+          base.arc(dotX, dotY, radius, 0, Math.PI * 2);
+          if (tint < 0.01) continue;
+          const hue =
+            crest * TIDE_ALPHA > Math.max(trailed, gripped) * 1.6
+              ? TIDE_HUES[grain(p, pageQ) < x / width ? 1 : 0]
+              : hueOf(p, pageQ);
+          const key = hue * 100 + Math.max(1, Math.round(tint * TINT_STEPS));
+          let path = tints.get(key);
+          if (!path) tints.set(key, (path = new Path2D()));
+          path.moveTo(dotX + radius, dotY);
+          path.arc(dotX, dotY, radius, 0, Math.PI * 2);
         }
       }
     });
 
     context.globalAlpha = 1;
     context.fillStyle = colours[0]!;
-    context.fill(resting);
-    for (const dot of lit) {
-      context.beginPath();
-      context.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
-      context.globalAlpha = 1;
-      context.fillStyle = colours[0]!;
-      context.fill();
-      context.globalAlpha = dot.tint;
-      context.fillStyle = colours[dot.hue]!;
-      context.fill();
+    context.fill(base);
+    for (const [key, path] of tints) {
+      context.globalAlpha = (key % 100) / TINT_STEPS;
+      context.fillStyle = colours[Math.floor(key / 100)]!;
+      context.fill(path);
     }
   };
 
   const tick = (now: number) => {
-    const aurora = withAurora && !still.matches;
-    if (aurora && now >= nextAurora) {
-      spawn(now);
-      nextAurora = now + between(AURORA_SPAWN_MS);
-    }
     draw(now);
-    frame = aurora || trail.length || presses.length ? requestAnimationFrame(tick) : 0;
+    frame =
+      (withTide && !still.matches) || trail.length || presses.length
+        ? requestAnimationFrame(tick)
+        : 0;
   };
   const wake = () => {
     if (!frame) frame = requestAnimationFrame(tick);
@@ -454,11 +353,12 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
     if (frame) draw();
   };
 
-  const move = (event: PointerEvent) => {
-    if (event.pointerType === "touch") return;
+  // A wheel or key scroll slides the page under a still pointer and fires no pointermove, so the
+  // trail also follows the pointer's place on the page as it scrolls.
+  let pointer: { x: number; y: number } | null = null;
+  const lay = (x: number, clientY: number) => {
     const now = performance.now();
-    const x = event.clientX;
-    const pageY = event.clientY + scrollY;
+    const pageY = clientY + scrollY;
     for (const press of presses) if (press.end === undefined) press.to = { x, pageY };
     trail = trail.filter((point) => now - point.at < TRAIL_MS);
     const last = trail.at(-1);
@@ -477,6 +377,17 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
     if (trail.length > TRAIL_MAX) trail.splice(0, trail.length - TRAIL_MAX);
     wake();
   };
+  const move = (event: PointerEvent) => {
+    if (event.pointerType === "touch") return;
+    pointer = { x: event.clientX, y: event.clientY };
+    lay(pointer.x, pointer.y);
+  };
+  const glide = () => {
+    if (pointer) lay(pointer.x, pointer.y);
+  };
+  const leave = (event: PointerEvent) => {
+    if (!event.relatedTarget) pointer = null;
+  };
   const press = (event: PointerEvent) => {
     if (event.pointerType === "touch" || event.button !== 0) return;
     const at = { x: event.clientX, pageY: event.clientY + scrollY };
@@ -492,18 +403,22 @@ function animateDots(element: HTMLDivElement, withAurora: boolean) {
   const hover = matchMedia("(hover: hover)").matches;
   if (hover) {
     addEventListener("pointermove", move, { passive: true });
+    addEventListener("scroll", glide, { passive: true });
+    document.addEventListener("pointerout", leave, { passive: true });
     addEventListener("pointerdown", press, { capture: true, passive: true });
     addEventListener("pointerup", release, { capture: true, passive: true });
     addEventListener("pointercancel", release, { capture: true, passive: true });
     addEventListener("blur", release);
   }
-  if (withAurora) wake();
+  if (withTide) wake();
   return () => {
     theme.disconnect();
     removeEventListener("scroll", scroll);
     removeEventListener("resize", onResize);
     cancelAnimationFrame(frame);
     removeEventListener("pointermove", move);
+    removeEventListener("scroll", glide);
+    document.removeEventListener("pointerout", leave);
     removeEventListener("pointerdown", press, { capture: true });
     removeEventListener("pointerup", release, { capture: true });
     removeEventListener("pointercancel", release, { capture: true });

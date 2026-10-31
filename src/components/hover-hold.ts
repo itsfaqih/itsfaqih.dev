@@ -1,5 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 /**
  * For an element that lifts on hover. Lifted, it slides out from under a pointer resting on its
  * bottom edge, drops back under it and lifts again, flickering. While it is hovered, its ::before
@@ -15,7 +17,7 @@ export const hoverHold = stylex.create({
       inset: "0 -2px -8px",
       // Under the element's content, inside the stacking context its lift transform makes.
       zIndex: -1,
-      display: { default: "none", ":hover": "block" },
+      display: { default: "none", ":hover": { default: null, [HOVER]: "block" } },
     },
   },
 });

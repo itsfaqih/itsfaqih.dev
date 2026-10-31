@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import { cursors, fonts, palette } from "../theme.stylex";
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 /**
  * The arcade's keys: a chunky button that sits on a hard drop shadow and presses down into it.
  * Every key takes `base`, then `go` (the accent), `hue` (its own --c) or `soft` (a quiet panel),
@@ -30,7 +32,10 @@ export const button = stylex.create({
       "transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 120ms ease, box-shadow 120ms ease",
   },
   go: {
-    backgroundColor: { default: palette["--go"], ":hover": palette["--go-hover"] },
+    backgroundColor: {
+      default: palette["--go"],
+      ":hover": { default: null, [HOVER]: palette["--go-hover"] },
+    },
     color: palette["--on-accent"],
     boxShadow: {
       default: `0 4px 0 ${palette["--go-shadow"]}`,
@@ -41,15 +46,21 @@ export const button = stylex.create({
     "--key": "color-mix(in oklab, var(--c) 62%, #000)",
     backgroundColor: {
       default: "var(--c)",
-      ":hover": "color-mix(in oklab, var(--c) 72%, #fff)",
+      ":hover": { default: null, [HOVER]: "color-mix(in oklab, var(--c) 72%, #fff)" },
     },
     color: "var(--on-c)",
     boxShadow: { default: "0 4px 0 var(--key)", ":active": "0 2px 0 var(--key)" },
   },
   soft: {
-    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--soft-key"],
+      ":hover": { default: null, [HOVER]: palette["--soft-key-hover"] },
+    },
     color: palette["--text"],
-    boxShadow: `0 4px 0 ${palette["--drop-ink"]}`,
+    boxShadow: {
+      default: `0 4px 0 ${palette["--soft-key-drop"]}`,
+      ":active": `0 2px 0 ${palette["--soft-key-drop"]}`,
+    },
   },
   sm: {
     height: "38px",

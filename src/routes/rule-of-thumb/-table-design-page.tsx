@@ -20,13 +20,15 @@ import {
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { Code, type Lesson, type Level, RuleLanding } from "./-components/rule-landing";
+import { Code, type Lesson, RuleLanding } from "./-components/rule-landing";
 import { row, tipped } from "./-table-design.stylex";
 import { kit } from "./-components/rule-landing.stylex";
 import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 
 const flash = stylex.keyframes({
   to: { opacity: 0 },
@@ -95,19 +97,26 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     backgroundColor: {
       default: null,
-      [stylex.when.ancestor(":hover", row)]:
-        `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+      [stylex.when.ancestor(":hover", row)]: {
+        default: null,
+        [HOVER]: `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+      },
     },
     transition: `background-color ${kit["--t-fb"]} ease`,
   },
   still: {
-    backgroundColor: { default: null, [stylex.when.ancestor(":hover", row)]: "transparent" },
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor(":hover", row)]: { default: null, [HOVER]: "transparent" },
+    },
   },
   editing: {
     backgroundColor: {
       default: "color-mix(in srgb, var(--c) 10%, transparent)",
-      [stylex.when.ancestor(":hover", row)]:
-        `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+      [stylex.when.ancestor(":hover", row)]: {
+        default: null,
+        [HOVER]: `color-mix(in srgb, ${palette["--text"]} 3%, transparent)`,
+      },
     },
   },
   num: {
@@ -180,7 +189,11 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "9px",
-    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--soft-key"],
+      ":hover": { default: null, [HOVER]: palette["--soft-key-hover"] },
+      ":active": palette["--soft-key-hover"],
+    },
     fontWeight: 700,
     fontSize: "13px",
     lineHeight: "normal",
@@ -231,7 +244,11 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: { default: palette["--dim"], ":hover": palette["--text"] },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
+    },
     whiteSpace: "nowrap",
     cursor: cursors["--cursor-point"],
     transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, box-shadow ${kit["--t-fb"]} ease`,
@@ -291,7 +308,8 @@ const styles = stylex.create({
     outlineColor: "currentcolor",
     backgroundColor: "transparent",
     backgroundPosition: "0px 0px",
-    fontSize: "14px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "14px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
     color: palette["--text"],
@@ -371,10 +389,13 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "8px",
-    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--soft-key"],
+      ":hover": { default: null, [HOVER]: palette["--soft-key-hover"] },
+    },
     boxShadow: {
-      default: `0 3px 0 ${palette["--drop-ink"]}`,
-      ":active": `0 1px 0 ${palette["--drop-ink"]}`,
+      default: `0 3px 0 ${palette["--soft-key-drop"]}`,
+      ":active": `0 1px 0 ${palette["--soft-key-drop"]}`,
     },
     fontWeight: 700,
     fontSize: "12px",
@@ -389,7 +410,7 @@ const styles = stylex.create({
     backgroundColor: "var(--c)",
     boxShadow: { default: "0 3px 0 var(--key-c)", ":active": "0 1px 0 var(--key-c)" },
     color: "var(--on-c)",
-    filter: { default: null, ":hover": "brightness(1.06)" },
+    filter: { default: null, ":hover": { default: null, [HOVER]: "brightness(1.06)" } },
   },
   btnIcon: {
     width: "14px",
@@ -415,10 +436,19 @@ const styles = stylex.create({
     borderRadius: "8px",
     backgroundColor: {
       default: "transparent",
-      ":hover": "color-mix(in srgb, var(--c) 16%, transparent)",
+      ":hover": { default: null, [HOVER]: "color-mix(in srgb, var(--c) 16%, transparent)" },
+      ":active": "color-mix(in srgb, var(--c) 16%, transparent)",
     },
-    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
-    color: { default: palette["--dim"], ":hover": "var(--c-ink)" },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
+    },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, [HOVER]: "var(--c-ink)" },
+      ":active": "var(--c-ink)",
+    },
     opacity: { default: null, ":disabled": 0.4 },
     cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
@@ -431,9 +461,14 @@ const styles = stylex.create({
   iconDanger: {
     backgroundColor: {
       default: "transparent",
-      ":hover": `color-mix(in srgb, ${kit["--no"]} 14%, transparent)`,
+      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${kit["--no"]} 14%, transparent)` },
+      ":active": `color-mix(in srgb, ${kit["--no"]} 14%, transparent)`,
     },
-    color: { default: palette["--dim"], ":hover": kit["--no-ink"] },
+    color: {
+      default: palette["--dim"],
+      ":hover": { default: null, [HOVER]: kit["--no-ink"] },
+      ":active": kit["--no-ink"],
+    },
   },
   iconGlyph: {
     width: "16px",
@@ -479,8 +514,16 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "6px",
-    backgroundColor: { default: "transparent", ":hover": palette["--panel-2"] },
-    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active": palette["--panel-2"],
+    },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
+    },
     fontWeight: 600,
     fontSize: "12px",
     lineHeight: "18px",
@@ -515,8 +558,16 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "6px",
-    backgroundColor: { default: "transparent", ":hover": palette["--panel-2"] },
-    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active": palette["--panel-2"],
+    },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
+    },
     fontWeight: 700,
     fontSize: "12px",
     lineHeight: "normal",
@@ -558,22 +609,42 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "8px",
-    backgroundColor: { default: "transparent", ":hover:enabled": palette["--panel-2"] },
-    backgroundPosition: { default: "0px 0px", ":hover:enabled": "initial" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover:enabled": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active:enabled": palette["--panel-2"],
+    },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover:enabled": { default: null, [HOVER]: "initial" },
+      ":active:enabled": "initial",
+    },
     fontWeight: 600,
     fontSize: "12px",
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
     fontVariantNumeric: "tabular-nums",
-    color: { default: palette["--dim"], ":hover:enabled": palette["--text"] },
+    color: {
+      default: palette["--dim"],
+      ":hover:enabled": { default: null, [HOVER]: palette["--text"] },
+      ":active:enabled": palette["--text"],
+    },
     opacity: { default: null, ":disabled": 0.35 },
     cursor: { default: cursors["--cursor-point"], ":disabled": cursors["--cursor-forbid"] },
     transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
   },
   pageOn: {
-    backgroundColor: { default: "var(--c)", ":hover:enabled": palette["--panel-2"] },
+    backgroundColor: {
+      default: "var(--c)",
+      ":hover:enabled": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active:enabled": palette["--panel-2"],
+    },
     backgroundPosition: "initial",
-    color: { default: "var(--on-c)", ":hover:enabled": palette["--text"] },
+    color: {
+      default: "var(--on-c)",
+      ":hover:enabled": { default: null, [HOVER]: palette["--text"] },
+      ":active:enabled": palette["--text"],
+    },
   },
   pageIcon: {
     width: "12px",
@@ -893,7 +964,7 @@ function Segments<T extends string>({
   onPick: (next: T) => void;
 }) {
   return (
-    <div {...stylex.props(styles.seg)} role="group" aria-label={label}>
+    <div {...stylex.props(styles.seg)} role="group" aria-label={label} data-hint>
       {options.map(([key, name]) => (
         <button
           key={key}
@@ -915,6 +986,9 @@ function SearchBox({ value, onChange }: { value: string; onChange: (next: string
       <MagnifyingGlassIcon weight="bold" aria-hidden="true" {...stylex.props(styles.searchIcon)} />
       <input
         type="search"
+        enterKeyHint="search"
+        autoCapitalize="none"
+        autoCorrect="off"
         {...stylex.props(styles.searchInput)}
         value={value}
         placeholder="Search users"
@@ -1073,10 +1147,10 @@ function ActionsDemo({ careful }: { careful: boolean }) {
           </tr>
         </thead>
         <tbody {...stylex.props(styles.body)}>
-          {rows.map(({ name, role }) => (
+          {rows.map(({ name, role }, at) => (
             <tr key={name} {...stylex.props(row)}>
               <td {...stylex.props(styles.td, editing === name && styles.editing)}>
-                {name}
+                <span data-hint={at === 0 || undefined}>{name}</span>
                 {!careful && (
                   <span {...stylex.props(styles.inline)}>
                     <button
@@ -1359,6 +1433,7 @@ function UrlDemo({ careful }: { careful: boolean }) {
           type="button"
           {...stylex.props(styles.icon, styles.ring)}
           aria-label="Reload"
+          data-hint
           disabled={now.reloading}
           onClick={() => setNow((old) => ({ ...old, reloading: true }))}
         >
@@ -1415,8 +1490,8 @@ export const LESSONS: Lesson[] = [
     title: "Right-align numbers",
     body: (
       <>
-        People compare numbers by their last digits. Set <Code>tabular-nums</Code> so every digit is
-        the same width, and format with <Code>toLocaleString()</Code>. Watch the right edge.
+        People compare numbers by their last digits. Use tabular figures so every digit is the same
+        width, and add thousands separators. Watch the right edge.
       </>
     ),
     extra: <LiveSwitch />,
@@ -1427,9 +1502,49 @@ export const LESSONS: Lesson[] = [
     },
     good: {
       label: "Align right, tabular",
-      costs: ["1 edge", "tabular-nums", "12,500.00"],
+      costs: ["1 edge", "tabular figures", "12,500.00"],
       view: <NumbersDemo careful />,
     },
+    levels: [
+      {
+        name: "Scan for the biggest",
+        prompt: (
+          <>
+            A revenue column holds <Code>9</Code>, <Code>120</Code> and <Code>12,500</Code>, and
+            people scan it for the biggest. Place the numbers.
+          </>
+        ),
+        piece: "9 · 120 · 12,500",
+        answer: "right",
+        rows: [
+          { depth: 0, text: "Revenue column", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "left",
+              label: "+ left-aligned",
+              note: "9 sits under the 1 of 12,500, so the digits that matter never line up.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "center",
+              label: "+ centred",
+              note: "Each value sits by its own width, so no column of digits lines up at all.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "right",
+              label: "+ right-aligned, even-width digits",
+              note: "Ones sit under ones and thousands under thousands, so the longest number reads as the biggest.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Give every state a next step",
@@ -1451,6 +1566,49 @@ export const LESSONS: Lesson[] = [
       costs: ["1 next step each", "height holds"],
       view: <StatesDemo careful />,
     },
+    levels: [
+      {
+        name: "Fill the blank",
+        prompt: (
+          <>
+            The users table can show no rows for three reasons. Place the <b>Add user</b>
+            button.
+          </>
+        ),
+        piece: "Add user",
+        answer: "empty",
+        rows: [
+          { depth: 0, text: "Users table", kind: "comp" },
+          { depth: 1, text: '"Couldn\'t load users"', tag: "error" },
+          {
+            depth: 2,
+            slot: {
+              id: "error",
+              label: "+ its button",
+              note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
+            },
+          },
+          { depth: 1, text: '"No users yet"', tag: "empty" },
+          {
+            depth: 2,
+            slot: {
+              id: "empty",
+              label: "+ its button",
+              note: "Nothing here yet, so offer adding the first user.",
+            },
+          },
+          { depth: 1, text: '"No results for "zed""', tag: "search" },
+          {
+            depth: 2,
+            slot: {
+              id: "search",
+              label: "+ its button",
+              note: "The users exist and the search hid them. Offer Clear search to bring them back.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Put actions in a fixed last column",
@@ -1471,6 +1629,49 @@ export const LESSONS: Lesson[] = [
       costs: ["always there", "1 column, 76px", "2 tooltips"],
       view: <ActionsDemo careful />,
     },
+    levels: [
+      {
+        name: "Place the actions",
+        prompt: (
+          <>
+            Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters.
+            Place the buttons.
+          </>
+        ),
+        piece: "Edit · Delete",
+        answer: "last",
+        rows: [
+          { depth: 0, text: "A user row", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "first",
+              label: "+ a column of their own, first",
+              note: "The row now opens with buttons, which push every name one column right.",
+            },
+          },
+          { depth: 1, text: "Alice Johnson" },
+          {
+            depth: 1,
+            slot: {
+              id: "name",
+              label: "+ in the name cell, after the text",
+              note: "Names differ in length, so Edit lands somewhere new on every row.",
+            },
+          },
+          { depth: 1, text: "alice@acme.com" },
+          { depth: 1, text: "Admin" },
+          {
+            depth: 1,
+            slot: {
+              id: "last",
+              label: "+ a column of their own, last, fixed width",
+              note: "Fix the width and right-align the column, so Edit sits in the same place on every row.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Skip the pager for one page",
@@ -1491,6 +1692,49 @@ export const LESSONS: Lesson[] = [
       costs: ["0 dead controls"],
       view: <PagerDemo careful />,
     },
+    levels: [
+      {
+        name: "Count the pages",
+        prompt: (
+          <>
+            The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Place the
+            pager.
+          </>
+        ),
+        piece: "pager",
+        answer: "31",
+        rows: [
+          { depth: 0, text: "Users table, 25 rows a page", kind: "comp" },
+          { depth: 1, text: "Admins", tag: "25 users" },
+          {
+            depth: 2,
+            slot: {
+              id: "25",
+              label: "+ pager",
+              note: "25 rows fill exactly one page. The pager would read Page 1 of 1 with two dead arrows.",
+            },
+          },
+          { depth: 1, text: "Everyone", tag: "31 users" },
+          {
+            depth: 2,
+            slot: {
+              id: "31",
+              label: "+ pager",
+              note: "Add it here, since the last 6 rows go on page 2.",
+            },
+          },
+          { depth: 1, text: "Owners", tag: "0 users" },
+          {
+            depth: 2,
+            slot: {
+              id: "0",
+              label: "+ pager",
+              note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Keep the page in the URL",
@@ -1510,11 +1754,50 @@ export const LESSONS: Lesson[] = [
       costs: ["?page=2", "reload keeps it"],
       view: <UrlDemo careful />,
     },
+    levels: [
+      {
+        name: "Share page 3",
+        prompt: (
+          <>
+            You're on page 3 of the orders and send the link to a teammate. Place the page number.
+          </>
+        ),
+        piece: "page 3",
+        answer: "url",
+        rows: [
+          { depth: 0, text: "Orders page", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "state",
+              label: "+ in memory",
+              note: "If you reload or press Back, you're on page 1. The link you sent opens on page 1 too.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "url",
+              label: "+ in the link",
+              note: "Make the page part of the link, so a reload, Back and your teammate all land on page 3.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "storage",
+              label: "+ in this browser's storage",
+              note: "It survives your reload, but your teammate's browser has its own storage and opens page 1.",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 
 export const TLDR = [
-  ["A column of numbers", "Right-align it, set tabular-nums, call toLocaleString()"],
+  ["A column of numbers", "Right-align it, with tabular figures and separators"],
   ["Money in a finance view", "Use a monospace face"],
   ["Rows still loading", "Draw skeleton rows at the real row height"],
   ["Empty, failed or no match", "Say which and give one next step: Add, Retry, Clear search"],
@@ -1522,222 +1805,6 @@ export const TLDR = [
   ["One page, or none", "Skip the pager"],
   ["The current page", "Put it in the URL as ?page=2"],
 ] as const;
-
-const LEVELS: Level[] = [
-  {
-    name: "Place the actions",
-    prompt: (
-      <>
-        Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Place
-        the buttons.
-      </>
-    ),
-    piece: "Edit · Delete",
-    answer: "last",
-    rows: [
-      { depth: 0, text: "<tr>", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "first",
-          label: "+ <td> first",
-          note: "The row now opens with buttons, which push every name one column right.",
-          cost: ["names pushed right"],
-        },
-      },
-      { depth: 1, text: "<td> Alice Johnson" },
-      {
-        depth: 1,
-        slot: {
-          id: "name",
-          label: "+ in the name cell, after the text",
-          note: "Names differ in length, so Edit lands somewhere new on every row.",
-          cost: ["a new x per row"],
-        },
-      },
-      { depth: 1, text: "<td> alice@acme.com" },
-      { depth: 1, text: "<td> Admin" },
-      {
-        depth: 1,
-        slot: {
-          id: "last",
-          label: "+ <td> last, w-24, text-right",
-          note: "Fix the width and right-align the column, so Edit sits in the same place on every row.",
-          cost: ["1 x-position", "96px"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Format at the edge",
-    prompt: (
-      <>
-        The table sorts by MRR and shows <Code>12,500.00</Code>. Place <Code>toLocaleString()</Code>
-        .
-      </>
-    ),
-    piece: "toLocaleString()",
-    answer: "cell",
-    rows: [
-      { depth: 0, text: "<RevenueTable>", kind: "comp" },
-      { depth: 1, text: "const rows = await getRevenue()" },
-      {
-        depth: 2,
-        slot: {
-          id: "api",
-          label: "+ in getRevenue(), on the server",
-          note: 'Every MRR arrives as a string like "12,500.00", so b.mrr - a.mrr is NaN and the sort breaks.',
-          cost: ["NaN sort", "strings in state"],
-        },
-      },
-      { depth: 1, text: "rows.sort(byMrr)" },
-      {
-        depth: 2,
-        slot: {
-          id: "sort",
-          label: "+ in the sort, as the key",
-          note: 'As text, "9,000.00" ranks above "12,500.00", because "9" comes after "1".',
-          cost: ["9,000 > 12,500"],
-        },
-      },
-      { depth: 1, text: '<td className="text-right tabular-nums">' },
-      {
-        depth: 2,
-        slot: {
-          id: "cell",
-          label: "+ {row.mrr…}",
-          note: "Sort the raw numbers and format only when you draw the cell.",
-          cost: ["sorts as numbers", "reads 12,500.00"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Fill the blank",
-    prompt: (
-      <>
-        The users table can show no rows for three reasons. Place the <b>Add user</b>
-        button.
-      </>
-    ),
-    piece: "Add user",
-    answer: "empty",
-    rows: [
-      { depth: 0, text: "<UsersTable>", kind: "comp" },
-      { depth: 1, text: '"Couldn\'t load users"', tag: "error" },
-      {
-        depth: 2,
-        slot: {
-          id: "error",
-          label: "+ its button",
-          note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
-          cost: ["hides the error", "0 retries"],
-        },
-      },
-      { depth: 1, text: '"No users yet"', tag: "empty" },
-      {
-        depth: 2,
-        slot: {
-          id: "empty",
-          label: "+ its button",
-          note: "Nothing here yet, so offer adding the first user.",
-          cost: ["1 next step"],
-        },
-      },
-      { depth: 1, text: '"No results for "zed""', tag: "search" },
-      {
-        depth: 2,
-        slot: {
-          id: "search",
-          label: "+ its button",
-          note: "The users exist and the search hid them. Offer Clear search to bring them back.",
-          cost: ["wrong next step", "duplicate users"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Count the pages",
-    prompt: (
-      <>
-        The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Place the pager.
-      </>
-    ),
-    piece: "<Pagination>",
-    answer: "31",
-    rows: [
-      { depth: 0, text: "<UsersTable pageSize={25}>", kind: "comp" },
-      { depth: 1, text: "role=admin", tag: "25 users" },
-      {
-        depth: 2,
-        slot: {
-          id: "25",
-          label: "+ pager",
-          note: "25 rows fill exactly one page. The pager would read Page 1 of 1 with two dead arrows.",
-          cost: ["Page 1 of 1", "2 dead arrows"],
-        },
-      },
-      { depth: 1, text: "role=any", tag: "31 users" },
-      {
-        depth: 2,
-        slot: {
-          id: "31",
-          label: "+ pager",
-          note: "Add it here, since the last 6 rows go on page 2.",
-          cost: ["2 pages"],
-        },
-      },
-      { depth: 1, text: "role=owner", tag: "0 users" },
-      {
-        depth: 2,
-        slot: {
-          id: "0",
-          label: "+ pager",
-          note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
-          cost: ["Page 1 of 0"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Share page 3",
-    prompt: (
-      <>You're on page 3 of the orders and send the link to a teammate. Place the page number.</>
-    ),
-    piece: "page 3",
-    answer: "url",
-    rows: [
-      { depth: 0, text: "<OrdersPage>", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "state",
-          label: "+ useState()",
-          note: "If you reload or press Back, you're on page 1. The link you sent opens on page 1 too.",
-          cost: ["reload → page 1"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "url",
-          label: "+ /orders?page=",
-          note: "Make the page part of the link, so a reload, Back and your teammate all land on page 3.",
-          cost: ["?page=3", "shareable"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "storage",
-          label: "+ localStorage",
-          note: "It survives your reload, but your teammate's browser has its own storage and opens page 1.",
-          cost: ["link → page 1"],
-        },
-      },
-    ],
-  },
-];
 
 export function TableDesign() {
   const [demos] = useState<Demos>(() => ({
@@ -1761,11 +1828,7 @@ export function TableDesign() {
         }}
         lessons={LESSONS}
         tldr={TLDR}
-        quiz={{
-          intro: <>Place each piece. A wrong spot shows what it costs.</>,
-          levels: LEVELS,
-          board: "table",
-        }}
+        board="table"
         take="build tables the same way"
       />
     </DemosContext>

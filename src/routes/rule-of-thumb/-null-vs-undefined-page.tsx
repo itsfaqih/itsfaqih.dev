@@ -5,7 +5,6 @@ import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import {
   Code,
   type Lesson,
-  type Level,
   onceOnScreen,
   paint,
   RuleLanding,
@@ -22,6 +21,8 @@ const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(null)\b|\b(undefined)\b|\b(const|let|function|return|type|await|new)\b/g;
 const PHONE = "@media (max-width: 640px)";
 const MOTION = "@media (prefers-reduced-motion: no-preference)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 
 const flash = stylex.keyframes({
   from: { opacity: 1 },
@@ -195,7 +196,8 @@ const styles = stylex.create({
     borderRadius: "10px",
     backgroundColor: palette["--panel-2"],
     fontWeight: 600,
-    fontSize: "14px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "14px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
     color: palette["--text"],
@@ -218,8 +220,8 @@ const styles = stylex.create({
     paddingBottom: 0,
     paddingLeft: "12px",
     borderRadius: "999px",
-    backgroundColor: palette["--panel-2"],
-    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+    backgroundColor: palette["--soft-key"],
+    boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
     fontWeight: 600,
     fontSize: "14px",
     lineHeight: "normal",
@@ -238,10 +240,10 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: "transparent",
-      ":hover": `color-mix(in srgb, ${kit["--no"]} 18%, transparent)`,
+      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${kit["--no"]} 18%, transparent)` },
     },
     fontSize: "12px",
-    color: { default: palette["--dim"], ":hover": kit["--no-ink"] },
+    color: { default: palette["--dim"], ":hover": { default: null, [HOVER]: kit["--no-ink"] } },
     cursor: cursors["--cursor-point"],
     transform: { default: null, ":active": "scale(0.92)" },
     outlineWidth: { default: null, ":focus-visible": "3px" },
@@ -663,6 +665,7 @@ function ClearDemo({ way }: { way: Way }) {
           <span {...stylex.props(styles.chip)}>
             Rina
             <button
+              data-hint
               type="button"
               aria-label="Remove reviewer Rina"
               onClick={save.send}
@@ -723,6 +726,7 @@ function RenameDemo({ way }: { way: Way }) {
         <label {...stylex.props(styles.field)}>
           <span {...stylex.props(styles.label)}>Title</span>
           <input
+            data-hint
             value={title}
             spellCheck={false}
             {...stylex.props(styles.input)}
@@ -744,6 +748,16 @@ function RenameDemo({ way }: { way: Way }) {
     </div>
   );
 }
+
+const code = (text: string) => (
+  <code {...stylex.props(styles.boardCode)}>{paint(text, TOKEN, KINDS)}</code>
+);
+const blank = (text: string) => (
+  <>
+    <span {...stylex.props(arcade.srOnly)}>{text}</span>
+    <span aria-hidden="true" {...stylex.props(styles.gap)} />
+  </>
+);
 
 export const LESSONS: Lesson[] = [
   {
@@ -783,6 +797,43 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "Fields you asked for",
+        prompt: (
+          <>
+            The client asked for <Code>?fields=name,manager</Code>. Bo has no manager. Nobody asked
+            for his phone. Pick the key to leave out.
+          </>
+        ),
+        piece: "omit the key",
+        answer: "phone",
+        rows: [
+          { depth: 0, text: code("// GET /users/bo?fields=name,manager") },
+          { depth: 0, text: code("{") },
+          { depth: 1, text: code('"name": "Bo",') },
+          {
+            depth: 1,
+            lead: code('"manager":'),
+            slot: {
+              id: "manager",
+              label: blank('"manager":'),
+              note: "A missing manager reads as not loaded, so the client fetches it again on every view.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code('"phone":'),
+            slot: {
+              id: "phone",
+              label: blank('"phone":'),
+              note: "Nobody asked, so send nothing. A missing key means no value was given.",
+            },
+          },
+          { depth: 0, text: code("}") },
+        ],
+      },
+    ],
   },
   {
     title: "Mark optional with ?:",
@@ -823,6 +874,50 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "A skippable field",
+        prompt: (
+          <>
+            Signing up, people may skip the nickname, and most callers never have one. Place{" "}
+            <Code>?: string</Code>.
+          </>
+        ),
+        piece: "?: string",
+        answer: "nickname",
+        rows: [
+          { depth: 0, text: code("type SignUp = {") },
+          {
+            depth: 1,
+            lead: code("email"),
+            slot: {
+              id: "email",
+              label: blank("email: string"),
+              note: "Every sign-up needs an email. Optional lets a caller forget it with no error.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("nickname"),
+            slot: {
+              id: "nickname",
+              label: blank("nickname: string"),
+              note: "Make it optional. Callers with no nickname leave it out, and it reads undefined.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("password"),
+            slot: {
+              id: "password",
+              label: blank("password: string"),
+              note: "A sign-up with no password should fail where it's written, not at the first login.",
+            },
+          },
+          { depth: 0, text: code("}") },
+        ],
+      },
+    ],
   },
   {
     title: "Clear with null",
@@ -842,6 +937,51 @@ export const LESSONS: Lesson[] = [
       costs: ["1 field cleared"],
       view: <ClearDemo way="good" />,
     },
+    levels: [
+      {
+        name: "The date picker",
+        prompt: (
+          <>
+            The user cleared the due date and never opened the assignee or notes. Place{" "}
+            <Code>null</Code>.
+          </>
+        ),
+        piece: "null",
+        answer: "due",
+        rows: [
+          { depth: 0, text: code('patch("/tasks/12", {') },
+          { depth: 1, text: code('title: "Ship v2",') },
+          {
+            depth: 1,
+            lead: code("assignee:"),
+            slot: {
+              id: "assignee",
+              label: blank("assignee:"),
+              note: "Sends assignee: null and unassigns Rina. Nobody asked for that.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("due:"),
+            slot: {
+              id: "due",
+              label: blank("due:"),
+              note: "Send null to clear it, since they cleared it on purpose.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("notes:"),
+            slot: {
+              id: "notes",
+              label: blank("notes:"),
+              note: "Sends notes: null and wipes notes the user never opened.",
+            },
+          },
+          { depth: 0, text: code("})") },
+        ],
+      },
+    ],
   },
   {
     title: "Leave untouched fields out",
@@ -861,6 +1001,51 @@ export const LESSONS: Lesson[] = [
       costs: ["0 fields wiped"],
       view: <RenameDemo way="good" />,
     },
+    levels: [
+      {
+        name: "Only the title",
+        prompt: (
+          <>
+            The user renamed the task and removed its reviewer. They didn't touch the due date.
+            Place <Code>undefined</Code>.
+          </>
+        ),
+        piece: "undefined",
+        answer: "due",
+        rows: [
+          { depth: 0, text: code("const changes = {") },
+          {
+            depth: 1,
+            lead: code("title:"),
+            slot: {
+              id: "title",
+              label: blank("title:"),
+              note: "undefined drops out of the JSON, so the rename never reaches the server.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("reviewer:"),
+            slot: {
+              id: "reviewer",
+              label: blank("reviewer:"),
+              note: "The removal drops out of the JSON, so the reviewer stays.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("due:"),
+            slot: {
+              id: "due",
+              label: blank("due:"),
+              note: "Leave it undefined so the server leaves due alone.",
+            },
+          },
+          { depth: 0, text: code("}") },
+          { depth: 0, text: code('patch("/tasks/12", changes)') },
+        ],
+      },
+    ],
   },
   {
     title: "Force the decision",
@@ -903,6 +1088,50 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "A new task",
+        prompt: (
+          <>
+            Every new task must name an assignee or say there's none. The colour is optional and
+            falls back to grey. Place <Code>| null</Code>.
+          </>
+        ),
+        piece: "| null",
+        answer: "assignee",
+        rows: [
+          { depth: 0, text: code("type NewTask = {") },
+          {
+            depth: 1,
+            lead: code("title: string"),
+            slot: {
+              id: "title",
+              label: blank("title: string"),
+              note: "Now a task can have no title, and every list that shows one needs a fallback.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("assignee: User"),
+            slot: {
+              id: "assignee",
+              label: blank("assignee: User"),
+              note: "Require it, so callers pass a user or null on purpose.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code("color?: string"),
+            slot: {
+              id: "color",
+              label: blank("color?: string"),
+              note: "Missing and null now both mean grey.",
+            },
+          },
+          { depth: 0, text: code("}") },
+        ],
+      },
+    ],
   },
   {
     title: "Return null for not found",
@@ -913,33 +1142,79 @@ export const LESSONS: Lesson[] = [
       </>
     ),
     bad: {
-      label: "res.json(user)",
+      label: "Send undefined",
       costs: ["0-byte body", "1 SyntaxError"],
       view: (
         <CodeBlock
           lines={[
             { c: "const user = users.get(email)", out: "undefined" },
-            { c: "res.json(user)", out: "body: 0 bytes", tone: "no", hot: true },
+            {
+              c: "const body = JSON.stringify(user)",
+              out: "undefined, 0 bytes",
+              tone: "no",
+              hot: true,
+            },
             { c: "// on the client" },
-            { c: "await r.json()", out: "SyntaxError: Unexpected end of JSON input", tone: "no" },
+            { c: "JSON.parse(body)", out: "SyntaxError: Unexpected end of JSON input", tone: "no" },
           ]}
         />
       ),
     },
     good: {
-      label: "user ?? null",
+      label: "Send null",
       costs: ["4-byte body", "0 errors"],
       view: (
         <CodeBlock
           lines={[
             { c: "const user = users.get(email)", out: "undefined" },
-            { c: "res.json(user ?? null)", out: "body: null", tone: "yes", hot: true },
+            {
+              c: "const body = JSON.stringify(user ?? null)",
+              out: '"null", 4 bytes',
+              tone: "yes",
+              hot: true,
+            },
             { c: "// on the client" },
-            { c: "await r.json()", out: 'null: "No such user"', tone: "yes" },
+            { c: "JSON.parse(body)", out: 'null: "No such user"', tone: "yes" },
           ]}
         />
       ),
     },
+    levels: [
+      {
+        name: "Two sign-ups",
+        prompt: (
+          <>
+            You looked up <Code>bo@x.io</Code> and nobody has that email. You haven't looked up{" "}
+            <Code>cy@x.io</Code> yet. Place <Code>null</Code>.
+          </>
+        ),
+        piece: "null",
+        answer: "bo",
+        rows: [
+          { depth: 0, text: code("const seen = new Map([") },
+          { depth: 1, text: code('["ana@x.io", { id: 7 }],') },
+          {
+            depth: 1,
+            lead: code('["bo@x.io",'),
+            slot: {
+              id: "bo",
+              label: blank('["bo@x.io",'),
+              note: "Cache null to record that nobody has it, so the next lookup is skipped.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code('["cy@x.io",'),
+            slot: {
+              id: "cy",
+              label: blank('["cy@x.io",'),
+              note: "Says nobody has cy@x.io before anyone checked. Cy can't sign in until the cache clears.",
+            },
+          },
+          { depth: 0, text: code("])") },
+        ],
+      },
+    ],
   },
 ];
 
@@ -951,229 +1226,6 @@ export const TLDR = [
   ["A field every caller must decide", "Type it T | null, not ?:"],
   ["A lookup that found nothing", "Return null"],
 ] as const;
-
-const code = (text: string) => (
-  <code {...stylex.props(styles.boardCode)}>{paint(text, TOKEN, KINDS)}</code>
-);
-const blank = (text: string) => (
-  <>
-    <span {...stylex.props(arcade.srOnly)}>{text}</span>
-    <span aria-hidden="true" {...stylex.props(styles.gap)} />
-  </>
-);
-
-const LEVELS: Level[] = [
-  {
-    name: "The date picker",
-    prompt: (
-      <>
-        The user cleared the due date and never opened the assignee or notes. Place{" "}
-        <Code>null</Code>.
-      </>
-    ),
-    piece: "null",
-    answer: "due",
-    rows: [
-      { depth: 0, text: code('patch("/tasks/12", {') },
-      { depth: 1, text: code('title: "Ship v2",') },
-      {
-        depth: 1,
-        lead: code("assignee:"),
-        slot: {
-          id: "assignee",
-          label: blank("assignee:"),
-          note: "Sends assignee: null and unassigns Rina. Nobody asked for that.",
-          cost: ["1 field wiped"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("due:"),
-        slot: {
-          id: "due",
-          label: blank("due:"),
-          note: "Send null to clear it, since they cleared it on purpose.",
-          cost: ["1 field cleared", "0 wiped"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("notes:"),
-        slot: {
-          id: "notes",
-          label: blank("notes:"),
-          note: "Sends notes: null and wipes notes the user never opened.",
-          cost: ["1 field wiped"],
-        },
-      },
-      { depth: 0, text: code("})") },
-    ],
-  },
-  {
-    name: "Only the title",
-    prompt: (
-      <>
-        The user renamed the task and removed its reviewer. They didn't touch the due date. Place{" "}
-        <Code>undefined</Code>.
-      </>
-    ),
-    piece: "undefined",
-    answer: "due",
-    rows: [
-      { depth: 0, text: code("const changes = {") },
-      {
-        depth: 1,
-        lead: code("title:"),
-        slot: {
-          id: "title",
-          label: blank("title:"),
-          note: "undefined drops out of the JSON, so the rename never reaches the server.",
-          cost: ["rename lost"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("reviewer:"),
-        slot: {
-          id: "reviewer",
-          label: blank("reviewer:"),
-          note: "The removal drops out of the JSON, so the reviewer stays.",
-          cost: ["clear lost"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("due:"),
-        slot: {
-          id: "due",
-          label: blank("due:"),
-          note: "Leave it undefined so the server leaves due alone.",
-          cost: ["0 fields wiped"],
-        },
-      },
-      { depth: 0, text: code("}") },
-      { depth: 0, text: code('patch("/tasks/12", changes)') },
-    ],
-  },
-  {
-    name: "Two sign-ups",
-    prompt: (
-      <>
-        You looked up <Code>bo@x.io</Code> and nobody has that email. You haven't looked up{" "}
-        <Code>cy@x.io</Code> yet. Place <Code>null</Code>.
-      </>
-    ),
-    piece: "null",
-    answer: "bo",
-    rows: [
-      { depth: 0, text: code("const seen = new Map([") },
-      { depth: 1, text: code('["ana@x.io", { id: 7 }],') },
-      {
-        depth: 1,
-        lead: code('["bo@x.io",'),
-        slot: {
-          id: "bo",
-          label: blank('["bo@x.io",'),
-          note: "Cache null to record that nobody has it, so the next lookup is skipped.",
-          cost: ["1 lookup saved"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code('["cy@x.io",'),
-        slot: {
-          id: "cy",
-          label: blank('["cy@x.io",'),
-          note: "Says nobody has cy@x.io before anyone checked. Cy can't sign in until the cache clears.",
-          cost: ["1 user locked out"],
-        },
-      },
-      { depth: 0, text: code("])") },
-    ],
-  },
-  {
-    name: "A new task",
-    prompt: (
-      <>
-        Every new task must name an assignee or say there's none. The colour is optional and falls
-        back to grey. Place <Code>| null</Code>.
-      </>
-    ),
-    piece: "| null",
-    answer: "assignee",
-    rows: [
-      { depth: 0, text: code("type NewTask = {") },
-      {
-        depth: 1,
-        lead: code("title: string"),
-        slot: {
-          id: "title",
-          label: blank("title: string"),
-          note: "Now a task can have no title, and every list that shows one needs a fallback.",
-          cost: ["+1 check per view"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("assignee: User"),
-        slot: {
-          id: "assignee",
-          label: blank("assignee: User"),
-          note: "Require it, so callers pass a user or null on purpose.",
-          cost: ["forgot it: 1 error"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code("color?: string"),
-        slot: {
-          id: "color",
-          label: blank("color?: string"),
-          note: "Missing and null now both mean grey.",
-          cost: ["2 ways to say grey"],
-        },
-      },
-      { depth: 0, text: code("}") },
-    ],
-  },
-  {
-    name: "Fields you asked for",
-    prompt: (
-      <>
-        The client asked for <Code>?fields=name,manager</Code>. Bo has no manager. Nobody asked for
-        his phone. Pick the key to leave out.
-      </>
-    ),
-    piece: "omit the key",
-    answer: "phone",
-    rows: [
-      { depth: 0, text: code("// GET /users/bo?fields=name,manager") },
-      { depth: 0, text: code("{") },
-      { depth: 1, text: code('"name": "Bo",') },
-      {
-        depth: 1,
-        lead: code('"manager":'),
-        slot: {
-          id: "manager",
-          label: blank('"manager":'),
-          note: "A missing manager reads as not loaded, so the client fetches it again on every view.",
-          cost: ["+1 request per view"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code('"phone":'),
-        slot: {
-          id: "phone",
-          label: blank('"phone":'),
-          note: "Nobody asked, so send nothing. A missing key means no value was given.",
-          cost: ["0 bytes", "0 claims"],
-        },
-      },
-      { depth: 0, text: code("}") },
-    ],
-  },
-];
 
 export function NullVsUndefined() {
   return (
@@ -1195,11 +1247,7 @@ export function NullVsUndefined() {
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "code",
-      }}
+      board="code"
       take="keep missing and empty apart too"
     />
   );

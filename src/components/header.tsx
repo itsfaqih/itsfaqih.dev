@@ -1,11 +1,19 @@
 import * as stylex from "@stylexjs/stylex";
-import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { SHOW_PROJECTS } from "../data/home";
 import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
+import { reducedMotion } from "../hooks/use-media-query";
 import { button } from "./button";
 import { loadIn } from "./load-in";
 import { arcade } from "./arcade";
@@ -70,6 +78,82 @@ function Seg({ on, compact, style, rowStyle, children }: SegProps) {
   );
 }
 
+// The capsule's width folds on a spring, but a grid column never opens past its content, so the
+// spring's overshoot is lost and the capsule would stop dead. Its ground carries the rest: it keeps
+// the speed the width had when it stopped, runs a few pixels on and springs back.
+const STIFFNESS = 0.0196; // rad/ms: a swing of about 320ms
+const DAMPING = 0.45;
+const FRAME_MS = 16;
+// The ground takes more than the speed the fold lost, so the bounce reads at a glance.
+const GAIN = 1.8;
+// The push the ground gets when the palette's drop lands back in the island, in px/ms.
+const CATCH_SPEED = 0.18;
+
+/** `since` is how long ago, in ms, the width stopped, so the bounce picks up where it would be. */
+function bounce(ground: HTMLElement, width: number, speed: number, since = 0) {
+  const swing = STIFFNESS * Math.sqrt(1 - DAMPING ** 2);
+  const reach = (speed * GAIN) / swing;
+  const frames: Keyframe[] = [];
+  for (let t = 0; Math.abs(reach) * Math.exp(-DAMPING * STIFFNESS * t) > 0.1; t += FRAME_MS) {
+    const stretch = reach * Math.exp(-DAMPING * STIFFNESS * t) * Math.sin(swing * t);
+    frames.push({ transform: `scaleX(${1 + stretch / width})` });
+  }
+  frames.push({ transform: "none" });
+  for (const running of ground.getAnimations()) running.cancel();
+  const play = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
+  play.currentTime = since;
+}
+
+// Watches the capsule's width after a fold and bounces its ground on the speed it stopped at.
+function useElasticGround(
+  islandRef: RefObject<HTMLElement | null>,
+  groundRef: RefObject<HTMLElement | null>,
+  mode: string,
+) {
+  useEffect(() => {
+    const island = islandRef.current;
+    const ground = groundRef.current;
+    if (!island || !ground || reducedMotion()) return;
+    let last = island.getBoundingClientRect().width;
+    let lastAt = performance.now();
+    let speed = 0;
+    let idle = 0;
+    const watch = (now: number) => {
+      const width = island.getBoundingClientRect().width;
+      const moved = width - last;
+      if (Math.abs(moved) > 0.05) {
+        speed = moved / Math.max(1, now - lastAt);
+        idle = 0;
+      } else if (Math.abs(speed) > 0.03) {
+        bounce(ground, width, speed, now - lastAt);
+        return;
+      } else if (++idle > 6) {
+        return;
+      }
+      last = width;
+      lastAt = now;
+      frame = requestAnimationFrame(watch);
+    };
+    let frame = requestAnimationFrame(watch);
+    return () => cancelAnimationFrame(frame);
+  }, [islandRef, groundRef, mode]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    let away = root.hasAttribute("data-island-away");
+    const observer = new MutationObserver(() => {
+      const island = islandRef.current;
+      const ground = groundRef.current;
+      const home = away && !root.hasAttribute("data-island-away");
+      away = root.hasAttribute("data-island-away");
+      if (home && island && ground && !reducedMotion())
+        bounce(ground, island.getBoundingClientRect().width, CATCH_SPEED);
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-island-away"] });
+    return () => observer.disconnect();
+  }, [islandRef, groundRef]);
+}
+
 export function Header() {
   const { toggleTheme } = useTheme();
   const openCommandPalette = () => {
@@ -80,6 +164,7 @@ export function Header() {
 
   const islandRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const groundRef = useRef<HTMLSpanElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const live = useSyncExternalStore(
@@ -122,6 +207,7 @@ export function Header() {
 
   const compact = scrolled && !open;
   const full = !compact;
+  useElasticGround(islandRef, groundRef, `${scrolled} ${open} ${live}`);
 
   return (
     <div
@@ -236,12 +322,14 @@ export function Header() {
             />
           </button>
         </Seg>
+        <span ref={groundRef} aria-hidden="true" {...stylex.props(styles.ground)} />
       </header>
     </div>
   );
 }
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 const TABLET = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const NARROW = "@media (max-width: 480px)";
@@ -251,10 +339,9 @@ const LIGHT = ":is(.light *)";
 // The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
 const READY = ":is(.js.no-intro *)";
 const WAITING = ":is(.js:not(.no-intro) *)";
+const AWAY = ":is([data-island-away] *)";
 
-// A sampled spring (damping 0.72), about 4% past and back.
-const SPRING =
-  "linear(0, 0.034, 0.12, 0.234, 0.359, 0.484, 0.601, 0.705, 0.793, 0.865, 0.922, 0.965, 0.996, 1.017, 1.03, 1.036, 1.038, 1.037, 1.034, 1.03, 1.025, 1.02, 1.016, 1.012, 1.008, 1.005, 1.003, 1.001, 1, 0.999, 0.999, 0.999, 0.999)";
+const SPRING = motion["--spring"];
 const FOLD = "560ms";
 
 // The island drops in on the page's first frame, a touch small, and settles on the spring.
@@ -276,11 +363,14 @@ const styles = stylex.create({
   // everywhere but the island itself.
   bar: {
     position: "fixed",
-    inset: "12px 0 auto",
-    zIndex: 50,
+    inset: "calc(12px + env(safe-area-inset-top, 0px)) 0 auto",
+    // Between the command palette's backdrop and the palette while it is mounted: the palette
+    // pours out of the island and back into it, so the island stays sharp underneath.
+    zIndex: { default: 50, ":is([data-palette] *)": 101 },
     display: "flex",
     justifyContent: "center",
-    padding: "0 12px",
+    padding:
+      "0 calc(12px + env(safe-area-inset-right, 0px)) 0 calc(12px + env(safe-area-inset-left, 0px))",
     pointerEvents: "none",
   },
   island: {
@@ -291,13 +381,8 @@ const styles = stylex.create({
     maxWidth: "100%",
     padding: { default: "0 10px", [NARROW]: "0 6px" },
     borderRadius: "999px",
+    isolation: "isolate",
     font: `500 13px ${fonts["--display"]}`,
-    pointerEvents: "auto",
-    backgroundColor: { default: "#0a0a0c", [DARK]: "#fff" },
-    boxShadow: {
-      default: "inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 28px -12px rgb(0 0 0 / 0.55)",
-      [DARK]: "inset 0 0 0 1px rgb(0 0 0 / 0.06), 0 10px 28px -12px rgb(0 0 0 / 0.7)",
-    },
     // The island's own ground, so everything inside reads light on black (dark on white).
     "--text": { default: "#fff", [DARK]: "#0a0a0c" },
     "--dim": { default: "rgb(255 255 255 / 0.66)", [DARK]: "rgb(10 10 12 / 0.68)" },
@@ -309,11 +394,28 @@ const styles = stylex.create({
       [DARK]: `color-mix(in oklab, ${palette["--go"]} 45%, #000)`,
     },
     color: palette["--text"],
-    opacity: { default: null, [WAITING]: 0 },
+    // Away while the palette pours out of it: the drop takes over the island's ink, so the island
+    // fades as the drop gathers and fades back in as the drop lands on it.
+    opacity: { default: null, [WAITING]: 0, [AWAY]: { default: 0, [REDUCE]: null } },
+    pointerEvents: { default: "auto", [AWAY]: { default: "none", [REDUCE]: null } },
+    transition: { default: "opacity 70ms ease", [REDUCE]: null },
     animationName: { default: null, [READY]: islandIn },
     animationDuration: { default: null, [READY]: FOLD },
     animationTimingFunction: { default: null, [READY]: SPRING },
     animationFillMode: { default: null, [READY]: "backwards" },
+  },
+  // The capsule's black (white) ground, its own layer so it can bounce past the folding parts.
+  ground: {
+    position: "absolute",
+    inset: 0,
+    zIndex: -1,
+    borderRadius: "inherit",
+    backgroundColor: { default: "#0a0a0c", [DARK]: "#fff" },
+    boxShadow: {
+      default: "inset 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 28px -12px rgb(0 0 0 / 0.55)",
+      [DARK]: "inset 0 0 0 1px rgb(0 0 0 / 0.06), 0 10px 28px -12px rgb(0 0 0 / 0.7)",
+    },
+    pointerEvents: "none",
   },
   seg: {
     display: "grid",
@@ -398,12 +500,14 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: null,
-      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active": palette["--panel-2"],
       ":is([aria-current='page'])": palette["--panel-2"],
     },
     color: {
       default: palette["--dim"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
       ":is([aria-current='page'])": palette["--text"],
     },
     transition: "background-color 120ms ease, color 120ms ease",
@@ -422,17 +526,20 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active": palette["--panel-2"],
     },
     // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
     // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
     backgroundPosition: {
       default: "0 0",
-      ":hover": { default: null, "@media (hover: hover)": "initial" },
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
     },
     color: {
       default: palette["--dim"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
     },
     font: "inherit",
     cursor: cursors["--cursor-point"],

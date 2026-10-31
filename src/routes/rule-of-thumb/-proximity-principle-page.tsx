@@ -4,7 +4,6 @@ import {
   Kbd,
   type Lesson,
   LessonText,
-  type Level,
   RuleLanding,
   Tip,
   Tree,
@@ -42,7 +41,7 @@ export const LESSONS: Lesson[] = [
           rows={[
             { depth: 0, text: "src/", kind: "dir" },
             { depth: 1, text: "routes/profile/", kind: "dir" },
-            { depth: 2, text: "user-profile.tsx", tag: "uses it" },
+            { depth: 2, text: "user-profile.ts", tag: "uses it" },
             { depth: 1, text: "utils/", kind: "dir" },
             { k: "fd", depth: 2, text: "format-date.ts", moved: true },
           ]}
@@ -57,18 +56,61 @@ export const LESSONS: Lesson[] = [
           rows={[
             { depth: 0, text: "src/", kind: "dir" },
             { depth: 1, text: "routes/profile/", kind: "dir" },
-            { depth: 2, text: "user-profile.tsx", tag: "uses it" },
+            { depth: 2, text: "user-profile.ts", tag: "uses it" },
             { k: "fd", depth: 3, text: "function formatDate()", moved: true },
           ]}
         />
       ),
     },
+    levels: [
+      {
+        name: "One caller",
+        prompt: (
+          <>
+            Only <Code>user-profile.ts</Code> calls <Code>formatDate()</Code>. Place it.
+          </>
+        ),
+        piece: "formatDate()",
+        answer: "inline",
+        rows: [
+          { depth: 0, text: "src/", kind: "dir" },
+          { depth: 1, text: "lib/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "lib",
+              label: "+ date.ts",
+              note: "A new file and an import for a single caller. lib/ is utils/ under another name.",
+            },
+          },
+          { depth: 1, text: "routes/profile/", kind: "dir" },
+          { depth: 2, text: "user-profile.ts", tag: "uses it" },
+          {
+            depth: 3,
+            slot: {
+              id: "inline",
+              label: "↳ inline, above UserProfile()",
+              note: "Keep it where it's used, with nothing to import or open.",
+            },
+          },
+          { depth: 1, text: "utils/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "utils",
+              label: "+ format-date.ts",
+              note: "Three folders from its only caller. Extract it when a second file needs it, not before.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Prefer fewer files",
     body: (
       <>
-        Keep one component in one file. If you split its types, styles and hook into a folder,
+        Keep one component in one file. If you split its types, styles and helpers into a folder,
         reading it takes five tabs.
       </>
     ),
@@ -80,11 +122,11 @@ export const LESSONS: Lesson[] = [
           rows={[
             { depth: 0, text: "routes/profile/", kind: "dir" },
             { depth: 1, text: "user-profile/", kind: "dir" },
-            { depth: 2, text: "index.tsx" },
-            { depth: 2, text: "user-profile.tsx" },
+            { depth: 2, text: "index.ts" },
+            { depth: 2, text: "user-profile.ts" },
             { k: "types", depth: 2, text: "types.ts", moved: true },
             { k: "styles", depth: 2, text: "styles.ts", moved: true },
-            { k: "hook", depth: 2, text: "hooks.ts", moved: true },
+            { k: "hook", depth: 2, text: "helpers.ts", moved: true },
           ]}
         />
       ),
@@ -96,22 +138,65 @@ export const LESSONS: Lesson[] = [
         <Tree
           rows={[
             { depth: 0, text: "routes/profile/", kind: "dir" },
-            { depth: 1, text: "user-profile.tsx" },
+            { depth: 1, text: "user-profile.ts" },
             { k: "types", depth: 2, text: "type Profile", moved: true },
             { k: "styles", depth: 2, text: "const styles", moved: true },
-            { k: "hook", depth: 2, text: "function useProfile()", moved: true },
+            { k: "hook", depth: 2, text: "function loadProfile()", moved: true },
           ]}
         />
       ),
     },
+    levels: [
+      {
+        name: "A component's own parts",
+        prompt: (
+          <>
+            <Code>UserProfile</Code> has its own types, styles and a helper. Nothing else uses them.
+            Place them.
+          </>
+        ),
+        piece: "types · styles · loadProfile()",
+        answer: "file",
+        rows: [
+          { depth: 0, text: "src/", kind: "dir" },
+          { depth: 1, text: "routes/profile/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "folder",
+              label: "+ user-profile/ index, types, styles, helpers",
+              note: "Five files for one component, so five tabs to read it.",
+            },
+          },
+          { depth: 2, text: "user-profile.ts" },
+          {
+            depth: 3,
+            slot: {
+              id: "file",
+              label: "↳ inside user-profile.ts",
+              note: "Keep the whole component in one file.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "kinds",
+              label: "+ types/, styles/, helpers/",
+              note: "Sorted by kind, one component now spans four folders.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
-    title: "Give state its own component",
+    title: "Comply with the constraint",
     exception: true,
     body: (
       <>
-        Extract code used once only when it has its own state. In a child, a keystroke re-renders
-        the child, not the page and its 500 rows.
+        Extract code used once when your stack demands a boundary. Many UI frameworks re-render the
+        component that holds a piece of state. If a search box keeps its text in a child, a
+        keystroke re-renders the child, not the page and its 500 rows.
       </>
     ),
     bad: {
@@ -120,10 +205,10 @@ export const LESSONS: Lesson[] = [
       view: (
         <Tree
           rows={[
-            { depth: 0, text: "<OrderPage>", kind: "comp" },
-            { k: "state", depth: 1, text: "useState(query)", moved: true },
-            { depth: 1, text: "<input>", kind: "comp" },
-            { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
+            { depth: 0, text: "Order page", kind: "comp" },
+            { k: "state", depth: 1, text: "query state", moved: true },
+            { depth: 1, text: "Search input", kind: "comp" },
+            { depth: 1, text: "Order list, 500 rows", kind: "comp" },
           ]}
         />
       ),
@@ -134,15 +219,57 @@ export const LESSONS: Lesson[] = [
       view: (
         <Tree
           rows={[
-            { depth: 0, text: "<OrderPage>", kind: "comp" },
-            { depth: 1, text: "<SearchInput>", kind: "comp" },
-            { k: "state", depth: 2, text: "useState(query)", moved: true },
-            { depth: 2, text: "<input>", kind: "comp" },
-            { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
+            { depth: 0, text: "Order page", kind: "comp" },
+            { depth: 1, text: "Search box", kind: "comp" },
+            { k: "state", depth: 2, text: "query state", moved: true },
+            { depth: 2, text: "Search input", kind: "comp" },
+            { depth: 1, text: "Order list, 500 rows", kind: "comp" },
           ]}
         />
       ),
     },
+    levels: [
+      {
+        name: "A search box",
+        prompt: (
+          <>
+            A search box keeps its text in state. Each keystroke re-renders whatever owns that
+            state. Place the state.
+          </>
+        ),
+        piece: "query state",
+        answer: "child",
+        rows: [
+          { depth: 0, text: "src/stores/", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "store",
+              label: "+ search-store.ts",
+              note: "A global store for one input's text adds a file and a subscription, and keeps the state far from its input.",
+            },
+          },
+          { depth: 0, text: "Order page", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "page",
+              label: "↳ state in the order page",
+              note: "Every keystroke re-renders the order page and the 500-row list under it.",
+            },
+          },
+          { depth: 1, text: "Order list, 500 rows", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "child",
+              label: "+ new search box",
+              note: "Extract it even when used once. Only the search box re-renders as you type.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Use the lowest common ancestor",
@@ -159,17 +286,17 @@ export const LESSONS: Lesson[] = [
       </Tip>
     ),
     bad: {
-      label: "In hooks/",
+      label: "In shared/",
       costs: ["2 hops each", "owner unclear"],
       view: (
         <Tree
           rows={[
             { depth: 0, text: "src/", kind: "dir" },
-            { depth: 1, text: "hooks/", kind: "dir" },
-            { k: "cart", depth: 2, text: "use-cart.ts", moved: true },
+            { depth: 1, text: "shared/", kind: "dir" },
+            { k: "cart", depth: 2, text: "cart.ts", moved: true },
             { depth: 1, text: "routes/shop/", kind: "dir" },
-            { depth: 2, text: "cart/summary.tsx", tag: "uses it" },
-            { depth: 2, text: "checkout/pay-button.tsx", tag: "uses it" },
+            { depth: 2, text: "cart/summary.ts", tag: "uses it" },
+            { depth: 2, text: "checkout/pay-button.ts", tag: "uses it" },
           ]}
         />
       ),
@@ -182,13 +309,59 @@ export const LESSONS: Lesson[] = [
           rows={[
             { depth: 0, text: "src/", kind: "dir" },
             { depth: 1, text: "routes/shop/", kind: "dir" },
-            { k: "cart", depth: 2, text: "use-cart.ts", moved: true },
-            { depth: 2, text: "cart/summary.tsx", tag: "uses it" },
-            { depth: 2, text: "checkout/pay-button.tsx", tag: "uses it" },
+            { k: "cart", depth: 2, text: "cart.ts", moved: true },
+            { depth: 2, text: "cart/summary.ts", tag: "uses it" },
+            { depth: 2, text: "checkout/pay-button.ts", tag: "uses it" },
           ]}
         />
       ),
     },
+    levels: [
+      {
+        name: "Two callers",
+        prompt: (
+          <>
+            <Code>cart/summary.ts</Code> and <Code>checkout/pay-button.ts</Code> now both call{" "}
+            <Code>getCart()</Code>. Move it.
+          </>
+        ),
+        piece: "getCart()",
+        answer: "shop",
+        rows: [
+          { depth: 0, text: "src/", kind: "dir" },
+          { depth: 1, text: "routes/shop/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "shop",
+              label: "+ cart.ts",
+              note: "Move it to routes/shop/, the nearest folder both callers share, so the path names its owner.",
+            },
+          },
+          { depth: 2, text: "cart/", kind: "dir" },
+          { depth: 3, text: "summary.ts", tag: "uses it" },
+          {
+            depth: 3,
+            slot: {
+              id: "cart",
+              label: "+ cart.ts",
+              note: "checkout/ would reach into cart/ for it. Move it up to the folder both share.",
+            },
+          },
+          { depth: 2, text: "checkout/", kind: "dir" },
+          { depth: 3, text: "pay-button.ts", tag: "uses it" },
+          { depth: 1, text: "shared/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "hooks",
+              label: "+ cart.ts",
+              note: "shared/ holds everything, so the path no longer says the shop owns it.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Give global code a type folder",
@@ -202,8 +375,8 @@ export const LESSONS: Lesson[] = [
     extra: (
       <LessonText style={styles.suffixes}>
         <Code style={styles.suffix}>user.schema.ts</Code>
-        <Code style={styles.suffix}>use-auth.hook.ts</Code>
-        <Code style={styles.suffix}>dashboard.page.tsx</Code>
+        <Code style={styles.suffix}>auth.service.ts</Code>
+        <Code style={styles.suffix}>dashboard.page.ts</Code>
       </LessonText>
     ),
     bad: {
@@ -215,7 +388,7 @@ export const LESSONS: Lesson[] = [
             { depth: 0, text: "src/", kind: "dir" },
             { depth: 1, text: "routes/", kind: "dir" },
             { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
-            { k: "btn", depth: 3, text: "button.tsx", moved: true },
+            { k: "btn", depth: 3, text: "button.ts", moved: true },
             { depth: 2, text: "checkout/", kind: "dir", tag: "uses it" },
             { depth: 2, text: "… 10 more pages", kind: "more", tag: "uses it" },
           ]}
@@ -230,7 +403,7 @@ export const LESSONS: Lesson[] = [
           rows={[
             { depth: 0, text: "src/", kind: "dir" },
             { depth: 1, text: "components/", kind: "dir" },
-            { k: "btn", depth: 2, text: "button.tsx", moved: true },
+            { k: "btn", depth: 2, text: "button.ts", moved: true },
             { depth: 1, text: "routes/", kind: "dir" },
             { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
             { depth: 2, text: "checkout/", kind: "dir", tag: "uses it" },
@@ -239,6 +412,48 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "Twelve callers",
+        prompt: (
+          <>
+            Twelve pages use <Code>button.ts</Code>. Place it.
+          </>
+        ),
+        piece: "button.ts",
+        answer: "components",
+        rows: [
+          { depth: 0, text: "src/", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "components",
+              label: "+ components/button.ts",
+              note: "Give it a type folder. components/ says what it is, and ⌘P finds it.",
+            },
+          },
+          { depth: 1, text: "routes/", kind: "dir" },
+          {
+            depth: 2,
+            slot: {
+              id: "routes",
+              label: "+ button.ts",
+              note: "routes/ is the lowest common ancestor, but a button belongs to no page.",
+            },
+          },
+          { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
+          {
+            depth: 3,
+            slot: {
+              id: "settings",
+              label: "+ button.ts",
+              note: "Its first caller doesn't own it. Eleven other pages would import from settings/.",
+            },
+          },
+          { depth: 2, text: "… 11 more pages", kind: "more", tag: "uses it" },
+        ],
+      },
+    ],
   },
 ];
 
@@ -248,247 +463,20 @@ export const TLDR = [
   ["Reused in the same file", "Extract a function, same file"],
   ["Reused across files", "Move it to the lowest common ancestor"],
   ["Used almost everywhere", "Use a type folder, like components/"],
-  ["A child with its own state", "Give it its own component"],
+  ["Your stack demands a boundary", "Comply with the constraint"],
 ] as const;
-
-const LEVELS: Level[] = [
-  {
-    name: "One caller",
-    prompt: (
-      <>
-        Only <Code>user-profile.tsx</Code> calls <Code>formatDate()</Code>. Place it.
-      </>
-    ),
-    piece: "formatDate()",
-    answer: "inline",
-    rows: [
-      { depth: 0, text: "src/", kind: "dir" },
-      { depth: 1, text: "lib/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "lib",
-          label: "+ date.ts",
-          note: "A new file and an import for a single caller. lib/ is utils/ under another name.",
-          cost: ["+1 file", "+1 import"],
-        },
-      },
-      { depth: 1, text: "routes/profile/", kind: "dir" },
-      { depth: 2, text: "user-profile.tsx", tag: "uses it" },
-      {
-        depth: 3,
-        slot: {
-          id: "inline",
-          label: "↳ inline, above UserProfile()",
-          note: "Keep it where it's used, with nothing to import or open.",
-          cost: ["0 files", "0 imports"],
-        },
-      },
-      { depth: 1, text: "utils/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "utils",
-          label: "+ format-date.ts",
-          note: "Three folders from its only caller. Extract it when a second file needs it, not before.",
-          cost: ["+1 file", "+1 import", "3 hops"],
-        },
-      },
-    ],
-  },
-  {
-    name: "A component's own parts",
-    prompt: (
-      <>
-        <Code>UserProfile</Code> has its own types, styles and a hook. Nothing else uses them. Place
-        them.
-      </>
-    ),
-    piece: "types · styles · useProfile()",
-    answer: "file",
-    rows: [
-      { depth: 0, text: "src/", kind: "dir" },
-      { depth: 1, text: "routes/profile/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "folder",
-          label: "+ user-profile/ index, types, styles, hooks",
-          note: "Five files for one component, so five tabs to read it.",
-          cost: ["5 files", "4 imports"],
-        },
-      },
-      { depth: 2, text: "user-profile.tsx" },
-      {
-        depth: 3,
-        slot: {
-          id: "file",
-          label: "↳ inside user-profile.tsx",
-          note: "Keep the whole component in one file.",
-          cost: ["1 file", "0 imports"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "kinds",
-          label: "+ types/, styles/, hooks/",
-          note: "Sorted by kind, one component now spans four folders.",
-          cost: ["4 folders", "3 imports"],
-        },
-      },
-    ],
-  },
-  {
-    name: "A search box",
-    prompt: (
-      <>
-        A search box keeps its text in <Code>useState</Code>. Each keystroke re-renders whatever
-        owns that state. Place the state.
-      </>
-    ),
-    piece: "useState(query)",
-    answer: "child",
-    rows: [
-      { depth: 0, text: "src/stores/", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "store",
-          label: "+ search-store.ts",
-          note: "A global store for one input's text adds a file and a subscription, and keeps the state far from its input.",
-          cost: ["+1 file", "global"],
-        },
-      },
-      { depth: 0, text: "<OrderPage>", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "page",
-          label: "↳ useState in OrderPage",
-          note: "Every keystroke re-renders OrderPage and the 500-row OrderList under it.",
-          cost: ["501 renders per key"],
-        },
-      },
-      { depth: 1, text: "<OrderList> 500 rows", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "child",
-          label: "+ new <SearchInput>",
-          note: "Extract it even when used once. Only SearchInput re-renders as you type.",
-          cost: ["1 render per key"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Two callers",
-    prompt: (
-      <>
-        <Code>cart/summary.tsx</Code> and <Code>checkout/pay-button.tsx</Code> now both call{" "}
-        <Code>useCart()</Code>. Move it.
-      </>
-    ),
-    piece: "useCart()",
-    answer: "shop",
-    rows: [
-      { depth: 0, text: "src/", kind: "dir" },
-      { depth: 1, text: "routes/shop/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "shop",
-          label: "+ use-cart.ts",
-          note: "Move it to routes/shop/, the nearest folder both callers share, so the path names its owner.",
-          cost: ["1 hop each", "owner: shop"],
-        },
-      },
-      { depth: 2, text: "cart/", kind: "dir" },
-      { depth: 3, text: "summary.tsx", tag: "uses it" },
-      {
-        depth: 3,
-        slot: {
-          id: "cart",
-          label: "+ use-cart.ts",
-          note: "checkout/ would reach into cart/ for it. Move it up to the folder both share.",
-          cost: ["checkout → cart"],
-        },
-      },
-      { depth: 2, text: "checkout/", kind: "dir" },
-      { depth: 3, text: "pay-button.tsx", tag: "uses it" },
-      { depth: 1, text: "hooks/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "hooks",
-          label: "+ use-cart.ts",
-          note: "hooks/ holds everything, so the path no longer says the shop owns it.",
-          cost: ["2 hops each", "owner unclear"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Twelve callers",
-    prompt: (
-      <>
-        Twelve pages use <Code>button.tsx</Code>. Place it.
-      </>
-    ),
-    piece: "button.tsx",
-    answer: "components",
-    rows: [
-      { depth: 0, text: "src/", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "components",
-          label: "+ components/button.tsx",
-          note: "Give it a type folder. components/ says what it is, and ⌘P finds it.",
-          cost: ["12 callers", "1 obvious home"],
-        },
-      },
-      { depth: 1, text: "routes/", kind: "dir" },
-      {
-        depth: 2,
-        slot: {
-          id: "routes",
-          label: "+ button.tsx",
-          note: "routes/ is the lowest common ancestor, but a button belongs to no page.",
-          cost: ["sits among pages"],
-        },
-      },
-      { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
-      {
-        depth: 3,
-        slot: {
-          id: "settings",
-          label: "+ button.tsx",
-          note: "Its first caller doesn't own it. Eleven other pages would import from settings/.",
-          cost: ["11 cross-imports"],
-        },
-      },
-      { depth: 2, text: "… 11 more pages", kind: "more", tag: "uses it" },
-    ],
-  },
-];
 
 export function ProximityPrinciple() {
   return (
     <RuleLanding
-      lead={<>Start inline. Extract only when a second caller, or its own state, demands it.</>}
+      lead={<>Start inline. Extract only when a second caller, or a constraint, demands it.</>}
       learn={{
         title: "Choose near over far",
         intro: <>Move code only as far as its callers need.</>,
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "tree",
-      }}
+      board="tree"
       take="place files the same way"
     />
   );

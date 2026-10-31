@@ -15,19 +15,13 @@ import {
 } from "react";
 import { reducedMotion } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import {
-  Code,
-  Kbd,
-  type Lesson,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-  Tip,
-} from "./-components/rule-landing";
+import { Kbd, type Lesson, onceOnScreen, RuleLanding, Tip } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 const LIGHT = ":is(.light *)";
 
 const ringIn = stylex.keyframes({
@@ -321,7 +315,8 @@ const styles = stylex.create({
     borderRadius: "8px",
     backgroundColor: palette["--bg"],
     fontWeight: 500,
-    fontSize: "13px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "13px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
     color: palette["--text"],
@@ -379,16 +374,32 @@ const styles = stylex.create({
     cursor: cursors["--cursor-point"],
   },
   soft: {
-    backgroundColor: { default: palette["--panel"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--panel"],
+      ":hover": { default: null, [HOVER]: palette["--soft-hover"] },
+      ":active": palette["--soft-hover"],
+    },
     boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
     color: palette["--text"],
   },
   softInCard: {
-    backgroundColor: { default: palette["--bg"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--bg"],
+      ":hover": { default: null, [HOVER]: palette["--soft-hover"] },
+      ":active": palette["--soft-hover"],
+    },
   },
   plain: {
-    backgroundColor: { default: "transparent", ":hover": palette["--soft-hover"] },
-    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, [HOVER]: palette["--soft-hover"] },
+      ":active": palette["--soft-hover"],
+    },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
+    },
     color: palette["--text"],
   },
   red: {
@@ -410,8 +421,16 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "8px",
-    backgroundColor: { default: "transparent", ":hover": palette["--soft-hover"] },
-    backgroundPosition: { default: "0px 0px", ":hover": "initial" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, [HOVER]: palette["--soft-hover"] },
+      ":active": palette["--soft-hover"],
+    },
+    backgroundPosition: {
+      default: "0px 0px",
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
+    },
     color: palette["--dim"],
     cursor: cursors["--cursor-point"],
   },
@@ -471,10 +490,13 @@ const styles = stylex.create({
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "8px",
-    backgroundColor: { default: palette["--panel-2"], ":hover": palette["--soft-hover"] },
+    backgroundColor: {
+      default: palette["--soft-key"],
+      ":hover": { default: null, [HOVER]: palette["--soft-key-hover"] },
+    },
     boxShadow: {
-      default: `0 3px 0 ${palette["--drop-ink"]}`,
-      ":active": `0 1px 0 ${palette["--drop-ink"]}`,
+      default: `0 3px 0 ${palette["--soft-key-drop"]}`,
+      ":active": `0 1px 0 ${palette["--soft-key-drop"]}`,
     },
     fontWeight: 700,
     fontSize: "12px",
@@ -682,10 +704,19 @@ function Field({ focus, name, label, ...input }: FieldProps) {
   );
 }
 
-function Key({ children, onPress }: { children: ReactNode; onPress: () => void }) {
+function Key({
+  children,
+  onPress,
+  hint,
+}: {
+  children: ReactNode;
+  onPress: () => void;
+  hint?: boolean;
+}) {
   return (
     <button
       type="button"
+      data-hint={hint || undefined}
       {...stylex.props(styles.key)}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onPress}
@@ -802,7 +833,9 @@ function FocusDemo({ sealed }: { sealed: boolean }) {
         stageRef={stageRef}
         keys={
           <>
-            <Key onPress={() => tab(true)}>Tab</Key>
+            <Key hint onPress={() => tab(true)}>
+              Tab
+            </Key>
             <Key onPress={() => open && hide()}>Esc</Key>
           </>
         }
@@ -913,7 +946,12 @@ function EscapeDemo({ sealed }: { sealed: boolean }) {
           <div inert={open} {...stylex.props(styles.page)}>
             <div {...stylex.props(styles.spread)}>
               <span {...stylex.props(styles.logo)} />
-              <button type="button" {...focus.stop("trigger", styles.pill, open)} onClick={show}>
+              <button
+                data-hint
+                type="button"
+                {...focus.stop("trigger", styles.pill, open)}
+                onClick={show}
+              >
                 What's new
               </button>
             </div>
@@ -1000,6 +1038,7 @@ function ConfirmDemo({ sealed }: { sealed: boolean }) {
                     <small {...stylex.props(styles.meta)}>214 files · edited 2h ago</small>
                   </span>
                   <button
+                    data-hint
                     type="button"
                     {...focus.stop("trigger", [styles.btn, styles.red, styles.redTint], open)}
                     onClick={() => go("open", sealed ? "cancel" : "delete")}
@@ -1146,6 +1185,7 @@ function DraftDemo({ sealed }: { sealed: boolean }) {
             <div {...stylex.props(styles.spread)}>
               <span {...stylex.props(styles.logo)} />
               <button
+                data-hint
                 type="button"
                 {...focus.stop("trigger", [styles.btn, styles.soft], phase !== "closed")}
                 onClick={show}
@@ -1289,6 +1329,7 @@ function ScrollDemo({ sealed }: { sealed: boolean }) {
             <div {...stylex.props(styles.spread)}>
               <b {...stylex.props(styles.strong)}>Why we moved to Postgres</b>
               <button
+                data-hint
                 type="button"
                 {...focus.stop("trigger", [styles.btn, styles.soft], open)}
                 onClick={show}
@@ -1401,6 +1442,7 @@ function NameDemo({ sealed }: { sealed: boolean }) {
                 <small {...stylex.props(styles.meta)}>2.4 MB · shared</small>
               </span>
               <button
+                data-hint
                 type="button"
                 {...focus.stop("trigger", [styles.btn, styles.soft, styles.softInCard], open)}
                 onClick={show}
@@ -1458,6 +1500,47 @@ export const LESSONS: Lesson[] = [
       costs: ["starts in Name", "Tab stays in", "back on close"],
       view: <FocusDemo sealed />,
     },
+    levels: [
+      {
+        name: "It closed",
+        prompt: (
+          <>
+            You opened <b>Edit profile</b> from its button halfway down a settings page, then
+            pressed Save. Place where focus goes.
+          </>
+        ),
+        piece: "focus",
+        answer: "trigger",
+        rows: [
+          {
+            depth: 0,
+            slot: {
+              id: "body",
+              label: "Top of the page",
+              note: "Focus starts over at the top. A keyboard user tabs past 12 links to get back.",
+            },
+          },
+          { depth: 1, text: "Nav, 12 links", kind: "more" },
+          { depth: 1, text: "Settings page", kind: "comp" },
+          {
+            depth: 2,
+            slot: {
+              id: "trigger",
+              label: "Edit profile button",
+              note: "Return focus here, where they left off. One Tab continues down the page.",
+            },
+          },
+          {
+            depth: 2,
+            slot: {
+              id: "next",
+              label: "Change password button",
+              note: "Close, but they never picked it, so a screen reader announces it without warning.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Let Escape close it",
@@ -1477,6 +1560,41 @@ export const LESSONS: Lesson[] = [
       costs: ["Esc closes", "4 ways out"],
       view: <EscapeDemo sealed />,
     },
+    levels: [
+      {
+        name: "A click outside",
+        prompt: <>Three dialogs. Place the close on the one a click outside should close.</>,
+        piece: "close",
+        answer: "news",
+        rows: [
+          { depth: 0, text: "click on the scrim", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "issue",
+              label: "New issue, title typed in",
+              note: `One stray click throws away the ${DRAFT.length} characters they typed.`,
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "news",
+              label: "What's new, nothing to fill in",
+              note: "Close it on a click outside, since there is nothing to lose.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "profile",
+              label: "Edit profile, nothing changed yet",
+              note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Focus the safe answer",
@@ -1501,6 +1619,85 @@ export const LESSONS: Lesson[] = [
       costs: ["Enter cancels", "0 files lost"],
       view: <ConfirmDemo sealed />,
     },
+    levels: [
+      {
+        name: "Delete forever",
+        prompt: (
+          <>
+            <b>Delete Moonbase?</b> removes 214 files for good. Place where focus starts.
+          </>
+        ),
+        piece: "first focus",
+        answer: "cancel",
+        rows: [
+          { depth: 0, text: "Moonbase project row", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "trigger",
+              label: "Delete project, on the page behind",
+              note: "Focus stays behind the dim layer. Tab moves through the page, and Enter reopens the dialog.",
+            },
+          },
+          { depth: 0, text: "Confirm dialog", kind: "comp" },
+          { depth: 1, text: "Delete Moonbase?" },
+          {
+            depth: 1,
+            slot: {
+              id: "cancel",
+              label: "Cancel",
+              note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "delete",
+              label: "Delete",
+              note: "One Enter deletes 214 files before anyone has read the title.",
+            },
+          },
+        ],
+      },
+      {
+        name: "Add a contact",
+        prompt: (
+          <>
+            <b>Add contact</b> has Name and Email fields. Place where focus starts.
+          </>
+        ),
+        piece: "first focus",
+        answer: "name",
+        rows: [
+          { depth: 0, text: "Add contact dialog", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "close",
+              label: "× Close",
+              note: "Typing goes nowhere, and one Enter closes the form they came to fill.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "name",
+              label: "Name field",
+              note: "Focus the first field so they start typing at once, with no click or Tab.",
+            },
+          },
+          { depth: 1, text: "Email field" },
+          {
+            depth: 1,
+            slot: {
+              id: "save",
+              label: "Save",
+              note: "Enter saves an empty contact, and they Shift+Tab back up to start.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Ask before you drop a draft",
@@ -1521,14 +1718,53 @@ export const LESSONS: Lesson[] = [
       costs: ["0 chars lost", "asks first"],
       view: <DraftDemo sealed />,
     },
+    levels: [
+      {
+        name: "A slip",
+        prompt: (
+          <>
+            Three dialogs, and a click lands on the dim area by mistake. Place the shake on the one
+            that should stay open.
+          </>
+        ),
+        piece: "shake",
+        answer: "issue",
+        rows: [
+          { depth: 0, text: "click on the scrim", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "news",
+              label: "What's new, nothing to fill in",
+              note: "Nothing typed, nothing lost. Shaking it blocks a safe way out.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "issue",
+              label: "New issue, title typed in",
+              note: `Shake it and keep the ${DRAFT.length} characters. Esc or × asks before it drops them.`,
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "preview",
+              label: "Image preview, nothing to fill in",
+              note: "It holds no input, so a click outside should just close it.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Lock the page behind",
     body: (
       <>
-        Set <Code>overflow: hidden</Code> on the body so the page under the dialog stays still. Add{" "}
-        <Code>scrollbar-gutter: stable</Code> so nothing shifts when the scrollbar hides. Open
-        Share, then scroll.
+        Stop the page under the dialog from scrolling, so it stays still. Keep the scrollbar's space
+        so nothing shifts when the scrollbar hides. Open Share, then scroll.
       </>
     ),
     bad: {
@@ -1541,27 +1777,105 @@ export const LESSONS: Lesson[] = [
       costs: ["0px moved", "0px shift"],
       view: <ScrollDemo sealed />,
     },
+    levels: [
+      {
+        name: "Hold the page",
+        prompt: (
+          <>
+            <b>Share</b> opens over a long article. Place the scroll lock so the article stays
+            still.
+          </>
+        ),
+        piece: "scroll lock",
+        answer: "body",
+        rows: [
+          {
+            depth: 0,
+            slot: {
+              id: "body",
+              label: "The page",
+              note: "Lock the page while the dialog is open, and keep room for its scrollbar so nothing shifts.",
+            },
+          },
+          { depth: 1, text: "The article, 3,000 words", kind: "more" },
+          {
+            depth: 1,
+            slot: {
+              id: "scrim",
+              label: "The dim layer",
+              note: "The dim layer never scrolled. The article under it still does.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "panel",
+              label: "The dialog panel",
+              note: "A long dialog gets cut off, and the article behind it still scrolls.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Give it a name",
     body: (
       <>
-        Tell a screen reader that a dialog opened and what it's called. Give it{" "}
-        <Code>role="dialog"</Code>, point <Code>aria-labelledby</Code> at the title and{" "}
-        <Code>aria-describedby</Code> at the text. On a real page add <Code>aria-modal="true"</Code>
-        , or use <Code>&lt;dialog&gt;</Code> with <Code>showModal()</Code>.
+        Tell a screen reader that a dialog opened and what it's called. Mark it as a modal dialog,
+        name it by its title and describe it by its text.
       </>
     ),
     bad: {
-      label: "A plain div",
+      label: "A plain box",
       costs: ["no role", "no name"],
       view: <NameDemo sealed={false} />,
     },
     good: {
       label: "Name the dialog",
-      costs: ["role=dialog", "named", "described"],
+      costs: ["a dialog", "named", "described"],
       view: <NameDemo sealed />,
     },
+    levels: [
+      {
+        name: "Read aloud",
+        prompt: (
+          <>
+            A screen reader user presses Delete and <b>Delete Moonbase?</b> opens. Pick the version
+            that tells them what opened.
+          </>
+        ),
+        piece: "the dialog",
+        answer: "named",
+        rows: [
+          { depth: 0, text: "screen reader, as it opens", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "plain",
+              label: "+ a plain box",
+              note: "Focus moves, but nothing says a dialog opened or what it asks.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "role",
+              label: "+ marked as a dialog",
+              note: "They hear dialog, but not which one or what it asks.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "named",
+              label: "+ a dialog with a name and a description",
+              note: "They hear Delete Moonbase?, dialog, then that 214 files go for good. That's enough to answer.",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -1571,214 +1885,9 @@ export const TLDR = [
   ["Escape", "Close it, every time"],
   ["A click outside", "Close an info dialog. Shake or ask on a form with input"],
   ["It closes", "Return focus to the button that opened it"],
-  ["The markup", 'Add role="dialog" and aria-modal. Label it by its title'],
+  ["For screen readers", "Mark it as a modal dialog. Name it by its title"],
   ["On a phone", "Use a bottom sheet that swipes down to close"],
 ] as const;
-
-const LEVELS: Level[] = [
-  {
-    name: "Delete forever",
-    prompt: (
-      <>
-        <b>Delete Moonbase?</b> removes 214 files for good. Place autoFocus.
-      </>
-    ),
-    piece: "autoFocus",
-    answer: "cancel",
-    rows: [
-      { depth: 0, text: "<ProjectRow> Moonbase", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "trigger",
-          label: "<button> Delete project",
-          note: "Focus stays behind the scrim. Tab moves through the page, and Enter reopens the dialog.",
-          cost: ["focus behind", "Enter reopens"],
-        },
-      },
-      { depth: 0, text: "<AlertDialog>", kind: "comp" },
-      { depth: 1, text: "Delete Moonbase?" },
-      {
-        depth: 1,
-        slot: {
-          id: "cancel",
-          label: "<button> Cancel",
-          note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
-          cost: ["Enter cancels", "0 files lost"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "delete",
-          label: "<button> Delete",
-          note: "One Enter deletes 214 files before anyone has read the title.",
-          cost: ["Enter deletes", "214 files"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Add a contact",
-    prompt: (
-      <>
-        <b>Add contact</b> has Name and Email fields. Place autoFocus.
-      </>
-    ),
-    piece: "autoFocus",
-    answer: "name",
-    rows: [
-      { depth: 0, text: "<Dialog> Add contact", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "close",
-          label: "<button> ×",
-          note: "Typing goes nowhere, and one Enter closes the form they came to fill.",
-          cost: ["1 extra Tab", "Enter closes"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "name",
-          label: "<input> Name",
-          note: "Focus the first field so they start typing at once, with no click or Tab.",
-          cost: ["0 clicks"],
-        },
-      },
-      { depth: 1, text: "<input> Email" },
-      {
-        depth: 1,
-        slot: {
-          id: "save",
-          label: "<button> Save",
-          note: "Enter saves an empty contact, and they Shift+Tab back up to start.",
-          cost: ["empty save", "2 Tabs back"],
-        },
-      },
-    ],
-  },
-  {
-    name: "A click outside",
-    prompt: <>Three dialogs. Place close() on the one a click outside should close.</>,
-    piece: "close()",
-    answer: "news",
-    rows: [
-      { depth: 0, text: "click on the scrim", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "issue",
-          label: "New issue, title typed in",
-          note: `One stray click throws away the ${DRAFT.length} characters they typed.`,
-          cost: [`${DRAFT.length} chars lost`],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "news",
-          label: "What's new, nothing to fill in",
-          note: "Close it on a click outside, since there is nothing to lose.",
-          cost: ["0 lost", "1 click out"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "profile",
-          label: "Edit profile, nothing changed yet",
-          note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
-          cost: ["a form", "risky by default"],
-        },
-      },
-    ],
-  },
-  {
-    name: "It closed",
-    prompt: (
-      <>
-        You opened <b>Edit profile</b> from its button halfway down a settings page, then pressed
-        Save. Place focus().
-      </>
-    ),
-    piece: "focus()",
-    answer: "trigger",
-    rows: [
-      {
-        depth: 0,
-        slot: {
-          id: "body",
-          label: "<body>",
-          note: "Focus starts over at the top. A keyboard user tabs past 12 links to get back.",
-          cost: ["12 Tabs back"],
-        },
-      },
-      { depth: 1, text: "<nav> 12 links", kind: "more" },
-      { depth: 1, text: "<SettingsPage>", kind: "comp" },
-      {
-        depth: 2,
-        slot: {
-          id: "trigger",
-          label: "<button> Edit profile",
-          note: "Return focus here, where they left off. One Tab continues down the page.",
-          cost: ["0 Tabs back"],
-        },
-      },
-      {
-        depth: 2,
-        slot: {
-          id: "next",
-          label: "<button> Change password",
-          note: "Close, but they never picked it, so a screen reader announces it without warning.",
-          cost: ["1 stop off", "lost place"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Hold the page",
-    prompt: (
-      <>
-        <b>Share</b> opens over a long article. Place <Code>overflow: hidden</Code> so the article
-        stays still.
-      </>
-    ),
-    piece: "overflow: hidden",
-    answer: "body",
-    rows: [
-      {
-        depth: 0,
-        slot: {
-          id: "body",
-          label: "<body>",
-          note: "Stop the page while the dialog is open. Add scrollbar-gutter: stable so it doesn't shift.",
-          cost: ["0px moved", "0px shift"],
-        },
-      },
-      { depth: 1, text: "<article> 3,000 words", kind: "more" },
-      {
-        depth: 1,
-        slot: {
-          id: "scrim",
-          label: ".scrim, the dim layer",
-          note: "The scrim never scrolled. The article under it still does.",
-          cost: ["page still moves"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "panel",
-          label: ".dialog, the panel",
-          note: "A long dialog gets cut off, and the article behind it still scrolls.",
-          cost: ["clips the dialog", "page still moves"],
-        },
-      },
-    ],
-  },
-];
 
 export function DialogDesign() {
   return (
@@ -1792,11 +1901,7 @@ export function DialogDesign() {
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "screen",
-      }}
+      board="screen"
       take="build dialogs the same way"
     />
   );

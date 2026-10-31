@@ -3,6 +3,7 @@ import { ArrowLeftIcon, CheckIcon, ShareNetworkIcon } from "@phosphor-icons/reac
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   createContext,
+  Fragment,
   isValidElement,
   type KeyboardEvent,
   type PointerEvent,
@@ -24,7 +25,7 @@ import {
 import type { PublishedGuideline } from "../../../data/guidelines";
 import { heroType } from "../../-components/hero-type";
 import { reticle } from "../../-components/reticle";
-import { isOpeningRule, RuleThumb } from "../../-components/rule-art";
+import { isOpeningRule, isTransitioning, RuleThumb, useRuleOpen } from "../../-components/rule-art";
 import { reducedMotion } from "../../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
@@ -32,6 +33,7 @@ import { button } from "../../../components/button";
 import { hoverHold } from "../../../components/hover-hold";
 import { section, veil } from "../../-components/section";
 import { arcade } from "../../../components/arcade";
+import { Backdrop } from "../../-components/backdrop";
 
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 const SNAP = "cubic-bezier(0.34, 1.56, 0.64, 1)";
@@ -44,6 +46,8 @@ export type Lesson = {
   extra?: ReactNode;
   bad: Side;
   good: Side;
+  /** Quiz levels that test this lesson, played right after it. */
+  levels: [Level, ...Level[]];
 };
 
 type TreeRow = {
@@ -53,7 +57,7 @@ type TreeRow = {
   tag?: string;
 } & ({ k: string; text: ReactNode } | { k?: undefined; text: string });
 
-type Slot = { id: string; label: ReactNode; note: string; cost: string[] };
+type Slot = { id: string; label: ReactNode; note: string };
 type BoardRow =
   | { depth: number; text: ReactNode; kind?: TreeRow["kind"]; tag?: string }
   | { depth: number; slot: Slot; lead?: ReactNode };
@@ -70,15 +74,13 @@ type RuleLandingProps = {
   learn: { title: string; intro: ReactNode };
   lessons: Lesson[];
   tldr: readonly (readonly [string, string])[];
-  /** `board` names what the pieces go into, as in "Drag the piece into the tree". */
-  quiz: { intro: ReactNode; levels: Level[]; board: string };
+  /** What the quiz pieces go into, as in "Drag the piece into the tree". */
+  board: string;
   /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
   take: string;
   /** Applied last to the row of cost tags under each lesson's panes. */
   costsStyle?: stylex.StyleXStyles;
 };
-
-type Results = (number | null)[];
 
 export function RuleLanding(props: RuleLandingProps) {
   const pathname = useLocation({ select: (location) => location.pathname });
@@ -95,7 +97,7 @@ function Landing({
   learn,
   lessons,
   tldr,
-  quiz,
+  board,
   take,
   costsStyle,
 }: RuleLandingProps & { rule: PublishedGuideline }) {
@@ -113,8 +115,7 @@ function Landing({
   const hue = { "--c": colorOf(rule.label) };
   const number = ruleNumber(rule);
 
-  const { levels } = quiz;
-  const [results, setResults] = useState<Results>(() => levels.map(() => null));
+  const levels = lessons.flatMap((lesson) => lesson.levels);
 
   const markdownUrl = `${rule.href}.md`;
   const words = rule.title.split(" ");
@@ -128,10 +129,10 @@ function Landing({
   return (
     <div
       ref={rootRef}
-      className={`arc ${stylex.props(arcade.root, shell.root, reveal).className}`}
+      className={`arc ${stylex.props(arcade.root, arcade.scan, shell.root, reveal).className}`}
       style={hue}
     >
-      <div {...stylex.props(shell.ground)} aria-hidden="true" />
+      <Backdrop tide />
       <IslandActivity>
         <span {...stylex.props(styles.activity)} style={hue}>
           <Link to="/rule-of-thumb" {...stylex.props(styles.action, styles.back)}>
@@ -208,7 +209,17 @@ function Landing({
           </div>
           <div {...stylex.props(lessonKit.lessons)}>
             {lessons.map((lesson) => (
-              <LessonCard key={lesson.title} lesson={lesson} costsStyle={costsStyle} />
+              <Fragment key={lesson.title}>
+                <LessonCard lesson={lesson} costsStyle={costsStyle} />
+                {lesson.levels.map((level) => (
+                  <LevelBoard
+                    key={level.name}
+                    n={levels.indexOf(level) + 1}
+                    level={level}
+                    board={board}
+                  />
+                ))}
+              </Fragment>
             ))}
           </div>
           <div {...stylex.props(lessonKit.sheetWrap, shell.rev)} data-rev>
@@ -222,45 +233,6 @@ function Landing({
               ))}
             </ol>
           </div>
-        </section>
-
-        <section
-          id="quiz"
-          aria-labelledby="quiz-title"
-          {...stylex.props(section.block, quizKit.section)}
-        >
-          <div {...stylex.props(quizKit.head, shell.rev)} data-rev>
-            <div {...stylex.props(veil.soft, lessonKit.headItem, quizKit.headCopy)}>
-              <h2 id="quiz-title" {...stylex.props(section.title, lessonKit.secTitle)}>
-                Mini quiz
-              </h2>
-              <Tone value="wrap">
-                <p {...stylex.props(lessonKit.secText)}>{quiz.intro}</p>
-              </Tone>
-            </div>
-            <div {...stylex.props(lessonKit.headItem, veil.dense, quizKit.score)}>
-              <span>
-                {clearedCount(results)}/{levels.length} cleared
-              </span>
-              <span {...stylex.props(quizKit.scoreStars)}>
-                ★ {starTotal(results)}/{levels.length * 3}
-              </span>
-            </div>
-          </div>
-          <Rail results={results}>
-            {levels.map((level, index) => (
-              <LevelBoard
-                key={index}
-                n={index + 1}
-                level={level}
-                board={quiz.board}
-                stars={results[index] ?? null}
-                onClear={(stars) =>
-                  setResults((list) => list.map((value, at) => (at === index ? stars : value)))
-                }
-              />
-            ))}
-          </Rail>
         </section>
 
         <section {...stylex.props(section.block, takeKit.section)}>
@@ -320,11 +292,13 @@ function PagerCard({
   direction: "Previous" | "Next";
 }) {
   const [hovered, setHovered] = useState(false);
+  const { linkProps: openRule } = useRuleOpen();
 
   return (
     <Link
       to={rule.href}
       preload="intent"
+      {...openRule(rule)}
       {...stylex.props(
         reticle.card,
         reticle.aim,
@@ -346,7 +320,7 @@ function PagerCard({
         <span {...stylex.props(pager.number)}>
           No.{ruleNumber(rule)} · {rule.label}
         </span>
-        <span {...stylex.props(pager.title)}>{rule.title}</span>
+        <span className={`t ${stylex.props(pager.title).className}`}>{rule.title}</span>
       </span>
     </Link>
   );
@@ -356,6 +330,7 @@ type CoverProps = { rule: PublishedGuideline; entering: boolean };
 
 function Cover({ rule, entering }: CoverProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [was, now] = rule.coverTag.split(" → ");
 
   function lean(event: PointerEvent<HTMLDivElement>) {
     const cover = ref.current;
@@ -380,10 +355,14 @@ function Cover({ rule, entering }: CoverProps) {
       onPointerLeave={rest}
     >
       <div {...stylex.props(cover.card)}>
-        <RuleThumb rule={rule} play at="cover" style={cover.thumb} />
-        <div aria-hidden="true" {...stylex.props(cover.foot)}>
-          <span>{rule.id}.md</span>
-          <span {...stylex.props(cover.tag)}>{rule.coverTag}</span>
+        <div {...stylex.props(cover.sheet)}>
+          <RuleThumb rule={rule} play at="cover" style={cover.thumb} />
+          <div {...stylex.props(cover.tear)} />
+          <div aria-hidden="true" {...stylex.props(cover.stub)}>
+            <span {...stylex.props(cover.was)}>{was}</span>
+            <span {...stylex.props(cover.to)}>→</span>
+            <span {...stylex.props(cover.now)}>{now}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -628,7 +607,583 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
           </figure>
         ))}
       </div>
+      <Hints side={side} />
     </article>
+  );
+}
+
+type Point = { x: number; y: number };
+type Box = { left: number; top: number; right: number; bottom: number };
+type Hint = { zone: string; at: Point; tilt: "up" | "down" | "level"; path: string };
+
+const HINT_STEP = 10;
+const HINT_CLEAR = 8;
+const HINT_NEAR = 56;
+const HINT_FAR = 130;
+// How far a toggle in the copy sits from its label, which points at it in a straight line.
+const HINT_SHORT = 26;
+// A label's gap from its target's edge, and how far it steps sideways off the edge's middle, so
+// every curved arrow has the same length and bend.
+const HINT_GAP = 26;
+const HINT_SHIFT = 14;
+// The room a label keeps from words level with it, so it never reads as part of a line of text.
+const HINT_BERTH = 40;
+// Wider rings a label falls back to when every slot at HINT_GAP is taken.
+const HINT_RINGS = [HINT_GAP, 44, 64];
+// The spots a label tries round its target, in order: above right, right, their mirror images,
+// level beside it, then below. `dir` is the side of the edge's middle it steps toward, and a
+// level label (dir 0) points straight across.
+const HINT_SLOTS = [
+  { edge: "top", dir: 1 },
+  { edge: "right", dir: -1 },
+  { edge: "top", dir: -1 },
+  { edge: "left", dir: -1 },
+  { edge: "right", dir: 0 },
+  { edge: "left", dir: 0 },
+  { edge: "bottom", dir: 1 },
+  { edge: "right", dir: 1 },
+  { edge: "bottom", dir: -1 },
+  { edge: "left", dir: 1 },
+] as const;
+
+function overlap(a: Box, b: Box) {
+  return (
+    Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
+    Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
+  );
+}
+
+function area(b: Box) {
+  return (b.right - b.left) * (b.bottom - b.top);
+}
+
+function holds(outer: Box, inner: Box) {
+  return (
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top >= outer.top &&
+    inner.bottom <= outer.bottom
+  );
+}
+
+/** The gap between two boxes, 0 when they touch. */
+function apart(a: Box, b: Box) {
+  return Math.hypot(
+    Math.max(0, a.left - b.right, b.left - a.right),
+    Math.max(0, a.top - b.bottom, b.top - a.bottom),
+  );
+}
+
+/** Where a ray from the box's centre toward `to` leaves the box, pushed `gap` further out. */
+function exit(b: Box, to: Point, gap: number): Point {
+  const cx = (b.left + b.right) / 2;
+  const cy = (b.top + b.bottom) / 2;
+  const dx = to.x - cx;
+  const dy = to.y - cy;
+  const length = Math.hypot(dx, dy) || 1;
+  const reach = Math.min(
+    dx ? (b.right - b.left) / 2 / Math.abs(dx) : Infinity,
+    dy ? (b.bottom - b.top) / 2 / Math.abs(dy) : Infinity,
+  );
+  return { x: cx + dx * reach + (dx / length) * gap, y: cy + dy * reach + (dy / length) * gap };
+}
+
+type Edge = (typeof HINT_SLOTS)[number]["edge"];
+type Spot = { edge: Edge; dir: -1 | 0 | 1; gap: number; shift: number };
+// Further steps off an edge's middle for when a neighbour blocks every slot, so the label slides
+// past it along the same edge.
+const HINT_REACH = [30, 48, 72, 100, 130, 160];
+// Every place a label tries round its target, nearest first.
+const HINT_SPOTS: Spot[] = [
+  ...HINT_RINGS.flatMap((gap) =>
+    HINT_SLOTS.map(({ edge, dir }) => ({ edge, dir, gap, shift: (HINT_SHIFT * gap) / HINT_GAP })),
+  ),
+  ...HINT_REACH.flatMap((shift) =>
+    HINT_RINGS.flatMap((gap) =>
+      HINT_SLOTS.filter(({ dir }) => dir !== 0).map(({ edge, dir }) => ({ edge, dir, gap, shift })),
+    ),
+  ),
+];
+type Way = { label: Box; way: ReturnType<typeof arc> };
+
+/** Where an arrow lands on its target: just off the middle of one edge, never a corner. */
+function landing(t: Box, edge: Edge): Point {
+  const cx = (t.left + t.right) / 2;
+  const cy = (t.top + t.bottom) / 2;
+  if (edge === "top") return { x: cx, y: t.top - 6 };
+  if (edge === "bottom") return { x: cx, y: t.bottom + 6 };
+  if (edge === "left") return { x: t.left - 6, y: cy };
+  return { x: t.right + 6, y: cy };
+}
+
+/** A `w` by `h` label at one of the HINT_SPOTS round `t`. */
+function slot(t: Box, { edge, dir, gap, shift }: Spot, w: number, h: number): Box {
+  const cx = (t.left + t.right) / 2;
+  const cy = (t.top + t.bottom) / 2;
+  if (edge === "top" || edge === "bottom") {
+    const left = dir > 0 ? cx + shift : cx - shift - w;
+    const top = edge === "top" ? t.top - gap - h : t.bottom + gap;
+    return { left, right: left + w, top, bottom: top + h };
+  }
+  const left = edge === "right" ? t.right + gap : t.left - gap - w;
+  const top = dir === 0 ? cy - h / 2 : dir > 0 ? cy + shift : cy - shift - h;
+  return { left, right: left + w, top, bottom: top + h };
+}
+
+/** How far an arc bows out past the edge it lands on, rather than back across the target. */
+const OUTWARD: Record<Edge, (way: ReturnType<typeof arc>) => number> = {
+  top: (way) => -way.ny,
+  bottom: (way) => way.ny,
+  left: (way) => -way.nx,
+  right: (way) => way.nx,
+};
+
+const EDGES = ["top", "bottom", "left", "right"] as const;
+
+/**
+ * A hand-drawn arc from the label to `end`, bowed to one side by `bow` (-1 to 1, straight at 0),
+ * with its head.
+ */
+function arc(label: Box, end: Point, bow: number) {
+  const start = exit(label, end, 6);
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const nx = -dy * 0.32 * bow;
+  const ny = dx * 0.32 * bow;
+  const c1 = { x: start.x + dx * 0.2 + nx, y: start.y + dy * 0.2 + ny };
+  const c2 = { x: start.x + dx * 0.72 + nx * 0.55, y: start.y + dy * 0.72 + ny * 0.55 };
+  const along = Array.from({ length: 29 }, (_, i) => {
+    const t = (i + 1) / 30;
+    const u = 1 - t;
+    return {
+      x: u ** 3 * start.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * end.x,
+      y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * end.y,
+    };
+  });
+  return { start, c1, c2, end, wings: wings(c2, end), along, nx, ny };
+}
+
+/** The two strokes of an arrowhead at `end`, for a line arriving from `from`. */
+function wings(from: Point, end: Point) {
+  const length = Math.hypot(end.x - from.x, end.y - from.y) || 1;
+  const ux = (end.x - from.x) / length;
+  const uy = (end.y - from.y) / length;
+  const wing = (turn: number) => ({
+    x: end.x - (ux * Math.cos(turn) - uy * Math.sin(turn)) * 8,
+    y: end.y - (ux * Math.sin(turn) + uy * Math.cos(turn)) * 8,
+  });
+  return [wing(0.5), wing(-0.5)] as const;
+}
+
+/** Spots right beside a target, nearest side first, for a label with a short straight arrow. */
+function beside(t: Box, w: number, h: number): Box[] {
+  const cx = (t.left + t.right) / 2;
+  const cy = (t.top + t.bottom) / 2;
+  return [
+    {
+      left: t.right + HINT_SHORT,
+      right: t.right + HINT_SHORT + w,
+      top: cy - h / 2,
+      bottom: cy + h / 2,
+    },
+    {
+      left: t.left - HINT_SHORT - w,
+      right: t.left - HINT_SHORT,
+      top: cy - h / 2,
+      bottom: cy + h / 2,
+    },
+    {
+      left: cx - w / 2,
+      right: cx + w / 2,
+      top: t.bottom + HINT_SHORT,
+      bottom: t.bottom + HINT_SHORT + h,
+    },
+    {
+      left: cx - w / 2,
+      right: cx + w / 2,
+      top: t.top - HINT_SHORT - h,
+      bottom: t.top - HINT_SHORT,
+    },
+  ];
+}
+
+/** Which cells of the room any box covers, summed so a rectangle's coverage costs one lookup. */
+function raster(room: Box, boxes: Box[]) {
+  const cell = 4;
+  const cols = Math.ceil((room.right - room.left) / cell);
+  const rows = Math.ceil((room.bottom - room.top) / cell);
+  const col = (x: number) => Math.min(cols, Math.max(0, Math.round((x - room.left) / cell)));
+  const row = (y: number) => Math.min(rows, Math.max(0, Math.round((y - room.top) / cell)));
+  const hit = new Uint8Array(cols * rows);
+  for (const b of boxes) {
+    for (let r = row(b.top); r < row(b.bottom); r++)
+      hit.fill(1, r * cols + col(b.left), r * cols + col(b.right));
+  }
+  const sum = new Uint32Array((cols + 1) * (rows + 1));
+  for (let r = 0; r < rows; r++) {
+    let line = 0;
+    for (let c = 0; c < cols; c++) {
+      line += hit[r * cols + c] ?? 0;
+      sum[(r + 1) * (cols + 1) + c + 1] = (sum[r * (cols + 1) + c + 1] ?? 0) + line;
+    }
+  }
+  const at = (r: number, c: number) => sum[r * (cols + 1) + c] ?? 0;
+  return {
+    covers: (b: Box) => {
+      const [c0, c1, r0, r1] = [col(b.left), col(b.right), row(b.top), row(b.bottom)];
+      return (at(r1, c1) - at(r0, c1) - at(r1, c0) + at(r0, c0)) * cell * cell;
+    },
+    has: (p: Point) => {
+      const c = Math.floor((p.x - room.left) / cell);
+      const r = Math.floor((p.y - room.top) / cell);
+      return c >= 0 && c < cols && r >= 0 && r < rows && hit[r * cols + c] === 1;
+    },
+  };
+}
+
+type Mark = {
+  e: Element;
+  box: Box;
+  kind: "content" | "surface" | "leaf" | "frame";
+  glyphs?: true;
+};
+
+/**
+ * Sort what's on screen in the card: content (text, controls, icons) a hint must never cover,
+ * surfaces (cards, panels) it covers only when they're big enough to be a backdrop, bare leaves
+ * that count only when small, and frames that don't count.
+ */
+function survey(things: Element[]): Mark[] {
+  return things.flatMap<Mark>((e) => {
+    const box = e.getBoundingClientRect();
+    // A screen-reader-only box is 1px, though its text still measures full width.
+    if (box.width <= 1 || box.height <= 1 || e.matches("col, colgroup")) return [];
+    if (e.matches("button, input, select, textarea, svg")) return [{ e, box, kind: "content" }];
+    const look = getComputedStyle(e);
+    const surface =
+      !/^(transparent|rgba\(0, 0, 0, 0\))$|\/ 0\)$/.test(look.backgroundColor) ||
+      parseFloat(look.borderTopWidth) + parseFloat(look.borderBottomWidth) > 0 ||
+      look.boxShadow !== "none";
+    const words = [...e.childNodes].filter(
+      (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim(),
+    );
+    const cell = e.matches("td, th");
+    if (words.length && surface && !cell) return [{ e, box, kind: "content" }];
+    // Bare text, and text in a table cell, counts only where its glyphs are, so a wide cell keeps
+    // its empty space.
+    if (words.length) {
+      const range = document.createRange();
+      const glyphs = words.flatMap((n) => {
+        range.selectNodeContents(n);
+        const r = range.getBoundingClientRect();
+        return r.width ? [{ e, box: r, kind: "content" as const, glyphs: true as const }] : [];
+      });
+      return surface ? [...glyphs, { e, box, kind: "surface" }] : glyphs;
+    }
+    return [{ e, box, kind: surface ? "surface" : e.childElementCount === 0 ? "leaf" : "frame" }];
+  });
+}
+
+/**
+ * An arrow to every `[data-hint]` in the card, so readers know the demo takes input. A toggle in
+ * the copy gets a short straight one from right beside it. Anything else gets a short curve from
+ * the first clear spot in HINT_SPOTS, landing on the middle of an edge, so every pane reads the
+ * same. Only when no spot is clear does the label search the pane for empty space. Each fades
+ * once the reader touches the pane it points into.
+ */
+function Hints({ side }: { side: SideKey }) {
+  const layerRef = useRef<HTMLDivElement>(null);
+  const rulerRef = useRef<HTMLSpanElement>(null);
+  const [hints, setHints] = useState<Hint[]>([]);
+  const [shown, setShown] = useState(false);
+  const [done, setDone] = useState<ReadonlySet<string>>(new Set());
+
+  useLayoutEffect(() => {
+    const card = layerRef.current?.parentElement;
+    const ruler = rulerRef.current;
+    if (!card || !ruler) return;
+    const place = () => {
+      const box = card.getBoundingClientRect();
+      const w = ruler.offsetWidth;
+      const h = ruler.offsetHeight;
+      const figures = [...card.querySelectorAll<HTMLElement>("figure[data-side]")];
+      const hidden = figures.filter((f) => getComputedStyle(f).visibility === "hidden");
+      const marks = survey(
+        [...card.querySelectorAll("*")].filter(
+          (e) => !e.closest("svg *, [data-hint-layer]") && !hidden.some((f) => f.contains(e)),
+        ),
+      );
+      const next: Hint[] = [];
+      const x = (p: Point) => `${(p.x - box.left).toFixed(1)} ${(p.y - box.top).toFixed(1)}`;
+      const pad = (b: Box) => ({
+        left: b.left - HINT_CLEAR,
+        right: b.right + HINT_CLEAR,
+        top: b.top - HINT_CLEAR,
+        bottom: b.bottom + HINT_CLEAR,
+      });
+      const curved: {
+        zone: string;
+        t: Box;
+        fits: (spot: Spot, snug: boolean) => Way | undefined;
+        roam: () => Way | undefined;
+      }[] = [];
+      for (const target of card.querySelectorAll<HTMLElement>("[data-hint]")) {
+        const figure = target.closest<HTMLElement>("figure[data-side]");
+        if (figure && hidden.includes(figure)) continue;
+        resized.observe(target);
+        const t = target.getBoundingClientRect();
+        if (t.width === 0) continue;
+        const zone = (figure ?? card).getBoundingClientRect();
+        const solid: Box[] = [];
+        const backdrops: Box[] = [];
+        const firm: Box[] = [];
+        const sheets: Box[] = [];
+        for (const { e, box: r, kind } of marks) {
+          if (kind === "frame" || target.contains(e)) continue;
+          const big = area(r) >= area(zone) * 0.4;
+          if (kind === "content" || !big) solid.push(r);
+          else if (kind === "surface") backdrops.push(r);
+          if (kind === "surface") sheets.push(r);
+          else if (kind === "content" || !big) firm.push(r);
+        }
+        for (const other of figures)
+          if (other !== figure && !hidden.includes(other)) {
+            solid.push(other.getBoundingClientRect());
+            firm.push(other.getBoundingClientRect());
+          }
+        const covered = raster(box, [...solid, t]);
+        const near = figure
+          ? undefined
+          : beside(t, w, h).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
+        if (near) {
+          const mid = { x: (near.left + near.right) / 2, y: (near.top + near.bottom) / 2 };
+          const start = exit(near, { x: (t.left + t.right) / 2, y: (t.top + t.bottom) / 2 }, 4);
+          const end = exit(t, mid, 5);
+          const [a, b] = wings(start, end);
+          next.push({
+            zone: "copy",
+            at: { x: mid.x - box.left, y: mid.y - box.top },
+            tilt: "level",
+            path: `M${x(start)} L${x(end)} M${x(a)} L${x(end)} L${x(b)}`,
+          });
+          continue;
+        }
+        const crossed = raster(box, [...solid.filter((r) => !holds(r, t)), t]);
+        const blocked = raster(box, [...firm, t]);
+        const words = raster(
+          box,
+          marks.filter((m) => m.glyphs && !target.contains(m.e)).map((m) => m.box),
+        );
+        const threaded = raster(box, [...firm.filter((r) => !holds(r, t)), t]);
+        const cells = [...(figure ?? card).querySelectorAll("td, th")].map((e) =>
+          e.getBoundingClientRect(),
+        );
+        // A label in a slot may sit on a card or off it, never across its edge. It sits in a table's
+        // cells only when `snug`, as nothing else fits.
+        const fits = (spot: Spot, snug: boolean) => {
+          const { edge, dir } = spot;
+          const label = slot(t, spot, w, h);
+          const clear = pad(label);
+          const level = {
+            ...label,
+            left: label.left - HINT_BERTH,
+            right: label.right + HINT_BERTH,
+          };
+          const sits =
+            holds(zone, clear) &&
+            blocked.covers(clear) === 0 &&
+            words.covers(level) === 0 &&
+            (snug || cells.every((r) => overlap(label, r) === 0)) &&
+            sheets.every((r) => {
+              const o = overlap(label, r);
+              return o === 0 || o === area(label);
+            });
+          if (!sits) return undefined;
+          const end = landing(t, edge);
+          // A full bend first, away from the target, then half a bend when a neighbour sits close.
+          const way = (
+            dir === 0
+              ? [[0]]
+              : [
+                  [1, -1],
+                  [0.5, -0.5],
+                ]
+          )
+            .flatMap((bows) =>
+              bows
+                .map((bow) => arc(label, end, bow))
+                .sort((a, b) => OUTWARD[edge](b) - OUTWARD[edge](a)),
+            )
+            .find((way) => !way.along.some(threaded.has));
+          return way && { label, way };
+        };
+        const roam = () => {
+          const spots: { label: Box; cost: number }[] = [];
+          for (
+            let y = box.top + h / 2 + HINT_CLEAR;
+            y <= box.bottom - h / 2 - HINT_CLEAR;
+            y += HINT_STEP
+          ) {
+            for (
+              let x = box.left + w / 2 + HINT_CLEAR;
+              x <= box.right - w / 2 - HINT_CLEAR;
+              x += HINT_STEP
+            ) {
+              const label = {
+                left: x - w / 2,
+                right: x + w / 2,
+                top: y - h / 2,
+                bottom: y + h / 2,
+              };
+              const clear = pad(label);
+              const gap = apart(label, t);
+              let cost =
+                (holds(zone, clear) ? 0 : 5000) +
+                Math.max(0, HINT_NEAR - gap) * 4 +
+                Math.max(0, gap - HINT_FAR) * 4 +
+                covered.covers(clear) * 100 +
+                words.covers({
+                  ...label,
+                  left: label.left - HINT_BERTH,
+                  right: label.right + HINT_BERTH,
+                }) *
+                  20;
+              for (const r of backdrops) {
+                const o = overlap(clear, r);
+                cost += Math.min(o, area(clear) - o) * 100;
+              }
+              spots.push({ label, cost });
+            }
+          }
+          spots.sort((a, b) => a.cost - b.cost);
+          return spots
+            .filter((spot, i, all) => i < 1500 && spot.cost < (all[0]?.cost ?? 0) + 600)
+            .flatMap(({ label, cost }) =>
+              EDGES.flatMap((edge) =>
+                ([1, -1] as const).map((bow) => {
+                  const way = arc(label, landing(t, edge), bow);
+                  const hits = way.along.filter(
+                    (p) =>
+                      crossed.has(p) ||
+                      !holds(zone, { left: p.x, right: p.x, top: p.y, bottom: p.y }),
+                  ).length;
+                  return { label, way, cost: cost + hits * 500 + (way.ny > 0 ? 1 : 0) };
+                }),
+              ),
+            )
+            .reduce<(Way & { cost: number }) | undefined>(
+              (a, b) => (a && a.cost <= b.cost ? a : b),
+              undefined,
+            );
+        };
+        curved.push({ zone: figure?.dataset.side ?? "copy", t, fits, roam });
+      }
+      // Both panes of a demo take the same slot when one suits them all, so they read alike.
+      const tries = [false, true].flatMap((snug) =>
+        HINT_SPOTS.map((spot) => [spot, snug] as const),
+      );
+      const shared = tries.find((at) => curved.every((c) => c.fits(...at)));
+      for (const { zone, t, fits, roam } of curved) {
+        const pick =
+          (shared && fits(...shared)) ?? tries.map((at) => fits(...at)).find(Boolean) ?? roam();
+        if (!pick) continue;
+        const { label, way } = pick;
+        const cx = (label.left + label.right) / 2;
+        next.push({
+          zone,
+          at: { x: cx - box.left, y: (label.top + label.bottom) / 2 - box.top },
+          tilt: cx < t.left + (t.right - t.left) / 2 ? "down" : "up",
+          path: `M${x(way.start)} C${x(way.c1)} ${x(way.c2)} ${x(way.end)} M${x(way.wings[0])} L${x(way.end)} L${x(way.wings[1])}`,
+        });
+      }
+      setHints(next);
+    };
+    // Measuring is costly, so a card measures only near the screen, and never while a page
+    // transition plays: that work would hold the old page frozen or drop the dive's frames.
+    let near = false;
+    let frame = 0;
+    const soon = () => {
+      cancelAnimationFrame(frame);
+      if (!near) return;
+      const settle = () => {
+        frame = requestAnimationFrame(isTransitioning() ? settle : place);
+      };
+      settle();
+    };
+    const resized = new ResizeObserver(soon);
+    // Demos below the fold can mount their controls late, so measure again on the way in.
+    const entered = new IntersectionObserver(
+      ([entry]) => {
+        near = entry?.isIntersecting ?? false;
+        soon();
+      },
+      { rootMargin: "50% 0px" },
+    );
+    resized.observe(card);
+    entered.observe(card);
+    void document.fonts.ready.then(soon);
+    return () => {
+      resized.disconnect();
+      entered.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [side]);
+
+  useEffect(() => {
+    const card = layerRef.current?.parentElement;
+    if (!card) return;
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        seen.disconnect();
+        setShown(true);
+      },
+      { rootMargin: "0px 0px -30% 0px" },
+    );
+    seen.observe(card);
+    const touch = (event: Event) => {
+      if (!(event.target instanceof Element)) return;
+      const zone =
+        event.target.closest<HTMLElement>("figure[data-side]")?.dataset.side ??
+        (event.target.closest("[data-hint]") ? "copy" : null);
+      if (zone) setDone((now) => (now.has(zone) ? now : new Set(now).add(zone)));
+    };
+    const kinds = ["pointerdown", "keydown", "input"] as const;
+    for (const kind of kinds) card.addEventListener(kind, touch, true);
+    return () => {
+      seen.disconnect();
+      for (const kind of kinds) card.removeEventListener(kind, touch, true);
+    };
+  }, []);
+
+  return (
+    <div ref={layerRef} data-hint-layer aria-hidden="true" {...stylex.props(hintKit.layer)}>
+      <span ref={rulerRef} {...stylex.props(hintKit.label, hintKit.ruler)}>
+        Try it
+      </span>
+      {hints.map((hint) => (
+        <Fragment key={`${hint.zone}-${hint.path}`}>
+          <svg {...stylex.props(hintKit.svg, (!shown || done.has(hint.zone)) && hintKit.gone)}>
+            <path
+              d={hint.path}
+              pathLength={1}
+              {...stylex.props(hintKit.arrow, shown && hintKit.drawn)}
+            />
+          </svg>
+          <span
+            style={{ left: hint.at.x, top: hint.at.y }}
+            {...stylex.props(
+              hintKit.label,
+              hintKit[hint.tilt],
+              hint.zone === "copy" && hintKit.onPanel,
+              (!shown || done.has(hint.zone)) && hintKit.gone,
+            )}
+          >
+            Try it
+          </span>
+        </Fragment>
+      ))}
+    </div>
   );
 }
 
@@ -645,61 +1200,15 @@ function Stars({ stars }: { stars: number | null }) {
   );
 }
 
-const starTotal = (results: Results) =>
-  results.reduce<number>((sum, stars) => sum + (stars ?? 0), 0);
-const clearedCount = (results: Results) => results.filter((stars) => stars !== null).length;
-
-function Rail({ results, children }: { results: Results; children: ReactNode }) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const fillRef = useRef<HTMLElement>(null);
-  const run = results.findIndex((stars) => stars === null);
-  const reached = run === -1 ? results.length : run;
-
-  useLayoutEffect(() => {
-    const rail = railRef.current;
-    const fill = fillRef.current;
-    if (!rail || !fill) return;
-    const place = () => {
-      const nodes = rail.querySelectorAll<HTMLElement>(".node");
-      const last = nodes[reached - 1];
-      const track = fill.parentElement ?? rail;
-      const top = track.getBoundingClientRect().top;
-      const height = track.offsetHeight || 1;
-      const y =
-        reached === results.length
-          ? height
-          : last
-            ? last.getBoundingClientRect().top + last.offsetHeight / 2 - top
-            : 0;
-      fill.style.transform = `scaleY(${Math.min(1, y / height)})`;
-    };
-    place();
-    const observer = new ResizeObserver(place);
-    observer.observe(rail);
-    return () => observer.disconnect();
-  }, [reached, results.length]);
-
-  return (
-    <div ref={railRef} {...stylex.props(quizKit.levels)}>
-      <span aria-hidden="true" {...stylex.props(quizKit.rail)}>
-        <i ref={fillRef} {...stylex.props(quizKit.railFill)} />
-      </span>
-      {children}
-    </div>
-  );
-}
-
 type LevelProps = {
   n: number;
   level: Level;
-  stars: number | null;
   board: string;
-  onClear: (stars: number) => void;
 };
 
 type Drag = { x0: number; y0: number; lastX: number; lastT: number; rot: number; moved: boolean };
 
-function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
+function LevelBoard({ n, level, board }: LevelProps) {
   const slots = level.rows.flatMap((row) => ("slot" in row ? [row.slot] : []));
   const [placed, setPlaced] = useState<string | null>(null);
   const [miss, setMiss] = useState<{ id: string; at: number } | null>(null);
@@ -716,6 +1225,7 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
   const flipFrom = useRef<{ rect: DOMRect; rot: number } | null>(null);
 
   const cleared = placed !== null;
+  const stars = cleared ? Math.max(1, 3 - mistakes) : null;
   const said = slots.find((slot) => slot.id === (placed ?? miss?.id));
 
   function flyHome(transform: string) {
@@ -735,7 +1245,6 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
       piece.style.transform = "";
       setPlaced(id);
       setMiss(null);
-      onClear(Math.max(1, 3 - mistakes));
       return;
     }
     setMistakes((value) => value + 1);
@@ -852,15 +1361,9 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
       data-rev
       onKeyDown={onKeyDown}
     >
-      <span
-        className={`node ${stylex.props(quizKit.node, cleared && quizKit.nodeClear).className}`}
-        aria-hidden="true"
-      >
-        {cleared ? "✓" : n}
-      </span>
       <div {...stylex.props(quizKit.copy)}>
         <div {...stylex.props(quizKit.levelHead)}>
-          <span {...stylex.props(quizKit.badge)}>LV {n}</span>
+          <span {...stylex.props(quizKit.badge)}>Quiz</span>
           {cleared && <span {...stylex.props(quizKit.stamp)}>Clear</span>}
           <Stars stars={stars} />
         </div>
@@ -878,21 +1381,6 @@ function LevelBoard({ n, level, board, stars, onClear }: LevelProps) {
           >
             {said ? said.note : `Drag the piece into the ${board}. Or tap it, then tap a spot.`}
           </p>
-          {said && (
-            <span {...stylex.props(lessonKit.costs)}>
-              {said.cost.map((cost) => (
-                <span
-                  key={cost}
-                  {...stylex.props(
-                    lessonKit.cost,
-                    cleared ? lessonKit.goodCost : lessonKit.badCost,
-                  )}
-                >
-                  {cost}
-                </span>
-              ))}
-            </span>
-          )}
         </div>
       </div>
 
@@ -1167,7 +1655,6 @@ function useReveal(rootRef: RefObject<HTMLElement | null>) {
 const enter = stylex.keyframes({ from: { opacity: 0.01, translate: "0 12px" } });
 
 const said = stylex.keyframes({ from: { opacity: 0, translate: "0 6px" } });
-const pop = stylex.keyframes({ "40%": { scale: 1.2 } });
 const stamp = stylex.keyframes({ from: { opacity: 0, scale: 0.6, rotate: "-12deg" } });
 const shake = stylex.keyframes({
   "20%": { translate: "-6px 0" },
@@ -1184,9 +1671,11 @@ const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
 const COMPACT = ':is(:root:has(.arc-bar[data-mode="compact"]) *)';
-const RULE_OPEN = ":is(html:active-view-transition-type(rule-open) *)";
+// Only the page being opened: when a pager card opens the next rule, the old page holds the card.
+const RULE_OPEN = ":is(html:active-view-transition-type(rule-open):not(:has([data-opening])) *)";
 const NARROW = "@media (max-width: 480px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 
 const shell = stylex.create({
   root: {
@@ -1195,16 +1684,6 @@ const shell = stylex.create({
     position: "relative",
     isolation: "isolate",
     overflowWrap: "break-word",
-  },
-  ground: {
-    position: "absolute",
-    inset: 0,
-    zIndex: -1,
-    pointerEvents: "none",
-    backgroundImage: `linear-gradient(${kit["--grid"]} 1px, transparent 1px), linear-gradient(90deg, ${kit["--grid"]} 1px, transparent 1px)`,
-    backgroundSize: "48px 48px",
-    backgroundPosition: "center -1px",
-    maskImage: "linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent)",
   },
   // Off while the header is compact: the island carries the way back then.
   crumbRow: {
@@ -1236,7 +1715,11 @@ const shell = stylex.create({
     userSelect: "none",
     marginBlock: "-12px",
     paddingBlock: "12px",
-    color: { default: null, ":hover": palette["--text"] },
+    color: {
+      default: null,
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
+    },
     transition: "color 120ms ease",
   },
   crumbTag: {
@@ -1364,8 +1847,8 @@ const text = stylex.create({
     paddingBlock: "1px",
     paddingInline: "6px",
     borderRadius: "6px",
-    backgroundColor: palette["--panel-2"],
-    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+    backgroundColor: palette["--soft-key"],
+    boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
     fontWeight: 600,
     fontSize: "0.86em",
     lineHeight: "normal",
@@ -1376,7 +1859,7 @@ const text = stylex.create({
     paddingBlock: "1px",
     paddingInline: "6px",
     borderRadius: "6px",
-    backgroundColor: palette["--panel-2"],
+    backgroundColor: palette["--soft-key"],
     fontSize: "0.86em",
     color: palette["--text"],
   },
@@ -1396,6 +1879,67 @@ const text = stylex.create({
     borderRadius: "12px",
     backgroundColor: palette["--panel-2"],
     fontSize: "14px",
+  },
+});
+
+const HINT_BLUE = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
+
+const hintKit = stylex.create({
+  layer: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 3,
+    pointerEvents: "none",
+  },
+  svg: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    overflow: "visible",
+    transition: `opacity 220ms ease`,
+  },
+  arrow: {
+    fill: "none",
+    stroke: HINT_BLUE,
+    strokeWidth: 2.25,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    strokeDasharray: 1,
+    strokeDashoffset: { default: 1, [REDUCE]: 0 },
+    transition: { default: `stroke-dashoffset 700ms ${OUT} 250ms`, [REDUCE]: "none" },
+  },
+  drawn: {
+    strokeDashoffset: 0,
+  },
+  label: {
+    position: "absolute",
+    fontWeight: 600,
+    fontSize: "13px",
+    lineHeight: 1,
+    fontFamily: fonts["--display"],
+    whiteSpace: "nowrap",
+    color: HINT_BLUE,
+    textShadow: `0 0 3px ${kit["--code-bg"]}, 0 0 3px ${kit["--code-bg"]}`,
+    transition: { default: `opacity 260ms ease 120ms`, [REDUCE]: "none" },
+  },
+  ruler: {
+    visibility: "hidden",
+  },
+  up: {
+    transform: "translate(-50%, -50%) rotate(-4deg)",
+  },
+  down: {
+    transform: "translate(-50%, -50%) rotate(4deg)",
+  },
+  level: {
+    transform: "translate(-50%, -50%)",
+  },
+  onPanel: {
+    textShadow: `0 0 3px ${palette["--panel"]}, 0 0 3px ${palette["--panel"]}`,
+  },
+  gone: {
+    opacity: 0,
   },
 });
 
@@ -1432,6 +1976,7 @@ const lessonKit = stylex.create({
     gap: "24px",
   },
   lesson: {
+    position: "relative",
     display: "grid",
     gap: "28px",
     paddingTop: { default: "32px", [PHONE]: "20px" },
@@ -1691,43 +2236,10 @@ const tree = stylex.create({
   },
 });
 
-const HOVER = "@media (hover: hover) and (pointer: fine)";
 const ON = "var(--c)";
 const ON_TINT = "color-mix(in srgb, var(--c) 16%, transparent)";
 
 const quizKit = stylex.create({
-  section: {
-    paddingTop: { default: "144px", [PHONE]: "104px" },
-    paddingBottom: 0,
-    scrollMarginTop: "8px",
-  },
-  head: {
-    display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr) auto", [PHONE]: "minmax(0, 1fr)" },
-    rowGap: "24px",
-    columnGap: "48px",
-    alignItems: "end",
-    marginBottom: "48px",
-  },
-  headCopy: {
-    display: "grid",
-    gap: "14px",
-  },
-  score: {
-    display: "flex",
-    flexWrap: { default: null, [PHONE]: "wrap" },
-    gap: "14px",
-    alignItems: "center",
-    fontWeight: 700,
-    fontSize: "13px",
-    lineHeight: "normal",
-    fontFamily: fonts["--display"],
-    color: palette["--dim"],
-    whiteSpace: "nowrap",
-  },
-  scoreStars: {
-    color: "var(--c-ink)",
-  },
   stars: {
     display: "inline-flex",
     gap: "1px",
@@ -1740,35 +2252,6 @@ const quizKit = stylex.create({
   },
   starOn: {
     color: "var(--c-ink)",
-  },
-  levels: {
-    position: "relative",
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr)",
-    gap: { default: "40px", [PHONE]: "28px" },
-    paddingLeft: { default: "72px", [PHONE]: 0 },
-  },
-  rail: {
-    position: "absolute",
-    top: "44px",
-    bottom: "44px",
-    left: "21px",
-    display: { default: null, [PHONE]: "none" },
-    width: "4px",
-    borderRadius: "2px",
-    backgroundColor: palette["--panel-2"],
-    overflow: "hidden",
-  },
-  railFill: {
-    position: "absolute",
-    inset: 0,
-    backgroundColor: ON,
-    transform: "scaleY(0)",
-    transformOrigin: "top",
-    transition: {
-      default: `transform ${motion["--t-panel"]} ${motion["--out"]}`,
-      [REDUCE]: "none",
-    },
   },
   level: {
     position: "relative",
@@ -1783,31 +2266,6 @@ const quizKit = stylex.create({
     paddingBottom: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
     paddingLeft: { default: "28px", [PAIRED]: "22px", [PHONE]: "18px" },
     scrollMarginTop: "24px",
-  },
-  node: {
-    position: "absolute",
-    top: "28px",
-    left: "-65px",
-    display: { default: "grid", [PHONE]: "none" },
-    placeItems: "center",
-    width: "32px",
-    height: "32px",
-    borderRadius: "10px",
-    backgroundColor: palette["--panel-2"],
-    boxShadow: `inset 0 0 0 2px ${palette["--hair"]}`,
-    fontWeight: 900,
-    fontSize: "13px",
-    lineHeight: "normal",
-    fontFamily: fonts["--display"],
-    color: palette["--dim"],
-  },
-  nodeClear: {
-    backgroundColor: ON,
-    boxShadow: "0 3px 0 var(--key-c)",
-    color: "var(--on-c)",
-    animationName: { default: pop, [REDUCE]: "none" },
-    animationDuration: { default: motion["--t-pop"], [REDUCE]: "0s" },
-    animationTimingFunction: { default: motion["--snap"], [REDUCE]: "ease" },
   },
   copy: {
     display: "grid",
@@ -1876,10 +2334,12 @@ const quizKit = stylex.create({
     backgroundColor: palette["--panel-2"],
   },
   sayNo: {
-    boxShadow: `inset 3px 0 0 ${kit["--no"]}`,
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 16%, transparent)`,
+    color: kit["--no-ink"],
   },
   sayYes: {
-    boxShadow: `inset 3px 0 0 ${kit["--yes-ink"]}`,
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
   },
   said: {
     fontSize: "15px",
@@ -1891,7 +2351,7 @@ const quizKit = stylex.create({
     animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
   },
   saidToned: {
-    color: palette["--text"],
+    color: "inherit",
   },
   board: {
     display: "grid",
@@ -2152,7 +2612,7 @@ const pager = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: palette["--hair"],
-      ":hover": ACCENT,
+      ":hover": { default: null, [HOVER]: ACCENT },
       ":focus-visible": ACCENT,
       ":active": ACCENT,
     },
@@ -2163,16 +2623,24 @@ const pager = stylex.create({
     backgroundColor: palette["--panel"],
     boxShadow: {
       default: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
-      ":hover": `${palette["--raise"]}, 0 8px 0 var(--key)`,
+      ":hover": { default: null, [HOVER]: `${palette["--raise"]}, 0 8px 0 var(--key)` },
       ":focus-visible": `${palette["--raise"]}, 0 8px 0 var(--key)`,
-      ":active": `${palette["--raise"]}, 0 1px 0 var(--key)`,
+      // Repeated under the media query, which would otherwise let hovering outrank pressing.
+      ":active": {
+        default: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+        [HOVER]: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+      },
     },
     transform: {
       default: null,
       // Reduced motion stills only the press; hover and focus keep their lift.
-      ":hover": LIFTED,
+      ":hover": { default: null, [HOVER]: LIFTED },
       ":focus-visible": LIFTED,
-      ":active": { default: PRESSED, [REDUCE]: "none" },
+      ":active": {
+        default: PRESSED,
+        [REDUCE]: "none",
+        [HOVER]: { default: PRESSED, [REDUCE]: "none" },
+      },
     },
     outlineWidth: { default: null, ":focus-visible": "3px" },
     outlineStyle: { default: null, ":focus-visible": "solid" },
@@ -2237,41 +2705,41 @@ const cover = stylex.create({
     "--ry": "0deg",
     position: "relative",
     justifySelf: { default: null, "@media (max-width: 720px)": "start" },
-    width: { default: null, "@media (max-width: 720px)": "min(100%, 240px)" },
+    width: { default: null, "@media (max-width: 720px)": "min(100%, 280px)" },
     maxWidth: { default: null, [STACKED]: "520px" },
     marginLeft: { default: null, "@media (max-width: 720px)": "6px" },
-    paddingBlock: { default: "24px", [PHONE]: "16px" },
-    paddingInline: { default: "12px", [PHONE]: "8px" },
-    borderWidth: "2px",
-    borderStyle: "solid",
-    borderColor: "var(--c)",
-    borderRadius: "18px",
-    backgroundColor: palette["--panel"],
-    boxShadow: `0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent), 0 20px 50px ${palette["--lift"]}`,
-    transform: "rotate(2deg)",
     perspective: "1200px",
-    "::before": {
-      content: '""',
-      position: "absolute",
-      inset: "40px 0 8px 32px",
-      borderRadius: "24px",
-      backgroundColor: "var(--c)",
-      boxShadow: "0 8px 0 var(--key-c)",
-      rotate: "4deg",
-    },
   },
   card: {
     position: "relative",
-    display: "grid",
-    gap: "12px",
-    padding: "14px",
-    borderRadius: "22px",
-    backgroundColor: palette["--panel"],
-    boxShadow: `${palette["--raise"]}, 0 10px 0 ${palette["--drop-ink"]}, 0 30px 60px ${palette["--lift"]}`,
-    transform: "rotate(-4deg) rotateX(var(--rx)) rotateY(var(--ry))",
+    borderRadius: "18px",
+    transform: "rotate(-1.5deg) rotateX(var(--rx)) rotateY(var(--ry))",
     transitionProperty: { default: "transform", [REDUCE]: "none" },
     transitionDuration: { default: motion["--t-panel"], [REDUCE]: "0s" },
     transitionTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+    // The sheet's mask would clip its own shadow, so the shadow lives on an empty layer behind it.
+    // An outer box-shadow never paints inside its box, so the notches stay see-through.
+    "::before": {
+      content: '""',
+      position: "absolute",
+      inset: 0,
+      borderRadius: "inherit",
+      boxShadow: `0 8px 0 ${palette["--drop-ink"]}, 0 30px 60px ${palette["--lift"]}`,
+    },
+  },
+  sheet: {
+    "--stub": { default: "62px", [PHONE]: "52px" },
+    "--notch": "calc(100% - var(--stub) - 1px)",
+    position: "relative",
+    paddingTop: { default: "12px", [PHONE]: "10px" },
+    paddingInline: { default: "12px", [PHONE]: "10px" },
+    borderRadius: "inherit",
+    backgroundColor: palette["--panel"],
+    backgroundImage: `radial-gradient(circle at 0 var(--notch), transparent 10px, ${palette["--hair"]} 10.5px, ${palette["--hair"]} 11.5px, transparent 12px), radial-gradient(circle at 100% var(--notch), transparent 10px, ${palette["--hair"]} 10.5px, ${palette["--hair"]} 11.5px, transparent 12px)`,
+    boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
+    maskImage:
+      "radial-gradient(circle at 0 var(--notch), transparent 10px, #000 10.5px), radial-gradient(circle at 100% var(--notch), transparent 10px, #000 10.5px)",
+    maskComposite: "intersect",
   },
   thumb: {
     borderTopLeftRadius: "12px",
@@ -2280,23 +2748,43 @@ const cover = stylex.create({
     borderBottomRightRadius: "12px",
     viewTransitionName: { default: null, [RULE_OPEN]: "rule-thumb" },
   },
-  foot: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "12px",
-    paddingTop: 0,
-    paddingRight: "4px",
-    paddingBottom: "2px",
-    paddingLeft: "4px",
-    fontWeight: 600,
-    fontSize: { default: "12px", [PHONE]: "11px" },
-    lineHeight: "normal",
-    fontFamily: fonts["--mono"],
-    color: palette["--mute"],
+  tear: {
+    height: { default: "26px", [PHONE]: "20px" },
+    marginInline: "2px",
+    borderBottomWidth: "2px",
+    borderBottomStyle: "dashed",
+    borderBottomColor: palette["--hair"],
+  },
+  stub: {
+    display: "grid",
+    gridTemplateColumns: "1fr auto 1fr",
+    alignItems: "center",
+    gap: { default: "10px", [PHONE]: "6px" },
+    height: "var(--stub)",
+    paddingInline: { default: "6px", [PHONE]: "2px" },
+    fontWeight: 800,
+    fontSize: { default: "14px", [PHONE]: "12px" },
+    lineHeight: 1,
+    fontFamily: fonts["--display"],
+    letterSpacing: "0.02em",
     whiteSpace: "nowrap",
   },
-  tag: {
-    color: "var(--c-ink)",
+  was: {
+    color: palette["--mute"],
+    textDecorationLine: "line-through",
+    textDecorationThickness: "2px",
+  },
+  to: {
+    fontFamily: fonts["--sans"],
+    color: palette["--mute"],
+  },
+  now: {
+    justifySelf: "end",
+    paddingBlock: { default: "7px", [PHONE]: "6px" },
+    paddingInline: { default: "10px", [PHONE]: "8px" },
+    borderRadius: "8px",
+    color: "var(--on-c)",
+    backgroundColor: "var(--c)",
   },
 });
 
@@ -2323,17 +2811,20 @@ const styles = stylex.create({
     borderRadius: "999px",
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, "@media (hover: hover)": palette["--panel-2"] },
+      ":hover": { default: null, [HOVER]: palette["--panel-2"] },
+      ":active": palette["--panel-2"],
     },
     // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
     // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
     backgroundPosition: {
       default: "0 0",
-      ":hover": { default: null, "@media (hover: hover)": "initial" },
+      ":hover": { default: null, [HOVER]: "initial" },
+      ":active": "initial",
     },
     color: {
       default: palette["--dim"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
     },
     font: "inherit",
     whiteSpace: "nowrap",

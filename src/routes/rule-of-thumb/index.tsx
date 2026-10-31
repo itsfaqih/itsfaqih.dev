@@ -30,7 +30,7 @@ function RuleOfThumbsIndex() {
 
   return (
     <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>
-      <Backdrop />
+      <Backdrop tide />
       <div {...stylex.props(arcade.wrap)}>
         <div {...stylex.props(styles.head)}>
           <div {...stylex.props(loadIn.veil, veil.dense, veil.fit, heroType.tag)} data-cut>

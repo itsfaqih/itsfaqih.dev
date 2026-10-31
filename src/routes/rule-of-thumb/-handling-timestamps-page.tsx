@@ -5,7 +5,6 @@ import { fonts, palette } from "../../theme.stylex";
 import {
   Code,
   type Lesson,
-  type Level,
   onceOnScreen,
   OUT,
   RuleLanding,
@@ -16,6 +15,8 @@ import { kit } from "./-components/rule-landing.stylex";
 import { arcade } from "../../components/arcade";
 
 const PHONE = "@media (max-width: 640px)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 const LIGHT = ":is(.light *)";
 
 const styles = stylex.create({
@@ -234,14 +235,15 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: palette["--hair"],
-      ":hover": palette["--hair-hover"],
+      ":hover": { default: null, [HOVER]: palette["--hair-hover"] },
       ":focus-visible": "var(--c-ink)",
     },
     borderRadius: "10px",
     backgroundColor: palette["--panel"],
     fontStyle: "normal",
     fontWeight: 600,
-    fontSize: "14px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "14px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--mono"],
     color: palette["--text"],
@@ -633,6 +635,7 @@ function ReminderDemo({ way }: { way: Way }) {
           Time
         </label>
         <input
+          data-hint
           id={`${id}-time`}
           type="time"
           value={time}
@@ -690,6 +693,7 @@ function FilterDemo({ way }: { way: Way }) {
       <label {...stylex.props(styles.form)}>
         <span {...stylex.props(styles.formHead)}>Rina's orders on</span>
         <input
+          data-hint
           type="date"
           value={date}
           required
@@ -768,6 +772,8 @@ const serverString = (() => {
   return `${at.getUTCMonth() + 1}/${at.getUTCDate()}/${at.getUTCFullYear()}, ${timeOf(SERVER_WALL, true)}`;
 })();
 
+const code = (text: string) => <Code>{text}</Code>;
+
 export const LESSONS: Lesson[] = [
   {
     title: "Store the moment in UTC",
@@ -792,6 +798,46 @@ export const LESSONS: Lesson[] = [
       costs: ["1 moment, 1 value", "0 s apart"],
       view: <OrdersTable way="good" />,
     },
+    levels: [
+      {
+        name: "Same second",
+        prompt: (
+          <>
+            Rina in Jakarta and Sam in New York order in the same second. Place what{" "}
+            <Code>created_at</Code> stores.
+          </>
+        ),
+        piece: "created_at",
+        answer: "utc",
+        rows: [
+          { depth: 0, text: "Database", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "local",
+              label: "Rina 13:00, Sam 01:00, each local clock",
+              note: "Same second, two values 12 hours apart. Sort by time and Sam's order comes first.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "server",
+              label: "both 01:00, the server's clock in New York",
+              note: "One value today, but no zone is stored. Move the server and old rows mean another moment.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "utc",
+              label: "both 06:00 UTC",
+              note: "Store UTC. One moment is one value, wherever the writer or the server is.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Return it with a Z",
@@ -832,6 +878,47 @@ export const LESSONS: Lesson[] = [
         </div>
       ),
     },
+    levels: [
+      {
+        name: "The response",
+        prompt: (
+          <>
+            The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Place{" "}
+            <Code>createdAt</Code> in the response.
+          </>
+        ),
+        piece: "createdAt",
+        answer: "z",
+        rows: [
+          { depth: 0, text: "API", kind: "dir", tag: "GET /orders/42" },
+          {
+            depth: 1,
+            slot: {
+              id: "bare",
+              label: code("2026-01-10T06:00:00"),
+              note: "No zone, so Sam's browser reads it as 6:00 AM New York time, five hours late.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "z",
+              label: code("2026-01-10T06:00:00Z"),
+              note: "The Z says UTC, so each browser converts it. Sam sees 1:00 AM and Rina 1:00 PM.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "text",
+              label: code("Jan 10, 6:00 AM"),
+              note: "A formatted string can't be converted again, so everyone sees the server's 6:00 AM.",
+            },
+          },
+          { depth: 0, text: "Sam's browser", kind: "dir", tag: "New York" },
+        ],
+      },
+    ],
   },
   {
     title: "Turn it local in the browser",
@@ -873,6 +960,48 @@ export const LESSONS: Lesson[] = [
         </div>
       ),
     },
+    levels: [
+      {
+        name: "Two readers",
+        prompt: (
+          <>
+            The order is stored as <Code>2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and
+            Sam 1:00 AM. Place the formatting.
+          </>
+        ),
+        piece: "format the time",
+        answer: "browser",
+        rows: [
+          { depth: 0, text: "Database", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "sql",
+              label: "in the database query",
+              note: "The query formats in one zone for everyone, so Rina and Sam can't both be right.",
+            },
+          },
+          { depth: 0, text: "API", kind: "dir", tag: "runs in New York" },
+          {
+            depth: 1,
+            slot: {
+              id: "api",
+              label: "on the server",
+              note: "The server uses New York time. Sam gets 1:00 AM, and so does Rina.",
+            },
+          },
+          { depth: 0, text: "Each reader's browser", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "browser",
+              label: "when the order renders",
+              note: "Format here. Each browser knows its own zone, so one UTC string becomes 1:00 PM for Rina and 1:00 AM for Sam.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Send the zone with the input",
@@ -893,6 +1022,86 @@ export const LESSONS: Lesson[] = [
       costs: ["0 h off"],
       view: <ReminderDemo way="good" />,
     },
+    levels: [
+      {
+        name: "7:00 in Jakarta",
+        prompt: <>Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</>,
+        piece: "→ UTC",
+        answer: "client",
+        rows: [
+          { depth: 0, text: "Rina's browser", kind: "dir", tag: "UTC+7" },
+          { depth: 1, text: code('picked = "2026-01-01T07:00"') },
+          {
+            depth: 1,
+            slot: {
+              id: "client",
+              label: "before the request",
+              note: "Convert here. Her browser knows she's at UTC+7, so it sends 2026-01-01T00:00:00.000Z and the server has nothing to guess.",
+            },
+          },
+          { depth: 0, text: "API", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "api",
+              label: "when the request arrives",
+              note: "The string has no zone, so the server reads 07:00 as UTC, 7 hours late.",
+            },
+          },
+          { depth: 0, text: "Database", kind: "dir" },
+          {
+            depth: 1,
+            slot: {
+              id: "db",
+              label: "on insert, as Asia/Jakarta",
+              note: "Right for Rina, but it assumes everyone lives in Jakarta. Sam's reminders fire 12 hours off.",
+            },
+          },
+        ],
+      },
+      {
+        name: "One offset",
+        prompt: (
+          <>
+            Rina's browser has her 7:00 AM and its <Code>+07:00</Code> offset. Place the offset.
+          </>
+        ),
+        piece: "+07:00",
+        answer: "body",
+        rows: [
+          { depth: 0, text: "POST /reminders, from Rina", kind: "dir" },
+          {
+            depth: 1,
+            lead: code('at: "2026-01-01T07:00:00'),
+            slot: {
+              id: "body",
+              label: '…"',
+              note: "Send it with the time, so the server knows the exact moment and stores 00:00 UTC.",
+            },
+          },
+          { depth: 0, text: "Database, reminders", kind: "dir" },
+          {
+            depth: 1,
+            lead: code("at_offset"),
+            slot: {
+              id: "db",
+              label: "new column",
+              note: "The column keeps an offset you don't need. Store only the UTC moment.",
+            },
+          },
+          { depth: 0, text: "GET /reminders, to Sam", kind: "dir" },
+          {
+            depth: 1,
+            lead: code('at: "2026-01-01T07:00:00'),
+            slot: {
+              id: "reply",
+              label: '…"',
+              note: "Sam gets Rina's offset, and every writer's zone leaks into replies. Return UTC with a Z.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Filter by the user's day",
@@ -913,6 +1122,48 @@ export const LESSONS: Lesson[] = [
       costs: ["3 of 3", "0 extra"],
       view: <FilterDemo way="good" />,
     },
+    levels: [
+      {
+        name: "Whose Jan 10?",
+        prompt: (
+          <>
+            Three filters for Jan 10 each need a start. Match 17:00 UTC on Jan 9 to the Jan 10 it
+            starts.
+          </>
+        ),
+        piece: "Jan 9, 17:00 UTC",
+        answer: "rina",
+        rows: [
+          { depth: 0, text: "UTC report, run by the server", kind: "dir", tag: "UTC" },
+          {
+            depth: 1,
+            slot: {
+              id: "utc",
+              label: "start",
+              note: "The UTC day starts at 00:00Z. From 17:00 the day before, the report counts 7 hours of Jan 9.",
+            },
+          },
+          { depth: 0, text: "Rina, Jakarta", kind: "dir", tag: "UTC+7" },
+          {
+            depth: 1,
+            slot: {
+              id: "rina",
+              label: "start",
+              note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
+            },
+          },
+          { depth: 0, text: "Sam, New York", kind: "dir", tag: "UTC−5" },
+          {
+            depth: 1,
+            slot: {
+              id: "sam",
+              label: "start",
+              note: "Sam's Jan 10 starts at 05:00 UTC. From 17:00 the day before, he gets 12 hours of Jan 9.",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -922,183 +1173,8 @@ export const TLDR = [
   ["Showing it to someone", "Format it in their browser"],
   ["Sending a time the user picked", "Convert to UTC, or keep its offset"],
   ["Filtering by a date", "Send the user's day as a UTC range"],
-  ["Date math", "Do the math on Date values, never on the string"],
+  ["Date math", "Do the math on parsed times, never on the string"],
 ] as const;
-
-const code = (text: string) => <Code>{text}</Code>;
-
-const LEVELS: Level[] = [
-  {
-    name: "Two readers",
-    prompt: (
-      <>
-        The order is stored as <Code>2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam
-        1:00 AM. Place the formatting.
-      </>
-    ),
-    piece: "Intl.DateTimeFormat",
-    answer: "browser",
-    rows: [
-      { depth: 0, text: "Database", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "sql",
-          label: "in the SELECT",
-          note: "The query formats in one zone for everyone, so Rina and Sam can't both be right.",
-          cost: ["right for 1 zone"],
-        },
-      },
-      { depth: 0, text: "API", kind: "dir", tag: "runs in New York" },
-      {
-        depth: 1,
-        slot: {
-          id: "api",
-          label: "before res.json()",
-          note: "The server uses New York time. Sam gets 1:00 AM, and so does Rina.",
-          cost: ["Rina 12 h off"],
-        },
-      },
-      { depth: 0, text: "Each reader's browser", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "browser",
-          label: "when the order renders",
-          note: "Format here. Each browser knows its own zone, so one UTC string becomes 1:00 PM for Rina and 1:00 AM for Sam.",
-          cost: ["right for 2 of 2"],
-        },
-      },
-    ],
-  },
-  {
-    name: "7:00 in Jakarta",
-    prompt: <>Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</>,
-    piece: "→ UTC",
-    answer: "client",
-    rows: [
-      { depth: 0, text: "Rina's browser", kind: "dir", tag: "UTC+7" },
-      { depth: 1, text: code('picked = "2026-01-01T07:00"') },
-      {
-        depth: 1,
-        slot: {
-          id: "client",
-          label: "before the request",
-          note: "Convert here. Her browser knows she's at UTC+7, so it sends 2026-01-01T00:00:00.000Z and the server has nothing to guess.",
-          cost: ["0 h off"],
-        },
-      },
-      { depth: 0, text: "API", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "api",
-          label: "when the request arrives",
-          note: "The string has no zone, so the server reads 07:00 as UTC, 7 hours late.",
-          cost: ["7 h late"],
-        },
-      },
-      { depth: 0, text: "Database", kind: "dir" },
-      {
-        depth: 1,
-        slot: {
-          id: "db",
-          label: "on insert, as Asia/Jakarta",
-          note: "Right for Rina, but it assumes everyone lives in Jakarta. Sam's reminders fire 12 hours off.",
-          cost: ["right for Jakarta only"],
-        },
-      },
-    ],
-  },
-  {
-    name: "One offset",
-    prompt: (
-      <>
-        Rina's browser has her 7:00 AM and its <Code>+07:00</Code> offset. Place the offset.
-      </>
-    ),
-    piece: "+07:00",
-    answer: "body",
-    rows: [
-      { depth: 0, text: "POST /reminders, from Rina", kind: "dir" },
-      {
-        depth: 1,
-        lead: code('at: "2026-01-01T07:00:00'),
-        slot: {
-          id: "body",
-          label: '…"',
-          note: "Send it with the time, so the server knows the exact moment and stores 00:00 UTC.",
-          cost: ["0 h off"],
-        },
-      },
-      { depth: 0, text: "Database, reminders", kind: "dir" },
-      {
-        depth: 1,
-        lead: code("at_offset"),
-        slot: {
-          id: "db",
-          label: "new column",
-          note: "The column keeps an offset you don't need. Store only the UTC moment.",
-          cost: ["+1 column", "2 zones per row"],
-        },
-      },
-      { depth: 0, text: "GET /reminders, to Sam", kind: "dir" },
-      {
-        depth: 1,
-        lead: code('at: "2026-01-01T07:00:00'),
-        slot: {
-          id: "reply",
-          label: '…"',
-          note: "Sam gets Rina's offset, and every writer's zone leaks into replies. Return UTC with a Z.",
-          cost: ["1 format per writer"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Whose Jan 10?",
-    prompt: (
-      <>
-        Three filters for Jan 10 each need a start. Match <Code>2026-01-09T17:00Z</Code> to the day
-        it starts.
-      </>
-    ),
-    piece: "from=2026-01-09T17:00Z",
-    answer: "rina",
-    rows: [
-      { depth: 0, text: "UTC report, run by the server", kind: "dir", tag: "UTC" },
-      {
-        depth: 1,
-        slot: {
-          id: "utc",
-          label: "from=",
-          note: "The UTC day starts at 00:00Z. From 17:00 the day before, the report counts 7 hours of Jan 9.",
-          cost: ["7 h of Jan 9"],
-        },
-      },
-      { depth: 0, text: "Rina, Jakarta", kind: "dir", tag: "UTC+7" },
-      {
-        depth: 1,
-        slot: {
-          id: "rina",
-          label: "from=",
-          note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
-          cost: ["3 of 3 orders"],
-        },
-      },
-      { depth: 0, text: "Sam, New York", kind: "dir", tag: "UTC−5" },
-      {
-        depth: 1,
-        slot: {
-          id: "sam",
-          label: "from=",
-          note: "Sam's Jan 10 starts at 05:00 UTC. From 17:00 the day before, he gets 12 hours of Jan 9.",
-          cost: ["12 h of Jan 9"],
-        },
-      },
-    ],
-  },
-];
 
 export function HandlingTimestamps() {
   return (
@@ -1121,11 +1197,7 @@ export function HandlingTimestamps() {
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "flow",
-      }}
+      board="flow"
       take="store, send and show time the same way"
     />
   );

@@ -5,7 +5,6 @@ import { fonts, palette } from "../../theme.stylex";
 import {
   Code,
   type Lesson,
-  type Level,
   onceOnScreen,
   OUT,
   paint,
@@ -337,6 +336,17 @@ function Checked({ lines }: { lines: Line[] }) {
   );
 }
 
+const code = (text: string) => <Code style={styles.boardCode}>{paint(text, TOKEN, KINDS)}</Code>;
+const blank = (text: string) => (
+  <>
+    <span {...stylex.props(arcade.srOnly)}>{text}</span>
+    <span aria-hidden="true" {...stylex.props(styles.gap)} />
+  </>
+);
+const holds = (text: string) => (
+  <Code style={[styles.boardCode, styles.holds]}>{paint(text, TOKEN, KINDS)}</Code>
+);
+
 export const LESSONS: Lesson[] = [
   {
     title: "Name it once",
@@ -359,9 +369,9 @@ export const LESSONS: Lesson[] = [
               hot: true,
               note: { text: "stack: at default", tone: "no" },
             },
-            { c: "// checkout.tsx" },
+            { c: "// checkout.ts" },
             { c: 'import total from "./cart"' },
-            { c: "// receipt.tsx" },
+            { c: "// receipt.ts" },
             { c: 'import calcTotl from "./cart"', note: { text: "0 errors", tone: "no" } },
           ]}
         />
@@ -379,9 +389,9 @@ export const LESSONS: Lesson[] = [
               hot: true,
               note: { text: "stack: at calculateTotal", tone: "yes" },
             },
-            { c: "// checkout.tsx" },
+            { c: "// checkout.ts" },
             { c: 'import { calculateTotal } from "./cart"' },
-            { c: "// receipt.tsx" },
+            { c: "// receipt.ts" },
             {
               c: 'import { calculateTotl } from "./cart"',
               note: { text: "TS2724: did you mean 'calculateTotal'?", tone: "yes", error: true },
@@ -390,6 +400,48 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "A typo",
+        prompt: (
+          <>
+            Three files import the price formatter, and one of them spells it{" "}
+            <Code>formatPrcie</Code>. Place the name so the typo fails the build.
+          </>
+        ),
+        piece: "formatPrice",
+        answer: "named",
+        rows: [
+          {
+            depth: 0,
+            lead: code("export default function"),
+            slot: {
+              id: "default",
+              label: blank("export default function formatPrice"),
+              note: "Each importer names a default export, so formatPrcie compiles and the stack trace says default.",
+            },
+          },
+          {
+            depth: 0,
+            lead: code("export function"),
+            slot: {
+              id: "named",
+              label: blank("export function formatPrice"),
+              note: "Export it by name. Every import must spell formatPrice, so the typo fails where it's written.",
+            },
+          },
+          {
+            depth: 0,
+            lead: code("function"),
+            slot: {
+              id: "local",
+              label: blank("function formatPrice"),
+              note: "Without export, all three imports fail, the correct ones too.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Extend with interface",
@@ -444,6 +496,46 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "A clash",
+        prompt: (
+          <>
+            <Code>Admin</Code> builds on <Code>User</Code>, but gives <Code>id</Code> a number where
+            User has a string. Place Admin so the clash fails where it's declared.
+          </>
+        ),
+        piece: "Admin",
+        answer: "extends",
+        rows: [
+          { depth: 0, text: code("type User = { id: string; name: string }") },
+          {
+            depth: 0,
+            slot: {
+              id: "and",
+              label: code("type Admin = User & { id: number }"),
+              note: "It compiles. id becomes never, and the error shows up at the first Admin you write.",
+            },
+          },
+          {
+            depth: 0,
+            slot: {
+              id: "extends",
+              label: code("interface Admin extends User { id: number }"),
+              note: "Extend it. The clash fails right here, and the message names both types of id.",
+            },
+          },
+          {
+            depth: 0,
+            slot: {
+              id: "value",
+              label: code("const Admin = { id: 0 }"),
+              note: "That's a value, not a type. Nothing checks it against User at all.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Use unions, not enums",
@@ -502,6 +594,49 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "The role list",
+        prompt: (
+          <>
+            You loop over the roles at runtime and want a <Code>Role</Code> type that matches the
+            list. Place <Code>as const</Code>.
+          </>
+        ),
+        piece: "as const",
+        answer: "roles",
+        rows: [
+          {
+            depth: 0,
+            lead: code('const ROLES = ["ADMIN", "EDITOR"]'),
+            slot: {
+              id: "roles",
+              label: blank('const ROLES = ["ADMIN", "EDITOR"]'),
+              note: "Freeze the list. ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
+            },
+          },
+          {
+            depth: 0,
+            lead: code('let role = "ADMIN"'),
+            slot: {
+              id: "role",
+              label: blank('let role = "ADMIN"'),
+              note: 'role is a let you mean to change. Frozen to "ADMIN", the next assignment fails.',
+            },
+          },
+          {
+            depth: 0,
+            lead: code("const limit = 3"),
+            slot: {
+              id: "limit",
+              label: blank("const limit = 3"),
+              note: "A const 3 is already the literal 3. ROLES stays string[], so Role is any string.",
+            },
+          },
+          { depth: 0, text: code("type Role = (typeof ROLES)[number]") },
+        ],
+      },
+    ],
   },
   {
     title: "Infer inside, annotate the edges",
@@ -552,6 +687,51 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "The contract",
+        prompt: (
+          <>
+            <Code>getUser</Code> is the module's public API, and <Code>find</Code> can return{" "}
+            <Code>undefined</Code>. Place <Code>: User</Code>.
+          </>
+        ),
+        piece: ": User",
+        answer: "ret",
+        rows: [
+          {
+            depth: 0,
+            lead: code("export function getUser(id: string)"),
+            slot: {
+              id: "ret",
+              label: blank("export function getUser(id: string)"),
+              note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside getUser.",
+            },
+          },
+          { depth: 1, text: code("return users.find((u) => u.id === id)") },
+          { depth: 0, text: code("// profile.ts") },
+          {
+            depth: 0,
+            lead: code("const user"),
+            slot: {
+              id: "local",
+              label: blank("const user"),
+              note: "The error moves into this caller, and every other caller still gets User | undefined.",
+            },
+          },
+          { depth: 1, text: code("= getUser(params.id)") },
+          {
+            depth: 0,
+            lead: code("users.map((u"),
+            slot: {
+              id: "param",
+              label: blank("users.map((u"),
+              note: "Skip the label. map already knows u is a User, and the label catches nothing.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Take one options object",
@@ -601,6 +781,43 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "Send an email",
+        prompt: <>Strings in a row can swap with no error. Place the options object.</>,
+        piece: "options",
+        answer: "send",
+        rows: [
+          {
+            depth: 0,
+            lead: code("function double("),
+            slot: {
+              id: "double",
+              label: holds("n: number"),
+              note: "One argument can't be swapped. Wrapping it adds a type and braces for nothing.",
+            },
+          },
+          {
+            depth: 0,
+            lead: code("function fullName("),
+            slot: {
+              id: "name",
+              label: holds("first, last"),
+              note: "Two arguments still read fine at the call. The rule starts at three.",
+            },
+          },
+          {
+            depth: 0,
+            lead: code("function sendEmail("),
+            slot: {
+              id: "send",
+              label: holds("to, subject, body"),
+              note: "Take one options object. Three strings in a row swap without an error, and named keys can't.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Turn the flags on",
@@ -653,6 +870,51 @@ export const LESSONS: Lesson[] = [
         />
       ),
     },
+    levels: [
+      {
+        name: "The crash report",
+        prompt: (
+          <>
+            <Code>users[0].name</Code> crashed in production on an empty list. <Code>strict</Code>{" "}
+            is already on. Set the flag that fails the build.
+          </>
+        ),
+        piece: "true",
+        answer: "index",
+        rows: [
+          { depth: 0, text: code('"compilerOptions": {') },
+          { depth: 1, text: code('"strict": true,') },
+          {
+            depth: 1,
+            lead: code('"noImplicitAny":'),
+            slot: {
+              id: "any",
+              label: blank('"noImplicitAny":'),
+              note: "strict already turns it on. users[0] still reads as User, so the crash ships.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code('"noUncheckedIndexedAccess":'),
+            slot: {
+              id: "index",
+              label: blank('"noUncheckedIndexedAccess":'),
+              note: "Turn it on. users[0] becomes User | undefined, and .name fails with TS18048 before it ships.",
+            },
+          },
+          {
+            depth: 1,
+            lead: code('"verbatimModuleSyntax":'),
+            slot: {
+              id: "verbatim",
+              label: blank('"verbatimModuleSyntax":'),
+              note: "It makes type imports say import type. Keep it, but users[0] still reads as User.",
+            },
+          },
+          { depth: 0, text: code("}") },
+        ],
+      },
+    ],
   },
 ];
 
@@ -666,194 +928,6 @@ export const TLDR = [
   ["A new tsconfig", "Enable strict, noUncheckedIndexedAccess, verbatimModuleSyntax and ESM"],
 ] as const;
 
-const code = (text: string) => <Code style={styles.boardCode}>{paint(text, TOKEN, KINDS)}</Code>;
-const blank = (text: string) => (
-  <>
-    <span {...stylex.props(arcade.srOnly)}>{text}</span>
-    <span aria-hidden="true" {...stylex.props(styles.gap)} />
-  </>
-);
-const holds = (text: string) => (
-  <Code style={[styles.boardCode, styles.holds]}>{paint(text, TOKEN, KINDS)}</Code>
-);
-
-const LEVELS: Level[] = [
-  {
-    name: "Send an email",
-    prompt: <>Strings in a row can swap with no error. Place the options object.</>,
-    piece: "options",
-    answer: "send",
-    rows: [
-      {
-        depth: 0,
-        lead: code("function double("),
-        slot: {
-          id: "double",
-          label: holds("n: number"),
-          note: "One argument can't be swapped. Wrapping it adds a type and braces for nothing.",
-          cost: ["+1 type", "0 swaps prevented"],
-        },
-      },
-      {
-        depth: 0,
-        lead: code("function fullName("),
-        slot: {
-          id: "name",
-          label: holds("first, last"),
-          note: "Two arguments still read fine at the call. The rule starts at three.",
-          cost: ["+1 type for 2 args"],
-        },
-      },
-      {
-        depth: 0,
-        lead: code("function sendEmail("),
-        slot: {
-          id: "send",
-          label: holds("to, subject, body"),
-          note: "Take one options object. Three strings in a row swap without an error, and named keys can't.",
-          cost: ["swap: impossible"],
-        },
-      },
-    ],
-  },
-  {
-    name: "The role list",
-    prompt: (
-      <>
-        You loop over the roles at runtime and want a <Code>Role</Code> type that matches the list.
-        Place <Code>as const</Code>.
-      </>
-    ),
-    piece: "as const",
-    answer: "roles",
-    rows: [
-      {
-        depth: 0,
-        lead: code('const ROLES = ["ADMIN", "EDITOR"]'),
-        slot: {
-          id: "roles",
-          label: blank('const ROLES = ["ADMIN", "EDITOR"]'),
-          note: "Freeze the list. ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
-          cost: ["Role: 2 members", "0 enum lines"],
-        },
-      },
-      {
-        depth: 0,
-        lead: code('let role = "ADMIN"'),
-        slot: {
-          id: "role",
-          label: blank('let role = "ADMIN"'),
-          note: 'role is a let you mean to change. Frozen to "ADMIN", the next assignment fails.',
-          cost: ["TS2322 on reassign"],
-        },
-      },
-      {
-        depth: 0,
-        lead: code("const limit = 3"),
-        slot: {
-          id: "limit",
-          label: blank("const limit = 3"),
-          note: "A const 3 is already the literal 3. ROLES stays string[], so Role is any string.",
-          cost: ["Role: string", "typo: 0 errors"],
-        },
-      },
-      { depth: 0, text: code("type Role = (typeof ROLES)[number]") },
-    ],
-  },
-  {
-    name: "The contract",
-    prompt: (
-      <>
-        <Code>getUser</Code> is the module's public API, and <Code>find</Code> can return{" "}
-        <Code>undefined</Code>. Place <Code>: User</Code>.
-      </>
-    ),
-    piece: ": User",
-    answer: "ret",
-    rows: [
-      {
-        depth: 0,
-        lead: code("export function getUser(id: string)"),
-        slot: {
-          id: "ret",
-          label: blank("export function getUser(id: string)"),
-          note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside getUser.",
-          cost: ["TS2322 at the return"],
-        },
-      },
-      { depth: 1, text: code("return users.find((u) => u.id === id)") },
-      { depth: 0, text: code("// profile.tsx") },
-      {
-        depth: 0,
-        lead: code("const user"),
-        slot: {
-          id: "local",
-          label: blank("const user"),
-          note: "The error moves into this caller, and every other caller still gets User | undefined.",
-          cost: ["error at 1 of N callers"],
-        },
-      },
-      { depth: 1, text: code("= getUser(params.id)") },
-      {
-        depth: 0,
-        lead: code("users.map((u"),
-        slot: {
-          id: "param",
-          label: blank("users.map((u"),
-          note: "Skip the label. map already knows u is a User, and the label catches nothing.",
-          cost: ["0 errors caught"],
-        },
-      },
-    ],
-  },
-  {
-    name: "The crash report",
-    prompt: (
-      <>
-        <Code>users[0].name</Code> crashed in production on an empty list. <Code>strict</Code> is
-        already on. Set the flag that fails the build.
-      </>
-    ),
-    piece: "true",
-    answer: "index",
-    rows: [
-      { depth: 0, text: code('"compilerOptions": {') },
-      { depth: 1, text: code('"strict": true,') },
-      {
-        depth: 1,
-        lead: code('"noImplicitAny":'),
-        slot: {
-          id: "any",
-          label: blank('"noImplicitAny":'),
-          note: "strict already turns it on. users[0] still reads as User, so the crash ships.",
-          cost: ["0 new errors"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code('"noUncheckedIndexedAccess":'),
-        slot: {
-          id: "index",
-          label: blank('"noUncheckedIndexedAccess":'),
-          note: "Turn it on. users[0] becomes User | undefined, and .name fails with TS18048 before it ships.",
-          cost: ["TS18048 at build", "0 crashes"],
-        },
-      },
-      {
-        depth: 1,
-        lead: code('"verbatimModuleSyntax":'),
-        slot: {
-          id: "verbatim",
-          label: blank('"verbatimModuleSyntax":'),
-          note: "It makes type imports say import type. Keep it, but users[0] still reads as User.",
-          cost: ["crash: 0 errors"],
-        },
-      },
-      { depth: 0, text: code("}") },
-    ],
-  },
-];
-
 export function TypeScriptCodeWriting() {
   return (
     <RuleLanding
@@ -864,11 +938,7 @@ export function TypeScriptCodeWriting() {
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "code",
-      }}
+      board="code"
       take="write the precise form too"
     />
   );

@@ -60,66 +60,68 @@ import { palette } from "../../theme.stylex";
 import { TECH_LOGOS } from "./tech-logos";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
-const MARKS = new Map<string, Mark>(Object.entries({
-  AdonisJS: siAdonisjs,
-  Apache: siApache,
-  Astro: siAstro,
-  "Base UI": siBaseui,
-  Biome: siBiome,
-  Bun: siBun,
-  "Claude Code": siClaudecode,
-  CSS: siCss,
-  Cypress: siCypress,
-  Docker: siDocker,
-  Drizzle: siDrizzle,
-  Effect: siEffect,
-  EJS: siEjs,
-  Express: siExpress,
-  Figma: siFigma,
-  Framer: siFramer,
-  Git: siGit,
-  HTML: siHtml5,
-  InertiaJS: siInertia,
-  Jest: siJest,
-  Laravel: siLaravel,
-  MariaDB: siMariadb,
-  MongoDB: siMongodb,
-  MSW: siMockserviceworker,
-  MySQL: siMysql,
-  "Next.js": siNextdotjs,
-  NGINX: siNginx,
-  "Node.js": siNodedotjs,
-  OpenCode: siOpencode,
-  OpenRouter: siOpenrouter,
-  Oxfmt: siOxc,
-  Oxlint: siOxc,
-  "Phosphor Icons": siPhosphoricons,
-  PHP: siPhp,
-  PostCSS: siPostcss,
-  PostgreSQL: siPostgresql,
-  Prisma: siPrisma,
-  "Radix UI": siRadixui,
-  "React Flow": siXyflow,
-  "React Router": siReactrouter,
-  React: siReact,
-  Redis: siRedis,
-  Redux: siRedux,
-  "Shadcn UI": siShadcnui,
-  Snowflake: siSnowflake,
-  Storybook: siStorybook,
-  "Tailwind CSS": siTailwindcss,
-  "TanStack Query": siTanstack,
-  "TanStack Router": siTanstack,
-  "TanStack Start": siTanstack,
-  tRPC: siTrpc,
-  TypeScript: siTypescript,
-  Vite: siVite,
-  Vitest: siVitest,
-  Vue: siVuedotjs,
-  XState: siXstate,
-  Zod: siZod,
-  ...EXTRA_MARKS,
-}));
+const MARKS = new Map<string, Mark>(
+  Object.entries({
+    AdonisJS: siAdonisjs,
+    Apache: siApache,
+    Astro: siAstro,
+    "Base UI": siBaseui,
+    Biome: siBiome,
+    Bun: siBun,
+    "Claude Code": siClaudecode,
+    CSS: siCss,
+    Cypress: siCypress,
+    Docker: siDocker,
+    Drizzle: siDrizzle,
+    Effect: siEffect,
+    EJS: siEjs,
+    Express: siExpress,
+    Figma: siFigma,
+    Framer: siFramer,
+    Git: siGit,
+    HTML: siHtml5,
+    InertiaJS: siInertia,
+    Jest: siJest,
+    Laravel: siLaravel,
+    MariaDB: siMariadb,
+    MongoDB: siMongodb,
+    MSW: siMockserviceworker,
+    MySQL: siMysql,
+    "Next.js": siNextdotjs,
+    NGINX: siNginx,
+    "Node.js": siNodedotjs,
+    OpenCode: siOpencode,
+    OpenRouter: siOpenrouter,
+    Oxfmt: siOxc,
+    Oxlint: siOxc,
+    "Phosphor Icons": siPhosphoricons,
+    PHP: siPhp,
+    PostCSS: siPostcss,
+    PostgreSQL: siPostgresql,
+    Prisma: siPrisma,
+    "Radix UI": siRadixui,
+    "React Flow": siXyflow,
+    "React Router": siReactrouter,
+    React: siReact,
+    Redis: siRedis,
+    Redux: siRedux,
+    "Shadcn UI": siShadcnui,
+    Snowflake: siSnowflake,
+    Storybook: siStorybook,
+    "Tailwind CSS": siTailwindcss,
+    "TanStack Query": siTanstack,
+    "TanStack Router": siTanstack,
+    "TanStack Start": siTanstack,
+    tRPC: siTrpc,
+    TypeScript: siTypescript,
+    Vite: siVite,
+    Vitest: siVitest,
+    Vue: siVuedotjs,
+    XState: siXstate,
+    Zod: siZod,
+    ...EXTRA_MARKS,
+  }),
+);
 
 type Rgb = { r: number; g: number; b: number };
 
@@ -139,7 +141,8 @@ const channel = (c: number) => {
   const v = c / 255;
   return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
 };
-const luminance = ({ r, g, b }: Rgb) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+const luminance = ({ r, g, b }: Rgb) =>
+  0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 const contrast = (x: Rgb, y: Rgb) => {
   const [a, b] = [luminance(x), luminance(y)];
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
@@ -151,7 +154,11 @@ const NON_TEXT_MIN_CONTRAST = 3;
 
 /** A brand colour (hex without #) for a theme: greys take the text colour, and a colour short of
  * minContrast against the panel moves away from it until it gets there. */
-export function brandFor(hex: string, theme: keyof typeof PANEL, minContrast = NON_TEXT_MIN_CONTRAST) {
+export function brandFor(
+  hex: string,
+  theme: keyof typeof PANEL,
+  minContrast = NON_TEXT_MIN_CONTRAST,
+) {
   const rgb = toRgb(hex);
   const spread = Math.max(rgb.r, rgb.g, rgb.b) - Math.min(rgb.r, rgb.g, rgb.b);
   if (spread < GRAYSCALE_MAX_SPREAD) return "var(--text)";
@@ -179,7 +186,10 @@ function ringOf(name: string, brand: { "--brand-dark": string; "--brand-light": 
 const BRANDS = new Map<string, CSSProperties>(
   [...MARKS].flatMap(([name, { hex }]) => {
     if (!hex) return [];
-    const brand = { "--brand-dark": brandFor(hex, "dark"), "--brand-light": brandFor(hex, "light") };
+    const brand = {
+      "--brand-dark": brandFor(hex, "dark"),
+      "--brand-light": brandFor(hex, "light"),
+    };
     return [[name, { ...brand, "--ring": ringOf(name, brand) }]];
   }),
 );
@@ -242,6 +252,8 @@ const BRAND = {
   },
 };
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 /**
  * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, a single-colour mark's
  * colour. Pair either with techBrand(name) as the inline style, which also carries --ring.
@@ -295,7 +307,7 @@ export const iconLit = stylex.create({
     "--lit": "1",
   },
   hover: {
-    "--lit": { default: null, ":hover": "1", ":focus-visible": "1" },
+    "--lit": { default: null, ":hover": { default: null, [HOVER]: "1" }, ":focus-visible": "1" },
   },
 });
 

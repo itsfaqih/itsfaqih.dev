@@ -1,34 +1,31 @@
-import {
-  ArrowRightIcon,
-  CheckIcon,
-  CircleNotchIcon,
-  BellIcon,
-  GearSixIcon,
-  PlusIcon,
-} from "@phosphor-icons/react";
+import { ArrowRightIcon, CheckIcon, BellIcon, GearSixIcon, PlusIcon } from "@phosphor-icons/react";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { reducedMotion } from "../../hooks/use-media-query";
-import { cursors, fonts, motion, palette } from "../../theme.stylex";
 import {
-  Code,
-  Kbd,
-  type Lesson,
-  type Level,
-  onceOnScreen,
-  RuleLanding,
-} from "./-components/rule-landing";
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { cursors, fonts, motion, palette } from "../../theme.stylex";
+import { Kbd, type Lesson, RuleLanding } from "./-components/rule-landing";
 import { kit } from "./-components/rule-landing.stylex";
 import { button } from "../../components/button";
 
 const TABLET = "@media (max-width: 820px)";
 const PHONE = "@media (max-width: 640px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+const TOUCH = "@media (pointer: coarse)";
 
-const roll = stylex.keyframes({ from: { opacity: 0, translate: "0 9px" } });
-const spin = stylex.keyframes({ to: { rotate: "1turn" } });
 const stepIn = stylex.keyframes({ from: { opacity: 0, translate: "0 4px" } });
 const fade = stylex.keyframes({ from: { opacity: 0 } });
+const drain = stylex.keyframes({ to: { transform: "scaleX(0)" } });
+
+const HOLD_MS = 1200;
+const UNDO_MS = 5000;
 
 const styles = stylex.create({
   stage: {
@@ -75,7 +72,7 @@ const styles = stylex.create({
     outlineOffset: { default: null, ":focus-visible": "3px" },
   },
   live: {
-    backgroundColor: { default: "var(--face)", ":hover": "var(--lit)" },
+    backgroundColor: { default: "var(--face)", ":hover": { default: null, [HOVER]: "var(--lit)" } },
     transform: {
       default: null,
       ":active": { default: "translateY(2px) scale(0.97)", [REDUCE]: "none" },
@@ -112,11 +109,11 @@ const styles = stylex.create({
     color: palette["--text"],
   },
   plain: {
-    "--face": palette["--panel-2"],
-    "--lit": palette["--soft-hover"],
+    "--face": palette["--soft-key"],
+    "--lit": palette["--soft-key-hover"],
     boxShadow: {
-      default: `0 4px 0 ${palette["--drop-ink"]}`,
-      ":active": `0 2px 0 ${palette["--drop-ink"]}`,
+      default: `0 4px 0 ${palette["--soft-key-drop"]}`,
+      ":active": `0 2px 0 ${palette["--soft-key-drop"]}`,
     },
     color: palette["--text"],
   },
@@ -174,78 +171,30 @@ const styles = stylex.create({
     fontFamily: fonts["--mono"],
     color: palette["--mute"],
   },
-  measure: {
-    display: "inline-grid",
-    gap: "10px",
+  fullRow: {
+    gridColumn: "1 / -1",
   },
-  save: {
-    display: "inline-grid",
-  },
-  waiting: {
-    cursor: "wait",
-  },
-  label: {
-    display: "inline-flex",
-    gridRowStart: 1,
-    gridColumnStart: 1,
-    gap: "8px",
+  slug: {
+    display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    opacity: 0,
-    translate: { default: "0 -8px", [REDUCE]: "none" },
-    transition: `opacity 120ms ease, translate 160ms ${motion["--out"]}`,
+    outline: { default: null, ":focus-within": `3px solid ${palette["--focus"]}` },
+    outlineOffset: { default: null, ":focus-within": "1px" },
   },
-  labelOn: {
-    opacity: 1,
-    translate: "none",
-    animationName: { default: roll, [REDUCE]: fade },
-    animationDuration: { default: "220ms", [REDUCE]: "160ms" },
-    animationTimingFunction: { default: "cubic-bezier(0.16, 1, 0.3, 1)", [REDUCE]: "ease" },
+  slugBase: {
+    color: palette["--mute"],
   },
-  jumpy: {
-    animationName: "none",
-    animationDuration: "0s",
-    animationTimingFunction: "ease",
-  },
-  jumpyOff: {
-    display: "none",
-  },
-  spin: {
-    animationName: { default: spin, [REDUCE]: "none" },
-    animationDuration: { default: "700ms", [REDUCE]: "0s" },
-    animationTimingFunction: { default: "linear", [REDUCE]: "ease" },
-    animationIterationCount: { default: "infinite", [REDUCE]: 1 },
-  },
-  ruler: {
-    position: "relative",
-    height: "9px",
-    borderLeftWidth: "1.5px",
-    borderLeftStyle: "solid",
-    borderLeftColor: palette["--mute"],
-    borderRightWidth: "1.5px",
-    borderRightStyle: "solid",
-    borderRightColor: palette["--mute"],
-    "::before": {
-      content: '""',
-      position: "absolute",
-      top: "4px",
-      right: 0,
-      bottom: "auto",
-      left: 0,
-      height: "1.5px",
-      backgroundColor: palette["--mute"],
-    },
-  },
-  width: {
-    position: "absolute",
-    top: "14px",
-    left: "50%",
-    translate: "-50% 0",
-    whiteSpace: "nowrap",
-    color: palette["--text"],
-  },
-  saveNote: {
-    marginTop: "14px",
+  slugInput: {
+    flex: 1,
+    minWidth: 0,
+    height: "100%",
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    fontWeight: "inherit",
+    fontSize: "inherit",
+    fontFamily: "inherit",
+    color: "inherit",
+    outline: "none",
   },
   form: {
     gridTemplateColumns: { default: "minmax(0, 1fr) auto", [PHONE]: "minmax(0, 1fr)" },
@@ -276,7 +225,8 @@ const styles = stylex.create({
     borderRadius: "10px",
     backgroundColor: palette["--panel"],
     fontWeight: 500,
-    fontSize: "14px",
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: { default: "14px", [TOUCH]: "16px" },
     lineHeight: "normal",
     fontFamily: fonts["--sans"],
     color: palette["--text"],
@@ -294,8 +244,8 @@ const styles = stylex.create({
     justifySelf: { default: null, [PHONE]: "start" },
   },
   off: {
-    "--face": palette["--panel-2"],
-    boxShadow: `0 4px 0 ${palette["--drop-ink"]}`,
+    "--face": palette["--soft-key"],
+    boxShadow: `0 4px 0 ${palette["--soft-key-drop"]}`,
     color: palette["--dim"],
     cursor: cursors["--cursor-forbid"],
   },
@@ -407,6 +357,8 @@ const styles = stylex.create({
     backgroundColor: "var(--c)",
   },
   project: {
+    position: "relative",
+    overflow: "hidden",
     display: "flex",
     flexWrap: "wrap",
     rowGap: "14px",
@@ -432,6 +384,65 @@ const styles = stylex.create({
     animationName: { default: stepIn, [REDUCE]: fade },
     animationDuration: { default: "200ms", [REDUCE]: "160ms" },
     animationTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
+  },
+  guards: {
+    display: "inline-flex",
+    gap: "2px",
+    padding: "3px",
+    borderRadius: "10px",
+    backgroundColor: palette["--panel-2"],
+  },
+  guard: {
+    height: "28px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: 0,
+    borderRadius: "7px",
+    backgroundColor: "transparent",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--dim"],
+    cursor: cursors["--cursor"],
+    outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
+  },
+  guardOn: {
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 1px 0 ${palette["--hair"]}, 0 0 0 1px ${palette["--hair"]}`,
+    color: palette["--text"],
+  },
+  hold: {
+    overflow: "hidden",
+    isolation: "isolate",
+    touchAction: "none",
+    userSelect: "none",
+    WebkitTouchCallout: "none",
+  },
+  holdFill: {
+    position: "absolute",
+    inset: 0,
+    zIndex: -1,
+    backgroundColor: `color-mix(in srgb, ${kit["--no"]} 34%, transparent)`,
+    transformOrigin: "left center",
+    transform: "scaleX(0)",
+    transition: `transform 200ms ${motion["--out"]}`,
+  },
+  holdFillOn: {
+    transform: "scaleX(1)",
+    transition: `transform ${HOLD_MS}ms linear`,
+  },
+  drain: {
+    position: "absolute",
+    insetInline: 0,
+    bottom: 0,
+    height: "3px",
+    backgroundColor: kit["--no"],
+    transformOrigin: "left center",
+    animationName: drain,
+    animationDuration: `${UNDO_MS}ms`,
+    animationTimingFunction: "linear",
+    animationFillMode: "forwards",
   },
   projectRow: {
     marginLeft: "auto",
@@ -479,9 +490,13 @@ const styles = stylex.create({
     "--pr": "0px",
     width: "38px",
   },
-  wide: {
-    "--pl": "18px",
-    "--pr": "18px",
+  // Padding alone sizes the key, the same on every side, so its size follows the icon.
+  padded: {
+    "--pl": "14px",
+    "--pr": "14px",
+    height: "auto",
+    paddingTop: "14px",
+    paddingBottom: "14px",
   },
   dims: {
     position: "absolute",
@@ -574,7 +589,11 @@ const FORCED = {
 function StatesDemo({ careful }: { careful: boolean }) {
   return (
     <div {...stylex.props(styles.stage)}>
-      <button type="button" {...stylex.props(styles.key, careful ? styles.live : styles.flat)}>
+      <button
+        data-hint
+        type="button"
+        {...stylex.props(styles.key, careful ? styles.live : styles.flat)}
+      >
         Save changes
       </button>
       <div {...stylex.props(styles.specimens)} aria-hidden="true">
@@ -599,125 +618,17 @@ function StatesDemo({ careful }: { careful: boolean }) {
   );
 }
 
-type Phase = "idle" | "pending" | "done";
-type Save = { phase: Phase; sent: number };
-
-const SAVE_MS = 1200;
-const DONE_MS = 1400;
-
-const LABELS: readonly { phase: Phase; text: string }[] = [
-  { phase: "idle", text: "Save" },
-  { phase: "pending", text: "Saving…" },
-  { phase: "done", text: "Saved" },
-];
-
-function SaveDemo({ careful }: { careful: boolean }) {
-  const stageRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [save, setSave] = useState<Save>({ phase: "idle", sent: 0 });
-  const [pressing, setPressing] = useState(false);
-  const [width, setWidth] = useState<number | null>(null);
-  const busy = careful && save.phase !== "idle";
-
-  useEffect(() => {
-    if (save.phase === "idle") return;
-    const id = setTimeout(
-      () => setSave((now) => ({ ...now, phase: now.phase === "pending" ? "done" : "idle" })),
-      save.phase === "pending" ? SAVE_MS : DONE_MS,
-    );
-    return () => clearTimeout(id);
-  }, [save]);
-
-  useLayoutEffect(() => {
-    const button = buttonRef.current;
-    if (!button) return;
-    const observer = new ResizeObserver(() => setWidth(Math.round(button.offsetWidth)));
-    observer.observe(button);
-    return () => observer.disconnect();
-  }, []);
-
-  function press() {
-    setSave((now) =>
-      careful && now.phase !== "idle"
-        ? now
-        : { phase: "pending", sent: now.phase === "pending" ? now.sent + 1 : 1 },
-    );
-  }
-
-  useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage || reducedMotion()) return;
-    const timers: number[] = [];
-    const stop = onceOnScreen(stage, () => {
-      timers.push(
-        window.setTimeout(() => setPressing(true), 500),
-        window.setTimeout(() => {
-          setPressing(false);
-          setSave((now) => (now.sent === 0 ? { phase: "pending", sent: 1 } : now));
-        }, 660),
-      );
-    });
-    return () => {
-      stop();
-      for (const timer of timers) clearTimeout(timer);
-    };
-  }, []);
-
-  return (
-    <div ref={stageRef} {...stylex.props(styles.stage)}>
-      <div {...stylex.props(styles.measure)}>
-        <button
-          ref={buttonRef}
-          type="button"
-          {...stylex.props(
-            styles.key,
-            !busy && styles.live,
-            styles.save,
-            busy && save.phase === "pending" && styles.waiting,
-            pressing && styles.press,
-          )}
-          aria-disabled={busy || undefined}
-          onClick={press}
-        >
-          {LABELS.map(({ phase, text }) => {
-            const on = save.phase === phase;
-            return (
-              <span
-                key={phase}
-                {...stylex.props(
-                  styles.label,
-                  on && styles.labelOn,
-                  !careful && styles.jumpy,
-                  !careful && !on && styles.jumpyOff,
-                )}
-                aria-hidden={!on || undefined}
-              >
-                {phase === "pending" && (
-                  <CircleNotchIcon weight="bold" {...stylex.props(styles.icon, styles.spin)} />
-                )}
-                {phase === "done" && <CheckIcon weight="bold" {...stylex.props(styles.icon)} />}
-                {text}
-              </span>
-            );
-          })}
-        </button>
-        <span {...stylex.props(styles.ruler)} aria-hidden="true">
-          <b {...stylex.props(styles.small, styles.width)}>{width ?? "–"} px</b>
-        </span>
-      </div>
-      <span {...stylex.props(styles.small, styles.saveNote)}>
-        {save.sent === 1 ? "1 request sent" : `${save.sent} requests sent`}
-      </span>
-    </div>
-  );
-}
+/** A slug an older post already holds, so this one can't publish under it. */
+const TAKEN = "spring-launch";
 
 function DisabledDemo({ careful }: { careful: boolean }) {
-  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState(TAKEN);
   const [published, setPublished] = useState(false);
   const [nudged, setNudged] = useState(false);
   const tipId = useId();
-  const ready = title.trim() !== "";
+  const reason =
+    slug.trim() === "" ? "Add a URL first" : slug.trim() === TAKEN ? "That URL is taken" : null;
+  const ready = reason === null;
 
   useEffect(() => {
     if (!published) return;
@@ -742,18 +653,29 @@ function DisabledDemo({ careful }: { careful: boolean }) {
 
   return (
     <div {...stylex.props(styles.stage, styles.form)}>
-      <label {...stylex.props(styles.field)}>
+      <label {...stylex.props(styles.field, styles.fullRow)}>
         <span>Title</span>
-        <input
-          value={title}
-          placeholder="Untitled post"
-          onChange={(event) => setTitle(event.target.value)}
-          {...stylex.props(styles.input)}
-        />
+        <input defaultValue="Spring launch" {...stylex.props(styles.input)} />
+      </label>
+      <label {...stylex.props(styles.field)}>
+        <span>URL</span>
+        <span {...stylex.props(styles.input, styles.slug)}>
+          <span aria-hidden="true" {...stylex.props(styles.slugBase)}>
+            /blog/
+          </span>
+          <input
+            value={slug}
+            aria-label="URL after /blog/"
+            spellCheck={false}
+            onChange={(event) => setSlug(event.target.value)}
+            {...stylex.props(styles.slugInput)}
+          />
+        </span>
       </label>
       {careful ? (
         <span {...stylex.props(styles.tip, styles.formEnd)}>
           <button
+            data-hint
             type="button"
             {...stylex.props(
               styles.key,
@@ -768,18 +690,19 @@ function DisabledDemo({ careful }: { careful: boolean }) {
           >
             {label}
           </button>
-          {!ready && (
+          {reason && (
             <span
               role="tooltip"
               id={tipId}
               {...stylex.props(styles.tooltip, nudged && styles.tooltipOpen)}
             >
-              Add a title first
+              {reason}
             </span>
           )}
         </span>
       ) : (
         <button
+          data-hint
           type="button"
           {...stylex.props(
             styles.key,
@@ -826,6 +749,7 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
   const [on, setOn] = useState(false);
   return (
     <button
+      data-hint
       type="button"
       {...stylex.props(button.base, button.soft, button.sm, styles.toggle)}
       data-toggle={name}
@@ -838,11 +762,23 @@ function LessonToggle({ label, name }: { label: string; name: string }) {
   );
 }
 
-type Step = "idle" | "confirm" | "deleted";
+type Step = "idle" | "confirm" | "undo" | "deleted";
+type Guard = "confirm" | "hold" | "undo";
+
+const GUARDS: readonly { id: Guard; label: string }[] = [
+  { id: "confirm", label: "Confirm" },
+  { id: "hold", label: "Hold" },
+  { id: "undo", label: "Undo" },
+];
+const HOLD_KEYS = new Set([" ", "Enter"]);
 
 function DeleteDemo({ careful }: { careful: boolean }) {
   const [step, setStep] = useState<Step>("idle");
+  const [guard, setGuard] = useState<Guard>("confirm");
+  const [holding, setHolding] = useState(false);
   const moved = useRef(false);
+  // The press that finished a hold is still down, and its release would click Reset demo.
+  const spent = useRef(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   function go(next: Step) {
@@ -855,15 +791,85 @@ function DeleteDemo({ careful }: { careful: boolean }) {
     rootRef.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
   }, [step]);
 
+  useEffect(() => {
+    if (!holding) return;
+    const id = setTimeout(() => {
+      spent.current = true;
+      setHolding(false);
+      go("deleted");
+    }, HOLD_MS);
+    return () => clearTimeout(id);
+  }, [holding]);
+
+  useEffect(() => {
+    if (step !== "undo") return;
+    const id = setTimeout(() => go("deleted"), UNDO_MS);
+    return () => clearTimeout(id);
+  }, [step]);
+
+  const held = careful && guard === "hold";
+  const press = held
+    ? {
+        onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          setHolding(true);
+        },
+        onPointerUp: () => setHolding(false),
+        onPointerCancel: () => setHolding(false),
+        onContextMenu: (event: MouseEvent) => event.preventDefault(),
+        onKeyDown: (event: KeyboardEvent) => {
+          if (!HOLD_KEYS.has(event.key)) return;
+          event.preventDefault();
+          if (!event.repeat) setHolding(true);
+        },
+        onKeyUp: (event: KeyboardEvent) => HOLD_KEYS.has(event.key) && setHolding(false),
+        onBlur: () => setHolding(false),
+      }
+    : { onClick: () => go(!careful ? "deleted" : guard === "confirm" ? "confirm" : "undo") };
+
+  const release = () => {
+    if (spent.current) setTimeout(() => (spent.current = false));
+  };
+
   const key = [styles.key, styles.sm, styles.live];
   const copy = stylex.props(styles.projectCopy, styles.stepIn);
   return (
-    <div ref={rootRef} {...stylex.props(styles.stage)}>
+    <div
+      ref={rootRef}
+      onClickCapture={(event) => {
+        if (!spent.current) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onPointerUpCapture={release}
+      onKeyUpCapture={release}
+      {...stylex.props(styles.stage)}
+    >
+      {careful && (
+        <div role="group" aria-label="Guard" {...stylex.props(styles.guards)}>
+          {GUARDS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={guard === id}
+              onClick={() => {
+                moved.current = false;
+                setGuard(id);
+                setHolding(false);
+                setStep("idle");
+              }}
+              {...stylex.props(styles.guard, guard === id && styles.guardOn)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
       <div
         {...stylex.props(
           styles.project,
           step === "confirm" && styles.confirm,
-          step === "deleted" && styles.deleted,
+          (step === "deleted" || step === "undo") && styles.deleted,
         )}
       >
         {step === "deleted" ? (
@@ -880,6 +886,22 @@ function DeleteDemo({ careful }: { careful: boolean }) {
             >
               Reset demo
             </button>
+          </>
+        ) : step === "undo" ? (
+          <>
+            <span {...copy}>
+              <b {...stylex.props(styles.projectName, styles.projectGone)}>Moonbase deleted</b>
+              <small {...stylex.props(styles.projectMeta)}>Undo within 5 seconds</small>
+            </span>
+            <button
+              type="button"
+              {...stylex.props(key, styles.text, styles.stepIn)}
+              data-autofocus
+              onClick={() => go("idle")}
+            >
+              Undo
+            </button>
+            <span aria-hidden="true" {...stylex.props(styles.drain)} />
           </>
         ) : step === "confirm" ? (
           <>
@@ -914,12 +936,19 @@ function DeleteDemo({ careful }: { careful: boolean }) {
               <small {...stylex.props(styles.projectMeta)}>214 files · edited 2h ago</small>
             </span>
             <button
+              data-hint
               type="button"
-              {...stylex.props(key, styles.red, careful && styles.tint, styles.stepIn)}
+              {...stylex.props(key, styles.red, styles.tint, held && styles.hold, styles.stepIn)}
               data-autofocus
-              onClick={() => go(careful ? "confirm" : "deleted")}
+              {...press}
             >
-              Delete project
+              {held && (
+                <span
+                  aria-hidden="true"
+                  {...stylex.props(styles.holdFill, holding && styles.holdFillOn)}
+                />
+              )}
+              {held ? "Hold to delete" : "Delete project"}
             </button>
           </>
         )}
@@ -974,12 +1003,13 @@ function IconKeysDemo({ careful }: { careful: boolean }) {
   const key = [styles.key, styles.sm, styles.live, styles.plain];
   return (
     <div {...stylex.props(styles.stage, styles.icons)}>
-      {TOOLS.map(({ label, Icon }) =>
+      {TOOLS.map(({ label, Icon }, at) =>
         careful ? (
           <span key={label} {...stylex.props(styles.tip)}>
             <button
               type="button"
               {...stylex.props(key, styles.square, stylex.defaultMarker())}
+              data-hint={at === 0 || undefined}
               aria-label={label}
               aria-describedby={`${tipId}-${label}`}
             >
@@ -991,9 +1021,15 @@ function IconKeysDemo({ careful }: { careful: boolean }) {
             </span>
           </span>
         ) : (
-          <button key={label} type="button" {...stylex.props(key, styles.wide)} aria-label={label}>
+          <button
+            key={label}
+            type="button"
+            data-hint={at === 0 || undefined}
+            {...stylex.props(key, styles.padded)}
+            aria-label={label}
+          >
             <Icon weight="bold" aria-hidden="true" {...stylex.props(styles.icon)} />
-            <Ruler width={52} />
+            <Ruler pads={[14, 14]} />
           </button>
         ),
       )}
@@ -1020,32 +1056,54 @@ export const LESSONS: Lesson[] = [
       costs: ["4 looks", "3px focus ring", "150ms"],
       view: <StatesDemo careful />,
     },
-  },
-  {
-    title: "Hold the width while it works",
-    body: (
-      <>
-        Stop taking clicks the moment it's pressed, say what it's doing, then say it worked. Stack
-        the labels in one grid cell so the width holds. Press each one a few times.
-      </>
-    ),
-    bad: {
-      label: "Swaps the label",
-      costs: ["width jumps 53px", "a request per click"],
-      view: <SaveDemo careful={false} />,
-    },
-    good: {
-      label: "Stack the labels",
-      costs: ["width holds", "1 request", "cursor: wait"],
-      view: <SaveDemo careful />,
-    },
+    levels: [
+      {
+        name: "Where am I?",
+        prompt: (
+          <>
+            Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Save</b>. Place the
+            look she needs to see where she is.
+          </>
+        ),
+        piece: "a visible change",
+        answer: "focus",
+        rows: [
+          { depth: 0, text: "Save button", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "hover",
+              label: "+ on hover",
+              note: "Hover needs a mouse. Mia never hovers, so she still can't tell where she is.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "press",
+              label: "+ on press",
+              note: "Press comes after she has found the button. She needs to see where she is before she presses Enter.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "focus",
+              label: "+ on focus",
+              note: "Focus is where the keyboard is. Give it a look, and every Tab lands somewhere she can see.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Say why it's off",
     body: (
       <>
-        A disabled button that only fades leaves people guessing. Show the no-entry cursor, keep the
-        label readable, and put the reason in a tooltip. Type a title to enable both.
+        A disabled button that only fades leaves people guessing, most of all when the form looks
+        done. Show the no-entry cursor, keep the label readable, and put the reason in a tooltip.
+        Find out why Publish is off in both, then fix it.
       </>
     ),
     bad: {
@@ -1058,6 +1116,48 @@ export const LESSONS: Lesson[] = [
       costs: ["1 reason", "6.4:1 contrast", "cursor: not-allowed"],
       view: <DisabledDemo careful />,
     },
+    levels: [
+      {
+        name: "Can't be pressed",
+        prompt: (
+          <>
+            Publish stays off because an older post already uses this URL. Nothing else on screen
+            says so. Pick how Publish looks when someone hovers it.
+          </>
+        ),
+        piece: "disabled Publish",
+        answer: "say",
+        rows: [
+          { depth: 0, text: "Post editor", kind: "comp" },
+          { depth: 1, text: "Title", tag: "filled" },
+          { depth: 1, text: "URL", tag: "taken" },
+          {
+            depth: 1,
+            slot: {
+              id: "fade",
+              label: "+ faded to 40%, nothing else",
+              note: "Fading says no, but not why. The form looks done, so they're left guessing.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "hide",
+              label: "+ hidden until it works",
+              note: "They can't find Publish at all, let alone learn the URL is taken.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "say",
+              label: "+ readable, tooltip: That URL is taken",
+              note: "Keep the label readable and say why on hover, so they know to change the URL.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Fill one button per screen",
@@ -1078,13 +1178,55 @@ export const LESSONS: Lesson[] = [
       costs: ["1 filled", "1 next step"],
       view: <HierarchyDemo careful />,
     },
+    levels: [
+      {
+        name: "The one next step",
+        prompt: (
+          <>
+            A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is
+            tinted. Style <b>Checkout</b>.
+          </>
+        ),
+        piece: "Checkout",
+        answer: "brand",
+        rows: [
+          { depth: 0, text: "Cart footer", kind: "comp" },
+          { depth: 1, text: "Continue shopping", tag: "text" },
+          { depth: 1, text: "Edit cart", tag: "tinted" },
+          {
+            depth: 1,
+            slot: {
+              id: "tint",
+              label: "+ tinted, like Edit cart",
+              note: "Checkout now weighs the same as Edit cart, so nothing says which one finishes the order.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "red",
+              label: "+ filled red",
+              note: "Red reads as danger. People pause on the one button you want them to press.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "brand",
+              label: "+ filled, brand colour",
+              note: "Fill one button in the brand colour to mark the step that finishes the job.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Guard the destructive action",
     body: (
       <>
-        Never let one stray click delete anything. Tint the trigger red, then confirm with a filled
-        red button that names what goes. Land focus on Cancel, the safe answer.
+        Never let one stray click delete anything. Confirm with a red button that names what goes,
+        ask people to hold the button down, or delete at once and offer Undo. Try all three.
       </>
     ),
     bad: {
@@ -1093,10 +1235,50 @@ export const LESSONS: Lesson[] = [
       view: <DeleteDemo careful={false} />,
     },
     good: {
-      label: "Confirm by name",
-      costs: ["2 clicks", "names 214 files"],
+      label: "Guard it",
+      costs: ["3 guards", "0 stray deletes"],
       view: <DeleteDemo careful />,
     },
+    levels: [
+      {
+        name: "Worth a confirm",
+        prompt: (
+          <>
+            A project page has three actions. Place the confirm on the one a stray click would make
+            you regret.
+          </>
+        ),
+        piece: "Are you sure?",
+        answer: "delete",
+        rows: [
+          { depth: 0, text: "Project page", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "rename",
+              label: "+ Rename",
+              note: "A rename loses nothing, and you can rename it back. A confirm only slows people down.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "archive",
+              label: "+ Archive, undo any time",
+              note: "Archive comes back in one click. Offer Undo after, rather than asking first.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "delete",
+              label: "+ Delete, 214 files for good",
+              note: "Nothing brings these back. Ask first, name what goes, and land focus on Cancel.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Pad the icon side less",
@@ -1117,268 +1299,130 @@ export const LESSONS: Lesson[] = [
       costs: ["12 | 16px", "looks even"],
       view: <IconsDemo careful />,
     },
+    levels: [
+      {
+        name: "Less padding",
+        prompt: (
+          <>
+            Every button in this toolbar has the same padding on both sides. Place the trim on the
+            one that will look lopsided.
+          </>
+        ),
+        piece: "trim the icon side",
+        answer: "lead",
+        rows: [
+          { depth: 0, text: "Toolbar", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "text",
+              label: "Save (text only)",
+              note: "With no icon, there's no hidden white space. Even padding already looks even.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "lead",
+              label: "＋ New project",
+              note: "Trim the icon's side. The icon's own white space makes up the rest.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "only",
+              label: "⚙ (icon only)",
+              note: "There's no text to balance against. Make it a square instead.",
+            },
+          },
+        ],
+      },
+    ],
   },
   {
     title: "Fix the size of an icon-only button",
     body: (
       <>
-        With no label, padding sets the size, so the button comes out wider than it is tall and
+        With no label, padding sets the size, so the button misses its neighbours' height and
         changes with every icon. Make it a fixed square as tall as its neighbours, and centre the
-        icon. With no text to read, add an <Code>aria-label</Code> and a tooltip.
+        icon. With no text to read, give it an accessible name and a tooltip.
       </>
     ),
     bad: {
       label: "Sized by padding",
-      costs: ["52 × 38", "no tooltip"],
+      costs: ["44 × 44", "no tooltip"],
       view: <IconKeysDemo careful={false} />,
     },
     good: {
       label: "Fixed square",
-      costs: ["38 × 38", "aria-label + tooltip"],
+      costs: ["38 × 38", "named + tooltip"],
       view: <IconKeysDemo careful />,
     },
+    levels: [
+      {
+        name: "Three icons",
+        prompt: (
+          <>
+            A toolbar has three icon-only buttons with the same padding. They come out 38, 42 and
+            46px wide. Place the fix.
+          </>
+        ),
+        piece: "one size for all",
+        answer: "square",
+        rows: [
+          { depth: 0, text: "Toolbar", kind: "comp" },
+          { depth: 1, text: "⚙  ✎  ⋯", tag: "38 · 42 · 46px" },
+          {
+            depth: 1,
+            slot: {
+              id: "pad",
+              label: "+ less padding on all three",
+              note: "They're still sized by each icon, just smaller. They still come out three widths.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "redraw",
+              label: "+ icons redrawn to one width",
+              note: "It holds until the next icon. The size still depends on what's inside.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "square",
+              label: "+ a fixed square, icon centred",
+              note: "Fix the box, not the padding. Every icon gets the same square, the next one too.",
+            },
+          },
+        ],
+      },
+    ],
   },
 ];
 
 export const TLDR = [
   ["Any button", "Give hover, press and focus a look, in 100 to 200ms"],
-  ["Waiting on a request", "Stop clicks, keep the width, say Saving… then Saved"],
-  ["Not available yet", "Set cursor: not-allowed and add a tooltip that says why"],
+  ["Not available yet", "Show the no-entry cursor and a tooltip that says why"],
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
-  ["It deletes something", "Make it red, behind a confirm that names what goes"],
+  ["It deletes something", "Make it red, then confirm by name, hold, or offer Undo"],
   ["An icon beside the label", "Take 4px off the icon's side"],
-  ["An icon with no label", "Make it a fixed square with an aria-label and a tooltip"],
+  ["An icon with no label", "Make it a fixed square with an accessible name and a tooltip"],
 ] as const;
-
-const LEVELS: Level[] = [
-  {
-    name: "The one next step",
-    prompt: (
-      <>
-        A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted.
-        Style <b>Checkout</b>.
-      </>
-    ),
-    piece: "Checkout",
-    answer: "brand",
-    rows: [
-      { depth: 0, text: "<CartFooter>", kind: "comp" },
-      { depth: 1, text: "Continue shopping", tag: "text" },
-      { depth: 1, text: "Edit cart", tag: "tinted" },
-      {
-        depth: 1,
-        slot: {
-          id: "tint",
-          label: "+ tinted, like Edit cart",
-          note: "Checkout now weighs the same as Edit cart, so nothing says which one finishes the order.",
-          cost: ["2 equal buttons", "0 filled"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "red",
-          label: "+ filled red",
-          note: "Red reads as danger. People pause on the one button you want them to press.",
-          cost: ["red = delete"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "brand",
-          label: "+ filled, brand colour",
-          note: "Fill one button in the brand colour to mark the step that finishes the job.",
-          cost: ["1 filled", "1 next step"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Remove a teammate",
-    prompt: (
-      <>
-        Each row on the team page can remove that member's access. You can invite them back later.
-        Pick the button for the row.
-      </>
-    ),
-    piece: "Remove access",
-    answer: "tint",
-    rows: [
-      { depth: 0, text: "<MemberRow>", kind: "comp" },
-      { depth: 1, text: "Dana Whitfield", tag: "editor" },
-      {
-        depth: 1,
-        slot: {
-          id: "filled",
-          label: "+ filled red, then a confirm",
-          note: "Save filled red for a delete you can't undo, like Delete project. On every row, it outweighs the rest of the page.",
-          cost: ["red on 12 rows"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "grey",
-          label: "+ grey text, one click",
-          note: "It looks like Cancel. One stray click locks Dana out, and nothing warned you.",
-          cost: ["1 click", "0 warnings"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "tint",
-          label: "+ tinted red, then a confirm",
-          note: "Tint it red and use a confirm that names Dana. You can undo it, so a milder warning fits.",
-          cost: ["2 clicks", "names who"],
-        },
-      },
-    ],
-  },
-  {
-    name: "While it saves",
-    prompt: (
-      <>
-        Saving takes 1.2 seconds, and impatient people click again at 300ms. Pick when the button
-        stops taking clicks and says <b>Saving…</b>
-      </>
-    ),
-    piece: "disabled · Saving…",
-    answer: "now",
-    rows: [
-      { depth: 0, text: "0 ms", tag: "click" },
-      {
-        depth: 1,
-        slot: {
-          id: "now",
-          label: "+ right at the click",
-          note: "Switch at the click. The button says so at once, and the second click does nothing.",
-          cost: ["1 request", "0ms silent"],
-        },
-      },
-      { depth: 0, text: "300 ms", tag: "second click" },
-      {
-        depth: 1,
-        slot: {
-          id: "late",
-          label: "+ at 400 ms",
-          note: "For 400ms it looks idle, so the click at 300ms sends the form twice.",
-          cost: ["2 requests", "400ms silent"],
-        },
-      },
-      { depth: 0, text: "1200 ms", tag: "response" },
-      {
-        depth: 1,
-        slot: {
-          id: "after",
-          label: "+ after the response",
-          note: "Nothing seems to happen for the whole wait, then it jumps to Saved.",
-          cost: ["2 requests", "1.2s silent"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Less padding",
-    prompt: (
-      <>
-        <Code>pl-2 pr-3</Code> puts 8px on the left and 12px on the right. Pick the toolbar button
-        for it.
-      </>
-    ),
-    piece: "pl-2 pr-3",
-    answer: "lead",
-    rows: [
-      { depth: 0, text: "<Toolbar>", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "trail",
-          label: "Continue →",
-          note: "Its icon is on the right. Trimming the left squeezes the text and leaves the arrow side loose.",
-          cost: ["tight on the wrong side"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "lead",
-          label: "＋ New project",
-          note: "Trim the side the icon leads on. Its own white space makes up the rest.",
-          cost: ["8 | 12px", "looks even"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "only",
-          label: "⚙ (icon only)",
-          note: "Make an icon-only button square, with the same padding on every side.",
-          cost: ["not square"],
-        },
-      },
-    ],
-  },
-  {
-    name: "Can't be pressed",
-    prompt: (
-      <>
-        Publish has three moments. Place <Code>cursor: not-allowed</Code>.
-      </>
-    ),
-    piece: "cursor: not-allowed",
-    answer: "off",
-    rows: [
-      { depth: 0, text: "<PublishButton>", kind: "comp" },
-      {
-        depth: 1,
-        slot: {
-          id: "idle",
-          label: "+ idle, title filled in",
-          note: "Keep the default arrow on a button that can be pressed. The hand is for links.",
-          cost: ["says no", "means yes"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "busy",
-          label: "+ saving, aria-busy",
-          note: "Saving is busy. Use cursor: wait to say it's working.",
-          cost: ["reads as refused"],
-        },
-      },
-      {
-        depth: 1,
-        slot: {
-          id: "off",
-          label: "+ disabled, no title yet",
-          note: "Show the no-entry sign on hover, with a tooltip that says to add a title first.",
-          cost: ["1 reason shown"],
-        },
-      },
-    ],
-  },
-];
 
 export function ButtonDesign() {
   return (
     <RuleLanding
-      lead={
-        <>Style every state, hold the width while it works, and confirm anything destructive.</>
-      }
+      lead={<>Style every state, say why it's off, and guard anything destructive.</>}
       learn={{
         title: "Answer every press",
-        intro: <>Give each state, wait and refusal a visible change, so no press feels lost.</>,
+        intro: <>Give each state and refusal a visible change, so no press feels lost.</>,
       }}
       lessons={LESSONS}
       tldr={TLDR}
-      quiz={{
-        intro: <>Place each piece. A wrong spot shows what it costs.</>,
-        levels: LEVELS,
-        board: "layout",
-      }}
+      board="layout"
       take="build buttons the same way"
     />
   );

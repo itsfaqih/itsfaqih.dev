@@ -97,10 +97,12 @@ function BlogIndex() {
   );
 }
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 const styles = stylex.create({
   page: {
     position: "relative",
-    minHeight: "100vh",
+    minHeight: "100svh",
   },
   container: {
     position: "relative",
@@ -177,7 +179,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: palette["--border"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--muted-foreground"] },
+      ":hover": { default: null, [HOVER]: palette["--muted-foreground"] },
     },
     borderRadius: "1rem",
     transitionProperty: "all",
@@ -232,7 +234,7 @@ const styles = stylex.create({
     color: palette["--muted-foreground"],
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "0.25rem 0" },
     },
     transitionProperty: "all",
     transitionTimingFunction: transitions.ease,
@@ -251,7 +253,8 @@ const styles = stylex.create({
     gap: "0.5rem",
     color: {
       default: palette["--muted-foreground"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
     },
     transitionProperty: transitions.colors,
     transitionTimingFunction: transitions.ease,
@@ -261,7 +264,7 @@ const styles = stylex.create({
     rotate: "180deg",
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, "@media (hover: hover)": "-0.25rem 0" },
+      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: "-0.25rem 0" },
     },
     transitionProperty: transitions.transform,
     transitionTimingFunction: transitions.ease,

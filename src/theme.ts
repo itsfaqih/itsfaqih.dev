@@ -28,6 +28,9 @@ const lightTheme = stylex.createTheme(palette, {
   "--bevel-lo": "rgb(30 30 60 / 0.07)",
   "--key-mix": "80%",
   "--soft-hover": "#e2e2ea",
+  "--soft-key": "#ececf2",
+  "--soft-key-hover": "#e2e2ea",
+  "--soft-key-drop": "#c5c5d1",
   "--hair-hover": "#b9b9c6",
   // Dark lines vanish on dark ink, so paper's scanlines are light: they cut through black text the
   // way dark mode's cut through white, and all but vanish on the pale page.
@@ -48,3 +51,6 @@ export const THEME_CLASSES: Record<Theme, string[]> = {
   light: ["light", ...(stylex.props(lightTheme, kitLight).className ?? "").split(" ")],
   dark: ["dark"],
 };
+
+/** Each theme's page background, for the browser chrome's theme-color. */
+export const THEME_COLORS: Record<Theme, string> = { light: "#f5f5f8", dark: "#0e0e13" };

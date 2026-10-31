@@ -10,7 +10,7 @@ import { PageScrollbar } from "../components/page-scrollbar";
 import { FaviconCycle } from "../components/favicon-cycle";
 import { PrintCursor } from "../components/print-cursor";
 import { SmoothScroll } from "../components/smooth-scroll";
-import { THEME_CLASSES } from "../theme";
+import { THEME_CLASSES, THEME_COLORS } from "../theme";
 
 import appCss from "../styles.css?url";
 
@@ -26,10 +26,12 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
+      },
       { title: "Faqih Muntashir" },
-      { name: "theme-color", content: "#f5f5f8", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#0e0e13", media: "(prefers-color-scheme: dark)" },
     ],
     links: [
       { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
@@ -59,6 +61,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" {...stylex.props(styles.html)} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {/* Here rather than in head(), which keeps only one meta per name. */}
+        <meta
+          name="theme-color"
+          content={THEME_COLORS.light}
+          media="(prefers-color-scheme: light)"
+          data-theme="light"
+        />
+        <meta
+          name="theme-color"
+          content={THEME_COLORS.dark}
+          media="(prefers-color-scheme: dark)"
+          data-theme="dark"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -75,6 +90,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 var themes = ${JSON.stringify(THEME_CLASSES)};
                 doc.classList.remove(...themes.light, ...themes.dark);
                 doc.classList.add(...themes[theme]);
+                // The metas' media queries follow the system, which a saved choice can contradict.
+                // Media rather than content changes: React matches the metas by content on hydration.
+                document.querySelectorAll('meta[name="theme-color"]').forEach(function(meta) {
+                  meta.media = meta.dataset.theme === theme ? 'all' : 'not all';
+                });
                 try {
                   // The home intro plays once per session, only when the visit lands on home,
                   // and never under reduced motion.
@@ -112,13 +132,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   );
 }
 
+const HOVER = "@media (hover: hover) and (pointer: fine)";
+
 const styles = stylex.create({
   notFound: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: "60vh",
+    minHeight: "60svh",
   },
   notFoundTitle: {
     marginBottom: "1rem",
@@ -129,7 +151,8 @@ const styles = stylex.create({
   homeLink: {
     color: {
       default: palette["--muted-foreground"],
-      ":hover": { default: null, "@media (hover: hover)": palette["--text"] },
+      ":hover": { default: null, [HOVER]: palette["--text"] },
+      ":active": palette["--text"],
     },
     textDecorationLine: "underline",
     textDecorationColor: palette["--border"],
@@ -138,14 +161,17 @@ const styles = stylex.create({
   html: {
     scrollBehavior: "smooth",
     // Anchored sections land below the fixed header bar.
-    scrollPaddingTop: "88px",
+    scrollPaddingTop: "calc(88px + env(safe-area-inset-top, 0px))",
     overflowX: "clip !important",
   },
   body: {
     position: "relative",
-    minHeight: "100vh",
+    minHeight: "100svh",
     // Room for the fixed header bar.
-    paddingTop: "72px",
+    paddingTop: "calc(72px + env(safe-area-inset-top, 0px))",
+    // viewport-fit=cover lays the page under a landscape notch; the background still bleeds there.
+    paddingLeft: "env(safe-area-inset-left, 0px)",
+    paddingRight: "env(safe-area-inset-right, 0px)",
     WebkitFontSmoothing: "antialiased",
     MozOsxFontSmoothing: "grayscale",
     color: palette["--text"],

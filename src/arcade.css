@@ -121,6 +121,14 @@ html:active-view-transition-type(rule-open) [data-opening] .t,
 html:active-view-transition-type(rule-open) [data-opening] > h3 {
   view-transition-name: rule-title;
 }
+/* The header island stays put over the dive, above the swelling card, instead of zooming away
+   with the page. */
+html:active-view-transition-type(rule-open) .island {
+  view-transition-name: site-nav;
+}
+::view-transition-group(site-nav) {
+  z-index: 1;
+}
 ::view-transition-group(rule-thumb),
 ::view-transition-group(rule-title) {
   animation-duration: 520ms;
@@ -145,17 +153,17 @@ html:active-view-transition-type(rule-open)::view-transition-new(root) {
     rule-dive-card 620ms cubic-bezier(0.32, 0.72, 0, 1) both,
     vt-fade-out 260ms 240ms ease-out both;
 }
+/* Both layers cover the screen as they grow, so a blur on either re-rasterises it every frame and
+   drops the dive to about 30fps. The upscaled card softens on its own. */
 @keyframes rule-dive-root {
   to {
     transform: scale(1.25);
     opacity: 0;
-    filter: blur(4px);
   }
 }
 @keyframes rule-dive-card {
   to {
     transform: scale(4.5);
-    filter: blur(10px);
   }
 }
 @keyframes vt-fade-out {

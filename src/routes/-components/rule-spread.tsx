@@ -1,5 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useEffectEvent, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Link } from "@tanstack/react-router";
 import { colorOf, ruleNumber } from "../../data/guidelines";
 import type { PublishedGuideline } from "../../data/guidelines";
@@ -20,7 +26,13 @@ const DRAG_START_PX = 6;
 const HIDDEN_AT = 2.95;
 const WHEEL_SETTLE_MS = 120;
 
-type Grab = { x: number; position: number; unit: number; samples: { x: number; t: number }[]; dragging: boolean };
+type Grab = {
+  x: number;
+  position: number;
+  unit: number;
+  samples: { x: number; t: number }[];
+  dragging: boolean;
+};
 
 export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
   const last = rules.length - 1;
@@ -30,7 +42,14 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const stageRef = useRef<HTMLDivElement>(null);
   const slots = useRef<HTMLDivElement[]>([]);
-  const deck = useRef({ position: initial, velocity: 0, target: initial, frame: 0, wheelTimer: 0, justDragged: false });
+  const deck = useRef({
+    position: initial,
+    velocity: 0,
+    target: initial,
+    frame: 0,
+    wheelTimer: 0,
+    justDragged: false,
+  });
   const grab = useRef<Grab | null>(null);
   const clamp = (index: number) => Math.max(0, Math.min(last, index));
 
@@ -59,9 +78,11 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
     const tick = (now: number) => {
       const dt = Math.min(0.032, (now - then) / 1000);
       then = now;
-      state.velocity += ((state.target - state.position) * STIFFNESS - state.velocity * DAMPING) * dt;
+      state.velocity +=
+        ((state.target - state.position) * STIFFNESS - state.velocity * DAMPING) * dt;
       state.position += state.velocity * dt;
-      const atRest = Math.abs(state.target - state.position) < 0.001 && Math.abs(state.velocity) < 0.01;
+      const atRest =
+        Math.abs(state.target - state.position) < 0.001 && Math.abs(state.velocity) < 0.01;
       if (atRest) {
         state.position = state.target;
         state.velocity = 0;
@@ -108,7 +129,10 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
     if (position > last) position = last + (position - last) * RUBBER;
     deck.current.position = position;
     const t = performance.now();
-    current.samples = [...current.samples.filter((sample) => t - sample.t < 100), { x: event.clientX, t }];
+    current.samples = [
+      ...current.samples.filter((sample) => t - sample.t < 100),
+      { x: event.clientX, t },
+    ];
     paint();
   };
 
@@ -213,7 +237,7 @@ export function RuleSpread({ rules }: { rules: PublishedGuideline[] }) {
             >
               <span {...stylex.props(styles.plate)}>
                 <span>No.{ruleNumber(item)}</span>
-                <span>{item.interactive ? "▶ DEMO" : "ARTICLE"}</span>
+                <span>▶ DEMO</span>
               </span>
               <RuleThumb rule={item} play={index === active} style={styles.thumb} />
               {/* .t names the title for the rule-open view transition in arcade.css. */}
@@ -279,7 +303,10 @@ function SlideNumber({ value }: { value: number }) {
           {pad(shown.previous)}
         </span>
       )}
-      <span key={shown.value} {...stylex.props(number.digits, shown.previous !== shown.value && number.now)}>
+      <span
+        key={shown.value}
+        {...stylex.props(number.digits, shown.previous !== shown.value && number.now)}
+      >
         {pad(shown.value)}
       </span>
     </span>
@@ -288,6 +315,7 @@ function SlideNumber({ value }: { value: number }) {
 
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const HOVER = "@media (hover: hover) and (pointer: fine)";
 // A press or hover counts only while the deck is not being dragged.
 const STILL = ":not([data-dragging] *)";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
@@ -318,13 +346,17 @@ const styles = stylex.create({
     perspective: "1400px",
     overflowX: "clip",
     touchAction: "pan-y",
-    cursor: { default: cursors["--cursor-grab"], ":is([data-dragging])": cursors["--cursor-grabbing"] },
+    cursor: {
+      default: cursors["--cursor-grab"],
+      ":is([data-dragging])": cursors["--cursor-grabbing"],
+    },
     userSelect: "none",
     "::before": {
       content: '""',
       position: "absolute",
       inset: "0 8%",
-      backgroundImage: "radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent)",
+      backgroundImage:
+        "radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent)",
       pointerEvents: "none",
     },
   },
@@ -406,7 +438,7 @@ const styles = stylex.create({
     color: INK,
     translate: {
       default: null,
-      "@media (hover: hover)": { default: null, [`:is(:hover > * > *)${STILL}`]: "2px -2px" },
+      [HOVER]: { default: null, [`:is(:hover > * > *)${STILL}`]: "2px -2px" },
     },
     transitionProperty: "translate",
     transitionDuration: "150ms",
