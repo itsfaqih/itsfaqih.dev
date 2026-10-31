@@ -1,6 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { colorOf, VISIBLE_GUIDELINES } from "../../data/guidelines";
 import type { Guideline } from "../../data/guidelines";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -44,10 +51,39 @@ const GLYPH = new Map<string, (stroke: StrokeProps) => ReactNode>([
 ]);
 
 const RULE_OPEN = "rule-open";
+const RULE_CLOSE = "rule-close";
+const PAGE_FADE = "page-fade";
+const RULE_PAGE = /^\/rule-of-thumb\/[^/]+$/;
+const INDEX_PAGE = /^\/rule-of-thumb\/?$/;
+
+// The rule being left for the index, read by the index's tiles as it mounts.
+let closingFrom: string | null = null;
+
+type LocationChange = {
+  fromLocation?: { pathname: string };
+  toLocation: { pathname: string };
+  pathChanged: boolean;
+};
+
+/**
+ * The router's transition for a path change. Leaving a rule for the index zooms back out onto
+ * the rule's tile, the dive in reverse; every other page fades through.
+ */
+export function pageTransitionTypes({ fromLocation, toLocation, pathChanged }: LocationChange) {
+  if (!pathChanged) return false;
+  const from = fromLocation?.pathname.replace(/\/$/, "") ?? "";
+  const closing =
+    RULE_PAGE.test(from) &&
+    INDEX_PAGE.test(toLocation.pathname) &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  closingFrom = closing ? from : null;
+  return [closing ? RULE_CLOSE : PAGE_FADE];
+}
 
 export function useRuleOpen() {
   const panel = useRef<HTMLElement>(null);
   const [opening, setOpening] = useState<{ rule: string; inPanel: boolean } | null>(null);
+  const [closing] = useState(() => (isClosingRule() ? closingFrom : null));
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const router = useRouter();
   // The dive holds the old page frozen until the new one renders, so a rule whose code is still
@@ -63,10 +99,23 @@ export function useRuleOpen() {
     const idle = requestIdleCallback(preload, { timeout: 1500 });
     return () => cancelIdleCallback(idle);
   }, [router]);
+  // The zoom out lands on the tile's centre, measured once the new page has laid out.
+  useLayoutEffect(() => {
+    const tile = closing && document.querySelector("[data-opening]");
+    if (!tile) return;
+    const card = tile.getBoundingClientRect();
+    const root = document.documentElement.style;
+    root.setProperty("--open-x", `${card.x + card.width / 2}px`);
+    root.setProperty("--open-y", `${card.y + card.height / 2}px`);
+  }, [closing]);
   return {
     panelProps: { ref: panel, "data-opening": opening?.inPanel ? "" : undefined },
     linkProps: (rule: Guideline) => ({
-      "data-opening": opening?.rule === rule.id && !opening.inPanel ? "" : undefined,
+      "data-opening": (
+        opening ? opening.rule === rule.id && !opening.inPanel : closing === rule.href
+      )
+        ? ""
+        : undefined,
       viewTransition: reduced ? undefined : { types: [RULE_OPEN] },
       onClick: (event: MouseEvent<HTMLElement>) => {
         const shown = panel.current?.checkVisibility() ? panel.current : null;
@@ -82,6 +131,10 @@ export function useRuleOpen() {
 
 export function isOpeningRule() {
   return matchesRoot(`:active-view-transition-type(${RULE_OPEN})`);
+}
+
+export function isClosingRule() {
+  return matchesRoot(`:active-view-transition-type(${RULE_CLOSE})`);
 }
 
 export function isTransitioning() {
@@ -109,11 +162,11 @@ export function RuleThumb({ rule, play = false, at = "card", style }: RuleThumbP
   const Art = rule && ART.get(rule.id);
   return (
     <div
-      className={`thumb ${stylex.props(screen.root, !rule && screen.blank, style).className}`}
+      className={`thumb ${stylex.props(screen.root, !rule && screen.blank, at === "cover" && depth.dots, style).className}`}
       style={rule && { "--c": colorOf(rule.label) }}
       aria-hidden="true"
     >
-      {rule && (Art ? <Art play={play} at={at} /> : <GlyphArt rule={rule} play={play} />)}
+      {rule && (Art ? <Art play={play} at={at} /> : <GlyphArt rule={rule} play={play} at={at} />)}
     </div>
   );
 }
@@ -131,7 +184,14 @@ type ChipProps = {
 
 function Chip({ beats, moves, playing, at }: ChipProps) {
   return (
-    <span {...stylex.props(screen.chip, at !== "card" && screen.chipLarge, playing)}>
+    <span
+      {...stylex.props(
+        screen.chip,
+        at !== "card" && screen.chipLarge,
+        at === "cover" && depth.near,
+        playing,
+      )}
+    >
       {beats.map((beat, index) => (
         <b key={beat} {...stylex.props(screen.beat, playing, playing && moves[index])}>
           {beat}
@@ -144,37 +204,50 @@ function Chip({ beats, moves, playing, at }: ChipProps) {
 // Proximity: styles.ts walks out to shared/ and back home into OrderCard/.
 function ProximityArt({ play, at }: ArtProps) {
   const playing = play && draw.play;
+  const z = at === "cover";
   return (
     <div {...stylex.props(screen.art, playing)}>
       <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
         <rect
-          {...stylex.props(proximity.box, draw.moving, playing, play && proximity.boxPlay)}
+          {...stylex.props(
+            proximity.box,
+            draw.moving,
+            playing,
+            play && proximity.boxPlay,
+            z && depth.back,
+          )}
           x="14"
           y="21"
           width="108"
           height="46"
           rx="6"
         />
-        <text {...stylex.props(draw.text, draw.dim, playing)} x="14" y="15">
+        <text {...stylex.props(draw.text, draw.dim, playing, z && depth.back)} x="14" y="15">
           src/
         </text>
-        <text {...stylex.props(draw.text, draw.hi, playing)} x="22" y="33">
+        <text {...stylex.props(draw.text, draw.hi, playing, z && depth.mid)} x="22" y="33">
           OrderCard/
         </text>
-        <text {...stylex.props(draw.text, playing)} x="32" y="47">
+        <text {...stylex.props(draw.text, playing, z && depth.mid)} x="32" y="47">
           OrderCard.tsx
         </text>
-        <text {...stylex.props(draw.text, draw.dim, playing)} x="22" y="77">
+        <text {...stylex.props(draw.text, draw.dim, playing, z && depth.mid)} x="22" y="77">
           shared/
         </text>
         <line
-          {...stylex.props(proximity.link, draw.moving, playing, play && proximity.linkPlay)}
+          {...stylex.props(
+            proximity.link,
+            draw.moving,
+            playing,
+            play && proximity.linkPlay,
+            z && depth.mid,
+          )}
           x1="27"
           y1="50"
           x2="27"
           y2="89"
         />
-        <g {...stylex.props(draw.moving, playing, play && proximity.filePlay)}>
+        <g {...stylex.props(draw.moving, playing, play && proximity.filePlay, z && depth.front)}>
           <rect
             {...stylex.props(proximity.file, playing)}
             x="30"
@@ -197,10 +270,19 @@ function ProximityArt({ play, at }: ArtProps) {
 // again 74-100%.
 function ButtonArt({ play, at }: ArtProps) {
   const playing = play && draw.playSlow;
+  const z = at === "cover";
   return (
     <div {...stylex.props(screen.art, playing)}>
       <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
-        <g {...stylex.props(button.button, draw.moving, playing, play && button.buttonPlay)}>
+        <g
+          {...stylex.props(
+            button.button,
+            draw.moving,
+            playing,
+            play && button.buttonPlay,
+            z && depth.mid,
+          )}
+        >
           <rect
             {...stylex.props(button.face, draw.moving, playing)}
             x="38"
@@ -252,7 +334,7 @@ function ButtonArt({ play, at }: ArtProps) {
         {PIP_PLAY.map((pipPlay, index) => (
           <rect
             key={index}
-            {...stylex.props(button.pip, draw.moving, playing, play && pipPlay)}
+            {...stylex.props(button.pip, draw.moving, playing, play && pipPlay, z && depth.back)}
             x={52 + index * 12}
             y="72"
             width="8"
@@ -261,7 +343,13 @@ function ButtonArt({ play, at }: ArtProps) {
           />
         ))}
         <path
-          {...stylex.props(button.cursor, draw.moving, playing, play && button.cursorPlay)}
+          {...stylex.props(
+            button.cursor,
+            draw.moving,
+            playing,
+            play && button.cursorPlay,
+            z && depth.front,
+          )}
           d="M100 46l0 16 4.5-4.2 3 6.6 2.6-1.2-3-6.4 6-.4z"
         />
       </svg>
@@ -290,7 +378,13 @@ function DataLoadingArt({ play, at }: ArtProps) {
     <div {...stylex.props(screen.art, playing)}>
       <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
         <rect
-          {...stylex.props(dataLoading.card, own && dataLoading.ownCard, draw.moving, playing)}
+          {...stylex.props(
+            dataLoading.card,
+            own && dataLoading.ownCard,
+            draw.moving,
+            playing,
+            own && depth.back,
+          )}
           x="22"
           y="16"
           width="116"
@@ -298,14 +392,20 @@ function DataLoadingArt({ play, at }: ArtProps) {
           rx="8"
         />
         <rect
-          {...stylex.props(dataLoading.flash, draw.moving, playing, play && dataLoading.flashPlay)}
+          {...stylex.props(
+            dataLoading.flash,
+            draw.moving,
+            playing,
+            play && dataLoading.flashPlay,
+            own && depth.mid,
+          )}
           x="24"
           y="44"
           width="112"
           height="16"
           rx="3"
         />
-        <g {...stylex.props(draw.moving, playing, play && dataLoading.rowsPlay)}>
+        <g {...stylex.props(draw.moving, playing, play && dataLoading.rowsPlay, own && depth.mid)}>
           {rows.map((row, index) => (
             <g key={row.y} {...stylex.props(playing)}>
               <circle {...stylex.props(dataLoading.mark, playing)} cx="36" cy={row.y + 2} r="4" />
@@ -342,6 +442,7 @@ function DataLoadingArt({ play, at }: ArtProps) {
             draw.moving,
             playing,
             play && dataLoading.oldPlay,
+            own && depth.mid,
           )}
           x="130"
           y="57"
@@ -354,6 +455,7 @@ function DataLoadingArt({ play, at }: ArtProps) {
             draw.moving,
             playing,
             play && (own ? dataLoading.slidePlay : dataLoading.sweepPlay),
+            own && depth.back,
           )}
           x="22"
           y="16"
@@ -370,11 +472,12 @@ function DataLoadingArt({ play, at }: ArtProps) {
 // Null vs undefined: the null box lifts out of its slot and drops back in; undefined stays empty.
 function NullArt({ play, at }: ArtProps) {
   const playing = play && draw.play;
+  const z = at === "cover";
   return (
     <div {...stylex.props(screen.art, playing)}>
       <svg viewBox="0 0 160 100" {...stylex.props(draw.svg, playing)}>
         <rect
-          {...stylex.props(nullish.slot, draw.moving, playing)}
+          {...stylex.props(nullish.slot, draw.moving, playing, z && depth.back)}
           x="20"
           y="20"
           width="52"
@@ -388,6 +491,7 @@ function NullArt({ play, at }: ArtProps) {
             draw.moving,
             playing,
             play && nullish.questionPlay,
+            z && depth.mid,
           )}
           x="46"
           y="51"
@@ -395,14 +499,14 @@ function NullArt({ play, at }: ArtProps) {
           ?
         </text>
         <rect
-          {...stylex.props(nullish.slot, draw.moving, playing)}
+          {...stylex.props(nullish.slot, draw.moving, playing, z && depth.back)}
           x="88"
           y="20"
           width="52"
           height="46"
           rx="8"
         />
-        <g {...stylex.props(draw.moving, playing, play && nullish.boxPlay)}>
+        <g {...stylex.props(draw.moving, playing, play && nullish.boxPlay, z && depth.front)}>
           <rect
             {...stylex.props(nullish.box, playing)}
             x="91"
@@ -416,14 +520,28 @@ function NullArt({ play, at }: ArtProps) {
           </text>
         </g>
         <text
-          {...stylex.props(draw.text, draw.dim, nullish.label, draw.moving, playing)}
+          {...stylex.props(
+            draw.text,
+            draw.dim,
+            nullish.label,
+            draw.moving,
+            playing,
+            z && depth.back,
+          )}
           x="46"
           y="84"
         >
           undefined
         </text>
         <text
-          {...stylex.props(draw.text, draw.hi, nullish.label, draw.moving, playing)}
+          {...stylex.props(
+            draw.text,
+            draw.hi,
+            nullish.label,
+            draw.moving,
+            playing,
+            z && depth.back,
+          )}
           x="114"
           y="84"
         >
@@ -441,7 +559,7 @@ function NullArt({ play, at }: ArtProps) {
 }
 
 // Rules without custom art yet: the topic glyph on the same screen.
-function GlyphArt({ rule, play }: { rule: Guideline; play: boolean }) {
+function GlyphArt({ rule, play, at }: { rule: Guideline; play: boolean; at: ArtProps["at"] }) {
   const playing = play && draw.play;
   const strokes = GLYPH.get(rule.label) ?? GLYPH.get("Best Practices")!;
   return (
@@ -454,7 +572,7 @@ function GlyphArt({ rule, play }: { rule: Guideline; play: boolean }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        {...stylex.props(glyph.svg, playing, play && glyph.float)}
+        {...stylex.props(glyph.svg, playing, play && glyph.float, at === "cover" && depth.near)}
       >
         {strokes(stylex.props(playing))}
       </svg>
@@ -546,6 +664,47 @@ const screen = stylex.create({
     backgroundColor: { default: "rgb(0 0 0 / 0.45)", [LIGHT]: "rgb(255 255 255 / 0.85)" },
     boxShadow: "inset 0 0 0 1px var(--c-dim)",
     opacity: { default: 0, ":last-child": 1 },
+  },
+});
+
+// On a rule's cover the art sits in layers that slide against the card's lean, nearer ones further.
+// The cover sets --px and --py, the pointer's offset from its centre from -0.5 to 0.5. Inside the
+// SVG a px is a viewBox unit, about three screen pixels at cover size. Translate composes with the
+// beats' transform, so the layers shift while the art plays.
+const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const depth = stylex.create({
+  dots: {
+    backgroundPositionX: "calc(var(--px, 0) * -12px), 0%",
+    backgroundPositionY: "calc(var(--py, 0) * -12px), 0%",
+    transitionProperty: { default: "background-position", [REDUCE]: "none" },
+    transitionDuration: motion["--t-panel"],
+    transitionTimingFunction: motion["--out"],
+  },
+  // In viewBox units.
+  back: {
+    translate: "calc(var(--px, 0) * 2px) calc(var(--py, 0) * 2px)",
+    transitionProperty: { default: "translate", [REDUCE]: "none" },
+    transitionDuration: motion["--t-panel"],
+    transitionTimingFunction: motion["--out"],
+  },
+  mid: {
+    translate: "calc(var(--px, 0) * 7px) calc(var(--py, 0) * 7px)",
+    transitionProperty: { default: "translate", [REDUCE]: "none" },
+    transitionDuration: motion["--t-panel"],
+    transitionTimingFunction: motion["--out"],
+  },
+  front: {
+    translate: "calc(var(--px, 0) * 12px) calc(var(--py, 0) * 12px)",
+    transitionProperty: { default: "translate", [REDUCE]: "none" },
+    transitionDuration: motion["--t-panel"],
+    transitionTimingFunction: motion["--out"],
+  },
+  // In screen pixels: the chip and the glyph sit outside a viewBox.
+  near: {
+    translate: "calc(var(--px, 0) * 28px) calc(var(--py, 0) * 28px)",
+    transitionProperty: { default: "translate", [REDUCE]: "none" },
+    transitionDuration: motion["--t-panel"],
+    transitionTimingFunction: motion["--out"],
   },
 });
 

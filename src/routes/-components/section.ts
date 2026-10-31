@@ -48,8 +48,10 @@ export const section = stylex.create({
  * Copy that sits straight on the dither, with no card under it, rests on a veil: a blurred,
  * rounded patch of page colour drawn behind the words, so the dither never runs through them.
  * `dense` is for small text, whose thin strokes the dither breaks up more easily; `fit` hugs the
- * veil to the words on a block element. The patch is an ::after at z-index -1, and the veil
- * isolates so it stays above the backdrop.
+ * veil to the words on a block element. The patch is an ::after at z-index -1. The veil itself
+ * stays out of stacking: it joins the content column's context (`arcade.wrap` isolates), where
+ * every patch paints before any text. A veil that isolated would paint its patch over the text
+ * of a neighbour or of the veiled heading around it.
  */
 const patch = {
   content: '""',
@@ -61,7 +63,6 @@ const patch = {
 export const veil = stylex.create({
   soft: {
     position: "relative",
-    isolation: "isolate",
     "::after": {
       ...patch,
       // Grows and rounds with the block, so a tall one turns into a blob rather than a card.
@@ -73,7 +74,6 @@ export const veil = stylex.create({
   },
   dense: {
     position: "relative",
-    isolation: "isolate",
     "::after": {
       ...patch,
       inset: "-12px -20px",

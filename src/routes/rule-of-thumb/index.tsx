@@ -1,9 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { TOPICS, VISIBLE_GUIDELINES as RULES } from "../../data/guidelines";
 import { Backdrop } from "../-components/backdrop";
 import { heroType } from "../-components/hero-type";
+import { isClosingRule } from "../-components/rule-art";
 import { RuleSelect } from "../-components/rule-select";
 import { useCutIns } from "../-components/use-cut-ins";
 import { pageHead } from "../../seo";
@@ -27,6 +28,16 @@ export const Route = createFileRoute("/rule-of-thumb/")({
 function RuleOfThumbsIndex() {
   const rootRef = useRef<HTMLDivElement>(null);
   useCutIns(rootRef);
+  // Zooming back out of a rule lands on the index at rest, as the dive left it, so every piece
+  // is already in place before the new page is captured.
+  const [returning] = useState(isClosingRule);
+  useLayoutEffect(() => {
+    if (!returning) return;
+    rootRef.current?.querySelectorAll<HTMLElement>("[data-cut]").forEach((piece) => {
+      piece.style.animation = "none";
+      piece.classList.add("in");
+    });
+  }, [returning]);
 
   return (
     <div ref={rootRef} className={`arc ${stylex.props(arcade.root, arcade.scan).className}`}>

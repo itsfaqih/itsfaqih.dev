@@ -21,6 +21,8 @@ const lightTheme = stylex.createTheme(palette, {
   "--ink-mix": "62%",
   "--eyebrow-mix": "90%",
   "--ts-deep": "color-mix(in oklab, var(--ts) 82%, #000)",
+  // The purple's light lavender washes out on paper, so light mode takes a deeper one.
+  "--ax": "#a084ff",
   // Yellow darkened toward black turns olive; light mode takes a gold of its own, 4:1 on white.
   "--go-ink": "#a87400",
   "--drop-ink": "#c5c5d1",

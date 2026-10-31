@@ -1472,7 +1472,7 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    title: "Wait before the skeleton",
+    title: "Avoid skeleton flickers",
     body: (
       <>
         Most replies are quick. Show loading UI only after 200ms, so a fast reply appears without a

@@ -302,16 +302,8 @@ export function Header() {
             <MoonIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.moonInDark)} />
           </button>
         </Seg>
-        <Seg on={full} style={styles.connectSeg} rowStyle={styles.connectRow}>
-          <Link
-            to="/"
-            hash="contact"
-            {...stylex.props(
-              button.base,
-              button.sm,
-              styles.connect,
-            )}
-          >
+        <Seg on compact="always" style={styles.connectSeg} rowStyle={styles.connectRow}>
+          <Link to="/" hash="contact" {...stylex.props(button.base, button.sm, styles.connect)}>
             Connect
           </Link>
         </Seg>
@@ -361,7 +353,12 @@ const READY = ":is(.js.no-intro *)";
 const WAITING = ":is(.js:not(.no-intro) *)";
 const AWAY = ":is([data-island-away] *)";
 
-const CONNECT_CHIP = `color-mix(in srgb, ${palette["--go"]} 18%, #0a0a0c)`;
+// The island inverts the page: black on paper, white in the dark. So the Connect chip takes the purple
+// of the ground it sits on, the dark theme's lavender on the black island and paper's deeper purple
+// on the white one, rather than the page's own --ax.
+const AX_ON_BLACK = "#bca2ff";
+const AX_ON_WHITE = "#a084ff";
+const CONNECT_CHIP = `color-mix(in srgb, ${AX_ON_BLACK} 18%, #0a0a0c)`;
 const SPRING = motion["--spring"];
 const FOLD = "560ms";
 
@@ -474,7 +471,10 @@ const styles = stylex.create({
     opacity: { default: 1, [NARROW]: 0 },
     filter: { default: "none", [NARROW]: { default: "blur(4px)", [REDUCE]: "none" } },
     visibility: { default: null, [NARROW]: "hidden" },
-    transition: { default: ROW_IN, [NARROW]: `${ROW_OUT}, visibility 0s ${motion["--t-moderate-exit"]}` },
+    transition: {
+      default: ROW_IN,
+      [NARROW]: `${ROW_OUT}, visibility 0s ${motion["--t-moderate-exit"]}`,
+    },
   },
   wideOnly: {
     display: { default: null, [TABLET]: "none" },
@@ -493,15 +493,15 @@ const styles = stylex.create({
   connectRow: {
     paddingLeft: { default: "8px", [NARROW]: "4px" },
   },
-  // Dark yellow on the white island; on the black island the same two colours swap places.
+  // Lavender with dark ink on the black island; the deeper purple with white ink on the white one.
   connect: {
-    color: { default: CONNECT_CHIP, [DARK]: palette["--go"] },
+    color: { default: CONNECT_CHIP, [DARK]: "#fff" },
     backgroundColor: {
-      default: palette["--go"],
-      ":hover": { default: null, [HOVER]: palette["--go-hover"] },
+      default: AX_ON_BLACK,
+      ":hover": { default: null, [HOVER]: `color-mix(in oklab, ${AX_ON_BLACK} 82%, #fff)` },
       [DARK]: {
-        default: CONNECT_CHIP,
-        ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${palette["--go"]} 28%, #0a0a0c)` },
+        default: AX_ON_WHITE,
+        ":hover": { default: null, [HOVER]: `color-mix(in oklab, ${AX_ON_WHITE} 88%, #000)` },
       },
     },
     flex: "none",

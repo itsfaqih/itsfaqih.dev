@@ -313,7 +313,6 @@ function SlideNumber({ value }: { value: number }) {
   );
 }
 
-const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 // A press or hover counts only while the deck is not being dragged.
@@ -343,8 +342,9 @@ const styles = stylex.create({
     paddingTop: "20px",
     paddingInline: 0,
     paddingBottom: "48px",
-    // Out to the screen edge, so the neighbours peek in from it instead of stopping at the gutter.
-    marginInline: { default: null, [STACKED]: "-18px" },
+    // Out to the screen edge at every width, so the neighbours peek in from it instead of being cut
+    // at the column's edge. html and body clip the overflow.
+    marginInline: "calc(50% - 50vw)",
     perspective: "1400px",
     overflowX: "clip",
     touchAction: "pan-y",

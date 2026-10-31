@@ -1,8 +1,7 @@
 import { createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
-
-const PAGE_FADE = "page-fade";
+import { pageTransitionTypes } from "./routes/-components/rule-art";
 
 export const getRouter = () =>
   createRouter({
@@ -12,5 +11,5 @@ export const getRouter = () =>
     scrollRestoration: true,
     defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
-    defaultViewTransition: { types: ({ pathChanged }) => (pathChanged ? [PAGE_FADE] : false) },
+    defaultViewTransition: { types: pageTransitionTypes },
   });

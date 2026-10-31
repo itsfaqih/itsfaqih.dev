@@ -240,6 +240,10 @@ const styles = stylex.create({
     borderRadius: "10px",
     fontSize: "12px",
   },
+  steps: {
+    display: "flex",
+    gap: "10px",
+  },
   formEnd: {
     justifySelf: { default: null, [PHONE]: "start" },
   },
@@ -721,6 +725,41 @@ function DisabledDemo({ careful }: { careful: boolean }) {
   );
 }
 
+function StillDemo({ careful }: { careful: boolean }) {
+  const tipId = useId();
+  return (
+    <div {...stylex.props(styles.stage)}>
+      <div {...stylex.props(styles.steps)}>
+        <span {...stylex.props(styles.tip)}>
+          <button
+            data-hint
+            type="button"
+            {...stylex.props(
+              styles.key,
+              styles.formKey,
+              styles.plain,
+              !careful && styles.live,
+              styles.off,
+              stylex.defaultMarker(),
+            )}
+            aria-disabled="true"
+            aria-describedby={tipId}
+          >
+            Back
+          </button>
+          <span role="tooltip" id={tipId} {...stylex.props(styles.tooltip)}>
+            This is the first step
+          </span>
+        </span>
+        <button type="button" {...stylex.props(styles.key, styles.formKey, styles.live)}>
+          Next
+        </button>
+      </div>
+      <small {...stylex.props(styles.small)}>Step 1 of 3</small>
+    </div>
+  );
+}
+
 function HierarchyDemo({ careful }: { careful: boolean }) {
   const key = [styles.key, styles.sm, styles.live];
   const inRow = styles.cardRowKey;
@@ -1160,6 +1199,66 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
+    title: "Keep a disabled button still on hover",
+    body: (
+      <>
+        A disabled button that lights up on hover says yes while its cursor says no, so people click
+        and nothing happens. Keep its colour and its drop still on hover and press, and let the
+        tooltip do the talking. Hover Back in both.
+      </>
+    ),
+    bad: {
+      label: "Lights up",
+      costs: ["lights on hover", "dips on press"],
+      view: <StillDemo careful={false} />,
+    },
+    good: {
+      label: "Stays still",
+      costs: ["0 changes on hover", "tooltip only"],
+      view: <StillDemo careful />,
+    },
+    levels: [
+      {
+        name: "Page 1 of 5",
+        prompt: (
+          <>
+            A pager sits on page 1 of 5, so <b>Previous</b> is disabled. Place the hover look on the
+            control a click can act on.
+          </>
+        ),
+        piece: "lights up on hover",
+        answer: "next",
+        rows: [
+          { depth: 0, text: "Pager", kind: "comp" },
+          {
+            depth: 1,
+            slot: {
+              id: "prev",
+              label: "+ Previous, disabled",
+              note: "There's no page before 1. Lighting it up invites a click that does nothing.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "current",
+              label: "+ 1, the current page",
+              note: "They're already on page 1, so a click there goes nowhere either.",
+            },
+          },
+          {
+            depth: 1,
+            slot: {
+              id: "next",
+              label: "+ Next",
+              note: "Next can act, so it lights up. The disabled one stays still, and the difference shows which works.",
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "Fill one button per screen",
     body: (
       <>
@@ -1406,6 +1505,7 @@ export const LESSONS: Lesson[] = [
 export const TLDR = [
   ["Any button", "Give hover, press and focus a look, in 100 to 200ms"],
   ["Not available yet", "Show the no-entry cursor and a tooltip that says why"],
+  ["Hovering a disabled button", "Keep its colour and drop still"],
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
   ["It deletes something", "Make it red, then confirm by name, hold, or offer Undo"],
   ["An icon beside the label", "Take 4px off the icon's side"],

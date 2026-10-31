@@ -39,14 +39,39 @@ const EXPERIENCE: Job[] = [
     role: "Software Engineer",
     stack: [
       "TypeScript",
+      "HTML",
+      "CSS",
       "React Router",
+      "Node.js",
       "Express",
       "PostgreSQL",
       "Snowflake",
+      "Redis",
+      "RabbitMQ",
       "Docker",
+      "Kubernetes",
+      "Amazon EKS",
+      "Amazon EC2",
+      "Amazon Glue",
+      "Amazon CloudFormation",
+      "Amazon Secrets Manager",
+      "Amazon Route 53",
+      "Amazon CodeBuild",
+      "Amazon CodePipeline",
+      "Amazon ECR",
+      "Amazon WAF",
+      "Amazon S3",
+      "Amazon SES",
+      "Amazon SNS",
+      "Git",
       "Vite",
       "Vitest",
+      "Jest",
+      "MSW",
+      "Storybook",
       "Biome",
+      "ESLint",
+      "Prettier",
       "Zod",
       "Tailwind CSS",
     ],
@@ -66,11 +91,22 @@ const EXPERIENCE: Job[] = [
     stack: [
       "React",
       "TypeScript",
+      "HTML",
+      "CSS",
       "Next.js",
       "TanStack Router",
+      "Node.js",
       "Express",
       "MongoDB",
+      "WebSocket",
+      "Zod",
       "Tailwind CSS",
+      "Radix UI",
+      "Shadcn UI",
+      "Git",
+      "Cypress",
+      "ESLint",
+      "Prettier",
     ],
     achievements: [
       "Simplified more than 80% of the code structure by co-locating related code and removing unnecessary abstractions.",
@@ -84,7 +120,28 @@ const EXPERIENCE: Job[] = [
     years: "2022 → 2023",
     company: "Jatis Mobile",
     role: "Full Stack Engineer",
-    stack: ["React", "TypeScript", "XState", "React Flow", "AdonisJS", "Tailwind CSS", "Figma"],
+    stack: [
+      "React",
+      "TypeScript",
+      "Astro",
+      "XState",
+      "React Flow",
+      "Tailwind CSS",
+      "Radix UI",
+      "Shadcn UI",
+      "Node.js",
+      "AdonisJS",
+      "PostgreSQL",
+      "MongoDB",
+      "Redis",
+      "NGINX",
+      "Git",
+      "Storybook",
+      "Cypress",
+      "ESLint",
+      "Prettier",
+      "Figma",
+    ],
     achievements: [
       "Eliminated server-side chatbot costs by building a client-side chatbot with XState that simulates a WhatsApp-style experience.",
       "Designed the UI and built the chatbot flow builder from scratch through deployment with React Flow, Tailwind CSS and AdonisJS.",
@@ -97,7 +154,7 @@ const EXPERIENCE: Job[] = [
     years: "2021 → 2022",
     company: "Rapidev",
     role: "Founding Engineer · PM",
-    stack: ["React", "TypeScript", "Laravel", "MySQL", "Figma"],
+    stack: ["React", "TypeScript", "Laravel", "MySQL", "Git", "Figma"],
     achievements: [
       "Cut dashboard load time by 80% by eager loading to fix N+1 queries and moving pagination to the server.",
       "Reduced the steps to update hotel availability and pricing by 66%.",
@@ -149,7 +206,7 @@ const OTHER_WORK = [
     company: "Mitra Integrasi Informatika",
     role: "Frontend Engineer",
     years: "2020 → 2021",
-    stack: ["React", "TypeScript", "Figma"],
+    stack: ["React", "TypeScript", "Git", "Figma"],
   },
 ];
 
@@ -218,6 +275,7 @@ const STACK_GROUPS: StackGroup[] = [
       "MariaDB",
       "MongoDB",
       "Redis",
+      "RabbitMQ",
       "Snowflake",
     ],
   },
@@ -231,6 +289,8 @@ const STACK_GROUPS: StackGroup[] = [
       "MSW",
       "Storybook",
       "Biome",
+      "ESLint",
+      "Prettier",
       "Oxlint",
       "Oxfmt",
     ],
@@ -239,6 +299,7 @@ const STACK_GROUPS: StackGroup[] = [
     label: "DevOps and infrastructure",
     tools: [
       "Docker",
+      "Kubernetes",
       "Git",
       "Vite",
       "Bun",
@@ -253,6 +314,11 @@ const STACK_GROUPS: StackGroup[] = [
       "Amazon S3",
       "Amazon SES",
       "Amazon SNS",
+      "Amazon EKS",
+      "Amazon EC2",
+      "Amazon Secrets Manager",
+      "Amazon Glue",
+      "Amazon CloudFormation",
     ],
   },
   { label: "Email and templating", tools: ["Mailjet", "Maizzle", "EJS"] },
@@ -414,11 +480,14 @@ function Index() {
             </span>
           </h2>
           <div {...stylex.props(loadIn.piece, heroType.acts)} data-cut style={{ marginTop: 24 }}>
-            <a {...stylex.props(button.base, buttonVariant["primary-brand"])} href={`mailto:${LINKS.email}`}>
+            <a
+              {...stylex.props(button.base, buttonVariant["primary-purple"])}
+              href={`mailto:${LINKS.email}`}
+            >
               {`Email ${LINKS.email}`}
             </a>
             <a
-              {...stylex.props(button.base, buttonVariant["secondary-brand"])}
+              {...stylex.props(button.base, buttonVariant["secondary-purple"])}
               href={LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
@@ -588,7 +657,7 @@ const styles = stylex.create({
     margin: 0,
     fontSize: "14px",
   },
-  // Purple, the hue of its eyebrow; the email key inherits it as --c.
+  // Purple, the hue of its eyebrow and of its two keys.
   contact: {
     "--c": palette["--ax"],
     marginTop: "24px",

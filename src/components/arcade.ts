@@ -25,7 +25,10 @@ export const arcade = stylex.create({
       backgroundImage: `repeating-linear-gradient(transparent 0 2px, ${palette["--scan"]} 2px 3px)`,
     },
   },
+  // Isolates so the veils' patches (section.ts) share one context above the backdrop, behind all
+  // of the column's text.
   wrap: {
+    isolation: "isolate",
     maxWidth: "1200px",
     marginBlock: 0,
     marginInline: "auto",

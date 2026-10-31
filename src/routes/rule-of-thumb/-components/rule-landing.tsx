@@ -340,11 +340,13 @@ function Cover({ rule, entering }: CoverProps) {
     const y = (event.clientY - box.top) / box.height - 0.5;
     cover.style.setProperty("--ry", `${(x * 10).toFixed(2)}deg`);
     cover.style.setProperty("--rx", `${(-y * 8).toFixed(2)}deg`);
+    // The art's layers read these to slide against the lean.
+    cover.style.setProperty("--px", x.toFixed(3));
+    cover.style.setProperty("--py", y.toFixed(3));
   }
 
   function rest() {
-    ref.current?.style.removeProperty("--ry");
-    ref.current?.style.removeProperty("--rx");
+    for (const name of ["--ry", "--rx", "--px", "--py"]) ref.current?.style.removeProperty(name);
   }
 
   return (
@@ -1530,7 +1532,15 @@ function ShareButton({ data, inIsland = false }: { data: ShareData; inIsland?: b
   return (
     <button
       type="button"
-      {...stylex.props(button.base, buttonVariant["tertiary-neutral"], button.sm, button.iconStart, shell.share, shell.in, shell.first)}
+      {...stylex.props(
+        button.base,
+        buttonVariant["tertiary-neutral"],
+        button.sm,
+        button.iconStart,
+        shell.share,
+        shell.in,
+        shell.first,
+      )}
       onClick={share}
     >
       <ShareGlyph copied={copied} />
@@ -1618,7 +1628,11 @@ function CopyMarkdown({ url }: { url: string }) {
   }
 
   return (
-    <button type="button" {...stylex.props(button.base, buttonVariant["primary-brand"])} onClick={handleCopy}>
+    <button
+      type="button"
+      {...stylex.props(button.base, buttonVariant["primary-brand"])}
+      onClick={handleCopy}
+    >
       {copied ? "Copied" : "Copy as Markdown"}
     </button>
   );
@@ -1683,8 +1697,10 @@ const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
 const COMPACT = ':is(:root:has(.arc-bar[data-mode="compact"]) *)';
-// Only the page being opened: when a pager card opens the next rule, the old page holds the card.
-const RULE_OPEN = ":is(html:active-view-transition-type(rule-open):not(:has([data-opening])) *)";
+// Only the rule page itself: when a pager card opens the next rule, the old page holds the card.
+// Diving in names the opened page; zooming back out to the index names the page being left.
+const RULE_OPEN =
+  ":is(html:active-view-transition-type(rule-open, rule-close):not(:has([data-opening])) *)";
 const NARROW = "@media (max-width: 480px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
@@ -2805,15 +2821,10 @@ const cover = stylex.create({
     transitionProperty: { default: "transform", [REDUCE]: "none" },
     transitionDuration: { default: motion["--t-panel"], [REDUCE]: "0s" },
     transitionTimingFunction: { default: motion["--out"], [REDUCE]: "ease" },
-    // The sheet's mask would clip its own shadow, so the shadow lives on an empty layer behind it.
-    // An outer box-shadow never paints inside its box, so the notches stay see-through.
-    "::before": {
-      content: '""',
-      position: "absolute",
-      inset: 0,
-      borderRadius: "inherit",
-      boxShadow: `0 8px 0 ${palette["--drop-ink"]}, 0 30px 60px ${palette["--lift"]}`,
-    },
+    // The sheet's mask would clip its own box-shadow, and a box-shadow on a layer behind it ignores
+    // the notches, so they read as bumps. A drop-shadow follows the masked sheet's alpha, so the
+    // drop and the lift are cut through at the notches too.
+    filter: `drop-shadow(0 8px 0 ${palette["--drop-ink"]}) drop-shadow(0 30px 60px ${palette["--lift"]})`,
   },
   sheet: {
     "--stub": { default: "62px", [PHONE]: "52px" },

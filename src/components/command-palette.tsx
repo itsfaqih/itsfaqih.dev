@@ -17,6 +17,7 @@ import {
 import { colorOf, VISIBLE_GUIDELINES } from "../data/guidelines";
 import { LINKS } from "../seo";
 import { RuleIcon } from "./rule-icon";
+import { BoxScrollbar, boxScrollbarHost } from "./box-scrollbar";
 import { fluidHover, placeHighlight } from "./fluid-hover";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 
@@ -102,6 +103,7 @@ export function CommandPalette() {
   // its last frame, so the live list can switch levels at once.
   const levelRef = useRef<HTMLDivElement>(null);
   const ghostsRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const slideAway = (toward: "left" | "right") => {
     const level = levelRef.current;
     const ghosts = ghostsRef.current;
@@ -307,8 +309,7 @@ export function CommandPalette() {
   useLayoutEffect(() => {
     const highlight = highlightRef.current;
     if (!highlight) return;
-    const option =
-      highlightedItem && document.getElementById(`cmd-option-${highlightedItem.id}`);
+    const option = highlightedItem && document.getElementById(`cmd-option-${highlightedItem.id}`);
     if (!option) {
       highlight.removeAttribute("data-on");
       return;
@@ -451,90 +452,99 @@ export function CommandPalette() {
                   <kbd {...stylex.props(styles.kbd)}>Esc</kbd>
                 </div>
 
-                <div
-                  id={listboxId}
-                  role="listbox"
-                  aria-label="Commands"
-                  {...stylex.props(styles.list)}
-                >
-                  <div ref={ghostsRef} aria-hidden="true" inert {...stylex.props(styles.ghosts)} />
+                <div {...stylex.props(styles.listFrame)}>
                   <div
-                    key={navigationLevel}
-                    ref={fitLevel}
-                    role="presentation"
-                    {...stylex.props(
-                      fluidHover.group,
-                      step && styles.level,
-                      step === "in" && styles.fromRight,
-                      step === "out" && styles.fromLeft,
-                    )}
+                    ref={listRef}
+                    id={listboxId}
+                    role="listbox"
+                    aria-label="Commands"
+                    {...stylex.props(styles.list, boxScrollbarHost.box)}
                   >
-                    <span
-                      ref={highlightRef}
+                    <div
+                      ref={ghostsRef}
                       aria-hidden="true"
-                      {...stylex.props(fluidHover.highlight, styles.highlight)}
+                      inert
+                      {...stylex.props(styles.ghosts)}
                     />
-                    {flatItems.length === 0 ? (
-                      <div {...stylex.props(styles.empty)}>
-                        No results for &quot;{inputValue}&quot;
-                      </div>
-                    ) : (
-                      groups.map((group, groupIndex) => (
-                        <div
-                          key={group.label}
-                          role="group"
-                          aria-label={group.label}
-                          {...stylex.props(groupIndex > 0 && styles.laterGroup)}
-                          style={{ "--c": group.hue }}
-                        >
-                          <div role="presentation" {...stylex.props(styles.label)}>
-                            {group.label}
-                          </div>
-                          {group.items.map((item) => {
-                            const flatIdx = flatItems.indexOf(item);
-                            const selected = flatIdx === selectedIndex;
-                            return (
-                              <div
-                                key={item.id}
-                                id={`cmd-option-${item.id}`}
-                                role="option"
-                                aria-selected={selected}
-                                onClick={item.action}
-                                onPointerMove={() => setHighlightedIndex(flatIdx)}
-                                {...stylex.props(styles.item, selected && styles.itemSelected)}
-                                style={item.hue ? { "--c": item.hue } : undefined}
-                              >
-                                <span
-                                  {...stylex.props(styles.icon, selected && styles.iconSelected)}
-                                >
-                                  {item.icon}
-                                </span>
-                                <span {...stylex.props(styles.text)}>
-                                  <span
-                                    className={`cmdk-name ${stylex.props(styles.name).className}`}
-                                  >
-                                    {item.label}
-                                  </span>
-                                  {item.description && (
-                                    <span {...stylex.props(styles.description)}>
-                                      {item.description}
-                                    </span>
-                                  )}
-                                </span>
-                                {item.id === "copy-email" && copied && (
-                                  <span {...stylex.props(styles.done)}>Copied!</span>
-                                )}
-                                {item.hasSubmenu && <CaretRightIcon size={14} weight="bold" />}
-                                {item.category === "external" && (
-                                  <ArrowSquareOutIcon size={14} weight="bold" />
-                                )}
-                              </div>
-                            );
-                          })}
+                    <div
+                      key={navigationLevel}
+                      ref={fitLevel}
+                      role="presentation"
+                      {...stylex.props(
+                        fluidHover.group,
+                        step && styles.level,
+                        step === "in" && styles.fromRight,
+                        step === "out" && styles.fromLeft,
+                      )}
+                    >
+                      <span
+                        ref={highlightRef}
+                        aria-hidden="true"
+                        {...stylex.props(fluidHover.highlight, styles.highlight)}
+                      />
+                      {flatItems.length === 0 ? (
+                        <div {...stylex.props(styles.empty)}>
+                          No results for &quot;{inputValue}&quot;
                         </div>
-                      ))
-                    )}
+                      ) : (
+                        groups.map((group, groupIndex) => (
+                          <div
+                            key={group.label}
+                            role="group"
+                            aria-label={group.label}
+                            {...stylex.props(groupIndex > 0 && styles.laterGroup)}
+                            style={{ "--c": group.hue }}
+                          >
+                            <div role="presentation" {...stylex.props(styles.label)}>
+                              {group.label}
+                            </div>
+                            {group.items.map((item) => {
+                              const flatIdx = flatItems.indexOf(item);
+                              const selected = flatIdx === selectedIndex;
+                              return (
+                                <div
+                                  key={item.id}
+                                  id={`cmd-option-${item.id}`}
+                                  role="option"
+                                  aria-selected={selected}
+                                  onClick={item.action}
+                                  onPointerMove={() => setHighlightedIndex(flatIdx)}
+                                  {...stylex.props(styles.item, selected && styles.itemSelected)}
+                                  style={item.hue ? { "--c": item.hue } : undefined}
+                                >
+                                  <span
+                                    {...stylex.props(styles.icon, selected && styles.iconSelected)}
+                                  >
+                                    {item.icon}
+                                  </span>
+                                  <span {...stylex.props(styles.text)}>
+                                    <span
+                                      className={`cmdk-name ${stylex.props(styles.name).className}`}
+                                    >
+                                      {item.label}
+                                    </span>
+                                    {item.description && (
+                                      <span {...stylex.props(styles.description)}>
+                                        {item.description}
+                                      </span>
+                                    )}
+                                  </span>
+                                  {item.id === "copy-email" && copied && (
+                                    <span {...stylex.props(styles.done)}>Copied!</span>
+                                  )}
+                                  {item.hasSubmenu && <CaretRightIcon size={14} weight="bold" />}
+                                  {item.category === "external" && (
+                                    <ArrowSquareOutIcon size={14} weight="bold" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
+                  <BoxScrollbar box={listRef} />
                 </div>
 
                 <div {...stylex.props(styles.foot)}>
@@ -931,14 +941,16 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    padding: "12px 20px 0",
+    // The fold clips this row, so the Back pill's hover fill takes real room rather than spilling
+    // past the row on negative margins.
+    padding: "8px 20px 0",
     font: `500 12px ${fonts["--display"]}`,
   },
   crumbBack: {
     display: "inline-flex",
     alignItems: "center",
     gap: "4px",
-    margin: "-4px -10px",
+    marginInline: "-10px",
     padding: "4px 10px",
     borderWidth: 0,
     borderStyle: "none",
@@ -1013,6 +1025,10 @@ const styles = stylex.create({
     "::placeholder": {
       color: palette["--mute"],
     },
+  },
+  // Holds the list and its scrollbar, which sits over the list's edge without scrolling with it.
+  listFrame: {
+    position: "relative",
   },
   list: {
     position: "relative",

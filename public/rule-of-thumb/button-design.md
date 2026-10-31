@@ -4,14 +4,15 @@ Make a button show what it does and what it's doing.
 
 ## TL;DR
 
-| Situation                | Do this                                                      |
-| ------------------------ | ------------------------------------------------------------ |
-| Any button               | Give hover, press and focus a look, in 100 to 200ms          |
-| Not available yet        | Show the no-entry cursor and a tooltip that says why         |
-| Picking a variant        | Fill one per screen, tint the secondary, make Cancel text    |
-| It deletes something     | Make it red, then confirm by name, hold, or offer Undo       |
-| An icon beside the label | Take 4px off the icon's side                                 |
-| An icon with no label    | Make it a fixed square with an accessible name and a tooltip |
+| Situation                  | Do this                                                      |
+| -------------------------- | ------------------------------------------------------------ |
+| Any button                 | Give hover, press and focus a look, in 100 to 200ms          |
+| Not available yet          | Show the no-entry cursor and a tooltip that says why         |
+| Hovering a disabled button | Keep its colour and drop still                               |
+| Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
+| It deletes something       | Make it red, then confirm by name, hold, or offer Undo       |
+| An icon beside the label   | Take 4px off the icon's side                                 |
+| An icon with no label      | Make it a fixed square with an accessible name and a tooltip |
 
 ## Give every state a look
 
@@ -59,6 +60,19 @@ button[aria-disabled="true"] {
 ```
 
 The click handler checks the state itself, since `aria-disabled` blocks nothing.
+
+## Keep a disabled button still on hover
+
+A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press, and let the tooltip do the talking. Scope the hover and press looks to buttons that can act.
+
+```css
+button:hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--button-hover);
+}
+button:active:not(:disabled, [aria-disabled="true"]) {
+  transform: translateY(2px) scale(0.97);
+}
+```
 
 ## Fill one button per screen
 

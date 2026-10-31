@@ -117,26 +117,29 @@ html {
   --dive-ease: cubic-bezier(0.32, 0.72, 0, 1);
   --dive-time: 620ms;
 }
-html:active-view-transition-type(rule-open) [data-opening] {
+html:active-view-transition-type(rule-open, rule-close) [data-opening] {
   view-transition-name: rule-card;
 }
-html:active-view-transition-type(rule-open) [data-opening] .thumb {
+html:active-view-transition-type(rule-open, rule-close) [data-opening] .thumb {
   view-transition-name: rule-thumb;
 }
-html:active-view-transition-type(rule-open) [data-opening] .t,
-html:active-view-transition-type(rule-open) [data-opening] > h3 {
+html:active-view-transition-type(rule-open, rule-close) [data-opening] .t,
+html:active-view-transition-type(rule-open, rule-close) [data-opening] > h3 {
   view-transition-name: rule-title;
 }
-/* The header island stays put over the dive, above the swelling card, instead of zooming away
-   with the page. */
-html:active-view-transition-type(rule-open) .island {
+/* The header island stays put over the dive and the page fade, above the swelling card, instead
+   of zooming or fading away with the page. */
+html:active-view-transition-type(rule-open, rule-close, page-fade) .island {
   view-transition-name: site-nav;
 }
 ::view-transition-group(site-nav) {
-  z-index: 1;
+  z-index: 2;
 }
+/* Above the card: zooming out, the card exists only on the new page, and new-only groups
+   otherwise stack over the ones both pages share. */
 ::view-transition-group(rule-thumb),
 ::view-transition-group(rule-title) {
+  z-index: 1;
   animation-duration: 520ms;
   animation-timing-function: var(--dive-ease);
 }
@@ -158,6 +161,33 @@ html:active-view-transition-type(rule-open)::view-transition-new(root) {
   animation:
     rule-dive-card var(--dive-time) var(--dive-ease) both,
     vt-fade-out 260ms 240ms ease-out both;
+}
+/* Leaving a rule for the index runs the dive backwards: the rule page fades, the index settles
+   in from the zoom toward the rule's tile (useRuleOpen sets --open-x and --open-y once it lays
+   out), and the tile's frame shrinks back from past the screen edges while the cover and heading
+   fly home into its thumbnail and title. */
+html:active-view-transition-type(rule-close)::view-transition-old(root) {
+  animation: vt-fade-out 300ms 100ms ease-in both;
+}
+html:active-view-transition-type(rule-close)::view-transition-new(root) {
+  transform-origin: var(--open-x, 50%) var(--open-y, 50%);
+  animation: rule-undive-root var(--dive-time) var(--dive-ease) both;
+}
+::view-transition-new(rule-card) {
+  animation:
+    rule-undive-card var(--dive-time) var(--dive-ease) both,
+    vt-fade-in 260ms 120ms ease-out both;
+}
+@keyframes rule-undive-root {
+  from {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+@keyframes rule-undive-card {
+  from {
+    transform: scale(4.5);
+  }
 }
 /* Both layers cover the screen as they grow, so a blur on either re-rasterises it every frame and
    drops the dive to about 30fps. The upscaled card softens on its own. */

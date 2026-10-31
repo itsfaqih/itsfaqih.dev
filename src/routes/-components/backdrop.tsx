@@ -18,14 +18,6 @@ const MAX_PRESSES = 4;
 // A lit dot swells up to the prints' own ratio of dot to screen.
 const DOT = 2;
 const DOT_LIFT = 3.5;
-// The dots the pointer leaves behind light up and gather onto its path a beat later, then let go.
-const TRAIL_RADIUS = 56;
-const TRAIL_PULL_RADIUS = 110;
-const TRAIL_PULL = 0.5;
-const TRAIL_DELAY = 180;
-const TRAIL_MS = 1000;
-const TRAIL_STEP = 8;
-const TRAIL_MAX = 80;
 // The tide: three slow waves cross the page, and the dots under their sum swell like a print's
 // screen under shifting ink. Each wave is [x frequency, y frequency, speed], per px and per second.
 const TIDE_WAVES = [
@@ -163,7 +155,6 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
   addEventListener("resize", onResize);
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
-  let trail: { x: number; pageY: number; at: number }[] = [];
   let presses: {
     x: number;
     pageY: number;
@@ -183,7 +174,6 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
   };
 
   const prune = (now: number) => {
-    trail = trail.filter((point) => now - point.at < TRAIL_MS);
     presses = presses.filter((press) => press.end === undefined || now - press.end < PRESS_RELEASE);
   };
 
@@ -208,37 +198,17 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
         strength: rise * (2 - rise) * held * held,
       };
     });
-    const sparks = trail.map((point) => {
-      const age = now - point.at;
-      const rise = Math.min(1, age / TRAIL_DELAY);
-      const left = 1 - Math.max(0, age - TRAIL_DELAY) / (TRAIL_MS - TRAIL_DELAY);
-      const taper = 0.4 + 0.6 * left;
-      return {
-        x: point.x,
-        y: point.pageY - scrollY,
-        // Nothing under the pointer yet: the dots come up once it has moved on.
-        life: rise * rise * (3 - 2 * rise) * left ** 1.5,
-        radius: TRAIL_RADIUS * taper,
-        reach: TRAIL_PULL_RADIUS * taper,
-      };
-    });
     const time = now / 1000;
     const tiding = withTide && !still.matches;
     const width = document.documentElement.clientWidth;
     const phases = TIDE_WAVES.map(([, , speed]) => time * speed);
 
-    // Presses and the trail move dots off their places, so the canvas then draws the whole screen
-    // in place of the grid. The tide only swells dots, so it draws them over the grid.
-    const moving = grips.length > 0 || sparks.length > 0;
+    // Presses move dots off their places, so the canvas then draws the whole screen in place of the
+    // grid. The tide only swells dots, so it draws them over the grid.
+    const moving = grips.length > 0;
     grid.style.visibility = moving ? "hidden" : "";
     const regions: Box[] =
       moving || tiding ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }] : [];
-    const trailBox: Box = {
-      left: Math.min(...sparks.map(({ x }) => x)) - TRAIL_PULL_RADIUS,
-      right: Math.max(...sparks.map(({ x }) => x)) + TRAIL_PULL_RADIUS,
-      top: Math.min(...sparks.map(({ y }) => y)) - TRAIL_PULL_RADIUS,
-      bottom: Math.max(...sparks.map(({ y }) => y)) + TRAIL_PULL_RADIUS,
-    };
     // Every drawn dot goes in one path of the theme's --dot; tints go on top, one path per hue and
     // alpha step.
     const base = new Path2D();
@@ -261,26 +231,8 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
             x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
           if (earlier.some(inside)) continue;
 
-          let trailed = 0;
           let dotX = x;
           let dotY = y;
-          if (inside(trailBox)) {
-            let pull = 0;
-            let toward = { x, y };
-            for (const spark of sparks) {
-              const distance = Math.hypot(spark.x - x, spark.y - y);
-              if (distance < spark.radius)
-                trailed = Math.max(trailed, (1 - distance / spark.radius) ** 2 * spark.life);
-              const drawn =
-                distance < spark.reach ? (1 - distance / spark.reach) ** 1.5 * spark.life : 0;
-              if (drawn > pull) {
-                pull = drawn;
-                toward = spark;
-              }
-            }
-            dotX += (toward.x - x) * TRAIL_PULL * pull * pulling;
-            dotY += (toward.y - y) * TRAIL_PULL * pull * pulling;
-          }
           let gripped = 0;
           for (const grip of grips) {
             const distance = Math.hypot(grip.x - x, grip.y - y);
@@ -304,8 +256,8 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
             crest = Math.max(0, (level - TIDE_CREST) / (1 - TIDE_CREST)) ** 1.5;
           }
 
-          const lift = Math.min(1, Math.max(trailed, gripped, swell * swell * TIDE_LIFT));
-          const tint = Math.min(1, Math.max(trailed * 1.6, gripped * 1.6, crest * TIDE_ALPHA));
+          const lift = Math.min(1, Math.max(gripped, swell * swell * TIDE_LIFT));
+          const tint = Math.min(1, Math.max(gripped * 1.6, crest * TIDE_ALPHA));
           if (tint < 0.01 && lift < 0.02) {
             if (!moving) continue;
             base.moveTo(dotX + DOT, dotY);
@@ -317,7 +269,7 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
           base.arc(dotX, dotY, radius, 0, Math.PI * 2);
           if (tint < 0.01) continue;
           const hue =
-            crest * TIDE_ALPHA > Math.max(trailed, gripped) * 1.6
+            crest * TIDE_ALPHA > gripped * 1.6
               ? TIDE_HUES[grain(p, pageQ) < x / width ? 1 : 0]
               : hueOf(p, pageQ);
           const key = hue * 100 + Math.max(1, Math.round(tint * TINT_STEPS));
@@ -342,7 +294,7 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
   const tick = (now: number) => {
     draw(now);
     frame =
-      (withTide && !still.matches) || trail.length || presses.length
+      (withTide && !still.matches) || presses.length
         ? requestAnimationFrame(tick)
         : 0;
   };
@@ -353,29 +305,12 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
     if (frame) draw();
   };
 
-  // A wheel or key scroll slides the page under a still pointer and fires no pointermove, so the
-  // trail also follows the pointer's place on the page as it scrolls.
+  // A wheel or key scroll slides the page under a still pointer and fires no pointermove, so a held
+  // press also follows the pointer's place on the page as it scrolls.
   let pointer: { x: number; y: number } | null = null;
   const lay = (x: number, clientY: number) => {
-    const now = performance.now();
     const pageY = clientY + scrollY;
     for (const press of presses) if (press.end === undefined) press.to = { x, pageY };
-    trail = trail.filter((point) => now - point.at < TRAIL_MS);
-    const last = trail.at(-1);
-    const gap = last ? Math.hypot(x - last.x, pageY - last.pageY) : TRAIL_STEP;
-    if (gap < TRAIL_STEP) return;
-    // A fast sweep skips ahead between events; fill the gap so the trail stays unbroken.
-    const steps = last ? Math.min(12, Math.floor(gap / TRAIL_STEP)) : 1;
-    for (let step = 1; step <= steps; step++) {
-      const along = step / steps;
-      trail.push({
-        x: last ? last.x + (x - last.x) * along : x,
-        pageY: last ? last.pageY + (pageY - last.pageY) * along : pageY,
-        at: now,
-      });
-    }
-    if (trail.length > TRAIL_MAX) trail.splice(0, trail.length - TRAIL_MAX);
-    wake();
   };
   const move = (event: PointerEvent) => {
     if (event.pointerType === "touch") return;

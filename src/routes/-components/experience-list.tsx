@@ -17,6 +17,7 @@ export type Job = {
 /** The work history: one row per job, one open at a time, with the open row's achievements. */
 export function ExperienceList({ jobs }: { jobs: Job[] }) {
   const [open, setOpen] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const listRef = useRef<HTMLDivElement>(null);
   const beforeRef = useRef<Snapshot | null>(null);
@@ -25,6 +26,7 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
     const list = listRef.current;
     if (list && !reduced) beforeRef.current = snapshotOf(list);
     setOpen(open === index ? -1 : index);
+    setExpanded(false);
   };
 
   useLayoutEffect(() => {
@@ -99,25 +101,12 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
                 aria-hidden="true"
               />
             </button>
-            <ul
-              {...stylex.props(styles.stack, isOpen && styles.stackOpen)}
-              aria-label={`${job.company} stack`}
-            >
-              {job.stack.map((tool) => (
-                <li
-                  key={tool}
-                  {...stylex.props(
-                    techBadge.badge,
-                    styles.pill,
-                    isOpen ? styles.pillOpen : styles.pillClosed,
-                  )}
-                  style={techBrand(tool)}
-                >
-                  <TechIcon name={tool} style={isOpen ? styles.markOpen : styles.markClosed} />
-                  {tool}
-                </li>
-              ))}
-            </ul>
+            <Stack
+              job={job}
+              isOpen={isOpen}
+              expanded={isOpen && expanded}
+              onExpand={() => setExpanded(!expanded)}
+            />
             <div id={panelId} {...stylex.props(styles.body)}>
               {isOpen && (
                 <ul {...stylex.props(styles.achievements)}>
@@ -136,6 +125,126 @@ export function ExperienceList({ jobs }: { jobs: Job[] }) {
   );
 }
 
+/**
+ * A job's tools, held to two rows. When they would run longer, the second row ends in a pill
+ * counting the rest, which shows them all on the open row.
+ */
+function Stack({
+  job,
+  isOpen,
+  expanded,
+  onExpand,
+}: {
+  job: Job;
+  isOpen: boolean;
+  expanded: boolean;
+  onExpand: () => void;
+}) {
+  const listRef = useRef<HTMLUListElement>(null);
+  const [fit, setFit] = useState({ shown: job.stack.length, overflows: false });
+  const hidden = job.stack.length - fit.shown;
+
+  // Measured on the page: lay every tool out, find where the third row starts, then give back
+  // tools from the end until the count pill fits on the second row. The DOM is left as measured,
+  // so the list's glide reads the final layout, and the render that follows matches it.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const measure = () => {
+      const pills = [...list.querySelectorAll<HTMLElement>(":scope > [data-tool]")];
+      const more = list.querySelector<HTMLElement>(":scope > [data-more]");
+      const label = more?.querySelector<HTMLElement>("[data-label]");
+      if (!more || !label) return;
+      const show = (count: number) =>
+        pills.forEach((pill, at) => (pill.style.display = at < count ? "" : "none"));
+      show(pills.length);
+      more.style.display = "none";
+      const rows = [...new Set(pills.map((pill) => pill.offsetTop))];
+      const overflows = rows.length > MAX_ROWS;
+      if (!overflows || expanded) {
+        more.style.display = overflows ? "" : "none";
+        setFit({ shown: pills.length, overflows });
+        return;
+      }
+      const lastRow = rows[MAX_ROWS - 1]!;
+      let count = pills.findIndex((pill) => pill.offsetTop > lastRow);
+      more.style.display = "";
+      for (; count > 0; count--) {
+        show(count);
+        label.dataset.label = moreLabel(pills.length - count);
+        if (more.offsetTop <= lastRow) break;
+      }
+      setFit({ shown: count, overflows });
+    };
+    measure();
+    // Web fonts change the badges' widths without changing the list's.
+    let live = true;
+    void document.fonts.ready.then(() => live && measure());
+    document.fonts.addEventListener("loadingdone", measure);
+    let width = list.offsetWidth;
+    const resize = new ResizeObserver(() => {
+      if (list.offsetWidth === width) return;
+      width = list.offsetWidth;
+      measure();
+    });
+    resize.observe(list);
+    return () => {
+      live = false;
+      resize.disconnect();
+      document.fonts.removeEventListener("loadingdone", measure);
+    };
+  }, [isOpen, expanded, job.stack]);
+
+  const label = expanded ? "Show less" : moreLabel(hidden);
+  return (
+    <ul
+      ref={listRef}
+      {...stylex.props(styles.stack, isOpen && styles.stackOpen)}
+      aria-label={`${job.company} stack`}
+    >
+      {job.stack.map((tool, at) => (
+        <li
+          key={tool}
+          data-tool
+          {...stylex.props(
+            techBadge.badge,
+            styles.pill,
+            isOpen ? styles.pillOpen : styles.pillClosed,
+          )}
+          style={{ ...techBrand(tool), display: at < fit.shown ? undefined : "none" }}
+        >
+          <TechIcon name={tool} style={isOpen ? styles.markOpen : styles.markClosed} />
+          {tool}
+        </li>
+      ))}
+      <li data-more style={{ display: fit.overflows ? undefined : "none" }}>
+        {isOpen ? (
+          <button
+            type="button"
+            data-label={label}
+            {...stylex.props(styles.pill, styles.more, styles.moreButton)}
+            aria-label={expanded ? "Show fewer tools" : `Show ${hidden} more tools`}
+            aria-expanded={expanded}
+            onClick={onExpand}
+          />
+        ) : (
+          <span
+            data-label={label}
+            {...stylex.props(styles.pill, styles.more, styles.pillClosed)}
+            aria-label={`${hidden} more tools`}
+          />
+        )}
+      </li>
+    </ul>
+  );
+}
+
+const MAX_ROWS = 2;
+
+function moreLabel(count: number) {
+  return `+${count} more`;
+}
+
 type Snapshot = {
   height: number;
   rows: Map<Element, number>;
@@ -150,6 +259,7 @@ function snapshotOf(list: HTMLElement): Snapshot {
     rows.set(row, box.top);
     row.querySelectorAll(":scope > ul > li").forEach((pill, order) => {
       const at = pill.getBoundingClientRect();
+      if (at.width === 0) return;
       pills.set(pill, { xInRow: at.left - box.left, yInRow: at.top - box.top, order });
     });
   }
@@ -363,6 +473,41 @@ const styles = stylex.create({
       default: motion["--exit"],
       ":hover": { default: null, [HOVER]: motion["--fast"] },
     },
+  },
+  // The count pill: its words come from data-label, so measuring can try each count without a
+  // render.
+  more: {
+    display: "inline-flex",
+    borderStyle: "dashed",
+    color: palette["--mute"],
+    "::after": {
+      content: "attr(data-label)",
+    },
+  },
+  moreButton: {
+    backgroundColor: "transparent",
+    cursor: cursors["--cursor-point"],
+    borderColor: {
+      default: palette["--hair"],
+      ":hover": { default: null, [HOVER]: palette["--hair-hover"] },
+    },
+    color: {
+      default: palette["--mute"],
+      ":hover": { default: null, [HOVER]: palette["--dim"] },
+    },
+    transitionProperty: "border-color, color",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+    },
+    outlineWidth: { default: null, ":focus-visible": "2px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "2px" },
   },
   markClosed: {
     color: {

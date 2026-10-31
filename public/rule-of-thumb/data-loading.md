@@ -41,7 +41,7 @@ async function refetch() {
 }
 ```
 
-## Wait before the skeleton
+## Avoid skeleton flickers
 
 Most replies are quick. Show loading UI only after 200ms, so a fast reply appears with no skeleton flash.
 
