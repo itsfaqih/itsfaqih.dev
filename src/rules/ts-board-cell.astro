@@ -2,11 +2,11 @@
 import Code from "./code.astro";
 import { codeCell } from "./handling-timestamps";
 
-type Props = { part: "text" | "lead" | "label"; value: string };
+type Props = { text: string; tone: "plain" | "wrap" };
 
-const { part, value } = Astro.props;
-const code = codeCell(value);
+const { text, tone } = Astro.props;
+const code = codeCell(text);
 // React's Code took tone "wrap" inside a slot button and no tone on the board around it.
 ---
 
-{code === undefined ? value : part === "label" ? <Code tone="wrap">{code}</Code> : <code>{code}</code>}
+{code === undefined ? text : tone === "wrap" ? <Code tone="wrap">{code}</Code> : <code>{code}</code>}

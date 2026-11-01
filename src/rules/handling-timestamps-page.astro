@@ -23,6 +23,7 @@ import TsReaders from "./ts-readers.astro";
 import TsReminder from "./ts-reminder.astro";
 import TsWire from "./ts-wire.astro";
 const [store, zulu, local, input, filter] = LESSONS;
+const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
 ---
 
 <RuleLanding
@@ -48,7 +49,7 @@ const [store, zulu, local, input, filter] = LESSONS;
     <TsOrders slot="bad" way="bad" />
     <TsOrders slot="good" way="good" />
   </RuleLesson>
-  <RuleQuiz n={1} level={store.levels[0]} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={1} level={store.levels[0]} board="flow" marks={marks}
     >Rina in Jakarta and Sam in New York order in the same second. Place what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.</RuleQuiz
   >
 
@@ -65,7 +66,7 @@ const [store, zulu, local, input, filter] = LESSONS;
       <TsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
-  <RuleQuiz n={2} level={zulu.levels[0]} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={2} level={zulu.levels[0]} board="flow" marks={marks}
     >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">createdAt</Code> in the response.</RuleQuiz
   >
 
@@ -82,7 +83,7 @@ const [store, zulu, local, input, filter] = LESSONS;
       <TsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
-  <RuleQuiz n={3} level={local.levels[0]} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={3} level={local.levels[0]} board="flow" marks={marks}
     >The order is stored as <Code tone="prompt">2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam 1:00 AM. Place the formatting.</RuleQuiz
   >
 
@@ -93,10 +94,10 @@ const [store, zulu, local, input, filter] = LESSONS;
     <TsReminder slot="bad" way="bad" />
     <TsReminder slot="good" way="good" />
   </RuleLesson>
-  <RuleQuiz n={4} level={input.levels[0]} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={4} level={input.levels[0]} board="flow" marks={marks}
     >Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</RuleQuiz
   >
-  <RuleQuiz n={5} level={input.levels[1]!} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={5} level={input.levels[1]!} board="flow" marks={marks}
     >Rina's browser has her 7:00 AM and its <Code tone="prompt">+07:00</Code> offset. Place the offset.</RuleQuiz
   >
 
@@ -107,7 +108,7 @@ const [store, zulu, local, input, filter] = LESSONS;
     <TsFilter slot="bad" way="bad" />
     <TsFilter slot="good" way="good" />
   </RuleLesson>
-  <RuleQuiz n={6} level={filter.levels[0]} board="flow" cell={TsBoardCell}
+  <RuleQuiz n={6} level={filter.levels[0]} board="flow" marks={marks}
     >Three filters for Jan 10 each need a start. Match 17:00 UTC on Jan 9 to the Jan 10 it starts.</RuleQuiz
   >
 </RuleLanding>

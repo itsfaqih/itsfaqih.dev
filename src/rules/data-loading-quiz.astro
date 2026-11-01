@@ -1,6 +1,5 @@
 ---
-import { isTimed } from "./data-loading";
-import { view } from "./data-loading.styles";
+import DataLoadingRow from "./data-loading-row.astro";
 import type { Level } from "./lesson";
 import RuleQuiz from "./rule-quiz.astro";
 
@@ -10,13 +9,4 @@ const { n, level } = Astro.props;
 // The default slot is the prompt. Each timed row leads with its time.
 ---
 
-<RuleQuiz n={n} level={level} board="timeline"
-  ><slot />{
-    level.rows.map(
-      (row, index) =>
-        isTimed(row) && (
-          <Fragment slot={`row-${index}`}><time class={view.time}>{row.at}</time>{row.text}</Fragment>
-        ),
-    )
-  }</RuleQuiz
->
+<RuleQuiz n={n} level={level} board="timeline" marks={{ text: DataLoadingRow }}><slot /></RuleQuiz>

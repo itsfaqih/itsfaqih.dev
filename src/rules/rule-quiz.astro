@@ -4,7 +4,10 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Level } from "./lesson";
 import { host, lessonKit, quizKit, quizView, shell, tree } from "./rule-landing.styles";
 
-/** Draws a row's string as markup, from props `text` and `tone` (how code reads where it lands). */
+/**
+ * Draws a row's string as markup, from props `text` and `tone` (how code reads where it lands: "wrap"
+ * inside a slot button, "plain" elsewhere). A text row's mark also gets the whole `row`.
+ */
 type Mark = AstroComponentFactory;
 
 type Props = {
@@ -13,26 +16,15 @@ type Props = {
   level: Level;
   /** What the pieces go into, as in "Drag the piece into the tree". */
   board: string;
-  /** Renders each row's text, lead and slot label when they carry markup; plain text otherwise. */
-  cell?: (props: {
-    part: "text" | "lead" | "label";
-    value: string;
-  }) => ReturnType<AstroComponentFactory>;
   /** For rows that carry markup, such as painted code: what draws each lead, slot label and text row. */
   marks?: { lead?: Mark; label?: Mark; text?: Mark };
 };
 
-const { n, level, board, cell: Cell, marks = {} } = Astro.props;
+const { n, level, board, marks = {} } = Astro.props;
 const { lead: Lead, label: Label, text: Text } = marks;
 const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
-// The default slot is the prompt, its code in tone "prompt". A text row whose copy carries markup
-// takes it from the slot `row-<i>`, i being its index in `level.rows`. The two templates hold what
-// clearing the level shows; rule-quiz.client.ts clones them.
-const marked = await Promise.all(
-  level.rows.map((_, index) =>
-    Astro.slots.has(`row-${index}`) ? Astro.slots.render(`row-${index}`) : undefined,
-  ),
-);
+// The default slot is the prompt, its code in tone "prompt". The two templates hold what clearing
+// the level shows; rule-quiz.client.ts clones them.
 ---
 
 <rule-quiz
@@ -56,21 +48,21 @@ const marked = await Promise.all(
     <div {...stylex.attrs(lessonKit.well, quizKit.board)}>
       <ul {...stylex.attrs(tree.list)}>
         {
-          level.rows.map((row, index) =>
+          level.rows.map((row) =>
             "slot" in row ? (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.lead ? quizKit.leadRow : null)}
-                >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{Cell ? <Cell part="lead" value={row.lead} /> : Lead ? <Lead text={row.lead} tone="plain" /> : row.lead}</span>}<button
+                >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{Lead ? <Lead text={row.lead} tone="plain" /> : row.lead}</span>}<button
                   type="button"
                   class={quizView.slot({ ...idle, lead: row.lead !== undefined })}
                   disabled
                   data-slot={row.slot.id}
                   data-note={row.slot.note}
-                  data-part="slot">{Cell ? <Cell part="label" value={row.slot.label} /> : Label ? <Label text={row.slot.label} tone="wrap" /> : row.slot.label}</button
+                  data-part="slot">{Label ? <Label text={row.slot.label} tone="wrap" /> : row.slot.label}</button
                 ></li
               >
             ) : (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.kind && tree[row.kind])}
-                >{marked[index] !== undefined ? <Fragment set:html={marked[index]} /> : Cell ? <Cell part="text" value={row.text} /> : Text ? <Text text={row.text} tone="plain" /> : row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
+                >{Text ? <Text text={row.text} tone="plain" row={row} /> : row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
               >
             ),
           )

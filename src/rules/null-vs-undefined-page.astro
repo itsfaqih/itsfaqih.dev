@@ -10,6 +10,7 @@ import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
 
 const [missing, optional, clear, untouched, force, lookup] = LESSONS;
+const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell };
 ---
 
 <RuleLanding
@@ -33,7 +34,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullCodeBlock slot="bad" lines={missing.bad.lines!} />
     <NullCodeBlock slot="good" lines={missing.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={1} level={missing.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={1} level={missing.levels[0]} board="code" marks={marks}
     >The client asked for <Code tone="prompt">?fields=name,manager</Code>. Bo has no manager. Nobody asked for his phone. Pick the key to leave out.</RuleQuiz
   >
 
@@ -44,7 +45,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullCodeBlock slot="bad" lines={optional.bad.lines!} />
     <NullCodeBlock slot="good" lines={optional.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={2} level={optional.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={2} level={optional.levels[0]} board="code" marks={marks}
     >Signing up, people may skip the nickname, and most callers never have one. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">?: string</Code>.</RuleQuiz
   >
 
@@ -55,7 +56,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullFlow slot="bad" demo="clear" way="bad" />
     <NullFlow slot="good" demo="clear" way="good" />
   </RuleLesson>
-  <RuleQuiz n={3} level={clear.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={3} level={clear.levels[0]} board="code" marks={marks}
     >The user cleared the due date and never opened the assignee or notes. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">null</Code>.</RuleQuiz
   >
 
@@ -66,7 +67,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullFlow slot="bad" demo="rename" way="bad" />
     <NullFlow slot="good" demo="rename" way="good" />
   </RuleLesson>
-  <RuleQuiz n={4} level={untouched.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={4} level={untouched.levels[0]} board="code" marks={marks}
     >The user renamed the task and removed its reviewer. They didn't touch the due date. Place <Code tone="prompt">undefined</Code>.</RuleQuiz
   >
 
@@ -77,7 +78,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullCodeBlock slot="bad" lines={force.bad.lines!} />
     <NullCodeBlock slot="good" lines={force.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={5} level={force.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={5} level={force.levels[0]} board="code" marks={marks}
     >Every new task must name an assignee or say there's none. The colour is optional and falls back to grey. Place <Code tone="prompt">| null</Code>.</RuleQuiz
   >
 
@@ -88,7 +89,7 @@ const [missing, optional, clear, untouched, force, lookup] = LESSONS;
     <NullCodeBlock slot="bad" lines={lookup.bad.lines!} />
     <NullCodeBlock slot="good" lines={lookup.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={6} level={lookup.levels[0]} board="code" cell={NullBoardCell}
+  <RuleQuiz n={6} level={lookup.levels[0]} board="code" marks={marks}
     >You looked up <Code tone="prompt">bo@x.io</Code> and nobody has that email. You haven't looked up<Fragment set:html="<!-- -->" /> <Code tone="prompt">cy@x.io</Code> yet. Place <Code tone="prompt">null</Code>.</RuleQuiz
   >
 </RuleLanding>
