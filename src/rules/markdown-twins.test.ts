@@ -8,7 +8,7 @@ import * as dialogDesign from "./dialog-design";
 import * as handlingTimestamps from "./handling-timestamps";
 import * as nullVsUndefined from "./null-vs-undefined";
 import * as proximityPrinciple from "./proximity-principle";
-import * as tableDesign from "./table-design-page";
+import * as tableDesign from "./table-design";
 import * as typescriptCodeWriting from "./typescript-code-writing";
 
 // "View .md" serves public/rule-of-thumb/<id>.md, which readers paste into their AGENTS.md. It is

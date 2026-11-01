@@ -1,0 +1,66 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import { ACCOUNTS, DIGITS, MRR, money } from "./table-design";
+import { styles, view } from "./table-design.styles";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+---
+
+<table-numbers {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
+  <table {...stylex.attrs(styles.table)}>
+    <caption {...stylex.attrs(arcade.srOnly)}>Monthly revenue by account</caption>
+    <colgroup><col /><col {...stylex.attrs(styles.colMoney)} /></colgroup>
+    <thead>
+      <tr
+        ><th scope="col" {...stylex.attrs(styles.th)}>Account</th><th
+          scope="col"
+          {...stylex.attrs(styles.th, careful && styles.num)}>MRR ($)</th
+        ></tr
+      >
+    </thead>
+    <tbody {...stylex.attrs(styles.body)}>
+      {
+        ACCOUNTS.map((account, at) => {
+          const value = MRR[at] ?? 0;
+          return (
+            <tr class={view.row}
+              ><td {...stylex.attrs(styles.td)}>{account}</td><td
+                {...stylex.attrs(styles.td, careful ? styles.num : styles.ragged)}
+                >{
+                  careful ? (
+                    <Fragment
+                      ><span {...stylex.attrs(arcade.srOnly)}>{money(value)}</span><span
+                        {...stylex.attrs(styles.reels)}
+                        aria-hidden="true"
+                        >{[...money(value)].map((char) =>
+                          /\d/.test(char) ? (
+                            <span class={view.reel}
+                              ><span class={view.strip} style={`--n:${char}`}
+                                >{DIGITS.map((digit) => <span class={view.digit}>{digit}</span>)}</span
+                              ></span
+                            >
+                          ) : (
+                            <span>{char}</span>
+                          ),
+                        )}</span
+                      ></Fragment
+                    >
+                  ) : (
+                    String(value)
+                  )
+                }</td
+              ></tr
+            >
+          );
+        })
+      }
+    </tbody>
+  </table>
+</table-numbers>
+
+<script>
+  import "./table-design.client";
+</script>
