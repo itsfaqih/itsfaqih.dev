@@ -1092,7 +1092,8 @@ export const quizKit = stylex.create({
   caption: {
     fontWeight: 700,
     fontSize: "13px",
-    lineHeight: 1.3,
+    // Whole pixels, so a board's height never leaves the quizzes below it on a sub-pixel.
+    lineHeight: "17px",
     fontFamily: fonts["--display"],
     color: palette["--dim"],
     textWrap: "pretty",

@@ -346,16 +346,6 @@ export const quiz = stylex.create({
     display: "grid",
     gap: "10px",
   },
-  // Every height on these boards is whole pixels. A fraction here leaves each later quiz on a new
-  // sub-pixel offset, and their behavior screenshots then shift by a pixel from run to run. So the
-  // cards draw their own 17px caption, not QuizChoice's 16.9px one.
-  card: {
-    display: "grid",
-    gap: "10px",
-  },
-  caption: {
-    lineHeight: "17px",
-  },
   table: {
     display: "grid",
     gridTemplateColumns: "max-content max-content minmax(0, 1fr)",
@@ -447,14 +437,6 @@ export const quiz = stylex.create({
     color: palette["--mute"],
     whiteSpace: "nowrap",
     transform: "translateX(-50%)",
-  },
-  asked: {
-    paddingLeft: "6px",
-    borderLeftWidth: "2px",
-    borderLeftStyle: "solid",
-    borderLeftColor: "var(--c-ink)",
-    color: "var(--c-ink)",
-    transform: "translateX(-1px)",
   },
   day: {
     position: "absolute",

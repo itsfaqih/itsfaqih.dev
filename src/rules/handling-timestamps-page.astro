@@ -21,7 +21,6 @@ import {
   wallOf,
 } from "./handling-timestamps";
 import { quiz, styles } from "./handling-timestamps.styles";
-import { quizKit } from "./rule-landing.styles";
 import LessonText from "./lesson-text.astro";
 import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
@@ -52,7 +51,6 @@ const responses = [
 // The axis runs from noon UTC on Jan 9 to noon UTC on Jan 11, so each lane's Jan 10 is half of it.
 const day = Date.parse(`${FILTER_DATE}T00:00:00Z`);
 const along = (instant: number) => `--at:${((instant - day + 12 * HOUR) / (2 * DAY)) * 100}%`;
-const asked = Date.parse("2026-01-09T17:00:00Z");
 const lanes = [
   ["utc", "UTC report", "run by the server", day],
   ["rina", "Rina", "Jakarta, UTC+7", day - JAKARTA],
@@ -88,9 +86,8 @@ const lanes = [
     <div slot="board" {...stylex.attrs(quiz.stack)}>
       {
         tables.map(([id, caption, rows]) => (
-          <QuizChoice level={store.levels[0]} id={id}
-            ><span {...stylex.attrs(quiz.card)}
-              ><span {...stylex.attrs(quiz.table)}
+          <QuizChoice level={store.levels[0]} id={id} caption={caption}
+            ><span {...stylex.attrs(quiz.table)}
                 ><span {...stylex.attrs(styles.th, quiz.head)}>id</span><span {...stylex.attrs(styles.th, quiz.head)}
                   >by</span
                 ><span {...stylex.attrs(styles.th, quiz.head)}>created_at</span>{
@@ -102,8 +99,7 @@ const lanes = [
                     >
                   ))
                 }</span
-              ><span {...stylex.attrs(quizKit.caption, quiz.caption)}>{caption}</span></span
-            ></QuizChoice
+              ></QuizChoice
           >
         ))
       }
@@ -128,15 +124,13 @@ const lanes = [
     <div slot="board" {...stylex.attrs(quiz.stack)}>
       {
         responses.map(([id, caption, value]) => (
-          <QuizChoice level={zulu.levels[0]} id={id}
-            ><span {...stylex.attrs(quiz.card)}
-              ><span {...stylex.attrs(styles.wire)}
+          <QuizChoice level={zulu.levels[0]} id={id} caption={caption}
+            ><span {...stylex.attrs(styles.wire)}
                 ><span {...stylex.attrs(styles.line, quiz.line)}>GET /orders/42</span><span
                   {...stylex.attrs(styles.line, quiz.line)}
                   >{'{ "createdAt": '}<span {...stylex.attrs(quiz.str)}>"{value}"</span>{" }"}</span
                 ></span
-              ><span {...stylex.attrs(quizKit.caption, quiz.caption)}>{caption}</span></span
-            ></QuizChoice
+              ></QuizChoice
           >
         ))
       }
@@ -184,11 +178,6 @@ const lanes = [
   <RuleQuiz n={6} level={filter.levels[0]}
     >Three filters for Jan 10 each need a start. Tap the Jan 10 that starts at 17:00 UTC on Jan 9.
     <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <span {...stylex.attrs(quiz.lane, quiz.rule)}
-        ><span {...stylex.attrs(quiz.axisWho)}></span><span {...stylex.attrs(quiz.ticks)}
-          ><span style={along(asked)} {...stylex.attrs(quiz.tick, quiz.asked)}>Jan 9, 17:00 UTC</span></span
-        ></span
-      >
       {
         lanes.map(([id, who, where, start]) => (
           <QuizChoice level={filter.levels[0]} id={id} look="spot"
@@ -197,7 +186,7 @@ const lanes = [
                 >{who}<span {...stylex.attrs(quiz.where)}>{where}</span></span
               ><span {...stylex.attrs(quiz.track)}
                 ><span style={along(start)} {...stylex.attrs(quiz.day)}>Jan 10</span><span
-                  style={along(asked)}
+                  style={along(day)}
                   {...stylex.attrs(quiz.mark)}></span
                 ></span
               ></span
