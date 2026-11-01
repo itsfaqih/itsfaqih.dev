@@ -287,14 +287,7 @@ html:active-view-transition-type(stack-filter)::view-transition-new(root) {
   }
 }
 
-/* Global: @property has no StyleX form. --glow must be a registered <color> so the glow behind
-   the home deck (rule-spread.astro) eases between hues. */
-@property --glow {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: transparent;
-}
-/* Global: @property, as above. --hue is registered so the hero prints' ink (hero-prints.astro)
+/* Global: @property has no StyleX form. --hue is registered so the hero prints' ink (hero-prints.astro)
    eases to the next slide's colour. */
 @property --hue {
   syntax: "<color>";

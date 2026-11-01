@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { reducedMotion, watchMedia } from "../hooks/media-query";
+import { glowDots } from "./backdrop-dots";
 import { watchRuleOpen } from "./rule-open";
 import { number, pad } from "./rule-spread.styles";
 
@@ -82,7 +83,6 @@ class RuleSpread extends HTMLElement {
       thumbs[active]!.removeAttribute("data-play");
       active = index;
       const card = cards[index]!;
-      this.style.setProperty("--c", card.style.getPropertyValue("--c"));
       card.setAttribute("aria-current", "true");
       thumbs[index]!.setAttribute("data-play", "");
       title.textContent = card.querySelector(".t")!.textContent;
@@ -101,7 +101,10 @@ class RuleSpread extends HTMLElement {
         slot.style.visibility = Math.abs(offset) > HIDDEN_AT ? "hidden" : "";
       });
       activate(clamp(Math.round(position)));
+      glow();
     };
+    const glow = () => glowDots(cards[active]!, cards[active]!.style.getPropertyValue("--c"));
+    glow();
 
     const settle = () => {
       cancelAnimationFrame(deck.frame);
@@ -251,6 +254,7 @@ class RuleSpread extends HTMLElement {
     });
 
     this.#stop = () => {
+      glowDots(null);
       controller.abort();
       unwatch();
       clearTimeout(deck.wheelTimer);

@@ -13,16 +13,11 @@ const NUDGED = `:is(:hover > * > *)${STILL}`;
  * The cards share one grid cell and take their pose from --d, the card's offset from the centre,
  * and --ad, its distance. Per step from the centre a card moves 68% of its width sideways, 10px
  * down and 92px back, turns 13deg toward the centre, tilts 2.5deg, and fades 20%, gone by the
- * third step. The glow behind the deck takes the centred card's hue.
+ * third step. The backdrop's dots around the centred card take its hue (backdrop-dots.ts).
  */
 export const styles = stylex.create({
-  // --glow is registered in arcade.css, so it can ease between hues.
   spread: {
     display: "block",
-    "--glow": "var(--c)",
-    transitionProperty: "--glow",
-    transitionDuration: "600ms",
-    transitionTimingFunction: "ease",
   },
   stage: {
     position: "relative",
@@ -42,14 +37,6 @@ export const styles = stylex.create({
       ":is([data-dragging])": cursors["--cursor-grabbing"],
     },
     userSelect: "none",
-    "::before": {
-      content: '""',
-      position: "absolute",
-      inset: "0 8%",
-      backgroundImage:
-        "radial-gradient(closest-side, color-mix(in srgb, var(--glow) 18%, transparent), transparent)",
-      pointerEvents: "none",
-    },
   },
   slot: {
     gridArea: "1 / 1",

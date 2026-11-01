@@ -30,10 +30,37 @@ const TIDE_LIFT = 0.6;
 const TIDE_ALPHA = 0.6;
 // Crests dither from --cw at the left edge to --ax at the right.
 const TIDE_HUES = [1 + PALETTE.indexOf("--cw"), 1 + PALETTE.indexOf("--ax")] as const;
+// A glow tints the dots around a box in its hue: fullest at the box's edge, gone GLOW_REACH px out,
+// or less on a narrow screen, so the hue still fades out before the screen's edge.
+// A new hue fades in over the old one in GLOW_FADE ms.
+const GLOW_REACH = 240;
+const GLOW_REACH_WIDTH = 0.3;
+const GLOW_ALPHA = 0.95;
+const GLOW_LIFT = 0.45;
+const GLOW_FADE = 600;
 // Lit dots are filled in this many alpha steps, so a frame fills a few paths rather than one per dot.
 const TINT_STEPS = 12;
 
 type Box = { left: number; right: number; top: number; bottom: number };
+type Glow = { box: Element; hue: string; since: number };
+
+// Newest last. A glow stays until a newer one has fully faded in over it.
+let glows: Glow[] = [];
+let onGlow = () => {};
+
+/**
+ * Tints the backdrop's dots around `box` in `hue`, a CSS colour, or clears the glow when `box` is
+ * null. Call it again as the box moves, so the dots follow it.
+ */
+export function glowDots(box: Element | null, hue = "") {
+  const newest = glows.at(-1);
+  if (box && newest?.box === box && newest.hue === hue) return onGlow();
+  const now = performance.now();
+  let covered = glows.length - 1;
+  while (covered > 0 && now - glows[covered]!.since < GLOW_FADE) covered--;
+  glows = box ? [...glows.slice(Math.max(0, covered)), { box, hue, since: now }] : [];
+  onGlow();
+}
 
 /** Whether grid step (p, q) holds a dot of the turned screen. */
 const onScreen = (p: number, q: number) => (3 * p + q) % 10 === 0;
@@ -98,17 +125,16 @@ export function animateDots(element: Element, withTide: boolean) {
   // colours[0] is the theme's --dot and the rest the palette's.
   let colours: string[] = [];
   let scale = 1;
+  const resolve = (value: string) => {
+    canvas.style.color = value;
+    return getComputedStyle(canvas).color;
+  };
+  const inkOf = (value: string) =>
+    resolve(`color-mix(in oklab, ${value} calc(var(--ink-mix) + 20%), #000)`);
+  const glowInk = new Map<string, string>();
   const paint = () => {
-    const resolve = (value: string) => {
-      canvas.style.color = value;
-      return getComputedStyle(canvas).color;
-    };
-    colours = [
-      resolve("var(--dot)"),
-      ...PALETTE.map((name) =>
-        resolve(`color-mix(in oklab, var(${name}) calc(var(--ink-mix) + 20%), #000)`),
-      ),
-    ];
+    glowInk.clear();
+    colours = [resolve("var(--dot)"), ...PALETTE.map((name) => inkOf(`var(${name})`))];
     const tile = document.createElement("canvas");
     tile.width = tile.height = TILE * scale;
     const ink = tile.getContext("2d");
@@ -193,13 +219,44 @@ export function animateDots(element: Element, withTide: boolean) {
     const tiding = withTide && !still.matches;
     const width = document.documentElement.clientWidth;
     const phases = TIDE_WAVES.map(([, , speed]) => time * speed);
+    const reach = Math.min(GLOW_REACH, innerWidth * GLOW_REACH_WIDTH);
+    // Each glow's box and weight: a glow fades in over its first GLOW_FADE ms, and gives way as
+    // each newer one fades in over it.
+    const lit = glows.flatMap((glow, index) => {
+      const weight = glows
+        .slice(index + 1)
+        .reduce(
+          (left, newer) => left * (1 - Math.min(1, (now - newer.since) / GLOW_FADE)),
+          Math.min(1, (now - glow.since) / GLOW_FADE),
+        );
+      const box = glow.box.getBoundingClientRect();
+      const offscreen = box.bottom < -reach || box.top > innerHeight + reach || box.width === 0;
+      if (weight < 0.01 || offscreen) return [];
+      let colour = glowInk.get(glow.hue);
+      if (!colour) glowInk.set(glow.hue, (colour = inkOf(glow.hue)));
+      const paths: Path2D[] = [];
+      return [{ box, weight, colour, paths }];
+    });
+    const nearness = (glow: (typeof lit)[number], x: number, y: number) => {
+      const dx = Math.max(glow.box.left - x, 0, x - glow.box.right);
+      const dy = Math.max(glow.box.top - y, 0, y - glow.box.bottom);
+      const near = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
+      return near * near * glow.weight;
+    };
 
     // Presses move dots off their places, so the canvas then draws the whole screen in place of the
     // grid. The tide only swells dots, so it draws them over the grid.
     const moving = grips.length > 0;
     grid.style.visibility = moving ? "hidden" : "";
     const regions: Box[] =
-      moving || tiding ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }] : [];
+      moving || tiding
+        ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }]
+        : lit.map(({ box }) => ({
+            left: box.left - reach,
+            right: box.right + reach,
+            top: box.top - reach,
+            bottom: box.bottom + reach,
+          }));
     // Every drawn dot goes in one path of the theme's --dot; tints go on top, one path per hue and
     // alpha step.
     const base = new Path2D();
@@ -247,9 +304,14 @@ export function animateDots(element: Element, withTide: boolean) {
             crest = Math.max(0, (level - TIDE_CREST) / (1 - TIDE_CREST)) ** 1.5;
           }
 
-          const lift = Math.min(1, Math.max(gripped, swell * swell * TIDE_LIFT));
+          let glowing = 0;
+          for (const glow of lit) glowing = Math.max(glowing, nearness(glow, x, y));
+          const lift = Math.min(
+            1,
+            Math.max(gripped, swell * swell * TIDE_LIFT, glowing * GLOW_LIFT),
+          );
           const tint = Math.min(1, Math.max(gripped * 1.6, crest * TIDE_ALPHA));
-          if (tint < 0.01 && lift < 0.02) {
+          if (tint < 0.01 && lift < 0.02 && glowing < 0.01) {
             if (!moving) continue;
             base.moveTo(dotX + DOT, dotY);
             base.arc(dotX, dotY, DOT, 0, Math.PI * 2);
@@ -258,6 +320,13 @@ export function animateDots(element: Element, withTide: boolean) {
           const radius = DOT + lift * DOT_LIFT;
           base.moveTo(dotX + radius, dotY);
           base.arc(dotX, dotY, radius, 0, Math.PI * 2);
+          for (const glow of lit) {
+            const step = Math.round(nearness(glow, x, y) * GLOW_ALPHA * TINT_STEPS);
+            if (step < 1) continue;
+            const path = (glow.paths[step] ??= new Path2D());
+            path.moveTo(dotX + radius, dotY);
+            path.arc(dotX, dotY, radius, 0, Math.PI * 2);
+          }
           if (tint < 0.01) continue;
           const hue =
             crest * TIDE_ALPHA > gripped * 1.6
@@ -275,6 +344,13 @@ export function animateDots(element: Element, withTide: boolean) {
     context.globalAlpha = 1;
     context.fillStyle = colours[0]!;
     context.fill(base);
+    for (const glow of lit) {
+      context.fillStyle = glow.colour;
+      glow.paths.forEach((path, step) => {
+        context.globalAlpha = step / TINT_STEPS;
+        context.fill(path);
+      });
+    }
     for (const [key, path] of tints) {
       context.globalAlpha = (key % 100) / TINT_STEPS;
       context.fillStyle = colours[Math.floor(key / 100)]!;
@@ -282,16 +358,19 @@ export function animateDots(element: Element, withTide: boolean) {
     }
   };
 
+  const fading = (now: number) => glows.some((glow) => now - glow.since < GLOW_FADE);
   const tick = (now: number) => {
     draw(now);
-    frame = (withTide && !still.matches) || presses.length ? requestAnimationFrame(tick) : 0;
+    const live = (withTide && !still.matches) || presses.length || fading(now);
+    frame = live ? requestAnimationFrame(tick) : 0;
   };
   const wake = () => {
     if (!frame) frame = requestAnimationFrame(tick);
   };
   redraw = () => {
-    if (frame) draw();
+    if (frame || glows.length) draw();
   };
+  onGlow = wake;
 
   // A wheel or key scroll slides the page under a still pointer and fires no pointermove, so a held
   // press also follows the pointer's place on the page as it scrolls.
@@ -333,8 +412,9 @@ export function animateDots(element: Element, withTide: boolean) {
     addEventListener("pointercancel", release, { capture: true, passive: true });
     addEventListener("blur", release);
   }
-  if (withTide) wake();
+  if (withTide || glows.length) wake();
   return () => {
+    onGlow = () => {};
     theme.disconnect();
     removeEventListener("scroll", scroll);
     removeEventListener("resize", onResize);
