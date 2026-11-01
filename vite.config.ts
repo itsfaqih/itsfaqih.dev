@@ -51,6 +51,29 @@ const config = defineConfig({
       "anti-slop/no-widen-then-assert": "error",
       "anti-slop/require-safety-comment-for-type-assertion": "error",
       "vite-plus/prefer-vite-plus-imports": "error",
+      // The site is Astro markup plus custom elements; React and its UI kits left with the migration.
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "react",
+                "react/*",
+                "react-dom",
+                "react-dom/*",
+                "@astrojs/react",
+                "@base-ui/*",
+                "vaul",
+                "@phosphor-icons/react",
+                "@phosphor-icons/react/*",
+              ],
+              message:
+                "Write an .astro component with a custom element (see docs/astro-migration.md); icons go through src/components/icon.astro.",
+            },
+          ],
+        },
+      ],
     },
   },
 });

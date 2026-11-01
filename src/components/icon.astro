@@ -3,8 +3,8 @@ import type { HTMLAttributes } from "astro/types";
 
 type Weight = "regular" | "bold";
 
-// Phosphor's path data at 2.1.10, the markup @phosphor-icons/react renders, one path per weight.
-// Add an icon or weight from its def in @phosphor-icons/react/dist/defs/<Name>.es.js.
+// Phosphor's path data at 2.1.10, one path per weight, drawn as Phosphor's React package drew it.
+// Add an icon or weight from the path in Phosphor's SVG for it (phosphoricons.com).
 const PATHS = {
   ArrowClockwise: {
     bold:

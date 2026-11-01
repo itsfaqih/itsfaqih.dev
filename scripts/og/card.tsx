@@ -1,7 +1,9 @@
+/** @jsxImportSource #og */
 import { readFile, readdir } from "node:fs/promises";
 import { Resvg } from "@resvg/resvg-js";
 import satori, { type Font } from "satori";
 import { SLIDES } from "../../src/data/home";
+import type { OgNode } from "./jsx-runtime";
 
 const CARD_SIZE = { width: 1200, height: 630 } as const;
 
@@ -95,7 +97,7 @@ function titleSize(title: string) {
   return 76;
 }
 
-function Frame({ ink, hue, children }: { ink: Ink; hue: string; children: React.ReactNode }) {
+function Frame({ ink, hue, children }: { ink: Ink; hue: string; children: OgNode }) {
   return (
     <div
       style={{
@@ -115,7 +117,7 @@ function Frame({ ink, hue, children }: { ink: Ink; hue: string; children: React.
   );
 }
 
-function Mono({ color, children }: { color: string; children: React.ReactNode }) {
+function Mono({ color, children }: { color: string; children: OgNode }) {
   return (
     <div
       style={{

@@ -32,7 +32,7 @@ function bounce(ground: HTMLElement, width: number, speed: number, since = 0) {
 /**
  * The site header (header.astro). It folds to a compact capsule once the page scrolls, unfolds
  * from the menu button, and holds whatever a page portals into `[data-island-activity]` while
- * compact (IslandActivity in src/rules/rule-landing.tsx).
+ * compact (the rule frame's island in src/rules/rule-landing.astro).
  */
 class SiteHeader extends HTMLElement {
   #stop?: () => void;

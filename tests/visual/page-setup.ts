@@ -25,8 +25,8 @@ export type Clip = { x: number; y: number; width: number; height: number };
 // one ~40. A flat budget holds a small change to the same bar on a tall page as on a short one.
 export const maxDiffPixels = 20;
 
-// Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (use-cut-ins.ts), and
-// [data-rev] rule sections gain data-in (rule-landing.tsx). A new reveal marker belongs here.
+// Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (cut-ins.ts), and
+// [data-rev] rule sections gain data-in (rule-motion.ts). A new reveal marker belongs here.
 const unrevealedSelector = "[data-cut]:not(.in), [data-rev]:not([data-in])";
 
 export const fixedTime = new Date("2026-01-15T09:30:00Z");

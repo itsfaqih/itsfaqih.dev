@@ -6,12 +6,9 @@ import { optimize } from "svgo";
 import { preloadFile } from "@pierre/diffs/ssr";
 import { defineConfig } from "astro/config";
 import type { AstroIntegration } from "astro";
-import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
 import rehypeSlug from "rehype-slug";
-import babel from "@rolldown/plugin-babel";
-import { reactCompilerPreset } from "@vitejs/plugin-react";
 import stylex from "@stylexjs/unplugin";
 import { Features } from "lightningcss";
 import { runnerImport, type Plugin } from "vite-plus";
@@ -194,7 +191,7 @@ export default defineConfig({
       rehypePlugins: [rehypeSlug, rehypeHighlightCode],
     }),
   },
-  integrations: [react(), mdx(), finishPages()],
+  integrations: [mdx(), finishPages()],
   vite: {
     // simple-icons is bundled rather than loaded from node_modules, so roundIconPaths rounds the
     // marks the prerender renders too.
@@ -202,7 +199,6 @@ export default defineConfig({
     plugins: [
       roundIconPaths(),
       { ...stylexPlugin, generateBundle: undefined, writeBundle: undefined },
-      babel({ presets: [reactCompilerPreset()] }),
     ],
   },
 });
