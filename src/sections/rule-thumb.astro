@@ -1,0 +1,307 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { colorOf, type Guideline } from "../data/guidelines";
+import {
+  ART_IDS,
+  beat,
+  button,
+  dataLoading,
+  depth,
+  draw,
+  glyph,
+  glyphOf,
+  nullish,
+  PIP_PLAY,
+  proximity,
+  screen,
+} from "./rule-thumb.styles";
+
+type Props = {
+  /** With no rule the screen is blank. */
+  rule?: Guideline;
+  /** The art plays while the screen carries data-play; its owner toggles it at runtime. */
+  play?: boolean;
+  /** Where the screen sits. The select panel and a rule's cover show it large, with a bigger chip. */
+  at?: "card" | "panel" | "cover";
+  style?: stylex.StyleXStyles;
+};
+
+const { rule, play = false, at = "card", style } = Astro.props;
+const art = rule && ART_IDS.has(rule.id) ? rule.id : undefined;
+// On a rule's cover the art sits in layers (depth), and the data-loading screen takes that page's
+// demo card styles, and its slide in place of the sweep.
+const z = at === "cover";
+const playing = art === "button-design" ? draw.playSlow : draw.play;
+const chip = art
+  ? {
+      "proximity-principle": { beats: ["FAR", "NEAR"], moves: [beat.away, beat.rest] },
+      "button-design": {
+        beats: ["IDLE", "HOVER", "PRESS", "LOAD", "DONE"],
+        moves: [beat.idle, beat.hover, beat.press, beat.load, beat.done],
+      },
+      "data-loading": { beats: ["STALE", "FRESH"], moves: [beat.away, beat.rest] },
+      "null-vs-undefined": { beats: ["MISSING", "EMPTY"], moves: [beat.missing, beat.empty] },
+    }[art]
+  : undefined;
+const rows = [
+  { y: 34, width: 50, value: "$12" },
+  { y: 52, width: 38, value: "$14" },
+  { y: 70, width: 58, value: "$31" },
+];
+---
+
+<div
+  class={`thumb ${stylex.attrs(screen.root, !rule && screen.blank, z && depth.dots, style).class}`}
+  style={rule && `--c:${colorOf(rule.label)}`}
+  aria-hidden="true"
+  data-play={play ? "" : undefined}
+>
+  {
+    rule && !art && (
+      <div {...stylex.attrs(screen.art, glyph.box, playing)}>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          {...stylex.attrs(glyph.svg, playing, glyph.float, z && depth.near)}
+        >
+          {
+            glyphOf(rule.label).map(({ tag: Stroke, attrs }) => (
+              <Stroke {...stylex.attrs(playing)} {...attrs} />
+            ))
+          }
+        </svg>
+      </div>
+    )
+  }
+  {
+    art && (
+      <div {...stylex.attrs(screen.art, playing)}>
+        {art === "proximity-principle" && (
+          <svg viewBox="0 0 160 100" {...stylex.attrs(draw.svg, playing)}>
+            <rect
+              {...stylex.attrs(
+                proximity.box,
+                draw.moving,
+                playing,
+                proximity.boxPlay,
+                z && depth.back,
+              )}
+              x="14"
+              y="21"
+              width="108"
+              height="46"
+              rx="6"
+            />
+            <text {...stylex.attrs(draw.text, draw.dim, playing, z && depth.back)} x="14" y="15">src/</text>
+            <text {...stylex.attrs(draw.text, draw.hi, playing, z && depth.mid)} x="22" y="33">OrderCard/</text>
+            <text {...stylex.attrs(draw.text, playing, z && depth.mid)} x="32" y="47">OrderCard.tsx</text>
+            <text {...stylex.attrs(draw.text, draw.dim, playing, z && depth.mid)} x="22" y="77">shared/</text>
+            <line
+              {...stylex.attrs(
+                proximity.link,
+                draw.moving,
+                playing,
+                proximity.linkPlay,
+                z && depth.mid,
+              )}
+              x1="27"
+              y1="50"
+              x2="27"
+              y2="89"
+            />
+            <g {...stylex.attrs(draw.moving, playing, proximity.filePlay, z && depth.front)}>
+              <rect
+                {...stylex.attrs(proximity.file, playing)}
+                x="30"
+                y="52"
+                width="56"
+                height="12"
+                rx="3"
+              />
+              <text {...stylex.attrs(draw.text, proximity.fileName, playing)} x="34" y="61">styles.ts</text>
+            </g>
+          </svg>
+        )}
+        {art === "button-design" && (
+          <svg viewBox="0 0 160 100" {...stylex.attrs(draw.svg, playing)}>
+            <g {...stylex.attrs(button.button, draw.moving, playing, button.buttonPlay, z && depth.mid)}>
+              <rect
+                {...stylex.attrs(button.face, draw.moving, playing)}
+                x="38"
+                y="30"
+                width="84"
+                height="28"
+                rx="8"
+              />
+              <rect
+                {...stylex.attrs(button.hover, draw.moving, playing, button.hoverPlay)}
+                x="38"
+                y="30"
+                width="84"
+                height="28"
+                rx="8"
+              />
+              <text
+                {...stylex.attrs(button.text, button.hidden, draw.moving, playing, button.idlePlay)}
+                x="80"
+                y="48">Save</text>
+              <g {...stylex.attrs(button.hidden, draw.moving, playing, button.pendingPlay)}>
+                <circle
+                  {...stylex.attrs(button.spinner, draw.moving, playing, button.spinnerPlay)}
+                  cx="52"
+                  cy="44"
+                  r="5"
+                />
+                <text {...stylex.attrs(button.text, button.pendingText, playing)} x="88" y="47.5">Saving…</text>
+              </g>
+              <text {...stylex.attrs(button.text, draw.moving, playing, button.donePlay)} x="80" y="48">Saved ✓</text>
+            </g>
+            {PIP_PLAY.map((pipPlay, index) => (
+              <rect
+                {...stylex.attrs(button.pip, draw.moving, playing, pipPlay, z && depth.back)}
+                x={52 + index * 12}
+                y="72"
+                width="8"
+                height="4"
+                rx="2"
+              />
+            ))}
+            <path
+              {...stylex.attrs(button.cursor, draw.moving, playing, button.cursorPlay, z && depth.front)}
+              d="M100 46l0 16 4.5-4.2 3 6.6 2.6-1.2-3-6.4 6-.4z"
+            />
+          </svg>
+        )}
+        {art === "data-loading" && (
+          <svg viewBox="0 0 160 100" {...stylex.attrs(draw.svg, playing)}>
+            <rect
+              {...stylex.attrs(dataLoading.card, z && dataLoading.ownCard, draw.moving, playing, z && depth.back)}
+              x="22"
+              y="16"
+              width="116"
+              height="72"
+              rx="8"
+            />
+            <rect
+              {...stylex.attrs(dataLoading.flash, draw.moving, playing, dataLoading.flashPlay, z && depth.mid)}
+              x="24"
+              y="44"
+              width="112"
+              height="16"
+              rx="3"
+            />
+            <g {...stylex.attrs(draw.moving, playing, dataLoading.rowsPlay, z && depth.mid)}>
+              {rows.map((row, index) => (
+                <g {...stylex.attrs(playing)}>
+                  <circle {...stylex.attrs(dataLoading.mark, playing)} cx="36" cy={row.y + 2} r="4" />
+                  <rect
+                    {...stylex.attrs(dataLoading.mark, playing)}
+                    x="46"
+                    y={row.y - 1}
+                    width={row.width}
+                    height="6"
+                    rx="3"
+                  />
+                  <text
+                    {...stylex.attrs(
+                      draw.text,
+                      draw.hi,
+                      dataLoading.value,
+                      index === 1 && draw.moving,
+                      playing,
+                      index === 1 && dataLoading.newPlay,
+                    )}
+                    x="130"
+                    y={row.y + 5}>{row.value}</text>
+                </g>
+              ))}
+            </g>
+            <text
+              {...stylex.attrs(
+                draw.text,
+                dataLoading.value,
+                dataLoading.old,
+                draw.moving,
+                playing,
+                dataLoading.oldPlay,
+                z && depth.mid,
+              )}
+              x="130"
+              y="57">$8</text>
+            <rect
+              {...stylex.attrs(
+                dataLoading.sweep,
+                draw.moving,
+                playing,
+                z ? dataLoading.slidePlay : dataLoading.sweepPlay,
+                z && depth.back,
+              )}
+              x="22"
+              y="16"
+              width="116"
+              height="3"
+              rx="1.5"
+            />
+          </svg>
+        )}
+        {art === "null-vs-undefined" && (
+          <svg viewBox="0 0 160 100" {...stylex.attrs(draw.svg, playing)}>
+            <rect
+              {...stylex.attrs(nullish.slot, draw.moving, playing, z && depth.back)}
+              x="20"
+              y="20"
+              width="52"
+              height="46"
+              rx="8"
+            />
+            <text
+              {...stylex.attrs(
+                nullish.mark,
+                nullish.question,
+                draw.moving,
+                playing,
+                nullish.questionPlay,
+                z && depth.mid,
+              )}
+              x="46"
+              y="51">?</text>
+            <rect
+              {...stylex.attrs(nullish.slot, draw.moving, playing, z && depth.back)}
+              x="88"
+              y="20"
+              width="52"
+              height="46"
+              rx="8"
+            />
+            <g {...stylex.attrs(draw.moving, playing, nullish.boxPlay, z && depth.front)}>
+              <rect {...stylex.attrs(nullish.box, playing)} x="91" y="23" width="46" height="40" rx="6" />
+              <text {...stylex.attrs(nullish.mark, playing)} x="114" y="51">∅</text>
+            </g>
+            <text
+              {...stylex.attrs(draw.text, draw.dim, nullish.label, draw.moving, playing, z && depth.back)}
+              x="46"
+              y="84">undefined</text>
+            <text
+              {...stylex.attrs(draw.text, draw.hi, nullish.label, draw.moving, playing, z && depth.back)}
+              x="114"
+              y="84">null</text>
+          </svg>
+        )}
+        {chip && (
+          <span
+            {...stylex.attrs(screen.chip, at !== "card" && screen.chipLarge, z && depth.near, playing)}
+          >
+            {chip.beats.map((name, index) => (
+              <b {...stylex.attrs(screen.beat, playing, chip.moves[index])}>{name}</b>
+            ))}
+          </span>
+        )}
+      </div>
+    )
+  }
+</div>

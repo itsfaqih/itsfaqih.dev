@@ -1,0 +1,24 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { styles } from "./backdrop-dots";
+
+type Props = {
+  /** Slow waves swell the dots across the page. */
+  tide?: boolean;
+};
+
+const { tide = false } = Astro.props;
+---
+
+<site-backdrop data-tide={tide ? "" : undefined} {...stylex.attrs(styles.host)}>
+  <template>
+    <div {...stylex.attrs(styles.root)} aria-hidden="true">
+      <i {...stylex.attrs(styles.layer, styles.grid)}></i><canvas {...stylex.attrs(styles.layer)}
+      ></canvas>
+    </div>
+  </template>
+</site-backdrop>
+
+<script>
+  import "./backdrop.client";
+</script>

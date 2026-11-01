@@ -65,7 +65,7 @@ export const reticle = stylex.create({
     },
   },
   // The card is picked while it carries data-on. An attribute rather than a conditional style, so
-  // the class list React writes never changes and the cut-in's .in survives the re-render.
+  // the class list never changes and the cut-in's .in survives every update.
   on: {
     "::after": {
       opacity: { default: 0, ":is([data-on])": 1 },
