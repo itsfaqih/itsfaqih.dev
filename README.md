@@ -65,7 +65,7 @@ The build does not process fonts. The script cuts Geist, Geist Mono and Unbounde
 ## Source layout
 
 - `src/pages/`: Astro's file-based pages. Each is a thin `.astro` file that picks the layout, the head tags and the page component.
-- `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the header, command palette, cursor and scrollbar and, in development, the StyleX dev sheet and React Grab), and `head-script.ts`, which sets the theme, the intro classes and the view-transition types before first paint.
+- `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the header, command palette, cursor and scrollbar and, in development, the StyleX dev sheet), and `head-script.ts`, which sets the theme, the intro classes and the view-transition types before first paint.
 - `src/sections/`: the home page (`home.astro`) and the pieces the rule pages share with it.
 - `src/rules/`: the Rule of Thumb index, each rule's page component, the `RuleLanding` frame and `rule-page.astro`. `docs/rule-pages.md` explains how a rule page is built.
 - `src/blog/`: the post list, the post frame and its table of contents.
