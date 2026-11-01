@@ -55,20 +55,27 @@ export function watchFluidHover(group: HTMLElement, highlight: HTMLElement, sign
 
 /**
  * Moves a `fluidHover.highlight` onto a box in its group's coordinates and lights it. An unlit
- * highlight jumps there and fades in; a lit one springs over. Axes left out keep their value.
+ * highlight jumps there and fades in; a lit one springs over. An `instant` placement shows it lit
+ * on the box at once, for a highlight that marks a selection already on screen. Axes left out keep
+ * their value.
  */
 export function placeHighlight(
   highlight: HTMLElement,
   box: { x?: number; y: number; w?: number; h: number },
+  { instant = false } = {},
 ) {
   const fresh = !highlight.hasAttribute("data-on");
-  if (fresh) highlight.setAttribute("data-fresh", "");
+  if (instant) highlight.style.transition = "none";
+  else if (fresh) highlight.setAttribute("data-fresh", "");
   for (const [axis, value] of Object.entries(box)) {
     highlight.style.setProperty(`--${axis}`, `${value}px`);
   }
-  if (fresh) {
-    // Commit the jump before the transitions come back, so a fresh entry only fades.
+  if (instant) highlight.setAttribute("data-on", "");
+  if (instant || fresh) {
+    // Commit the jump before the transitions come back, so a fresh entry only fades and an instant
+    // one doesn't move at all.
     highlight.getBoundingClientRect();
+    highlight.style.removeProperty("transition");
     highlight.removeAttribute("data-fresh");
   }
   highlight.setAttribute("data-on", "");

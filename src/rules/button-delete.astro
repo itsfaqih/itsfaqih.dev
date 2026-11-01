@@ -1,5 +1,6 @@
 ---
 import * as stylex from "@stylexjs/stylex";
+import { fluidHover } from "../components/fluid-hover";
 import { styles, view } from "./button-design.styles";
 
 type Props = { careful?: boolean };
@@ -18,12 +19,20 @@ const key = [styles.key, styles.sm, styles.live];
 <button-delete {...stylex.attrs(styles.stage)} data-careful={careful ? "true" : undefined}>
   {
     careful && (
-      <div role="group" aria-label="Guard" {...stylex.attrs(styles.guards)}>
+      <div role="group" aria-label="Guard" {...stylex.attrs(fluidHover.group, styles.guards)}>
+        <span
+          aria-hidden="true"
+          data-part="pill"
+          {...stylex.attrs(fluidHover.highlight, styles.guardPill, styles.guardSlide)}
+        />
         {GUARDS.map(({ id, label }) => (
           <button
             type="button"
             aria-pressed={id === "confirm" ? "true" : "false"}
-            class={view.guard(id === "confirm")}
+            {...stylex.attrs(
+              styles.guard,
+              id === "confirm" && [styles.guardOn, styles.guardPill],
+            )}
             data-guard={id}>{label}</button
           >
         ))}

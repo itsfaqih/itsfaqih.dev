@@ -395,9 +395,20 @@ export const styles = stylex.create({
     outline: { default: null, ":focus-visible": `3px solid ${palette["--focus"]}` },
   },
   guardOn: {
+    color: palette["--text"],
+  },
+  // The pill under the pressed guard. The server paints it on the Confirm button itself, and the
+  // client moves it onto the one highlight that slides between guards (fluid-hover.ts).
+  guardPill: {
+    borderRadius: "7px",
     backgroundColor: palette["--panel"],
     boxShadow: `0 1px 0 ${palette["--hair"]}, 0 0 0 1px ${palette["--hair"]}`,
-    color: palette["--text"],
+  },
+  // It answers a click rather than chasing the pointer, so it takes the moderate spring over
+  // hover's fast one.
+  guardSlide: {
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
   },
   hold: {
     overflow: "hidden",

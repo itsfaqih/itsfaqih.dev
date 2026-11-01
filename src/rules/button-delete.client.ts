@@ -1,3 +1,4 @@
+import { placeHighlight } from "../components/fluid-hover";
 import { HOLD_MS, type Step, UNDO_MS, view } from "./button-design.styles";
 
 const GUARDS = ["confirm", "hold", "undo"] as const;
@@ -43,6 +44,7 @@ class ButtonDelete extends HTMLElement {
       const button = this.querySelector<HTMLButtonElement>(`[data-guard="${kind}"]`);
       return button ? [{ kind, button }] : [];
     });
+    const pill = this.querySelector<HTMLElement>('[data-part="pill"]');
 
     let step: Step = "idle";
     let guard: Guard = "confirm";
@@ -63,16 +65,31 @@ class ButtonDelete extends HTMLElement {
 
     const held = () => careful && guard === "hold";
 
-    const render = () => {
-      project.className = view.project(step);
-      name.className = view.projectName(step === "deleted" || step === "undo");
-      name.textContent = COPY[step].name;
-      meta.textContent = COPY[step].meta;
+    // One pill slides to the pressed guard (fluid-hover.ts). Until this runs, the server-rendered
+    // Confirm button paints the pill itself, so placing it `instant` swaps the two with no flash.
+    const showGuard = (instant = false) => {
       for (const { kind, button } of guards) {
         const on = kind === guard;
         button.setAttribute("aria-pressed", String(on));
         button.className = view.guard(on);
       }
+      const pressed = guards.find(({ kind }) => kind === guard)?.button;
+      if (!pill || !pressed) return;
+      const area = pill.parentElement!.getBoundingClientRect();
+      const box = pressed.getBoundingClientRect();
+      placeHighlight(
+        pill,
+        { x: box.left - area.left, y: box.top - area.top, w: box.width, h: box.height },
+        { instant },
+      );
+    };
+
+    const render = () => {
+      project.className = view.project(step);
+      name.className = view.projectName(step === "deleted" || step === "undo");
+      name.textContent = COPY[step].name;
+      meta.textContent = COPY[step].meta;
+      showGuard();
 
       if (step === "confirm") {
         action?.remove();
@@ -234,8 +251,14 @@ class ButtonDelete extends HTMLElement {
       { signal },
     );
 
+    showGuard(true);
+    // Fonts landing or the viewport changing resize the guards, so the pill follows them at once.
+    const resize = new ResizeObserver(() => showGuard(true));
+    if (pill) resize.observe(pill.parentElement!);
+
     this.#stop = () => {
       controller.abort();
+      resize.disconnect();
       clearTimeout(holdTimer);
       clearTimeout(undoTimer);
     };
