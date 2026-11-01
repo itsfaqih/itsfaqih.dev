@@ -1,6 +1,6 @@
 ---
 import "../styles.css";
-import { CommandPalette } from "../components/command-palette";
+import CommandPalette from "../components/command-palette.astro";
 import Header from "../components/header.astro";
 import PageScrollbar from "../components/page-scrollbar.astro";
 import PrintCursor from "../components/print-cursor.astro";
@@ -68,7 +68,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
   </head>
   <body class={site.body}>
     <Header path={path} />
-    <CommandPalette client:idle />
+    <CommandPalette />
     <main class={site.main}><slot /></main>
     <PrintCursor />
     <PageScrollbar />

@@ -1,0 +1,296 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { colorOf, VISIBLE_GUIDELINES, type RuleId } from "../data/guidelines";
+import { LINKS } from "../seo";
+import { boxScrollbar, boxScrollbarHost, marker } from "./box-scrollbar";
+import { styles, view } from "./command-palette.styles";
+import { fluidHover } from "./fluid-hover";
+import Icon from "./icon.astro";
+import RuleIcon from "./rule-icon.astro";
+
+type Command = {
+  id: string;
+  label: string;
+  description: string;
+  keywords: string[];
+  icon: "House" | "BookOpen" | "GithubLogo" | "LinkedinLogo" | "Envelope" | RuleId;
+  /** Overrides the group's hue, as a rule takes its topic's. */
+  hue?: string;
+} & (
+  | { href: string }
+  | { external: string }
+  | { copy: string }
+  | { submenu: "rule-of-thumb" }
+);
+
+type Group = { label: string; hue: string; items: Command[] };
+
+// Each section wears its own hue on its label and on the highlighted item's icon.
+const levels: { id: string; groups: Group[] }[] = [
+  {
+    id: "root",
+    groups: [
+      {
+        label: "Pages",
+        hue: "var(--cw)",
+        items: [
+          {
+            id: "home",
+            label: "Home",
+            description: "Go to homepage",
+            icon: "House",
+            keywords: ["index", "main", "start"],
+            href: "/",
+          },
+          {
+            id: "rule-of-thumb",
+            label: "Rule of Thumb",
+            description: "Browse design and code guidelines",
+            icon: "BookOpen",
+            keywords: ["guidelines", "principles", "best practices"],
+            submenu: "rule-of-thumb",
+          },
+        ],
+      },
+      {
+        label: "Links",
+        hue: "var(--ux)",
+        items: [
+          {
+            id: "github",
+            label: "GitHub",
+            description: "Open GitHub profile in new tab",
+            icon: "GithubLogo",
+            keywords: ["code", "repository", "repo", "source"],
+            external: LINKS.github,
+          },
+          {
+            id: "linkedin",
+            label: "LinkedIn",
+            description: "Open LinkedIn profile in new tab",
+            icon: "LinkedinLogo",
+            keywords: ["profile", "professional", "connect", "network"],
+            external: LINKS.linkedin,
+          },
+        ],
+      },
+      {
+        label: "Actions",
+        hue: "var(--ts)",
+        items: [
+          {
+            id: "copy-email",
+            label: "Copy Email",
+            description: `Copy ${LINKS.email} to clipboard`,
+            icon: "Envelope",
+            keywords: ["email", "contact", "mail", "clipboard"],
+            copy: LINKS.email,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "rule-of-thumb",
+    groups: [
+      {
+        label: "Rule of Thumb",
+        hue: "var(--cw)",
+        items: [
+          {
+            id: "rot-index",
+            label: "Index",
+            description: "View all rules of thumb",
+            icon: "BookOpen",
+            keywords: ["all", "list", "overview"],
+            href: "/rule-of-thumb",
+          },
+          ...VISIBLE_GUIDELINES.map(
+            (guideline): Command => ({
+              id: `rot-${guideline.id}`,
+              label: guideline.title,
+              description: `${guideline.label} • ${guideline.description}`,
+              icon: guideline.id,
+              keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
+              hue: colorOf(guideline.label),
+              href: guideline.href,
+            }),
+          ),
+        ],
+      },
+    ],
+  },
+];
+
+// The filter matches the query inside any one of these, so a newline, which the input can't hold,
+// keeps a match from spanning two.
+const searchText = (command: Command) =>
+  [command.label, command.description, ...command.keywords].join("\n").toLowerCase();
+const PHOSPHOR = ["House", "BookOpen", "GithubLogo", "LinkedinLogo"] as const;
+const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
+  PHOSPHOR.some((name) => name === icon);
+---
+
+<command-palette {...stylex.attrs(styles.host)}>
+  <span data-part="guard" tabindex="0" aria-hidden="true" hidden {...stylex.attrs(styles.guard)}></span>
+  <div
+    data-pour
+    role="presentation"
+    aria-hidden="true"
+    hidden
+    style="user-select: none"
+    {...stylex.attrs(styles.backdrop)}
+  >
+  </div>
+  <dialog data-pour tabindex="-1" {...stylex.attrs(styles.dialog, styles.stage)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.drop)}></div>
+    <div data-cmd-panel {...stylex.attrs(styles.panel)}>
+      <div {...stylex.attrs(styles.surface)}>
+        <div {...stylex.attrs(styles.body)}>
+          <div data-part="crumb" inert class={view.crumb(false)}>
+            <div {...stylex.attrs(styles.crumbClip)}>
+              <div {...stylex.attrs(styles.crumb)}>
+                <button type="button" data-part="back" {...stylex.attrs(styles.crumbBack)}
+                  ><Icon name="CaretLeft" size={12} weight="bold" />Back</button
+                ><span aria-hidden="true" {...stylex.attrs(styles.crumbSlash)}>/</span><b
+                  {...stylex.attrs(styles.crumbLevel)}>Rule of Thumb</b
+                >
+              </div>
+            </div>
+          </div>
+
+          <div {...stylex.attrs(styles.search)}>
+            <Icon name="MagnifyingGlass" size={18} weight="bold" /><input
+              role="combobox"
+              aria-expanded="true"
+              aria-controls="cmd-listbox"
+              aria-activedescendant="cmd-option-home"
+              aria-autocomplete="list"
+              aria-label="Search commands"
+              placeholder="Search pages, links, or actions..."
+              value=""
+              enterkeyhint="search"
+              autocapitalize="none"
+              autocorrect="off"
+              {...stylex.attrs(styles.input)}
+            /><kbd {...stylex.attrs(styles.kbd)}>Esc</kbd>
+          </div>
+
+          <div {...stylex.attrs(styles.listFrame)}>
+            <div
+              id="cmd-listbox"
+              role="listbox"
+              aria-label="Commands"
+              {...stylex.attrs(styles.list, boxScrollbarHost.box)}
+            >
+              <div data-part="ghosts" aria-hidden="true" inert {...stylex.attrs(styles.ghosts)}>
+              </div>
+              {
+                levels.map((level, levelIndex) => (
+                  <div
+                    data-level={level.id}
+                    role="presentation"
+                    hidden={levelIndex > 0}
+                    class={view.level(null)}
+                  >
+                    <span
+                      data-part="highlight"
+                      aria-hidden="true"
+                      {...stylex.attrs(fluidHover.highlight, styles.highlight)}
+                    />
+                    <div data-part="empty" {...stylex.attrs(styles.empty)} />
+                    {level.groups.map((group, groupIndex) => (
+                      <div
+                        role="group"
+                        aria-label={group.label}
+                        class={view.group(groupIndex > 0)}
+                        style={`--c:${group.hue}`}
+                      >
+                        <div role="presentation" {...stylex.attrs(styles.label)}>
+                          {group.label}
+                        </div>
+                        {group.items.map((item, itemIndex) => {
+                          const selected = groupIndex === 0 && itemIndex === 0;
+                          return (
+                            <div
+                              id={`cmd-option-${item.id}`}
+                              role="option"
+                              aria-selected={String(selected)}
+                              data-search={searchText(item)}
+                              data-href={"href" in item ? item.href : undefined}
+                              data-external={"external" in item ? item.external : undefined}
+                              data-copy={"copy" in item ? item.copy : undefined}
+                              data-submenu={"submenu" in item ? item.submenu : undefined}
+                              class={view.item(selected)}
+                              style={item.hue ? `--c:${item.hue}` : undefined}
+                            >
+                              <span class={view.icon(selected)}>
+                                {isPhosphor(item.icon) ? (
+                                  <Icon name={item.icon} size={18} />
+                                ) : item.icon === "Envelope" ? (
+                                  <>
+                                    <span data-part="mail" class={view.glyph(false)}>
+                                      <Icon name="Envelope" size={18} />
+                                    </span>
+                                    <span data-part="check" class={view.glyph(true)}>
+                                      <Icon name="Check" size={18} />
+                                    </span>
+                                  </>
+                                ) : (
+                                  <RuleIcon id={item.icon} />
+                                )}
+                              </span>
+                              <span {...stylex.attrs(styles.text)}>
+                                <span class={`cmdk-name ${stylex.attrs(styles.name).class}`}>
+                                  {item.label}
+                                </span>
+                                <span {...stylex.attrs(styles.description)}>
+                                  {item.description}
+                                </span>
+                              </span>
+                              {"copy" in item && (
+                                <span data-part="copied" hidden {...stylex.attrs(styles.done)}>
+                                  Copied!
+                                </span>
+                              )}
+                              {"submenu" in item && (
+                                <Icon name="CaretRight" size={14} weight="bold" />
+                              )}
+                              {"external" in item && (
+                                <Icon name="ArrowSquareOut" size={14} weight="bold" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                ))
+              }
+            </div>
+            <div hidden aria-hidden="true" {...stylex.attrs(boxScrollbar.track, marker)}>
+              <div {...stylex.attrs(boxScrollbar.thumb)}></div>
+            </div>
+          </div>
+
+          <div data-part="foot" {...stylex.attrs(styles.foot)}>
+            <span {...stylex.attrs(styles.hint)}
+              ><kbd {...stylex.attrs(styles.kbd)}>↑</kbd><kbd
+                {...stylex.attrs(styles.kbd, styles.lastKey)}>↓</kbd
+              >Navigate</span
+            ><span {...stylex.attrs(styles.hint)}
+              ><kbd {...stylex.attrs(styles.kbd, styles.lastKey)}>↵</kbd>Select</span
+            ><span data-part="back-hint" {...stylex.attrs(styles.hint)}
+              ><kbd {...stylex.attrs(styles.kbd, styles.lastKey)}>←</kbd>Back</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <span data-part="guard" tabindex="0" aria-hidden="true" hidden {...stylex.attrs(styles.guard)}></span>
+</command-palette>
+
+<script>
+  import "./command-palette.client";
+</script>
