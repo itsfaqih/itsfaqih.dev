@@ -128,7 +128,7 @@ function remove() {
 }
 ```
 
-## Pad the icon side less
+## Optical alignment over mathematical alignment
 
 Take 4px off the icon's side. An icon carries white space inside its own box, so equal padding makes that side look wider.
 

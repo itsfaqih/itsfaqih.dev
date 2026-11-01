@@ -231,7 +231,7 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    title: "Pad the icon side less",
+    title: "Optical alignment over mathematical alignment",
     bad: {
       label: "Even padding",
       costs: ["16 | 16px", "icon side looks wider"],
