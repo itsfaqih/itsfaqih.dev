@@ -1,12 +1,13 @@
 ---
-import { ArrowLeftIcon, CalendarBlankIcon, ClockIcon } from "@phosphor-icons/react";
 import { render } from "astro:content";
-import { MarkdownCodeBlock } from "../../components/code-block";
-import { post as classes, TocDrawer } from "../../blog/post";
+import { post as classes } from "../../blog/post.styles";
 import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts, type Post } from "../../blog/posts";
 import ProseH2 from "../../blog/prose-h2.astro";
 import ProseP from "../../blog/prose-p.astro";
-import { TableOfContents } from "../../blog/table-of-contents";
+import TableOfContents from "../../blog/table-of-contents.astro";
+import TocDrawer from "../../blog/toc-drawer.astro";
+import CodeBlock from "../../components/code-block.astro";
+import Icon from "../../components/icon.astro";
 import Site from "../../layouts/site.astro";
 
 export async function getStaticPaths() {
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const { title, summary, publishedAt } = post.data;
 ---
 
@@ -38,21 +39,18 @@ const { title, summary, publishedAt } = post.data;
     <div class={classes.shell}>
       <div class={classes.layout}>
         <div>
-          <a href="/blog" class={classes.backLinkTop}>
-            <ArrowLeftIcon size={16} className={classes.backArrow} />
-            Back to Blog
-          </a>
+          <a href="/blog" class={classes.backLinkTop}
+            ><Icon name="ArrowLeft" size={16} class={classes.backArrow} />Back to Blog</a
+          >
 
           <article>
             <header class={classes.header}>
               <div class={classes.meta}>
                 <div class={classes.metaItem}>
-                  <CalendarBlankIcon size={14} />
-                  <time>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
+                  <Icon name="CalendarBlank" size={14} /><time>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
                 </div>
                 <div class={classes.metaItem}>
-                  <ClockIcon size={14} />
-                  <span>5 min read</span>
+                  <Icon name="Clock" size={14} /><span>5 min read</span>
                 </div>
               </div>
 
@@ -64,16 +62,15 @@ const { title, summary, publishedAt } = post.data;
             <div class={classes.rule}></div>
 
             <div class={classes.body}>
-              <Content components={{ p: ProseP, h2: ProseH2, pre: MarkdownCodeBlock }} />
+              <Content components={{ p: ProseP, h2: ProseH2, pre: CodeBlock }} />
             </div>
           </article>
 
           <footer class={classes.footer}>
             <div class={classes.footerRow}>
-              <a href="/blog" class={classes.backLink}>
-                <ArrowLeftIcon size={16} className={classes.backArrow} />
-                Back to all posts
-              </a>
+              <a href="/blog" class={classes.backLink}
+                ><Icon name="ArrowLeft" size={16} class={classes.backArrow} />Back to all posts</a
+              >
 
               <p class={classes.thanks}>Thanks for reading!</p>
             </div>
@@ -81,11 +78,11 @@ const { title, summary, publishedAt } = post.data;
         </div>
 
         <div class={classes.tocRail}>
-          <TableOfContents client:media="(min-width: 64rem)" />
+          <TableOfContents headings={headings} />
         </div>
       </div>
     </div>
 
-    <TocDrawer client:visible />
+    <TocDrawer headings={headings} />
   </div>
 </Site>
