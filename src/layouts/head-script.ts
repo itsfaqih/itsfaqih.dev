@@ -1,4 +1,4 @@
-import { OPENING_KEY } from "../sections/rule-art";
+import { OPENING_KEY } from "../sections/rule-open";
 import { THEME_CLASSES } from "../theme";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
@@ -42,20 +42,19 @@ export const HEAD_SCRIPT = String.raw`(function () {
   } catch (e) {
     doc.classList.add("no-intro");
   }
-  // An island that plays the cut-ins cancels the fallback once it hydrates.
+  // Whatever plays the cut-ins cancels the fallback once it starts: an island once it hydrates, a
+  // custom element once it watches them (cut-ins.ts).
   var rest = setTimeout(function () {
     document.querySelectorAll("[data-cut]").forEach(function (piece) {
       piece.setAttribute("data-rest", "");
     });
     doc.classList.add("no-intro");
   }, Math.max(0, ${REST_AFTER_MS} - performance.now()));
-  document.addEventListener(
-    "astro:hydrate",
-    function (event) {
-      if (event.target.querySelector("[data-cut]")) clearTimeout(rest);
-    },
-    true,
-  );
+  function settle(event) {
+    if (event.target.querySelector("[data-cut]")) clearTimeout(rest);
+  }
+  document.addEventListener("astro:hydrate", settle, true);
+  document.addEventListener("cut-ins", settle, true);
 
   var RULE_PAGE = /^\/rule-of-thumb\/[^/]+$/;
   var RULE_INDEX = /^\/rule-of-thumb$/;
