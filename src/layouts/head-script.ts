@@ -43,13 +43,11 @@ export const HEAD_SCRIPT = String.raw`(function () {
   } catch (e) {
     doc.classList.add("no-intro");
   }
-  // A page reached from another page of the site keeps the header as it was, so its island and
-  // parts play their drop-in only on the first page of a visit, or on a reload.
   try {
     var entry = performance.getEntriesByType("navigation")[0];
     var sameSite = document.referrer.indexOf(location.origin + "/") === 0;
     if (sameSite && !(entry && entry.type === "reload")) {
-      doc.classList.add("carried");
+      doc.classList.add("from-site");
     }
   } catch (e) {}
   // Whatever plays the cut-ins cancels the fallback once it starts: an island once it hydrates, a
@@ -85,8 +83,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
     var opening = dive();
     return opening && opening.href === to ? "rule-open" : "page-fade";
   }
-  // Zooms toward the card, and swells it far enough that its edges leave the screen early in
-  // the dive rather than at its end.
+  var SWELL_PAST_EDGES = 1.5;
   function aimAt(card) {
     var x = card.x + card.width / 2;
     var y = card.y + card.height / 2;
@@ -96,7 +93,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
     );
     doc.style.setProperty("--open-x", x + "px");
     doc.style.setProperty("--open-y", y + "px");
-    doc.style.setProperty("--dive-scale", String(reach * 1.5));
+    doc.style.setProperty("--dive-scale", String(reach * SWELL_PAST_EDGES));
   }
   addEventListener("pageswap", function (event) {
     if (!event.viewTransition || !event.activation) return;

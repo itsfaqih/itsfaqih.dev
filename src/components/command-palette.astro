@@ -30,7 +30,6 @@ type Command = {
   icon: (typeof PHOSPHOR)[number] | "Envelope" | RuleId;
   /** Overrides the group's hue, as a rule takes its topic's. */
   hue?: string;
-  /** Listed only while the root search has a query, so everything on the site is findable from it. */
   searchOnly?: true;
 } & (
   | { href: string }

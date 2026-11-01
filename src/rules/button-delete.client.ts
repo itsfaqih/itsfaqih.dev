@@ -65,8 +65,6 @@ class ButtonDelete extends HTMLElement {
 
     const held = () => careful && guard === "hold";
 
-    // One pill slides to the pressed guard (fluid-hover.ts). Until this runs, the server-rendered
-    // Confirm button paints the pill itself, so placing it `instant` swaps the two with no flash.
     const showGuard = (instant = false) => {
       for (const { kind, button } of guards) {
         const on = kind === guard;
@@ -252,7 +250,6 @@ class ButtonDelete extends HTMLElement {
     );
 
     showGuard(true);
-    // Fonts landing or the viewport changing resize the guards, so the pill follows them at once.
     const resize = new ResizeObserver(() => showGuard(true));
     if (pill) resize.observe(pill.parentElement!);
 

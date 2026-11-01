@@ -21,8 +21,6 @@ export const opensElsewhere = (event: MouseEvent) =>
  */
 export function recordDive(href: string, card: Element) {
   const box = card.getBoundingClientRect();
-  // The art's loop restarts on the rule page, so its time crosses too, for the cover to pick up
-  // the picture the dive leaves.
   const art = card.querySelector(".thumb")?.getAnimations({ subtree: true })[0];
   const phase = art?.currentTime ?? null;
   const dive = { href, x: box.x, y: box.y, width: box.width, height: box.height, phase };

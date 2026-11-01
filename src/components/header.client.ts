@@ -147,13 +147,11 @@ class SiteHeader extends HTMLElement {
     markHash();
     addEventListener("hashchange", markHash, { signal });
 
-    // A page can name the row the header folds over (a rule page's crumbs); until it slides
-    // under the island, the header stays whole.
     const fold = document.querySelector("[data-header-fold]");
-    let line = 0;
-    const measure = () => (line = this.getBoundingClientRect().top + island.offsetHeight);
+    let islandBottom = 0;
+    const measure = () => (islandBottom = this.getBoundingClientRect().top + island.offsetHeight);
     const onScroll = () =>
-      set({ scrolled: fold ? fold.getBoundingClientRect().bottom < line : scrollY > 8 });
+      set({ scrolled: fold ? fold.getBoundingClientRect().bottom < islandBottom : scrollY > 8 });
     if (fold) {
       measure();
       addEventListener("resize", () => (measure(), onScroll()), { passive: true, signal });

@@ -9,8 +9,7 @@ const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
 const HELD = ":is(.js [data-cut]:not(.in) *)";
 // The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
 const BOOTING = ":is(.js:not(.no-intro) *)";
-// The header's parts skip their glitch on a page reached from another page of the site (.carried).
-const ARRIVING = ":is(.js.no-intro:not(.carried) *)";
+const ARRIVING = ":is(.js.no-intro:not(.from-site) *)";
 const STAGGER = `calc(min(var(--cut-order, 0), 12) * ${motion["--t-step"]})`;
 
 // Slices clip top and bottom only, with room at the sides for the colour split.

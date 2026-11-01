@@ -148,8 +148,6 @@ html:active-view-transition-type(rule-open, rule-close, page-fade) .island {
   animation-duration: 520ms;
   animation-timing-function: var(--dive-ease);
 }
-/* The title rewraps at the larger size, so both pictures keep their own shape, pinned top left,
-   and hand over one after the other: overlapping, the two wraps read as doubled text. */
 ::view-transition-old(rule-title),
 ::view-transition-new(rule-title) {
   height: 100%;
@@ -174,7 +172,6 @@ html:active-view-transition-type(rule-open, rule-close, page-fade) .island {
     filter: blur(4px);
   }
 }
-/* The page leaves before the rule's title lands, so its copy never ghosts under the new page. */
 html:active-view-transition-type(rule-open)::view-transition-old(root) {
   transform-origin: var(--open-x, 50%) var(--open-y, 50%);
   animation:
@@ -184,7 +181,6 @@ html:active-view-transition-type(rule-open)::view-transition-old(root) {
 html:active-view-transition-type(rule-open)::view-transition-new(root) {
   animation: vt-fade-in 300ms 220ms ease-out both;
 }
-/* The card's own copy swells with it, so it fades while the frame sweeps off the screen. */
 ::view-transition-old(rule-card) {
   animation:
     rule-dive-card var(--dive-time) var(--dive-ease) both,

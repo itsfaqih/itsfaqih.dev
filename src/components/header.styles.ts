@@ -48,8 +48,7 @@ const TINY = "@media (max-width: 380px)";
 const DARK = ":is(.dark *)";
 const LIGHT = ":is(.light *)";
 // The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
-// The drop-in waits for that too, and skips a page reached from another page of the site (.carried).
-const ARRIVING = ":is(.js.no-intro:not(.carried) *)";
+const ARRIVING = ":is(.js.no-intro:not(.from-site) *)";
 const WAITING = ":is(.js:not(.no-intro) *)";
 const AWAY = ":is([data-island-away] *)";
 
@@ -62,7 +61,6 @@ const CONNECT_CHIP = `color-mix(in srgb, ${AX_ON_BLACK} 18%, #0a0a0c)`;
 const SPRING = motion["--spring"];
 const FOLD = "560ms";
 
-// The island drops in on the visit's first page, a touch small, and settles on the spring.
 const islandIn = stylex.keyframes({
   from: { opacity: 0, scale: 0.82 },
 });
