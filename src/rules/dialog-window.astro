@@ -1,0 +1,18 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { readView, scrimView, styles } from "./dialog-design.styles";
+// Slots: "page" (the app under the dialog), the default slot (its dialogs), "keys" (the buttons
+// under the window) and "read" (the line that reports what happened).
+---
+
+<div {...stylex.attrs(styles.stage)} data-part="stage">
+  <div {...stylex.attrs(styles.screen)} data-part="screen">
+    <slot name="page" />
+    <div aria-hidden="true" class={scrimView(false, false)} data-part="scrim"></div>
+    <slot />
+  </div>
+  <div {...stylex.attrs(styles.bar)}>
+    <span {...stylex.attrs(styles.keys)} data-part="keys"><slot name="keys" /></span>
+    <span aria-live="polite" class={readView(undefined)} data-part="read"><slot name="read" /></span>
+  </div>
+</div>

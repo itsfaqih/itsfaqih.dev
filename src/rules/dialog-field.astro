@@ -1,0 +1,11 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { styles } from "./dialog-design.styles";
+
+type Props = { name: string; label: string; value: string; placeholder?: string };
+
+const { name, label, value, placeholder } = Astro.props;
+// The focus ring goes on the wrap, as an input draws no ::after.
+---
+
+<label {...stylex.attrs(styles.field)}><span {...stylex.attrs(styles.label)}>{label}</span><span {...stylex.attrs(styles.inputWrap)}><input value={value} placeholder={placeholder} data-stop={name} {...stylex.attrs(styles.stop, styles.input)} /></span></label>

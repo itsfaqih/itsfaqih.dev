@@ -1,0 +1,7 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { styles } from "./dialog-design.styles";
+---
+
+<button type="button" aria-label="Close" data-stop="x" {...stylex.attrs(styles.stop, styles.close)}><Icon name="X" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(styles.closeIcon)} /></button>

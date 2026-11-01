@@ -1,0 +1,33 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { dialogView, styles } from "./dialog-design.styles";
+
+type Props = {
+  /** Prefixes the title's and body's ids, which name and describe the dialog. */
+  id: string;
+  title: string;
+  body?: string;
+  /** No role, name or description: a plain box, as the bad side of "Give it a name" shows. */
+  bare?: boolean;
+  /** The confirm that stacks over another dialog. */
+  top?: boolean;
+  part: string;
+};
+
+const { id, title, body, bare = false, top = false, part } = Astro.props;
+// Labelled by its title and described by its body. No aria-modal: inside a pane it would tell a
+// screen reader the real page is gone. It starts closed; dialog-design.client.ts opens it.
+---
+
+<div
+  role={bare ? undefined : "dialog"}
+  aria-labelledby={bare ? undefined : `${id}t`}
+  aria-describedby={bare || !body ? undefined : `${id}d`}
+  inert
+  class={dialogView(top, false)}
+  data-part={part}
+>
+  <div {...stylex.attrs(styles.head)}><p id={`${id}t`} {...stylex.attrs(styles.title)}>{title}</p><slot name="close" /></div>
+  {body && <p id={`${id}d`} {...stylex.attrs(styles.body)} data-part="body">{body}</p>}
+  <slot />
+</div>

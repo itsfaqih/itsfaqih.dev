@@ -1,0 +1,30 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import DialogBox from "./dialog-box.astro";
+import { cardView, styles } from "./dialog-design.styles";
+import DialogKey from "./dialog-key.astro";
+import DialogWindow from "./dialog-window.astro";
+import { host } from "./rule-landing.styles";
+
+type Props = { sealed?: boolean };
+
+const { sealed = false } = Astro.props;
+// The template holds the project card's deleted state, which dialog-design.client.ts swaps in.
+---
+
+<dialog-confirm {...stylex.attrs(host.contents)} data-sealed={sealed ? "" : undefined}>
+  <DialogWindow>
+    <div slot="page" {...stylex.attrs(styles.page)} data-part="page">
+      <div {...stylex.attrs(styles.spread)}><span {...stylex.attrs(styles.logo)}></span><span style="--w:30%" {...stylex.attrs(styles.ghost)}></span></div>
+      <div class={cardView(false)} data-part="card"><span {...stylex.attrs(styles.project)}><b {...stylex.attrs(styles.strong)}>Moonbase</b><small {...stylex.attrs(styles.meta)}>214 files · edited 2h ago</small></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.red, styles.redTint)}>Delete project</button></div>
+      <span style="--w:62%" {...stylex.attrs(styles.ghost)}></span>
+      <span style="--w:48%" {...stylex.attrs(styles.ghost)}></span>
+    </div>
+    <DialogBox id={`confirm-${sealed ? "good" : "bad"}-`} title="Delete Moonbase?" body="Its 214 files go too. This can't be undone." part="dialog">
+      <div {...stylex.attrs(styles.acts)}><button type="button" data-stop="cancel" {...stylex.attrs(styles.stop, styles.btn, styles.plain)}>Cancel</button><button type="button" data-stop="delete" {...stylex.attrs(styles.stop, styles.btn, styles.red)}>Delete</button></div>
+    </DialogBox>
+    <DialogKey slot="keys" part="enter">Enter</DialogKey>
+    <Fragment slot="read">Open Delete project, then press Enter</Fragment>
+  </DialogWindow>
+  <template data-part="gone"><span {...stylex.attrs(styles.project)}><b {...stylex.attrs(styles.strong, styles.goneName)}>Moonbase deleted</b><small {...stylex.attrs(styles.meta)}>214 files gone</small></span><button type="button" data-stop="reset" {...stylex.attrs(styles.stop, styles.btn, styles.soft, styles.softInCard)}>Restore</button></template>
+</dialog-confirm>

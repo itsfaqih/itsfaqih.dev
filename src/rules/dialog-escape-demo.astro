@@ -1,0 +1,32 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import DialogBox from "./dialog-box.astro";
+import DialogClose from "./dialog-close.astro";
+import { styles } from "./dialog-design.styles";
+import DialogKey from "./dialog-key.astro";
+import DialogWindow from "./dialog-window.astro";
+import { host } from "./rule-landing.styles";
+
+type Props = { sealed?: boolean };
+
+const { sealed = false } = Astro.props;
+---
+
+<dialog-escape {...stylex.attrs(host.contents)} data-sealed={sealed ? "" : undefined}>
+  <DialogWindow>
+    <div slot="page" {...stylex.attrs(styles.page)} data-part="page">
+      <div {...stylex.attrs(styles.spread)}><span {...stylex.attrs(styles.logo)}></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.pill)}>What's new</button></div>
+      {
+        [72, 54, 64, 46].map((width) => (
+          <div {...stylex.attrs(styles.mail)}><span {...stylex.attrs(styles.dot)}></span><span style={`--w:${width}%`} {...stylex.attrs(styles.ghost)}></span></div>
+        ))
+      }
+    </div>
+    <DialogBox id={`escape-${sealed ? "good" : "bad"}-`} title="What's new in 2.4" body="Threads fold up, and search now finds attachments." part="dialog">
+      <DialogClose slot="close" />
+      <div {...stylex.attrs(styles.acts)}><button type="button" data-stop="ok" {...stylex.attrs(styles.stop, styles.btn)}>Got it</button></div>
+    </DialogBox>
+    <DialogKey slot="keys" part="esc">Esc</DialogKey>
+    <Fragment slot="read">Open What's new, then press Esc</Fragment>
+  </DialogWindow>
+</dialog-escape>
