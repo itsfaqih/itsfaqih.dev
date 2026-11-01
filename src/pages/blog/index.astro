@@ -1,0 +1,18 @@
+---
+import { BlogIndex } from "../../blog/blog-index";
+import { BLOG_DESCRIPTION, getAllPosts } from "../../blog/posts";
+import Site from "../../layouts/site.astro";
+
+const posts = await getAllPosts();
+---
+
+<Site
+  page={{
+    path: "/blog",
+    title: "Blog · Faqih Muntashir",
+    description: BLOG_DESCRIPTION,
+    type: "website",
+  }}
+>
+  <BlogIndex posts={posts} />
+</Site>

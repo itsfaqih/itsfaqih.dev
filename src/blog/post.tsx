@@ -1,154 +1,44 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ComponentProps } from "react";
-import type { MDXComponents } from "mdx/types";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getPost } from "./-components/posts";
-import { MarkdownCodeBlock } from "@/components/code-block";
-import { CalendarBlankIcon, ArrowLeftIcon, ClockIcon, ListIcon } from "@phosphor-icons/react";
+import { ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "vaul";
-import { TableOfContents } from "./-components/table-of-contents";
-import { pageHead } from "../../seo";
-import { motion, palette } from "../../theme.stylex";
+import { TableOfContents } from "./table-of-contents";
+import { motion, palette } from "../theme.stylex";
 
-function requirePost(slug: string) {
-  const post = getPost(slug);
-  if (!post) throw notFound();
-  return post;
-}
-
-export const Route = createFileRoute("/blog/$slug")({
-  component: BlogPost,
-  loader: ({ params }) => {
-    const post = requirePost(params.slug);
-    return {
-      frontmatter: post.frontmatter,
-      slug: params.slug,
-    };
-  },
-  head: ({ loaderData }) =>
-    loaderData
-      ? pageHead({
-          path: `/blog/${loaderData.slug}`,
-          title: `${loaderData.frontmatter.title} · Faqih Muntashir`,
-          description: loaderData.frontmatter.summary ?? BLOG_DESCRIPTION,
-          type: "article",
-          headline: loaderData.frontmatter.title,
-          schema: "BlogPosting",
-          publishedAt: new Date(loaderData.frontmatter.publishedAt).toISOString().slice(0, 10),
-        })
-      : {},
-});
-
-function BlogPost() {
-  const { slug } = Route.useLoaderData();
-  const post = requirePost(slug);
-  const Component = post.default;
+/** The table of contents on narrow screens: a floating button that opens it in a drawer. */
+export function TocDrawer() {
   const [isTocOpen, setIsTocOpen] = useState(false);
 
   return (
-    <div {...stylex.props(styles.page)}>
-      <div {...stylex.props(styles.shell)}>
-        <div {...stylex.props(styles.layout)}>
-          <div>
-            <Link
-              to="/blog"
-              preload="intent"
-              {...stylex.props(styles.backLink, styles.backLinkTop, stylex.defaultMarker())}
-            >
-              <ArrowLeftIcon size={16} {...stylex.props(styles.backArrow)} />
-              Back to Blog
-            </Link>
-
-            <article>
-              <header {...stylex.props(styles.header)}>
-                <div {...stylex.props(styles.meta)}>
-                  {post.frontmatter.publishedAt && (
-                    <div {...stylex.props(styles.metaItem, styles.small, styles.muted)}>
-                      <CalendarBlankIcon size={14} />
-                      <time>
-                        {BLOG_DATE_FORMATTER.format(new Date(post.frontmatter.publishedAt))}
-                      </time>
-                    </div>
-                  )}
-                  <div {...stylex.props(styles.metaItem, styles.small, styles.muted)}>
-                    <ClockIcon size={14} />
-                    <span>5 min read</span>
-                  </div>
-                </div>
-
-                <h1 {...stylex.props(styles.title)}>{post.frontmatter.title}</h1>
-
-                {post.frontmatter.summary && (
-                  <p {...stylex.props(styles.summary)}>{post.frontmatter.summary}</p>
-                )}
-              </header>
-
-              <div {...stylex.props(styles.rule)} />
-
-              <div {...stylex.props(styles.body)}>
-                <Component components={components} />
-              </div>
-            </article>
-
-            <footer {...stylex.props(styles.footer)}>
-              <div {...stylex.props(styles.footerRow)}>
-                <Link
-                  to="/blog"
-                  preload="intent"
-                  {...stylex.props(styles.backLink, stylex.defaultMarker())}
-                >
-                  <ArrowLeftIcon size={16} {...stylex.props(styles.backArrow)} />
-                  Back to all posts
-                </Link>
-
-                <p {...stylex.props(styles.small, styles.muted)}>Thanks for reading!</p>
-              </div>
-            </footer>
-          </div>
-
-          <div {...stylex.props(styles.tocRail)}>
-            <TableOfContents />
-          </div>
-        </div>
-      </div>
-
-      <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
-        <Drawer.Trigger asChild>
-          <button {...stylex.props(styles.tocButton)} aria-label="Table of Contents">
-            <ListIcon size={24} />
-          </button>
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay {...stylex.props(styles.overlay)} />
-          <Drawer.Content {...stylex.props(styles.drawer)}>
-            <div {...stylex.props(styles.drawerPanel)}>
-              <div aria-hidden {...stylex.props(styles.handle)} />
-              <div {...stylex.props(styles.drawerBody)}>
-                <Drawer.Title {...stylex.props(styles.drawerTitle)}>Table of Contents</Drawer.Title>
-                <div {...stylex.props(styles.drawerScroll)}>
-                  <TableOfContents onLinkClick={() => setIsTocOpen(false)} />
-                </div>
+    <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
+      <Drawer.Trigger asChild>
+        <button {...stylex.props(styles.tocButton)} aria-label="Table of Contents">
+          <ListIcon size={24} />
+        </button>
+      </Drawer.Trigger>
+      <Drawer.Portal>
+        <Drawer.Overlay {...stylex.props(styles.overlay)} />
+        <Drawer.Content {...stylex.props(styles.drawer)}>
+          <div {...stylex.props(styles.drawerPanel)}>
+            <div aria-hidden {...stylex.props(styles.handle)} />
+            <div {...stylex.props(styles.drawerBody)}>
+              <Drawer.Title {...stylex.props(styles.drawerTitle)}>Table of Contents</Drawer.Title>
+              <div {...stylex.props(styles.drawerScroll)}>
+                <TableOfContents onLinkClick={() => setIsTocOpen(false)} />
               </div>
             </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
-
-// The tags the posts render. Values follow Tailwind Typography's prose-zinc.
-const components: MDXComponents = {
-  p: (props: ComponentProps<"p">) => <p {...props} {...stylex.props(prose.p)} />,
-  h2: (props: ComponentProps<"h2">) => <h2 {...props} {...stylex.props(prose.h2)} />,
-  pre: MarkdownCodeBlock,
-};
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
-const prose = stylex.create({
+// The tags the posts render. Values follow Tailwind Typography's prose-zinc.
+const proseStyles = stylex.create({
   p: {
     marginTop: { default: "1.25em", ":first-child": 0, ":is(h2 + *)": 0 },
     marginBottom: { default: "1.25em", ":last-child": 0 },
@@ -388,3 +278,31 @@ const styles = stylex.create({
     overscrollBehavior: "contain",
   },
 });
+
+const classes = (...style: Parameters<typeof stylex.props>) => stylex.props(...style).className;
+
+/** The post page's classes, for its .astro frame, which StyleX cannot compile. */
+export const post = {
+  page: classes(styles.page),
+  shell: classes(styles.shell),
+  layout: classes(styles.layout),
+  backLinkTop: classes(styles.backLink, styles.backLinkTop, stylex.defaultMarker()),
+  backLink: classes(styles.backLink, stylex.defaultMarker()),
+  backArrow: classes(styles.backArrow),
+  header: classes(styles.header),
+  meta: classes(styles.meta),
+  metaItem: classes(styles.metaItem, styles.small, styles.muted),
+  title: classes(styles.title),
+  summary: classes(styles.summary),
+  rule: classes(styles.rule),
+  body: classes(styles.body),
+  footer: classes(styles.footer),
+  footerRow: classes(styles.footerRow),
+  thanks: classes(styles.small, styles.muted),
+  tocRail: classes(styles.tocRail),
+};
+
+export const prose = {
+  p: classes(proseStyles.p),
+  h2: classes(proseStyles.h2),
+};

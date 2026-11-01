@@ -1,25 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts } from "./-components/posts";
-import { PageContainer } from "../../components/page-container";
+import { BLOG_DATE_FORMATTER, type Post } from "./posts";
+import { PageContainer } from "../components/page-container";
 import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
-import { pageHead } from "../../seo";
-import { motion, palette } from "../../theme.stylex";
+import { motion, palette } from "../theme.stylex";
 
-export const Route = createFileRoute("/blog/")({
-  component: BlogIndex,
-  loader: () => ({ posts: getAllPosts() }),
-  head: () =>
-    pageHead({
-      path: "/blog",
-      title: "Blog · Faqih Muntashir",
-      description: BLOG_DESCRIPTION,
-      type: "website",
-    }),
-});
-
-function BlogIndex() {
-  const { posts } = Route.useLoaderData();
+/** The blog's post list. It has no state, so the page renders it to HTML and ships no JS. */
+export function BlogIndex({ posts }: { posts: Post[] }) {
 
   return (
     <div {...stylex.props(styles.page)}>
@@ -48,28 +34,25 @@ function BlogIndex() {
             </div>
           ) : (
             posts.map((post) => (
-              <article key={post.slug} {...stylex.props(styles.post)}>
-                <Link
-                  to="/blog/$slug"
-                  params={{ slug: post.slug }}
+              <article key={post.id} {...stylex.props(styles.post)}>
+                <a
+                  href={`/blog/${post.id}`}
                   {...stylex.props(styles.postLink, stylex.defaultMarker())}
                 >
                   <div {...stylex.props(styles.card)}>
                     <div {...stylex.props(styles.cardRow)}>
                       <div {...stylex.props(styles.cardBody)}>
-                        {post.frontmatter.publishedAt && (
-                          <div {...stylex.props(styles.date)}>
-                            <CalendarBlankIcon size={14} {...stylex.props(styles.muted)} />
-                            <time {...stylex.props(styles.muted, styles.small)}>
-                              {BLOG_DATE_FORMATTER.format(new Date(post.frontmatter.publishedAt))}
-                            </time>
-                          </div>
-                        )}
+                        <div {...stylex.props(styles.date)}>
+                          <CalendarBlankIcon size={14} {...stylex.props(styles.muted)} />
+                          <time {...stylex.props(styles.muted, styles.small)}>
+                            {BLOG_DATE_FORMATTER.format(post.data.publishedAt)}
+                          </time>
+                        </div>
 
-                        <h2 {...stylex.props(styles.postTitle)}>{post.frontmatter.title}</h2>
+                        <h2 {...stylex.props(styles.postTitle)}>{post.data.title}</h2>
 
-                        {post.frontmatter.summary && (
-                          <p {...stylex.props(styles.summary)}>{post.frontmatter.summary}</p>
+                        {post.data.summary && (
+                          <p {...stylex.props(styles.summary)}>{post.data.summary}</p>
                         )}
                       </div>
 
@@ -80,17 +63,17 @@ function BlogIndex() {
                       </div>
                     </div>
                   </div>
-                </Link>
+                </a>
               </article>
             ))
           )}
         </div>
 
         <div {...stylex.props(styles.footer)}>
-          <Link to="/" preload="intent" {...stylex.props(styles.backLink, stylex.defaultMarker())}>
+          <a href="/" {...stylex.props(styles.backLink, stylex.defaultMarker())}>
             <ArrowRightIcon size={16} {...stylex.props(styles.backArrow)} />
             Back to Home
-          </Link>
+          </a>
         </div>
       </PageContainer>
     </div>

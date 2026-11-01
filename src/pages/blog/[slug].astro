@@ -1,0 +1,87 @@
+---
+import { ArrowLeftIcon, CalendarBlankIcon, ClockIcon } from "@phosphor-icons/react";
+import { render } from "astro:content";
+import { MarkdownCodeBlock } from "../../components/code-block";
+import { post as classes, TocDrawer } from "../../blog/post";
+import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts, type Post } from "../../blog/posts";
+import ProseH2 from "../../blog/prose-h2.astro";
+import ProseP from "../../blog/prose-p.astro";
+import { TableOfContents } from "../../blog/table-of-contents";
+import Site from "../../layouts/site.astro";
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { title, summary, publishedAt } = post.data;
+---
+
+<Site
+  page={{
+    path: `/blog/${post.id}`,
+    title: `${title} · Faqih Muntashir`,
+    description: summary ?? BLOG_DESCRIPTION,
+    type: "article",
+    headline: title,
+    schema: "BlogPosting",
+    publishedAt: publishedAt.toISOString().slice(0, 10),
+  }}
+>
+  <div class={classes.page}>
+    <div class={classes.shell}>
+      <div class={classes.layout}>
+        <div>
+          <a href="/blog" class={classes.backLinkTop}>
+            <ArrowLeftIcon size={16} className={classes.backArrow} />
+            Back to Blog
+          </a>
+
+          <article>
+            <header class={classes.header}>
+              <div class={classes.meta}>
+                <div class={classes.metaItem}>
+                  <CalendarBlankIcon size={14} />
+                  <time>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
+                </div>
+                <div class={classes.metaItem}>
+                  <ClockIcon size={14} />
+                  <span>5 min read</span>
+                </div>
+              </div>
+
+              <h1 class={classes.title}>{title}</h1>
+
+              {summary && <p class={classes.summary}>{summary}</p>}
+            </header>
+
+            <div class={classes.rule}></div>
+
+            <div class={classes.body}>
+              <Content components={{ p: ProseP, h2: ProseH2, pre: MarkdownCodeBlock }} />
+            </div>
+          </article>
+
+          <footer class={classes.footer}>
+            <div class={classes.footerRow}>
+              <a href="/blog" class={classes.backLink}>
+                <ArrowLeftIcon size={16} className={classes.backArrow} />
+                Back to all posts
+              </a>
+
+              <p class={classes.thanks}>Thanks for reading!</p>
+            </div>
+          </footer>
+        </div>
+
+        <div class={classes.tocRail}>
+          <TableOfContents client:media="(min-width: 64rem)" />
+        </div>
+      </div>
+    </div>
+
+    <TocDrawer client:visible />
+  </div>
+</Site>

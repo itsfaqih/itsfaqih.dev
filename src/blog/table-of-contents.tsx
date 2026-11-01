@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { motion, palette } from "../../../theme.stylex";
+import { motion, palette } from "../theme.stylex";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 type TableOfContentsProps = {
