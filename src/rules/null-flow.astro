@@ -1,0 +1,81 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import NullCodeBlock from "./null-code-block.astro";
+import { arrived, DEMOS, TITLE, verdictOf, type Demo, type Way } from "./null-vs-undefined";
+import { flowView, KINDS, paint, styles } from "./null-vs-undefined.styles";
+import { host } from "./rule-landing.styles";
+
+type Props = { demo: Demo; way: Way };
+
+const { demo, way } = Astro.props;
+const { fields, before, lines } = DEMOS[demo];
+const body = DEMOS[demo].body(way, TITLE);
+const after = { ...before, ...arrived(body) };
+const intent = DEMOS[demo].intent(TITLE);
+// The first frame is the save already done, as React rendered it; null-flow.client.ts rewinds it to
+// "not sent yet" when the demo starts below the fold, and plays the save once it is on screen.
+---
+
+<null-flow {...stylex.attrs(host.contents)} data-demo={demo} data-way={way}>
+  <div {...stylex.attrs(styles.view)}>
+    <NullCodeBlock lines={lines(way)} />
+    <div {...stylex.attrs(styles.flow)} data-part="flow">
+      <div {...stylex.attrs(styles.form)} data-part="form">
+        {
+          demo === "clear" ? (
+            <Fragment><span {...stylex.attrs(styles.label)}>Reviewer</span><span {...stylex.attrs(styles.none)}>None</span><button type="button" class={flowView.again} data-part="again">Reset</button></Fragment>
+          ) : (
+            <Fragment><label {...stylex.attrs(styles.field)}><span {...stylex.attrs(styles.label)}>Title</span><input data-hint="true" spellcheck="false" {...stylex.attrs(styles.input)} value={TITLE} data-part="input" /></label><button type="button" class={flowView.again} data-part="save">Reset</button></Fragment>
+          )
+        }
+      </div>
+      <div class={flowView.wire} data-part="wire"
+        ><span class={flowView.verb}>PATCH /tasks/12</span><code class={flowView.body(false)}
+          >{
+            paint(JSON.stringify(body), KINDS).map((p) =>
+              p.class ? <span class={p.class}>{p.text}</span> : p.text,
+            )
+          }</code
+        ><i aria-hidden="true" class={flowView.packet(false)}></i></div
+      >
+      <dl class={flowView.record} data-part="record">
+        {
+          fields.map((field, index) => {
+            const verdict = verdictOf(field, before, after, intent);
+            const bad = verdict === "wiped" || verdict === "lost";
+            const value = after[field];
+            return (
+              <div style={`--i:${index}`} class={flowView.cell(verdict, false)}
+                ><dt class={flowView.name}>{field}</dt><dd class={flowView.value(bad, false)}
+                  >{value === null ? <span class={flowView.nul(bad)}>null</span> : value}</dd
+                ><span class={flowView.tag(verdict)}>{verdict}</span></div
+              >
+            );
+          })
+        }
+      </dl>
+    </div>
+  </div>
+  {
+    demo === "clear" && (
+      <Fragment>
+        <template data-part="chip"
+          ><span {...stylex.attrs(styles.chip)}
+            >Rina<button
+              data-hint="true"
+              type="button"
+              aria-label="Remove reviewer Rina"
+              {...stylex.attrs(styles.remove)}
+              data-part="remove">✕</button
+            ></span
+          ></template
+        >
+        <template data-part="none"><span {...stylex.attrs(styles.none)}>None</span></template>
+      </Fragment>
+    )
+  }
+</null-flow>
+
+<script>
+  import "./null-flow.client";
+</script>

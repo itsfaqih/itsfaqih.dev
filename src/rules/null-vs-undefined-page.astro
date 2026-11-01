@@ -1,0 +1,94 @@
+---
+import Code from "./code.astro";
+import NullBoardCell from "./null-board-cell.astro";
+import NullCodeBlock from "./null-code-block.astro";
+import NullFlow from "./null-flow.astro";
+import { LESSONS, TLDR } from "./null-vs-undefined";
+import { styles } from "./null-vs-undefined.styles";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+
+const [missing, optional, clear, untouched, force, lookup] = LESSONS;
+---
+
+<RuleLanding
+  id="null-vs-undefined"
+  learn="Keep missing and empty apart"
+  tldr={TLDR}
+  take="keep missing and empty apart too"
+>
+  <Fragment slot="lead">Send <Code>null</Code> to clear a field. Leave a field out to keep it.</Fragment>
+  <Fragment slot="intro"
+    >Give <Code tone="wrap" style={styles.introCode}>undefined</Code> and<Fragment set:html="<!-- -->" /> <Code
+      tone="wrap"
+      style={styles.introCode}>null</Code
+    > one meaning each, so no code has to guess which it got.</Fragment
+  >
+
+  <RuleLesson lesson={missing}>
+    <Fragment slot="body"
+      >Read <Code tone="chip">undefined</Code> to mean nobody gave a value. Read <Code tone="chip">null</Code> to mean someone checked and found nothing. Ana skipped the phone question. Bo said he has no phone. If you send both as <Code tone="chip">null</Code>, no code can tell them apart.</Fragment
+    >
+    <NullCodeBlock slot="bad" lines={missing.bad.lines!} />
+    <NullCodeBlock slot="good" lines={missing.good.lines!} />
+  </RuleLesson>
+  <RuleQuiz n={1} level={missing.levels[0]} board="code" cell={NullBoardCell}
+    >The client asked for <Code tone="prompt">?fields=name,manager</Code>. Bo has no manager. Nobody asked for his phone. Pick the key to leave out.</RuleQuiz
+  >
+
+  <RuleLesson lesson={optional}>
+    <Fragment slot="body"
+      >Leave a skipped value <Code tone="chip">undefined</Code>. If you type it with <Code tone="chip">?:</Code>, callers can leave it out. If you type it <Code tone="chip">| null</Code>, callers with no value must pass<Fragment set:html="<!-- -->" /> <Code tone="chip">null</Code>.</Fragment
+    >
+    <NullCodeBlock slot="bad" lines={optional.bad.lines!} />
+    <NullCodeBlock slot="good" lines={optional.good.lines!} />
+  </RuleLesson>
+  <RuleQuiz n={2} level={optional.levels[0]} board="code" cell={NullBoardCell}
+    >Signing up, people may skip the nickname, and most callers never have one. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">?: string</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={clear}>
+    <Fragment slot="body"
+      >When the user empties a field, send <Code tone="chip">null</Code>. JSON drops keys set to<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>, so that clear never reaches the server.</Fragment
+    >
+    <NullFlow slot="bad" demo="clear" way="bad" />
+    <NullFlow slot="good" demo="clear" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={3} level={clear.levels[0]} board="code" cell={NullBoardCell}
+    >The user cleared the due date and never opened the assignee or notes. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">null</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={untouched}>
+    <Fragment slot="body"
+      >A PATCH changes only the fields it carries. If you fill a draft with <Code tone="chip">null</Code>, every untouched field goes out as a clear. Start it empty so only the changes go out.</Fragment
+    >
+    <NullFlow slot="bad" demo="rename" way="bad" />
+    <NullFlow slot="good" demo="rename" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={4} level={untouched.levels[0]} board="code" cell={NullBoardCell}
+    >The user renamed the task and removed its reviewer. They didn't touch the due date. Place <Code tone="prompt">undefined</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={force}>
+    <Fragment slot="body"
+      ><Code tone="chip">?:</Code> lets a caller skip a field silently. When every caller must decide, make it required and nullable. A caller who leaves it out gets a type error, and "nobody" is a<Fragment set:html="<!-- -->" /> <Code tone="chip">null</Code> someone wrote on purpose.</Fragment
+    >
+    <NullCodeBlock slot="bad" lines={force.bad.lines!} />
+    <NullCodeBlock slot="good" lines={force.good.lines!} />
+  </RuleLesson>
+  <RuleQuiz n={5} level={force.levels[0]} board="code" cell={NullBoardCell}
+    >Every new task must name an assignee or say there's none. The colour is optional and falls back to grey. Place <Code tone="prompt">| null</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={lookup}>
+    <Fragment slot="body"
+      >Return <Code tone="chip">null</Code> from a lookup that finds nothing. <Code tone="chip">Map.get</Code> returns<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>, and <Code tone="chip">JSON.stringify</Code> turns that into no body.</Fragment
+    >
+    <NullCodeBlock slot="bad" lines={lookup.bad.lines!} />
+    <NullCodeBlock slot="good" lines={lookup.good.lines!} />
+  </RuleLesson>
+  <RuleQuiz n={6} level={lookup.levels[0]} board="code" cell={NullBoardCell}
+    >You looked up <Code tone="prompt">bo@x.io</Code> and nobody has that email. You haven't looked up<Fragment set:html="<!-- -->" /> <Code tone="prompt">cy@x.io</Code> yet. Place <Code tone="prompt">null</Code>.</RuleQuiz
+  >
+</RuleLanding>
