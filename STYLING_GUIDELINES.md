@@ -8,13 +8,14 @@ This project uses **StyleX** for extracted, type-safe component styles. Every co
 
 ### 1. Define New Component Styles with StyleX
 
-Use `stylex.create` for reusable styles and `stylex.props` when rendering a host element:
+StyleX compiles TypeScript modules only, not `.astro` files. Put `stylex.create` in a module beside the component (`card.styles.ts` for `card.astro`), and spread `stylex.attrs` on the element in the `.astro` template:
 
-```tsx
+```ts
+// card.styles.ts
 import * as stylex from "@stylexjs/stylex";
 import { palette } from "../theme.stylex";
 
-const styles = stylex.create({
+export const styles = stylex.create({
   card: {
     borderRadius: "0.75rem",
     padding: "1rem",
@@ -27,24 +28,33 @@ const styles = stylex.create({
     },
   },
 });
+```
 
-export function Card() {
-  return <article {...stylex.props(styles.card, styles.interactive)} />;
-}
+```astro
+---
+// card.astro
+import * as stylex from "@stylexjs/stylex";
+import { styles } from "./card.styles";
+---
+
+<article {...stylex.attrs(styles.card, styles.interactive)}><slot /></article>
 ```
 
 Keep style definitions static so the Vite StyleX plugin can extract them at build time.
 
-StyleX compiles `.ts` and `.tsx` modules only, not `.astro` files. An `.astro` page or layout that styles its own markup imports class strings from a module that builds them with `stylex.props(...).className`, as `src/layouts/site.stylex.ts` does for the layout and the `post` and `prose` objects in `src/blog/post.tsx` do for the blog post frame.
+Some modules export ready class strings instead, built with `stylex.props(...).className`, as `src/layouts/site.stylex.ts` does for the layout and the `post` and `prose` objects in `src/blog/post.styles.ts` do for the blog post frame. A custom element that swaps classes at runtime reads them from view helpers in the same module, such as `landingView` in `src/rules/rule-landing.styles.ts`.
 
 ### 2. Accept StyleX Styles, Not Class Strings
 
-A component that lets its caller adjust it takes a `style?: stylex.StyleXStyles` prop and passes it last to `stylex.props`, so the caller's values win:
+A component that lets its caller adjust it takes a `style?: stylex.StyleXStyles` prop and passes it last to `stylex.attrs`, so the caller's values win:
 
-```tsx
-export function Panel({ style }: { style?: stylex.StyleXStyles }) {
-  return <div {...stylex.props(styles.panel, style)} />;
-}
+```astro
+---
+type Props = { style?: stylex.StyleXStyles };
+const { style } = Astro.props;
+---
+
+<div {...stylex.attrs(styles.panel, style)}><slot /></div>
 ```
 
 Parent hover and focus states use `stylex.when.ancestor(...)` with `stylex.defaultMarker()` on the parent.
@@ -53,7 +63,7 @@ Parent hover and focus states use `stylex.when.ancestor(...)` with `stylex.defau
 
 Tokens live in `src/theme.stylex.ts`, and `src/theme.ts` overrides them for the light theme. StyleX styles read them through the exported objects, so a misspelt token fails the typecheck. Each keeps its literal `--name`, so plain CSS and runtime values read it as `var(--name)`:
 
-```tsx
+```ts
 const styles = stylex.create({
   root: {
     color: palette["--text"],
@@ -81,7 +91,7 @@ Do not add a new global utility class when a local StyleX rule can express the s
 
 Nest pseudo-classes and media queries under the property they change. Hover styles sit inside `@media (hover: hover)` so touch screens do not keep them after a tap:
 
-```tsx
+```ts
 const styles = stylex.create({
   link: {
     color: {

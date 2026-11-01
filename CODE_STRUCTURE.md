@@ -15,18 +15,13 @@ This document outlines the principles for structuring code and files in this pro
 
 **Exception 1:** If the code is too long and hurts readability, it's fine to extract it into a function — but keep it in the same file. The goal is **readability**, not creating unnecessary abstractions across files.
 
-**Exception 2 (React):** Extract a child component when it has its own state that shouldn't trigger parent re-renders. This is a performance optimization, not reuse — the child's state changes won't cause the parent to re-render.
+**Exception 2 (Astro):** An `.astro` file cannot hold `stylex.create`, and its browser code runs from a `<script>`. Put a component's styles in `<name>.styles.ts` and its custom element in `<name>.client.ts`, beside the `.astro` file. This is a framework constraint, not reuse, so it does not count against the rules below.
 
-```tsx
-// ✅ Good - child state doesn't re-render parent
-function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
-  const [query, setQuery] = useState(""); // Only SearchInput re-renders on typing
-  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
-}
-
-function Parent() {
-  return <SearchInput onSearch={handleSearch} />; // Doesn't re-render on every keystroke
-}
+```
+src/components/
+├── header.astro        ← markup, and a <script> that imports header.client.ts
+├── header.client.ts    ← the <site-header> custom element
+└── header.styles.ts    ← stylex.create for both
 ```
 
 ### 2. Prefer Fewer Files
@@ -65,22 +60,22 @@ When extracting shared code to a new file, place it at the **lowest common ances
 
 ### Inline Code (No Reuse)
 
-```tsx
+```ts
 // ✅ Good - code is only used here, keep it inline
-function UserProfile() {
-  const formattedDate = new Date().toLocaleDateString("en-US", {
+function profileLine(user: User) {
+  const joined = user.joinedAt.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  return <div>{formattedDate}</div>;
+  return `${user.name}, joined ${joined}`;
 }
 ```
 
 ### Same-File Extraction (Reused Within File)
 
-```tsx
+```ts
 // ✅ Good - reused within the same file, extract but keep in same file
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -90,12 +85,12 @@ function formatDate(date: Date) {
   });
 }
 
-function UserProfile() {
-  return <div>{formatDate(new Date())}</div>;
+function profileLine(user: User) {
+  return `${user.name}, joined ${formatDate(user.joinedAt)}`;
 }
 
-function UserActivity() {
-  return <div>Last active: {formatDate(user.lastActiveAt)}</div>;
+function activityLine(user: User) {
+  return `Last active: ${formatDate(user.lastActiveAt)}`;
 }
 ```
 
@@ -110,8 +105,8 @@ If both files are in the same folder:
 ```
 src/
 └── components/
-    ├── user-profile.tsx    ← needs formatDate
-    ├── user-activity.tsx   ← needs formatDate
+    ├── user-profile.astro  ← needs formatDate
+    ├── user-activity.astro ← needs formatDate
     └── format-date.ts      ← put it here (same folder)
 ```
 
@@ -124,9 +119,9 @@ src/
 └── features/
     ├── utils.ts            ← put shared code here (common ancestor)
     ├── profile/
-    │   └── user-profile.tsx    ← needs formatDate
+    │   └── user-profile.astro  ← needs formatDate
     └── activity/
-        └── user-activity.tsx   ← needs formatDate
+        └── user-activity.astro ← needs formatDate
 ```
 
 #### Deeper Example
@@ -138,12 +133,12 @@ src/
     ├── feature-utils.ts    ← if needed by multiple features
     ├── feature-a/
     │   ├── components/
-    │   │   └── card.tsx
+    │   │   └── card.astro
     │   └── hooks/
-    │       └── use-card.ts
+    │       └── card-drag.ts
     └── feature-b/
         └── components/
-            └── card.tsx
+            └── card.astro
 ```
 
 Shared StyleX styles follow the same rule: `src/components/button.ts` serves the whole site, while `src/sections/section.ts` serves only the home page and the rule pages.
@@ -161,8 +156,8 @@ When you have a few shared items of the same type, group them in a single file:
 ```
 src/
 ├── schemas.ts      ← only contains Zod schemas
-├── hooks.ts        ← only contains React hooks
-├── icons.tsx       ← only contains icon components
+├── hooks.ts        ← only contains browser helpers
+├── icons.ts        ← only contains icon path data
 └── utils.ts        ← only contains utility functions
 ```
 
@@ -176,8 +171,8 @@ src/
 │   ├── user.schema.ts
 │   └── organization.schema.ts
 ├── hooks/
-│   ├── use-intersection.hook.ts
-│   └── use-unmount.hook.ts
+│   ├── idle.hook.ts
+│   └── media-query.hook.ts
 └── utils/
     ├── date.util.ts
     └── user.util.ts
@@ -197,27 +192,28 @@ Without suffixes, you'd see multiple `user.ts` files and have to guess which one
 
 ### Common Type Suffixes
 
-| Type     | Suffix         | Example             |
-| -------- | -------------- | ------------------- |
-| Schema   | `.schema.ts`   | `user.schema.ts`    |
-| Hook     | `.hook.ts`     | `use-auth.hook.ts`  |
-| Utility  | `.util.ts`     | `date.util.ts`      |
-| Type     | `.type.ts`     | `api.type.ts`       |
-| Constant | `.const.ts`    | `routes.const.ts`   |
-| Context  | `.context.tsx` | `theme.context.tsx` |
+| Type           | Suffix       | Example            |
+| -------------- | ------------ | ------------------ |
+| Schema         | `.schema.ts` | `user.schema.ts`   |
+| Hook           | `.hook.ts`   | `idle.hook.ts`     |
+| Utility        | `.util.ts`   | `date.util.ts`     |
+| Type           | `.type.ts`   | `api.type.ts`      |
+| Constant       | `.const.ts`  | `routes.const.ts`  |
+| Styles         | `.styles.ts` | `header.styles.ts` |
+| Custom element | `.client.ts` | `header.client.ts` |
 
 ---
 
 ## Summary
 
-| Scenario                          | Action                                           |
-| --------------------------------- | ------------------------------------------------ |
-| Code used once                    | Keep it inline                                   |
-| Code is too long                  | Extract to function, keep in same file           |
-| Code reused in same file          | Extract to function, keep in same file           |
-| Code reused across files          | Extract to new file at lowest common ancestor    |
-| React: Child has own state        | Extract to component (prevents parent re-render) |
-| Deciding where to put shared file | As close as possible to the files that need it   |
+| Scenario                          | Action                                         |
+| --------------------------------- | ---------------------------------------------- |
+| Code used once                    | Keep it inline                                 |
+| Code is too long                  | Extract to function, keep in same file         |
+| Code reused in same file          | Extract to function, keep in same file         |
+| Code reused across files          | Extract to new file at lowest common ancestor  |
+| Astro: styles or browser code     | Move to `.styles.ts` or `.client.ts` beside it |
+| Deciding where to put shared file | As close as possible to the files that need it |
 
 ---
 
