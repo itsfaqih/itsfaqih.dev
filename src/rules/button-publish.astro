@@ -1,0 +1,64 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { styles, TAKEN, view } from "./button-design.styles";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+// The first frame: the slug is taken, so Publish is off and says why.
+const tipId = "publish-tip";
+---
+
+<button-publish
+  {...stylex.attrs(styles.stage, styles.form)}
+  data-careful={careful ? "true" : undefined}
+>
+  <label {...stylex.attrs(styles.field, styles.fullRow)}>
+    <span>Title</span>
+    <input value="Spring launch" {...stylex.attrs(styles.input)} />
+  </label>
+  <label {...stylex.attrs(styles.field)}>
+    <span>URL</span>
+    <span {...stylex.attrs(styles.input, styles.slug)}
+      ><span aria-hidden="true" {...stylex.attrs(styles.slugBase)}>/blog/</span><input
+        value={TAKEN}
+        aria-label="URL after /blog/"
+        spellcheck="false"
+        {...stylex.attrs(styles.slugInput)}
+        data-part="slug"
+      /></span
+    >
+  </label>
+  {
+    careful ? (
+      <span {...stylex.attrs(styles.tip, styles.formEnd)}
+        ><button
+          data-hint="true"
+          type="button"
+          class={view.publish(true, false)}
+          aria-disabled="true"
+          aria-describedby={tipId}
+          data-part="publish">Publish</button
+        ><span role="tooltip" id={tipId} class={view.tooltip(false)} data-part="tip"
+          >That URL is taken</span
+        ></span
+      >
+    ) : (
+      <button
+        data-hint="true"
+        type="button"
+        class={view.publish(false, false)}
+        disabled
+        data-part="publish">Publish</button
+      >
+    )
+  }
+  <template data-part="check"
+    ><Icon name="Check" size="1em" weight="bold" {...stylex.attrs(styles.icon)} /></template
+  >
+</button-publish>
+
+<script>
+  import "./button-publish.client";
+</script>

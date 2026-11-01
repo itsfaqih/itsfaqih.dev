@@ -1,0 +1,29 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { button, buttonVariant } from "../components/button";
+import { styles, view } from "./button-design.styles";
+import { host } from "./rule-landing.styles";
+
+type Props = {
+  label: string;
+  /** Read by the demo's styles as `[data-toggle=name][aria-pressed=true]`. */
+  name: string;
+};
+
+const { label, name } = Astro.props;
+---
+
+<button-toggle {...stylex.attrs(host.contents)}
+  ><button
+    data-hint="true"
+    type="button"
+    {...stylex.attrs(button.base, buttonVariant["primary-neutral"], button.sm, styles.toggle)}
+    data-toggle={name}
+    aria-pressed="false"
+    ><span class={view.dot(false)} aria-hidden="true"></span>{label}</button
+  ></button-toggle
+>
+
+<script>
+  import "./button-toggle.client";
+</script>

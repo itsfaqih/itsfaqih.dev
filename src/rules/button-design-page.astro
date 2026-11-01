@@ -1,0 +1,106 @@
+---
+import { LESSONS, TLDR } from "./button-design";
+import ButtonDelete from "./button-delete.astro";
+import ButtonHierarchy from "./button-hierarchy.astro";
+import ButtonIconKeys from "./button-icon-keys.astro";
+import ButtonIcons from "./button-icons.astro";
+import ButtonPublish from "./button-publish.astro";
+import ButtonStates from "./button-states.astro";
+import ButtonStill from "./button-still.astro";
+import ButtonToggle from "./button-toggle.astro";
+import Kbd from "./kbd.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+
+const [states, disabled, still, hierarchy, guard, icons, iconKeys] = LESSONS;
+---
+
+<RuleLanding
+  id="button-design"
+  learn="Answer every press"
+  tldr={TLDR}
+  take="build buttons the same way"
+>
+  <Fragment slot="lead">Style every state, say why it's off, and guard anything destructive.</Fragment>
+  <Fragment slot="intro">Give each state and refusal a visible change, so no press feels lost.</Fragment>
+
+  <RuleLesson lesson={states}>
+    <Fragment slot="body"
+      >Give hover, press and focus a look. If nothing changes, a click feels like it missed and a keyboard user can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.</Fragment
+    >
+    <ButtonStates slot="bad" />
+    <ButtonStates slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={1} level={states.levels[0]} board="layout"
+    >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Save</b>. Place the look she needs to see where she is.</RuleQuiz
+  >
+
+  <RuleLesson lesson={disabled}>
+    <Fragment slot="body"
+      >A disabled button that only fades leaves people guessing, most of all when the form looks done. Show the no-entry cursor, keep the label readable, and put the reason in a tooltip. Find out why Publish is off in both, then fix it.</Fragment
+    >
+    <ButtonPublish slot="bad" />
+    <ButtonPublish slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={2} level={disabled.levels[0]} board="layout"
+    >Publish stays off because an older post already uses this URL. Nothing else on screen says so. Pick how Publish looks when someone hovers it.</RuleQuiz
+  >
+
+  <RuleLesson lesson={still}>
+    <Fragment slot="body"
+      >A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press, and let the tooltip do the talking. Hover Back in both.</Fragment
+    >
+    <ButtonStill slot="bad" />
+    <ButtonStill slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={3} level={still.levels[0]} board="layout"
+    >A pager sits on page 1 of 5, so <b>Previous</b> is disabled. Place the hover look on the control a click can act on.</RuleQuiz
+  >
+
+  <RuleLesson lesson={hierarchy}>
+    <Fragment slot="body"
+      >Visual weight shows people the next step. Fill the main action in the brand colour, tint the supporting one, and leave Cancel as text. Keep red for destructive actions.</Fragment
+    >
+    <ButtonToggle slot="extra" label="Squint" name="squint" />
+    <ButtonHierarchy slot="bad" />
+    <ButtonHierarchy slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={4} level={hierarchy.levels[0]} board="layout"
+    >A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted. Style <b>Checkout</b>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={guard}>
+    <Fragment slot="body"
+      >Never let one stray click delete anything. Confirm with a red button that names what goes, ask people to hold the button down, or delete at once and offer Undo. Try all three.</Fragment
+    >
+    <ButtonDelete slot="bad" />
+    <ButtonDelete slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={5} level={guard.levels[0]} board="layout"
+    >A project page has three actions. Place the confirm on the one a stray click would make you regret.</RuleQuiz
+  >
+
+  <RuleLesson lesson={icons}>
+    <Fragment slot="body"
+      >Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.</Fragment
+    >
+    <ButtonToggle slot="extra" label="Show padding" name="pads" />
+    <ButtonIcons slot="bad" />
+    <ButtonIcons slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={6} level={icons.levels[0]} board="layout"
+    >Every button in this toolbar has the same padding on both sides. Place the trim on the one that will look lopsided.</RuleQuiz
+  >
+
+  <RuleLesson lesson={iconKeys}>
+    <Fragment slot="body"
+      >With no label, padding sets the size, so the button misses its neighbours' height and changes with every icon. Make it a fixed square as tall as its neighbours, and centre the icon. With no text to read, give it an accessible name and a tooltip.</Fragment
+    >
+    <ButtonIconKeys slot="bad" />
+    <ButtonIconKeys slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={7} level={iconKeys.levels[0]} board="layout"
+    >A toolbar has three icon-only buttons with the same padding. They come out 38, 42 and 46px wide. Place the fix.</RuleQuiz
+  >
+</RuleLanding>

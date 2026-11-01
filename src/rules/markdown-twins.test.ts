@@ -2,14 +2,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vite-plus/test";
 import type { Tldr } from "./lesson";
 import { PUBLISHED_GUIDELINES } from "../data/guidelines";
-import * as buttonDesign from "./button-design-page";
+import * as buttonDesign from "./button-design";
 import * as dataLoading from "./data-loading";
 import * as dialogDesign from "./dialog-design";
 import * as handlingTimestamps from "./handling-timestamps";
 import * as nullVsUndefined from "./null-vs-undefined";
 import * as proximityPrinciple from "./proximity-principle";
 import * as tableDesign from "./table-design-page";
-import * as typescriptCodeWriting from "./typescript-code-writing-page";
+import * as typescriptCodeWriting from "./typescript-code-writing";
 
 // "View .md" serves public/rule-of-thumb/<id>.md, which readers paste into their AGENTS.md. It is
 // written by hand, so it carries code the page shows as demos; this keeps its rule in step with the page.
