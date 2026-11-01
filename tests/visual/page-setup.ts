@@ -6,6 +6,12 @@ import { PNG } from "pngjs";
 import { inject } from "vite-plus/test";
 import { pageReady } from "./ready";
 
+declare global {
+  interface Window {
+    settleFrames?: number;
+  }
+}
+
 export const viewports = {
   desktop: { width: 1440, height: 900 },
   mobile: { width: 390, height: 844 },
@@ -22,6 +28,8 @@ export const maxDiffPixels = 20;
 // Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (use-cut-ins.ts), and
 // [data-rev] rule sections gain data-in (rule-landing.tsx). A new reveal marker belongs here.
 const unrevealedSelector = "[data-cut]:not(.in), [data-rev]:not([data-in])";
+
+export const fixedTime = new Date("2026-01-15T09:30:00Z");
 
 export function routeSlug(route: string) {
   return route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
@@ -57,6 +65,7 @@ export async function openSettledPage(
       animation-delay: 0s !important;
       transition-duration: 0s !important;
       transition-delay: 0s !important;
+      scroll-behavior: auto !important;
     }`;
     document.addEventListener("DOMContentLoaded", () => document.head.append(style));
   }, scheme);
@@ -66,37 +75,68 @@ export async function openSettledPage(
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
-  await page.clock.setFixedTime(new Date("2026-01-15T09:30:00Z"));
+  await page.clock.setFixedTime(fixedTime);
   try {
     await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
     await page.waitForFunction(pageReady);
-    const unrevealed = await page.evaluate(async (pending) => {
-      await document.fonts.ready;
-      const unrevealedInView = () =>
-        Array.from(document.querySelectorAll(pending)).some((block) => {
-          const rect = block.getBoundingClientRect();
-          return rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight * 0.85;
-        });
-      const settle = async () => {
-        for (let frame = 0; frame < 100; frame++) {
-          await new Promise((resolve) => requestAnimationFrame(resolve));
-          if (frame > 0 && !unrevealedInView()) return;
-        }
-      };
-      for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight / 2) {
-        window.scrollTo({ top: y, behavior: "instant" });
-        await settle();
+    await page.evaluate(() => document.fonts.ready);
+    // Polled on real frames with a real deadline: the page's own requestAnimationFrame runs on the
+    // fake clock, which fires a burst of frames at once after the main thread stalls. Two frames
+    // pass first so intersection observers see the new scroll position.
+    const settle = async () => {
+      try {
+        await page.waitForFunction(
+          (pending) => {
+            window.settleFrames = (window.settleFrames ?? 0) + 1;
+            if (window.settleFrames < 3) return false;
+            return !Array.from(document.querySelectorAll(pending)).some((block) => {
+              const rect = block.getBoundingClientRect();
+              return (
+                rect.height > 0 &&
+                rect.bottom > 0 &&
+                rect.top < window.innerHeight * 0.85 &&
+                rect.right > 0 &&
+                rect.left < window.innerWidth
+              );
+            });
+          },
+          unrevealedSelector,
+          { polling: "raf", timeout: 2_000 },
+        );
+      } catch (error) {
+        if (!(error instanceof Error && error.name === "TimeoutError")) throw error;
       }
-      window.scrollTo({ top: 0, behavior: "instant" });
+    };
+    const scrollTo = (top: number) =>
+      page.evaluate((top) => {
+        window.settleFrames = 0;
+        window.scrollTo({ top, behavior: "instant" });
+        return document.body.scrollHeight;
+      }, top);
+    for (let y = 0; y < (await scrollTo(y)); y += viewports[viewport].height / 2) {
       await settle();
-      // A carousel card waiting off to the side cuts in when it is paged to, not on scroll.
-      return Array.from(document.querySelectorAll(pending)).filter((block) => {
-        const rect = block.getBoundingClientRect();
-        const center = rect.left + rect.width / 2;
-        return rect.width > 0 && center >= 0 && center <= window.innerWidth;
-      }).length;
-    }, unrevealedSelector);
-    if (unrevealed > 0) throw new Error(`${unrevealed} blocks never revealed on ${route}`);
+    }
+    await scrollTo(0);
+    await settle();
+    // A carousel card waiting off to the side cuts in when it is paged to, not on scroll.
+    const unrevealed = await page.evaluate(
+      (pending) =>
+        Array.from(document.querySelectorAll(pending))
+          .filter((block) => {
+            const rect = block.getBoundingClientRect();
+            const center = rect.left + rect.width / 2;
+            return rect.width > 0 && center >= 0 && center <= window.innerWidth;
+          })
+          .map((block) => {
+            const { top, height } = block.getBoundingClientRect();
+            const text = block.textContent?.trim().slice(0, 40);
+            return `"${text}" at ${Math.round(top + window.scrollY)}+${Math.round(height)}`;
+          }),
+      unrevealedSelector,
+    );
+    if (unrevealed.length) {
+      throw new Error(`blocks never revealed on ${route}: ${unrevealed.join(", ")}`);
+    }
     await page.waitForFunction(() => !document.querySelector("[data-shown]"));
     await page.waitForLoadState("networkidle");
   } catch (error) {
@@ -106,13 +146,21 @@ export async function openSettledPage(
   return { context, page, errors };
 }
 
-/** Screenshots a clip until two captures in a row agree, so a page mid-update is never kept. */
-export async function stableScreenshot(page: Page, clip: Clip, label: string) {
+/**
+ * Screenshots a clip until two captures in a row agree, so a page mid-update is never kept. The
+ * clip is in page coordinates for a full-page capture and in viewport coordinates otherwise.
+ */
+export async function stableScreenshot(
+  page: Page,
+  clip: Clip,
+  label: string,
+  { fullPage = true } = {},
+) {
   let previous: Buffer | undefined;
   for (let attempt = 0; attempt < 5; attempt++) {
     await page.waitForTimeout(100);
     const current = await page.screenshot({
-      fullPage: true,
+      fullPage,
       clip,
       animations: "disabled",
       caret: "hide",

@@ -29,3 +29,6 @@ tests/visual/__diff__
 /shots/
 /*.png
 .astro
+
+# Behavior baselines are captured from the React build for the Astro-only port and kept local (97 MB)
+tests/visual/__behavior__/*.png

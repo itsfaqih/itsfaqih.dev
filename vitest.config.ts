@@ -22,8 +22,20 @@ export default defineConfig({
           name: "visual",
           environment: "node",
           include: ["tests/visual/**/*.test.ts"],
+          exclude: ["tests/visual/behavior.test.ts"],
           globalSetup: ["tests/visual/serve-build.ts"],
           testTimeout: 60_000,
+          hookTimeout: 60_000,
+        },
+      },
+      {
+        test: {
+          name: "behavior",
+          environment: "node",
+          include: ["tests/visual/behavior.test.ts"],
+          globalSetup: ["tests/visual/serve-build.ts"],
+          // Every route starts at once; a shared pool in the test caps how many pages are open.
+          maxConcurrency: 20,
           hookTimeout: 60_000,
         },
       },
