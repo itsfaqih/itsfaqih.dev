@@ -1,0 +1,67 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { styles, view } from "./button-design.styles";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+const GUARDS = [
+  { id: "confirm", label: "Confirm" },
+  { id: "hold", label: "Hold" },
+  { id: "undo", label: "Undo" },
+] as const;
+const key = [styles.key, styles.sm, styles.live];
+// The first frame is the idle project under the Confirm guard. The templates hold what the steps
+// mount fresh, so their step-in plays again: the confirm row, the drain and the hold fill.
+---
+
+<button-delete {...stylex.attrs(styles.stage)} data-careful={careful ? "true" : undefined}>
+  {
+    careful && (
+      <div role="group" aria-label="Guard" {...stylex.attrs(styles.guards)}>
+        {GUARDS.map(({ id, label }) => (
+          <button
+            type="button"
+            aria-pressed={id === "confirm" ? "true" : "false"}
+            class={view.guard(id === "confirm")}
+            data-guard={id}>{label}</button
+          >
+        ))}
+      </div>
+    )
+  }
+  <div class={view.project("idle")} data-part="project">
+    <span {...stylex.attrs(styles.projectCopy, styles.stepIn)}
+      ><b class={view.projectName(false)} data-part="name">Moonbase</b><small
+        {...stylex.attrs(styles.projectMeta)}
+        data-part="meta">214 files · edited 2h ago</small
+      ></span
+    ><button
+      data-hint="true"
+      type="button"
+      class={view.action("idle", false)}
+      data-autofocus="true"
+      data-part="action">Delete project</button
+    >
+  </div>
+  <template data-part="new-confirm"
+    ><span {...stylex.attrs(styles.row, styles.projectRow, styles.stepIn)}
+      ><button
+        type="button"
+        {...stylex.attrs(key, styles.text)}
+        data-autofocus="true"
+        data-step="idle">Cancel</button
+      ><button type="button" {...stylex.attrs(key, styles.red)} data-step="deleted"
+        >Delete project</button
+      ></span
+    ></template
+  >
+  <template data-part="new-drain"><span aria-hidden="true" {...stylex.attrs(styles.drain)}></span></template>
+  <template data-part="new-fill"
+    ><span aria-hidden="true" class={view.holdFill(false)}></span></template
+  >
+</button-delete>
+
+<script>
+  import "./button-delete.client";
+</script>
