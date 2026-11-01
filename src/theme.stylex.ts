@@ -106,7 +106,7 @@ export const motion = stylex.defineVars({
   "--t-panel": "560ms",
 });
 
-/** The system cursors, shown until the print cursor takes over (print-cursor.tsx). */
+/** The system cursors, shown until the print cursor takes over (print-cursor.client.ts). */
 export const cursors = stylex.defineVars({
   "--cursor": "auto",
   "--cursor-point": "pointer",

@@ -3,7 +3,7 @@ import "../styles.css";
 import { CommandPalette } from "../components/command-palette";
 import { Header } from "../components/header";
 import PageScrollbar from "../components/page-scrollbar.astro";
-import { PrintCursor } from "../components/print-cursor";
+import PrintCursor from "../components/print-cursor.astro";
 import { pageHead, type SharedPage } from "../seo";
 import { THEME_COLORS } from "../theme";
 import { HEAD_SCRIPT } from "./head-script";
@@ -70,7 +70,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
     <Header client:load path={path} />
     <CommandPalette client:idle />
     <main class={site.main}><slot /></main>
-    <PrintCursor client:idle />
+    <PrintCursor />
     <PageScrollbar />
     <script>
       import "../components/favicon-cycle";
