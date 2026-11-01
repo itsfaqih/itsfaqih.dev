@@ -1,0 +1,71 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import type { Job } from "./home-content";
+import { loadIn } from "../components/load-in";
+import { techBrand } from "./tech-brand";
+import { marker, moreLabel, rowView, styles } from "./experience-list.styles";
+import CompanyLogo from "./company-logo.astro";
+import TechIcon from "./tech-icon.astro";
+
+// The work history (experience-list.client.ts): one row per job, one open at a time, with the
+// open row's achievements. Each row keeps its achievements in a template for when it opens.
+type Props = { jobs: Job[] };
+
+const { jobs } = Astro.props;
+---
+
+<experience-list {...stylex.attrs(styles.list)}
+  >{
+    jobs.map((job, index) => {
+      const isOpen = index === 0;
+      const view = rowView(isOpen);
+      const achievements = () => (
+        <ul {...stylex.attrs(styles.achievements)}>
+          {job.achievements.map((item, at) => (
+            <li {...stylex.attrs(styles.achievement)} style={`--j:${at}`}>{item}</li>
+          ))}
+        </ul>
+      );
+      return (
+        <div
+          {...stylex.attrs(loadIn.piece, styles.row, marker)}
+          data-cut="true"
+          data-on={isOpen ? "" : undefined}
+        >
+          <button
+            type="button"
+            class={view.head}
+            aria-expanded={isOpen ? "true" : "false"}
+            aria-controls={`job-${index}`}
+          >
+            <span {...stylex.attrs(styles.years)}>{job.years}</span>
+            <h3 class={view.company}><CompanyLogo name={job.company} xstyle={styles.logo} />{job.company}<small {...stylex.attrs(styles.role)}>{job.role}</small></h3>
+            <span class={view.chevron} aria-hidden="true" />
+          </button>
+          <ul class={view.stack} aria-label={`${job.company} stack`}>
+            {job.stack.map((tool) => (
+              <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} xstyle={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
+            ))}
+            <li data-more="true" style="display:none">{isOpen ? (
+                <button
+                  type="button"
+                  data-label={moreLabel(0)}
+                  class={view.more}
+                  aria-label="Show 0 more tools"
+                  aria-expanded="false"
+                />
+              ) : (
+                <span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" />
+              )}</li>
+          </ul>
+          <div id={`job-${index}`} {...stylex.attrs(styles.body)}>{isOpen && achievements()}</div>
+          <template>{achievements()}</template>
+        </div>
+      );
+    })
+  }</experience-list
+>
+
+<script>
+  import "./experience-list.client";
+</script>

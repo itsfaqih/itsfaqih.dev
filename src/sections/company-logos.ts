@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
-import { brandFor, icon, techBadge } from "./tech-icon";
+import { brandFor, styleOf } from "./tech-brand";
 
 /* Each employer's icon mark, one path per brand colour. EvidenceCare's is redrawn from its site's
    mark with the navy outline thickened to stay visible at chip size, and its navy turns to the text
@@ -8,10 +7,10 @@ import { brandFor, icon, techBadge } from "./tech-icon";
    traced from their sites' images, Rapidev's is rebuilt on a hexagon grid from its logo, and Vestis
    Labs, which has only a wordmark, uses that wordmark's V. */
 // `at` places a colour on the logo's ring (ringOf), in degrees clockwise from the top.
-type Part = { d: string; hex: string; at?: number; evenOdd?: boolean; dark?: string };
+export type Part = { d: string; hex: string; at?: number; evenOdd?: boolean; dark?: string };
 type Logo = { viewBox: string; parts: Part[] };
 
-const LOGOS = new Map<string, Logo>(
+export const LOGOS = new Map<string, Logo>(
   Object.entries({
     EvidenceCare: {
       viewBox: "7 7 255 255",
@@ -105,7 +104,7 @@ const LOGOS = new Map<string, Logo>(
 
 // A logo keeps its own colours on the light panel, where even the palest still has an edge. On the
 // dark one, colours too dark to read lift toward white as the tool marks do.
-const toneOf = ({ hex, dark }: Part) => ({
+export const toneOf = ({ hex, dark }: Part) => ({
   "--brand-light": brandFor(hex, "light", 1),
   "--brand-dark": dark ?? brandFor(hex, "dark"),
 });
@@ -114,7 +113,7 @@ const toneOf = ({ hex, dark }: Part) => ({
  * The logo's colours for an outline, as --ring-dark and --ring-light: a conic gradient with each
  * colour where it sits in the mark, or the one colour of a single-colour mark.
  */
-export function ringOf(name: string): CSSProperties | undefined {
+export function ringOf(name: string) {
   const logo = LOGOS.get(name);
   if (!logo) return undefined;
   const placed = logo.parts.filter((part) => part.at !== undefined);
@@ -128,39 +127,10 @@ export function ringOf(name: string): CSSProperties | undefined {
     const around = stops.map((part, index) => `${tones[index]} ${(part.at ?? 0) - from}deg`);
     return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${tones[0]} 360deg)`;
   };
-  return { "--ring-dark": ring("--brand-dark"), "--ring-light": ring("--brand-light") };
+  return styleOf({ "--ring-dark": ring("--brand-dark"), "--ring-light": ring("--brand-light") });
 }
 
-/**
- * An employer's mark in one colour, which `style` can tint, over the mark in its own colours as
- * toneOf sets them for the theme. The colours show while an ancestor sets --lit to 1 (iconLit).
- */
-export function CompanyLogo({ name, style }: { name: string; style?: stylex.StyleXStyles }) {
-  const logo = LOGOS.get(name);
-  if (!logo) return null;
-  const paths = (lit: boolean) =>
-    logo.parts.map((part) => (
-      <path
-        key={part.d}
-        {...stylex.props(lit && techBadge.brand, lit && styles.part)}
-        style={lit ? toneOf(part) : undefined}
-        d={part.d}
-        fillRule={part.evenOdd ? "evenodd" : undefined}
-      />
-    ));
-  return (
-    <span {...stylex.props(icon.pair, style)} aria-hidden="true">
-      <svg {...stylex.props(icon.flat)} viewBox={logo.viewBox}>
-        {paths(false)}
-      </svg>
-      <svg {...stylex.props(icon.lit)} viewBox={logo.viewBox}>
-        {paths(true)}
-      </svg>
-    </span>
-  );
-}
-
-const styles = stylex.create({
+export const companyLogo = stylex.create({
   part: {
     fill: "var(--brand)",
   },

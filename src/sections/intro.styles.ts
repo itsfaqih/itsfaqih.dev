@@ -1,84 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef, useState } from "react";
-import { SLIDES } from "../data/home";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 
-const SKIP_GRACE_MS = 1200;
-
-// The home intro: the name slams in, cuts flash through what I build, then the shutters split.
-// It plays once per session; the head script (src/layouts/head-script.ts) sets .no-intro whenever
-// it shouldn't.
-// The effect drives it with classes on the root: .play starts the run, .out ends it.
-export function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [gone, setGone] = useState(false);
-
-  useEffect(() => {
-    const element = ref.current;
-    const html = document.documentElement;
-    if (!element || html.classList.contains("no-intro")) {
-      setGone(true);
-      onDone(true);
-      return;
-    }
-
-    const openedAt = performance.now();
-    let removeTimer = 0;
-    const finish = () => {
-      if (element.classList.contains("out")) return;
-      element.classList.add("out");
-      html.classList.add("no-intro");
-      try {
-        sessionStorage.setItem("intro-seen", "1");
-      } catch {}
-      onDone(true);
-      removeTimer = window.setTimeout(() => setGone(true), 700);
-    };
-    const skip = () => {
-      if (performance.now() - openedAt > SKIP_GRACE_MS) finish();
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (["Escape", "Enter", " "].includes(event.key)) skip();
-    };
-    const onAnimationEnd = (event: AnimationEvent) => {
-      if (event.target === element) finish();
-    };
-
-    element.addEventListener("animationend", onAnimationEnd);
-    element.addEventListener("click", skip);
-    addEventListener("keydown", onKeyDown);
-    element.classList.add("play");
-    return () => {
-      element.removeEventListener("animationend", onAnimationEnd);
-      element.removeEventListener("click", skip);
-      removeEventListener("keydown", onKeyDown);
-      clearTimeout(removeTimer);
-    };
-  }, [onDone]);
-
-  if (gone) return null;
-
-  return (
-    <div ref={ref} {...stylex.props(styles.root, stylex.defaultMarker())} aria-hidden="true">
-      <div {...stylex.props(styles.shutter, styles.top)} />
-      <div {...stylex.props(styles.shutter, styles.bottom)} />
-      <div {...stylex.props(styles.stage)}>
-        <div {...stylex.props(styles.name)}>FAQIH MUNTASHIR</div>
-        <div {...stylex.props(styles.slot)}>
-          {SLIDES.slice(0, 4).map(({ tab, color }, index, words) => (
-            <span
-              key={tab}
-              {...stylex.props(styles.cut, index === words.length - 1 && styles.lastCut)}
-              style={{ "--i": index, "--c": color }}
-            >
-              {tab.toUpperCase()}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+export const marker = stylex.defaultMarker();
 
 // The root's own animation only times the run: its animationend ends the intro.
 const hold = stylex.keyframes({ to: { opacity: 1 } });
@@ -91,7 +14,7 @@ const cutIn = stylex.keyframes({
   to: { opacity: 1, transform: "translate(-50%,-50%)" },
 });
 
-const styles = stylex.create({
+export const styles = stylex.create({
   root: {
     position: "fixed",
     inset: 0,

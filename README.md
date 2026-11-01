@@ -72,7 +72,7 @@ Stories live in `src/stories` and use the same global stylesheet and StyleX toke
 
 - `src/pages/`: Astro's file-based pages. Each is a thin `.astro` file that picks the layout, the head tags and the islands.
 - `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the shell islands and, in development, the StyleX dev sheet and React Grab), and `head-script.ts`, which sets the theme, the intro classes and the view-transition types before first paint.
-- `src/sections/`: the home page (`home.tsx`) and the pieces the rule pages share with it.
+- `src/sections/`: the home page (`home.astro`) and the pieces the rule pages share with it.
 - `src/rules/`: the Rule of Thumb index, each rule's page component, the `RuleLanding` frame and `rule-page.astro`.
 - `src/blog/`: the post list, the post frame and its table of contents.
 - `src/components/`: shared UI and article thumbnails.

@@ -1,172 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { SLIDES } from "../../data/home";
-import { useMediaQuery } from "../../hooks/use-media-query";
 import { cursors, fonts, motion, palette } from "../../theme.stylex";
-import { heroType } from "../hero-type";
-import { HeroPrints, SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints";
-import { button, buttonVariant } from "../../components/button";
-import { veil } from "../section";
-import { loadIn } from "../../components/load-in";
 
-// The home hero: the headline cycles through what I build, and the bench beside it shows each in
-// print. The slides advance on a timer once the intro hands off; the pips jump, the button pauses.
-export function Hero({ introDone }: { introDone: boolean }) {
-  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const [slide, setSlide] = useState({ index: 0, run: 0, lead: 0 });
-  const [pausedByUser, setPausedByUser] = useState<boolean | null>(null);
-
-  const runRef = useRef(0);
-  const remainingRef = useRef(SLIDE_MS);
-
-  const userPaused = pausedByUser ?? reduced;
-  const current = SLIDES[slide.index]!;
-
-  const go = (index: number) => {
-    runRef.current += 1;
-    const lead = reduced ? 0 : SCENE_LEAD_MS;
-    remainingRef.current = SLIDE_MS + lead;
-    setSlide({ index, run: runRef.current, lead });
-  };
-
-  useEffect(() => {
-    const requested = Number(new URLSearchParams(location.search).get("slide"));
-    if (requested > 0 && requested < SLIDES.length) go(requested);
-  }, []);
-
-  const advance = useEffectEvent(() => go((slide.index + 1) % SLIDES.length));
-  useEffect(() => {
-    if (!introDone || userPaused) return;
-    const run = slide.run;
-    const armedAt = performance.now();
-    const timer = setTimeout(advance, remainingRef.current);
-    return () => {
-      clearTimeout(timer);
-      if (runRef.current === run) remainingRef.current -= performance.now() - armedAt;
-    };
-  }, [introDone, userPaused, slide.run]);
-
-  return (
-    <div {...stylex.props(styles.root)}>
-      <div {...stylex.props(veil.soft)}>
-        <div {...stylex.props(loadIn.veil, veil.dense, heroType.tag)} data-cut>
-          <span {...stylex.props(loadIn.piece, loadIn.words)} data-cut>
-            Full-stack engineer · Indonesia
-          </span>
-        </div>
-        <h1 data-cut {...stylex.props(loadIn.piece, heroType.title, styles.title)}>
-          <span {...stylex.props(styles.line)}>I build</span>
-          <span {...stylex.props(styles.phrases)}>
-            {SLIDES.map((item, index) => {
-              const on = index === slide.index;
-              return (
-                <span
-                  key={item.tab}
-                  {...stylex.props(
-                    styles.phrase,
-                    on && styles.phraseOn,
-                    on && introDone && slide.run > 0 && styles.slash,
-                  )}
-                  style={{ "--c": item.color }}
-                  aria-hidden={on ? undefined : true}
-                >
-                  <span {...stylex.props(styles.line, styles.nowrap)}>{item.phrase}</span>
-                  <span {...stylex.props(styles.line)}>
-                    <span {...stylex.props(heroType.hl)}>{item.highlight}</span>.
-                  </span>
-                </span>
-              );
-            })}
-          </span>
-        </h1>
-        <p {...stylex.props(loadIn.piece, heroType.lead)} data-cut>
-          I'm Faqih, a full-stack engineer with 5+ years on web products: frontends, backends, and
-          lately the agent tooling around them. Right now I'm building healthcare software at{" "}
-          <a
-            {...stylex.props(styles.leadLink)}
-            href="https://evidence.care"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            EvidenceCare
-          </a>
-          .
-        </p>
-        <div {...stylex.props(heroType.acts)}>
-          <a
-            {...stylex.props(loadIn.piece, button.base, buttonVariant["primary-brand"], styles.go)}
-            href="#contact"
-            data-cut
-            style={{ "--c": current.color }}
-          >
-            Connect with me
-          </a>
-          <a {...stylex.props(loadIn.piece, styles.cue)} href="#rules" data-cut>
-            <span {...stylex.props(styles.mouse)} aria-hidden="true">
-              <span {...stylex.props(styles.wheel)} />
-            </span>
-            Scroll down
-          </a>
-        </div>
-      </div>
-
-      <div {...stylex.props(loadIn.piece, styles.bench)} data-cut style={{ "--c": current.color }}>
-        <HeroPrints
-          index={slide.index}
-          restartKey={slide.run}
-          playing={introDone}
-          held={userPaused}
-        />
-        <div {...stylex.props(styles.controls)}>
-          <div {...stylex.props(styles.pips)} role="group" aria-label="What I build">
-            {SLIDES.map((item, index) => {
-              const on = index === slide.index;
-              return (
-                <button
-                  key={item.tab}
-                  type="button"
-                  {...stylex.props(styles.pip, stylex.defaultMarker())}
-                  aria-label={item.tab}
-                  aria-pressed={on}
-                  style={{
-                    "--c": item.color,
-                    "--ms": `${SLIDE_MS + (on ? slide.lead : 0)}ms`,
-                  }}
-                  onClick={() => go(index)}
-                >
-                  <i
-                    key={on ? slide.run : "idle"}
-                    {...stylex.props(
-                      styles.bar,
-                      on && styles.barOn,
-                      on && userPaused && styles.barHeld,
-                    )}
-                  />
-                </button>
-              );
-            })}
-          </div>
-          <button
-            type="button"
-            {...stylex.props(styles.pause)}
-            aria-label={userPaused ? "Play" : "Pause"}
-            onClick={() => setPausedByUser(!userPaused)}
-          >
-            <span
-              aria-hidden="true"
-              {...stylex.props(styles.glyph, !userPaused && styles.glyphOff)}
-            >
-              ▶
-            </span>
-            <span aria-hidden="true" {...stylex.props(styles.glyph, userPaused && styles.glyphOff)}>
-              ❚❚
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+export const marker = stylex.defaultMarker();
 
 const STACKED = "@media (max-width: 960px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -194,7 +29,7 @@ const scrollWheel = stylex.keyframes({
 });
 const prog = stylex.keyframes({ to: { transform: "scaleX(1)" } });
 
-const styles = stylex.create({
+export const styles = stylex.create({
   root: {
     display: "grid",
     gridTemplateColumns: { default: "1fr 1.05fr", [STACKED]: "1fr" },
@@ -445,3 +280,10 @@ const styles = stylex.create({
     transitionTimingFunction: "ease-in",
   },
 });
+
+export const phraseClass = (on: boolean, slashing: boolean) =>
+  stylex.attrs(styles.phrase, on && styles.phraseOn, on && slashing && styles.slash).class ?? "";
+export const barClass = (on: boolean, held: boolean) =>
+  stylex.attrs(styles.bar, on && styles.barOn, on && held && styles.barHeld).class ?? "";
+export const glyphClass = (off: boolean) =>
+  stylex.attrs(styles.glyph, off && styles.glyphOff).class ?? "";

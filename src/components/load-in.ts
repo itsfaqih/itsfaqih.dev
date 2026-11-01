@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { motion } from "../theme.stylex";
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
-// useCutIns adds .in to each [data-cut] piece once it is on screen.
+// watchCutIns (cut-ins.ts) adds .in to each [data-cut] piece once it is on screen.
 const IN = ":is(.in)";
 // With JS on, a piece waits hidden until it gets .in, and so does every piece inside one still waiting.
 const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
@@ -100,11 +100,11 @@ const deal = stylex.keyframes({
 /**
  * The load-in: pieces boot like a corrupted game frame. Each cuts in as torn slices that jump
  * sideways on a pink and cyan split, drops out once, then locks clean, in hard steps with no
- * easing. Every [data-cut] composes `piece` first: it plays once, when useCutIns gives it .in, and
+ * easing. Every [data-cut] composes `piece` first: it plays once, when watchCutIns gives it .in, and
  * pieces that arrive in the same frame stagger by --cut-order. A piece inside one still waiting
  * waits too. Siblings alternate two slice patterns so a row never tears in unison. Without JS
  * everything sits at rest; with reduced motion a piece only fades up. A piece under [data-loop]
- * pauses while useCutIns marks it .paused, except for that fade.
+ * pauses while watchCutIns marks it .paused, except for that fade.
  *
  * `deal` swaps the glitch for a dealt card, on the rule tiles. `veil` is for a [data-cut] that
  * wears a veil (see section.ts): it fades up while its words, a `piece` composed with `words`
