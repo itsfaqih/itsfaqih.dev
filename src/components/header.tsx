@@ -8,7 +8,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@tanstack/react-router";
 import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
 import { SHOW_PROJECTS } from "../data/home";
 import { useTheme } from "../hooks/use-theme";
@@ -155,8 +154,20 @@ function useElasticGround(
   }, [islandRef, groundRef]);
 }
 
-export function Header() {
+function subscribeHash(listener: () => void) {
+  addEventListener("hashchange", listener);
+  return () => removeEventListener("hashchange", listener);
+}
+
+/** The site header. `path` is the page's pathname, which marks the current section's link. */
+export function Header({ path }: { path: string }) {
   const { toggleTheme } = useTheme();
+  const hash = useSyncExternalStore(
+    subscribeHash,
+    () => location.hash,
+    () => "",
+  );
+  const current = (active: boolean) => (active ? ("page" as const) : undefined);
   const openCommandPalette = () => {
     document.dispatchEvent(
       new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }),
@@ -234,46 +245,40 @@ export function Header() {
           style={open && styles.homeFolded}
           rowStyle={open && styles.homeFoldedRow}
         >
-          <Link
-            to="/"
-            aria-label="Faqih Muntashir, home"
-            {...stylex.props(styles.brand, styles.ring)}
-          >
+          <a href="/" aria-label="Faqih Muntashir, home" {...stylex.props(styles.brand, styles.ring)}>
             FAQIH
-          </Link>
+          </a>
         </Seg>
         <Seg on={compact && live} compact="live">
           <div ref={hostActivity} />
         </Seg>
         <Seg on={full}>
           <nav aria-label="Main" {...stylex.props(styles.nav)}>
-            <Link
-              to="/rule-of-thumb"
-              activeProps={{ "aria-current": "page" }}
+            <a
+              href="/rule-of-thumb"
+              aria-current={current(path.startsWith("/rule-of-thumb"))}
               data-fluid-item
               {...stylex.props(styles.navLink, styles.ring)}
             >
               Rule of Thumb
-            </Link>
-            <Link
-              to="/"
-              hash="work"
-              activeOptions={{ includeHash: true }}
+            </a>
+            <a
+              href="/#work"
+              aria-current={current(path === "/" && hash === "#work")}
               data-fluid-item
               {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
             >
               Experience
-            </Link>
+            </a>
             {SHOW_PROJECTS && (
-              <Link
-                to="/"
-                hash="projects"
-                activeOptions={{ includeHash: true }}
+              <a
+                href="/#projects"
+                aria-current={current(path === "/" && hash === "#projects")}
                 data-fluid-item
                 {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
               >
                 Projects
-              </Link>
+              </a>
             )}
           </nav>
         </Seg>
@@ -303,9 +308,9 @@ export function Header() {
           </button>
         </Seg>
         <Seg on compact="always" style={styles.connectSeg} rowStyle={styles.connectRow}>
-          <Link to="/" hash="contact" {...stylex.props(button.base, button.sm, styles.connect)}>
+          <a href="/#contact" {...stylex.props(button.base, button.sm, styles.connect)}>
             Connect
-          </Link>
+          </a>
         </Seg>
         <Seg on={scrolled} compact="always">
           <button

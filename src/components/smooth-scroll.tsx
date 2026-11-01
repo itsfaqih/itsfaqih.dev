@@ -1,4 +1,3 @@
-import { useRouter } from "@tanstack/react-router";
 import Lenis from "lenis";
 import { useEffect } from "react";
 import { reducedMotion } from "../hooks/use-media-query";
@@ -13,8 +12,6 @@ export function jumpTo(top: number) {
 }
 
 export function SmoothScroll() {
-  const router = useRouter();
-
   useEffect(() => {
     if (reducedMotion()) return;
     const lenis = new Lenis({
@@ -28,17 +25,11 @@ export function SmoothScroll() {
         !(event.target instanceof Element && event.target.closest("[role='dialog']")),
     });
     active = lenis;
-    // Not stop() then start(): with autoToggle, stop() only clips <html> and stops on the
-    // next transitionend, so the start() is a no-op and the page stays locked.
-    const unsubscribe = router.subscribe("onBeforeNavigate", () => {
-      lenis.scrollTo(scrollY, { immediate: true, force: true });
-    });
     return () => {
-      unsubscribe();
       lenis.destroy();
       active = null;
     };
-  }, [router]);
+  }, []);
 
   return null;
 }

@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { Dialog } from "@base-ui/react/dialog";
 import {
   ArrowSquareOutIcon,
@@ -95,7 +94,6 @@ export function CommandPalette() {
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const copiedResetTimerRef = useRef<number>(undefined);
-  const navigate = useNavigate();
 
   const close = () => setIsOpen(false);
 
@@ -130,7 +128,7 @@ export function CommandPalette() {
       category: "navigation",
       keywords: ["index", "main", "start"],
       action: () => {
-        navigate({ to: "/" });
+        location.assign("/");
         close();
       },
     },
@@ -215,7 +213,7 @@ export function CommandPalette() {
       category: "navigation",
       keywords: ["all", "list", "overview"],
       action: () => {
-        navigate({ to: "/rule-of-thumb" });
+        location.assign("/rule-of-thumb");
         close();
       },
     },
@@ -228,7 +226,7 @@ export function CommandPalette() {
       keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
       hue: colorOf(guideline.label),
       action: () => {
-        navigate({ to: guideline.href });
+        location.assign(guideline.href);
         close();
       },
     })),

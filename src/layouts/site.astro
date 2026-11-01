@@ -1,0 +1,69 @@
+---
+import "../styles.css";
+import { CommandPalette } from "../components/command-palette";
+import { FaviconCycle } from "../components/favicon-cycle";
+import { Header } from "../components/header";
+import { PageScrollbar } from "../components/page-scrollbar";
+import { PrintCursor } from "../components/print-cursor";
+import { SmoothScroll } from "../components/smooth-scroll";
+import { pageHead, type SharedPage } from "../seo";
+import { THEME_COLORS } from "../theme";
+import { HEAD_SCRIPT } from "./head-script";
+import { site } from "./site.stylex";
+
+type Props = {
+  /** The page's sharing metadata. Without it the page gets the site title and no sharing tags. */
+  page?: SharedPage;
+};
+
+const { page } = Astro.props;
+const head = page ? pageHead(page) : undefined;
+const title = head?.meta.find((meta) => "title" in meta)?.title ?? "Faqih Muntashir";
+const tags = head?.meta.filter((meta) => !("title" in meta)) ?? [];
+// The build names pages index.html and blog.html; the page's own path is / and /blog.
+const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
+---
+
+<!doctype html>
+<html lang="en" class={site.html}>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <title>{title}</title>
+    {tags.map((meta) => <meta {...meta} />)}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
+    {head?.links.map((link) => <link {...link} />)}
+    <meta
+      name="theme-color"
+      content={THEME_COLORS.light}
+      media="(prefers-color-scheme: light)"
+      data-theme="light"
+    />
+    <meta
+      name="theme-color"
+      content={THEME_COLORS.dark}
+      media="(prefers-color-scheme: dark)"
+      data-theme="dark"
+    />
+    {
+      head?.scripts.map((script) => (
+        <script is:inline type={script.type} set:html={script.children} />
+      ))
+    }
+    <script is:inline set:html={HEAD_SCRIPT} />
+  </head>
+  <body class={site.body}>
+    <Header client:load path={path} />
+    <CommandPalette client:idle />
+    <main class={site.main}><slot /></main>
+    <PrintCursor client:idle />
+    <FaviconCycle client:idle />
+    <SmoothScroll client:idle />
+    <PageScrollbar client:idle />
+  </body>
+</html>

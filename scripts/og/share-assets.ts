@@ -22,8 +22,9 @@ type BuiltPage = {
 const OG_IMAGE_BASE = `${SITE_ORIGIN}${OG_DIR}/`;
 
 export async function writeShareAssets(outDir: string) {
+  // Every page but the 404, which no one shares or indexes.
   const files = (await readdir(outDir, { recursive: true })).filter(
-    (file) => path.basename(file) === "index.html",
+    (file) => file.endsWith(".html") && file !== "404.html",
   );
   const pages = await Promise.all(
     files.map(async (file) => readPage(file, await readFile(path.join(outDir, file), "utf8"))),
@@ -40,8 +41,9 @@ export async function writeShareAssets(outDir: string) {
 }
 
 function readPage(file: string, html: string): BuiltPage {
-  const dir = path.dirname(file).split(path.sep).join("/");
-  const pagePath = dir === "." ? "/" : `/${dir}`;
+  // blog.html is /blog and index.html is /: the build writes each page as a file of its own.
+  const route = file.split(path.sep).join("/").replace(/\.html$/, "");
+  const pagePath = route === "index" ? "/" : `/${route}`;
   const head = html.slice(0, html.indexOf("</head>"));
   const tags = (name: string) =>
     [...head.matchAll(new RegExp(`<${name}\\s[^>]*>`, "g"))].map(([tag]) => attributes(tag));
@@ -86,20 +88,23 @@ function readPage(file: string, html: string): BuiltPage {
 
 function attributes(tag: string) {
   return new Map(
-    [...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, unescapeReactAttribute(v!)]),
+    [...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, unescapeAttribute(v!)]),
   );
 }
 
 const ENTITIES = new Map([
-  ["&amp;", "&"],
-  ["&lt;", "<"],
-  ["&gt;", ">"],
-  ["&quot;", '"'],
-  ["&#x27;", "'"],
+  ["amp", "&"],
+  ["lt", "<"],
+  ["gt", ">"],
+  ["quot", '"'],
 ]);
 
-function unescapeReactAttribute(text: string) {
-  return text.replace(/&(?:amp|lt|gt|quot|#x27);/g, (entity) => ENTITIES.get(entity)!);
+function unescapeAttribute(text: string) {
+  return text.replace(/&(amp|lt|gt|quot|#\d+|#x[\da-f]+);/gi, (_, name: string) =>
+    name.startsWith("#")
+      ? String.fromCodePoint(Number(name[1] === "x" ? `0${name.slice(1)}` : name.slice(1)))
+      : ENTITIES.get(name)!,
+  );
 }
 
 function cardFor(page: BuiltPage): OgCard {
