@@ -749,8 +749,7 @@ export const view = {
   mailRow: (skeleton: boolean) => cls(styles.mailRow, skeleton && styles.mailRowStill),
   avatar: (skeleton: boolean) => cls(styles.avatar, skeleton && styles.bone),
   mailText: cls(styles.mailText),
-  mailFrom: (skeleton: boolean) =>
-    cls(styles.mailLine, styles.mailFrom, skeleton && styles.bone),
+  mailFrom: (skeleton: boolean) => cls(styles.mailLine, styles.mailFrom, skeleton && styles.bone),
   mailSubject: (skeleton: boolean) =>
     cls(styles.mailLine, styles.mailSubject, skeleton && styles.bone),
   signal: (signal: Signal) =>
@@ -769,3 +768,126 @@ export const view = {
   histAmount: cls(styles.histAmount),
   time: cls(styles.time),
 };
+
+/** The quiz boards: versions of a card set side by side, and mock screens whose parts are the choices. */
+export const quiz = stylex.create({
+  trio: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
+    gap: "10px",
+  },
+  prices: {
+    display: "grid",
+    gridTemplateRows: "auto 52px auto",
+    gap: "8px",
+  },
+  rows: {
+    display: "grid",
+    gap: "4px",
+    alignContent: "center",
+  },
+  row: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "8px",
+    fontSize: "13px",
+    color: palette["--dim"],
+  },
+  // Pictures of a spinner, so they hold still.
+  still: {
+    animationName: "none",
+  },
+  bigSpin: {
+    alignSelf: "center",
+    justifySelf: "center",
+  },
+  screen: {
+    position: "relative",
+    isolation: "isolate",
+    display: "grid",
+    gap: "12px",
+    paddingBlock: "14px",
+    paddingInline: { default: "14px", [PHONE]: "12px" },
+  },
+  // The page spot lies under the dashboard, so it rings the whole page and takes the clicks that land
+  // between the other spots.
+  page: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: -1,
+    display: "grid",
+  },
+  through: {
+    pointerEvents: "none",
+  },
+  tiles: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "8px",
+  },
+  wide: {
+    gridColumn: "1 / -1",
+    display: "grid",
+    pointerEvents: "auto",
+  },
+  tile: {
+    display: "grid",
+    gap: "2px",
+    alignContent: "start",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderRadius: "10px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `${palette["--raise"]}, 0 2px 0 ${palette["--drop-ink"]}`,
+    pointerEvents: "none",
+  },
+  tileLabel: {
+    fontSize: "12px",
+    color: palette["--dim"],
+  },
+  tileValue: {
+    fontWeight: 800,
+    fontSize: "18px",
+    lineHeight: 1.2,
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+    fontVariantNumeric: "tabular-nums",
+  },
+  // Where the revenue chart would have drawn.
+  hole: {
+    height: "44px",
+  },
+  toastSpot: {
+    justifySelf: "center",
+    display: "grid",
+  },
+  toast: {
+    position: "static",
+    translate: "none",
+    opacity: 1,
+    animationName: "none",
+  },
+  wallet: {
+    overflow: "visible",
+  },
+  // Room between a wallet part and the ring around it.
+  inset: {
+    paddingTop: "6px",
+    paddingRight: "9px",
+    paddingBottom: "6px",
+    paddingLeft: "9px",
+    borderTopWidth: 0,
+  },
+  rate: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: "8px",
+    alignItems: "center",
+    fontSize: "12px",
+    color: palette["--dim"],
+  },
+});

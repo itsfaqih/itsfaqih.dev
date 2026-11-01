@@ -1,5 +1,7 @@
 ---
-import { EARLY, LATE, LESSONS, TLDR } from "./data-loading";
+import * as stylex from "@stylexjs/stylex";
+import { EARLY, HISTORY, LATE, LESSONS, money, TLDR } from "./data-loading";
+import { quiz, styles, view } from "./data-loading.styles";
 import DataLoadingInbox from "./data-loading-inbox.astro";
 import DataLoadingParse from "./data-loading-parse.astro";
 import DataLoadingQuiz from "./data-loading-quiz.astro";
@@ -8,10 +10,22 @@ import DataLoadingTeam from "./data-loading-team.astro";
 import DataLoadingWallet from "./data-loading-wallet.astro";
 import DataLoadingWaterfall from "./data-loading-waterfall.astro";
 import LessonText from "./lesson-text.astro";
+import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
 
 const [early, stale, flicker, errors, boundary, persist] = LESSONS;
+const PRICES = [
+  ["Gold", "$2,384"],
+  ["Silver", "$28.40"],
+] as const;
+const TILES = [
+  ["Orders", "1,284"],
+  ["Visitors", "18.2k"],
+  ["Refunds", "12"],
+  ["Signups", "342"],
+] as const;
 ---
 
 <RuleLanding id="data-loading" learn="Fast first paint, smooth updates" tldr={TLDR} take="load data the same way">
@@ -36,9 +50,43 @@ const [early, stale, flicker, errors, boundary, persist] = LESSONS;
     <DataLoadingRevenue slot="bad" />
     <DataLoadingRevenue slot="good" swr />
   </RuleLesson>
-  <DataLoadingQuiz n={2} level={stale.levels[0]}
-    >You return to a tab of prices loaded 5 minutes ago. They refetch on focus. Place the cached prices.</DataLoadingQuiz
-  >
+  <RuleQuiz n={2} level={stale.levels[0]}
+    >You return to a tab of prices loaded 5 minutes ago. They refetch on focus, which takes 600ms. Pick what the tab shows meanwhile.
+    <div slot="board" {...stylex.attrs(quiz.trio)}>
+      <QuizChoice level={stale.levels[0]} id="blank" caption="A full spinner"
+        ><span {...stylex.attrs(quiz.prices)}
+          ><span {...stylex.attrs(styles.head)}>Prices</span><span {...stylex.attrs(styles.spin, quiz.still, quiz.bigSpin)}
+          ></span><span {...stylex.attrs(styles.status)}>Updating</span></span
+        ></QuizChoice
+      >
+      {
+        (
+          [
+            ["stay", "A small spinner beside them", true],
+            ["keep", "Kept until the next load", false],
+          ] as const
+        ).map(([id, caption, spin]) => (
+          <QuizChoice level={stale.levels[0]} id={id} caption={caption}
+            ><span {...stylex.attrs(quiz.prices)}
+              ><span {...stylex.attrs(styles.head)}>Prices</span><span {...stylex.attrs(quiz.rows)}
+                >{
+                  PRICES.map(([name, price]) => (
+                    <span {...stylex.attrs(quiz.row)}
+                      ><span>{name}</span><b {...stylex.attrs(styles.histAmount)}>{price}</b></span
+                    >
+                  ))
+                }</span
+              ><span {...stylex.attrs(styles.status)}
+                >{spin && <span {...stylex.attrs(styles.spin, styles.spinSmall, quiz.still)} />}{
+                  spin ? "Updating" : "Updated 5 min ago"
+                }</span
+              ></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={flicker}>
     <Fragment slot="body"
@@ -58,9 +106,37 @@ const [early, stale, flicker, errors, boundary, persist] = LESSONS;
     <DataLoadingTeam slot="bad" />
     <DataLoadingTeam slot="good" inline />
   </RuleLesson>
-  <DataLoadingQuiz n={4} level={errors.levels[0]}
-    >A dashboard loads five cards, and the revenue card fails to load. Place what people see.</DataLoadingQuiz
-  >
+  <RuleQuiz n={4} level={errors.levels[0]}
+    >A dashboard loads five cards, and the revenue card fails to load. Tap where its error and Retry should go.
+    <div slot="board" {...stylex.attrs(quiz.screen)}>
+      <span {...stylex.attrs(quiz.page)}><QuizChoice level={errors.levels[0]} id="page" look="spot" /></span>
+      <span {...stylex.attrs(styles.head, quiz.through)}
+        ><span>Dashboard</span><span {...stylex.attrs(styles.status)}>4 of 5 loaded</span></span
+      >
+      <span {...stylex.attrs(quiz.tiles, quiz.through)}>
+        <span {...stylex.attrs(quiz.wide)}
+          ><QuizChoice level={errors.levels[0]} id="inline" look="spot"
+            ><span {...stylex.attrs(quiz.tile)}
+              ><span {...stylex.attrs(quiz.tileLabel)}>Revenue, this week</span><span {...stylex.attrs(quiz.hole)}
+              ></span></span
+            ></QuizChoice
+          ></span
+        >
+        {
+          TILES.map(([label, value]) => (
+            <span {...stylex.attrs(quiz.tile)}
+              ><span {...stylex.attrs(quiz.tileLabel)}>{label}</span><b {...stylex.attrs(quiz.tileValue)}>{value}</b></span
+            >
+          ))
+        }
+      </span>
+      <span {...stylex.attrs(quiz.toastSpot)}
+        ><QuizChoice level={errors.levels[0]} id="toast" look="spot"
+          ><span {...stylex.attrs(styles.toast, quiz.toast)}>Something went wrong</span></QuizChoice
+        ></span
+      >
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={boundary}>
     <Fragment slot="body"
@@ -83,7 +159,41 @@ const [early, stale, flicker, errors, boundary, persist] = LESSONS;
     <DataLoadingWallet slot="bad" />
     <DataLoadingWallet slot="good" careful />
   </RuleLesson>
-  <DataLoadingQuiz n={6} level={persist.levels[0]}
-    >A banking app persists its cache. On day 3 you open it with no signal. Place what it may show from the cache.</DataLoadingQuiz
-  >
+  <RuleQuiz n={6} level={persist.levels[0]}
+    >A banking app persists its cache. On day 2 you spend $1,830 on a laptop. On day 3 you open the app with no signal. Tap what it may show from the cache.
+    <div slot="board" {...stylex.attrs(styles.card, quiz.wallet)}>
+      <span {...stylex.attrs(styles.head)}
+        ><span>Wallet</span><span class={view.signal("offline")}>No signal, day 3</span></span
+      >
+      <QuizChoice level={persist.levels[0]} id="balance" look="spot"
+        ><span {...stylex.attrs(styles.balance, quiz.inset)}
+          ><span {...stylex.attrs(styles.balanceLabel)}>Balance</span><b {...stylex.attrs(styles.balanceValue, quiz.still)}
+            >{money(2140)}</b
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={persist.levels[0]} id="history" look="spot"
+        ><span {...stylex.attrs(styles.hist, quiz.inset)}
+          ><span {...stylex.attrs(styles.histHead)}
+            ><span>Recent</span><span {...stylex.attrs(styles.stamp)}>Updated 2 days ago</span></span
+          ><span {...stylex.attrs(styles.histList)}
+            >{
+              HISTORY.map((row) => (
+                <span {...stylex.attrs(quiz.row)}
+                  ><span>{row.label}</span><b {...stylex.attrs(styles.histAmount)}
+                    >{row.amount < 0 ? "−" : "+"}{money(Math.abs(row.amount))}</b
+                  ></span
+                >
+              ))
+            }</span
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={persist.levels[0]} id="rate" look="spot"
+        ><span {...stylex.attrs(quiz.rate, quiz.inset)}
+          ><span>Transfer rate</span><b {...stylex.attrs(styles.histAmount)}>1 USD = 16,240 IDR</b></span
+        ></QuizChoice
+      >
+    </div>
+  </RuleQuiz>
 </RuleLanding>

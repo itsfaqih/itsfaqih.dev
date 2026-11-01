@@ -9,7 +9,12 @@ export const isTimed = (row: BoardRow): row is TimedRow => "at" in row;
 
 export const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
-export type Bar = { label: string; from: number; to: number; kind: "code" | "render" | "req" | "defer" };
+export type Bar = {
+  label: string;
+  from: number;
+  to: number;
+  kind: "code" | "render" | "req" | "defer";
+};
 export type Waterfall = { bars: Bar[]; paint: number };
 
 export const AXIS = 1000;
@@ -144,34 +149,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Back to the tab",
-        piece: "cached prices",
         answer: "stay",
-        rows: [
-          at("0ms", "The tab gets focus, refetch starts"),
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "blank",
-              label: "make way for a full spinner",
-              note: "Prices you could have read vanish for 600ms, then come back a little different.",
-            },
+            id: "blank",
+            label: "Prices replaced by a full spinner",
+            note: "Prices you could have read vanish for 600ms, then come back a little different.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "stay",
-              label: "stay, with a small spinner beside them",
-              note: "Keep them readable. Fresh numbers swap in place when they land.",
-            },
+            id: "stay",
+            label: "Prices kept, with a small spinner beside them",
+            note: "Keep them readable. Fresh numbers swap in place when they land.",
           },
-          at("600ms", "Fresh prices arrive"),
           {
-            depth: 1,
-            slot: {
-              id: "keep",
-              label: "stay until the next page load",
-              note: "The fresh prices arrive and nobody sees them. The cache never revalidates.",
-            },
+            id: "keep",
+            label: "Prices kept until the next page load",
+            note: "The fresh prices arrive and nobody sees them. The cache never revalidates.",
           },
         ],
       },
@@ -225,35 +218,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "One card fails",
-        piece: "error + Retry",
         answer: "inline",
-        rows: [
-          at("0ms", "The dashboard opens"),
-          at("400ms", "Four cards load"),
-          at("420ms", "Revenue fails to load"),
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "page",
-              label: "an error page instead of the dashboard",
-              note: "One bad card throws away four good ones, and nothing retries in place.",
-            },
+            id: "page",
+            label: "An error page instead of the dashboard",
+            note: "One bad card throws away four good ones, and nothing retries in place.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "inline",
-              label: "inside the revenue card",
-              note: "Put it where the chart would be. The other four stay, and one tap retries. Log it too.",
-            },
+            id: "inline",
+            label: "Inside the revenue card",
+            note: "Put it where the chart would be. The other four stay, and one tap retries. Log it too.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "toast",
-              label: "a toast: Something went wrong",
-              note: "It fades in 3s, doesn't say which card, and the revenue card stays empty.",
-            },
+            id: "toast",
+            label: "A toast that says Something went wrong",
+            note: "It fades in 3s, doesn't say which card, and the revenue card stays empty.",
           },
         ],
       },
@@ -307,35 +287,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Offline on day 3",
-        piece: "from cache",
         answer: "history",
-        rows: [
-          at("Day 1", "The app loads and saves its cache"),
-          at("Day 2", "You spend $1,830 on a laptop"),
-          at("Day 3", "You open the app, no signal"),
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "balance",
-              label: "Balance: $2,140",
-              note: "It's $310 now. You'd plan with $1,830 you no longer have.",
-            },
+            id: "balance",
+            label: "Balance, $2,140",
+            note: "It's $310 now. You'd plan with $1,830 you no longer have.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "history",
-              label: "Last week's payments, updated 2 days ago",
-              note: "Persist it with the date. Past payments don't change.",
-            },
+            id: "history",
+            label: "Last week's payments, updated 2 days ago",
+            note: "Persist it with the date. Past payments don't change.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "rate",
-              label: "1 USD = 16,240 IDR",
-              note: "Rates move by the minute. A two-day-old rate prices every transfer wrong.",
-            },
+            id: "rate",
+            label: "Rate, 1 USD = 16,240 IDR",
+            note: "Rates move by the minute. A two-day-old rate prices every transfer wrong.",
           },
         ],
       },
