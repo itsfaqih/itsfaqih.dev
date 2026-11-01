@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/tanstack-react";
 
 import { Counter } from "../content/blog/counter";
-import { TableOfContents } from "../routes/blog/-components/table-of-contents";
+import { TableOfContents } from "../blog/table-of-contents";
 import { Showcase } from "./story-support";
 
 const meta = {

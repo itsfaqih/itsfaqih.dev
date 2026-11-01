@@ -1,4 +1,4 @@
-"""Writes src/routes/-components/tech-logos.ts: the stack's tools in their full-colour logos.
+"""Writes src/sections/tech-logos.ts: the stack's tools in their full-colour logos.
 
 Each logo comes from an Iconify set (the logos set, devicon where it lacks one), or from scripts/logos
 for the VoidZero tools, and is themed here,
@@ -105,12 +105,12 @@ FLAT = {"Redis", "MySQL", "HTML", "Drizzle", "Vitest", "Jest", "Vite", "OpenRout
 SOLID = {"Vitest", "Vite", "Oxlint", "Oxfmt", "Cypress"}
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "src/routes/-components/tech-logos.ts"
+OUT = ROOT / "src/sections/tech-logos.ts"
 
 
 def ecr() -> tuple[str, str]:
     """Amazon ECR, which the logos set lacks: tech-marks' glyph on the Containers tile, as AWS draws it."""
-    marks = (ROOT / "src/routes/-components/tech-marks.ts").read_text()
+    marks = (ROOT / "src/sections/tech-marks.ts").read_text()
     glyph = re.search(r'"Amazon ECR": \{.*?path: "([^"]+)"', marks, re.S)
     assert glyph, "tech-marks.ts has no Amazon ECR path"
     return "0 0 64 64", (

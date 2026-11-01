@@ -49,7 +49,7 @@ export const palette = stylex.defineVars({
   "--soft-key-drop": "#202029",
   "--hair-hover": "#3a3a4c",
   "--scan": "rgb(0 0 0 / 0.18)",
-  // Text that sits straight on the dither gets a patch of page colour under it (see veil in routes/-components/section.ts).
+  // Text that sits straight on the dither gets a patch of page colour under it (see veil in sections/section.ts).
   "--veil": "color-mix(in srgb, var(--bg) 72%, transparent)",
   // Small text has thin strokes the dither breaks up easily, so its veil is denser.
   "--veil-dense": "color-mix(in srgb, var(--bg) 90%, transparent)",

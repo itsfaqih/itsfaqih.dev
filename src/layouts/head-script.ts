@@ -1,13 +1,17 @@
+import { OPENING_KEY } from "../sections/rule-art";
 import { THEME_CLASSES } from "../theme";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
 export const REST_AFTER_MS = 3500;
 
 /**
- * Runs before first paint: the theme, the intro gate, and the rest fallback that settles the
- * cut-ins when the islands that play them are slow to arrive.
+ * Runs before first paint: the theme, the intro gate, the rest fallback that settles the cut-ins
+ * when the islands that play them are slow to arrive, and the cross-document view transitions'
+ * types. Opening a rule from its tile dives into it (rule-open); leaving a rule for the index
+ * zooms back out onto its tile (rule-close); every other page change fades through (page-fade).
+ * The transition's pictures live on the new page, so the dive's origin crosses in sessionStorage.
  */
-export const HEAD_SCRIPT = `(function () {
+export const HEAD_SCRIPT = String.raw`(function () {
   var doc = document.documentElement;
   doc.classList.add("js");
   // A saved choice wins; otherwise follow the system.
@@ -52,4 +56,64 @@ export const HEAD_SCRIPT = `(function () {
     },
     true,
   );
+
+  var RULE_PAGE = /^\/rule-of-thumb\/[^/]+$/;
+  var RULE_INDEX = /^\/rule-of-thumb$/;
+  function pathOf(url) {
+    return new URL(url, location.href).pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
+  }
+  function dive() {
+    try {
+      return JSON.parse(sessionStorage.getItem("${OPENING_KEY}") || "null");
+    } catch (e) {
+      return null;
+    }
+  }
+  function transitionType(from, to) {
+    if (from === to) return null;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return "page-fade";
+    if (RULE_PAGE.test(from) && RULE_INDEX.test(to)) return "rule-close";
+    var opening = dive();
+    return opening && opening.href === to ? "rule-open" : "page-fade";
+  }
+  addEventListener("pageswap", function (event) {
+    if (!event.viewTransition || !event.activation) return;
+    var type = transitionType(pathOf(location.href), pathOf(event.activation.entry.url));
+    if (type) event.viewTransition.types.add(type);
+    else event.viewTransition.skipTransition();
+  });
+  addEventListener("pagereveal", function (event) {
+    if (!event.viewTransition) return;
+    var from = self.navigation && navigation.activation && navigation.activation.from;
+    var type = from && from.url ? transitionType(pathOf(from.url), pathOf(location.href)) : null;
+    if (!type) return event.viewTransition.skipTransition();
+    event.viewTransition.types.add(type);
+    doc.dataset.vt = type;
+    if (type === "rule-open") {
+      var opening = dive();
+      doc.style.setProperty("--open-x", opening.x + "px");
+      doc.style.setProperty("--open-y", opening.y + "px");
+    }
+    if (type === "rule-close") {
+      // The index lands at rest, as the dive left it, with the rule's tile named for the morph
+      // and the zoom centred on it.
+      document.querySelectorAll("[data-cut]").forEach(function (piece) {
+        piece.style.animation = "none";
+        piece.classList.add("in");
+      });
+      var tile = document.querySelector('[data-cut][href="' + pathOf(from.url) + '"]');
+      if (tile) {
+        tile.setAttribute("data-opening", "");
+        var card = tile.getBoundingClientRect();
+        doc.style.setProperty("--open-x", card.x + card.width / 2 + "px");
+        doc.style.setProperty("--open-y", card.y + card.height / 2 + "px");
+        event.viewTransition.finished.finally(function () {
+          tile.removeAttribute("data-opening");
+        });
+      }
+    }
+    try {
+      sessionStorage.removeItem("${OPENING_KEY}");
+    } catch (e) {}
+  });
 })();`;

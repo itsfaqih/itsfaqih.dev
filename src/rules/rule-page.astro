@@ -1,0 +1,10 @@
+---
+import Site from "../layouts/site.astro";
+import { ruleHead } from "./rule-head";
+
+type Props = { id: string };
+---
+
+<Site page={ruleHead(Astro.props.id)}>
+  <slot />
+</Site>

@@ -1,7 +1,7 @@
 import { createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
-import { pageTransitionTypes } from "./routes/-components/rule-art";
+import { pageTransitionTypes } from "./sections/rule-art";
 
 export const getRouter = () =>
   createRouter({

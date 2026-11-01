@@ -88,7 +88,12 @@ html.sb-own::-webkit-scrollbar {
 
 /* Global (to the end of the stack-filter block): view transitions are pseudo-elements of html,
    keyed on its attributes and transition types, which StyleX cannot target.
+   Every same-site page change is a cross-document view transition; the head script
+   (src/layouts/head-script.ts) gives each one its type.
    Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
+@view-transition {
+  navigation: auto;
+}
 html[data-theme-swap]::view-transition-old(root),
 html[data-theme-swap]::view-transition-new(root) {
   animation: none;
@@ -107,8 +112,8 @@ html[data-theme-swap]::view-transition-new(root) {
 }
 
 /* Opening a rule from a card dives into it: the home deck's card, or on the index the panel the
-   tile projects onto. The page zooms toward the card (useRuleOpen sets --open-x and --open-y to
-   its centre) while the card's frame swells past the screen edges, and its thumbnail and title fly
+   tile projects onto. The page zooms toward the card (the head script sets --open-x and --open-y
+   to the centre useRuleOpen measured) while the card's frame swells past the screen edges, and its thumbnail and title fly
    on into the rule page's cover and heading. The names exist only during that transition, so the
    theme switch still reveals the page as one picture. */
 /* Global: the dive's one curve and length, set on html so its view-transition pseudo-elements
@@ -163,8 +168,8 @@ html:active-view-transition-type(rule-open)::view-transition-new(root) {
     vt-fade-out 260ms 240ms ease-out both;
 }
 /* Leaving a rule for the index runs the dive backwards: the rule page fades, the index settles
-   in from the zoom toward the rule's tile (useRuleOpen sets --open-x and --open-y once it lays
-   out), and the tile's frame shrinks back from past the screen edges while the cover and heading
+   in from the zoom toward the rule's tile (the head script sets --open-x and --open-y to its
+   centre), and the tile's frame shrinks back from past the screen edges while the cover and heading
    fly home into its thumbnail and title. */
 html:active-view-transition-type(rule-close)::view-transition-old(root) {
   animation: vt-fade-out 300ms 100ms ease-in both;

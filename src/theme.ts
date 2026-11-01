@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { kit } from "./routes/rule-of-thumb/-components/rule-landing.stylex";
+import { kit } from "./rules/rule-landing.stylex";
 import { palette } from "./theme.stylex";
 
 export type Theme = "light" | "dark";
