@@ -1,0 +1,36 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import type { Level } from "./lesson";
+import { quizKit, quizView } from "./rule-landing.styles";
+
+type Props = {
+  level: Level;
+  id: string;
+  /**
+   * "card" frames a version to set beside the others; "spot" rings a part of a mock screen, sized
+   * by what it holds.
+   */
+  look?: "card" | "spot";
+  /** A short line under a card's version, such as "Tinted". */
+  caption?: string;
+};
+
+const { level, id, look = "card", caption } = Astro.props;
+const choice = "choices" in level ? level.choices.find((candidate) => candidate.id === id) : undefined;
+if (!choice) throw new Error(`${level.name} has no choice "${id}"`);
+// The default slot is what the reader sees. A button holds phrasing content only, so it is drawn
+// from spans; QuizChoice styles the button, and the page styles what it draws.
+---
+
+<button
+  type="button"
+  class={quizView.choice(look, { missed: false, cleared: false, seated: false })}
+  aria-label={choice.label}
+  data-part="slot"
+  data-slot={choice.id}
+  data-note={choice.note}
+  data-look={look}
+  ><span {...stylex.attrs(quizKit.choiceBody)}><slot /></span>{
+    caption && <span {...stylex.attrs(quizKit.caption)}>{caption}</span>
+  }</button
+>

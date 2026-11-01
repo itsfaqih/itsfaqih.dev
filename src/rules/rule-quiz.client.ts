@@ -4,9 +4,10 @@ import { OUT, quizView, SNAP } from "./rule-landing.styles";
 type Drag = { x0: number; y0: number; lastX: number; lastT: number; rot: number; moved: boolean };
 
 /**
- * A quiz level (rule-quiz.astro). The reader drags the piece to a spot on the board, or taps it and
- * then a spot, or picks it up from the keyboard. A wrong spot shakes and says why; the right one
- * seats the piece with a burst, and the level shows its stars.
+ * A quiz level (rule-quiz.astro). In a place level the reader drags the piece to a spot on the
+ * board, or taps it and then a spot, or picks it up from the keyboard. A choose level has no piece,
+ * and the reader taps a candidate. A wrong pick shakes and says why; the right one seats the piece,
+ * or ticks the candidate, with a burst, and the level shows its stars.
  */
 class RuleQuiz extends HTMLElement {
   #stop?: () => void;
@@ -18,11 +19,12 @@ class RuleQuiz extends HTMLElement {
     const part = <T extends Element = HTMLElement>(name: string) =>
       this.querySelector<T>(`[data-part="${name}"]`)!;
     const answer = this.dataset.answer!;
-    const name = this.dataset.piece!;
+    const name = this.dataset.piece;
     const board = this.dataset.board!;
-    const piece = part<HTMLButtonElement>("piece");
+    const hint = this.dataset.hint!;
+    const piece = this.querySelector<HTMLButtonElement>('[data-part="piece"]');
     const say = part("say");
-    const note = part("note");
+    const note = this.querySelector('[data-part="note"]');
     const head = part("head");
     const slots = new Map(
       [...this.querySelectorAll<HTMLButtonElement>('[data-part="slot"]')].map((slot) => [
@@ -46,7 +48,7 @@ class RuleQuiz extends HTMLElement {
 
     const sync = () => {
       const cleared = placed !== null;
-      const open = !cleared && (picked || dragging);
+      const open = !cleared && (!piece || picked || dragging);
       for (const [id, old] of slots) {
         const seated = placed === id;
         const missed = miss?.id === id;
@@ -59,14 +61,18 @@ class RuleQuiz extends HTMLElement {
           slots.set(id, slot);
           keys.set(id, key);
         }
-        slot.className = quizView.slot({
-          lead: slot.previousElementSibling !== null,
-          open,
-          near: near === id,
-          missed,
-          cleared,
-          seated,
-        });
+        const look = slot.dataset.look;
+        slot.className =
+          look === "card" || look === "spot"
+            ? quizView.choice(look, { missed, cleared, seated })
+            : quizView.slot({
+                lead: slot.previousElementSibling !== null,
+                open,
+                near: near === id,
+                missed,
+                cleared,
+                seated,
+              });
         slot.disabled = !open;
         if (cleared && !seated) slot.dataset.off = "true";
         else slot.removeAttribute("data-off");
@@ -75,7 +81,8 @@ class RuleQuiz extends HTMLElement {
             part<HTMLTemplateElement>("seat").content.firstElementChild!,
             true,
           );
-          slot.replaceChildren(seat);
+          if (piece) slot.replaceChildren(seat);
+          else slot.append(seat);
         }
       }
 
@@ -87,13 +94,13 @@ class RuleQuiz extends HTMLElement {
         saidKey = key;
         const fresh = document.createElement("p");
         fresh.className = quizView.said(text !== undefined);
-        fresh.textContent = text ?? `Drag the piece into the ${board}. Or tap it, then tap a spot.`;
+        fresh.textContent = text ?? hint;
         said.replaceWith(fresh);
         said = fresh;
       }
 
       if (cleared) {
-        piece.remove();
+        piece?.remove();
         if (!head.querySelector("i")) {
           const stars = Math.max(1, 3 - mistakes);
           const clear = document.importNode(part<HTMLTemplateElement>("clear").content, true);
@@ -104,7 +111,7 @@ class RuleQuiz extends HTMLElement {
           });
           head.append(clear);
         }
-      } else {
+      } else if (piece) {
         piece.className = quizView.piece(picked, dragging);
         if (dragging) piece.dataset.dragging = "true";
         else piece.removeAttribute("data-dragging");
@@ -114,11 +121,12 @@ class RuleQuiz extends HTMLElement {
           `${name}. ${picked ? `Picked up. Choose a spot in the ${board}.` : "Pick up"}`,
         );
       }
-      note.textContent = cleared
-        ? "In its place."
-        : picked
-          ? "Choose a spot. Esc puts it back."
-          : "Your piece";
+      if (note)
+        note.textContent = cleared
+          ? "In its place."
+          : picked
+            ? "Choose a spot. Esc puts it back."
+            : "Your piece";
     };
 
     const pick = (value: boolean) => {
@@ -130,6 +138,7 @@ class RuleQuiz extends HTMLElement {
     };
 
     const flyHome = (transform: string) => {
+      if (!piece) return;
       piece.style.transform = "";
       if (!transform || reducedMotion()) return;
       piece.animate([{ transform }, { transform: "none" }], { duration: 360, easing: OUT });
@@ -139,12 +148,12 @@ class RuleQuiz extends HTMLElement {
       if (placed !== null) return;
       picked = false;
       if (id === answer) {
-        const from = { rect: piece.getBoundingClientRect(), rot: drag?.rot ?? 0 };
-        piece.style.transform = "";
+        const from = piece && { rect: piece.getBoundingClientRect(), rot: drag?.rot ?? 0 };
+        if (piece) piece.style.transform = "";
         placed = id;
         miss = null;
         sync();
-        if (!seat || reducedMotion()) return;
+        if (!from || !seat || reducedMotion()) return;
         const to = seat.getBoundingClientRect();
         const dx = from.rect.left - to.left;
         const dy = from.rect.top - to.top;
@@ -159,8 +168,10 @@ class RuleQuiz extends HTMLElement {
       }
       mistakes += 1;
       miss = { id, at: performance.now() };
-      flyHome(piece.style.transform);
+      flyHome(piece?.style.transform ?? "");
       sync();
+      // The shake replays on a fresh button, so focus follows it there.
+      if (!piece && document.activeElement === document.body) slots.get(id)?.focus();
     };
 
     const nearest = (x: number, y: number) => {
@@ -192,67 +203,69 @@ class RuleQuiz extends HTMLElement {
       dragging = false;
       if (target && !cancelled) drop(target);
       else {
-        flyHome(piece.style.transform);
+        flyHome(piece?.style.transform ?? "");
         sync();
       }
       drag = null;
     };
 
-    piece.addEventListener(
-      "pointerdown",
-      (event) => {
-        if (placed !== null || event.button !== 0) return;
-        piece.setPointerCapture(event.pointerId);
-        drag = {
-          x0: event.clientX,
-          y0: event.clientY,
-          lastX: event.clientX,
-          lastT: event.timeStamp,
-          rot: 0,
-          moved: false,
-        };
-      },
-      { signal },
-    );
-    piece.addEventListener(
-      "pointermove",
-      (event) => {
-        if (!drag) return;
-        const dx = event.clientX - drag.x0;
-        const dy = event.clientY - drag.y0;
-        if (!drag.moved) {
-          if (Math.hypot(dx, dy) < 4) return;
-          drag.moved = true;
-          dragging = true;
-          picked = false;
-          sync();
-        }
-        const dt = Math.max(event.timeStamp - drag.lastT, 1);
-        const lean = reducedMotion()
-          ? 0
-          : Math.max(-8, Math.min(8, ((event.clientX - drag.lastX) / dt) * 6));
-        drag.rot += (lean - drag.rot) * 0.2;
-        drag.lastX = event.clientX;
-        drag.lastT = event.timeStamp;
-        piece.style.transform = `translate(${dx}px, ${dy}px) rotate(${drag.rot}deg) scale(1.05)`;
-        const target = nearest(event.clientX, event.clientY);
-        if (target !== near) {
-          near = target;
-          sync();
-        }
-      },
-      { signal },
-    );
-    piece.addEventListener("pointerup", () => endDrag(false), { signal });
-    piece.addEventListener("pointercancel", () => endDrag(true), { signal });
-    piece.addEventListener(
-      "click",
-      (event) => {
-        // Pointer taps are handled on pointerup; this is Enter and Space.
-        if (event.detail === 0) pick(!picked);
-      },
-      { signal },
-    );
+    if (piece) {
+      piece.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (placed !== null || event.button !== 0) return;
+          piece.setPointerCapture(event.pointerId);
+          drag = {
+            x0: event.clientX,
+            y0: event.clientY,
+            lastX: event.clientX,
+            lastT: event.timeStamp,
+            rot: 0,
+            moved: false,
+          };
+        },
+        { signal },
+      );
+      piece.addEventListener(
+        "pointermove",
+        (event) => {
+          if (!drag) return;
+          const dx = event.clientX - drag.x0;
+          const dy = event.clientY - drag.y0;
+          if (!drag.moved) {
+            if (Math.hypot(dx, dy) < 4) return;
+            drag.moved = true;
+            dragging = true;
+            picked = false;
+            sync();
+          }
+          const dt = Math.max(event.timeStamp - drag.lastT, 1);
+          const lean = reducedMotion()
+            ? 0
+            : Math.max(-8, Math.min(8, ((event.clientX - drag.lastX) / dt) * 6));
+          drag.rot += (lean - drag.rot) * 0.2;
+          drag.lastX = event.clientX;
+          drag.lastT = event.timeStamp;
+          piece.style.transform = `translate(${dx}px, ${dy}px) rotate(${drag.rot}deg) scale(1.05)`;
+          const target = nearest(event.clientX, event.clientY);
+          if (target !== near) {
+            near = target;
+            sync();
+          }
+        },
+        { signal },
+      );
+      piece.addEventListener("pointerup", () => endDrag(false), { signal });
+      piece.addEventListener("pointercancel", () => endDrag(true), { signal });
+      piece.addEventListener(
+        "click",
+        (event) => {
+          // Pointer taps are handled on pointerup; this is Enter and Space.
+          if (event.detail === 0) pick(!picked);
+        },
+        { signal },
+      );
+    }
     article.addEventListener(
       "click",
       (event) => {
@@ -267,7 +280,7 @@ class RuleQuiz extends HTMLElement {
       (event) => {
         if (event.key !== "Escape" || !picked) return;
         pick(false);
-        piece.focus();
+        piece?.focus();
       },
       { signal },
     );

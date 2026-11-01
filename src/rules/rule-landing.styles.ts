@@ -972,6 +972,153 @@ export const quizKit = stylex.create({
     animationTimingFunction: motion["--out"],
     animationFillMode: "both",
   },
+  chooseBoard: {
+    alignContent: "center",
+  },
+  // A choose level's candidate: a version set beside the others, or a spot on a mock screen.
+  choice: {
+    position: "relative",
+    display: "grid",
+    gap: "10px",
+    alignContent: "start",
+    minWidth: 0,
+    paddingBlock: "12px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    font: "inherit",
+    color: palette["--text"],
+    textAlign: "left",
+    cursor: cursors["--cursor-point"],
+    transitionProperty: "border-color, background-color, opacity, filter, translate, box-shadow",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: motion["--exit"],
+  },
+  spot: {
+    position: "relative",
+    display: "grid",
+    minWidth: 0,
+    paddingBlock: "3px",
+    paddingInline: "3px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: `color-mix(in srgb, ${ON} 55%, transparent)`,
+    borderRadius: "12px",
+    backgroundColor: `color-mix(in srgb, ${ON} 5%, transparent)`,
+    font: "inherit",
+    color: "inherit",
+    textAlign: "inherit",
+    cursor: cursors["--cursor-point"],
+    transitionProperty: "border-color, background-color, opacity, filter, scale",
+    transitionDuration: motion["--t-fast-exit"],
+    transitionTimingFunction: motion["--exit"],
+  },
+  // Hover and focus ring the candidate in the rule's colour, while it can still be picked.
+  choiceLive: {
+    borderStyle: "solid",
+    borderColor: {
+      default: palette["--hair"],
+      ":focus-visible": ON,
+      ":hover": { default: null, [HOVER]: ON },
+    },
+    backgroundColor: {
+      default: palette["--panel"],
+      ":focus-visible": ON_TINT,
+      ":hover": { default: null, [HOVER]: ON_TINT },
+    },
+    translate: {
+      default: null,
+      ":hover": { default: null, [HOVER]: { default: "0 -2px", [REDUCE]: null } },
+    },
+    outline: "none",
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":focus-visible": motion["--t-fast"],
+      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":focus-visible": motion["--fast"],
+      ":hover": { default: null, [HOVER]: motion["--fast"] },
+    },
+  },
+  spotLive: {
+    borderStyle: {
+      default: "dashed",
+      ":focus-visible": "solid",
+      ":hover": { default: null, [HOVER]: "solid" },
+    },
+    borderColor: {
+      default: `color-mix(in srgb, ${ON} 55%, transparent)`,
+      ":focus-visible": ON,
+      ":hover": { default: null, [HOVER]: ON },
+    },
+    backgroundColor: {
+      default: `color-mix(in srgb, ${ON} 5%, transparent)`,
+      ":focus-visible": ON_TINT,
+      ":hover": { default: null, [HOVER]: ON_TINT },
+    },
+    outline: "none",
+  },
+  choiceMiss: {
+    borderStyle: "solid",
+    borderColor: palette["--no"],
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, ${palette["--panel"]})`,
+    animationName: { default: shake, [REDUCE]: "none" },
+    animationDuration: { default: SHAKE_TIME, [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--cut"], [REDUCE]: "ease" },
+  },
+  choiceOff: {
+    opacity: 0.4,
+    filter: "grayscale(0.7)",
+    cursor: "default",
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
+  },
+  choiceSeat: {
+    borderStyle: "solid",
+    borderColor: kit["--yes-ink"],
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 10%, ${palette["--panel"]})`,
+    cursor: "default",
+  },
+  choiceBody: {
+    display: "grid",
+    minWidth: 0,
+    pointerEvents: "none",
+  },
+  caption: {
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: 1.3,
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+    textWrap: "pretty",
+  },
+  // The check a chosen candidate wears once the level clears.
+  tick: {
+    position: "absolute",
+    top: "-11px",
+    right: "-11px",
+    zIndex: 2,
+    display: "grid",
+    placeItems: "center",
+    width: "26px",
+    height: "26px",
+    borderRadius: "999px",
+    backgroundColor: kit["--yes-ink"],
+    boxShadow: `0 0 0 3px ${palette["--panel-2"]}`,
+    fontWeight: 900,
+    fontSize: "14px",
+    lineHeight: 1,
+    fontFamily: fonts["--display"],
+    color: palette["--panel"],
+    animationName: { default: stamp, [REDUCE]: "none" },
+    animationDuration: { default: motion["--t-pop"], [REDUCE]: "0s" },
+    animationTimingFunction: { default: motion["--snap"], [REDUCE]: "ease" },
+  },
 });
 
 export const takeKit = stylex.create({
@@ -1398,6 +1545,8 @@ export type SlotState = {
   seated: boolean;
 };
 
+type ChoiceState = Pick<SlotState, "missed" | "cleared" | "seated">;
+
 export const quizView = {
   slot: ({ lead, open, near, missed, cleared, seated }: SlotState) =>
     stylex.attrs(
@@ -1416,4 +1565,13 @@ export const quizView = {
     stylex.attrs(quizKit.say, cleared ? quizKit.sayYes : said && quizKit.sayNo).class ?? "",
   said: (said: boolean) => stylex.attrs(quizKit.said, said && quizKit.saidToned).class ?? "",
   star: (on: boolean) => stylex.attrs(quizKit.star, on && quizKit.starOn).class ?? "",
+  choice: (look: "card" | "spot", { missed, cleared, seated }: ChoiceState) =>
+    stylex.attrs(
+      look === "card" ? quizKit.choice : quizKit.spot,
+      !cleared && (look === "card" ? quizKit.choiceLive : quizKit.spotLive),
+      missed && quizKit.choiceMiss,
+      cleared && !seated && quizKit.choiceOff,
+      seated && quizKit.choiceSeat,
+      stylex.defaultMarker(),
+    ).class ?? "",
 };

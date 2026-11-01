@@ -599,3 +599,68 @@ export const view = {
   holdFill: (holding: boolean) =>
     stylex.attrs(styles.holdFill, holding && styles.holdFillOn).class ?? "",
 };
+
+/** The quiz boards: versions set side by side, and mock screens whose parts are the choices. */
+export const quiz = stylex.create({
+  trio: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
+    gap: "10px",
+  },
+  stack: {
+    display: "grid",
+    gap: "10px",
+  },
+  mock: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "64px",
+  },
+  // Room above the key for its tooltip.
+  tipRoom: {
+    paddingTop: "40px",
+  },
+  end: {
+    justifyContent: "flex-end",
+  },
+  // Where a hidden button would sit.
+  gap: {
+    width: "84px",
+    height: "38px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+  },
+  screen: {
+    display: "grid",
+    gap: "14px",
+    justifyItems: "start",
+    paddingBlock: "16px",
+    paddingInline: "16px",
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}`,
+  },
+  bar: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    alignItems: "center",
+  },
+  pageKey: {
+    "--pl": "12px",
+    "--pr": "12px",
+    height: "32px",
+    borderRadius: "8px",
+    fontSize: "12px",
+  },
+  // Room under the key for its padding rulers.
+  ruled: {
+    display: "inline-grid",
+    paddingBottom: "26px",
+  },
+});

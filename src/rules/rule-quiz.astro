@@ -14,24 +14,32 @@ type Props = {
   /** The level's number across the page, for its `lv-N` anchor. */
   n: number;
   level: Level;
-  /** What the pieces go into, as in "Drag the piece into the tree". */
-  board: string;
+  /**
+   * A place level: what the piece goes into, as in "Drag the piece into the tree". A choose level
+   * draws its board in the `board` slot, from QuizChoice buttons.
+   */
+  board?: string;
   /** For rows that carry markup, such as painted code: what draws each lead, slot label and text row. */
   marks?: { lead?: Mark; label?: Mark; text?: Mark };
 };
 
-const { n, level, board, marks = {} } = Astro.props;
+const { n, level, board = "board", marks = {} } = Astro.props;
 const { lead: Lead, label: Label, text: Text } = marks;
 const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
-// The default slot is the prompt, its code in tone "prompt". The two templates hold what clearing
-// the level shows; rule-quiz.client.ts clones them.
+const place = "piece" in level ? level : null;
+const hint = place
+  ? `Drag the piece into the ${board}. Or tap it, then tap a spot.`
+  : "Tap the one that fits.";
+// The default slot is the prompt, its code in tone "prompt". The templates hold what clearing the
+// level shows; rule-quiz.client.ts clones them.
 ---
 
 <rule-quiz
   {...stylex.attrs(host.contents)}
   data-answer={level.answer}
-  data-piece={level.piece}
+  data-piece={place?.piece}
   data-board={board}
+  data-hint={hint}
 >
   <article id={`lv-${n}`} {...stylex.attrs(lessonKit.panel, quizKit.level, shell.rev)} data-rev="true">
     <div {...stylex.attrs(quizKit.copy)}>
@@ -41,14 +49,23 @@ const idle = { open: false, near: false, missed: false, cleared: false, seated: 
       <h3 {...stylex.attrs(quizKit.title)}>{level.name}</h3>
       <p {...stylex.attrs(quizKit.prompt)}><slot /></p>
       <div aria-live="polite" class={quizView.say(false, false)} data-part="say">
-        <p class={quizView.said(false)}>Drag the piece into the {board}. Or tap it, then tap a spot.</p>
+        <p class={quizView.said(false)}>{hint}</p>
       </div>
     </div>
 
+    {
+      !place && (
+        <div {...stylex.attrs(lessonKit.well, quizKit.board, quizKit.chooseBoard)}>
+          <slot name="board" />
+        </div>
+      )
+    }
+    {
+      place && (
     <div {...stylex.attrs(lessonKit.well, quizKit.board)}>
       <ul {...stylex.attrs(tree.list)}>
         {
-          level.rows.map((row) =>
+          place.rows.map((row) =>
             "slot" in row ? (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.lead ? quizKit.leadRow : null)}
                 >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{Lead ? <Lead text={row.lead} tone="plain" /> : row.lead}</span>}<button
@@ -73,15 +90,17 @@ const idle = { open: false, near: false, missed: false, cleared: false, seated: 
           type="button"
           class={quizView.piece(false, false)}
           aria-pressed="false"
-          aria-label={`${level.piece}. Pick up`}
-          data-part="piece">{level.piece}</button
+          aria-label={`${place.piece}. Pick up`}
+          data-part="piece">{place.piece}</button
         ><span {...stylex.attrs(quizKit.trayNote)} data-part="note">Your piece</span>
       </div>
     </div>
+      )
+    }
   </article>
   <template data-part="seat"
-    ><span {...stylex.attrs(quizKit.piece, quizKit.seated)}
-      >{level.piece}<span aria-hidden="true" {...stylex.attrs(quizKit.burst)}
+    ><span {...stylex.attrs(place ? [quizKit.piece, quizKit.seated] : quizKit.tick)}
+      >{place ? place.piece : "✓"}<span aria-hidden="true" {...stylex.attrs(quizKit.burst)}
         >{
           Array.from({ length: 8 }, (_, index) => (
             <i style={`--a:${index * 45 + 22}deg`} {...stylex.attrs(quizKit.spark)} />

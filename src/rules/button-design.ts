@@ -14,33 +14,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Where am I?",
-        piece: "a visible change",
         answer: "focus",
-        rows: [
-          { depth: 0, text: "Save button", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "hover",
-              label: "+ on hover",
-              note: "Hover needs a mouse. Mia never hovers, so she still can't tell where she is.",
-            },
+            id: "hover",
+            label: "Save, changes on hover",
+            note: "Hover needs a mouse. Mia never hovers, so she still can't tell where she is.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "press",
-              label: "+ on press",
-              note: "Press comes after she has found the button. She needs to see where she is before she presses Enter.",
-            },
+            id: "press",
+            label: "Save, changes on press",
+            note: "Press comes after she has found the button. She needs to see where she is before she presses Enter.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "focus",
-              label: "+ on focus",
-              note: "Focus is where the keyboard is. Give it a look, and every Tab lands somewhere she can see.",
-            },
+            id: "focus",
+            label: "Save, changes on focus",
+            note: "Focus is where the keyboard is. Give it a look, and every Tab lands somewhere she can see.",
           },
         ],
       },
@@ -59,35 +48,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Can't be pressed",
-        piece: "disabled Publish",
         answer: "say",
-        rows: [
-          { depth: 0, text: "Post editor", kind: "comp" },
-          { depth: 1, text: "Title", tag: "filled" },
-          { depth: 1, text: "URL", tag: "taken" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "fade",
-              label: "+ faded to 40%, nothing else",
-              note: "Fading says no, but not why. The form looks done, so they're left guessing.",
-            },
+            id: "fade",
+            label: "Publish faded to 40%",
+            note: "Fading says no, but not why. The form looks done, so they're left guessing.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "hide",
-              label: "+ hidden until it works",
-              note: "They can't find Publish at all, let alone learn the URL is taken.",
-            },
+            id: "hide",
+            label: "Publish hidden",
+            note: "They can't find Publish at all, let alone learn the URL is taken.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "say",
-              label: "+ readable, tooltip: That URL is taken",
-              note: "Keep the label readable and say why on hover, so they know to change the URL.",
-            },
+            id: "say",
+            label: "Publish readable, with a tooltip that says the URL is taken",
+            note: "Keep the label readable and say why on hover, so they know to change the URL.",
           },
         ],
       },
@@ -106,33 +82,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Page 1 of 5",
-        piece: "lights up on hover",
         answer: "next",
-        rows: [
-          { depth: 0, text: "Pager", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "prev",
-              label: "+ Previous, disabled",
-              note: "There's no page before 1. Lighting it up invites a click that does nothing.",
-            },
+            id: "prev",
+            label: "Previous, disabled",
+            note: "There's no page before 1. Lighting it up invites a click that does nothing.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "current",
-              label: "+ 1, the current page",
-              note: "They're already on page 1, so a click there goes nowhere either.",
-            },
+            id: "current",
+            label: "1, the current page",
+            note: "They're already on page 1, so a click there goes nowhere either.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "next",
-              label: "+ Next",
-              note: "Next can act, so it lights up. The disabled one stays still, and the difference shows which works.",
-            },
+            id: "next",
+            label: "Next",
+            note: "Next can act, so it lights up. The disabled one stays still, and the difference shows which works.",
           },
         ],
       },
@@ -151,35 +116,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "The one next step",
-        piece: "Checkout",
         answer: "brand",
-        rows: [
-          { depth: 0, text: "Cart footer", kind: "comp" },
-          { depth: 1, text: "Continue shopping", tag: "text" },
-          { depth: 1, text: "Edit cart", tag: "tinted" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "tint",
-              label: "+ tinted, like Edit cart",
-              note: "Checkout now weighs the same as Edit cart, so nothing says which one finishes the order.",
-            },
+            id: "tint",
+            label: "Checkout tinted",
+            note: "Checkout now weighs the same as Edit cart, so nothing says which one finishes the order.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "red",
-              label: "+ filled red",
-              note: "Red reads as danger. People pause on the one button you want them to press.",
-            },
+            id: "red",
+            label: "Checkout filled red",
+            note: "Red reads as danger. People pause on the one button you want them to press.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "brand",
-              label: "+ filled, brand colour",
-              note: "Fill one button in the brand colour to mark the step that finishes the job.",
-            },
+            id: "brand",
+            label: "Checkout filled in the brand colour",
+            note: "Fill one button in the brand colour to mark the step that finishes the job.",
           },
         ],
       },
@@ -198,33 +150,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Worth a confirm",
-        piece: "Are you sure?",
         answer: "delete",
-        rows: [
-          { depth: 0, text: "Project page", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "rename",
-              label: "+ Rename",
-              note: "A rename loses nothing, and you can rename it back. A confirm only slows people down.",
-            },
+            id: "rename",
+            label: "Rename",
+            note: "A rename loses nothing, and you can rename it back. A confirm only slows people down.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "archive",
-              label: "+ Archive, undo any time",
-              note: "Archive comes back in one click. Offer Undo after, rather than asking first.",
-            },
+            id: "archive",
+            label: "Archive",
+            note: "Archive comes back in one click. Offer Undo after, rather than asking first.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "delete",
-              label: "+ Delete, 214 files for good",
-              note: "Nothing brings these back. Ask first, name what goes, and land focus on Cancel.",
-            },
+            id: "delete",
+            label: "Delete",
+            note: "Nothing brings these back. Ask first, name what goes, and land focus on Cancel.",
           },
         ],
       },
@@ -243,33 +184,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Less padding",
-        piece: "trim the icon side",
         answer: "lead",
-        rows: [
-          { depth: 0, text: "Toolbar", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "text",
-              label: "Save (text only)",
-              note: "With no icon, there's no hidden white space. Even padding already looks even.",
-            },
+            id: "text",
+            label: "Save, text only",
+            note: "With no icon, there's no hidden white space. Even padding already looks even.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "lead",
-              label: "＋ New project",
-              note: "Trim the icon's side. The icon's own white space makes up the rest.",
-            },
+            id: "lead",
+            label: "New project, with a plus icon",
+            note: "Trim the icon's side. The icon's own white space makes up the rest.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "only",
-              label: "⚙ (icon only)",
-              note: "There's no text to balance against. Make it a square instead.",
-            },
+            id: "only",
+            label: "Search, icon only",
+            note: "There's no text to balance against. Make it a square instead.",
           },
         ],
       },
