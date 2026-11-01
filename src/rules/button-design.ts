@@ -275,52 +275,6 @@ export const LESSONS: Lesson[] = [
       },
     ],
   },
-  {
-    title: "Fix the size of an icon-only button",
-    bad: {
-      label: "Sized by padding",
-      costs: ["44 × 44", "no tooltip"],
-    },
-    good: {
-      label: "Fixed square",
-      costs: ["38 × 38", "named + tooltip"],
-    },
-    levels: [
-      {
-        name: "Three icons",
-        piece: "one size for all",
-        answer: "square",
-        rows: [
-          { depth: 0, text: "Toolbar", kind: "comp" },
-          { depth: 1, text: "⚙  ✎  ⋯", tag: "38 · 42 · 46px" },
-          {
-            depth: 1,
-            slot: {
-              id: "pad",
-              label: "+ less padding on all three",
-              note: "They're still sized by each icon, just smaller. They still come out three widths.",
-            },
-          },
-          {
-            depth: 1,
-            slot: {
-              id: "redraw",
-              label: "+ icons redrawn to one width",
-              note: "It holds until the next icon. The size still depends on what's inside.",
-            },
-          },
-          {
-            depth: 1,
-            slot: {
-              id: "square",
-              label: "+ a fixed square, icon centred",
-              note: "Fix the box, not the padding. Every icon gets the same square, the next one too.",
-            },
-          },
-        ],
-      },
-    ],
-  },
 ];
 
 export const TLDR = [
@@ -330,5 +284,4 @@ export const TLDR = [
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
   ["It deletes something", "Make it red, then confirm by name, hold, or offer Undo"],
   ["An icon beside the label", "Take 4px off the icon's side"],
-  ["An icon with no label", "Make it a fixed square with an accessible name and a tooltip"],
 ] as const satisfies Tldr;

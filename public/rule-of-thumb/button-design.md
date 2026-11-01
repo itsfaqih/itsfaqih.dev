@@ -12,7 +12,6 @@ Make a button show what it does and what it's doing.
 | Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
 | It deletes something       | Make it red, then confirm by name, hold, or offer Undo       |
 | An icon beside the label   | Take 4px off the icon's side                                 |
-| An icon with no label      | Make it a fixed square with an accessible name and a tooltip |
 
 ## Give every state a look
 
@@ -139,24 +138,5 @@ Take 4px off the icon's side. An icon carries white space inside its own box, so
 }
 .icon-end {
   padding-inline: 16px 12px; /* Continue → */
-}
-```
-
-## Fix the size of an icon-only button
-
-With no label, padding sets the size, so the button misses its neighbours' height and changes with every icon. Make it a fixed square as tall as its neighbours, and centre the icon. With no text to read, give it an accessible name, and add a tooltip that shows on hover and on keyboard focus.
-
-```html
-<button class="icon-only" aria-label="Settings"><svg aria-hidden="true">…</svg></button>
-<span role="tooltip">Settings</span>
-```
-
-```css
-.icon-only {
-  inline-size: 36px;
-  block-size: 36px;
-  padding: 0;
-  display: inline-grid;
-  place-items: center;
 }
 ```

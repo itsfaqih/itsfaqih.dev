@@ -3,24 +3,15 @@ import * as stylex from "@stylexjs/stylex";
 import { styles } from "./button-design.styles";
 
 type Props = {
-  /** Dimension lines under a key: its two paddings, or its whole width. */
-  pads?: [left: number, right: number];
-  width?: number;
+  /** Dimension lines under a key: its two paddings. */
+  pads: [left: number, right: number];
 };
 
-const { pads, width } = Astro.props;
+const { pads } = Astro.props;
 ---
 
 <span aria-hidden="true" {...stylex.attrs(styles.dims)}
-  >{
-    pads ? (
-      <Fragment
-        ><span {...stylex.attrs(styles.dim, styles.dimLeft)}>{pads[0]}</span><span
-          {...stylex.attrs(styles.dim, styles.dimRight)}>{pads[1]}</span
-        ></Fragment
-      >
-    ) : (
-      <span {...stylex.attrs(styles.dim, styles.dimAll)}>{width}</span>
-    )
-  }</span
+  ><span {...stylex.attrs(styles.dim, styles.dimLeft)}>{pads[0]}</span><span
+    {...stylex.attrs(styles.dim, styles.dimRight)}>{pads[1]}</span
+  ></span
 >

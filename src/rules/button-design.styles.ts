@@ -472,19 +472,6 @@ export const styles = stylex.create({
     "--pl": "16px",
     "--pr": "16px",
   },
-  square: {
-    "--pl": "0px",
-    "--pr": "0px",
-    width: "38px",
-  },
-  // Padding alone sizes the key, the same on every side, so its size follows the icon.
-  padded: {
-    "--pl": "14px",
-    "--pr": "14px",
-    height: "auto",
-    paddingTop: "14px",
-    paddingBottom: "14px",
-  },
   dims: {
     position: "absolute",
     top: "calc(100% + 10px)",
@@ -519,10 +506,6 @@ export const styles = stylex.create({
   dimRight: {
     right: 0,
     width: "var(--pr)",
-  },
-  dimAll: {
-    right: 0,
-    left: 0,
   },
   pads: {
     "::before": {
