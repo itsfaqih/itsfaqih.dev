@@ -95,11 +95,11 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
   await page.addInitScript(() => {
     window.__perf = { lcp: [], longTasks: [] };
     // The page can be used once the header answers input: its bar carries a React fiber, or the
-    // custom element that hosts it is defined.
+    // custom element that is or hosts the bar is defined.
     const poll = setInterval(() => {
       const bar = document.querySelector(".arc-bar");
       if (!bar) return;
-      let host = bar.parentElement;
+      let host: Element | null = bar;
       while (host && (!host.localName.includes("-") || host.localName === "astro-island")) {
         host = host.parentElement;
       }
