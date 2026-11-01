@@ -2,17 +2,28 @@
 import * as stylex from "@stylexjs/stylex";
 import Code from "./code.astro";
 import {
+  DAY,
+  digits,
+  FILTER_DATE,
   formatLines,
+  HOUR,
+  JAKARTA,
   LESSONS,
   MOMENT,
   NO_Z,
+  ordersOf,
   responseLines,
   RIGHT,
+  SAM,
   SERVER_TIME,
   TLDR,
+  utcIso,
+  wallOf,
 } from "./handling-timestamps";
-import { styles } from "./handling-timestamps.styles";
+import { quiz, styles } from "./handling-timestamps.styles";
+import { quizKit } from "./rule-landing.styles";
 import LessonText from "./lesson-text.astro";
+import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
@@ -24,6 +35,29 @@ import TsReminder from "./ts-reminder.astro";
 import TsWire from "./ts-wire.astro";
 const [store, zulu, local, input, filter] = LESSONS;
 const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
+
+const serverClock = wallOf(MOMENT, SAM.tz);
+const tables = [
+  ["local", "Each writer's clock", ordersOf("bad")],
+  ["server", "The server's clock, New York", ordersOf("good").map((row) => ({ ...row, at: serverClock }))],
+  ["utc", "UTC", ordersOf("good")],
+] as const;
+
+const responses = [
+  ["bare", "No zone", digits(MOMENT)],
+  ["z", "Ends in Z", utcIso(MOMENT).replace(".000", "")],
+  ["text", "Already formatted", "Jan 10, 6:00 AM"],
+] as const;
+
+// The axis runs from noon UTC on Jan 9 to noon UTC on Jan 11, so each lane's Jan 10 is half of it.
+const day = Date.parse(`${FILTER_DATE}T00:00:00Z`);
+const along = (instant: number) => `--at:${((instant - day + 12 * HOUR) / (2 * DAY)) * 100}%`;
+const asked = Date.parse("2026-01-09T17:00:00Z");
+const lanes = [
+  ["utc", "UTC report", "run by the server", day],
+  ["rina", "Rina", "Jakarta, UTC+7", day - JAKARTA],
+  ["sam", "Sam", "New York, UTC−5", day + 5 * HOUR],
+] as const;
 ---
 
 <RuleLanding
@@ -49,9 +83,32 @@ const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
     <TsOrders slot="bad" way="bad" />
     <TsOrders slot="good" way="good" />
   </RuleLesson>
-  <RuleQuiz n={1} level={store.levels[0]} board="flow" marks={marks}
-    >Rina in Jakarta and Sam in New York order in the same second. Place what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.</RuleQuiz
-  >
+  <RuleQuiz n={1} level={store.levels[0]}
+    >Rina in Jakarta and Sam in New York order in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.
+    <div slot="board" {...stylex.attrs(quiz.stack)}>
+      {
+        tables.map(([id, caption, rows]) => (
+          <QuizChoice level={store.levels[0]} id={id}
+            ><span {...stylex.attrs(quiz.card)}
+              ><span {...stylex.attrs(quiz.table)}
+                ><span {...stylex.attrs(styles.th, quiz.head)}>id</span><span {...stylex.attrs(styles.th, quiz.head)}
+                  >by</span
+                ><span {...stylex.attrs(styles.th, quiz.head)}>created_at</span>{
+                  rows.map((row) => (
+                    <Fragment
+                      ><span {...stylex.attrs(styles.td, quiz.cell)}>{row.id}</span><span
+                        {...stylex.attrs(styles.td, quiz.cell)}>{row.by.who}</span
+                      ><span {...stylex.attrs(styles.td, quiz.cell)}>{digits(row.at).replace("T", " ")}</span></Fragment
+                    >
+                  ))
+                }</span
+              ><span {...stylex.attrs(quizKit.caption, quiz.caption)}>{caption}</span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={zulu} costsStyle={styles.costs}>
     <Fragment slot="body"
@@ -66,9 +123,25 @@ const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
       <TsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
-  <RuleQuiz n={2} level={zulu.levels[0]} board="flow" marks={marks}
-    >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">createdAt</Code> in the response.</RuleQuiz
-  >
+  <RuleQuiz n={2} level={zulu.levels[0]}
+    >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Pick the response that gets him there.
+    <div slot="board" {...stylex.attrs(quiz.stack)}>
+      {
+        responses.map(([id, caption, value]) => (
+          <QuizChoice level={zulu.levels[0]} id={id}
+            ><span {...stylex.attrs(quiz.card)}
+              ><span {...stylex.attrs(styles.wire)}
+                ><span {...stylex.attrs(styles.line, quiz.line)}>GET /orders/42</span><span
+                  {...stylex.attrs(styles.line, quiz.line)}
+                  >{'{ "createdAt": '}<span {...stylex.attrs(quiz.str)}>"{value}"</span>{" }"}</span
+                ></span
+              ><span {...stylex.attrs(quizKit.caption, quiz.caption)}>{caption}</span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={local} costsStyle={styles.costs}>
     <Fragment slot="body"
@@ -108,7 +181,38 @@ const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
     <TsFilter slot="bad" way="bad" />
     <TsFilter slot="good" way="good" />
   </RuleLesson>
-  <RuleQuiz n={6} level={filter.levels[0]} board="flow" marks={marks}
-    >Three filters for Jan 10 each need a start. Match 17:00 UTC on Jan 9 to the Jan 10 it starts.</RuleQuiz
-  >
+  <RuleQuiz n={6} level={filter.levels[0]}
+    >Three filters for Jan 10 each need a start. Tap the Jan 10 that starts at 17:00 UTC on Jan 9.
+    <div slot="board" {...stylex.attrs(quiz.screen)}>
+      <span {...stylex.attrs(quiz.lane, quiz.rule)}
+        ><span {...stylex.attrs(quiz.axisWho)}></span><span {...stylex.attrs(quiz.ticks)}
+          ><span style={along(asked)} {...stylex.attrs(quiz.tick, quiz.asked)}>Jan 9, 17:00 UTC</span></span
+        ></span
+      >
+      {
+        lanes.map(([id, who, where, start]) => (
+          <QuizChoice level={filter.levels[0]} id={id} look="spot"
+            ><span {...stylex.attrs(quiz.lane)}
+              ><span {...stylex.attrs(quiz.who)}
+                >{who}<span {...stylex.attrs(quiz.where)}>{where}</span></span
+              ><span {...stylex.attrs(quiz.track)}
+                ><span style={along(start)} {...stylex.attrs(quiz.day)}>Jan 10</span><span
+                  style={along(asked)}
+                  {...stylex.attrs(quiz.mark)}></span
+                ></span
+              ></span
+            ></QuizChoice
+          >
+        ))
+      }
+      <span {...stylex.attrs(quiz.lane, quiz.rule)}
+        ><span {...stylex.attrs(quiz.axisWho)}>UTC</span><span {...stylex.attrs(quiz.ticks)}
+          ><span style={along(day)} {...stylex.attrs(quiz.tick)}>Jan 10, 00:00</span><span
+            style={along(day + DAY)}
+            {...stylex.attrs(quiz.tick)}>Jan 11, 00:00</span
+          ></span
+        ></span
+      >
+    </div>
+  </RuleQuiz>
 </RuleLanding>

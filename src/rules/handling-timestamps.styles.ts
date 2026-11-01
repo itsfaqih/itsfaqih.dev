@@ -339,3 +339,145 @@ export const tsView = {
       (fate === "missed" || fate === "extra") && styles.fateWrong,
     ),
 };
+
+/** The quiz boards: tables and responses set as cards, and day lanes laid against one UTC axis. */
+export const quiz = stylex.create({
+  stack: {
+    display: "grid",
+    gap: "10px",
+  },
+  // Every height on these boards is whole pixels. A fraction here leaves each later quiz on a new
+  // sub-pixel offset, and their behavior screenshots then shift by a pixel from run to run. So the
+  // cards draw their own 17px caption, not QuizChoice's 16.9px one.
+  card: {
+    display: "grid",
+    gap: "10px",
+  },
+  caption: {
+    lineHeight: "17px",
+  },
+  table: {
+    display: "grid",
+    gridTemplateColumns: "max-content max-content minmax(0, 1fr)",
+    fontSize: { default: "12.5px", [PHONE]: "12px" },
+    lineHeight: "18px",
+    fontFamily: fonts["--mono"],
+  },
+  cell: {
+    paddingBlock: "6px",
+    whiteSpace: "nowrap",
+  },
+  head: {
+    borderBottomWidth: "1px",
+    lineHeight: "16px",
+  },
+  line: {
+    display: "block",
+  },
+  // styles.str dims inside any [data-note], and every QuizChoice carries one.
+  str: {
+    display: "inline-block",
+    whiteSpace: "nowrap",
+    color: `color-mix(in oklab, ${palette["--ar"]} ${palette["--ink-mix"]}, #000)`,
+  },
+  screen: {
+    display: "grid",
+    gap: "6px",
+    paddingBlock: "18px",
+    paddingInline: { default: "16px", [PHONE]: "12px" },
+    borderRadius: "14px",
+    backgroundColor: palette["--panel"],
+    boxShadow: `0 0 0 1px ${palette["--hair"]}`,
+  },
+  // A spot's border and padding, so the axis rows line up with the lanes inside the spots.
+  rule: {
+    paddingInline: "4.5px",
+  },
+  lane: {
+    display: "grid",
+    gridTemplateColumns: { default: "118px minmax(0, 1fr)", [PHONE]: "minmax(0, 1fr)" },
+    gap: { default: "10px", [PHONE]: "4px" },
+    alignItems: "center",
+  },
+  who: {
+    display: "grid",
+    paddingInline: { default: 0, [PHONE]: "2px" },
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "15px",
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+    whiteSpace: "nowrap",
+  },
+  where: {
+    fontWeight: 600,
+    fontSize: "11px",
+    color: palette["--dim"],
+  },
+  axisWho: {
+    display: { default: null, [PHONE]: "none" },
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: "16px",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  },
+  track: {
+    position: "relative",
+    display: "block",
+    height: "32px",
+    borderRadius: "8px",
+    backgroundColor: kit["--code-bg"],
+    // Midnight UTC on Jan 10 and Jan 11, a quarter and three quarters of the way along.
+    backgroundImage: `linear-gradient(90deg, transparent calc(25% - 0.5px), ${palette["--hair"]} calc(25% - 0.5px) calc(25% + 0.5px), transparent calc(25% + 0.5px) calc(75% - 0.5px), ${palette["--hair"]} calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px))`,
+  },
+  ticks: {
+    position: "relative",
+    display: "block",
+    height: "16px",
+  },
+  tick: {
+    position: "absolute",
+    top: 0,
+    left: "var(--at)",
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "16px",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+    transform: "translateX(-50%)",
+  },
+  asked: {
+    paddingLeft: "6px",
+    borderLeftWidth: "2px",
+    borderLeftStyle: "solid",
+    borderLeftColor: "var(--c-ink)",
+    color: "var(--c-ink)",
+    transform: "translateX(-1px)",
+  },
+  day: {
+    position: "absolute",
+    top: "5px",
+    bottom: "5px",
+    left: "var(--at)",
+    display: "grid",
+    placeItems: "center",
+    width: "50%",
+    borderRadius: "5px",
+    backgroundColor: `color-mix(in srgb, ${palette["--text"]} 16%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${palette["--text"]} 22%, transparent)`,
+    fontWeight: 600,
+    fontSize: "11px",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  },
+  mark: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: "calc(var(--at) - 1px)",
+    width: "2px",
+    backgroundColor: "var(--c-ink)",
+  },
+});

@@ -78,15 +78,17 @@ describe("the built site responds to a reader", () => {
     expect(await theme()).toEqual({ dark: true, saved: "dark" });
   });
 
-  it("answers the Handling Timestamps quiz when a piece is placed", async () => {
+  it("clears the Handling Timestamps quiz when the right choice is tapped", async () => {
     const page = await open("/rule-of-thumb/handling-timestamps");
     const quiz = page.locator("article#lv-1");
     await quiz.scrollIntoViewIfNeeded();
     const status = quiz.locator("[aria-live]");
-    await expect.poll(() => status.innerText()).toContain("tap it, then tap a spot");
-    await quiz.getByRole("button", { name: /Pick up/ }).click();
-    await quiz.getByRole("button", { name: "both 06:00 UTC" }).click();
+    await expect.poll(() => status.innerText()).toContain("Tap the one that fits");
+    const right = quiz.getByRole("button", { name: "Both 06:00 UTC" });
+    await right.click();
     await expect.poll(() => status.innerText()).toContain("Store UTC");
+    await expect.poll(() => quiz.getByText("Clear", { exact: true }).isVisible()).toBe(true);
+    await expect.poll(() => right.isDisabled()).toBe(true);
   });
 
   it("closes the Dialog Design demo's dialog on Esc", async () => {

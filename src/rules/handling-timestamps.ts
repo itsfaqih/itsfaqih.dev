@@ -8,33 +8,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Same second",
-        piece: "created_at",
         answer: "utc",
-        rows: [
-          { depth: 0, text: "Database", kind: "dir" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "local",
-              label: "Rina 13:00, Sam 01:00, each local clock",
-              note: "Same second, two values 12 hours apart. Sort by time and Sam's order comes first.",
-            },
+            id: "local",
+            label: "Rina 13:00, Sam 01:00, each local clock",
+            note: "Same second, two values 12 hours apart. Sort by time and Sam's order comes first.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "server",
-              label: "both 01:00, the server's clock in New York",
-              note: "One value today, but no zone is stored. Move the server and old rows mean another moment.",
-            },
+            id: "server",
+            label: "Both 01:00, the server's clock in New York",
+            note: "One value today, but no zone is stored. Move the server and old rows mean another moment.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "utc",
-              label: "both 06:00 UTC",
-              note: "Store UTC. One moment is one value, wherever the writer or the server is.",
-            },
+            id: "utc",
+            label: "Both 06:00 UTC",
+            note: "Store UTC. One moment is one value, wherever the writer or the server is.",
           },
         ],
       },
@@ -47,35 +36,23 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "The response",
-        piece: "createdAt",
         answer: "z",
-        rows: [
-          { depth: 0, text: "API", kind: "dir", tag: "GET /orders/42" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "bare",
-              label: "`2026-01-10T06:00:00`",
-              note: "No zone, so Sam's browser reads it as 6:00 AM New York time, five hours late.",
-            },
+            id: "bare",
+            label: "createdAt 2026-01-10T06:00:00, no zone",
+            note: "No zone, so Sam's browser reads it as 6:00 AM New York time, five hours late.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "z",
-              label: "`2026-01-10T06:00:00Z`",
-              note: "The Z says UTC, so each browser converts it. Sam sees 1:00 AM and Rina 1:00 PM.",
-            },
+            id: "z",
+            label: "createdAt 2026-01-10T06:00:00Z, ending in Z",
+            note: "The Z says UTC, so each browser converts it. Sam sees 1:00 AM and Rina 1:00 PM.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "text",
-              label: "`Jan 10, 6:00 AM`",
-              note: "A formatted string can't be converted again, so everyone sees the server's 6:00 AM.",
-            },
+            id: "text",
+            label: "createdAt Jan 10, 6:00 AM, already formatted",
+            note: "A formatted string can't be converted again, so everyone sees the server's 6:00 AM.",
           },
-          { depth: 0, text: "Sam's browser", kind: "dir", tag: "New York" },
         ],
       },
     ],
@@ -207,35 +184,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Whose Jan 10?",
-        piece: "Jan 9, 17:00 UTC",
         answer: "rina",
-        rows: [
-          { depth: 0, text: "UTC report, run by the server", kind: "dir", tag: "UTC" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "utc",
-              label: "start",
-              note: "The UTC day starts at 00:00Z. From 17:00 the day before, the report counts 7 hours of Jan 9.",
-            },
+            id: "utc",
+            label: "UTC report, Jan 10 from 00:00 UTC on Jan 10 to 00:00 UTC on Jan 11",
+            note: "The UTC day starts at 00:00Z. From 17:00 the day before, the report counts 7 hours of Jan 9.",
           },
-          { depth: 0, text: "Rina, Jakarta", kind: "dir", tag: "UTC+7" },
           {
-            depth: 1,
-            slot: {
-              id: "rina",
-              label: "start",
-              note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
-            },
+            id: "rina",
+            label: "Rina in Jakarta, Jan 10 from 17:00 UTC on Jan 9 to 17:00 UTC on Jan 10",
+            note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
           },
-          { depth: 0, text: "Sam, New York", kind: "dir", tag: "UTC−5" },
           {
-            depth: 1,
-            slot: {
-              id: "sam",
-              label: "start",
-              note: "Sam's Jan 10 starts at 05:00 UTC. From 17:00 the day before, he gets 12 hours of Jan 9.",
-            },
+            id: "sam",
+            label: "Sam in New York, Jan 10 from 05:00 UTC on Jan 10 to 05:00 UTC on Jan 11",
+            note: "Sam's Jan 10 starts at 05:00 UTC. From 17:00 the day before, he gets 12 hours of Jan 9.",
           },
         ],
       },
