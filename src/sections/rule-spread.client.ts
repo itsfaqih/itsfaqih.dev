@@ -230,10 +230,7 @@ class RuleSpread extends HTMLElement {
         deck.position = Math.max(-RUBBER, Math.min(last + RUBBER, moved));
         paint();
         clearTimeout(deck.wheelTimer);
-        deck.wheelTimer = window.setTimeout(
-          () => goTo(Math.round(deck.position)),
-          WHEEL_SETTLE_MS,
-        );
+        deck.wheelTimer = window.setTimeout(() => goTo(Math.round(deck.position)), WHEEL_SETTLE_MS);
       },
       { passive: false, signal },
     );

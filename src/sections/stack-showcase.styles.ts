@@ -237,4 +237,5 @@ export const toolClass = (filtered: boolean) =>
     hoverHold.lift,
     styles.tool,
   ).class ?? "";
-export const countClass = (on: boolean) => stylex.attrs(chips.count, on && chips.countOn).class ?? "";
+export const countClass = (on: boolean) =>
+  stylex.attrs(chips.count, on && chips.countOn).class ?? "";

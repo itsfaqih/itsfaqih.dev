@@ -1,12 +1,4 @@
-import {
-  circle,
-  dot,
-  moved,
-  type Outline,
-  polygon,
-  rect,
-  sector,
-} from "./hero-morph";
+import { circle, dot, moved, type Outline, polygon, rect, sector } from "./hero-morph";
 import type { TopInk } from "./hero-prints.styles";
 
 export const QUEUE_Y = 124;

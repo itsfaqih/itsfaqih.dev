@@ -80,11 +80,9 @@ function tiltToCursor(stage: HTMLElement, card: HTMLElement, signal: AbortSignal
     },
     { signal },
   );
-  document.documentElement.addEventListener(
-    "pointerleave",
-    () => aim(REST_DEG.x, REST_DEG.y),
-    { signal },
-  );
+  document.documentElement.addEventListener("pointerleave", () => aim(REST_DEG.x, REST_DEG.y), {
+    signal,
+  });
   signal.addEventListener("abort", () => cancelAnimationFrame(frame));
 }
 

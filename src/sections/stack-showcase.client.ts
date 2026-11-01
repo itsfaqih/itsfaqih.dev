@@ -57,7 +57,10 @@ class StackShowcase extends HTMLElement {
         `template[data-peek="${CSS.escape(tool)}"]`,
       )!;
       if (!card) {
-        card = document.importNode(cardTemplate.content.querySelector<HTMLElement>(`#${PEEK_ID}`)!, true);
+        card = document.importNode(
+          cardTemplate.content.querySelector<HTMLElement>(`#${PEEK_ID}`)!,
+          true,
+        );
         groupsBox.after(card);
       }
       card.setAttribute("style", template.dataset.style ?? "");

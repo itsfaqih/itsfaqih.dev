@@ -1,11 +1,4 @@
-import {
-  ABSORBED_SCALE,
-  type Piece,
-  QUEUE_Y,
-  SLOT_GAP,
-  SLOT_X,
-  WORKER_X,
-} from "./hero-pieces";
+import { ABSORBED_SCALE, type Piece, QUEUE_Y, SLOT_GAP, SLOT_X, WORKER_X } from "./hero-pieces";
 import {
   easeInOut,
   INOUT,
