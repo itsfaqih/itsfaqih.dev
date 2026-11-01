@@ -142,7 +142,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
     {...stylex.attrs(styles.backdrop)}
   >
   </div>
-  <dialog data-pour tabindex="-1" {...stylex.attrs(styles.dialog, styles.stage)}>
+  <dialog data-pour tabindex="-1" aria-modal="true" {...stylex.attrs(styles.dialog, styles.stage)}>
     <div aria-hidden="true" {...stylex.attrs(styles.drop)}></div>
     <div data-cmd-panel {...stylex.attrs(styles.panel)}>
       <div {...stylex.attrs(styles.surface)}>
