@@ -148,24 +148,47 @@ html:active-view-transition-type(rule-open, rule-close, page-fade) .island {
   animation-duration: 520ms;
   animation-timing-function: var(--dive-ease);
 }
-/* The title rewraps at the larger size, so both pictures keep their own shape, pinned top left. */
+/* The title rewraps at the larger size, so both pictures keep their own shape, pinned top left,
+   and hand over one after the other: overlapping, the two wraps read as doubled text. */
 ::view-transition-old(rule-title),
 ::view-transition-new(rule-title) {
   height: 100%;
   object-fit: contain;
   object-position: left top;
 }
+::view-transition-old(rule-title) {
+  animation: rule-title-out 160ms ease-out both;
+}
+::view-transition-new(rule-title) {
+  animation: rule-title-in 280ms 140ms ease-out both;
+}
+@keyframes rule-title-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes rule-title-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+/* The page leaves before the rule's title lands, so its copy never ghosts under the new page. */
 html:active-view-transition-type(rule-open)::view-transition-old(root) {
   transform-origin: var(--open-x, 50%) var(--open-y, 50%);
-  animation: rule-dive-root var(--dive-time) var(--dive-ease) both;
+  animation:
+    rule-dive-root var(--dive-time) var(--dive-ease) both,
+    vt-fade-out 200ms ease-out both;
 }
 html:active-view-transition-type(rule-open)::view-transition-new(root) {
   animation: vt-fade-in 300ms 220ms ease-out both;
 }
+/* The card's own copy swells with it, so it fades while the frame sweeps off the screen. */
 ::view-transition-old(rule-card) {
   animation:
     rule-dive-card var(--dive-time) var(--dive-ease) both,
-    vt-fade-out 260ms 240ms ease-out both;
+    vt-fade-out 180ms 80ms ease-out both;
 }
 /* Leaving a rule for the index runs the dive backwards: the rule page fades, the index settles
    in from the zoom toward the rule's tile (the head script sets --open-x and --open-y to its
@@ -191,7 +214,7 @@ html:active-view-transition-type(rule-close)::view-transition-new(root) {
 }
 @keyframes rule-undive-card {
   from {
-    transform: scale(4.5);
+    transform: scale(var(--dive-scale, 4.5));
   }
 }
 /* Both layers cover the screen as they grow, so a blur on either re-rasterises it every frame and
@@ -199,12 +222,11 @@ html:active-view-transition-type(rule-close)::view-transition-new(root) {
 @keyframes rule-dive-root {
   to {
     transform: scale(1.25);
-    opacity: 0;
   }
 }
 @keyframes rule-dive-card {
   to {
-    transform: scale(4.5);
+    transform: scale(var(--dive-scale, 4.5));
   }
 }
 @keyframes vt-fade-out {

@@ -1,5 +1,5 @@
 import { reducedMotion } from "../hooks/media-query";
-import { watchRuleOpen } from "../sections/rule-open";
+import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
 import { landingView } from "./rule-landing.styles";
 import { watchReveal, watchTitleFit, watchTitleSwap } from "./rule-motion";
 
@@ -109,6 +109,7 @@ class RuleLanding extends HTMLElement {
     cover.addEventListener(
       "pointerleave",
       () => {
+        if (isTransitioning()) return;
         for (const name of LEAN) cover.style.removeProperty(name);
       },
       { signal },
@@ -116,7 +117,11 @@ class RuleLanding extends HTMLElement {
 
     for (const card of this.querySelectorAll<HTMLElement>('[data-part="pager"]')) {
       const thumb = card.querySelector(".thumb")!;
-      const play = (on: boolean) => () => thumb.toggleAttribute("data-play", on);
+      // Chromium fires pointerleave between pageswap and the snapshot, which would stop the art
+      // a dive morphs from.
+      const play = (on: boolean) => () => {
+        if (!isTransitioning()) thumb.toggleAttribute("data-play", on);
+      };
       card.addEventListener("pointerenter", play(true), { signal });
       card.addEventListener("pointerleave", play(false), { signal });
       card.addEventListener("focus", play(true), { signal });

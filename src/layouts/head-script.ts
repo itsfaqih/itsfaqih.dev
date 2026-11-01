@@ -85,6 +85,19 @@ export const HEAD_SCRIPT = String.raw`(function () {
     var opening = dive();
     return opening && opening.href === to ? "rule-open" : "page-fade";
   }
+  // Zooms toward the card, and swells it far enough that its edges leave the screen early in
+  // the dive rather than at its end.
+  function aimAt(card) {
+    var x = card.x + card.width / 2;
+    var y = card.y + card.height / 2;
+    var reach = Math.max(
+      Math.max(x, innerWidth - x) / (card.width / 2),
+      Math.max(y, innerHeight - y) / (card.height / 2),
+    );
+    doc.style.setProperty("--open-x", x + "px");
+    doc.style.setProperty("--open-y", y + "px");
+    doc.style.setProperty("--dive-scale", String(reach * 1.5));
+  }
   addEventListener("pageswap", function (event) {
     if (!event.viewTransition || !event.activation) return;
     var type = transitionType(pathOf(location.href), pathOf(event.activation.entry.url));
@@ -100,8 +113,13 @@ export const HEAD_SCRIPT = String.raw`(function () {
     doc.dataset.vt = type;
     if (type === "rule-open") {
       var opening = dive();
-      doc.style.setProperty("--open-x", opening.x + "px");
-      doc.style.setProperty("--open-y", opening.y + "px");
+      aimAt(opening);
+      var cover = document.querySelector('[data-part="cover"] .thumb');
+      if (cover && opening.phase != null) {
+        cover.getAnimations({ subtree: true }).forEach(function (art) {
+          art.currentTime = opening.phase;
+        });
+      }
     }
     if (type === "rule-close") {
       // The index lands at rest, as the dive left it, with the rule's tile named for the morph
@@ -113,9 +131,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
       var tile = document.querySelector('[data-cut][href="' + pathOf(from.url) + '"]');
       if (tile) {
         tile.setAttribute("data-opening", "");
-        var card = tile.getBoundingClientRect();
-        doc.style.setProperty("--open-x", card.x + card.width / 2 + "px");
-        doc.style.setProperty("--open-y", card.y + card.height / 2 + "px");
+        aimAt(tile.getBoundingClientRect());
         event.viewTransition.finished.finally(function () {
           tile.removeAttribute("data-opening");
         });

@@ -16,12 +16,16 @@ export const opensElsewhere = (event: MouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 
 /**
- * Leaves the dive into `href` for the rule page, zooming from the centre of `card`. The
+ * Leaves the dive into `href` for the rule page, zooming from `card`. The
  * transition's pictures live on the rule page, so the origin crosses in sessionStorage.
  */
 export function recordDive(href: string, card: Element) {
   const box = card.getBoundingClientRect();
-  const dive = { href, x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  // The art's loop restarts on the rule page, so its time crosses too, for the cover to pick up
+  // the picture the dive leaves.
+  const art = card.querySelector(".thumb")?.getAnimations({ subtree: true })[0];
+  const phase = art?.currentTime ?? null;
+  const dive = { href, x: box.x, y: box.y, width: box.width, height: box.height, phase };
   try {
     if (reducedMotion()) sessionStorage.removeItem(OPENING_KEY);
     else sessionStorage.setItem(OPENING_KEY, JSON.stringify(dive));

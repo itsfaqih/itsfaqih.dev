@@ -2,7 +2,7 @@ import Fuse from "fuse.js";
 import { colorOf, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
 import { reducedMotion } from "../hooks/media-query";
-import { watchRuleOpen } from "./rule-open";
+import { isTransitioning, watchRuleOpen } from "./rule-open";
 import { beamClass, countClass } from "./rule-select.styles";
 
 type Point = [x: number, y: number];
@@ -190,6 +190,9 @@ class RuleSelect extends HTMLElement {
     };
 
     const paint = () => {
+      // Chromium fires pointerleave between pageswap and the old page's snapshot, which would put
+      // the panel back on standby under a dive that morphs from it.
+      if (isTransitioning()) return;
       const matches = matchesNow();
       const selected = matches.find((rule) => rule.id === selectedId);
       const key = `${category}|${query.trim().toLowerCase()}`;
