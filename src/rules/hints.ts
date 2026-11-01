@@ -272,7 +272,6 @@ function survey(things: Element[]): Mark[] {
   });
 }
 
-
 /**
  * An arrow to every `[data-hint]` in the card, so readers know the demo takes input. A toggle in
  * the copy gets a short straight one from right beside it. Anything else gets a short curve from
@@ -458,9 +457,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       curved.push({ zone: figure?.dataset.side ?? "copy", t, fits, roam });
     }
     // Both panes of a demo take the same slot when one suits them all, so they read alike.
-    const tries = [false, true].flatMap((snug) =>
-      HINT_SPOTS.map((spot) => [spot, snug] as const),
-    );
+    const tries = [false, true].flatMap((snug) => HINT_SPOTS.map((spot) => [spot, snug] as const));
     const shared = tries.find((at) => curved.every((c) => c.fits(...at)));
     for (const { zone, t, fits, roam } of curved) {
       const pick =

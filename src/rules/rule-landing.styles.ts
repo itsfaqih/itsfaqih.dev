@@ -1356,3 +1356,73 @@ export const island = stylex.create({
   },
 });
 
+// The custom elements of rule-landing.astro: the page root stands in for the block it was, and the
+// lesson and quiz hosts keep their native articles as the boxes.
+export const host = stylex.create({
+  block: {
+    display: "block",
+  },
+  contents: {
+    display: "contents",
+  },
+});
+
+export type SideKey = "bad" | "good";
+export type Tone = "plain" | "wrap" | "chip" | "prompt" | "take";
+
+/** How inline code reads where the kit puts it: a chip in lesson copy, a tint in a quiz prompt. */
+export const codeTone = (tone: Tone) => [
+  tone !== "plain" && text.wrap,
+  tone === "chip" && text.chip,
+  tone === "prompt" && text.tint,
+  tone === "take" && text.bright,
+];
+
+export const landingView = {
+  label: stylex.attrs(island.label, stylex.defaultMarker()).class ?? "",
+  glyph: (shown: boolean) =>
+    stylex.attrs(glyphSwap.glyph, shown ? glyphSwap.shown : glyphSwap.hidden).class ?? "",
+};
+
+export const lessonView = {
+  article: `lesson ${stylex.attrs(lessonKit.lesson, shell.rev, stylex.defaultMarker()).class ?? ""}`,
+  flipKey: (key: SideKey, on: boolean) =>
+    stylex.attrs(lessonKit.flipKey, on && lessonKit[key]).class ?? "",
+  pane: (on: boolean) =>
+    stylex.attrs(lessonKit.well, lessonKit.pane, !on && lessonKit.behind, stylex.defaultMarker())
+      .class ?? "",
+  hintSvg: (gone: boolean) => stylex.attrs(hintKit.svg, gone && hintKit.gone).class ?? "",
+  hintArrow: (drawn: boolean) => stylex.attrs(hintKit.arrow, drawn && hintKit.drawn).class ?? "",
+  hintLabel: (tilt: "up" | "down" | "level", onPanel: boolean, gone: boolean) =>
+    stylex.attrs(hintKit.label, hintKit[tilt], onPanel && hintKit.onPanel, gone && hintKit.gone)
+      .class ?? "",
+};
+
+export type SlotState = {
+  lead: boolean;
+  open: boolean;
+  near: boolean;
+  missed: boolean;
+  cleared: boolean;
+  seated: boolean;
+};
+
+export const quizView = {
+  slot: ({ lead, open, near, missed, cleared, seated }: SlotState) =>
+    stylex.attrs(
+      quizKit.slot,
+      lead ? quizKit.slotAfterLead : null,
+      open && quizKit.slotOpen,
+      near && quizKit.slotNear,
+      missed && (open ? quizKit.slotMissOpen : quizKit.slotMiss),
+      cleared && !seated && quizKit.slotOff,
+      seated && quizKit.slotSeat,
+      stylex.defaultMarker(),
+    ).class ?? "",
+  piece: (picked: boolean, dragging: boolean) =>
+    stylex.attrs(quizKit.piece, picked && quizKit.picked, dragging && quizKit.dragging).class ?? "",
+  say: (cleared: boolean, said: boolean) =>
+    stylex.attrs(quizKit.say, cleared ? quizKit.sayYes : said && quizKit.sayNo).class ?? "",
+  said: (said: boolean) => stylex.attrs(quizKit.said, said && quizKit.saidToned).class ?? "",
+  star: (on: boolean) => stylex.attrs(quizKit.star, on && quizKit.starOn).class ?? "",
+};

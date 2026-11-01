@@ -1,0 +1,54 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade";
+import { button, buttonVariant } from "../components/button";
+import { glyphSwap, island, landingView, shell } from "./rule-landing.styles";
+
+type Props = {
+  /** The header island's icon-only button. */
+  inIsland?: boolean;
+};
+
+const { inIsland = false } = Astro.props;
+// rule-landing.client.ts swaps the glyphs and the label while the link is copied.
+---
+
+{
+  inIsland ? (
+    <button type="button" {...stylex.attrs(island.action)} data-part="share"
+      ><span aria-hidden="true" {...stylex.attrs(glyphSwap.cell)}
+        ><Icon name="ShareNetwork" size={16} weight="bold" class={landingView.glyph(true)} data-part="glyph" /><Icon
+          name="Check"
+          size={16}
+          weight="bold"
+          class={landingView.glyph(false)}
+          data-part="glyph"
+        /></span
+      ><span {...stylex.attrs(arcade.srOnly)} aria-live="polite" data-part="label">Share</span></button
+    >
+  ) : (
+    <button
+      type="button"
+      {...stylex.attrs(
+        button.base,
+        buttonVariant["tertiary-neutral"],
+        button.sm,
+        button.iconStart,
+        shell.share,
+        shell.in,
+        shell.first,
+      )}
+      data-part="share"
+      ><span aria-hidden="true" {...stylex.attrs(glyphSwap.cell)}
+        ><Icon name="ShareNetwork" size={16} weight="bold" class={landingView.glyph(true)} data-part="glyph" /><Icon
+          name="Check"
+          size={16}
+          weight="bold"
+          class={landingView.glyph(false)}
+          data-part="glyph"
+        /></span
+      ><span aria-live="polite" {...stylex.attrs(shell.shareLabel)} data-part="label">Share</span></button
+    >
+  )
+}

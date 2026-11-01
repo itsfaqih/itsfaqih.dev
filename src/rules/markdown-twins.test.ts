@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vite-plus/test";
-import type { Lesson } from "./rule-landing";
+import type { Tldr } from "./lesson";
 import { PUBLISHED_GUIDELINES } from "../data/guidelines";
 import * as buttonDesign from "./button-design-page";
 import * as dataLoading from "./data-loading-page";
 import * as dialogDesign from "./dialog-design-page";
 import * as handlingTimestamps from "./handling-timestamps-page";
 import * as nullVsUndefined from "./null-vs-undefined-page";
-import * as proximityPrinciple from "./proximity-principle-page";
+import * as proximityPrinciple from "./proximity-principle";
 import * as tableDesign from "./table-design-page";
 import * as typescriptCodeWriting from "./typescript-code-writing-page";
 
@@ -22,7 +22,7 @@ const PAGES = {
   "proximity-principle": proximityPrinciple,
   "table-design": tableDesign,
   "typescript-code-writing": typescriptCodeWriting,
-} satisfies Record<string, { LESSONS: Lesson[]; TLDR: readonly (readonly [string, string])[] }>;
+} satisfies Record<string, { LESSONS: { title: string }[]; TLDR: Tldr }>;
 
 // Table rows as trimmed cells, so a formatter padding the columns cannot break the match.
 const rows = (markdown: string) =>

@@ -1,0 +1,92 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import type { Level } from "./lesson";
+import { host, lessonKit, quizKit, quizView, shell, tree } from "./rule-landing.styles";
+
+type Props = {
+  /** The level's number across the page, for its `lv-N` anchor. */
+  n: number;
+  level: Level;
+  /** What the pieces go into, as in "Drag the piece into the tree". */
+  board: string;
+};
+
+const { n, level, board } = Astro.props;
+const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
+// The default slot is the prompt, its code in tone "prompt". The two templates hold what clearing
+// the level shows; rule-quiz.client.ts clones them.
+---
+
+<rule-quiz
+  {...stylex.attrs(host.contents)}
+  data-answer={level.answer}
+  data-piece={level.piece}
+  data-board={board}
+>
+  <article id={`lv-${n}`} {...stylex.attrs(lessonKit.panel, quizKit.level, shell.rev)} data-rev="true">
+    <div {...stylex.attrs(quizKit.copy)}>
+      <div {...stylex.attrs(quizKit.levelHead)} data-part="head">
+        <span {...stylex.attrs(quizKit.badge)}>Quiz</span>
+      </div>
+      <h3 {...stylex.attrs(quizKit.title)}>{level.name}</h3>
+      <p {...stylex.attrs(quizKit.prompt)}><slot /></p>
+      <div aria-live="polite" class={quizView.say(false, false)} data-part="say">
+        <p class={quizView.said(false)}>Drag the piece into the {board}. Or tap it, then tap a spot.</p>
+      </div>
+    </div>
+
+    <div {...stylex.attrs(lessonKit.well, quizKit.board)}>
+      <ul {...stylex.attrs(tree.list)}>
+        {
+          level.rows.map((row) =>
+            "slot" in row ? (
+              <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.lead ? quizKit.leadRow : null)}
+                >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{row.lead}</span>}<button
+                  type="button"
+                  class={quizView.slot({ ...idle, lead: row.lead !== undefined })}
+                  disabled
+                  data-slot={row.slot.id}
+                  data-note={row.slot.note}
+                  data-part="slot">{row.slot.label}</button
+                ></li
+              >
+            ) : (
+              <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.kind && tree[row.kind])}
+                >{row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
+              >
+            ),
+          )
+        }
+      </ul>
+      <div {...stylex.attrs(quizKit.tray)}>
+        <button
+          type="button"
+          class={quizView.piece(false, false)}
+          aria-pressed="false"
+          aria-label={`${level.piece}. Pick up`}
+          data-part="piece">{level.piece}</button
+        ><span {...stylex.attrs(quizKit.trayNote)} data-part="note">Your piece</span>
+      </div>
+    </div>
+  </article>
+  <template data-part="seat"
+    ><span {...stylex.attrs(quizKit.piece, quizKit.seated)}
+      >{level.piece}<span aria-hidden="true" {...stylex.attrs(quizKit.burst)}
+        >{
+          Array.from({ length: 8 }, (_, index) => (
+            <i style={`--a:${index * 45 + 22}deg`} {...stylex.attrs(quizKit.spark)} />
+          ))
+        }</span
+      ></span
+    ></template
+  >
+  <template data-part="clear"
+    ><span {...stylex.attrs(quizKit.stamp)}>Clear</span><span {...stylex.attrs(quizKit.stars)}
+      >{[1, 2, 3].map(() => <i class={quizView.star(false)}>★</i>)}</span
+    ></template
+  >
+</rule-quiz>
+
+<script>
+  import "./rule-quiz.client";
+</script>

@@ -3,7 +3,6 @@ import { ArrowLeftIcon, CheckIcon, ShareNetworkIcon } from "@phosphor-icons/reac
 import {
   createContext,
   Fragment,
-  isValidElement,
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
@@ -61,16 +60,9 @@ export type Lesson = {
   levels: [Level, ...Level[]];
 };
 
-type TreeRow = {
-  depth: number;
-  kind?: "dir" | "comp" | "more";
-  moved?: boolean;
-  tag?: string;
-} & ({ k: string; text: ReactNode } | { k?: undefined; text: string });
-
 type Slot = { id: string; label: ReactNode; note: string };
 type BoardRow =
-  | { depth: number; text: ReactNode; kind?: TreeRow["kind"]; tag?: string }
+  | { depth: number; text: ReactNode; kind?: "dir" | "comp" | "more"; tag?: string }
   | { depth: number; slot: Slot; lead?: ReactNode };
 export type Level = {
   name: string;
@@ -416,7 +408,7 @@ export function Kbd({ children }: { children: ReactNode }) {
 }
 
 /** A paragraph of lesson copy, for a lesson's `extra` as well as its body. */
-export function LessonText({
+function LessonText({
   children,
   style,
 }: {
@@ -433,33 +425,6 @@ export function LessonText({
 export function Tip({ children }: { children: ReactNode }) {
   return <LessonText style={text.tip}>{children}</LessonText>;
 }
-
-export function Tree({ rows }: { rows: TreeRow[] }) {
-  return (
-    <ul {...stylex.props(tree.list, tree.inPane)}>
-      {rows.map((row) => {
-        const k = keyOf(row);
-        return (
-          <li
-            key={k}
-            data-k={k}
-            data-moved={row.moved || undefined}
-            {...stylex.props(tree.row, row.kind && tree[row.kind])}
-            style={{ "--d": row.depth }}
-          >
-            <span {...stylex.props(row.moved && tree.moved)}>{row.text}</span>
-            {row.tag && <span {...stylex.props(tree.calls)}>{row.tag}</span>}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-const keyOf = (row: TreeRow) => (row.k === undefined ? row.text : row.k);
-
-const treeRows = (view: ReactNode) =>
-  isValidElement<{ rows: TreeRow[] }>(view) && view.type === Tree ? view.props.rows.length : 0;
 
 /** Colours a line of code: a match of `token`'s nth capture group gets the style `kinds[n]`. */
 export function paint(
@@ -552,8 +517,6 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
     placed.current = next;
   }, [side]);
 
-  const most = Math.max(treeRows(lesson.bad.view), treeRows(lesson.good.view));
-
   return (
     <article
       ref={cardRef}
@@ -569,7 +532,7 @@ function LessonCard({ lesson, costsStyle }: { lesson: Lesson; costsStyle?: style
       <div
         ref={demoRef}
         data-show={side}
-        style={{ "--rows": most }}
+        style={{ "--rows": 0 }}
         {...stylex.props(lessonKit.demo)}
       >
         <div role="group" aria-label={`${lesson.title}: compare`} {...stylex.props(lessonKit.flip)}>

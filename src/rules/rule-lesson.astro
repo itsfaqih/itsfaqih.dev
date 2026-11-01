@@ -1,0 +1,85 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import type { Lesson } from "./lesson";
+import {
+  hintKit,
+  host,
+  lessonKit,
+  lessonView,
+  text,
+  type SideKey,
+} from "./rule-landing.styles";
+
+type Props = {
+  lesson: Lesson;
+  /** The most tree rows either pane shows, which sizes the panes on phones; 0 for other demos. */
+  rows?: number;
+  /** Applied last to the row of cost tags under each pane. */
+  costsStyle?: stylex.StyleXStyles;
+};
+
+const { lesson, rows = 0, costsStyle } = Astro.props;
+const SIDES: readonly SideKey[] = ["bad", "good"];
+const MARK = { bad: "✕", good: "✓" } as const;
+// Slots: "body" (the lesson copy, its code in tone "chip"), "extra" (a block under it), and "bad"
+// and "good" (each pane's demo). The panes start on "good", as rule-lesson.client.ts expects.
+---
+
+<rule-lesson {...stylex.attrs(host.contents)}>
+  <article class={lessonView.article} data-rev="true">
+    <div {...stylex.attrs(lessonKit.copy)}>
+      {lesson.exception && <span {...stylex.attrs(lessonKit.exception)}>Exception</span>}
+      <h3 {...stylex.attrs(lessonKit.title)}>{lesson.title}</h3>
+      <p {...stylex.attrs(text.lesson)}><slot name="body" /></p>
+      <slot name="extra" />
+    </div>
+    <div data-show="good" style={`--rows:${rows}`} {...stylex.attrs(lessonKit.demo)} data-part="demo">
+      <div
+        role="group"
+        aria-label={`${lesson.title}: compare`}
+        {...stylex.attrs(lessonKit.flip)}
+      >
+        {
+          SIDES.map((key) => (
+            <button
+              type="button"
+              aria-pressed={key === "good" ? "true" : "false"}
+              class={lessonView.flipKey(key, key === "good")}
+              data-part={key}
+              ><span aria-hidden="true" {...stylex.attrs(lessonKit.mark)}>{MARK[key]}</span>{
+                lesson[key].label
+              }</button
+            >
+          ))
+        }
+      </div>
+      {
+        SIDES.map((key) => (
+          <figure data-side={key} class={lessonView.pane(key === "good")}>
+            <figcaption {...stylex.attrs(lessonKit.caption, lessonKit[key])}
+              ><span aria-hidden="true" {...stylex.attrs(lessonKit.mark)}>{MARK[key]}</span><span
+                {...stylex.attrs(arcade.srOnly)}>{key === "bad" ? "Avoid: " : "Do: "}</span
+              >{lesson[key].label}</figcaption
+            >
+            {key === "bad" ? <slot name="bad" /> : <slot name="good" />}
+            <div {...stylex.attrs(lessonKit.costs, costsStyle)}>
+              {lesson[key].costs.map((cost) => (
+                <span {...stylex.attrs(lessonKit.cost, lessonKit.costIn, lessonKit[`${key}Cost`])}>
+                  {cost}
+                </span>
+              ))}
+            </div>
+          </figure>
+        ))
+      }
+    </div>
+    <div data-hint-layer="true" aria-hidden="true" {...stylex.attrs(hintKit.layer)} data-part="hints"
+      ><span {...stylex.attrs(hintKit.label, hintKit.ruler)} data-part="ruler">Try it</span></div
+    >
+  </article>
+</rule-lesson>
+
+<script>
+  import "./rule-lesson.client";
+</script>
