@@ -20,7 +20,13 @@ const baselineDir = path.join(import.meta.dirname, "__screenshots__");
 const diffDir = path.join(import.meta.dirname, "__diff__");
 const update = process.env.UPDATE_VISUAL === "1";
 
-const maxDiffRatio = 0.0005;
+// Repeat captures match pixel for pixel, while a recoloured icon changes ~130 pixels and a hidden
+// one ~40. A flat budget holds a small change to the same bar on a tall page as on a short one.
+const maxDiffPixels = 20;
+
+// Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (use-cut-ins.ts), and
+// [data-rev] rule sections gain data-in (rule-landing.tsx). A new reveal marker belongs here.
+const unrevealedSelector = "[data-cut]:not(.in), [data-rev]:not([data-in])";
 
 const routes = inject("routes");
 
@@ -70,6 +76,11 @@ async function capture(shot: Shot) {
     document.addEventListener("DOMContentLoaded", () => document.head.append(style));
   }, shot.scheme);
   const page = await context.newPage();
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
   await page.clock.setFixedTime(new Date("2026-01-15T09:30:00Z"));
   try {
     await page.goto(new URL(shot.route, inject("baseURL")).href, { waitUntil: "networkidle" });
@@ -77,15 +88,13 @@ async function capture(shot: Shot) {
       const bar = document.querySelector(".arc-bar");
       return bar && Object.keys(bar).some((key) => key.startsWith("__reactFiber"));
     });
-    await page.evaluate(async () => {
+    const unrevealed = await page.evaluate(async (pending) => {
       await document.fonts.ready;
       const unrevealedInView = () =>
-        Array.from(document.querySelectorAll("[data-rv]:not(.in), [data-cut]:not(.in)")).some(
-          (block) => {
-            const rect = block.getBoundingClientRect();
-            return rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight * 0.85;
-          },
-        );
+        Array.from(document.querySelectorAll(pending)).some((block) => {
+          const rect = block.getBoundingClientRect();
+          return rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight * 0.85;
+        });
       const settle = async () => {
         for (let frame = 0; frame < 100; frame++) {
           await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -98,17 +107,30 @@ async function capture(shot: Shot) {
       }
       window.scrollTo({ top: 0, behavior: "instant" });
       await settle();
-    });
+      // A carousel card waiting off to the side cuts in when it is paged to, not on scroll.
+      return Array.from(document.querySelectorAll(pending)).filter((block) => {
+        const rect = block.getBoundingClientRect();
+        const center = rect.left + rect.width / 2;
+        return rect.width > 0 && center >= 0 && center <= window.innerWidth;
+      }).length;
+    }, unrevealedSelector);
+    if (unrevealed > 0) throw new Error(`${unrevealed} blocks never revealed on ${shot.route}`);
+    await page.waitForFunction(() => !document.querySelector("[data-shown]"));
     await page.waitForLoadState("networkidle");
+    const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    // A full-page capture sizes itself from body's overflow too, which counts decoration the root
+    // clips, so the clip pins it to the area a reader can scroll to.
+    const clip = { x: 0, y: 0, width: viewports[shot.viewport].width, height: scrollHeight };
     let previous: Buffer | undefined;
     for (let attempt = 0; attempt < 5; attempt++) {
       await page.waitForTimeout(100);
       const current = await page.screenshot({
         fullPage: true,
+        clip,
         animations: "disabled",
         caret: "hide",
       });
-      if (previous && !mismatch(previous, current)) return current;
+      if (previous && !mismatch(previous, current)) return { image: current, errors };
       previous = current;
     }
     throw new Error(`${shot.route} never settled into a stable screenshot`);
@@ -126,7 +148,7 @@ function mismatch(expected: Buffer, actual: Buffer) {
   }
   const diff = new PNG({ width, height });
   const changed = pixelmatch(before.data, after.data, diff.data, width, height, { threshold: 0.1 });
-  if (changed / (width * height) <= maxDiffRatio) return undefined;
+  if (changed <= maxDiffPixels) return undefined;
   return { reason: `${changed} pixels changed`, diff: PNG.sync.write(diff) };
 }
 
@@ -138,7 +160,8 @@ function writeDiff(name: string, actual: Buffer, diff?: Buffer) {
 
 describe.concurrent("pages match their baseline screenshots", () => {
   it.each(shots.map((shot) => [shotName(shot), shot] as const))("%s", async (name, shot) => {
-    const actual = await capture(shot);
+    const { image: actual, errors } = await capture(shot);
+    expect(errors, "errors logged while the page ran").toEqual([]);
     if (update) {
       mkdirSync(baselineDir, { recursive: true });
       writeFileSync(path.join(baselineDir, name), actual);
