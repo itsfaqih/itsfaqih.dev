@@ -49,6 +49,8 @@ vp run preview
 
 Pages render without JavaScript except where a component carries a `client:` directive. The header hydrates on load, and the command palette, cursor, favicon cycle, smooth scroll and scrollbar hydrate when the browser is idle. The home page, the Rule of Thumb index and each rule page hydrate whole on load, since their reveals and demos need script to show. The blog index, the post frame and its code blocks ship none; a post's table of contents hydrates at desktop widths and its drawer and MDX islands when scrolled into view. Navigations are full page loads, animated by cross-document view transitions that `src/layouts/head-script.ts` types in `pageswap` and `pagereveal`, and Astro prefetches a link on hover. Each page lists the modules its `client:load` islands import as `modulepreload` links (the `finish-pages` integration in `astro.config.ts`), so an island's import chain arrives in one round trip instead of one per level.
 
+`docs/astro-migration.md` records the move from TanStack Start, its decisions, and the load comparison against the React build, with the `scripts/perf-compare.ts` command that reruns it.
+
 ## Fonts
 
 ```bash
