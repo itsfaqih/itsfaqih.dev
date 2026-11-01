@@ -1,7 +1,7 @@
 ---
 import "../styles.css";
 import { CommandPalette } from "../components/command-palette";
-import { Header } from "../components/header";
+import Header from "../components/header.astro";
 import PageScrollbar from "../components/page-scrollbar.astro";
 import PrintCursor from "../components/print-cursor.astro";
 import { pageHead, type SharedPage } from "../seo";
@@ -67,7 +67,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
     }
   </head>
   <body class={site.body}>
-    <Header client:load path={path} />
+    <Header path={path} />
     <CommandPalette client:idle />
     <main class={site.main}><slot /></main>
     <PrintCursor />

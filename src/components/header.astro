@@ -1,0 +1,121 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { SHOW_PROJECTS } from "../data/home";
+import { arcade } from "./arcade";
+import { button } from "./button";
+import { fluidHover } from "./fluid-hover";
+import { menuGlyphs, styles } from "./header.styles";
+import Seg from "./header-seg.astro";
+import Icon from "./icon.astro";
+
+type Props = {
+  /** The page's pathname, which marks the current section's link. */
+  path: string;
+};
+
+const { path } = Astro.props;
+const current = (active: boolean) => (active ? "page" : undefined);
+// The server can't see the hash; header.client.ts marks these once it can.
+const hashOnHome = (hash: string) => (path === "/" ? hash : undefined);
+const glyphs = menuGlyphs(false);
+---
+
+<site-header
+  class={`arc arc-bar ${stylex.attrs(arcade.root, styles.bar).class}`}
+  data-mode="full"
+>
+  <header class={`island ${stylex.attrs(styles.island).class}`}>
+    <Seg name="home">
+      <a href="/" aria-label="Faqih Muntashir, home" {...stylex.attrs(styles.brand, styles.ring)}>
+        FAQIH
+      </a>
+    </Seg>
+    <Seg name="live"><div data-island-activity></div></Seg>
+    <Seg name="nav">
+      <nav aria-label="Main" {...stylex.attrs(styles.nav)}>
+        <a
+          href="/rule-of-thumb"
+          aria-current={current(path.startsWith("/rule-of-thumb"))}
+          data-fluid-item="true"
+          {...stylex.attrs(styles.navLink, styles.ring)}>Rule of Thumb</a
+        >
+        <a
+          href="/#work"
+          data-hash={hashOnHome("#work")}
+          data-fluid-item="true"
+          {...stylex.attrs(styles.navLink, styles.ring, styles.wideOnly)}>Experience</a
+        >
+        {
+          SHOW_PROJECTS && (
+            <a
+              href="/#projects"
+              data-hash={hashOnHome("#projects")}
+              data-fluid-item="true"
+              {...stylex.attrs(styles.navLink, styles.ring, styles.wideOnly)}
+            >
+              Projects
+            </a>
+          )
+        }
+      </nav>
+    </Seg>
+    <Seg name="tools">
+      <button
+        type="button"
+        aria-label="Search the site"
+        data-fluid-item="true"
+        data-part="search"
+        {...stylex.attrs(styles.find, styles.ring)}
+        ><Icon name="MagnifyingGlass" size={16} weight="bold" /><kbd
+          {...stylex.attrs(styles.findKey, styles.wideOnly)}>⌘K</kbd
+        ></button
+      ><button
+        type="button"
+        aria-label="Switch theme"
+        data-fluid-item="true"
+        data-part="theme"
+        {...stylex.attrs(styles.find, styles.ring, styles.iconButton)}
+        ><Icon
+          name="Sun"
+          size={16}
+          weight="bold"
+          {...stylex.attrs(styles.glyph, styles.sunInLight)}
+        /><Icon
+          name="Moon"
+          size={16}
+          weight="bold"
+          {...stylex.attrs(styles.glyph, styles.moonInDark)}
+        /></button
+      >
+    </Seg>
+    <Seg name="connect">
+      <a href="/#contact" {...stylex.attrs(button.base, button.sm, styles.connect)}>Connect</a>
+    </Seg>
+    <Seg name="menu">
+      <button
+        type="button"
+        class={`find menu ${stylex.attrs(styles.find, styles.ring, styles.iconButton, styles.menu).class}`}
+        aria-expanded="false"
+        aria-label="Open menu"
+        data-fluid-item="true"
+        data-part="menu"
+        ><Icon name="List" size={16} weight="bold" class={glyphs.list} data-part="list" /><Icon
+          name="X"
+          size={16}
+          weight="bold"
+          class={glyphs.x}
+          data-part="x"
+        /></button
+      >
+    </Seg>
+    <span data-part="ground" aria-hidden="true" {...stylex.attrs(styles.ground)}></span>
+    <span
+      data-part="highlight"
+      aria-hidden="true"
+      {...stylex.attrs(fluidHover.highlight, styles.highlight)}></span>
+  </header>
+</site-header>
+
+<script>
+  import "./header.client";
+</script>

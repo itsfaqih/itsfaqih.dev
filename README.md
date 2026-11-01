@@ -47,7 +47,7 @@ vp run preview
 
 `astro build` writes a static site to `dist/`, one `x.html` per page (`blog.html`, `rule-of-thumb/table-design.html`) so a static host answers `/blog` without a redirect, plus `404.html`. The `finish-pages` integration in `astro.config.ts` then inlines StyleX's sheet and the core fonts and cursors into every page, writes the OG cards, `sitemap.xml` and `robots.txt` (`scripts/og/share-assets.ts`), and writes `_headers`, which gives each Markdown twin a canonical `Link` header on Cloudflare Pages. No runtime server is needed.
 
-Pages render without JavaScript except where a component carries a `client:` directive. The header hydrates on load, and the command palette, cursor, favicon cycle, smooth scroll and scrollbar hydrate when the browser is idle. The home page, the Rule of Thumb index and each rule page hydrate whole on load, since their reveals and demos need script to show. The blog index, the post frame and its code blocks ship none; a post's table of contents hydrates at desktop widths and its drawer and MDX islands when scrolled into view. Navigations are full page loads, animated by cross-document view transitions that `src/layouts/head-script.ts` types in `pageswap` and `pagereveal`, and Astro prefetches a link on hover. Each page lists the modules its `client:load` islands import as `modulepreload` links (the `finish-pages` integration in `astro.config.ts`), so an island's import chain arrives in one round trip instead of one per level.
+Pages render without JavaScript except where a component carries a `client:` directive or an Astro component ships a `<script>`. The header, cursor and scrollbar are Astro components whose scripts define custom elements: the header on load, the cursor and scrollbar when the browser is idle, as do the favicon cycle and smooth scroll. The command palette hydrates when the browser is idle. The home page, the Rule of Thumb index and each rule page hydrate whole on load, since their reveals and demos need script to show. The blog index, the post frame and its code blocks ship none; a post's table of contents hydrates at desktop widths and its drawer and MDX islands when scrolled into view. Navigations are full page loads, animated by cross-document view transitions that `src/layouts/head-script.ts` types in `pageswap` and `pagereveal`, and Astro prefetches a link on hover. Each page lists the modules its `client:load` islands import as `modulepreload` links (the `finish-pages` integration in `astro.config.ts`), so an island's import chain arrives in one round trip instead of one per level.
 
 `docs/astro-migration.md` records the move from TanStack Start, its decisions, and the load comparison against the React build, with the `scripts/perf-compare.ts` command that reruns it.
 
@@ -66,7 +66,7 @@ vp run storybook
 vp run build-storybook
 ```
 
-Stories live in `src/stories` and use the same global stylesheet and StyleX tokens as the website. With no theme class on `<html>`, they render in the dark palette. They build with `@storybook/react-vite`; a story renders the component as an island would, so `Header` takes the page's `path`.
+Stories live in `src/stories` and use the same global stylesheet and StyleX tokens as the website. With no theme class on `<html>`, they render in the dark palette. They build with `@storybook/react-vite`; a story renders the component as an island would.
 
 ## Source layout
 

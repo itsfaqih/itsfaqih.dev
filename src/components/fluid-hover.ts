@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef, type PointerEvent } from "react";
 import { motion } from "../theme.stylex";
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -11,47 +10,47 @@ const REDUCE = "@media (prefers-reduced-motion: reduce)";
  * between items; another link or button, or leaving the group, puts it out. A fresh entry fades in
  * where it lands instead of sliding in from the last item.
  *
- * The group takes `fluidHover.group` and `handlers`, and renders the highlight with
- * `ref={highlightRef}`. Items keep their own colour change on hover but no hover background. Call
- * `clear` when the items move under a resting pointer.
+ * The group takes `fluidHover.group` and the highlight `fluidHover.highlight`. Items keep their own
+ * colour change on hover but no hover background. Call the returned `clear` when the items move
+ * under a resting pointer.
  */
-export function useFluidHover() {
-  const highlightRef = useRef<HTMLSpanElement>(null);
-  const litItem = useRef<HTMLElement | null>(null);
+export function watchFluidHover(group: HTMLElement, highlight: HTMLElement, signal: AbortSignal) {
+  let litItem: HTMLElement | null = null;
 
-  const out = () => {
-    litItem.current = null;
-    highlightRef.current?.removeAttribute("data-on");
+  const clear = () => {
+    litItem = null;
+    highlight.removeAttribute("data-on");
   };
 
-  const onPointerOver = (event: PointerEvent<HTMLElement>) => {
-    const highlight = highlightRef.current;
-    if (!highlight || event.pointerType === "touch") return;
+  const onPointerOver = (event: PointerEvent) => {
+    if (event.pointerType === "touch") return;
     const item =
       event.target instanceof Element
         ? event.target.closest<HTMLElement>("[data-fluid-item]")
         : null;
-    if (!item || !event.currentTarget.contains(item)) {
-      if (event.target instanceof Element && event.target.closest("a, button")) out();
+    if (!item || !group.contains(item)) {
+      if (event.target instanceof Element && event.target.closest("a, button")) clear();
       return;
     }
     if (item.getAttribute("aria-disabled") === "true") {
-      out();
+      clear();
       return;
     }
-    if (item === litItem.current) return;
-    litItem.current = item;
-    const group = event.currentTarget.getBoundingClientRect();
+    if (item === litItem) return;
+    litItem = item;
+    const area = group.getBoundingClientRect();
     const box = item.getBoundingClientRect();
     placeHighlight(highlight, {
-      x: box.left - group.left,
-      y: box.top - group.top,
+      x: box.left - area.left,
+      y: box.top - area.top,
       w: box.width,
       h: box.height,
     });
   };
 
-  return { highlightRef, clear: out, handlers: { onPointerOver, onPointerLeave: out } };
+  group.addEventListener("pointerover", onPointerOver, { signal });
+  group.addEventListener("pointerleave", clear, { signal });
+  return clear;
 }
 
 /**

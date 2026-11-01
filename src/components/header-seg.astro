@@ -1,0 +1,13 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { segView, styles, type Seg } from "./header.styles";
+
+type Props = { name: Seg };
+
+const { name } = Astro.props;
+const view = segView(name, { scrolled: false, open: false, live: false });
+---
+
+<div class={view.seg} data-compact={view.compact} inert={!view.on} data-seg={name}>
+  <div {...stylex.attrs(styles.clip)}><div class={view.row}><slot /></div></div>
+</div>

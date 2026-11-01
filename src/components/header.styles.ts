@@ -1,352 +1,42 @@
 import * as stylex from "@stylexjs/stylex";
-import {
-  type ReactNode,
-  type RefObject,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { createPortal } from "react-dom";
-import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosphor-icons/react";
-import { SHOW_PROJECTS } from "../data/home";
-import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
-import { reducedMotion } from "../hooks/media-query";
-import { button } from "./button";
-import { fluidHover, useFluidHover } from "./fluid-hover";
 import { loadIn } from "./load-in";
-import { arcade } from "./arcade";
 
-let activityHost: HTMLElement | null = null;
-let activityCount = 0;
-const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((listener) => listener());
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
+export type HeaderState = { scrolled: boolean; open: boolean; live: boolean };
 
-// Stable, so a Header re-render doesn't detach the host and remount the page's portal.
-function hostActivity(node: HTMLDivElement | null) {
-  activityHost = node;
-  emit();
-  return () => {
-    activityHost = null;
-    emit();
+export const SEGS = ["home", "live", "nav", "tools", "connect", "menu"] as const;
+export type Seg = (typeof SEGS)[number];
+
+/** Each segment's classes for a state. header.astro renders the first state, header.client.ts the rest. */
+export function segView(seg: Seg, { scrolled, open, live }: HeaderState) {
+  const full = !scrolled || open;
+  const view = {
+    home: {
+      on: full || !live,
+      compact: "idle",
+      style: open && styles.homeFolded,
+      row: open && styles.homeFoldedRow,
+    },
+    live: { on: !full && live, compact: "live", style: null, row: null },
+    nav: { on: full, compact: undefined, style: null, row: null },
+    tools: { on: true, compact: "always", style: styles.toolsSeg, row: null },
+    connect: { on: true, compact: "always", style: styles.connectSeg, row: styles.connectRow },
+    menu: { on: scrolled, compact: "always", style: null, row: null },
+  }[seg];
+  return {
+    on: view.on,
+    compact: view.compact,
+    seg:
+      stylex.attrs(loadIn.islandPart, styles.seg, view.on && styles.segOn, view.style).class ?? "",
+    row: `row ${stylex.attrs(styles.row, view.on && styles.rowOn, view.row).class}`,
   };
 }
 
-export function IslandActivity({ children }: { children: ReactNode }) {
-  const host = useSyncExternalStore(
-    subscribe,
-    () => activityHost,
-    () => null,
-  );
-  useEffect(() => {
-    activityCount += 1;
-    emit();
-    return () => {
-      activityCount -= 1;
-      emit();
-    };
-  }, []);
-  return host ? createPortal(children, host) : null;
-}
-
-type SegProps = {
-  on: boolean;
-  compact?: "idle" | "live" | "always";
-  style?: stylex.StyleXStyles;
-  rowStyle?: stylex.StyleXStyles;
-  children: ReactNode;
-};
-
-function Seg({ on, compact, style, rowStyle, children }: SegProps) {
-  return (
-    <div
-      {...stylex.props(loadIn.islandPart, styles.seg, on && styles.segOn, style)}
-      data-compact={compact}
-      inert={!on}
-    >
-      <div {...stylex.props(styles.clip)}>
-        <div className={`row ${stylex.props(styles.row, on && styles.rowOn, rowStyle).className}`}>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// The capsule's width folds on a spring, but a grid column never opens past its content, so the
-// spring's overshoot is lost and the capsule would stop dead. Its ground carries the rest: it keeps
-// the speed the width had when it stopped, runs a few pixels on and springs back.
-const STIFFNESS = 0.0196; // rad/ms: a swing of about 320ms
-const DAMPING = 0.45;
-const FRAME_MS = 16;
-// The ground takes more than the speed the fold lost, so the bounce reads at a glance.
-const GAIN = 1.8;
-// The push the ground gets when the palette's drop lands back in the island, in px/ms.
-const CATCH_SPEED = 0.18;
-
-/** `since` is how long ago, in ms, the width stopped, so the bounce picks up where it would be. */
-function bounce(ground: HTMLElement, width: number, speed: number, since = 0) {
-  const swing = STIFFNESS * Math.sqrt(1 - DAMPING ** 2);
-  const reach = (speed * GAIN) / swing;
-  const frames: Keyframe[] = [];
-  for (let t = 0; Math.abs(reach) * Math.exp(-DAMPING * STIFFNESS * t) > 0.1; t += FRAME_MS) {
-    const stretch = reach * Math.exp(-DAMPING * STIFFNESS * t) * Math.sin(swing * t);
-    frames.push({ transform: `scaleX(${1 + stretch / width})` });
-  }
-  frames.push({ transform: "none" });
-  for (const running of ground.getAnimations()) running.cancel();
-  const play = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
-  play.currentTime = since;
-}
-
-// Watches the capsule's width after a fold and bounces its ground on the speed it stopped at.
-function useElasticGround(
-  islandRef: RefObject<HTMLElement | null>,
-  groundRef: RefObject<HTMLElement | null>,
-  mode: string,
-) {
-  useEffect(() => {
-    const island = islandRef.current;
-    const ground = groundRef.current;
-    if (!island || !ground || reducedMotion()) return;
-    let last = island.getBoundingClientRect().width;
-    let lastAt = performance.now();
-    let speed = 0;
-    let idle = 0;
-    const watch = (now: number) => {
-      const width = island.getBoundingClientRect().width;
-      const moved = width - last;
-      if (Math.abs(moved) > 0.05) {
-        speed = moved / Math.max(1, now - lastAt);
-        idle = 0;
-      } else if (Math.abs(speed) > 0.03) {
-        bounce(ground, width, speed, now - lastAt);
-        return;
-      } else if (++idle > 6) {
-        return;
-      }
-      last = width;
-      lastAt = now;
-      frame = requestAnimationFrame(watch);
-    };
-    let frame = requestAnimationFrame(watch);
-    return () => cancelAnimationFrame(frame);
-  }, [islandRef, groundRef, mode]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    let away = root.hasAttribute("data-island-away");
-    const observer = new MutationObserver(() => {
-      const island = islandRef.current;
-      const ground = groundRef.current;
-      const home = away && !root.hasAttribute("data-island-away");
-      away = root.hasAttribute("data-island-away");
-      if (home && island && ground && !reducedMotion())
-        bounce(ground, island.getBoundingClientRect().width, CATCH_SPEED);
-    });
-    observer.observe(root, { attributes: true, attributeFilter: ["data-island-away"] });
-    return () => observer.disconnect();
-  }, [islandRef, groundRef]);
-}
-
-function subscribeHash(listener: () => void) {
-  addEventListener("hashchange", listener);
-  return () => removeEventListener("hashchange", listener);
-}
-
-/** The site header. `path` is the page's pathname, which marks the current section's link. */
-export function Header({ path }: { path: string }) {
-  const { toggleTheme } = useTheme();
-  const hash = useSyncExternalStore(
-    subscribeHash,
-    () => location.hash,
-    () => "",
-  );
-  const current = (active: boolean) => (active ? ("page" as const) : undefined);
-  const openCommandPalette = () => {
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }),
-    );
+export function menuGlyphs(open: boolean) {
+  return {
+    list: stylex.attrs(styles.glyph, open && styles.turnedRight).class ?? "",
+    x: stylex.attrs(styles.glyph, !open && styles.turnedLeft).class ?? "",
   };
-
-  const islandRef = useRef<HTMLElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const groundRef = useRef<HTMLSpanElement>(null);
-  const hover = useFluidHover();
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-  const live = useSyncExternalStore(
-    subscribe,
-    () => activityCount > 0,
-    () => false,
-  );
-
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    addEventListener("scroll", update, { passive: true });
-    return () => removeEventListener("scroll", update);
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const from = scrollY;
-    const onScroll = () => {
-      if (Math.abs(scrollY - from) > 24) setOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setOpen(false);
-      toggleRef.current?.focus();
-    };
-    const onPress = (event: PointerEvent) => {
-      if (event.target instanceof Node && !islandRef.current?.contains(event.target))
-        setOpen(false);
-    };
-    addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPress);
-    return () => {
-      removeEventListener("scroll", onScroll);
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPress);
-    };
-  }, [open]);
-
-  const compact = scrolled && !open;
-  const full = !compact;
-  useElasticGround(islandRef, groundRef, `${scrolled} ${open} ${live}`);
-  const { clear } = hover;
-  useEffect(clear, [clear, scrolled, open, live]);
-
-  return (
-    <div
-      className={`arc arc-bar ${stylex.props(arcade.root, styles.bar).className}`}
-      data-scrolled={scrolled ? "" : undefined}
-      data-mode={compact ? "compact" : "full"}
-      data-open={open || undefined}
-    >
-      <header
-        ref={islandRef}
-        className={`island ${stylex.props(styles.island).className}`}
-        {...hover.handlers}
-        onClick={(event) => {
-          if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
-        }}
-      >
-        <Seg
-          on={full || !live}
-          compact="idle"
-          style={open && styles.homeFolded}
-          rowStyle={open && styles.homeFoldedRow}
-        >
-          <a
-            href="/"
-            aria-label="Faqih Muntashir, home"
-            {...stylex.props(styles.brand, styles.ring)}
-          >
-            FAQIH
-          </a>
-        </Seg>
-        <Seg on={compact && live} compact="live">
-          <div ref={hostActivity} />
-        </Seg>
-        <Seg on={full}>
-          <nav aria-label="Main" {...stylex.props(styles.nav)}>
-            <a
-              href="/rule-of-thumb"
-              aria-current={current(path.startsWith("/rule-of-thumb"))}
-              data-fluid-item
-              {...stylex.props(styles.navLink, styles.ring)}
-            >
-              Rule of Thumb
-            </a>
-            <a
-              href="/#work"
-              aria-current={current(path === "/" && hash === "#work")}
-              data-fluid-item
-              {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
-            >
-              Experience
-            </a>
-            {SHOW_PROJECTS && (
-              <a
-                href="/#projects"
-                aria-current={current(path === "/" && hash === "#projects")}
-                data-fluid-item
-                {...stylex.props(styles.navLink, styles.ring, styles.wideOnly)}
-              >
-                Projects
-              </a>
-            )}
-          </nav>
-        </Seg>
-        <Seg on compact="always" style={styles.toolsSeg}>
-          <button
-            type="button"
-            onClick={openCommandPalette}
-            aria-label="Search the site"
-            data-fluid-item
-            {...stylex.props(styles.find, styles.ring)}
-          >
-            <MagnifyingGlassIcon size={16} weight="bold" />
-            <kbd {...stylex.props(styles.findKey, styles.wideOnly)}>⌘K</kbd>
-          </button>
-          <button
-            type="button"
-            onClick={(event) => {
-              const box = event.currentTarget.getBoundingClientRect();
-              toggleTheme({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
-            }}
-            aria-label="Switch theme"
-            data-fluid-item
-            {...stylex.props(styles.find, styles.ring, styles.iconButton)}
-          >
-            <SunIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.sunInLight)} />
-            <MoonIcon size={16} weight="bold" {...stylex.props(styles.glyph, styles.moonInDark)} />
-          </button>
-        </Seg>
-        <Seg on compact="always" style={styles.connectSeg} rowStyle={styles.connectRow}>
-          <a href="/#contact" {...stylex.props(button.base, button.sm, styles.connect)}>
-            Connect
-          </a>
-        </Seg>
-        <Seg on={scrolled} compact="always">
-          <button
-            ref={toggleRef}
-            type="button"
-            className={`find menu ${stylex.props(styles.find, styles.ring, styles.iconButton, styles.menu).className}`}
-            aria-expanded={open}
-            aria-label={open ? "Close menu" : "Open menu"}
-            data-fluid-item
-            onClick={() => setOpen((value) => !value)}
-          >
-            <ListIcon
-              size={16}
-              weight="bold"
-              {...stylex.props(styles.glyph, open && styles.turnedRight)}
-            />
-            <XIcon
-              size={16}
-              weight="bold"
-              {...stylex.props(styles.glyph, !open && styles.turnedLeft)}
-            />
-          </button>
-        </Seg>
-        <span ref={groundRef} aria-hidden="true" {...stylex.props(styles.ground)} />
-        <span
-          ref={hover.highlightRef}
-          aria-hidden="true"
-          {...stylex.props(fluidHover.highlight, styles.highlight)}
-        />
-      </header>
-    </div>
-  );
 }
 
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -385,7 +75,7 @@ const ROW_OUT = `opacity ${motion["--t-moderate-exit"]} ${motion["--exit"]}, fil
 // from 1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the parts
 // blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
 // over the dark one, so it is always the one shape that stands apart from the page.
-const styles = stylex.create({
+export const styles = stylex.create({
   // A clear strip at the top of every page that only centres the island; presses pass through it
   // everywhere but the island itself.
   bar: {
