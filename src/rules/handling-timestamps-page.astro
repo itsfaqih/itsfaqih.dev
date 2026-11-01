@@ -1,0 +1,113 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Code from "./code.astro";
+import {
+  formatLines,
+  LESSONS,
+  MOMENT,
+  NO_Z,
+  responseLines,
+  RIGHT,
+  SERVER_TIME,
+  TLDR,
+} from "./handling-timestamps";
+import { styles } from "./handling-timestamps.styles";
+import LessonText from "./lesson-text.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import TsBoardCell from "./ts-board-cell.astro";
+import TsFilter from "./ts-filter.astro";
+import TsOrders from "./ts-orders.astro";
+import TsReaders from "./ts-readers.astro";
+import TsReminder from "./ts-reminder.astro";
+import TsWire from "./ts-wire.astro";
+const [store, zulu, local, input, filter] = LESSONS;
+---
+
+<RuleLanding
+  id="handling-timestamps"
+  learn="One moment, two clocks"
+  tldr={TLDR}
+  take="store, send and show time the same way"
+>
+  <Fragment slot="lead"
+    >Convert picked times to UTC in the browser, return ISO strings ending in Z, and filter by the user's own day as a UTC range.</Fragment
+  >
+  <Fragment slot="intro"
+    >Keep one moment as one value until it reaches the screen of Rina in Jakarta (UTC+7) or Sam in New York (UTC−5).</Fragment
+  >
+
+  <RuleLesson lesson={store} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores each writer's local time, so one moment becomes two values. Store UTC to keep it one.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >UTC never shifts for daylight saving or politics. It means the same moment everywhere.</LessonText
+    >
+    <TsOrders slot="bad" way="bad" />
+    <TsOrders slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={1} level={store.levels[0]} board="flow" cell={TsBoardCell}
+    >Rina in Jakarta and Sam in New York order in the same second. Place what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.</RuleQuiz
+  >
+
+  <RuleLesson lesson={zulu} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >An ISO string without a <Code tone="chip">Z</Code> has no zone, so each browser reads it as local time. Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code tone="chip">Z</Code> so each browser converts it to its own zone.</Fragment
+    >
+    <div slot="bad" {...stylex.attrs(styles.view)}>
+      <TsWire lines={responseLines("bad")} />
+      <TsReaders readings={NO_Z} utc={MOMENT} />
+    </div>
+    <div slot="good" {...stylex.attrs(styles.view)}>
+      <TsWire lines={responseLines("good")} />
+      <TsReaders readings={RIGHT} utc={MOMENT} />
+    </div>
+  </RuleLesson>
+  <RuleQuiz n={2} level={zulu.levels[0]} board="flow" cell={TsBoardCell}
+    >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">createdAt</Code> in the response.</RuleQuiz
+  >
+
+  <RuleLesson lesson={local} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >The server knows its own time zone, not the reader's, so a time it formats is right only where it runs. Send UTC and let each browser format it.</Fragment
+    >
+    <div slot="bad" {...stylex.attrs(styles.view)}>
+      <TsWire lines={formatLines("bad")} />
+      <TsReaders readings={SERVER_TIME} utc={MOMENT} />
+    </div>
+    <div slot="good" {...stylex.attrs(styles.view)}>
+      <TsWire lines={formatLines("good")} />
+      <TsReaders readings={RIGHT} utc={MOMENT} />
+    </div>
+  </RuleLesson>
+  <RuleQuiz n={3} level={local.levels[0]} board="flow" cell={TsBoardCell}
+    >The order is stored as <Code tone="prompt">2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam 1:00 AM. Place the formatting.</RuleQuiz
+  >
+
+  <RuleLesson lesson={input} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >Rina sets a reminder for 7:00 AM. From <Code tone="chip">2026-01-01T07:00:00</Code> the server can't tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code tone="chip">Z</Code>, or the local time with its offset. Both name one moment.</Fragment
+    >
+    <TsReminder slot="bad" way="bad" />
+    <TsReminder slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={4} level={input.levels[0]} board="flow" cell={TsBoardCell}
+    >Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</RuleQuiz
+  >
+  <RuleQuiz n={5} level={input.levels[1]!} board="flow" cell={TsBoardCell}
+    >Rina's browser has her 7:00 AM and its <Code tone="prompt">+07:00</Code> offset. Place the offset.</RuleQuiz
+  >
+
+  <RuleLesson lesson={filter} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs 07:00 to 07:00 her time, so orders before 07:00 go missing and the next morning's show up.</Fragment
+    >
+    <TsFilter slot="bad" way="bad" />
+    <TsFilter slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={6} level={filter.levels[0]} board="flow" cell={TsBoardCell}
+    >Three filters for Jan 10 each need a start. Match 17:00 UTC on Jan 9 to the Jan 10 it starts.</RuleQuiz
+  >
+</RuleLanding>

@@ -1,0 +1,35 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import type { WireLine } from "./handling-timestamps";
+import { styles, tsView } from "./handling-timestamps.styles";
+
+type Props = { lines: WireLine[] };
+
+const { lines } = Astro.props;
+// The empty comments split adjacent text the way React's server markup did, so the elements can
+// patch each piece in place (ts-wire.ts).
+---
+
+<div {...stylex.attrs(styles.wire)}>
+  {
+    lines.map((line) => (
+      <code
+        data-note={line.note ? "true" : undefined}
+        class={tsView.line(line.note === true, line.hot === true)}
+        >{
+          line.c.map((part, index) =>
+            part.quoted ? (
+              <span {...stylex.attrs(styles.str)}
+                >"<Fragment set:html="<!-- -->" />{part.text}<Fragment set:html="<!-- -->" />"</span
+              >
+            ) : (
+              <Fragment
+                >{index > 0 && !line.c[index - 1]!.quoted && <Fragment set:html="<!-- -->" />}{part.text}</Fragment
+              >
+            ),
+          )
+        }</code
+      >
+    ))
+  }
+</div>

@@ -1,0 +1,35 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { digits, HOUR, ordersLines, ordersOf, type Way } from "./handling-timestamps";
+import { styles } from "./handling-timestamps.styles";
+import TsWire from "./ts-wire.astro";
+
+type Props = { way: Way };
+
+const { way } = Astro.props;
+const rows = ordersOf(way);
+const first = rows[0]?.at ?? 0;
+const gap = ((rows[rows.length - 1]?.at ?? 0) - first) / HOUR;
+---
+
+<div {...stylex.attrs(styles.view)}>
+  <TsWire lines={ordersLines(way)} /><table {...stylex.attrs(styles.table)}
+    ><thead
+      ><tr
+        ><th scope="col" {...stylex.attrs(styles.th)}>id</th><th scope="col" {...stylex.attrs(styles.th)}
+          >by</th
+        ><th scope="col" {...stylex.attrs(styles.th)}>created_at</th></tr
+      ></thead
+    ><tbody
+      >{
+        rows.map((row) => (
+          <tr
+            ><td {...stylex.attrs(styles.td)}>{row.id}</td><td {...stylex.attrs(styles.td)}>{row.by.who}</td><td
+              {...stylex.attrs(styles.td, styles.at)}>{digits(row.at).replace("T", " ")}</td
+            ></tr
+          >
+        ))
+      }</tbody
+    ></table
+  ><p {...stylex.attrs(styles.sum)}>{gap ? `One second, stored ${gap} h apart.` : "One second, one value."}</p>
+</div>
