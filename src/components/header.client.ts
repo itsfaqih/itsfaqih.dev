@@ -88,9 +88,7 @@ class SiteHeader extends HTMLElement {
       Object.assign(state, next);
       if (state.scrolled === was.scrolled && state.open === was.open && state.live === was.live)
         return;
-      const compact = state.scrolled && !state.open;
       this.toggleAttribute("data-scrolled", state.scrolled);
-      this.dataset.mode = compact ? "compact" : "full";
       this.toggleAttribute("data-open", state.open);
       for (const { name, seg, row } of segs) {
         const view = segView(name, state);
@@ -149,7 +147,17 @@ class SiteHeader extends HTMLElement {
     markHash();
     addEventListener("hashchange", markHash, { signal });
 
-    const onScroll = () => set({ scrolled: scrollY > 8 });
+    // A page can name the row the header folds over (a rule page's crumbs); until it slides
+    // under the island, the header stays whole.
+    const fold = document.querySelector("[data-header-fold]");
+    let line = 0;
+    const measure = () => (line = this.getBoundingClientRect().top + island.offsetHeight);
+    const onScroll = () =>
+      set({ scrolled: fold ? fold.getBoundingClientRect().bottom < line : scrollY > 8 });
+    if (fold) {
+      measure();
+      addEventListener("resize", () => (measure(), onScroll()), { passive: true, signal });
+    }
     onScroll();
     addEventListener("scroll", onScroll, { passive: true, signal });
 

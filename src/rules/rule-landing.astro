@@ -66,7 +66,7 @@ const [was, now] = rule.coverTag.split(" → ");
   <Backdrop tide />
   <header {...stylex.attrs(arcade.wrap, shell.titleScreen)}>
     {/* Spans both columns, so Share sits over the cover's right edge. */}
-    <div {...stylex.attrs(shell.crumbRow)}>
+    <div {...stylex.attrs(shell.crumbRow)} data-header-fold>
       <nav
         {...stylex.attrs(heroType.tag, veil.dense, shell.crumb, shell.in, shell.first)}
         aria-label="Breadcrumb"

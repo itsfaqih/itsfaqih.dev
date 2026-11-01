@@ -28,7 +28,6 @@ const SHAKE_TIME = "320ms";
 const STACKED = "@media (max-width: 960px)";
 const PHONE = "@media (max-width: 640px)";
 const TINY = "@media (max-width: 400px)";
-const COMPACT = ':is(:root:has(.arc-bar[data-mode="compact"]) *)';
 // Only the rule page itself: when a pager card opens the next rule, the old page holds the card.
 // Diving in names the opened page; zooming back out to the index names the page being left.
 // Set by the head script (head-script.ts) on a page a rule tile's dive opened.
@@ -47,7 +46,6 @@ export const shell = stylex.create({
     isolation: "isolate",
     overflowWrap: "break-word",
   },
-  // Off while the header is compact: the island carries the way back then.
   crumbRow: {
     display: "flex",
     alignItems: "center",
@@ -57,13 +55,6 @@ export const shell = stylex.create({
     justifySelf: "stretch",
     // Stacked, the rows' gap opens for the cover; the crumbs keep closer to the title.
     marginBottom: { default: 0, [STACKED]: "-16px" },
-    opacity: { default: null, [COMPACT]: 0 },
-    filter: { default: null, [COMPACT]: { default: "blur(4px)", [REDUCE]: "none" } },
-    visibility: { default: null, [COMPACT]: "hidden" },
-    transition: {
-      default: `opacity 240ms ${motion["--out"]} 40ms, filter 260ms ${motion["--out"]} 40ms, visibility 0s`,
-      [COMPACT]: "opacity 120ms ease, filter 120ms ease, visibility 0s 120ms",
-    },
   },
   crumb: {
     gap: { default: "10px", [TINY]: "6px" },
