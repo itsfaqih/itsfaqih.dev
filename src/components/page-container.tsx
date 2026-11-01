@@ -31,7 +31,8 @@ const styles = stylex.create({
       backgroundImage: {
         default: null,
         [PHONE]: {
-          default: "linear-gradient(90deg, transparent 0%, #FFFFFF 0%, #FFFFFF 100%, transparent 100%)",
+          default:
+            "linear-gradient(90deg, transparent 0%, #FFFFFF 0%, #FFFFFF 100%, transparent 100%)",
           ":is(.dark *)": "none",
         },
       },
@@ -39,7 +40,8 @@ const styles = stylex.create({
       backgroundPosition: { default: null, [PHONE]: { default: null, ":is(.dark *)": "0 0" } },
       maskImage: {
         default: null,
-        [PHONE]: "linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%)",
+        [PHONE]:
+          "linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%)",
       },
       opacity: { default: null, [PHONE]: 0.9 },
     },

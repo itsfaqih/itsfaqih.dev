@@ -681,7 +681,12 @@ function ClearDemo({ way }: { way: Way }) {
         {cleared && (
           <button
             type="button"
-            {...stylex.props(button.base, buttonVariant["primary-neutral"], button.sm, styles.again)}
+            {...stylex.props(
+              button.base,
+              buttonVariant["primary-neutral"],
+              button.sm,
+              styles.again,
+            )}
             disabled={save.phase === "sent"}
             onClick={save.reset}
           >

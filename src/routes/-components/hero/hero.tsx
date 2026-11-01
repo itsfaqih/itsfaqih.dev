@@ -152,7 +152,10 @@ export function Hero({ introDone }: { introDone: boolean }) {
             aria-label={userPaused ? "Play" : "Pause"}
             onClick={() => setPausedByUser(!userPaused)}
           >
-            <span aria-hidden="true" {...stylex.props(styles.glyph, !userPaused && styles.glyphOff)}>
+            <span
+              aria-hidden="true"
+              {...stylex.props(styles.glyph, !userPaused && styles.glyphOff)}
+            >
               ▶
             </span>
             <span aria-hidden="true" {...stylex.props(styles.glyph, userPaused && styles.glyphOff)}>

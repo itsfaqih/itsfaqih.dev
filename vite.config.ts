@@ -244,7 +244,7 @@ const remarkPlugins = [remarkFrontmatter, remarkMdxFrontmatter];
 
 const config = defineConfig({
   fmt: {
-    ignorePatterns: ["tools/oxlint/anti-slop/**"],
+    ignorePatterns: ["tools/oxlint/anti-slop/**", "src/routeTree.gen.ts", "src/fonts.css"],
   },
   lint: {
     ignorePatterns: [

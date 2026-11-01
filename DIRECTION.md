@@ -7,12 +7,14 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
 ## Brief
 
 **Who arrives.** There are two groups:
+
 - Front-end engineers who got an article link from a colleague, X or LinkedIn. They land on one article, read part of it, and decide whether the rest of the shelf is worth a look.
 - Hiring managers who came from the home page and use the shelf as proof of how Faqih thinks.
 
 **The one action.** Open the next rule. On the index, that means picking a rule. On an article, it means reaching the end and taking the next-rule card.
 
-**Feel.** *Playful, legible, exact.*
+**Feel.** _Playful, legible, exact._
+
 - Playful keeps the arcade's select-screen energy.
 - Legible pulls back toward long-form reading, because these are articles people read for ten minutes.
 - Exact means each thumbnail shows the rule itself, not a generic icon.
@@ -29,7 +31,7 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
    - The art fills the upper ~60% of a portrait card, with the copy bottom-aligned at 16px padding.
    - Small labelled overlay boxes pop on and off over the art, so the art looks "inspected".
    - Taken: one hue per thumbnail, tints of that hue only, and one state chip that changes during the loop.
-3. **uiarc:speculative-decoding** (moving): an illustration that *is* the concept.
+3. **uiarc:speculative-decoding** (moving): an illustration that _is_ the concept.
    - Chips arrive one at a time, then a left-to-right sweep stamps each one with a verdict.
    - Probe values: chip transitions at 160ms `cubic-bezier(0.22,1,0.36,1)`, entrances at 340ms `cubic-bezier(0.16,1,0.3,1)` staggered by 50ms, a strike-through at 180ms, and narrating microcopy that changes in step.
    - Reduced motion: 0 moving. 60fps.
@@ -47,17 +49,18 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
 
 ### Type
 
-| Role | Font and size | Notes |
-| --- | --- | --- |
-| Article H1 | Unbounded 900, 52px desktop / 36px mobile, leading 1.02 | Tracking -0.04em, as in the v5 hero h1 |
-| Article H2 | Unbounded 700, 28px / 24px | Tracking -0.03em, 1.3x the H3 |
-| H3 | Inter 600, 20px | Left as the articles have it, apart from colour |
-| Lead paragraph | Inter 400, 19px / 1.55, `--dim` | The emphasised second line is `--text` |
-| Body | Inter 16px / 1.65 | The 768px column keeps it near 70ch |
-| Labels | Unbounded 500/700, 11–12px | Rule number, topic, nav and chip labels, as in the v5 `.tag` and `.tile .n` |
-| Code tokens in thumbnails | Geist Mono 9–10px (SVG units) | `styles.ts`, `null` and similar. Code is the only thing set in mono. |
+| Role                      | Font and size                                           | Notes                                                                       |
+| ------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Article H1                | Unbounded 900, 52px desktop / 36px mobile, leading 1.02 | Tracking -0.04em, as in the v5 hero h1                                      |
+| Article H2                | Unbounded 700, 28px / 24px                              | Tracking -0.03em, 1.3x the H3                                               |
+| H3                        | Inter 600, 20px                                         | Left as the articles have it, apart from colour                             |
+| Lead paragraph            | Inter 400, 19px / 1.55, `--dim`                         | The emphasised second line is `--text`                                      |
+| Body                      | Inter 16px / 1.65                                       | The 768px column keeps it near 70ch                                         |
+| Labels                    | Unbounded 500/700, 11–12px                              | Rule number, topic, nav and chip labels, as in the v5 `.tag` and `.tile .n` |
+| Code tokens in thumbnails | Geist Mono 9–10px (SVG units)                           | `styles.ts`, `null` and similar. Code is the only thing set in mono.        |
 
 ### Color
+
 - **Neutrals** carry the page, using the v5 tokens above.
 - **Topic hue (`--c`).** Each rule takes its topic hue. It may appear on:
   - the number and topic label,
@@ -66,7 +69,7 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
   - the active contents tick,
   - the next-rule card's border on hover,
   - the 4px top stripe of a tile.
-  Body text, headings and demos never take it; demos keep their own semantic colours.
+    Body text, headings and demos never take it; demos keep their own semantic colours.
 - **Yellow `--go`** is kept for actions and focus: the focus ring, the search focus and "Email me". The Markdown button stays neutral (`btn soft`).
 - **Thumbnail field:** `color-mix(in srgb, var(--c) 9%, #101017)`.
 - **Thumbnail art:**
@@ -76,6 +79,7 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
 - **Dot grid:** `--c` at 14%, on an 8px pitch.
 
 ### Layout
+
 - **Index.** Keep the v5 select layout: the 340px sticky panel plus the grid.
   - Tiles become cartridges: a 16:10 thumbnail screen on top, then the number row, then the title.
   - The grid minimum is 168px. That gives 4 columns at 1440px, 3 at 1024px and 2 at 390px.
@@ -89,41 +93,47 @@ The `redesign/` prototypes and `shots/` captures this file cites are no longer i
 - **Spacing scale:** 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96.
 
 ### Imagery
+
 Every visible rule gets a hand-made SVG thumbnail (viewBox 160×100), animated with CSS keyframes:
 
-| Rule | Loop (≈3.2s) | Still frame | Chip |
-| --- | --- | --- | --- |
-| Proximity Principle | `styles.ts` sits in `shared/`, far from `OrderCard/`. A dashed link from `OrderCard.tsx` to it is long. The file slides into `OrderCard/` and the link shrinks to nothing. | file inside `OrderCard/` | `FAR` → `NEAR` |
-| Button Design | A cursor arrives, the button lightens (hover), presses (scale .94), spins (`Saving…`) and lands on `Saved ✓`. A row of 5 pips marks each state. | `Saved ✓`, all pips lit | `IDLE` / `HOVER` / `PRESS` / `LOAD` / `DONE` |
-| Data Loading | Cached rows show at once, dimmed. A revalidate bar sweeps the top edge, and row 2 changes value and flashes. | fresh rows | `STALE` → `FRESH` |
-| Null vs Undefined | Two slots. `undefined` is a dashed outline with a blinking `?`. A solid box with `∅` drops into the `null` slot. | both slots filled as described | `MISSING` / `EMPTY` |
-| Any rule without art | The topic glyph, centred on the dot grid in the same frame. | — | — |
+| Rule                 | Loop (≈3.2s)                                                                                                                                                               | Still frame                    | Chip                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | -------------------------------------------- |
+| Proximity Principle  | `styles.ts` sits in `shared/`, far from `OrderCard/`. A dashed link from `OrderCard.tsx` to it is long. The file slides into `OrderCard/` and the link shrinks to nothing. | file inside `OrderCard/`       | `FAR` → `NEAR`                               |
+| Button Design        | A cursor arrives, the button lightens (hover), presses (scale .94), spins (`Saving…`) and lands on `Saved ✓`. A row of 5 pips marks each state.                            | `Saved ✓`, all pips lit        | `IDLE` / `HOVER` / `PRESS` / `LOAD` / `DONE` |
+| Data Loading         | Cached rows show at once, dimmed. A revalidate bar sweeps the top edge, and row 2 changes value and flashes.                                                               | fresh rows                     | `STALE` → `FRESH`                            |
+| Null vs Undefined    | Two slots. `undefined` is a dashed outline with a blinking `?`. A solid box with `∅` drops into the `null` slot.                                                           | both slots filled as described | `MISSING` / `EMPTY`                          |
+| Any rule without art | The topic glyph, centred on the dot grid in the same frame.                                                                                                                | —                              | —                                            |
 
 The fallback lets the shelf grow to 100 rules before each one has custom art.
 
 ### Motion
-| Moment | Trigger | Properties | Curve / duration | Reduced motion | Source |
-| --- | --- | --- | --- | --- | --- |
-| Thumbnail loop | `[data-play]` on an ancestor: the selected tile, the select panel, the hovered next-rule card, and the article hero for 2 loops | transform, opacity only, as keyframes with 4 beats and per-beat `--out` easing | 3200ms | no animation; the designed still shows | uiarc:speculative-decoding |
-| Tile select | hover or focus | existing lift (−4px, scale 1.04) and sibling dim to 25%; the thumbnail starts playing | 220ms `--snap`, dim 160ms ease | colour and opacity only | v5 |
-| Panel swap | selection changes | thumbnail enters `translateX(-60px) scale(.7)` → 0 | 380ms `--snap` | none | v5 `.sel .big` |
-| Article hero entrance | load, once | breadcrumb, H1, lead and actions move `translateX(-24px)` → 0 with opacity, staggered 60ms; the thumbnail goes scale .9 → 1 | 380ms `--snap` | opacity, 200ms | v5 cut-in |
-| Contents tick | active section changes (IntersectionObserver) | `scaleX` 1 → 2.2 and colour to `--c` | 300ms `cubic-bezier(.23,1,.32,1)` | colour only | 21st:research-report |
-| Next-rule card | hover or focus | `translateY(-4px)`, border to `--c`, thumbnail plays | 220ms `--snap` | border colour only | v5 tile |
+
+| Moment                | Trigger                                                                                                                         | Properties                                                                                                                  | Curve / duration                  | Reduced motion                         | Source                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | -------------------------------------- | -------------------------- |
+| Thumbnail loop        | `[data-play]` on an ancestor: the selected tile, the select panel, the hovered next-rule card, and the article hero for 2 loops | transform, opacity only, as keyframes with 4 beats and per-beat `--out` easing                                              | 3200ms                            | no animation; the designed still shows | uiarc:speculative-decoding |
+| Tile select           | hover or focus                                                                                                                  | existing lift (−4px, scale 1.04) and sibling dim to 25%; the thumbnail starts playing                                       | 220ms `--snap`, dim 160ms ease    | colour and opacity only                | v5                         |
+| Panel swap            | selection changes                                                                                                               | thumbnail enters `translateX(-60px) scale(.7)` → 0                                                                          | 380ms `--snap`                    | none                                   | v5 `.sel .big`             |
+| Article hero entrance | load, once                                                                                                                      | breadcrumb, H1, lead and actions move `translateX(-24px)` → 0 with opacity, staggered 60ms; the thumbnail goes scale .9 → 1 | 380ms `--snap`                    | opacity, 200ms                         | v5 cut-in                  |
+| Contents tick         | active section changes (IntersectionObserver)                                                                                   | `scaleX` 1 → 2.2 and colour to `--c`                                                                                        | 300ms `cubic-bezier(.23,1,.32,1)` | colour only                            | 21st:research-report       |
+| Next-rule card        | hover or focus                                                                                                                  | `translateY(-4px)`, border to `--c`, thumbnail plays                                                                        | 220ms `--snap`                    | border colour only                     | v5 tile                    |
 
 **What stays still:** the article body, demos (they have their own controls), headings after their entrance, and every thumbnail not being pointed at. Only one thumbnail loops in the grid at a time, plus the panel's copy of the same rule.
 
 ### Shader
+
 None. The thumbnails are the moving signature, and a shader ground would compete with long-form reading.
 
 ### Moves
+
 - `monochrome-hue-matched-card-art`: one hue per rule keeps a shelf of up to 100 rules coherent.
 - `state-narrating-microcopy`: the chip names each beat, so the loop teaches the rule even on a small tile.
 - `hover-focus-dims-siblings`: kept from v5 on the grid.
 - `colour-maps-to-meaning`: the topic hue means the topic everywhere: tile, panel, cover, rail, next card.
 
 ### Signature
+
 **Every rule is a cartridge that plays its own rule.** Point at a tile and its screen acts the rule out in three seconds:
+
 - a styles file walks over to the component that uses it,
 - a button runs through all five states,
 - stale rows revalidate,
@@ -132,7 +142,9 @@ None. The thumbnails are the moving signature, and a shader ground would compete
 The same cartridge is the article's cover and the "next rule" card, so a visitor learns the shelf by its pictures. None of the anchors makes the thumbnail a demonstration of the content it covers.
 
 ## Sameness check (planned)
+
 Only one house-style trait is shared: numbered items ("No.002"). The page avoids the rest:
+
 - the ground is near-black, not warm paper;
 - there are five topic hues plus yellow, not one orange accent;
 - the display face is Unbounded 900, not a light serif;
@@ -141,7 +153,9 @@ Only one house-style trait is shared: numbered items ("No.002"). The page avoids
 - there is no dark closing band with a giant wordmark.
 
 ## Critique, round 1
+
 Shots: `shots/rot/r1-index`, `shots/rot/r1-article`, `shots/rot/r1-proximity`.
+
 - **Squint (1440).** The eye lands on the H1, then the cover, then "View Markdown", then the first demo. The cover is the brightest thing in the hero but sits second because of the H1's size. That is the intended order.
 - **Type.** H1 46px, then H2 Unbounded 28px, then H3 Inter 20px (about 1.4× each step). Display tracking is tightened. The 768px column keeps body text near 70ch. The H2 override beats the StyleX classes, which the shots confirm.
 - **Color.** Neutrals carry the page, with one topic hue per article: the crumb, the cover and the active tick. Yellow appears only on "Email me". There are three hues on screen, counting the demo's blue.
@@ -155,7 +169,9 @@ Shots: `shots/rot/r1-index`, `shots/rot/r1-article`, `shots/rot/r1-proximity`.
 Fixes: the spinner moved to x=52 and `Saving…` is now 8px at x=88. The mobile cover is now 240px and left-aligned with the text.
 
 ## Critique, round 2
+
 Shots: `shots/rot/r2-null`, `shots/rot/r2-data`. Motion: `shots/rot/r2-motion`, `r2-motion-390`, `r2-motion-index`.
+
 - **Motion, index.** The tile stagger is 320ms `--snap` at 18ms steps, and the panel thumb enters in 380ms `--snap`. Only the selected rule's loop runs (3200ms `--out`). The dim is 160ms. Findings: none. Under reduced motion, 0 animations run.
 - **Motion, article.** The crumb, H1, lead and actions enter at 380ms `--snap` with 60ms steps, and the cover at 420ms, +120ms. The cover loops twice and then holds the still frame. The rail ticks transition at 300ms.
 - **Explained findings:**
@@ -166,6 +182,7 @@ Shots: `shots/rot/r2-null`, `shots/rot/r2-data`. Motion: `shots/rot/r2-motion`, 
 - **Spinner fix.** It holds at every size in the LOAD frames.
 
 Remaining nits:
+
 - Hidden rules (typescript, table, dialog, timestamps) use the glyph fallback until they get art.
 - The article demos keep their own blue, by design.
 
@@ -174,23 +191,26 @@ Remaining nits:
 # Home hero: the bench (Anatomy pass)
 
 ## Brief
+
 **Who arrives.** Hiring managers and engineers landing on the home page for the first time.
 **The one action.** Email Faqih. "Read my rules" is the second action.
-**Feel.** *Exact, mechanical, playful.* The hero should look like a precision instrument, while the arcade palette and the rotating headline keep it fun.
+**Feel.** _Exact, mechanical, playful._ The hero should look like a precision instrument, while the arcade palette and the rotating headline keep it fun.
 **Request.** Add a fifth headline, "I build reliable tests". The right side becomes one 3D illustration built with the Anatomy skill (github.com/wheresryan22/anatomy, MIT). The tabs, captions and state buttons go.
 
 ## Anchors
+
 1. **Anatomy `examples/dial-indicator` and `examples/push-button`** set the drawing quality for every part:
    - a base plate on feet, a groove inset 5, corner screws as 0.5 dots inside 2.2 rings;
    - a ruler strip with ticks every 4 and a major every 5th;
    - four-tone sides, 0.6px lines, one lit part.
    - Camera: azimuth 42°, elevation 30°.
    - Motion: exponential follow (τ 0.28s), and springs at stiffness 420.
-2. **anatomy:collection.mutex**: a concurrency bug told as a machine (two pumps, one interlock key). This is the idea to take: each headline gets a machine whose working *is* the claim.
+2. **anatomy:collection.mutex**: a concurrency bug told as a machine (two pumps, one interlock key). This is the idea to take: each headline gets a machine whose working _is_ the claim.
 3. **designspells:animated-isometric-illustrations-in-airbnb's-filters**: one line drawing per option, swapped in the same frame and at the same scale when the option changes. This is how the bench changes machine with each headline.
 4. **21st:eugeneshilow.agentic-factory-3d** (moving): a pipeline drawn as a small machine on a dark stage, where a token travels station to station. It is the model for the Agents machine.
 
 ## Direction
+
 - **Imagery.** Five machines share one bench: the same 260×140 base plate, the same camera (azimuth 40°, elevation 30°), the same scale and the same viewBox. The plate stays put and only the machine on it changes.
   1. **Interfaces that behave:** a key-switch test rig. A probe on a post lowers onto a `SAVE` keycap: hover, press, pending, done. Five state lamps on a strip light in turn, and the last one is green.
   2. **Agentic setups that work:** a conveyor. A puck (the change) passes a tool stamp, then a gate with three check lamps (lint, types, tests), then lands in a review tray, where a flag goes up.
@@ -205,6 +225,7 @@ Remaining nits:
 - **Signature.** The headline names the work and the bench below it does that work: change the headline and the machine on the plate changes with it.
 
 ## Critique, round 1 (hero bench)
+
 - **Squint.** Headline, then the yellow Email button, then the bench. The bench read as a dim smudge: the structure tones (lo #3d3d4e at 0.75px) disappeared against #0e0e13 at 1x. **Fix:** lo → #4a4a5e, mid → #7d7d96, faint → #30303f, top → #21212d, weight 0.9px.
 - **Size.** The plate filled about 75% of the column, but the camera fit left empty headroom. **Fix:** fit padding 14 → 6, and on desktop the figure runs 56px past the column into the gap.
 - **Motion probe** (1440 and 390, `shots/hero-3d/motion-*.webp`): 57fps, p95 16.8ms, rAF only while a machine runs (35/s). Reduced motion: 0 moving, 0 rAF. Each machine shows its finished frame, checked by capture: done lamp, flag up, stack of three, batch on the counter, five passes. Findings are explained, not bugs: the 420ms machine swap is a scene change, not control feedback; the 7.6s pip bar is the slide timer.
@@ -214,6 +235,7 @@ Remaining nits:
 - **Generated tells.** None added: no captions or pills over the visual, and no card around it.
 
 ## Critique, round 2 (hero bench)
+
 - Desktop and 390 captures in `shots/hero-3d/desktop.png` and `mobile.png`. The bench now holds its own against the headline without competing with it. At 390 the headline and both actions stay above the fold and the bench follows.
 - **Nit:** the dev-only floating widgets sit over the pause button at 390. They are not in production.
 - **Cost:** the five machines ship as SVG strings, about 53KB gzipped inside the home route chunk (103KB gzipped total). This is acceptable for the hero image. If it ever matters, the next step is to lazy-load machines 2 to 5.
@@ -226,7 +248,8 @@ Remaining nits:
 
 **The one action.** Pick a card. That means a rule tile, the next-rule card, or a project. Every other card is there to be read.
 
-**Feel.** *Toy-like, legible, tactile.*
+**Feel.** _Toy-like, legible, tactile._
+
 - Toy-like means cards look like physical game pieces: raised panels, slots sunk into them, a selection cursor.
 - Legible pulls against that. Article text inside the panels is read for minutes at a time, so the game language stays on the frame and never touches the copy.
 - Tactile means a card you can press behaves like the arcade keys on the site's buttons: it rises on hover and sinks on press.
@@ -243,9 +266,11 @@ Remaining nits:
 ## Direction
 
 ### Type
+
 No change. Unbounded 700 for card titles and labels, and Geist for body text (from anchor 1: game styling goes on the chrome, not the copy).
 
 ### Color
+
 - Neutrals carry the panels: `--panel`, `--panel-2` and `--hair` are unchanged.
 - New tokens:
   - `--bevel-hi`: `rgba(255,255,255,.06)` in dark, `rgba(255,255,255,.9)` in light. The inner top edge.
@@ -254,30 +279,36 @@ No change. Unbounded 700 for card titles and labels, and Geist for body text (fr
 - Each card's hue `--c` stays where it already is (top bar, labels and the hover border), and also colours the reticle. Yellow `--go` is the reticle colour for cards that have no hue of their own.
 
 ### Layout
+
 No change to grids or spacing. Radii stay the same so the cards keep matching the buttons and chips.
 
 ### Imagery
+
 No new imagery. The thumbnails stay as they are; the reticle is pure CSS (eight gradient legs on one `::after`).
 
 ### Motion
+
 All card motion uses the existing tokens `--snap` and `--out`, plus `ease` for colour.
 
-| Moment | Trigger | Properties | Curve and duration | Reduced motion | Source |
-| --- | --- | --- | --- | --- | --- |
-| Lift | hover or focus on a pickable card | `translateY(-4px)`, drop grows from 4px to 8px | `--snap`, 220ms | no movement; the drop is still applied | anchor 6 |
-| Press | `:active` | `translateY(2px)`, drop shrinks to 1px | `ease`, 100ms | no movement | anchor 5 |
-| Reticle lock | hover or focus on a pickable card | brackets go from opacity 0 at `scale(1.08)` to 1 at `scale(1)` | `--snap`, 200ms; fades out over 120ms | fades only, no scale | anchor 2 |
+| Moment       | Trigger                           | Properties                                                     | Curve and duration                    | Reduced motion                         | Source   |
+| ------------ | --------------------------------- | -------------------------------------------------------------- | ------------------------------------- | -------------------------------------- | -------- |
+| Lift         | hover or focus on a pickable card | `translateY(-4px)`, drop grows from 4px to 8px                 | `--snap`, 220ms                       | no movement; the drop is still applied | anchor 6 |
+| Press        | `:active`                         | `translateY(2px)`, drop shrinks to 1px                         | `ease`, 100ms                         | no movement                            | anchor 5 |
+| Reticle lock | hover or focus on a pickable card | brackets go from opacity 0 at `scale(1.08)` to 1 at `scale(1)` | `--snap`, 200ms; fades out over 120ms | fades only, no scale                   | anchor 2 |
 
 What stays still: reading panels (code, verdicts, tips, demos) get the bevel and drop but no lift, because nobody picks them. The existing small hover nudge on tip slots stays.
 
 ### Shader
+
 None. The site already has a dithered dot-matrix backdrop, and a dither inside cards would compete with code and demos that people read.
 
 ### Moves
+
 - `skeuomorphic-hardware-controls`: raised panels and sunken wells make the cards look like hardware.
 - `technical-annotation-overlay`: only the corner brackets are taken, and they mean "selected", not measurement.
 
 ### Signature
+
 **The select reticle.** Four chunky corner brackets in the card's own hue snap onto whichever card the pointer or keyboard focus is on, the way a fighting-game character-select cursor locks onto a fighter. It works the same on rule tiles, project cards, next-rule cards and feature tiles, and it reuses the site's "select screen" idea (`.select`, `.sel`), so the whole site has one cursor.
 
 ## Critique, round 1 (cards)
@@ -324,26 +355,27 @@ The visitor is a hiring manager or founder who opened the link from a message. T
 
 **Trigger.** The existing `[data-cut]` observer (rootMargin -12% at the bottom) adds `.in` once. It now starts observing only after the intro hands off (`started`), so nothing plays under the shutter. Without JS, and with no `.js` class, everything shows at rest.
 
-| Moment | What moves | Curve and duration | Reduced motion |
-| --- | --- | --- | --- |
-| Header (first paint) | Bar drops from -100% to 0 | 400ms `--out` | Static |
-| Header (scrolled past 8px) | Gains a panel background, hairline and 4px hard drop | 200ms ease | Same: colour only |
-| Hero (on start) | Tag blinks on; headline keeps its pop and slash; lead rises 16px at +140ms; buttons pop from 0.6 at +240ms and +290ms; bench rises 32px from 0.94 at +100ms | `--out` 560ms; pops `--snap` 420ms | Fade only, 240ms |
-| Ticker | Clip wipe left to right | 640ms `--cut` | Fade only |
-| Section eyebrows | 8-bit blink on, `steps(1)` | 360ms | Fade only |
-| Section headings | Existing pop-in, kept | 500ms `--snap` | Fade only |
-| Rule tiles and project cards | Dealt like cards: from 0.6 scale and -6deg, 40ms apart | 420ms `--snap` | Fade only |
-| Rule select panel, filter chips, search | Panel rises 24px; chips pop 40ms apart | `--out` 560ms; `--snap` 420ms | Fade only |
-| Stack badges (signature) | Power-up collect: each badge pops from 0.3 and flashes its real brand colour on the border and icon, then settles back to neutral, 30ms apart | 520ms `--snap` | Fade only, no flash |
-| Experience rows | Existing stepped flick, kept | 420ms `steps(1)` | Fade only |
-| Contact panel | Rises 40ms onto its gold drop; then the buttons pop | `--out` 560ms; buttons +180ms | Fade only |
-| Footer | Rises 12px | 400ms `--out` | Fade only |
+| Moment                                  | What moves                                                                                                                                                  | Curve and duration                 | Reduced motion      |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------- |
+| Header (first paint)                    | Bar drops from -100% to 0                                                                                                                                   | 400ms `--out`                      | Static              |
+| Header (scrolled past 8px)              | Gains a panel background, hairline and 4px hard drop                                                                                                        | 200ms ease                         | Same: colour only   |
+| Hero (on start)                         | Tag blinks on; headline keeps its pop and slash; lead rises 16px at +140ms; buttons pop from 0.6 at +240ms and +290ms; bench rises 32px from 0.94 at +100ms | `--out` 560ms; pops `--snap` 420ms | Fade only, 240ms    |
+| Ticker                                  | Clip wipe left to right                                                                                                                                     | 640ms `--cut`                      | Fade only           |
+| Section eyebrows                        | 8-bit blink on, `steps(1)`                                                                                                                                  | 360ms                              | Fade only           |
+| Section headings                        | Existing pop-in, kept                                                                                                                                       | 500ms `--snap`                     | Fade only           |
+| Rule tiles and project cards            | Dealt like cards: from 0.6 scale and -6deg, 40ms apart                                                                                                      | 420ms `--snap`                     | Fade only           |
+| Rule select panel, filter chips, search | Panel rises 24px; chips pop 40ms apart                                                                                                                      | `--out` 560ms; `--snap` 420ms      | Fade only           |
+| Stack badges (signature)                | Power-up collect: each badge pops from 0.3 and flashes its real brand colour on the border and icon, then settles back to neutral, 30ms apart               | 520ms `--snap`                     | Fade only, no flash |
+| Experience rows                         | Existing stepped flick, kept                                                                                                                                | 420ms `steps(1)`                   | Fade only           |
+| Contact panel                           | Rises 40ms onto its gold drop; then the buttons pop                                                                                                         | `--out` 560ms; buttons +180ms      | Fade only           |
+| Footer                                  | Rises 12px                                                                                                                                                  | 400ms `--out`                      | Fade only           |
 
 **What stays still:** the backdrop, the ticker's marquee speed, and hover and press feedback, which keep their existing timings. Nothing animates on scroll back up.
 
 **Shader:** none. The page's ground is already set and the motion lives in the panels.
 
 **Moves:**
+
 - `spring-and-rubber-band-physics`: one overshoot on small pieces, with a 30 to 50ms stagger.
 - `motion-token-scale`: the four timing tokens.
 - `branded-intro-sequence`: the order runs intro, then header, then hero, then sections, and the existing name intro stays the mark.
@@ -405,6 +437,7 @@ Shots and motion sheets: `shots/load/`, including the probe sheets for the top a
 ## Direction
 
 **Hero type:**
+
 - The same Unbounded 900, with leading 1.02 and tracking -0.04em.
 - Line 1 is "I build". Line 2 is the noun plus "that". Line 3 is the highlight plus a full stop.
 - The size is capped so the longest line 2 ("agentic setups that") fits the column without wrapping: `clamp(34px, 4.1vw, 52px)` at desktop. At 390px a line 2 may wrap, which still gives three or more lines.
@@ -416,10 +449,10 @@ Shots and motion sheets: `shots/load/`, including the probe sheets for the top a
 
 **Article slides:** each direct child of each top-level section block is a slide piece.
 
-| Phase | Timeline | Transform | Opacity |
-| --- | --- | --- | --- |
-| Enter | `view()`, `entry 0%` to `entry 100%` (capped by `cover 40%` for tall blocks) | `perspective(1200px) rotateX(22deg) translateY(60px) scale(0.92)` to none, origin at the bottom | 0 to 1 |
-| Leave | `view()`, `exit 0%` to `exit 100%` | to `perspective(1200px) rotateX(-8deg) scale(0.94)`, origin at the top | to 0.25 |
+| Phase | Timeline                                                                     | Transform                                                                                       | Opacity |
+| ----- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------- |
+| Enter | `view()`, `entry 0%` to `entry 100%` (capped by `cover 40%` for tall blocks) | `perspective(1200px) rotateX(22deg) translateY(60px) scale(0.92)` to none, origin at the bottom | 0 to 1  |
+| Leave | `view()`, `exit 0%` to `exit 100%`                                           | to `perspective(1200px) rotateX(-8deg) scale(0.94)`, origin at the top                          | to 0.25 |
 
 - The section h2 marker square gets an extra spin-in (rotate 90deg to 0) on the same entry range, so each slide is "stamped".
 - **Fallback (no scroll timelines):** a one-shot IntersectionObserver deal-in of the same pieces, at `--t-panel` with `--out`.
@@ -437,6 +470,7 @@ Shots and motion sheets: `shots/load/`, including the probe sheets for the top a
 The user's correction: the slides must play with progress controlled by scroll, not as per-piece reveals or interactive widgets. The `pinned-stacked-panel-scroll` move is now applied for real, pin included.
 
 **Structure:**
+
 - `RulePage` wraps each child except the pager in `.rot-slide > .rot-card + .rot-tail`. The first slide is the hero (no panel) and the last section never holds.
 - A ResizeObserver keeps each card's height in `--h`.
 - The card is `position: sticky` at `--pin: min(88px, 100svh - h - 24px)`, so a short card pins under the 72px header and a tall card pins only once its bottom edge is on screen. Nothing gets covered before it has been read.
@@ -444,12 +478,12 @@ The user's correction: the slides must play with progress controlled by scroll, 
 
 **Scroll-driven moments:**
 
-| Moment | Timeline and range | Change |
-| --- | --- | --- |
-| Card rise | the slide's own `view-timeline: --slide`, `cover 0%` to `cover 45svh` | `perspective(1400px) rotateX(16deg) scale(.92)` to flat |
-| Pieces stand up | each piece's `view()`, `entry 0%` to `entry 100%` | `translateY(40px) scale(.96)` with opacity 0, to rest |
+| Moment                    | Timeline and range                                                                                                                                                                                                 | Change                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| Card rise                 | the slide's own `view-timeline: --slide`, `cover 0%` to `cover 45svh`                                                                                                                                              | `perspective(1400px) rotateX(16deg) scale(.92)` to flat |
+| Pieces stand up           | each piece's `view()`, `entry 0%` to `entry 100%`                                                                                                                                                                  | `translateY(40px) scale(.96)` with opacity 0, to rest   |
 | Card sinks under the next | `.rot-tail`, a 1px marker at the next card's top edge (`timeline-scope: --tail`, `view-timeline-inset: 88px 0`), from the moment the next card touches this one's bottom edge to the next card reaching the header | `scale` to .88, opacity to 0, then `visibility: hidden` |
-| Heading stamp | the h2 marker's `view()` | the existing spin-in |
+| Heading stamp             | the h2 marker's `view()`                                                                                                                                                                                           | the existing spin-in                                    |
 
 Every moment uses linear easing because scroll is the clock, and scrolling back plays it in reverse.
 
@@ -474,6 +508,7 @@ Shots: `shots/deck/dl-1440-s1-*.png` (first build).
 ## Critique, round 2 (pinned deck)
 
 Shots:
+
 - `shots/deck/dl-1440-s1-{0,0.4,0.75}.png`: a short card pinned, half covered, then nearly gone.
 - `dl-1440-tall-s3-0.5.png`: a tall card pinned by its bottom edge.
 - `dl-1440-hero-0.5.png`: the hero sinking under slide 1.
@@ -481,6 +516,7 @@ Shots:
 - `proximity-principle-`, `button-design-` and `dialog-design-1440-s2-0.5.png`: light theme.
 
 Checks:
+
 - **Motion:** pinning, covering and sinking all reverse when you scroll up.
 - **Navigation:** stepping with the keys lands each slide pinned at 88px with the previous slide at opacity 0.
 - **Reduced motion:** `position: static`, `animation: none`, no spacer.
@@ -488,6 +524,7 @@ Checks:
 - **Mobile:** no horizontal overflow at 390.
 
 Nits left:
+
 - The HUD title switches once the incoming heading crosses 30% of the screen, a little before that card pins.
 - In dev, the PostHog toolbar and the TanStack devtools button still overlap the HUD. Neither ships.
 
@@ -543,6 +580,7 @@ Shots: `shots/writing/r1-*.png` (1440 dark, every article; 390 dark; 1440 light)
   - Stagger: +80ms steps.
 
   The `long-entrance` findings are the hero cartridge's own 3200ms loop, which predates this pass.
+
 - **Bugs found and fixed.**
   - A CSS counter numbered every heading "1", because counters do not carry across the `display: contents` wrapper. Numbers now come from `data-stage`, which the rail sets.
   - The checkpoint bar could not complete the last two sections when both fit in the final screen. The bar now maps page scroll onto the route, so it always finishes at the bottom.

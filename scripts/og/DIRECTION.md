@@ -8,7 +8,7 @@ The build draws one 1200×630 card per page with Satori (see `card.tsx`). The ca
 
 **The one action.** Open the link. The card earns the click by saying the rule's point before the visit, which the page's `<title>` alone cannot.
 
-**Feel.** *Loud, exact, quiet.* Loud is the arcade's chunky Unbounded and topic hue, so the card stands out in a grey feed. Exact means each card names its own rule and its before→after, not a generic site banner. Quiet keeps it to one hue per card on the site's near-black ground.
+**Feel.** _Loud, exact, quiet._ Loud is the arcade's chunky Unbounded and topic hue, so the card stands out in a grey feed. Exact means each card names its own rule and its before→after, not a generic site banner. Quiet keeps it to one hue per card on the site's near-black ground.
 
 ## Anchors
 
@@ -20,39 +20,47 @@ The build draws one 1200×630 card per page with Satori (see `card.tsx`). The ca
 ## Direction
 
 ### Type
-| Role | Font | Size |
-| --- | --- | --- |
-| Title | Unbounded 900, tracking -0.04em, leading 1.0 | 104px up to 18 characters, 88px up to 30, 76px past that |
-| Lede | Geist 400, `--dim` | 34px / 1.3, at most two lines in 960px |
-| Eyebrow, footer labels, topic names | Geist Mono 500, uppercase, tracking +0.06em | 24px |
-| Chips | Unbounded 700, uppercase | 20px |
+
+| Role                                | Font                                         | Size                                                     |
+| ----------------------------------- | -------------------------------------------- | -------------------------------------------------------- |
+| Title                               | Unbounded 900, tracking -0.04em, leading 1.0 | 104px up to 18 characters, 88px up to 30, 76px past that |
+| Lede                                | Geist 400, `--dim`                           | 34px / 1.3, at most two lines in 960px                   |
+| Eyebrow, footer labels, topic names | Geist Mono 500, uppercase, tracking +0.06em  | 24px                                                     |
+| Chips                               | Unbounded 700, uppercase                     | 20px                                                     |
 
 The title sizes step by about 1.18x, chosen so a two-word rule title fits two lines at 104px and a blog title of 60 characters fits three at 76px. A longer title stops at three lines with an ellipsis rather than running into the footer.
 
 ### Color
+
 - Neutrals carry the card: `--bg`, `--hair`, `--text` and `--dim`, plus a dot colour of `#2a2a36`. The site's `--dot` is fainter, and it vanished at feed size (round 1).
 - One hue per card (move `colour-maps-to-meaning`). A rule takes its topic hue. Home, the indexes and blog posts take the action yellow. The hue appears only on the 12px top bar, the eyebrow, the arrow and the "after" chip.
 - Two cards show several hues, because there the set of topics is the subject. The Rule of Thumb card marks each topic with its dot, and the home card keeps the site's striped ticker.
 
 ### Layout
+
 - 72px side padding, 52px top under the bar, 56px bottom.
 - Eyebrow row on top, title and lede in the middle, footer row on the bottom (wordmark left, chips or domain right).
 - The ground carries a dot grid like the site's, at a 28px pitch where the site uses 22px, so the dots stay distinct when the card shrinks.
 
 ### Imagery
+
 No pictures. The title is the image. The only drawn shapes are the arrow between the before and after chips and the status dot, both SVG or boxes so they need no glyphs the subset fonts lack (the latin subset has no `→`).
 
 ### Motion
+
 None. A link preview is a still image.
 
 ### Shader
+
 None. Satori renders static SVG, and a still dot grid already matches the site's backdrop.
 
 ### Moves
+
 - `colour-maps-to-meaning`: the hue is the topic, the same legend the index and tiles use.
 - `mono-microlabel-layer`: Geist Mono carries every piece of metadata, Unbounded carries the statement.
 
 ### Signature
+
 The rule card's footer shows the rule as a before→after: the "before" chip in dim outline, an arrow, the "after" chip filled in the topic hue (`SILENT → TACTILE`, `BLANK → INSTANT`). Each rule's cover tag already says what the rule changes, so the preview says it too, in a feed, before anyone visits.
 
 ## Critique, round 1

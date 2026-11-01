@@ -37,7 +37,14 @@ function resample(vertices: readonly Pt[]): Outline {
   return [...out.slice(start), ...out.slice(0, start)];
 }
 
-const arcPoints = (cx: number, cy: number, r: number, fromDeg: number, toDeg: number, steps: number) =>
+const arcPoints = (
+  cx: number,
+  cy: number,
+  r: number,
+  fromDeg: number,
+  toDeg: number,
+  steps: number,
+) =>
   Array.from({ length: steps + 1 }, (_, k): Pt => {
     const a = ((fromDeg + ((toDeg - fromDeg) * k) / steps) * Math.PI) / 180;
     return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
@@ -64,7 +71,8 @@ export const collapsed = (outline: Outline): Outline => {
   return dot(x, y);
 };
 
-export const dot = (x: number, y: number): Outline => Array.from({ length: OUTLINE_POINTS }, () => [x, y]);
+export const dot = (x: number, y: number): Outline =>
+  Array.from({ length: OUTLINE_POINTS }, () => [x, y]);
 
 export function moved(outline: Outline, dx: number, dy: number, deg = 0, scale = 1): Outline {
   const xs = outline.map(([x]) => x);

@@ -461,7 +461,10 @@ const styles = stylex.create({
   iconDanger: {
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, [HOVER]: `color-mix(in srgb, ${palette["--no"]} 14%, transparent)` },
+      ":hover": {
+        default: null,
+        [HOVER]: `color-mix(in srgb, ${palette["--no"]} 14%, transparent)`,
+      },
       ":active": `color-mix(in srgb, ${palette["--no"]} 14%, transparent)`,
     },
     color: {

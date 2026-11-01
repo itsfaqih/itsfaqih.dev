@@ -403,8 +403,14 @@ const styles = stylex.create({
     },
     overflow: "hidden",
     transitionProperty: "border-color, box-shadow",
-    transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit] > *)": motion["--t-fast"] },
-    transitionTimingFunction: { default: motion["--exit"], ":is([data-lit] > *)": motion["--fast"] },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":is([data-lit] > *)": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":is([data-lit] > *)": motion["--fast"],
+    },
   },
   plate: {
     fontWeight: 700,
@@ -621,7 +627,10 @@ const styles = stylex.create({
       ...halftoneOverHue,
       opacity: { default: 0, ":is([data-lit])": 1 },
       transitionProperty: "opacity",
-      transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit])": motion["--t-fast"] },
+      transitionDuration: {
+        default: motion["--t-fast-exit"],
+        ":is([data-lit])": motion["--t-fast"],
+      },
       transitionTimingFunction: { default: motion["--exit"], ":is([data-lit])": motion["--fast"] },
     },
   },
@@ -673,8 +682,14 @@ const styles = stylex.create({
     mixBlendMode: { default: "screen", [LIGHT]: "multiply" },
     opacity: { default: 0, ":is([data-lit] > *)": 1 },
     transitionProperty: "opacity",
-    transitionDuration: { default: motion["--t-fast-exit"], ":is([data-lit] > *)": motion["--t-fast"] },
-    transitionTimingFunction: { default: motion["--exit"], ":is([data-lit] > *)": motion["--fast"] },
+    transitionDuration: {
+      default: motion["--t-fast-exit"],
+      ":is([data-lit] > *)": motion["--t-fast"],
+    },
+    transitionTimingFunction: {
+      default: motion["--exit"],
+      ":is([data-lit] > *)": motion["--fast"],
+    },
     animationName: { default: null, ":is([data-lit] > *)": beamOn },
     animationDuration: { default: null, ":is([data-lit] > *)": "260ms" },
     animationTimingFunction: { default: null, ":is([data-lit] > *)": "steps(1)" },

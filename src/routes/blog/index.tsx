@@ -235,7 +235,10 @@ const styles = stylex.create({
     color: palette["--muted-foreground"],
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "0.25rem 0", [REDUCE]: null } },
+      [stylex.when.ancestor(":hover")]: {
+        default: null,
+        [HOVER]: { default: "0.25rem 0", [REDUCE]: null },
+      },
     },
     transitionProperty: "translate",
     transitionDuration: {
@@ -279,7 +282,10 @@ const styles = stylex.create({
     rotate: "180deg",
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "-0.25rem 0", [REDUCE]: null } },
+      [stylex.when.ancestor(":hover")]: {
+        default: null,
+        [HOVER]: { default: "-0.25rem 0", [REDUCE]: null },
+      },
     },
     transitionProperty: "translate",
     transitionDuration: {

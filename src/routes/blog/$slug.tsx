@@ -214,7 +214,10 @@ const styles = stylex.create({
   backArrow: {
     translate: {
       default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER]: { default: "-0.25rem 0", [REDUCE]: null } },
+      [stylex.when.ancestor(":hover")]: {
+        default: null,
+        [HOVER]: { default: "-0.25rem 0", [REDUCE]: null },
+      },
     },
     transitionProperty: "translate",
     transitionDuration: {

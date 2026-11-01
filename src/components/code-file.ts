@@ -3,22 +3,24 @@ import { registerCustomCSSVariableTheme, type FileContents, type FileOptions } f
 const ARCADE_THEME = "arcade";
 registerCustomCSSVariableTheme(ARCADE_THEME, {});
 
-const LANGUAGE_EXTENSIONS = new Map(Object.entries({
-  bash: "sh",
-  css: "css",
-  html: "html",
-  javascript: "js",
-  jsx: "jsx",
-  json: "json",
-  markdown: "md",
-  mdx: "mdx",
-  shell: "sh",
-  text: "txt",
-  ts: "ts",
-  tsx: "tsx",
-  typescript: "ts",
-  yaml: "yml",
-}));
+const LANGUAGE_EXTENSIONS = new Map(
+  Object.entries({
+    bash: "sh",
+    css: "css",
+    html: "html",
+    javascript: "js",
+    jsx: "jsx",
+    json: "json",
+    markdown: "md",
+    mdx: "mdx",
+    shell: "sh",
+    text: "txt",
+    ts: "ts",
+    tsx: "tsx",
+    typescript: "ts",
+    yaml: "yml",
+  }),
+);
 
 export const CODE_OPTIONS: FileOptions<undefined, undefined> = {
   theme: {

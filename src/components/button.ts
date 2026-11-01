@@ -124,7 +124,10 @@ const tone = stylex.create({
 const emphasis = stylex.create({
   // Filled, on its drop: the one main action on a screen.
   primary: {
-    backgroundColor: { default: "var(--c)", [LIVE_HOVER]: { default: null, [HOVER]: "var(--lit)" } },
+    backgroundColor: {
+      default: "var(--c)",
+      [LIVE_HOVER]: { default: null, [HOVER]: "var(--lit)" },
+    },
     color: "var(--on-c)",
     boxShadow: { default: "0 4px 0 var(--key)", [LIVE_ACTIVE]: "0 2px 0 var(--key)" },
   },

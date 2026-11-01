@@ -41,7 +41,8 @@ async function loadFonts(): Promise<Font[]> {
 async function loadTokens() {
   const source = await readFile(new URL("../../src/theme.stylex.ts", import.meta.url), "utf8");
   const palette = source.match(/palette = stylex\.defineVars\(\{([\s\S]*?)\n\}\);/)?.[1];
-  if (!palette) throw new Error("src/theme.stylex.ts has no `palette = stylex.defineVars({…});` block.");
+  if (!palette)
+    throw new Error("src/theme.stylex.ts has no `palette = stylex.defineVars({…});` block.");
   return new Map(
     [...palette.matchAll(/"--([\w-]+)":\s*"(#[0-9a-f]{3,8})"/gi)].map(([, k, v]) => [k!, v!]),
   );

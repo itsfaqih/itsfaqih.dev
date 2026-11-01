@@ -1,6 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import { File } from "@pierre/diffs/react";
-import { isValidElement, type ComponentPropsWithoutRef, type CSSProperties, type ReactElement } from "react";
+import {
+  isValidElement,
+  type ComponentPropsWithoutRef,
+  type CSSProperties,
+  type ReactElement,
+} from "react";
 import { CODE_OPTIONS, codeFile } from "./code-file";
 import { fonts, palette } from "../theme.stylex";
 
@@ -61,9 +66,7 @@ export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
     : undefined;
   const className = codeProps?.className ?? "";
   const language =
-    codeProps?.["data-language"] ??
-    className.match(/(?:^|\s)language-([^\s]+)/)?.[1] ??
-    "text";
+    codeProps?.["data-language"] ?? className.match(/(?:^|\s)language-([^\s]+)/)?.[1] ?? "text";
   const code = readText(codeProps?.children ?? props.children).replace(/\r?\n$/, "");
 
   return <CodeBlock code={code} lang={language} prerenderedHTML={props["data-prerendered"]} />;
@@ -77,7 +80,8 @@ const styles = stylex.create({
     width: "100%",
     minWidth: 0,
     maxWidth: "100%",
-    minHeight: "calc(var(--lines, 0) * var(--diffs-line-height) + 2 * var(--diffs-gap-block) + 2px)",
+    minHeight:
+      "calc(var(--lines, 0) * var(--diffs-line-height) + 2 * var(--diffs-gap-block) + 2px)",
     overflow: "hidden",
     borderWidth: "1px",
     borderStyle: "solid",

@@ -1,5 +1,14 @@
 import * as stylex from "@stylexjs/stylex";
-import { type CSSProperties, type ReactNode, useEffect, useEffectEvent, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useEffectEvent,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   blend,
   circle,
@@ -21,7 +30,11 @@ type TopInk = "solid" | "hue" | "outline";
 function Ink({ p, top = "solid", children }: { p: string; top?: TopInk; children: ReactNode }) {
   return (
     <>
-      <g transform="translate(5 4)" fill={`url(#${p}ht)`} {...stylex.props(styles.part, styles.screen)}>
+      <g
+        transform="translate(5 4)"
+        fill={`url(#${p}ht)`}
+        {...stylex.props(styles.part, styles.screen)}
+      >
         {children}
       </g>
       {top === "solid" && <g {...draw(styles.ink)}>{children}</g>}
@@ -140,7 +153,14 @@ const advancesFrom = (from: number, to?: number) => ADVANCES.slice(from, to);
 const intoWorkerAt = (advance: number) => ADVANCES[advance]! + MOVE_MS;
 const backendsPct = (ms: number) => pct((ms / BACKENDS_MS) * 100);
 
-type JobStop = { at: number; x: number; y?: number; scale?: number; opacity?: number; ease?: string };
+type JobStop = {
+  at: number;
+  x: number;
+  y?: number;
+  scale?: number;
+  opacity?: number;
+  ease?: string;
+};
 
 const jobFrame = ({ at, x, y = 0, scale = 1, opacity = 1, ease }: JobStop) =>
   `${backendsPct(at)} { opacity: ${opacity}; transform: translate(${+x.toFixed(1)}px, ${+y.toFixed(1)}px) scale(${scale});${ease ? ` animation-timing-function: ${ease};` : ""} }`;
@@ -168,14 +188,24 @@ function joining(steps: number[]): JobStop[] {
 }
 
 const absorbed = (advance: number): JobStop[] =>
-  [intoWorkerAt(advance) + ABSORB_MS, BACKENDS_MS].map((at) => ({ at, x: WORKER_X, scale: ABSORBED_SCALE, opacity: 0 }));
+  [intoWorkerAt(advance) + ABSORB_MS, BACKENDS_MS].map((at) => ({
+    at,
+    x: WORKER_X,
+    scale: ABSORBED_SCALE,
+    opacity: 0,
+  }));
 
 function arcBack(): JobStop[] {
   const steps = 16;
   return Array.from({ length: steps - 1 }, (_, k) => {
     const s = (k + 1) / steps;
     const { x, y } = arcPoint(easeInOut(s));
-    return { at: REJECT_MS + ARC_MS * s, x, y: y - QUEUE_Y, scale: +Math.min(1, ABSORBED_SCALE + s * 1.35).toFixed(2) };
+    return {
+      at: REJECT_MS + ARC_MS * s,
+      x,
+      y: y - QUEUE_Y,
+      scale: +Math.min(1, ABSORBED_SCALE + s * 1.35).toFixed(2),
+    };
   });
 }
 
@@ -183,7 +213,10 @@ const STEPS_TO_WORKER = SLOT_X.length + 1;
 const joiner = (advance: number) => {
   const steps = advancesFrom(advance, advance + STEPS_TO_WORKER);
   const done = advance + STEPS_TO_WORKER - 1;
-  return { top: "solid" as const, stops: [...joining(steps), ...(done < ADVANCE_COUNT ? absorbed(done) : [])] };
+  return {
+    top: "solid" as const,
+    stops: [...joining(steps), ...(done < ADVANCE_COUNT ? absorbed(done) : [])],
+  };
 };
 
 const JOBS: { top: TopInk; stops: JobStop[] }[] = [
@@ -212,8 +245,12 @@ const REJECTED_AT = HUE_TAKES[0]!;
 
 function queueKeyframes() {
   const heldToEnd = (stops: JobStop[]) =>
-    stops.at(-1)!.at < BACKENDS_MS ? [...stops, { ...stops.at(-1)!, at: BACKENDS_MS, ease: undefined }] : stops;
-  const jobs = JOBS.map(({ stops }, k) => `@keyframes hp-job-${k} { ${heldToEnd(stops).map(jobFrame).join(" ")} }`);
+    stops.at(-1)!.at < BACKENDS_MS
+      ? [...stops, { ...stops.at(-1)!, at: BACKENDS_MS, ease: undefined }]
+      : stops;
+  const jobs = JOBS.map(
+    ({ stops }, k) => `@keyframes hp-job-${k} { ${heldToEnd(stops).map(jobFrame).join(" ")} }`,
+  );
   const work = WORKER_TAKES.flatMap((at) => [
     `${backendsPct(at)} { transform: scale(0.72); animation-timing-function: ${SPRING}; }`,
     `${backendsPct(at + PULSE_MS)} { transform: scale(1); animation-timing-function: ${INOUT}; }`,
@@ -299,7 +336,11 @@ const SCENES: Scene[] = [
         {QUARTERS.map((piece, i) => (
           <g key={i} {...draw(styles.settle)} style={settleVars(piece, i, 0.3, 0.18)}>
             <Ink p={p} top={piece.top}>
-              <path {...draw(styles.token)} data-token={QUARTER_TOKENS.indexOf(i)} d={toPath(piece.outline)} />
+              <path
+                {...draw(styles.token)}
+                data-token={QUARTER_TOKENS.indexOf(i)}
+                d={toPath(piece.outline)}
+              />
             </Ink>
           </g>
         ))}
@@ -316,10 +357,17 @@ const SCENES: Scene[] = [
     label: "A ball takes the straight line while its ghost walks the long way round",
     body: (p) => (
       <>
-        <path {...draw(styles.inkLine, styles.ghost)} d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`} />
+        <path
+          {...draw(styles.inkLine, styles.ghost)}
+          d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`}
+        />
         <Float at={DEV_TOOLS_HIT_AT}>
           <Ink p={p} top="hue">
-            <polygon {...draw(styles.token)} data-token={1} points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5" />
+            <polygon
+              {...draw(styles.token)}
+              data-token={1}
+              points="37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5"
+            />
           </Ink>
           <Ink p={p} top="outline">
             <circle {...draw(styles.token)} data-token={3} cx="40" cy="160" r="14" />
@@ -327,7 +375,13 @@ const SCENES: Scene[] = [
           <Ink p={p} top="outline">
             <rect {...draw(styles.token)} data-token={2} x="264" y="24" width="32" height="32" />
           </Ink>
-          <rect {...draw(styles.hue, styles.screen, styles.cutHit)} x="268" y="28" width="24" height="24" />
+          <rect
+            {...draw(styles.hue, styles.screen, styles.cutHit)}
+            x="268"
+            y="28"
+            width="24"
+            height="24"
+          />
         </Float>
         <g {...draw(styles.viewBox, styles.cutGhost)}>
           <circle {...draw(styles.inkLine)} strokeWidth={1.6} strokeDasharray="3 3" r="10" />
@@ -347,9 +401,19 @@ const SCENES: Scene[] = [
     body: (p) => (
       <g {...draw()} style={{ "--scene-duration": `${BACKENDS_MS}ms` }}>
         {SLOT_X.map((x) => (
-          <rect key={x} {...draw(styles.inkLine, styles.ghost)} x={x - 14} y="110" width="28" height="28" />
+          <rect
+            key={x}
+            {...draw(styles.inkLine, styles.ghost)}
+            x={x - 14}
+            y="110"
+            width="28"
+            height="28"
+          />
         ))}
-        <path {...draw(styles.inkLine, styles.ghost)} d="M200 124 H226 M220 118 L226 124 L220 130" />
+        <path
+          {...draw(styles.inkLine, styles.ghost)}
+          d="M200 124 H226 M220 118 L226 124 L220 130"
+        />
         <path
           {...draw(styles.hueLine, styles.ghost)}
           d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
@@ -358,14 +422,33 @@ const SCENES: Scene[] = [
           <Ink p={p} top="outline">
             <rect {...draw(styles.token)} data-token={2} x="230" y="92" width="64" height="64" />
           </Ink>
-          <rect {...draw(styles.hue, styles.screen, styles.queueWork, styles.token)} data-token={3} x="246" y="108" width="32" height="32" />
+          <rect
+            {...draw(styles.hue, styles.screen, styles.queueWork, styles.token)}
+            data-token={3}
+            x="246"
+            y="108"
+            width="32"
+            height="32"
+          />
           <rect {...draw(styles.ink, styles.queueOut)} x="298" y="119" width="10" height="10" />
-          <rect {...draw(styles.hue, styles.queueOutRetry)} x="298" y="119" width="10" height="10" />
+          <rect
+            {...draw(styles.hue, styles.queueOutRetry)}
+            x="298"
+            y="119"
+            width="10"
+            height="10"
+          />
         </Float>
         {JOBS.map((job, k) => (
           <g key={k} {...draw(styles.queueJob)} style={{ animationName: `hp-job-${k}` }}>
             <Ink p={p} top={job.top}>
-              <circle {...draw(k < 2 && styles.token)} data-token={k < 2 ? k : undefined} cx="0" cy={QUEUE_Y} r="11" />
+              <circle
+                {...draw(k < 2 && styles.token)}
+                data-token={k < 2 ? k : undefined}
+                cx="0"
+                cy={QUEUE_Y}
+                r="11"
+              />
             </Ink>
           </g>
         ))}
@@ -382,18 +465,32 @@ const SCENES: Scene[] = [
     ),
   },
   {
-    label: "Two snapshots side by side; a scan catches the shape that slipped and it snaps into place",
+    label:
+      "Two snapshots side by side; a scan catches the shape that slipped and it snaps into place",
     body: (p) => {
       const comp = (x0: number, slip: boolean) => {
         const square = (
           <Ink p={p}>
-            <rect {...draw(styles.token)} data-token={slip ? 1 : 0} x={x0 + 62} y="92" width="34" height="34" />
+            <rect
+              {...draw(styles.token)}
+              data-token={slip ? 1 : 0}
+              x={x0 + 62}
+              y="92"
+              width="34"
+              height="34"
+            />
           </Ink>
         );
         return (
           <Float>
             <Ink p={p} top="hue">
-              <circle {...draw(styles.token)} data-token={slip ? 3 : 2} cx={x0 + 40} cy="74" r="18" />
+              <circle
+                {...draw(styles.token)}
+                data-token={slip ? 3 : 2}
+                cx={x0 + 40}
+                cy="74"
+                r="18"
+              />
             </Ink>
             {slip ? <g {...draw(styles.snapSlip)}>{square}</g> : square}
             <Ink p={p}>
@@ -429,7 +526,10 @@ type SceneTokens = { enter: Token[]; exit: Token[] };
 const scattered = (pieces: Piece[]) =>
   pieces.map(({ outline, top, dx, dy, r }) => ({ outline: moved(outline, dx, dy, r), top }));
 const settled = (pieces: Piece[]) => pieces.map(({ outline, top }) => ({ outline, top }));
-const settling = (pieces: Piece[]): SceneTokens => ({ enter: scattered(pieces), exit: settled(pieces) });
+const settling = (pieces: Piece[]): SceneTokens => ({
+  enter: scattered(pieces),
+  exit: settled(pieces),
+});
 
 const DEV_TOOLS_TOKENS = (ball: Outline): Token[] => [
   { outline: ball, top: "solid" },
@@ -503,7 +603,8 @@ function isShown(drawing: Element, scene: Element) {
 
 function drawnIn(scene: SVGGElement | undefined, tokens: Token[]): Drawn[] {
   return tokens.map(({ outline, top }, k) => {
-    const drawing = scene && [...scene.querySelectorAll<SVGGeometryElement>(`[data-token="${k}"]`)].at(-1);
+    const drawing =
+      scene && [...scene.querySelectorAll<SVGGeometryElement>(`[data-token="${k}"]`)].at(-1);
     const toScene = scene?.getCTM();
     const toScreen = drawing?.getCTM();
     if (!drawing || !toScene || !toScreen) return { outline, inks: inksOf(top) };
@@ -512,8 +613,10 @@ function drawnIn(scene: SVGGElement | undefined, tokens: Token[]): Drawn[] {
     return { outline: isShown(drawing, scene) ? drawn : collapsed(drawn), inks: inksOf(top) };
   });
 }
-const fadeOf = (layer: SVGGElement | undefined) => Number(layer?.style.getPropertyValue("--fade") || 1);
-const setFade = (layer: SVGGElement, fade: number) => layer.style.setProperty("--fade", String(fade));
+const fadeOf = (layer: SVGGElement | undefined) =>
+  Number(layer?.style.getPropertyValue("--fade") || 1);
+const setFade = (layer: SVGGElement, fade: number) =>
+  layer.style.setProperty("--fade", String(fade));
 
 function useSceneMorph(index: number, run: number) {
   const [stage, setStage] = useState<Stage>({ layers: [{ index, run }], phase: "still" });
@@ -536,7 +639,10 @@ function useSceneMorph(index: number, run: number) {
       return;
     }
 
-    const leaving = layers.map((layer) => ({ layer, from: fadeOf(layerRefs.current.get(layerKey(layer))) }));
+    const leaving = layers.map((layer) => ({
+      layer,
+      from: fadeOf(layerRefs.current.get(layerKey(layer))),
+    }));
     const from =
       phase === "leaving"
         ? drawnRef.current
@@ -551,7 +657,9 @@ function useSceneMorph(index: number, run: number) {
       const layer = morphRef.current;
       if (layer) {
         drawnRef.current = from.map((start, k) => {
-          const t = landing(clamp01((elapsed - k * TOKEN_STAGGER_MS) / (SCENE_LEAD_MS - k * TOKEN_STAGGER_MS)));
+          const t = landing(
+            clamp01((elapsed - k * TOKEN_STAGGER_MS) / (SCENE_LEAD_MS - k * TOKEN_STAGGER_MS)),
+          );
           return {
             outline: blend(start.outline, to[k]!.outline, t),
             inks: start.inks.map((ink, i) => ink + (to[k]!.inks[i]! - ink) * t),
@@ -609,12 +717,22 @@ function MorphTokens({ p }: { p: string }) {
     <>
       {Array.from({ length: TOKEN_COUNT }, (_, k) => (
         <g key={k} {...draw()}>
-          <path transform="translate(5 4)" fill={`url(#${p}ht)`} {...stylex.props(styles.part, styles.screen)} />
+          <path
+            transform="translate(5 4)"
+            fill={`url(#${p}ht)`}
+            {...stylex.props(styles.part, styles.screen)}
+          />
           {TOPS.map((top) => (
             <path
               key={top}
               data-top={top}
-              {...draw(...(top === "solid" ? [styles.ink] : top === "hue" ? [styles.hue, styles.screen] : [styles.inkLine]))}
+              {...draw(
+                ...(top === "solid"
+                  ? [styles.ink]
+                  : top === "hue"
+                    ? [styles.hue, styles.screen]
+                    : [styles.inkLine]),
+              )}
               strokeWidth={top === "outline" ? 3 : undefined}
             />
           ))}
@@ -731,7 +849,8 @@ export function HeroPrints({
 // Every shape and group the prints draw: it holds still while the hero is paused or its layer is
 // on the way out, and turns about its own box. The halftone copies carry a transform attribute
 // instead, so they take the hold alone.
-const draw = (...more: (stylex.StyleXStyles | false)[]) => stylex.props(styles.part, styles.box, ...more);
+const draw = (...more: (stylex.StyleXStyles | false)[]) =>
+  stylex.props(styles.part, styles.box, ...more);
 
 const SCENE = "var(--scene-duration)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
@@ -755,7 +874,10 @@ const hit = stylex.keyframes({
 });
 const float = stylex.keyframes({ to: { transform: "translateY(-2px)" } });
 const slip = stylex.keyframes({
-  "0%, 56%": { animationTimingFunction: "var(--spring)", transform: "translate(12px,-14px)rotate(16deg)" },
+  "0%, 56%": {
+    animationTimingFunction: "var(--spring)",
+    transform: "translate(12px,-14px)rotate(16deg)",
+  },
   "70%, to": { transform: "none" },
 });
 const scan = stylex.keyframes({
@@ -769,7 +891,11 @@ const notEqual = stylex.keyframes({
   "68%, to": { opacity: 0 },
 });
 const mark = stylex.keyframes({
-  "0%, 38%": { opacity: 0, animationTimingFunction: "var(--spring)", transform: "scale(.3)rotate(-45deg)" },
+  "0%, 38%": {
+    opacity: 0,
+    animationTimingFunction: "var(--spring)",
+    transform: "scale(.3)rotate(-45deg)",
+  },
   "46%, 58%": { opacity: 1, transform: "none" },
   "66%, to": { opacity: 0, transform: "none" },
 });

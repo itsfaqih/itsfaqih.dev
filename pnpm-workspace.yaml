@@ -6,21 +6,21 @@ catalog:
   vitest: 5.0.5
   vite-plus: 1.4.0
 minimumReleaseAgeExclude:
-    - '@tsrs/darwin-arm64@0.20.1-ts7.1.0-beta'
-    - '@tsrs/darwin-x64@0.20.1-ts7.1.0-beta'
-    - '@tsrs/linux-arm64-gnu@0.20.1-ts7.1.0-beta'
-    - '@tsrs/linux-arm64-musl@0.20.1-ts7.1.0-beta'
-    - '@tsrs/linux-x64-gnu@0.20.1-ts7.1.0-beta'
-    - '@tsrs/linux-x64-musl@0.20.1-ts7.1.0-beta'
-    - '@tsrs/win32-x64@0.20.1-ts7.1.0-beta'
-    - tsrs@0.20.1-ts7.1.0-beta
+  - "@tsrs/darwin-arm64@0.20.1-ts7.1.0-beta"
+  - "@tsrs/darwin-x64@0.20.1-ts7.1.0-beta"
+  - "@tsrs/linux-arm64-gnu@0.20.1-ts7.1.0-beta"
+  - "@tsrs/linux-arm64-musl@0.20.1-ts7.1.0-beta"
+  - "@tsrs/linux-x64-gnu@0.20.1-ts7.1.0-beta"
+  - "@tsrs/linux-x64-musl@0.20.1-ts7.1.0-beta"
+  - "@tsrs/win32-x64@0.20.1-ts7.1.0-beta"
+  - tsrs@0.20.1-ts7.1.0-beta
 overrides:
-  vite@*: 'catalog:'
-  vitest@*: 'catalog:'
+  vite@*: "catalog:"
+  vitest@*: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
     - vitest
   allowedVersions:
-    vite: '*'
-    vitest: '*'
+    vite: "*"
+    vitest: "*"

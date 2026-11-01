@@ -22,7 +22,10 @@ export const section = stylex.create({
     flexWrap: "wrap",
   },
   title: {
-    font: { default: `900 44px/1 ${fonts["--display"]}`, [STACKED]: `900 34px/1 ${fonts["--display"]}` },
+    font: {
+      default: `900 44px/1 ${fonts["--display"]}`,
+      [STACKED]: `900 34px/1 ${fonts["--display"]}`,
+    },
     letterSpacing: "-0.04em",
     color: palette["--text"],
     margin: 0,

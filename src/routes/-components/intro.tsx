@@ -143,7 +143,10 @@ const styles = stylex.create({
     letterSpacing: "-0.03em",
     animationName: { default: null, [stylex.when.ancestor(":is(.play)")]: slam },
     animationDuration: { default: null, [stylex.when.ancestor(":is(.play)")]: "260ms" },
-    animationTimingFunction: { default: null, [stylex.when.ancestor(":is(.play)")]: motion["--out"] },
+    animationTimingFunction: {
+      default: null,
+      [stylex.when.ancestor(":is(.play)")]: motion["--out"],
+    },
     animationDelay: { default: null, [stylex.when.ancestor(":is(.play)")]: "150ms" },
     animationFillMode: { default: null, [stylex.when.ancestor(":is(.play)")]: "forwards" },
   },
@@ -164,8 +167,14 @@ const styles = stylex.create({
     transform: "translate(-50%, -50%)",
     animationName: { default: null, [stylex.when.ancestor(":is(.play)")]: cutIn },
     animationDuration: { default: null, [stylex.when.ancestor(":is(.play)")]: "240ms" },
-    animationTimingFunction: { default: null, [stylex.when.ancestor(":is(.play)")]: motion["--out"] },
-    animationDelay: { default: null, [stylex.when.ancestor(":is(.play)")]: "calc(650ms + var(--i) * 260ms)" },
+    animationTimingFunction: {
+      default: null,
+      [stylex.when.ancestor(":is(.play)")]: motion["--out"],
+    },
+    animationDelay: {
+      default: null,
+      [stylex.when.ancestor(":is(.play)")]: "calc(650ms + var(--i) * 260ms)",
+    },
   },
   // The last cut holds, longer, until the shutters split.
   lastCut: {

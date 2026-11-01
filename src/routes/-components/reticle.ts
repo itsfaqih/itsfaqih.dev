@@ -70,7 +70,10 @@ export const reticle = stylex.create({
     "::after": {
       opacity: { default: 0, ":is([data-on])": 1 },
       transform: { default: AWAY, ":is([data-on])": "none", [REDUCE]: "none" },
-      transitionDuration: { default: motion["--t-fast-exit"], ":is([data-on])": motion["--t-fast"] },
+      transitionDuration: {
+        default: motion["--t-fast-exit"],
+        ":is([data-on])": motion["--t-fast"],
+      },
       transitionTimingFunction: { default: motion["--exit"], ":is([data-on])": motion["--fast"] },
     },
   },

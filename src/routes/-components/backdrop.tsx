@@ -293,10 +293,7 @@ function animateDots(element: HTMLDivElement, withTide: boolean) {
 
   const tick = (now: number) => {
     draw(now);
-    frame =
-      (withTide && !still.matches) || presses.length
-        ? requestAnimationFrame(tick)
-        : 0;
+    frame = (withTide && !still.matches) || presses.length ? requestAnimationFrame(tick) : 0;
   };
   const wake = () => {
     if (!frame) frame = requestAnimationFrame(tick);
