@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { THEME_CLASSES, type Theme } from "../theme";
-import { reducedMotion } from "./use-media-query";
+import { reducedMotion } from "./media-query";
 
 const THEME_CHANGE_EVENT = "theme-change";
 

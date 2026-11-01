@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, type RefObject } from "react";
 
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { cursors, motion, palette } from "../theme.stylex";
 
 const REVEAL_PX = 24;

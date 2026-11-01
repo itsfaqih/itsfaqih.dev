@@ -18,7 +18,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { Code, type Lesson, RuleLanding } from "./rule-landing";
 import { row, tipped } from "./table-design.stylex";

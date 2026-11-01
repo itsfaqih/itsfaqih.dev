@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { Code, type Lesson, onceOnScreen, paint, RuleLanding, TABBED } from "./rule-landing";
 import { kit } from "./rule-landing.stylex";

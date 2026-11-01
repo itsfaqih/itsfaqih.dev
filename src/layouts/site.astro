@@ -1,11 +1,9 @@
 ---
 import "../styles.css";
 import { CommandPalette } from "../components/command-palette";
-import { FaviconCycle } from "../components/favicon-cycle";
 import { Header } from "../components/header";
-import { PageScrollbar } from "../components/page-scrollbar";
+import PageScrollbar from "../components/page-scrollbar.astro";
 import { PrintCursor } from "../components/print-cursor";
-import { SmoothScroll } from "../components/smooth-scroll";
 import { pageHead, type SharedPage } from "../seo";
 import { THEME_COLORS } from "../theme";
 import { HEAD_SCRIPT } from "./head-script";
@@ -73,8 +71,10 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
     <CommandPalette client:idle />
     <main class={site.main}><slot /></main>
     <PrintCursor client:idle />
-    <FaviconCycle client:idle />
-    <SmoothScroll client:idle />
-    <PageScrollbar client:idle />
+    <PageScrollbar />
+    <script>
+      import "../components/favicon-cycle";
+      import "../components/smooth-scroll";
+    </script>
   </body>
 </html>

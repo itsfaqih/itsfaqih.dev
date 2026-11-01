@@ -12,7 +12,7 @@ import { ListIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, XIcon } from "@phosph
 import { SHOW_PROJECTS } from "../data/home";
 import { useTheme } from "../hooks/use-theme";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { button } from "./button";
 import { fluidHover, useFluidHover } from "./fluid-hover";
 import { loadIn } from "./load-in";
