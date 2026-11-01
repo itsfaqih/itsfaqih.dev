@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { PageContainer } from "../components/page-container";
 

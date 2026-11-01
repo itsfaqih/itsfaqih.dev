@@ -1,6 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { StorybookConfig } from "@storybook/tanstack-react";
+import type { StorybookConfig } from "@storybook/react-vite";
 import stylex from "@stylexjs/unplugin";
 import { mergeConfig } from "vite";
 
@@ -9,7 +9,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
-  framework: "@storybook/tanstack-react",
+  framework: "@storybook/react-vite",
   viteFinal: (viteConfig) =>
     mergeConfig(viteConfig, {
       resolve: {

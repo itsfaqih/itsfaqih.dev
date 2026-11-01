@@ -219,7 +219,7 @@ html:active-view-transition-type(rule-close)::view-transition-new(root) {
 }
 
 /* Every other navigation fades through: the old page fades out, then the new one fades in. The
-   router starts it (PAGE_FADE in router.tsx); rule cards and the theme switch run their own. */
+   head script (src/layouts/head-script.ts) types it; rule cards and the theme switch run their own. */
 html:active-view-transition-type(page-fade)::view-transition-old(root) {
   animation: vt-fade-out 160ms ease-out both;
 }

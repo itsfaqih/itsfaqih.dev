@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { CommandPalette } from "../components/command-palette";
-import { Showcase, tanstackRouterParameters } from "./story-support";
+import { Showcase } from "./story-support";
 
 const meta = {
   title: "Components/CommandPalette",
@@ -16,9 +16,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const InteractivePalette: Story = {
-  parameters: {
-    ...tanstackRouterParameters,
-  },
   render: () => (
     <Showcase style={{ minHeight: 180 }}>
       <p style={{ color: "var(--muted-foreground)", marginBottom: 16 }}>

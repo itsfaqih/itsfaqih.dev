@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ArrowRightIcon, GearSixIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
 
 import { button, buttonVariant, type ButtonVariant } from "../components/button";

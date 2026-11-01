@@ -245,7 +245,11 @@ export function Header({ path }: { path: string }) {
           style={open && styles.homeFolded}
           rowStyle={open && styles.homeFoldedRow}
         >
-          <a href="/" aria-label="Faqih Muntashir, home" {...stylex.props(styles.brand, styles.ring)}>
+          <a
+            href="/"
+            aria-label="Faqih Muntashir, home"
+            {...stylex.props(styles.brand, styles.ring)}
+          >
             FAQIH
           </a>
         </Seg>

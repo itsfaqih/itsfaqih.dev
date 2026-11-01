@@ -42,7 +42,10 @@ export async function writeShareAssets(outDir: string) {
 
 function readPage(file: string, html: string): BuiltPage {
   // blog.html is /blog and index.html is /: the build writes each page as a file of its own.
-  const route = file.split(path.sep).join("/").replace(/\.html$/, "");
+  const route = file
+    .split(path.sep)
+    .join("/")
+    .replace(/\.html$/, "");
   const pagePath = route === "index" ? "/" : `/${route}`;
   const head = html.slice(0, html.indexOf("</head>"));
   const tags = (name: string) =>

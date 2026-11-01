@@ -6,7 +6,6 @@ import { motion, palette } from "../theme.stylex";
 
 /** The blog's post list. It has no state, so the page renders it to HTML and ships no JS. */
 export function BlogIndex({ posts }: { posts: Post[] }) {
-
   return (
     <div {...stylex.props(styles.page)}>
       <PageContainer maxWidth="3xl" style={styles.container}>

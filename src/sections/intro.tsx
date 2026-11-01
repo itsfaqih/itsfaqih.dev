@@ -6,7 +6,8 @@ import { cursors, fonts, motion, palette } from "../theme.stylex";
 const SKIP_GRACE_MS = 1200;
 
 // The home intro: the name slams in, cuts flash through what I build, then the shutters split.
-// It plays once per session; the html script in __root.tsx sets .no-intro whenever it shouldn't.
+// It plays once per session; the head script (src/layouts/head-script.ts) sets .no-intro whenever
+// it shouldn't.
 // The effect drives it with classes on the root: .play starts the run, .out ends it.
 export function Intro({ onDone }: { onDone: (introDone: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Counter } from "../content/blog/counter";
 import { TableOfContents } from "../blog/table-of-contents";

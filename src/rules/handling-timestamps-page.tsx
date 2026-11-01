@@ -2,15 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { reducedMotion } from "../hooks/use-media-query";
 import { fonts, palette } from "../theme.stylex";
-import {
-  Code,
-  type Lesson,
-  onceOnScreen,
-  OUT,
-  RuleLanding,
-  TABBED,
-  Tip,
-} from "./rule-landing";
+import { Code, type Lesson, onceOnScreen, OUT, RuleLanding, TABBED, Tip } from "./rule-landing";
 import { kit } from "./rule-landing.stylex";
 import { arcade } from "../components/arcade";
 

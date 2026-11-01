@@ -172,11 +172,7 @@ export default defineConfig({
       rehypePlugins: [rehypeSlug, rehypeHighlightCode],
     }),
   },
-  integrations: [
-    react(),
-    mdx(),
-    finishPages(),
-  ],
+  integrations: [react(), mdx(), finishPages()],
   vite: {
     // simple-icons is bundled rather than loaded from node_modules, so roundIconPaths rounds the
     // marks the prerender renders too.

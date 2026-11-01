@@ -15,12 +15,7 @@ import {
   useState,
 } from "react";
 import { IslandActivity } from "../components/header";
-import {
-  colorOf,
-  PUBLISHED_GUIDELINES,
-  ruleNumber,
-  VISIBLE_GUIDELINES,
-} from "../data/guidelines";
+import { colorOf, PUBLISHED_GUIDELINES, ruleNumber, VISIBLE_GUIDELINES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
 import { heroType } from "../sections/hero-type";
 import { reticle } from "../sections/reticle";

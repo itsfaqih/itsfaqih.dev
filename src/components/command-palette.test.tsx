@@ -1,10 +1,4 @@
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterProvider,
-} from "@tanstack/react-router";
-import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
@@ -24,17 +18,12 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-let history: ReturnType<typeof createMemoryHistory>;
+let visited: string[];
 
 async function openPalette() {
   const user = userEvent.setup();
-  history = createMemoryHistory({ initialEntries: ["/blog"] });
-  const router = createRouter({
-    routeTree: createRootRoute({ component: CommandPalette }),
-    history,
-  });
-  await act(() => router.load());
-  render(<RouterProvider router={router} />);
+  visited = [];
+  render(<CommandPalette navigate={(href) => visited.push(href)} />);
   await user.keyboard("{Meta>}k{/Meta}");
   await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("combobox")));
   return user;
@@ -86,7 +75,7 @@ describe("CommandPalette", () => {
     expect(selectedOption()).toBe("Home");
 
     await user.keyboard("{Enter}");
-    await waitFor(() => expect(history.location.pathname).toBe("/"));
+    expect(visited).toEqual(["/"]);
   });
 
   it("opens the Rule of Thumb submenu and returns to its parent item", async () => {
@@ -100,7 +89,7 @@ describe("CommandPalette", () => {
     ]);
 
     await user.keyboard("{ArrowDown}{Enter}");
-    await waitFor(() => expect(history.location.pathname).toBe(VISIBLE_GUIDELINES[0]?.href));
+    expect(visited).toEqual([VISIBLE_GUIDELINES[0]?.href]);
 
     await user.keyboard("{Meta>}k{/Meta}");
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("combobox")));

@@ -1,13 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import {
-  Code,
-  Kbd,
-  type Lesson,
-  LessonText,
-  RuleLanding,
-  Tip,
-  Tree,
-} from "./rule-landing";
+import { Code, Kbd, type Lesson, LessonText, RuleLanding, Tip, Tree } from "./rule-landing";
 
 const styles = stylex.create({
   suffixes: {

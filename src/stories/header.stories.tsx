@@ -1,14 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Header } from "../components/header";
-import { tanstackRouterParameters } from "./story-support";
 
 const meta = {
   title: "Layout/Header",
   component: Header,
   tags: ["autodocs"],
+  args: { path: "/" },
   parameters: {
-    ...tanstackRouterParameters,
     layout: "fullscreen",
   },
 } satisfies Meta<typeof Header>;
@@ -17,9 +16,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: () => (
+  render: (args) => (
     <div style={{ minHeight: 220 }}>
-      <Header />
+      <Header {...args} />
       <main style={{ padding: "120px 24px 48px", textAlign: "center" }}>
         <p style={{ color: "var(--muted-foreground)" }}>
           The header combines navigation, social links, search, and theme controls.

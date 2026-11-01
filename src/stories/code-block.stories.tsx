@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/tanstack-react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { CodeBlock } from "../components/code-block";
 import { Showcase } from "./story-support";

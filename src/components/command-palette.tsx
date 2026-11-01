@@ -78,7 +78,16 @@ function groupCommands(
   ].filter((group) => group.items.length > 0);
 }
 
-export function CommandPalette() {
+function assignLocation(href: string) {
+  location.assign(href);
+}
+
+export function CommandPalette({
+  navigate = assignLocation,
+}: {
+  /** Leaves for a page. A test swaps it, since jsdom cannot navigate. */
+  navigate?: (href: string) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   // Every open pours the header island into the palette and every close pours it back, however
   // it was opened or left. This tracks whether a close has an island to pour back to yet.
@@ -128,7 +137,7 @@ export function CommandPalette() {
       category: "navigation",
       keywords: ["index", "main", "start"],
       action: () => {
-        location.assign("/");
+        navigate("/");
         close();
       },
     },
@@ -213,7 +222,7 @@ export function CommandPalette() {
       category: "navigation",
       keywords: ["all", "list", "overview"],
       action: () => {
-        location.assign("/rule-of-thumb");
+        navigate("/rule-of-thumb");
         close();
       },
     },
@@ -226,7 +235,7 @@ export function CommandPalette() {
       keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
       hue: colorOf(guideline.label),
       action: () => {
-        location.assign(guideline.href);
+        navigate(guideline.href);
         close();
       },
     })),

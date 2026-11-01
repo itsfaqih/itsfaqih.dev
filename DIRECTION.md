@@ -526,7 +526,7 @@ Checks:
 Nits left:
 
 - The HUD title switches once the incoming heading crosses 30% of the screen, a little before that card pins.
-- In dev, the PostHog toolbar and the TanStack devtools button still overlap the HUD. Neither ships.
+- In dev, the PostHog toolbar still overlaps the HUD. It does not ship.
 
 # Rule of Thumb articles: polished game writing
 

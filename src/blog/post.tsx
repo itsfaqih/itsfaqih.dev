@@ -279,30 +279,28 @@ const styles = stylex.create({
   },
 });
 
-const classes = (...style: Parameters<typeof stylex.props>) => stylex.props(...style).className;
-
 /** The post page's classes, for its .astro frame, which StyleX cannot compile. */
 export const post = {
-  page: classes(styles.page),
-  shell: classes(styles.shell),
-  layout: classes(styles.layout),
-  backLinkTop: classes(styles.backLink, styles.backLinkTop, stylex.defaultMarker()),
-  backLink: classes(styles.backLink, stylex.defaultMarker()),
-  backArrow: classes(styles.backArrow),
-  header: classes(styles.header),
-  meta: classes(styles.meta),
-  metaItem: classes(styles.metaItem, styles.small, styles.muted),
-  title: classes(styles.title),
-  summary: classes(styles.summary),
-  rule: classes(styles.rule),
-  body: classes(styles.body),
-  footer: classes(styles.footer),
-  footerRow: classes(styles.footerRow),
-  thanks: classes(styles.small, styles.muted),
-  tocRail: classes(styles.tocRail),
+  page: stylex.props(styles.page).className,
+  shell: stylex.props(styles.shell).className,
+  layout: stylex.props(styles.layout).className,
+  backLinkTop: stylex.props(styles.backLink, styles.backLinkTop, stylex.defaultMarker()).className,
+  backLink: stylex.props(styles.backLink, stylex.defaultMarker()).className,
+  backArrow: stylex.props(styles.backArrow).className,
+  header: stylex.props(styles.header).className,
+  meta: stylex.props(styles.meta).className,
+  metaItem: stylex.props(styles.metaItem, styles.small, styles.muted).className,
+  title: stylex.props(styles.title).className,
+  summary: stylex.props(styles.summary).className,
+  rule: stylex.props(styles.rule).className,
+  body: stylex.props(styles.body).className,
+  footer: stylex.props(styles.footer).className,
+  footerRow: stylex.props(styles.footerRow).className,
+  thanks: stylex.props(styles.small, styles.muted).className,
+  tocRail: stylex.props(styles.tocRail).className,
 };
 
 export const prose = {
-  p: classes(proseStyles.p),
-  h2: classes(proseStyles.h2),
+  p: stylex.props(proseStyles.p).className,
+  h2: stylex.props(proseStyles.h2).className,
 };
