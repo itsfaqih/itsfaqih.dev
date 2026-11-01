@@ -1,0 +1,93 @@
+---
+import Code from "./code.astro";
+import LessonText from "./lesson-text.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import TsBlank from "./ts-blank.astro";
+import TsChecked from "./ts-checked.astro";
+import TsCode from "./ts-code.astro";
+import TsHolds from "./ts-holds.astro";
+import { LESSONS, TLDR } from "./typescript-code-writing";
+
+const [named, extend, unions, edges, options, flags] = LESSONS;
+// Quiz rows are code: leads and plain rows painted, slot labels painted, held or left blank.
+const blanks = { lead: TsCode, label: TsBlank, text: TsCode };
+---
+
+<RuleLanding id="typescript-code-writing" learn="Let the compiler catch it" tldr={TLDR} take="write the precise form too">
+  <Fragment slot="lead">Prefer named exports, unions and typed edges. Turn on the strict flags.</Fragment>
+  <Fragment slot="intro">Make a typo fail where you wrote it, not in a caller.</Fragment>
+
+  <RuleLesson lesson={named}>
+    <Fragment slot="body"
+      >Export each function by name, with the <Code tone="chip">function</Code> keyword. A default export takes whatever name each importer gives it, so a typo compiles and the stack trace says<Fragment set:html="<!-- -->" /> <Code tone="chip">default</Code>. Keep arrow functions for callbacks.</Fragment
+    >
+    <TsChecked slot="bad" lines={named.bad.lines} />
+    <TsChecked slot="good" lines={named.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={1} level={named.levels[0]} board="code" marks={blanks}
+    >Three files import the price formatter, and one of them spells it<Fragment set:html="<!-- -->" /> <Code tone="prompt">formatPrcie</Code>. Place the name so the typo fails the build.</RuleQuiz
+  >
+
+  <RuleLesson lesson={extend}>
+    <Fragment slot="body"
+      >Use <Code tone="chip">type</Code> for shapes, unions and aliases. To build one shape on another, use<Fragment set:html="<!-- -->" /> <Code tone="chip">interface … extends</Code>. A clash then fails at the declaration, in plain words. With <Code tone="chip">&</Code>, the clash compiles, the field becomes <Code tone="chip">never</Code>, and the error shows up at the first object of that type.</Fragment
+    >
+    <TsChecked slot="bad" lines={extend.bad.lines} />
+    <TsChecked slot="good" lines={extend.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={2} level={extend.levels[0]} board="code" marks={{ label: TsCode, text: TsCode }}
+    ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Place Admin so the clash fails where it's declared.</RuleQuiz
+  >
+
+  <RuleLesson lesson={unions}>
+    <Fragment slot="body"
+      >Write a string union, which is only a type. A string enum is a runtime object. It rejects the plain string it stands for, adds JavaScript to your bundle, and won't run under Node's type stripping.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >For the values at runtime too, write <Code tone="chip">const ROLES = ["ADMIN", "VIEWER"] as const</Code> <Fragment set:html="<!-- -->" />and derive the type from it.</LessonText
+    >
+    <TsChecked slot="bad" lines={unions.bad.lines} />
+    <TsChecked slot="good" lines={unions.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={3} level={unions.levels[0]} board="code" marks={blanks}
+    >You loop over the roles at runtime and want a <Code tone="prompt">Role</Code> type that matches the list. Place <Code tone="prompt">as const</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={edges}>
+    <Fragment slot="body"
+      >Let TypeScript infer locals. A label on a local only widens it. Annotate where a contract starts: a return type, a public API. Then a typo fails where you wrote it, not in a caller.</Fragment
+    >
+    <TsChecked slot="bad" lines={edges.bad.lines} />
+    <TsChecked slot="good" lines={edges.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={4} level={edges.levels[0]} board="code" marks={blanks}
+    ><Code tone="prompt">getUser</Code> is the module's public API, and <Code tone="prompt">find</Code> can return<Fragment set:html="<!-- -->" /> <Code tone="prompt">undefined</Code>. Place <Code tone="prompt">: User</Code>.</RuleQuiz
+  >
+
+  <RuleLesson lesson={options}>
+    <Fragment slot="body"
+      >Past two parameters, take one object. Four positional arguments say nothing at the call, and two strings can swap with no error. Named keys can't swap, label each value, and take a new optional field without breaking a caller.</Fragment
+    >
+    <TsChecked slot="bad" lines={options.bad.lines} />
+    <TsChecked slot="good" lines={options.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={5} level={options.levels[0]} board="code" marks={{ lead: TsCode, label: TsHolds }}
+    >Strings in a row can swap with no error. Place the options object.</RuleQuiz
+  >
+
+  <RuleLesson lesson={flags}>
+    <Fragment slot="body"
+      >Enable <Code tone="chip">noUncheckedIndexedAccess</Code>, which types every index read as possibly<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>. Under <Code tone="chip">strict</Code> alone, <Code tone="chip">users[0]</Code> still reads as a <Code tone="chip">User</Code> on an empty list.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >Add <Code tone="chip">verbatimModuleSyntax</Code> too, so a type import must say<Fragment set:html="<!-- -->" /> <Code tone="chip">import type</Code>. Write ESM only: <Code tone="chip">import</Code> and <Code tone="chip">export</Code>, never<Fragment set:html="<!-- -->" /> <Code tone="chip">require</Code>.</LessonText
+    >
+    <TsChecked slot="bad" lines={flags.bad.lines} />
+    <TsChecked slot="good" lines={flags.good.lines} />
+  </RuleLesson>
+  <RuleQuiz n={6} level={flags.levels[0]} board="code" marks={blanks}
+    ><Code tone="prompt">users[0].name</Code> crashed in production on an empty list. <Code tone="prompt">strict</Code> <Fragment set:html="<!-- -->" />is already on. Set the flag that fails the build.</RuleQuiz
+  >
+</RuleLanding>

@@ -9,7 +9,7 @@ import * as handlingTimestamps from "./handling-timestamps-page";
 import * as nullVsUndefined from "./null-vs-undefined-page";
 import * as proximityPrinciple from "./proximity-principle";
 import * as tableDesign from "./table-design-page";
-import * as typescriptCodeWriting from "./typescript-code-writing-page";
+import * as typescriptCodeWriting from "./typescript-code-writing";
 
 // "View .md" serves public/rule-of-thumb/<id>.md, which readers paste into their AGENTS.md. It is
 // written by hand, so it carries code the page shows as demos; this keeps its rule in step with the page.

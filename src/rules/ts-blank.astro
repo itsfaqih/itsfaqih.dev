@@ -1,0 +1,11 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import { styles } from "./typescript-code-writing.styles";
+
+type Props = { text: string };
+
+const { text } = Astro.props;
+---
+
+<span {...stylex.attrs(arcade.srOnly)}>{text}</span><span aria-hidden="true" {...stylex.attrs(styles.gap)}></span>

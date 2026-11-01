@@ -1,0 +1,19 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { tokenize } from "./paint";
+import { styles } from "./typescript-code-writing.styles";
+
+type Props = { text: string };
+
+const { text } = Astro.props;
+const TOKEN =
+  /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(export|default|function|import|from|type|interface|extends|enum|const|let|return|as|true|false)\b|\b([A-Z][A-Za-z]*)\b|\b(\d+)\b/g;
+// By TOKEN's capture group: comments, strings, keywords, types, numbers.
+const KINDS = [styles.quiet, styles.str, styles.kw, styles.ty, styles.quiet];
+---
+
+{
+  tokenize(text, TOKEN).map((part) =>
+    part.kind === undefined ? part.text : <span {...stylex.attrs(KINDS[part.kind])}>{part.text}</span>,
+  )
+}
