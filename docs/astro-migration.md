@@ -12,7 +12,7 @@ Every page and component is an `.astro` file, prerendered to HTML. An interactiv
 ## What changed for a reader
 
 - **Less JavaScript.** Step one cut each page's script by 17% to 58%. Step two cut it again, to 23 to 47 KB per page. The blog post went from 318 KB of script on the React build to 27 KB.
-- **Interactive sooner.** On mobile 4G every measured page became usable 0.4 to 1.0 s sooner than on the React build. The blog post gained the most, 3.31 s to 2.31 s.
+- **Header usable sooner.** On mobile 4G the header answered input 0.4 to 1.0 s sooner than on the React build on every measured page. The blog post gained the most, 3.31 s to 2.31 s. This measures the header only. The demos and the idle-defined palette are not timed.
 - **Navigation.** A link is now a full page load. Astro prefetches a link on hover, and the browser's cross-document view transitions replay the old fade, rule dive, and zoom-out (`src/layouts/head-script.ts`). Browsers without cross-document view transitions (Firefox today) navigate with no animation.
 - **Build output.** Step one took the output from 432 JS files (12.3 MB, mostly syntax-highlighter grammars and themes split into chunks) to 43 (1.1 MB). Code blocks are prerendered, so the highlighter no longer ships. Step two shrank `dist/_astro` from 660 KB to 444 KB.
 
@@ -32,7 +32,7 @@ Every page and component is an `.astro` file, prerendered to HTML. An interactiv
 
 One run measured all three builds side by side on 2026-11-02. "React" is the TanStack Start build (`.output/public` from `main` at 53ec8bb). "Step one" is the React-islands build (51e75b8). "Step two" is the current build.
 
-Method: `scripts/perf-compare.ts` serves every build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating the order of the builds, and reports the median with the range in parentheses. "Interactive" is when the header answers input, which is when its React root mounts or its `<site-header>` element is defined. All 240 runs finished with zero failed requests and zero console errors. The load average was 4 to 10 on 10 cores, and the alternating order spread that noise across the builds.
+Method: `scripts/perf-compare.ts` serves every build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating the order of the builds, and reports the median with the range in parentheses. "Interactive" is when the header answers input, which is when its React root mounts or its `<site-header>` element is defined. It does not time the page's demos or the palette, which is defined when the browser is idle. All 240 runs finished with zero failed requests and zero console errors. The load average was 4 to 10 on 10 cores, and the alternating order spread that noise across the builds.
 
 ### Mobile 4G (390×844, 1.47 Mbit/s, 562 ms RTT, 4× CPU slowdown)
 
@@ -87,9 +87,23 @@ The preloads save 0.26 to 0.41 s on mobile and 0.9 to 1.5 s on slow 3G for the p
 
 - **What limits interactivity.** Round trips. Step two removed 90 to 160 KB of script per page compared with step one, which is 0.5 to 0.9 s of transfer at 1.47 Mbit/s. Interactivity moved by at most 0.43 s on mobile, because the header's script was never the bulk of those bytes. It waits for the HTML and then one more round trip for its modules. On slow 3G, four 2 s round trips put the floor near 8 s, and the blog, the blog post and dialog-design sit on it.
 - **Table design is slower than step one.** Step one preloaded only the modules of `client:load` islands. Step two preloads every module script, so the table demos' 47 KB downloads alongside the header's script and delays it by 0.18 s on mobile and 0.6 s on slow 3G. Without the preloads the page is slower still.
-- **The rule index and home paint their largest text later than step one.** Step two matches the React build here (rule index 10.75 s against 10.76 s on slow 3G) and beats it on mobile. Step one is the outlier. In step two the rule index's title paints about 2.4 s after the header is defined on slow 3G. This run does not isolate why step one painted it sooner.
+- **The rule index paints its largest text later than step one, and home does on slow 3G.** Rule index LCP is 3596 against 3072 ms on mobile and 10748 against 9056 ms on slow 3G. Home LCP is 12956 against 11304 ms on slow 3G and equal on mobile. Step two still matches or beats the React build on both pages (rule index 10.75 s against 10.76 s on slow 3G). In step two the rule index's title paints about 2.4 s after the header is defined on slow 3G. This run does not isolate why step one painted it sooner.
+- **Other regressions against step one.** Home's FCP on mobile is 3340 ms (3320–3508) against 3172 ms (3156–3200). Total blocking time on mobile rose on dialog-design (7 to 43 ms) and table-design (15 to 41 ms), still far under the 200 ms that counts as poor.
 - **Why the `load` event is not compared.** The React build injected its app script after `load` on purpose, so its `load` fired right after the HTML. Astro's module scripts load before `load`. The raw values are in the `--out` JSON files when you rerun.
 - **v1 → v2 of step one.** The first Astro build was slower than React (mobile interactive on home 4.69 s, on the blog post 4.50 s). It lacked the module preloads and still prefetched rule pages on idle. Those two fixes produced step one's numbers above.
+
+## Known differences from the React build
+
+These were found while porting and kept on purpose. None of them changes a screenshot baseline.
+
+- The command palette opens with `show()` instead of as a modal, makes the rest of the page `inert`, and keeps Tab inside with focus guards, so the header can sit above its backdrop. It carries `aria-modal="true"` as Base UI's popup did. On first open it highlights Home.
+- The post's table-of-contents drawer moves focus into itself when it opens, because the page behind it is inert. Vaul left focus on the trigger.
+- The drawer no longer lists "Table of Contents". The React build read headings from the live page and picked up the drawer's own title.
+- Typed inputs set `.value` only. React also mirrored the value into the `value` attribute.
+- Ids are fixed strings derived from props instead of `useId` output.
+- Some hint arrows sit at a different place in the DOM, with the same rendering.
+- The home stack filter's view transition names every element it moves.
+- The phone reader’s clocks on the timestamps page do not swing in. They did not on the React build either.
 
 ## Rerun
 
