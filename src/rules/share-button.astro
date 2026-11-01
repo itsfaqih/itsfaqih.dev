@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import { arcade } from "../components/arcade";
 import { button, buttonVariant } from "../components/button";
+import { veil } from "../sections/section";
 import { glyphSwap, island, landingView, shell } from "./rule-landing.styles";
 
 type Props = {
@@ -35,6 +36,7 @@ const { inIsland = false } = Astro.props;
         buttonVariant["tertiary-neutral"],
         button.sm,
         button.iconStart,
+        veil.dense,
         shell.share,
         shell.in,
         shell.first,
