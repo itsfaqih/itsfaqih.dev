@@ -1,41 +1,25 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
-import { ListIcon } from "@phosphor-icons/react";
-import { Drawer } from "vaul";
-import { TableOfContents } from "./table-of-contents";
 import { motion, palette } from "../theme.stylex";
-
-/** The table of contents on narrow screens: a floating button that opens it in a drawer. */
-export function TocDrawer() {
-  const [isTocOpen, setIsTocOpen] = useState(false);
-
-  return (
-    <Drawer.Root open={isTocOpen} onOpenChange={setIsTocOpen}>
-      <Drawer.Trigger asChild>
-        <button {...stylex.props(styles.tocButton)} aria-label="Table of Contents">
-          <ListIcon size={24} />
-        </button>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay {...stylex.props(styles.overlay)} />
-        <Drawer.Content {...stylex.props(styles.drawer)}>
-          <div {...stylex.props(styles.drawerPanel)}>
-            <div aria-hidden {...stylex.props(styles.handle)} />
-            <div {...stylex.props(styles.drawerBody)}>
-              <Drawer.Title {...stylex.props(styles.drawerTitle)}>Table of Contents</Drawer.Title>
-              <div {...stylex.props(styles.drawerScroll)}>
-                <TableOfContents onLinkClick={() => setIsTocOpen(false)} />
-              </div>
-            </div>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
-  );
-}
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
+const OPEN = ":is([data-state=open])";
+const CLOSED = ":is([data-state=closed])";
+
+// Vaul's timing. It plays under reduced motion too, as Vaul did.
+export const SLIDE_MS = 500;
+const SLIDE = `${SLIDE_MS}ms`;
+const EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
+export const SLIDE_TRANSITION = `transform ${SLIDE} ${EASE}`;
+export const FADE_TRANSITION = `opacity ${SLIDE} ${EASE}`;
+
+const fadeIn = stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } });
+const fadeOut = stylex.keyframes({ to: { opacity: 0 } });
+const slideFromBottom = stylex.keyframes({
+  from: { transform: "translate3d(0, 100%, 0)" },
+  to: { transform: "translate3d(0, 0, 0)" },
+});
+const slideToBottom = stylex.keyframes({ to: { transform: "translate3d(0, 100%, 0)" } });
 
 // The tags the posts render. Values follow Tailwind Typography's prose-zinc.
 const proseStyles = stylex.create({
@@ -180,6 +164,17 @@ const styles = stylex.create({
     position: "sticky",
     top: "3rem",
   },
+  drawerHost: {
+    display: "contents",
+  },
+  // Focus lands on one only when Tab runs off either end of the open drawer; the client sends it
+  // back around, as Radix's focus scope did.
+  guard: {
+    position: "fixed",
+    width: 1,
+    height: 0,
+    overflow: "hidden",
+  },
   tocButton: {
     position: "fixed",
     right: "calc(1.5rem + env(safe-area-inset-right, 0px))",
@@ -217,13 +212,42 @@ const styles = stylex.create({
     inset: 0,
     zIndex: 50,
     backgroundColor: "rgb(0 0 0 / 0.4)",
+    animationName: { default: null, [OPEN]: fadeIn, [CLOSED]: fadeOut },
+    animationDuration: SLIDE,
+    animationTimingFunction: EASE,
+    animationFillMode: { default: null, [CLOSED]: "forwards" },
   },
+  // Vaul's drawer, which the native dialog's own box has to give way to.
   drawer: {
     position: "fixed",
+    top: "auto",
     right: 0,
     bottom: 0,
     left: 0,
     zIndex: 50,
+    width: "auto",
+    maxWidth: "none",
+    color: "inherit",
+    touchAction: "none",
+    userSelect: { default: null, [HOVER]: "none" },
+    willChange: "transform",
+    transitionProperty: "transform",
+    transitionDuration: SLIDE,
+    transitionTimingFunction: EASE,
+    animationName: { default: null, [OPEN]: slideFromBottom, [CLOSED]: slideToBottom },
+    animationDuration: SLIDE,
+    animationTimingFunction: EASE,
+    animationFillMode: { default: null, [CLOSED]: "forwards" },
+    // Fills the gap below the drawer while a drag pulls it past its resting place.
+    "::after": {
+      content: '""',
+      position: "absolute",
+      top: "100%",
+      right: 0,
+      left: 0,
+      height: "200%",
+      backgroundColor: "inherit",
+    },
     display: "flex",
     flexDirection: "column",
     maxHeight: "85dvh",
@@ -303,4 +327,18 @@ export const post = {
 export const prose = {
   p: stylex.props(proseStyles.p).className,
   h2: stylex.props(proseStyles.h2).className,
+};
+
+/** The table-of-contents drawer's classes, for toc-drawer.astro. */
+export const drawer = {
+  host: stylex.attrs(styles.drawerHost).class ?? "",
+  guard: stylex.attrs(styles.guard).class ?? "",
+  button: stylex.attrs(styles.tocButton).class ?? "",
+  overlay: stylex.attrs(styles.overlay).class ?? "",
+  content: stylex.attrs(styles.drawer).class ?? "",
+  panel: stylex.attrs(styles.drawerPanel).class ?? "",
+  handle: stylex.attrs(styles.handle).class ?? "",
+  body: stylex.attrs(styles.drawerBody).class ?? "",
+  title: stylex.attrs(styles.drawerTitle).class ?? "",
+  scroll: stylex.attrs(styles.drawerScroll).class ?? "",
 };

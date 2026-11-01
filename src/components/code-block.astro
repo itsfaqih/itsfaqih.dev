@@ -1,0 +1,20 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { DIFFS_TAG_NAME } from "@pierre/diffs";
+import { styles } from "./code-block.styles";
+
+// A post's fenced code as rehypeHighlightCode in astro.config.ts hands it over: the source, its
+// language, and the HTML @pierre/diffs prerendered for it, which the shadow root shows as is.
+type Props = {
+  "data-code": string;
+  "data-language": string;
+  "data-prerendered": string;
+};
+
+const { "data-code": code, "data-prerendered": html } = Astro.props;
+const Container = DIFFS_TAG_NAME;
+---
+
+<Container {...stylex.attrs(styles.file)} style={`--lines:${code.split("\n").length}`}
+  ><template shadowrootmode="open" set:html={html} /></Container
+>

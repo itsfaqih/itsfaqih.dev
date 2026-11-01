@@ -1,19 +1,8 @@
-import type { ReactNode } from "react";
 import * as stylex from "@stylexjs/stylex";
-
-type PageContainerProps = {
-  children: ReactNode;
-  maxWidth?: "2xl" | "3xl" | "4xl";
-  style?: stylex.StyleXStyles;
-};
-
-export function PageContainer({ children, maxWidth = "2xl", style }: PageContainerProps) {
-  return <div {...stylex.props(styles.container, maxWidths[maxWidth], style)}>{children}</div>;
-}
 
 const PHONE = "@media (max-width: 639px)";
 
-const styles = stylex.create({
+export const styles = stylex.create({
   container: {
     position: { default: null, [PHONE]: "relative" },
     isolation: { default: null, [PHONE]: "isolate" },
@@ -48,7 +37,7 @@ const styles = stylex.create({
   },
 });
 
-const maxWidths = stylex.create({
+export const maxWidths = stylex.create({
   "2xl": { maxWidth: "42rem" },
   "3xl": { maxWidth: "48rem" },
   "4xl": { maxWidth: "56rem" },

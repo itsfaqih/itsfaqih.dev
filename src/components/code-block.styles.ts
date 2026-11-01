@@ -1,49 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import { File } from "@pierre/diffs/react";
-import type { CSSProperties } from "react";
-import { CODE_OPTIONS, codeFile } from "./code-file";
 import { fonts, palette } from "../theme.stylex";
-
-type CodeBlockProps = {
-  code: string;
-  lang: string;
-  prerenderedHTML?: string;
-};
-
-export function CodeBlock({ code, lang, prerenderedHTML }: CodeBlockProps) {
-  const fileStyle: CSSProperties = { "--lines": code.split("\n").length };
-
-  return (
-    <File
-      file={codeFile(code, lang)}
-      options={CODE_OPTIONS}
-      prerenderedHTML={prerenderedHTML}
-      {...stylex.props(styles.file)}
-      style={fileStyle}
-    />
-  );
-}
-
-type MarkdownCodeBlockProps = {
-  "data-code": string;
-  "data-language": string;
-  "data-prerendered": string;
-};
-
-/** A post's fenced code, as rehypeHighlightCode in astro.config.ts hands it over. */
-export function MarkdownCodeBlock(props: MarkdownCodeBlockProps) {
-  return (
-    <CodeBlock
-      code={props["data-code"]}
-      lang={props["data-language"]}
-      prerenderedHTML={props["data-prerendered"]}
-    />
-  );
-}
 
 const ink = (hue: string) => `color-mix(in oklab, ${hue} ${palette["--ink-mix"]}, #000)`;
 
-const styles = stylex.create({
+export const styles = stylex.create({
   file: {
     display: "block",
     width: "100%",

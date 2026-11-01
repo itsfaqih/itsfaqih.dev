@@ -1,35 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
 import { motion } from "../../theme.stylex";
-import { useState } from "react";
-import { PlusIcon, MinusIcon } from "@phosphor-icons/react";
-
-export function Counter() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div {...stylex.props(styles.counter)}>
-      <button
-        onClick={() => setCount(count - 1)}
-        {...stylex.props(styles.button, styles.decrease)}
-        aria-label="Decrease count"
-      >
-        <MinusIcon size={18} />
-      </button>
-
-      <div {...stylex.props(styles.display)}>
-        <span {...stylex.props(styles.count)}>{count}</span>
-      </div>
-
-      <button
-        onClick={() => setCount(count + 1)}
-        {...stylex.props(styles.button, styles.increase)}
-        aria-label="Increase count"
-      >
-        <PlusIcon size={18} />
-      </button>
-    </div>
-  );
-}
 
 // Tailwind's zinc greys, with 700, 600 and 400 in lab() form.
 const zinc700 = "lab(26.8019% 1.35387 -4.68303)";
@@ -39,7 +9,7 @@ const zinc400 = "lab(65.6464% 1.53497 -5.42429)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
-const styles = stylex.create({
+export const styles = stylex.create({
   counter: {
     display: "inline-flex",
     alignItems: "center",
