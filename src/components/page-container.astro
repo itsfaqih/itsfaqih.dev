@@ -1,0 +1,13 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { maxWidths, styles } from "./page-container.styles";
+
+type Props = {
+  maxWidth?: "2xl" | "3xl" | "4xl";
+  style?: stylex.StyleXStyles;
+};
+
+const { maxWidth = "2xl", style } = Astro.props;
+---
+
+<div {...stylex.attrs(styles.container, maxWidths[maxWidth], style)}><slot /></div>

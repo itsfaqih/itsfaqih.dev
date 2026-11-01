@@ -1,88 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
-import { BLOG_DATE_FORMATTER, type Post } from "./posts";
-import { PageContainer } from "../components/page-container";
-import { CalendarBlankIcon, ArrowRightIcon, FileTextIcon } from "@phosphor-icons/react";
 import { motion, palette } from "../theme.stylex";
-
-/** The blog's post list. It has no state, so the page renders it to HTML and ships no JS. */
-export function BlogIndex({ posts }: { posts: Post[] }) {
-  return (
-    <div {...stylex.props(styles.page)}>
-      <PageContainer maxWidth="3xl" style={styles.container}>
-        <div {...stylex.props(styles.intro)}>
-          <div {...stylex.props(styles.label)}>
-            <div {...stylex.props(styles.labelIcon)}>
-              <FileTextIcon size={20} />
-            </div>
-            <span {...stylex.props(styles.labelText)}>Blog</span>
-          </div>
-          <h1 {...stylex.props(styles.title)}>Thoughts & Tutorials</h1>
-          <p {...stylex.props(styles.lede)}>
-            Exploring web development, design patterns, and the technologies that power modern
-            applications.
-          </p>
-        </div>
-
-        <div>
-          {posts.length === 0 ? (
-            <div {...stylex.props(styles.empty)}>
-              <FileTextIcon size={48} {...stylex.props(styles.emptyIcon)} />
-              <p {...stylex.props(styles.muted, styles.emptyText)}>
-                No posts yet. Check back soon!
-              </p>
-            </div>
-          ) : (
-            posts.map((post) => (
-              <article key={post.id} {...stylex.props(styles.post)}>
-                <a
-                  href={`/blog/${post.id}`}
-                  {...stylex.props(styles.postLink, stylex.defaultMarker())}
-                >
-                  <div {...stylex.props(styles.card)}>
-                    <div {...stylex.props(styles.cardRow)}>
-                      <div {...stylex.props(styles.cardBody)}>
-                        <div {...stylex.props(styles.date)}>
-                          <CalendarBlankIcon size={14} {...stylex.props(styles.muted)} />
-                          <time {...stylex.props(styles.muted, styles.small)}>
-                            {BLOG_DATE_FORMATTER.format(post.data.publishedAt)}
-                          </time>
-                        </div>
-
-                        <h2 {...stylex.props(styles.postTitle)}>{post.data.title}</h2>
-
-                        {post.data.summary && (
-                          <p {...stylex.props(styles.summary)}>{post.data.summary}</p>
-                        )}
-                      </div>
-
-                      <div {...stylex.props(styles.arrowSlot)}>
-                        <div {...stylex.props(styles.arrowWell)}>
-                          <ArrowRightIcon size={20} {...stylex.props(styles.arrow)} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </article>
-            ))
-          )}
-        </div>
-
-        <div {...stylex.props(styles.footer)}>
-          <a href="/" {...stylex.props(styles.backLink, stylex.defaultMarker())}>
-            <ArrowRightIcon size={16} {...stylex.props(styles.backArrow)} />
-            Back to Home
-          </a>
-        </div>
-      </PageContainer>
-    </div>
-  );
-}
 
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 
-const styles = stylex.create({
+export const styles = stylex.create({
   page: {
     position: "relative",
     minHeight: "100svh",
@@ -280,3 +202,5 @@ const styles = stylex.create({
     },
   },
 });
+
+export const marker = stylex.defaultMarker();
