@@ -178,7 +178,9 @@ export default defineConfig({
     finishPages(),
   ],
   vite: {
-    resolve: { tsconfigPaths: true },
+    // simple-icons is bundled rather than loaded from node_modules, so roundIconPaths rounds the
+    // marks the prerender renders too.
+    resolve: { tsconfigPaths: true, noExternal: ["simple-icons"] },
     plugins: [
       roundIconPaths(),
       { ...stylexPlugin, generateBundle: undefined, writeBundle: undefined },

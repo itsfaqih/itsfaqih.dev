@@ -1,36 +1,23 @@
 import * as stylex from "@stylexjs/stylex";
 import { useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { VISIBLE_GUIDELINES } from "../data/guidelines";
 import { SHOW_PROJECTS, SLIDES } from "../data/home";
-import { Backdrop } from "../sections/backdrop";
-import { ExperienceList, type Job } from "../sections/experience-list";
-import { Hero } from "../sections/hero/hero";
-import { heroType } from "../sections/hero-type";
-import { Intro } from "../sections/intro";
-import { reticle } from "../sections/reticle";
-import { RuleSpread } from "../sections/rule-spread";
-import { StackShowcase, type StackGroup } from "../sections/stack-showcase";
-import { useCutIns } from "../sections/use-cut-ins";
-import { LINKS, pageHead } from "../seo";
+import { Backdrop } from "./backdrop";
+import { ExperienceList, type Job } from "./experience-list";
+import { Hero } from "./hero/hero";
+import { heroType } from "./hero-type";
+import { Intro } from "./intro";
+import { reticle } from "./reticle";
+import { RuleSpread } from "./rule-spread";
+import { StackShowcase, type StackGroup } from "./stack-showcase";
+import { useCutIns } from "./use-cut-ins";
+import { LINKS } from "../seo";
 import { fonts, motion, palette } from "../theme.stylex";
 import { button, buttonVariant } from "../components/button";
-import { section, veil } from "../sections/section";
+import { section, veil } from "./section";
 import { hoverHold } from "../components/hover-hold";
 import { loadIn } from "../components/load-in";
 import { arcade } from "../components/arcade";
-
-export const Route = createFileRoute("/")({
-  component: Index,
-  head: () =>
-    pageHead({
-      path: "/",
-      title: "Faqih Muntashir · Full-Stack Engineer in Indonesia",
-      description:
-        "Full-stack engineer in Indonesia with 5+ years on web products: frontends, backends, and agent tooling. Now building healthcare software at EvidenceCare.",
-      type: "website",
-    }),
-});
 
 const EXPERIENCE: Job[] = [
   {
@@ -341,7 +328,7 @@ const STACK_SOURCES = [
 
 const TICKER_RUN = Array.from({ length: 6 }, () => SLIDES).flat();
 
-function Index() {
+export function Home() {
   const [introDone, setIntroDone] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
