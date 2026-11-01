@@ -94,10 +94,17 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
   page.on("pageerror", (error) => errors.push(error.message));
   await page.addInitScript(() => {
     window.__perf = { lcp: [], longTasks: [] };
-    // The header bar is a React root on both builds; its fiber marks when the page can be used.
+    // The page can be used once the header answers input: its bar carries a React fiber, or the
+    // custom element that hosts it is defined.
     const poll = setInterval(() => {
       const bar = document.querySelector(".arc-bar");
-      if (!bar || !Object.keys(bar).some((key) => key.startsWith("__reactFiber"))) return;
+      if (!bar) return;
+      let host = bar.parentElement;
+      while (host && (!host.localName.includes("-") || host.localName === "astro-island")) {
+        host = host.parentElement;
+      }
+      const reactRoot = Object.keys(bar).some((key) => key.startsWith("__reactFiber"));
+      if (!reactRoot && !(host && customElements.get(host.localName))) return;
       window.__perf.interactive = performance.now();
       clearInterval(poll);
     }, 20);

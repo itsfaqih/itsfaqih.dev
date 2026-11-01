@@ -1,6 +1,7 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import { VISIBLE_GUIDELINES } from "../../src/data/guidelines";
+import { pageReady } from "./ready";
 
 // Drives the built site the way a reader does, across island hydration and page navigations.
 // Every test fails on any error the page logs.
@@ -33,13 +34,8 @@ async function open(route: string, viewport = { width: 1440, height: 900 }) {
   return page;
 }
 
-/** Astro drops an island's ssr attribute once it hydrates; load and idle islands always do. */
 function hydrated(page: Page) {
-  return page.waitForFunction(() =>
-    Array.from(document.querySelectorAll("astro-island[ssr]")).every(
-      (island) => !["load", "idle"].includes(island.getAttribute("client") ?? ""),
-    ),
-  );
+  return page.waitForFunction(pageReady);
 }
 
 // pagereveal can fire after load, so the transition's type is polled for.

@@ -4,6 +4,7 @@ import pixelmatch from "pixelmatch";
 import { chromium, type Browser } from "playwright";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vite-plus/test";
+import { pageReady } from "./ready";
 
 type Shot = {
   route: string;
@@ -84,10 +85,7 @@ async function capture(shot: Shot) {
   await page.clock.setFixedTime(new Date("2026-01-15T09:30:00Z"));
   try {
     await page.goto(new URL(shot.route, inject("baseURL")).href, { waitUntil: "networkidle" });
-    await page.waitForFunction(() => {
-      const bar = document.querySelector(".arc-bar");
-      return bar && Object.keys(bar).some((key) => key.startsWith("__reactFiber"));
-    });
+    await page.waitForFunction(pageReady);
     const unrevealed = await page.evaluate(async (pending) => {
       await document.fonts.ready;
       const unrevealedInView = () =>
