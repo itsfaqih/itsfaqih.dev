@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { useLayoutEffect, useRef, useState } from "react";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { fonts, palette } from "../theme.stylex";
 import {
   Code,

@@ -66,7 +66,7 @@ html {
 }
 
 /* Global: keys on a class a script sets on html.
-   print-cursor.tsx sets html.cur-on and draws the shape itself, so every element's cursor token
+   print-cursor.client.ts sets html.cur-on and draws the shape itself, so every element's cursor token
    becomes a blank image whose fragment names that shape, for the cursor to read back. */
 html.cur-on {
   --cursor: url("/cursors/none.svg#arrow") 0 0, none;
@@ -77,7 +77,7 @@ html.cur-on {
   --cursor-forbid: url("/cursors/none.svg#forbid") 0 0, none;
 }
 /* Global: keys on a class a script sets on html.
-   page-scrollbar.tsx sets html.sb-own and draws its own bar; the native one belongs to <html>. */
+   page-scrollbar.client.ts sets html.sb-own and draws its own bar; the native one belongs to <html>. */
 html.sb-own {
   scrollbar-width: none;
 }

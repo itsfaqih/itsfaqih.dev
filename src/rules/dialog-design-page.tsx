@@ -13,7 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { Kbd, type Lesson, onceOnScreen, RuleLanding, Tip } from "./rule-landing";
 import { kit } from "./rule-landing.stylex";

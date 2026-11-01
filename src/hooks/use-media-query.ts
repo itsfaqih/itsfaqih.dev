@@ -1,23 +1,12 @@
 import { useSyncExternalStore } from "react";
+import { watchMedia } from "./media-query";
 
 const getServerSnapshot = () => false;
 
-function getSnapshot(query: string) {
-  return window.matchMedia(query).matches;
-}
-
-function subscribe(query: string, onStoreChange: () => void) {
-  const mediaQuery = window.matchMedia(query);
-  mediaQuery.addEventListener("change", onStoreChange);
-  return () => mediaQuery.removeEventListener("change", onStoreChange);
-}
-
 export function useMediaQuery(query: string) {
   return useSyncExternalStore(
-    (onStoreChange) => subscribe(query, onStoreChange),
-    () => getSnapshot(query),
+    (onStoreChange) => watchMedia(query, onStoreChange),
+    () => matchMedia(query).matches,
     getServerSnapshot,
   );
 }
-
-export const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;

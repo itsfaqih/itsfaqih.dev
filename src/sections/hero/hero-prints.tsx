@@ -22,7 +22,7 @@ import {
   toPath,
   traced,
 } from "./hero-morph";
-import { reducedMotion } from "../../hooks/use-media-query";
+import { reducedMotion } from "../../hooks/media-query";
 import { palette } from "../../theme.stylex";
 
 type TopInk = "solid" | "hue" | "outline";

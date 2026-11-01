@@ -14,13 +14,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { IslandActivity } from "../components/header";
+import { createPortal } from "react-dom";
 import { colorOf, PUBLISHED_GUIDELINES, ruleNumber, VISIBLE_GUIDELINES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
 import { heroType } from "../sections/hero-type";
 import { reticle } from "../sections/reticle";
 import { isTransitioning, RuleThumb, useRuleOpen } from "../sections/rule-art";
-import { reducedMotion } from "../hooks/use-media-query";
+import { reducedMotion } from "../hooks/media-query";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { kit, reveal } from "./rule-landing.stylex";
 import { button, buttonVariant } from "../components/button";
@@ -271,6 +271,13 @@ function Landing({
       </div>
     </div>
   );
+}
+
+// Lends the compact header island (header.astro) its children.
+function IslandActivity({ children }: { children: ReactNode }) {
+  const [host, setHost] = useState<Element | null>(null);
+  useEffect(() => setHost(document.querySelector("[data-island-activity]")), []);
+  return host ? createPortal(children, host) : null;
 }
 
 function PagerCard({
