@@ -56,8 +56,8 @@ When extracting shared code to a new file, place it at the **lowest common ances
 
 **Framework constraints override these guidelines.**
 
-- If a framework (like Next.js or TanStack Router) enforces a specific file structure (e.g., file-based routing), follow it.
-- **Example:** If you need to colocate components in a route directory but the framework thinks they are routes, create a `components` folder to hold them.
+- If a framework (like Next.js or Astro) enforces a specific file structure (e.g., file-based routing), follow it.
+- **Example:** Astro treats every file in `src/pages/` as a page, so a page's components live outside it: `src/sections/` for the home page and the pieces the rule pages share, `src/rules/` for the rule pages, and `src/blog/` for the blog.
 
 ---
 
@@ -146,7 +146,7 @@ src/
             └── card.tsx
 ```
 
-Shared StyleX styles follow the same rule: `src/components/button.ts` serves the whole site, while `src/routes/-components/section.ts` serves only the home page and the rule pages under `src/routes/`.
+Shared StyleX styles follow the same rule: `src/components/button.ts` serves the whole site, while `src/sections/section.ts` serves only the home page and the rule pages.
 
 ---
 

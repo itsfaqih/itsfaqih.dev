@@ -1,6 +1,6 @@
 # Faqih Muntashir’s website
 
-Personal website built with React, TanStack Start, Vite, and StyleX. It includes a homepage, MDX blog, and interactive Rule of Thumb articles.
+Personal website built with Astro, React, and StyleX. It includes a homepage, MDX blog, and interactive Rule of Thumb articles. Astro prerenders every page to static HTML, and React renders the interactive parts as islands.
 
 ## Development
 
@@ -9,7 +9,7 @@ vp install
 vp dev
 ```
 
-Vite is configured for `http://127.0.0.1:5173`. If that port belongs to another project, use a separate port rather than stopping its server:
+`vp dev` runs `astro dev` at `http://127.0.0.1:5173`. If that port belongs to another project, use a separate port rather than stopping its server:
 
 ```bash
 vp dev --port 5174 --strictPort
@@ -24,24 +24,30 @@ vp run lint
 vp run typecheck
 vp run test
 vp run test:visual
-vp build
+vp run build
+vp node scripts/head-parity.ts <other-build>
 ```
 
-Oxlint runs the default rules plus all generic [anti-slop](https://github.com/dmmulroy/anti-slop) rules at error severity. Lint and format configuration lives in the `lint` and `fmt` blocks of `vite.config.ts`; Vite+ bundles Oxlint and Oxfmt. The vendored plugin, license, upstream revision, and local compatibility note live in `tools/oxlint/anti-slop/`, which the formatter skips so it stays byte-for-byte with upstream. `vp run typecheck` runs [tsrs](https://github.com/oxc-project/tsrs), a Rust port of the TypeScript 7 checker.
+Oxlint runs the default rules plus all generic [anti-slop](https://github.com/dmmulroy/anti-slop) rules at error severity. Lint and format configuration lives in the `lint` and `fmt` blocks of `vite.config.ts`, which holds nothing else; Vite+ bundles Oxlint and Oxfmt. Astro builds from `astro.config.ts`, and `vitest.config.ts` holds the test projects. The vendored plugin, license, upstream revision, and local compatibility note live in `tools/oxlint/anti-slop/`, which the formatter skips so it stays byte-for-byte with upstream. `vp run typecheck` runs [tsrs](https://github.com/oxc-project/tsrs), a Rust port of the TypeScript 7 checker.
 
-Agent assets, the vendored plugin, and TanStack's generated route tree are excluded from application linting. Owned Storybook configuration remains checked. The vendored TypeScript source is included in typechecking. Effect rules are not enabled because the website has no direct Effect dependency.
+Agent assets, the vendored plugin, the build output, and Astro's generated `.astro/` types are excluded from application linting. Owned Storybook configuration remains checked. The vendored TypeScript source is included in typechecking. Effect rules are not enabled because the website has no direct Effect dependency.
 
-Vitest has two projects. `unit` runs `src/**/*.test.{ts,tsx}` in jsdom, with the StyleX plugin compiling components as the site build does. `tests/unit/setup.ts` stands in for the `matchMedia` jsdom lacks, answering every query false. The test command allows an empty suite, but regression tests should be added for behavior changed during maintenance.
+Vitest has two projects. `unit` runs `src/**/*.test.{ts,tsx}` in jsdom, with the StyleX plugin compiling components as the site build does. `tests/unit/setup.ts` stands in for the `matchMedia` jsdom lacks, answering every query false, and `tests/unit/astro-prefetch.ts` stands in for the `astro:prefetch` module only Astro's bundler serves. The test command allows an empty suite, but regression tests should be added for behavior changed during maintenance.
 
-`visual` builds the site, serves the prerendered pages in `.output/public`, and screenshots every page with Playwright Chromium at desktop (1440px) and mobile (390px) widths in light and dark themes. Before each capture it scrolls the page through so every scroll reveal plays, and it fails if a rendered `[data-cut]` or `[data-rev]` block is still unrevealed; a new reveal marker joins `unrevealedSelector` in `pages.test.ts`. Each screenshot spans the viewport width and the page's scroll height, and is compared with its baseline in `tests/visual/__screenshots__/`, failing when more than 20 pixels differ. Any error the page logs or throws also fails it. On a failure, the actual and diff images land in `tests/visual/__diff__/`. Pages are discovered from the build, so a new page fails the suite until its baselines exist, and a removed page fails it until its baselines are deleted. After an intended visual change, run `vp run test:visual:update`, review the changed PNGs, and commit them. Baselines are rendered on macOS; another OS renders fonts differently and needs its own baselines.
+`visual` serves the build in `dist/` (another directory through `SITE_DIR`) and runs two files. `pages.test.ts` screenshots every page with Playwright Chromium at desktop (1440px) and mobile (390px) widths in light and dark themes. Before each capture it scrolls the page through so every scroll reveal plays, and it fails if a rendered `[data-cut]` or `[data-rev]` block is still unrevealed; a new reveal marker joins `unrevealedSelector` in `pages.test.ts`. Each screenshot spans the viewport width and the page's scroll height, and is compared with its baseline in `tests/visual/__screenshots__/`, failing when more than 20 pixels differ. Any error the page logs or throws also fails it. On a failure, the actual and diff images land in `tests/visual/__diff__/`. Pages are discovered from the build, so a new page fails the suite until its baselines exist, and a removed page fails it until its baselines are deleted. After an intended visual change, run `vp run test:visual:update`, review the changed PNGs, and commit them. Baselines are rendered on macOS; another OS renders fonts differently and needs its own baselines. `interactions.test.ts` drives the pages as a reader does: the command palette, the theme switch and its reload, a demo on two rule pages, the dive from a rule tile and the zoom back out, the blog's table of contents and code, and the home stack filter and experience list. It fails on any error a page logs. `vp run test:visual` builds first; `vp test run --project visual` tests the build already in `dist/`.
+
+`scripts/head-parity.ts` compares the head tags crawlers and share cards read (title, description, canonical, `og:*`, `twitter:*`, theme-color, icons and JSON-LD) on every page of `dist/` with another build, and exits 1 on a missing page or any difference.
 
 ## Production
 
 ```bash
-vp build
+vp run build
+vp run preview
 ```
 
-TanStack Start prerenders discoverable routes as complete HTML in `.output/public`. React hydrates those pages for client-side navigation and interactions; static hosting does not need a runtime server. The Cloudflare preview command uses `scripts/cloudflare-pages-preview.mjs` when the Cloudflare build environment is detected.
+`astro build` writes a static site to `dist/`, one `x.html` per page (`blog.html`, `rule-of-thumb/table-design.html`) so a static host answers `/blog` without a redirect, plus `404.html`. The `finish-pages` integration in `astro.config.ts` then inlines StyleX's sheet and the core fonts and cursors into every page, writes the OG cards, `sitemap.xml` and `robots.txt` (`scripts/og/share-assets.ts`), and writes `_headers`, which gives each Markdown twin a canonical `Link` header on Cloudflare Pages. No runtime server is needed.
+
+Pages render without JavaScript except where a component carries a `client:` directive. The header hydrates on load, and the command palette, cursor, favicon cycle, smooth scroll and scrollbar hydrate when the browser is idle. The home page, the Rule of Thumb index and each rule page hydrate whole on load, since their reveals and demos need script to show. The blog index, the post frame and its code blocks ship none; a post's table of contents hydrates at desktop widths and its drawer and MDX islands when scrolled into view. Navigations are full page loads, animated by cross-document view transitions that `src/layouts/head-script.ts` types in `pageswap` and `pagereveal`, and Astro prefetches a link on hover.
 
 ## Fonts
 
@@ -58,19 +64,22 @@ vp run storybook
 vp run build-storybook
 ```
 
-Stories live in `src/stories` and use the same global stylesheet and StyleX tokens as the website. With no theme class on `<html>`, they render in the dark palette. The explicit `*.stories.tsx` glob keeps route MDX files in the TanStack Start pipeline.
+Stories live in `src/stories` and use the same global stylesheet and StyleX tokens as the website. With no theme class on `<html>`, they render in the dark palette. They build with `@storybook/react-vite`; a story renders the component as an island would, so `Header` takes the page's `path`.
 
 ## Source layout
 
-- `src/routes/`: file-based routes and their local components. `src/routes/__root.tsx` owns the root layout and development-only React Grab loader.
+- `src/pages/`: Astro's file-based pages. Each is a thin `.astro` file that picks the layout, the head tags and the islands.
+- `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the shell islands and, in development, the StyleX dev sheet and React Grab), and `head-script.ts`, which sets the theme, the intro classes and the view-transition types before first paint.
+- `src/sections/`: the home page (`home.tsx`) and the pieces the rule pages share with it.
+- `src/rules/`: the Rule of Thumb index, each rule's page component, the `RuleLanding` frame and `rule-page.astro`.
+- `src/blog/`: the post list, the post frame and its table of contents.
 - `src/components/`: shared UI and article thumbnails.
 - `src/hooks/`: shared browser and interaction hooks.
-- `src/content/blog/`: MDX articles.
+- `src/content/blog/`: MDX articles, loaded as a content collection (`src/content.config.ts`).
 - `src/data/guidelines.ts`: Rule of Thumb metadata.
-- Styles: every component styles itself with a colocated StyleX `stylex.create`. Styles shared across files live in their own modules at the lowest common ancestor: `src/components/arcade.ts` (the arcade roots, column, scanlines and screen-reader text), `button.ts` and `load-in.ts`, and `src/routes/-components/section.ts` and `hero-type.ts`.
+- Styles: every component styles itself with a colocated StyleX `stylex.create`. Styles shared across files live in their own modules at the lowest common ancestor: `src/components/arcade.ts` (the arcade roots, column, scanlines and screen-reader text), `button.ts` and `load-in.ts`, and `src/sections/section.ts` and `hero-type.ts`.
 - `src/styles.css`, `src/arcade.css` and `src/fonts.css`: the only global CSS, for what StyleX cannot express: the preflight reset, `@font-face`, the Lenis sheet, rules on `<html>` and the classes scripts set on it, view transitions, `@property` registrations and the reduced-motion blanket. Each rule says why it is global.
 - `src/theme.stylex.ts` and `src/theme.ts`: StyleX tokens and the light theme.
-- `src/routeTree.gen.ts`: generated by TanStack; do not edit by hand.
-- `public/rule-of-thumb/<id>.md`: the Markdown twin of each rule page, served by its "View .md" link for readers to paste into an `AGENTS.md`. Change it with the page. `src/routes/rule-of-thumb/-markdown-twins.test.ts` checks that it opens with the rule's title and claim, has a section per lesson and carries every TL;DR row.
+- `public/rule-of-thumb/<id>.md`: the Markdown twin of each rule page, served by its "View .md" link for readers to paste into an `AGENTS.md`. Change it with the page. `src/rules/markdown-twins.test.ts` checks that it opens with the rule's title and claim, has a section per lesson and carries every TL;DR row.
 
 See `CODE_STRUCTURE.md` and `STYLING_GUIDELINES.md` for repository conventions. The interactive article demos are site content, not disposable starter examples.

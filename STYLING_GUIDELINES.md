@@ -35,6 +35,8 @@ export function Card() {
 
 Keep style definitions static so the Vite StyleX plugin can extract them at build time.
 
+StyleX compiles `.ts` and `.tsx` modules only, not `.astro` files. An `.astro` page or layout that styles its own markup imports class strings from a module that builds them with `stylex.props(...).className`, as `src/layouts/site.stylex.ts` does for the layout and the `post` and `prose` objects in `src/blog/post.tsx` do for the blog post frame.
+
 ### 2. Accept StyleX Styles, Not Class Strings
 
 A component that lets its caller adjust it takes a `style?: stylex.StyleXStyles` prop and passes it last to `stylex.props`, so the caller's values win:
@@ -71,7 +73,7 @@ Global CSS lives in `src/styles.css`, `src/arcade.css` and `src/fonts.css`, and 
 - it styles third-party markup that takes no class, such as the Lenis sheet;
 - it must reach every element under a root, such as the reduced-motion blanket.
 
-Everything else is StyleX, including keyframes, page backgrounds, and states keyed on a class a script sets on `<html>`, which a component reads with a condition such as `":is(.dark *)"` or `":is(.js.no-intro *)"`. When several files share a style, export it from a `stylex.create` module at their lowest common ancestor (`src/components/button.ts`, `src/routes/-components/section.ts`) and compose it first, before the caller's own styles. Style rendered Markdown through an MDX `components` map instead of descendant selectors.
+Everything else is StyleX, including keyframes, page backgrounds, and states keyed on a class a script sets on `<html>`, which a component reads with a condition such as `":is(.dark *)"` or `":is(.js.no-intro *)"`. When several files share a style, export it from a `stylex.create` module at their lowest common ancestor (`src/components/button.ts`, `src/sections/section.ts`) and compose it first, before the caller's own styles. Style rendered Markdown through an MDX `components` map instead of descendant selectors. Astro passes an element's children to that map's entries as a slot, so the blog's `p` and `h2` entries are Astro components (`src/blog/prose-p.astro`, `prose-h2.astro`) that put the `prose` classes on the element.
 
 Do not add a new global utility class when a local StyleX rule can express the same style.
 
@@ -104,4 +106,4 @@ vp run test
 vp build
 ```
 
-The StyleX Vite plugin must be active in `vite.config.ts`, and production builds must contain the extracted StyleX CSS asset.
+The StyleX Vite plugin must be active in `astro.config.ts`. The build inlines its collected sheet into every page's `<head>` after the global CSS, so a built page must carry that `<style>` block. In development the layout links `/virtual:stylex.css` instead.
