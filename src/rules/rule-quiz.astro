@@ -13,8 +13,14 @@ type Props = {
 
 const { n, level, board } = Astro.props;
 const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
-// The default slot is the prompt, its code in tone "prompt". The two templates hold what clearing
-// the level shows; rule-quiz.client.ts clones them.
+// The default slot is the prompt, its code in tone "prompt". A text row whose copy carries markup
+// takes it from the slot `row-<i>`, i being its index in `level.rows`. The two templates hold what
+// clearing the level shows; rule-quiz.client.ts clones them.
+const marked = await Promise.all(
+  level.rows.map((_, index) =>
+    Astro.slots.has(`row-${index}`) ? Astro.slots.render(`row-${index}`) : undefined,
+  ),
+);
 ---
 
 <rule-quiz
@@ -38,7 +44,7 @@ const idle = { open: false, near: false, missed: false, cleared: false, seated: 
     <div {...stylex.attrs(lessonKit.well, quizKit.board)}>
       <ul {...stylex.attrs(tree.list)}>
         {
-          level.rows.map((row) =>
+          level.rows.map((row, index) =>
             "slot" in row ? (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.lead ? quizKit.leadRow : null)}
                 >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{row.lead}</span>}<button
@@ -52,7 +58,7 @@ const idle = { open: false, near: false, missed: false, cleared: false, seated: 
               >
             ) : (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.kind && tree[row.kind])}
-                >{row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
+                >{marked[index] === undefined ? row.text : <Fragment set:html={marked[index]} />}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
               >
             ),
           )

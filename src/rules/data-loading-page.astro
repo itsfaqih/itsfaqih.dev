@@ -1,0 +1,89 @@
+---
+import { EARLY, LATE, LESSONS, TLDR } from "./data-loading";
+import DataLoadingInbox from "./data-loading-inbox.astro";
+import DataLoadingParse from "./data-loading-parse.astro";
+import DataLoadingQuiz from "./data-loading-quiz.astro";
+import DataLoadingRevenue from "./data-loading-revenue.astro";
+import DataLoadingTeam from "./data-loading-team.astro";
+import DataLoadingWallet from "./data-loading-wallet.astro";
+import DataLoadingWaterfall from "./data-loading-waterfall.astro";
+import LessonText from "./lesson-text.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+
+const [early, stale, flicker, errors, boundary, persist] = LESSONS;
+---
+
+<RuleLanding id="data-loading" learn="Fast first paint, smooth updates" tldr={TLDR} take="load data the same way">
+  <Fragment slot="lead">Start requests on navigation and keep stale data on screen. Show a skeleton only after 200ms.</Fragment>
+  <Fragment slot="intro">Design the wait, because people judge loading by what they see while it lasts.</Fragment>
+
+  <RuleLesson lesson={early}>
+    <Fragment slot="body"
+      >Fetch on navigation, not on render. A fetch that starts when the page renders waits for the page's code to load and render first. Start it as the user navigates, so it runs while the code loads. Wait for what the page needs and stream the rest.</Fragment
+    >
+    <DataLoadingWaterfall slot="bad" {...LATE} />
+    <DataLoadingWaterfall slot="good" {...EARLY} />
+  </RuleLesson>
+  <DataLoadingQuiz n={1} level={early.levels[0]}
+    >The orders page lists 20 orders, one row each. Place the request.</DataLoadingQuiz
+  >
+
+  <RuleLesson lesson={stale}>
+    <Fragment slot="body"
+      >When you refetch data you already have, show a small spinner beside it and swap the new value in place. Press Refetch on both.</Fragment
+    >
+    <DataLoadingRevenue slot="bad" />
+    <DataLoadingRevenue slot="good" swr />
+  </RuleLesson>
+  <DataLoadingQuiz n={2} level={stale.levels[0]}
+    >You return to a tab of prices loaded 5 minutes ago. They refetch on focus. Place the cached prices.</DataLoadingQuiz
+  >
+
+  <RuleLesson lesson={flicker}>
+    <Fragment slot="body"
+      >Most replies are quick. Show loading UI only after 200ms, so a fast reply appears without a skeleton flash.</Fragment
+    >
+    <DataLoadingInbox slot="bad" />
+    <DataLoadingInbox slot="good" delay />
+  </RuleLesson>
+  <DataLoadingQuiz n={3} level={flicker.levels[0]}
+    >Most replies to this list land in 80ms. A few take 2s. Place the spinner.</DataLoadingQuiz
+  >
+
+  <RuleLesson lesson={errors}>
+    <Fragment slot="body"
+      >Show the error where the data would go, with a Retry button. A toast fades before anyone reads it and leaves an empty card. Log every failure so you hear about it before your users do.</Fragment
+    >
+    <DataLoadingTeam slot="bad" />
+    <DataLoadingTeam slot="good" inline />
+  </RuleLesson>
+  <DataLoadingQuiz n={4} level={errors.levels[0]}
+    >A dashboard loads five cards, and the revenue card fails to load. Place what people see.</DataLoadingQuiz
+  >
+
+  <RuleLesson lesson={boundary}>
+    <Fragment slot="body"
+      >API data is a guess until you check it. Parse it as soon as it arrives and give optional fields a fallback, so the rest of your code gets real types. If you skip it, a missing field crashes far from where it came in.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >When a required field fails, show a plain message and log the details. Update the schema when the API changes. It documents the API too.</LessonText
+    >
+    <DataLoadingParse slot="bad" />
+    <DataLoadingParse slot="good" parse />
+  </RuleLesson>
+  <DataLoadingQuiz n={5} level={boundary.levels[0]}
+    >The server sometimes leaves out the user's photo, and the avatar reads it two screens deep. Place the check.</DataLoadingQuiz
+  >
+
+  <RuleLesson lesson={persist}>
+    <Fragment slot="body"
+      >A disk cache is already old when the app next opens. Persist history, settings and static content, and show when it was updated. Never persist balances, prices or stock counts. A stale number there leads to a wrong decision.</Fragment
+    >
+    <DataLoadingWallet slot="bad" />
+    <DataLoadingWallet slot="good" careful />
+  </RuleLesson>
+  <DataLoadingQuiz n={6} level={persist.levels[0]}
+    >A banking app persists its cache. On day 3 you open it with no signal. Place what it may show from the cache.</DataLoadingQuiz
+  >
+</RuleLanding>

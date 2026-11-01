@@ -3,7 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import type { Tldr } from "./lesson";
 import { PUBLISHED_GUIDELINES } from "../data/guidelines";
 import * as buttonDesign from "./button-design-page";
-import * as dataLoading from "./data-loading-page";
+import * as dataLoading from "./data-loading";
 import * as dialogDesign from "./dialog-design-page";
 import * as handlingTimestamps from "./handling-timestamps-page";
 import * as nullVsUndefined from "./null-vs-undefined-page";
