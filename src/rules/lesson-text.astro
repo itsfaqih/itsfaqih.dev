@@ -1,0 +1,14 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { text } from "./rule-landing.styles";
+
+type Props = {
+  /** A side note under the lesson copy. */
+  tip?: boolean;
+  style?: stylex.StyleXStyles;
+};
+
+const { tip = false, style } = Astro.props;
+---
+
+<p {...stylex.attrs(text.lesson, tip && text.tip, style)}><slot /></p>

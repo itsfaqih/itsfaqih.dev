@@ -1,0 +1,211 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import {
+  colorOf,
+  PUBLISHED_GUIDELINES,
+  ruleNumber,
+  VISIBLE_GUIDELINES,
+} from "../data/guidelines";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade";
+import { button, buttonVariant } from "../components/button";
+import Backdrop from "../sections/backdrop.astro";
+import { heroType } from "../sections/hero-type";
+import { reticle } from "../sections/reticle";
+import RuleThumb from "../sections/rule-thumb.astro";
+import { section, veil } from "../sections/section";
+import Code from "./code.astro";
+import type { Tldr } from "./lesson";
+import PagerCard from "./pager-card.astro";
+import { reveal } from "./rule-landing.stylex";
+import {
+  cover,
+  host,
+  island,
+  landingView,
+  lessonKit,
+  pager,
+  shell,
+  takeKit,
+} from "./rule-landing.styles";
+import ShareButton from "./share-button.astro";
+
+type Props = {
+  /** The published rule this page teaches. */
+  id: string;
+  /** The heading over the lessons; its intro goes in the "intro" slot. */
+  learn: string;
+  tldr: Tldr;
+  /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
+  take: string;
+};
+
+const { id, learn, tldr, take } = Astro.props;
+const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
+if (!rule) throw new Error(`No published rule "${id}"`);
+
+const hue = `--c:${colorOf(rule.label)}`;
+const number = ruleNumber(rule);
+const markdownUrl = `${rule.href}.md`;
+const words = rule.title.split(" ");
+const last = words.pop();
+const head = words.join(" ");
+const at = VISIBLE_GUIDELINES.indexOf(rule);
+const prev = VISIBLE_GUIDELINES[at - 1];
+const next = VISIBLE_GUIDELINES[at + 1];
+const [was, now] = rule.coverTag.split(" → ");
+---
+
+<rule-landing
+  class={`arc ${stylex.attrs(arcade.root, arcade.scan, shell.root, reveal, host.block).class}`}
+  style={hue}
+  data-title={rule.title}
+  data-claim={rule.claim}
+  data-markdown={markdownUrl}
+>
+  <Backdrop tide />
+  <header {...stylex.attrs(arcade.wrap, shell.titleScreen)}>
+    {/* Spans both columns, so Share sits over the cover's right edge. */}
+    <div {...stylex.attrs(shell.crumbRow)}>
+      <nav
+        {...stylex.attrs(heroType.tag, veil.dense, shell.crumb, shell.in, shell.first)}
+        aria-label="Breadcrumb"
+        ><a href="/rule-of-thumb" {...stylex.attrs(shell.crumbLink)}>← All rules</a>{
+          number && <span {...stylex.attrs(shell.crumbTag)}>No.<!-- -->{number}</span>
+        }<span {...stylex.attrs(shell.crumbTag)}>{rule.label}</span></nav
+      >
+      <ShareButton />
+    </div>
+    <div {...stylex.attrs(veil.soft, shell.heroCopy)}>
+      <h1 {...stylex.attrs(heroType.title, shell.title)} data-part="title"
+        >{
+          head && (
+            <Fragment>
+              <span {...stylex.attrs(shell.titleLine)}>{head}</span>{" "}
+            </Fragment>
+          )
+        }<span {...stylex.attrs(shell.titleLine)}
+          ><span {...stylex.attrs(heroType.hl, shell.titleMark)}>{last}</span></span
+        ></h1
+      >
+      <p {...stylex.attrs(shell.claim, shell.in, shell.second)}>{rule.claim}</p>
+      <p {...stylex.attrs(heroType.lead, shell.lead, shell.in, shell.third)}><slot name="lead" /></p>
+    </div>
+    <div {...stylex.attrs(cover.box, shell.in, shell.coverIn, shell.third)} data-part="cover">
+      <div {...stylex.attrs(cover.card)}>
+        <div {...stylex.attrs(cover.sheet)}>
+          <RuleThumb rule={rule} play at="cover" style={cover.thumb} />
+          <div {...stylex.attrs(cover.tear)}></div>
+          <div aria-hidden="true" {...stylex.attrs(cover.stub)}>
+            <span {...stylex.attrs(cover.was)}>{was}</span><span {...stylex.attrs(cover.to)}
+              >→</span
+            ><span {...stylex.attrs(cover.now)}>{now}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div {...stylex.attrs(arcade.wrap)}>
+    <section
+      id="learn"
+      aria-labelledby="learn-title"
+      {...stylex.attrs(section.block, lessonKit.section)}
+    >
+      <div {...stylex.attrs(lessonKit.secHead, shell.rev)} data-rev="true">
+        <h2
+          id="learn-title"
+          {...stylex.attrs(section.title, veil.soft, lessonKit.headItem, lessonKit.secTitle)}
+        >
+          {learn}
+        </h2>
+        <p {...stylex.attrs(veil.soft, lessonKit.headItem, lessonKit.secText)}><slot name="intro" /></p>
+      </div>
+      <div {...stylex.attrs(lessonKit.lessons)}>
+        <slot />
+      </div>
+      <div {...stylex.attrs(lessonKit.sheetWrap, shell.rev)} data-rev="true">
+        <h3 {...stylex.attrs(veil.soft, lessonKit.sheetTitle)}>TL;DR</h3>
+        <ol {...stylex.attrs(lessonKit.panel, lessonKit.sheet)}>
+          {
+            tldr.map(([situation, answer]) => (
+              <li {...stylex.attrs(lessonKit.sheetRow)}
+                ><span {...stylex.attrs(lessonKit.situation)}>{situation}</span><b
+                  {...stylex.attrs(lessonKit.answer)}>{answer}</b
+                ></li
+              >
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <section {...stylex.attrs(section.block, takeKit.section)}>
+      <div {...stylex.attrs(veil.soft, takeKit.copy, shell.rev)} data-rev="true">
+        <h2 {...stylex.attrs(section.title, takeKit.title)}>Take the rule with you</h2>
+        <p {...stylex.attrs(takeKit.text)}
+          >The whole rule in Markdown. Paste it into your <Code tone="take">AGENTS.md</Code>{
+            ` and your agents will ${take}.`
+          }</p
+        >
+        <div {...stylex.attrs(heroType.acts, takeKit.acts)}>
+          <button
+            type="button"
+            {...stylex.attrs(button.base, buttonVariant["primary-brand"])}
+            data-part="copy">Copy as Markdown</button
+          >
+          <a
+            {...stylex.attrs(button.base, buttonVariant["secondary-brand"])}
+            href={markdownUrl}
+            target="_blank"
+            rel="noopener noreferrer">View .md</a
+          >
+        </div>
+      </div>
+      <div {...stylex.attrs(shell.rev)} data-rev="true">
+        {
+          at !== -1 && (
+            <nav {...stylex.attrs(arcade.root, pager.nav)} aria-label="More rules">
+              {prev ? (
+                <PagerCard rule={prev} direction="Previous" />
+              ) : (
+                <div {...stylex.attrs(pager.gap)} />
+              )}
+              {next ? (
+                <PagerCard rule={next} direction="Next" />
+              ) : (
+                <a
+                  href="/rule-of-thumb"
+                  {...stylex.attrs(reticle.card, reticle.aim, pager.card, pager.all)}
+                  ><span {...stylex.attrs(pager.dir)}>That's every rule so far</span><span
+                    {...stylex.attrs(pager.title)}>Back to all rules →</span
+                  ></a
+                >
+              )}
+            </nav>
+          )
+        }
+      </div>
+    </section>
+  </div>
+  {/* The compact header island's live activity, moved into its [data-island-activity] on load. */}
+  <template data-part="activity"
+    ><span {...stylex.attrs(island.activity)} style={hue}
+      ><a href="/rule-of-thumb" {...stylex.attrs(island.action, island.back)}
+        ><Icon name="ArrowLeft" size={16} weight="bold" aria-hidden="true" /><span
+          {...stylex.attrs(island.backText)}>All rules</span
+        ></a
+      ><span class={landingView.label} data-part="label"
+        ><span {...stylex.attrs(island.labelPart, island.tags)}
+          >{number && <span>No.<!-- -->{number}</span>}<span>{rule.label}</span></span
+        ><span aria-hidden="true" {...stylex.attrs(island.labelPart, island.title)}
+          >{head && `${head} `}<span {...stylex.attrs(heroType.hl)}>{last}</span></span
+        ></span
+      ><ShareButton inIsland /></span
+    ></template
+  >
+</rule-landing>
+
+<script>
+  import "./rule-landing.client";
+</script>

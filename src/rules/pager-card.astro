@@ -1,0 +1,35 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { colorOf, ruleNumber, type PublishedGuideline } from "../data/guidelines";
+import { hoverHold } from "../components/hover-hold";
+import { reticle } from "../sections/reticle";
+import RuleThumb from "../sections/rule-thumb.astro";
+import { pager } from "./rule-landing.styles";
+
+type Props = { rule: PublishedGuideline; direction: "Previous" | "Next" };
+
+const { rule, direction } = Astro.props;
+// The thumb plays while the card is hovered or focused (rule-landing.client.ts).
+---
+
+<a
+  href={rule.href}
+  {...stylex.attrs(
+    reticle.card,
+    reticle.aim,
+    hoverHold.lift,
+    pager.card,
+    direction === "Next" && pager.next,
+  )}
+  style={`--c:${colorOf(rule.label)}`}
+  data-rule-open
+  data-part="pager"
+  ><RuleThumb rule={rule} style={pager.thumb} /><span {...stylex.attrs(pager.meta)}
+    ><span {...stylex.attrs(pager.dir)}>{direction === "Next" ? "Next rule →" : "← Previous rule"}</span
+    ><span {...stylex.attrs(pager.number)}
+      >No.<!-- -->{ruleNumber(rule)}<!-- --> · <!-- -->{rule.label}</span
+    >{/* .t names the title for the rule-open view transition in arcade.css. */}<span
+      class={`t ${stylex.attrs(pager.title).class}`}>{rule.title}</span
+    ></span
+  ></a
+>

@@ -12,5 +12,5 @@ export const kit = stylex.defineVars({
   "--t-fb": "160ms",
 });
 
-/** The page root, once useReveal has marked what is already on screen. */
+/** The page root, once watchReveal has marked what is already on screen. */
 export const reveal = stylex.defineMarker();
