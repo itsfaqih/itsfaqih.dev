@@ -1,0 +1,46 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { parseJson, RESPONSE, trustJson } from "./data-loading";
+import { styles, view } from "./data-loading.styles";
+
+type Props = {
+  /** Parse the response with a schema instead of trusting it. */
+  parse?: boolean;
+};
+
+const { parse = false } = Astro.props;
+const outcome = parse ? parseJson(RESPONSE) : trustJson(RESPONSE);
+---
+
+<data-loading-parse {...stylex.attrs(styles.view)}
+  ><pre {...stylex.attrs(styles.source)}><span {...stylex.attrs(styles.comment)}>{"// GET /users/1 → "}</span>{RESPONSE}<!-- -->{"\n"}<!-- -->{parse ? <Fragment>{"const user = "}<mark {...stylex.attrs(styles.mark)}>User.parse</mark>{"(await res.json());\n"}<span {...stylex.attrs(styles.comment)}>{'// a missing city becomes "Unknown"'}</span></Fragment> : <Fragment>{"const user = await res.json(); "}<span {...stylex.attrs(styles.comment)}>{"// any"}</span></Fragment>}{"\n"}<!-- -->{"render(user.city.toUpperCase());"}</pre
+  ><div {...stylex.attrs(styles.card, styles.result)} aria-live="polite" data-part="result"
+    >{
+      outcome.ok ? (
+        <div {...stylex.attrs(styles.profile)}
+          ><i aria-hidden="true" {...stylex.attrs(styles.avatar, styles.profileAvatar)}
+            >{outcome.user.name.charAt(0)}</i
+          ><b {...stylex.attrs(styles.profileName)}>{outcome.user.name}</b><span
+            {...stylex.attrs(styles.city)}>{outcome.user.city}</span
+          ></div
+        >
+      ) : (
+        <div {...stylex.attrs(styles.crash)} role="alert"
+          ><b {...stylex.attrs(styles.crashTitle)}>Uncaught <!-- -->{outcome.error.split(":")[0]}</b
+          ><code {...stylex.attrs(styles.crashCode)}>{outcome.error}</code></div
+        >
+      )
+    }</div
+  ><div {...stylex.attrs(styles.ctl)}
+    ><span {...stylex.attrs(styles.note)}>The API left out city</span><button
+      data-hint="true"
+      type="button"
+      class={view.ctlButton}
+      data-part="fetch">Fetch /users/1</button
+    ></div
+  ></data-loading-parse
+>
+
+<script>
+  import "./data-loading-parse.client";
+</script>

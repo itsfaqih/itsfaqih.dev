@@ -1,0 +1,47 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { inboxRows } from "./data-loading";
+import { styles, view } from "./data-loading.styles";
+
+type Props = {
+  /** Hold the skeleton back until the reply has taken 200ms. */
+  delay?: boolean;
+};
+
+const { delay = false } = Astro.props;
+---
+
+<data-loading-inbox {...stylex.attrs(styles.view)} data-delay={delay ? "" : undefined}
+  ><div {...stylex.attrs(styles.card)}
+    ><div {...stylex.attrs(styles.head)}
+      ><span>Inbox</span><span {...stylex.attrs(styles.status)} data-part="unread"
+        >3<!-- --> unread</span
+      ></div
+    ><ul {...stylex.attrs(styles.mail)} data-part="mail"
+      >{
+        inboxRows(0).map(([from, subject]) => (
+          <li class={view.mailRow(false)}
+            ><i aria-hidden="true" class={view.avatar(false)}>{from.charAt(0)}</i><span
+              class={view.mailText}
+              ><b class={view.mailFrom(false)}>{from}</b><em class={view.mailSubject(false)}
+                >{subject}</em
+              ></span
+            ></li
+          >
+        ))
+      }</ul
+    ><p {...stylex.attrs(styles.said)} aria-live="polite" data-part="said"
+      >Pick how fast the server replies.</p
+    ></div
+  ><div {...stylex.attrs(styles.ctl)}
+    ><span {...stylex.attrs(styles.note)}>Server replies in</span><span
+      {...stylex.attrs(styles.pair)}
+      ><button data-hint="true" type="button" class={view.ctlButton} data-part="fast">80ms</button
+      ><button type="button" class={view.ctlButton} data-part="slow">1.2s</button></span
+    ></div
+  ></data-loading-inbox
+>
+
+<script>
+  import "./data-loading-inbox.client";
+</script>

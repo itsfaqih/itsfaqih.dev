@@ -1,0 +1,55 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { HISTORY, money } from "./data-loading";
+import { styles, view } from "./data-loading.styles";
+
+type Props = {
+  /** Persist only the dated history; the balance waits for a connection. */
+  careful?: boolean;
+};
+
+const { careful = false } = Astro.props;
+---
+
+<data-loading-wallet {...stylex.attrs(styles.view)} data-careful={careful ? "" : undefined}
+  ><div {...stylex.attrs(styles.card)}
+    ><div {...stylex.attrs(styles.head)}
+      ><span>Wallet</span><span class={view.signal("offline")} data-part="signal"
+        >No signal, day 3</span
+      ></div
+    ><div {...stylex.attrs(styles.balance)} data-part="balance"
+      ><span {...stylex.attrs(styles.balanceLabel)}>Balance</span><b
+        class={view.balance(false, careful)}>{careful ? "Needs a connection" : money(2140)}</b
+      ></div
+    ><div {...stylex.attrs(styles.hist)}
+      ><div {...stylex.attrs(styles.histHead)}
+        ><span>Recent</span>{
+          careful && (
+            <span {...stylex.attrs(styles.stamp)} data-part="stamp">Updated 2 days ago</span>
+          )
+        }</div
+      ><ul {...stylex.attrs(styles.histList)} data-part="history"
+        >{
+          HISTORY.map((row) => (
+            <li class={view.histRow(false)}
+              ><span>{row.label}</span><b class={view.histAmount}
+                >{row.amount < 0 ? "−" : "+"}<!-- -->{money(Math.abs(row.amount))}</b
+              ></li
+            >
+          ))
+        }</ul
+      ></div
+    ></div
+  ><div {...stylex.attrs(styles.ctl)}
+    ><span {...stylex.attrs(styles.note)}>Opened from cache</span><button
+      data-hint="true"
+      type="button"
+      class={view.ctlButton}
+      data-part="go">Get signal</button
+    ></div
+  ></data-loading-wallet
+>
+
+<script>
+  import "./data-loading-wallet.client";
+</script>
