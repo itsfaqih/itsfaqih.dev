@@ -16,34 +16,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "It closed",
-        piece: "focus",
         answer: "trigger",
-        rows: [
+        choices: [
           {
-            depth: 0,
-            slot: {
-              id: "body",
-              label: "Top of the page",
-              note: "Focus starts over at the top. A keyboard user tabs past 12 links to get back.",
-            },
-          },
-          { depth: 1, text: "Nav, 12 links", kind: "more" },
-          { depth: 1, text: "Settings page", kind: "comp" },
-          {
-            depth: 2,
-            slot: {
-              id: "trigger",
-              label: "Edit profile button",
-              note: "Return focus here, where they left off. One Tab continues down the page.",
-            },
+            id: "body",
+            label: "Top of the page",
+            note: "Focus starts over at the top. A keyboard user tabs past 12 links to get back.",
           },
           {
-            depth: 2,
-            slot: {
-              id: "next",
-              label: "Change password button",
-              note: "Close, but they never picked it, so a screen reader announces it without warning.",
-            },
+            id: "trigger",
+            label: "Edit profile button",
+            note: "Return focus here, where they left off. One Tab continues down the page.",
+          },
+          {
+            id: "next",
+            label: "Change password button",
+            note: "Close, but they never picked it, so a screen reader announces it without warning.",
           },
         ],
       },
@@ -62,33 +50,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "A click outside",
-        piece: "close",
         answer: "news",
-        rows: [
-          { depth: 0, text: "click on the scrim", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "issue",
-              label: "New issue, title typed in",
-              note: `One stray click throws away the ${DRAFT.length} characters they typed.`,
-            },
+            id: "issue",
+            label: "New issue, title typed in",
+            note: `One stray click throws away the ${DRAFT.length} characters they typed.`,
           },
           {
-            depth: 1,
-            slot: {
-              id: "news",
-              label: "What's new, nothing to fill in",
-              note: "Close it on a click outside, since there is nothing to lose.",
-            },
+            id: "news",
+            label: "What's new, nothing to fill in",
+            note: "Close it on a click outside, since there is nothing to lose.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "profile",
-              label: "Edit profile, nothing changed yet",
-              note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
-            },
+            id: "profile",
+            label: "Edit profile, nothing changed yet",
+            note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
           },
         ],
       },
@@ -107,68 +84,43 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Delete forever",
-        piece: "first focus",
         answer: "cancel",
-        rows: [
-          { depth: 0, text: "Moonbase project row", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "trigger",
-              label: "Delete project, on the page behind",
-              note: "Focus stays behind the dim layer. Tab moves through the page, and Enter reopens the dialog.",
-            },
-          },
-          { depth: 0, text: "Confirm dialog", kind: "comp" },
-          { depth: 1, text: "Delete Moonbase?" },
-          {
-            depth: 1,
-            slot: {
-              id: "cancel",
-              label: "Cancel",
-              note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
-            },
+            id: "trigger",
+            label: "Delete project, on the page behind",
+            note: "Focus stays behind the dim layer. Tab moves through the page, and Enter reopens the dialog.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "delete",
-              label: "Delete",
-              note: "One Enter deletes 214 files before anyone has read the title.",
-            },
+            id: "cancel",
+            label: "Cancel",
+            note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
+          },
+          {
+            id: "delete",
+            label: "Delete",
+            note: "One Enter deletes 214 files before anyone has read the title.",
           },
         ],
       },
       {
         name: "Add a contact",
-        piece: "first focus",
         answer: "name",
-        rows: [
-          { depth: 0, text: "Add contact dialog", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "close",
-              label: "× Close",
-              note: "Typing goes nowhere, and one Enter closes the form they came to fill.",
-            },
+            id: "close",
+            label: "Close",
+            note: "Typing goes nowhere, and one Enter closes the form they came to fill.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "name",
-              label: "Name field",
-              note: "Focus the first field so they start typing at once, with no click or Tab.",
-            },
+            id: "name",
+            label: "Name field",
+            note: "Focus the first field so they start typing at once, with no click or Tab.",
           },
-          { depth: 1, text: "Email field" },
           {
-            depth: 1,
-            slot: {
-              id: "save",
-              label: "Save",
-              note: "Enter saves an empty contact, and they Shift+Tab back up to start.",
-            },
+            id: "save",
+            label: "Save",
+            note: "Enter saves an empty contact, and they Shift+Tab back up to start.",
           },
         ],
       },
@@ -187,33 +139,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "A slip",
-        piece: "shake",
         answer: "issue",
-        rows: [
-          { depth: 0, text: "click on the scrim", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "news",
-              label: "What's new, nothing to fill in",
-              note: "Nothing typed, nothing lost. Shaking it blocks a safe way out.",
-            },
+            id: "news",
+            label: "What's new, nothing to fill in",
+            note: "Nothing typed, nothing lost. Shaking it blocks a safe way out.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "issue",
-              label: "New issue, title typed in",
-              note: `Shake it and keep the ${DRAFT.length} characters. Esc or × asks before it drops them.`,
-            },
+            id: "issue",
+            label: "New issue, title typed in",
+            note: `Shake it and keep the ${DRAFT.length} characters. Esc or × asks before it drops them.`,
           },
           {
-            depth: 1,
-            slot: {
-              id: "preview",
-              label: "Image preview, nothing to fill in",
-              note: "It holds no input, so a click outside should just close it.",
-            },
+            id: "preview",
+            label: "Image preview, nothing to fill in",
+            note: "It holds no input, so a click outside should just close it.",
           },
         ],
       },
@@ -232,33 +173,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Hold the page",
-        piece: "scroll lock",
         answer: "body",
-        rows: [
+        choices: [
           {
-            depth: 0,
-            slot: {
-              id: "body",
-              label: "The page",
-              note: "Lock the page while the dialog is open, and keep room for its scrollbar so nothing shifts.",
-            },
-          },
-          { depth: 1, text: "The article, 3,000 words", kind: "more" },
-          {
-            depth: 1,
-            slot: {
-              id: "scrim",
-              label: "The dim layer",
-              note: "The dim layer never scrolled. The article under it still does.",
-            },
+            id: "body",
+            label: "The page",
+            note: "Lock the page while the dialog is open, and keep room for its scrollbar so nothing shifts.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "panel",
-              label: "The dialog panel",
-              note: "A long dialog gets cut off, and the article behind it still scrolls.",
-            },
+            id: "scrim",
+            label: "The dim layer",
+            note: "The dim layer never scrolled. The article under it still does.",
+          },
+          {
+            id: "panel",
+            label: "The dialog panel",
+            note: "A long dialog gets cut off, and the article behind it still scrolls.",
           },
         ],
       },
@@ -277,33 +207,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Read aloud",
-        piece: "the dialog",
         answer: "named",
-        rows: [
-          { depth: 0, text: "screen reader, as it opens", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "plain",
-              label: "+ a plain box",
-              note: "Focus moves, but nothing says a dialog opened or what it asks.",
-            },
+            id: "plain",
+            label: "A plain box",
+            note: "Focus moves, but nothing says a dialog opened or what it asks.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "role",
-              label: "+ marked as a dialog",
-              note: "They hear dialog, but not which one or what it asks.",
-            },
+            id: "role",
+            label: "Marked as a dialog",
+            note: "They hear dialog, but not which one or what it asks.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "named",
-              label: "+ a dialog with a name and a description",
-              note: "They hear Delete Moonbase?, dialog, then that 214 files go for good. That's enough to answer.",
-            },
+            id: "named",
+            label: "A dialog with a name and a description",
+            note: "They hear Delete Moonbase?, dialog, then that 214 files go for good. That's enough to answer.",
           },
         ],
       },
