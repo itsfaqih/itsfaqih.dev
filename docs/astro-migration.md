@@ -11,12 +11,10 @@ Every page and component is an `.astro` file, prerendered to HTML. An interactiv
 
 ## What changed for a reader
 
-These are step one's results.
-
-- **Less JavaScript.** Each page downloaded 17% to 58% less script (the measured "JS" columns below). The blog index and the post frame shipped no React of their own. Only the header and the global helpers (the command palette, the cursor, the favicon cycle, smooth scroll, the scrollbar) hydrated.
-- **Interactive sooner.** Each measured page became usable sooner on both network profiles. The biggest gain was the blog post: 3.43 s → 2.44 s on mobile 4G.
+- **Less JavaScript.** Step one cut each page's script by 17% to 58%. Step two cut it again, to 23 to 47 KB per page. The blog post went from 318 KB of script on the React build to 27 KB.
+- **Interactive sooner.** On mobile 4G every measured page became usable 0.4 to 1.0 s sooner than on the React build. The blog post gained the most, 3.31 s to 2.31 s.
 - **Navigation.** A link is now a full page load. Astro prefetches a link on hover, and the browser's cross-document view transitions replay the old fade, rule dive, and zoom-out (`src/layouts/head-script.ts`). Browsers without cross-document view transitions (Firefox today) navigate with no animation.
-- **Build output.** The output went from 432 JS files (12.3 MB, mostly syntax-highlighter grammars and themes split into chunks) to 43 (1.1 MB). Code blocks are prerendered, so the highlighter no longer ships.
+- **Build output.** Step one took the output from 432 JS files (12.3 MB, mostly syntax-highlighter grammars and themes split into chunks) to 43 (1.1 MB). Code blocks are prerendered, so the highlighter no longer ships. Step two shrank `dist/_astro` from 660 KB to 444 KB.
 
 ## Decisions
 
@@ -32,58 +30,79 @@ These are step one's results.
 
 ## Results
 
-These numbers compare the TanStack Start build with the step one Astro build. This doc has no measurement of step two yet.
+One run measured all three builds side by side on 2026-11-02. "React" is the TanStack Start build (`.output/public` from `main` at 53ec8bb). "Step one" is the React-islands build (51e75b8). "Step two" is the current build.
 
-Method: `scripts/perf-compare.ts` serves the React build (`.output/public` from `main` at 53ec8bb) and the Astro build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating which build goes first, and reports the median with the range in parentheses. "Interactive" is when the header's React root mounts, which is the same component on both builds. Every run finished with zero failed requests and zero console errors.
+Method: `scripts/perf-compare.ts` serves every build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating the order of the builds, and reports the median with the range in parentheses. "Interactive" is when the header answers input, which is when its React root mounts or its `<site-header>` element is defined. All 240 runs finished with zero failed requests and zero console errors. The load average was 4 to 10 on 10 cores, and the alternating order spread that noise across the builds.
 
 ### Mobile 4G (390×844, 1.47 Mbit/s, 562 ms RTT, 4× CPU slowdown)
 
-| Page                         | Build | FCP ms           | LCP ms           | Interactive ms   | Transferred KB | JS KB |
-| ---------------------------- | ----- | ---------------- | ---------------- | ---------------- | -------------- | ----- |
-| /                            | React | 4268 (4236–4732) | 4412 (4364–4848) | 3845 (3696–4507) | 423            | 287   |
-| /                            | Astro | 3356 (3204–3436) | 3572 (3368–3620) | 3557 (3482–3585) | 340            | 202   |
-| /blog                        | React | 1084 (1076–1136) | 1084             | 2973 (2930–2993) | 231            | 154   |
-| /blog                        | Astro | 1096 (1084–1156) | 1096             | 2412 (2391–2513) | 193            | 114   |
-| /blog/hello-world            | React | 1088 (1084–1204) | 1088             | 3426 (3317–4140) | 404            | 318   |
-| /blog/hello-world            | Astro | 1104 (1092–4596) | 1104             | 2443 (2369–5772) | 223            | 135   |
-| /rule-of-thumb               | React | 1596 (1556–4484) | 3976 (3848–6896) | 3172 (3058–6056) | 302            | 223   |
-| /rule-of-thumb               | Astro | 1596 (1572–3140) | 3160 (3108–4968) | 2855 (2810–4659) | 218            | 137   |
-| /rule-of-thumb/dialog-design | React | 1380 (1080–3484) | 1380             | 3409 (3346–5775) | 271            | 187   |
-| /rule-of-thumb/dialog-design | Astro | 1228 (1104–3644) | 1248             | 2716 (2612–5276) | 241            | 156   |
-| /rule-of-thumb/table-design  | React | 1304 (1092–4064) | 1304             | 3431 (3341–6538) | 271            | 187   |
-| /rule-of-thumb/table-design  | Astro | 1296 (1088–3748) | 1384             | 3373 (3160–5528) | 242            | 156   |
-
-The machine's load average was 21 to 26 during this run, which accounts for the outlier maxima. The alternating order exposed both builds to the same noise.
+| Page                         | Build    | FCP ms | LCP ms | Interactive ms   | Transferred KB | JS KB |
+| ---------------------------- | -------- | ------ | ------ | ---------------- | -------------- | ----- |
+| /                            | React    | 3924   | 4052   | 3598 (3594–4948) | 423            | 287   |
+| /                            | Step one | 3172   | 3344   | 3436 (3370–3459) | 340            | 202   |
+| /                            | Step two | 3340   | 3340   | 3177 (3171–3333) | 187            | 43    |
+| /blog                        | React    | 1048   | 1048   | 2891 (2849–2972) | 231            | 154   |
+| /blog                        | Step one | 1072   | 1072   | 2356 (2354–2371) | 193            | 114   |
+| /blog                        | Step two | 1080   | 1080   | 2307 (2301–2322) | 104            | 24    |
+| /blog/hello-world            | React    | 1064   | 1064   | 3307 (3271–3331) | 404            | 318   |
+| /blog/hello-world            | Step one | 1064   | 1064   | 2363 (2349–2366) | 223            | 135   |
+| /blog/hello-world            | Step two | 1076   | 1076   | 2310 (2297–2318) | 117            | 27    |
+| /rule-of-thumb               | React    | 1540   | 3792   | 3012 (2994–3080) | 302            | 223   |
+| /rule-of-thumb               | Step one | 1540   | 3072   | 2786 (2778–2790) | 218            | 137   |
+| /rule-of-thumb               | Step two | 1172   | 3596   | 2360 (2354–2369) | 122            | 39    |
+| /rule-of-thumb/dialog-design | React    | 1240   | 1240   | 3256 (3203–3317) | 271            | 187   |
+| /rule-of-thumb/dialog-design | Step one | 1168   | 1184   | 2610 (2580–2624) | 241            | 156   |
+| /rule-of-thumb/dialog-design | Step two | 1196   | 1244   | 2398 (2390–2429) | 131            | 42    |
+| /rule-of-thumb/table-design  | React    | 1212   | 1212   | 3357 (3265–3401) | 271            | 187   |
+| /rule-of-thumb/table-design  | Step one | 1116   | 1164   | 2774 (2764–2846) | 242            | 156   |
+| /rule-of-thumb/table-design  | Step two | 1196   | 1196   | 2949 (2947–2970) | 136            | 47    |
 
 ### Desktop slow 3G (1440×900, 400 kbit/s, 2000 ms RTT, no CPU slowdown)
 
-| Page                         | React interactive ms | Astro interactive ms | React LCP ms | Astro LCP ms |
-| ---------------------------- | -------------------- | -------------------- | ------------ | ------------ |
-| /                            | 12750 (12679–12808)  | 12207 (12189–12212)  | 13416        | 11424        |
-| /blog                        | 10101 (10096–10107)  | 8324 (8297–8335)     | 3604         | 3656         |
-| /blog/hello-world            | 11435 (11416–11460)  | 8331 (8318–8333)     | 3600         | 3660         |
-| /rule-of-thumb               | 10158 (10152–10203)  | 9897 (9892–9899)     | 10796        | 9180         |
-| /rule-of-thumb/dialog-design | 10987 (10963–11001)  | 9173 (9150–9181)     | 3652         | 3700         |
-| /rule-of-thumb/table-design  | 10980 (10978–11010)  | 10777 (10745–10817)  | 3644         | 3700         |
+| Page                         | React interactive ms | Step one interactive ms | Step two interactive ms | React LCP ms | Step one LCP ms | Step two LCP ms |
+| ---------------------------- | -------------------- | ----------------------- | ----------------------- | ------------ | --------------- | --------------- |
+| /                            | 12691 (12665–12752)  | 12112 (12098–12149)     | 11256 (11253–11266)     | 13336        | 11304           | 12956           |
+| /blog                        | 10019 (10003–10056)  | 8236 (8214–8265)        | 8073 (8072–8117)        | 3572         | 3648            | 3652            |
+| /blog/hello-world            | 11383 (11355–11400)  | 8233 (8206–8275)        | 8101 (8072–8139)        | 3572         | 3636            | 3668            |
+| /rule-of-thumb               | 10145 (10103–10149)  | 9773 (9755–9822)        | 8316 (8289–8347)        | 10760        | 9056            | 10748           |
+| /rule-of-thumb/dialog-design | 10914 (10906–10941)  | 9063 (9038–9104)        | 8474 (8430–8477)        | 3628         | 3676            | 3712            |
+| /rule-of-thumb/table-design  | 10936 (10906–10951)  | 9759 (9754–9852)        | 10366 (10355–10417)     | 3636         | 3680            | 3704            |
+
+### What the module preloads buy
+
+Step two first shipped with the preload list empty, because the code that builds it looked for `<astro-island>` elements and none were left. The same pages built without the list measure the fix.
+
+| Page                         | Mobile interactive ms, without → with | Mobile LCP ms, without → with | Desktop interactive ms, without → with |
+| ---------------------------- | ------------------------------------- | ----------------------------- | -------------------------------------- |
+| /                            | 3145 → 3177                           | 4164 → 3340                   | 11113 → 11256                          |
+| /blog                        | 2238 → 2307                           | 1084 → 1080                   | 7832 → 8073                            |
+| /blog/hello-world            | 2567 → 2310                           | 1080 → 1076                   | 9041 → 8101                            |
+| /rule-of-thumb               | 2726 → 2360                           | 3576 → 3596                   | 9649 → 8316                            |
+| /rule-of-thumb/dialog-design | 2807 → 2398                           | 1176 → 1244                   | 9933 → 8474                            |
+| /rule-of-thumb/table-design  | 3362 → 2949                           | 1168 → 1196                   | 11801 → 10366                          |
+
+The preloads save 0.26 to 0.41 s on mobile and 0.9 to 1.5 s on slow 3G for the pages with deep import chains. Home's LCP improves by 0.8 s on mobile. On the blog index and home, the list makes no measurable difference on mobile and delays interactivity by 0.14 to 0.24 s on slow 3G, because the preloads share the link with the header's own script.
 
 ### Reading the numbers
 
-- **What limits interactivity.** Round trips plus bytes. On slow 3G each round trip is 2 s and the link moves about 50 KB/s, so the header becomes interactive after the HTML, the module preloads, and the island script. Pages whose eager island is small (blog, blog post, dialog-design) gain the most. On table-design and home, a large page island still downloads before the header can mount, so the gain is smaller.
-- **Why FCP is about 50 ms later on most Astro pages under slow 3G.** Astro's HTML is about 2 KB larger (the island markup and the preload list), which is about 40 ms at 50 KB/s. Home paints earlier because its intro waits for the page's island, and that island now arrives sooner.
-- **Why the `load` event is not compared.** The React build injected its app script after `load` on purpose, so its `load` fired right after the HTML. Astro's island scripts load before `load`. The raw values are in `--out` JSON files when you rerun.
-- **v1 → v2.** The first Astro build was slower than React (mobile interactive on home 4.69 s, on the blog post 4.50 s). It lacked the module preloads and still prefetched rule pages on idle. Those two fixes produced the numbers above.
+- **What limits interactivity.** Round trips. Step two removed 90 to 160 KB of script per page compared with step one, which is 0.5 to 0.9 s of transfer at 1.47 Mbit/s. Interactivity moved by at most 0.43 s on mobile, because the header's script was never the bulk of those bytes. It waits for the HTML and then one more round trip for its modules. On slow 3G, four 2 s round trips put the floor near 8 s, and the blog, the blog post and dialog-design sit on it.
+- **Table design is slower than step one.** Step one preloaded only the modules of `client:load` islands. Step two preloads every module script, so the table demos' 47 KB downloads alongside the header's script and delays it by 0.18 s on mobile and 0.6 s on slow 3G. Without the preloads the page is slower still.
+- **The rule index and home paint their largest text later than step one.** Step two matches the React build here (rule index 10.75 s against 10.76 s on slow 3G) and beats it on mobile. Step one is the outlier. In step two the rule index's title paints about 2.4 s after the header is defined on slow 3G. This run does not isolate why step one painted it sooner.
+- **Why the `load` event is not compared.** The React build injected its app script after `load` on purpose, so its `load` fired right after the HTML. Astro's module scripts load before `load`. The raw values are in the `--out` JSON files when you rerun.
+- **v1 → v2 of step one.** The first Astro build was slower than React (mobile interactive on home 4.69 s, on the blog post 4.50 s). It lacked the module preloads and still prefetched rule pages on idle. Those two fixes produced step one's numbers above.
 
 ## Rerun
 
 ```bash
-git worktree add ../itsfaqih-react 53ec8bb && (cd ../itsfaqih-react && vp install && vp build)
-vp build
-vp node scripts/perf-compare.ts --site react=../itsfaqih-react/.output/public --site astro=dist \
-  --profile mobile-4g --runs 5 --out /tmp/perf
+git worktree add --detach ../itsfaqih-react 53ec8bb && (cd ../itsfaqih-react && vp install && vp build)
+git worktree add --detach ../itsfaqih-step1 51e75b8 && (cd ../itsfaqih-step1 && vp install && vp run build)
+vp run build
+vp node scripts/perf-compare.ts --site react=../itsfaqih-react/.output/public \
+  --site step1=../itsfaqih-step1/dist --site astro=dist --profile mobile-4g --runs 5 --out /tmp/perf
 ```
 
 `--profile desktop-3g` selects the second profile, and `--route /blog` (repeatable) limits the pages.
 
 ## Next lever
 
-Step one named Preact as the next lever, since React DOM was about 63 KB of the roughly 120 KB every page paid. Step two removed React instead, so that lever is gone. Rerunning the comparison above against the current build would measure what step two saved.
+Preload the header's import closure ahead of the page's own modules, or give the page's preloads a low `fetchpriority`. That would recover table design's 0.18 s and the 0.14 to 0.24 s on the blog index and home under slow 3G without losing what the preloads save on deep chains.
