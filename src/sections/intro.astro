@@ -1,0 +1,31 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { SLIDES } from "../data/home";
+import { marker, styles } from "./intro.styles";
+
+// The home intro: the name slams in, cuts flash through what I build, then the shutters split.
+// It plays once per session; the head script (src/layouts/head-script.ts) sets .no-intro whenever
+// it shouldn't.
+const words = SLIDES.slice(0, 4);
+---
+
+<home-intro {...stylex.attrs(styles.root, marker)} aria-hidden="true"
+  ><div {...stylex.attrs(styles.shutter, styles.top)}></div><div
+    {...stylex.attrs(styles.shutter, styles.bottom)}
+  ></div><div {...stylex.attrs(styles.stage)}
+    ><div {...stylex.attrs(styles.name)}>FAQIH MUNTASHIR</div><div {...stylex.attrs(styles.slot)}
+      >{
+        words.map(({ tab, color }, index) => (
+          <span
+            {...stylex.attrs(styles.cut, index === words.length - 1 && styles.lastCut)}
+            style={`--i:${index};--c:${color}`}
+          >{tab.toUpperCase()}</span>
+        ))
+      }</div
+    ></div
+  ></home-intro
+>
+
+<script>
+  import "./intro.client";
+</script>

@@ -1,0 +1,141 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { VISIBLE_GUIDELINES } from "../data/guidelines";
+import { SHOW_PROJECTS } from "../data/home";
+import { LINKS } from "../seo";
+import { arcade } from "../components/arcade";
+import { button, buttonVariant } from "../components/button";
+import { hoverHold } from "../components/hover-hold";
+import { loadIn } from "../components/load-in";
+import Backdrop from "./backdrop.astro";
+import ExperienceList from "./experience-list.astro";
+import Hero from "./hero/hero.astro";
+import { heroType } from "./hero-type";
+import { EXPERIENCE, PROJECTS, STACK_GROUPS, STACK_SOURCES, TICKER_RUN } from "./home-content";
+import { styles } from "./home.styles";
+import Intro from "./intro.astro";
+import { reticle } from "./reticle";
+import RuleSpread from "./rule-spread.astro";
+import { section, veil } from "./section";
+import StackShowcase from "./stack-showcase.astro";
+
+const eyebrow = stylex.attrs(loadIn.veil, section.eyebrow, veil.dense, veil.fit);
+const words = stylex.attrs(loadIn.piece, loadIn.words);
+const titleText = stylex.attrs(loadIn.piece, section.titleText);
+const external = { target: "_blank", rel: "noopener noreferrer" };
+const footerLink = stylex.attrs(styles.footerLink);
+const footerVeil = stylex.attrs(loadIn.veil, veil.dense);
+---
+
+{/* The ticker is the third child: loadIn.piece staggers on :nth-child, so the backdrop goes last. */}
+<home-page class={`arc ${stylex.attrs(arcade.root, arcade.scan, styles.root).class}`}
+  ><Intro /><div {...stylex.attrs(arcade.wrap)}><Hero /></div><div
+    {...stylex.attrs(loadIn.piece, styles.ticker)}
+    data-loop="true"
+    data-cut="true"
+    aria-hidden="true"
+    ><div {...stylex.attrs(styles.tickerTrack, styles.pausable)}
+      >{
+        TICKER_RUN.map(({ ticker, color }) => (
+          <span {...stylex.attrs(styles.tickerTile, styles.pausable)} style={`--c:${color}`}
+            >{ticker}<Fragment set:html="<!-- -->" /> ★</span
+          >
+        ))
+      }</div
+    ></div
+  ><div {...stylex.attrs(arcade.wrap)}
+    ><section id="rules" {...stylex.attrs(section.block)}
+      ><div {...stylex.attrs(section.head)}
+        ><h2 {...stylex.attrs(section.title, veil.soft)}
+          ><small {...eyebrow} data-cut="true" data-eyebrow="true" style="--c:var(--cw)"
+            ><span {...words} data-cut="true">Writing</span></small
+          ><span {...titleText} data-cut="true">Rule of Thumb</span></h2
+        ><p {...stylex.attrs(loadIn.veil, section.blurb, veil.dense)} data-cut="true"
+          ><span {...words} data-cut="true">Opinions I've earned from my experience</span></p
+        ></div
+      ><RuleSpread rules={VISIBLE_GUIDELINES} /></section
+    ><section id="work" {...stylex.attrs(section.block)}
+      ><div {...stylex.attrs(section.head)}
+        ><h2 {...stylex.attrs(section.title, veil.soft)}
+          ><small {...eyebrow} data-cut="true" data-eyebrow="true" style="--c:var(--ux)"
+            ><span {...words} data-cut="true">Experience</span></small
+          ><span {...titleText} data-cut="true">Where I've worked</span></h2
+        ></div
+      ><ExperienceList jobs={EXPERIENCE} /></section
+    ><StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />{
+      SHOW_PROJECTS && (
+        <section id="projects" {...stylex.attrs(section.block)}
+          ><div {...stylex.attrs(section.head)}
+            ><h2 {...stylex.attrs(section.title, veil.soft)}
+              ><small {...eyebrow} data-cut="true" data-eyebrow="true" style="--c:var(--ts-deep)"
+                ><span {...words} data-cut="true">Side projects</span></small
+              ><span {...titleText} data-cut="true">Projects</span></h2
+            ></div
+          ><div {...stylex.attrs(styles.projects)}
+            >{
+              PROJECTS.map((project) => (
+                <a
+                  {...stylex.attrs(
+                    loadIn.piece,
+                    reticle.card,
+                    reticle.aim,
+                    hoverHold.lift,
+                    styles.project,
+                  )}
+                  data-cut="true"
+                  href={project.href}
+                  {...external}
+                  style={`--c:${project.color}`}
+                  ><small {...stylex.attrs(styles.projectKind)}>{project.kind}</small><h3
+                    {...stylex.attrs(styles.projectTitle)}>{project.title}</h3
+                  ><p {...stylex.attrs(styles.projectSummary)}>{project.summary}</p></a
+                >
+              ))
+            }</div
+          ></section
+        >
+      )
+    }<div id="contact" {...stylex.attrs(loadIn.piece, styles.contact)} data-cut="true"
+      ><h2 {...stylex.attrs(section.title)}
+        ><small
+          {...stylex.attrs(loadIn.piece, section.eyebrow)}
+          data-cut="true"
+          data-eyebrow="true"
+          style="--c:var(--ax)">Contact</small
+        ><span {...titleText} data-cut="true"
+          >Ready to bring the next level of care to your product?</span
+        ></h2
+      ><div
+        {...stylex.attrs(loadIn.piece, heroType.acts)}
+        data-cut="true"
+        style="margin-top:24px"
+        ><a
+          {...stylex.attrs(button.base, buttonVariant["primary-purple"])}
+          href={`mailto:${LINKS.email}`}>{`Email ${LINKS.email}`}</a
+        ><a
+          {...stylex.attrs(button.base, buttonVariant["secondary-purple"])}
+          href={LINKS.linkedin}
+          {...external}>LinkedIn</a
+        ></div
+      ></div
+    ><footer {...stylex.attrs(styles.footer)}
+      ><span {...footerVeil} data-cut="true"
+        ><span {...words} data-cut="true">© 2026 Faqih Muntashir</span></span
+      ><span {...footerVeil} data-cut="true"
+        ><span {...words} data-cut="true"
+          ><a {...footerLink} href={LINKS.github} {...external}>GitHub</a> <Fragment
+            set:html="<!-- -->·<!-- -->"
+          /> <a {...footerLink} href={LINKS.linkedin} {...external}>LinkedIn</a> <Fragment
+            set:html="<!-- -->·<!-- -->"
+          /> <a {...footerLink} href={LINKS.dribbble} {...external}>Dribbble</a> <Fragment
+            set:html="<!-- -->·<!-- -->"
+          /> <a {...footerLink} href="https://medium.com/@itsfaqih" {...external}>Medium</a></span
+        ></span
+      ></footer
+    ></div
+  ><Backdrop tide /></home-page
+>
+
+<script>
+  import "./home.client";
+</script>

@@ -1,5 +1,3 @@
-import * as stylex from "@stylexjs/stylex";
-import { type CSSProperties, useId } from "react";
 import {
   siAdonisjs,
   siApache,
@@ -60,11 +58,10 @@ import {
   siXyflow,
   siZod,
 } from "simple-icons";
-import { motion, palette } from "../theme.stylex";
 import { TECH_LOGOS } from "./tech-logos";
 import { EXTRA_MARKS, type Mark } from "./tech-marks";
 
-const MARKS = new Map<string, Mark>(
+export const MARKS = new Map<string, Mark>(
   Object.entries({
     AdonisJS: siAdonisjs,
     Apache: siApache,
@@ -191,7 +188,7 @@ function ringOf(name: string, brand: { "--brand-dark": string; "--brand-light": 
   return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${stops[0]?.[0]} 360deg)`;
 }
 
-const BRANDS = new Map<string, CSSProperties>(
+const BRANDS = new Map<string, Record<string, string>>(
   [...MARKS].flatMap(([name, { hex }]) => {
     if (!hex) return [];
     const brand = {
@@ -202,128 +199,18 @@ const BRANDS = new Map<string, CSSProperties>(
   }),
 );
 
+/** A tool's brand colours and ring as an inline style string, for its badge (techBadge). */
 export function techBrand(name: string) {
-  return BRANDS.get(name);
+  const brand = BRANDS.get(name);
+  return brand && styleOf(brand);
 }
 
-/**
- * A tool's one-colour mark (drawn from its logo where simple-icons draws another shape), which
- * `style` can tint, over its logo in its own colours: the logo
- * themed by scripts/tech-logos.py, or the mark in its brand colour where there is no such logo.
- * The colours show while an ancestor sets --lit to 1 (iconLit), and the mark fades out for them.
- * A logo wider than it is tall (the VoidZero marks in their parentheses) widens the icon to fit.
- */
-export function TechIcon({ name, style }: { name: string; style?: stylex.StyleXStyles }) {
-  const suffix = useId().replace(/[^\w-]/g, "");
-  const mark = MARKS.get(name);
-  if (!mark) return null;
-  const logo = TECH_LOGOS.get(name);
-  const path = <path d={mark.path} fillRule={mark.evenOdd ? "evenodd" : undefined} />;
-  const [, , width = 1, height = 1] = logo?.viewBox.split(" ").map(Number) ?? [];
-  return (
-    <span
-      {...stylex.props(icon.pair, style)}
-      style={width > height ? { "--wide": width / height } : undefined}
-      aria-hidden="true"
-    >
-      {logo?.flat ? (
-        <svg
-          {...stylex.props(icon.flat)}
-          viewBox={logo.viewBox}
-          dangerouslySetInnerHTML={{ __html: logo.flat.replaceAll("$", suffix) }}
-        />
-      ) : (
-        <svg {...stylex.props(icon.flat)} viewBox={mark.viewBox ?? "0 0 24 24"}>
-          {path}
-        </svg>
-      )}
-      {logo ? (
-        <svg
-          {...stylex.props(icon.lit)}
-          viewBox={logo.viewBox}
-          dangerouslySetInnerHTML={{ __html: logo.body.replaceAll("$", suffix) }}
-        />
-      ) : (
-        <svg {...stylex.props(icon.lit, styles.brand)} viewBox={mark.viewBox ?? "0 0 24 24"}>
-          {path}
-        </svg>
-      )}
-    </span>
-  );
-}
+/** Serializes custom properties the way React writes a style object: `--a:1;--b:2`. */
+export const styleOf = (properties: Record<string, string | number>) =>
+  Object.entries(properties)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(";");
 
-// The tool's own colour for the current theme, from techBrand's inline properties.
-const BRAND = {
-  "--brand": {
-    default: `var(--brand-dark, ${palette["--go-ink"]})`,
-    ":is(.light *)": `var(--brand-light, ${palette["--go-ink"]})`,
-  },
-};
-
-const HOVER = "@media (hover: hover) and (pointer: fine)";
-
-/**
- * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, a single-colour mark's
- * colour. Pair either with techBrand(name) as the inline style, which also carries --ring.
- */
-export const techBadge = stylex.create({
-  badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "6px",
-    userSelect: "none",
-    ...BRAND,
-  },
-  brand: BRAND,
-});
-
-// The layer arriving takes the fast tier and the one leaving its quicker exit, picked by --lit.
-const FADE_GAP = `(${motion["--t-fast"]} - ${motion["--t-fast-exit"]})`;
-const FADE = {
-  transitionProperty: "opacity",
-  transitionTimingFunction: motion["--exit"],
-};
-
-/** The two layers of a TechIcon or CompanyLogo: `flat`, the one-colour mark, and `lit`, the colours. */
-export const icon = stylex.create({
-  pair: {
-    flex: "none",
-    display: "inline-grid",
-    width: "calc(1.15em * var(--wide, 1))",
-    height: "1.15em",
-    color: palette["--dim"],
-  },
-  flat: {
-    gridArea: "1 / 1",
-    width: "100%",
-    height: "100%",
-    fill: "currentColor",
-    opacity: "calc(1 - var(--lit, 0))",
-    ...FADE,
-    transitionDuration: `calc(${motion["--t-fast"]} - var(--lit, 0) * ${FADE_GAP})`,
-  },
-  lit: {
-    gridArea: "1 / 1",
-    width: "100%",
-    height: "100%",
-    opacity: "var(--lit, 0)",
-    ...FADE,
-    transitionDuration: `calc(${motion["--t-fast-exit"]} + var(--lit, 0) * ${FADE_GAP})`,
-  },
-});
-
-/** Lights the icons inside: set it on a badge under the pointer, focused, pressed or open. */
-export const iconLit = stylex.create({
-  on: {
-    "--lit": "1",
-  },
-  hover: {
-    "--lit": { default: null, ":hover": { default: null, [HOVER]: "1" }, ":focus-visible": "1" },
-  },
-});
-
-const styles = stylex.create({
-  brand: {
-    fill: `var(--brand, ${palette["--mute"]})`,
-  },
-});
+let instances = 0;
+/** Keeps the gradient ids of each TechIcon on a page apart, as React's useId did. */
+export const instanceSuffix = () => `t${++instances}`;

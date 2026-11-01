@@ -1,0 +1,81 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import {
+  draw,
+  marker,
+  REST_TRANSFORM,
+  SCENE_MS,
+  styles,
+  TOKEN_COUNT,
+  TOPS,
+} from "./hero-prints.styles";
+import { KEYFRAMES, SCENE_LABELS } from "./hero-scenes";
+import HeroScene from "./hero-scene.astro";
+
+// The bench's prints (hero-prints.client.ts). Scene 0 is drawn; every scene and the morph's tokens
+// wait in templates for the element to swap in.
+const p = "hp";
+const topInk = { solid: [styles.ink], hue: [styles.hue, styles.screen], outline: [styles.inkLine] };
+---
+
+<hero-prints {...stylex.attrs(styles.root, marker)} data-paused=""
+  ><style is:inline set:html={KEYFRAMES}></style><div {...stylex.attrs(styles.stage)}
+    ><div {...stylex.attrs(styles.card)} style={`transform:${REST_TRANSFORM}`}
+      ><svg
+        {...stylex.attrs(styles.svg)}
+        viewBox="0 0 320 200"
+        role="img"
+        aria-label={SCENE_LABELS[0]}
+        style={`--scene-duration:${SCENE_MS}ms`}
+        ><defs {...draw()}
+          ><pattern
+            {...draw()}
+            id={`${p}ht`}
+            width="5"
+            height="5"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(18)"
+            ><circle {...draw(styles.hue)} cx="2.5" cy="2.5" r="1.75"></circle></pattern
+          ></defs
+        ><g {...draw(styles.layer, marker)}><HeroScene index={0} p={p} /></g></svg
+      ></div
+    ></div
+  >{
+    SCENE_LABELS.map((label, index) => (
+      <template data-scene={index} data-label={label}>
+        <svg>
+          <g {...draw(styles.layer, marker)}>
+            <HeroScene index={index} p={p} />
+          </g>
+        </svg>
+      </template>
+    ))
+  }<template data-morph
+    ><svg
+      ><g {...draw()}
+        >{
+          Array.from({ length: TOKEN_COUNT }, () => (
+            <g {...draw()}>
+              <path
+                transform="translate(5 4)"
+                fill={`url(#${p}ht)`}
+                {...stylex.attrs(styles.part, styles.screen)}
+              />
+              {TOPS.map((top) => (
+                <path
+                  data-top={top}
+                  {...draw(...topInk[top])}
+                  stroke-width={top === "outline" ? "3" : undefined}
+                />
+              ))}
+            </g>
+          ))
+        }</g
+      ></svg
+    ></template
+  ></hero-prints
+>
+
+<script>
+  import "./hero-prints.client";
+</script>

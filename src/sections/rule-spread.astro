@@ -1,0 +1,82 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { colorOf, ruleNumber, type PublishedGuideline } from "../data/guidelines";
+import { arcade } from "../components/arcade";
+import { loadIn } from "../components/load-in";
+import { veil } from "./section";
+import { number, pad, styles } from "./rule-spread.styles";
+import RuleThumb from "./rule-thumb.astro";
+
+// The home deck of rules (rule-spread.client.ts), fanned out from the middle one.
+type Props = { rules: PublishedGuideline[] };
+
+const { rules } = Astro.props;
+const last = rules.length - 1;
+const initial = Math.floor(last / 2);
+const rule = rules[initial]!;
+---
+
+<rule-spread {...stylex.attrs(styles.spread)} style={`--c:${colorOf(rule.label)}`}
+  ><div
+    {...stylex.attrs(styles.stage)}
+    role="group"
+    aria-roledescription="carousel"
+    aria-label="Rules. Drag, scroll sideways, or use the left and right arrow keys."
+    data-part="stage"
+    >{
+      rules.map((item, index) => (
+        <div
+          {...stylex.attrs(styles.slot)}
+          style={`--d:${index - initial};--ad:${Math.abs(index - initial)};z-index:${10 - Math.abs(index - initial)}`}
+        ><a
+            href={item.href}
+            {...stylex.attrs(loadIn.piece, styles.card)}
+            data-cut="true"
+            draggable="false"
+            aria-current={index === initial ? "true" : undefined}
+            style={`--c:${colorOf(item.label)}`}
+            data-rule-open
+          ><span {...stylex.attrs(styles.plate)}><span>No.<Fragment set:html="<!-- -->" />{ruleNumber(item)}</span><span>▶ DEMO</span></span><RuleThumb
+              rule={item}
+              play={index === initial}
+              style={styles.thumb}
+            />{/* .t names the title for the rule-open view transition in arcade.css. */}<span
+              class={`t ${stylex.attrs(styles.title).class}`}>{item.title}</span
+            ><span {...stylex.attrs(styles.summary)}>{item.description}</span><span
+              {...stylex.attrs(styles.plate, styles.foot)}
+              ><span>{item.label}</span><span {...stylex.attrs(styles.arrow)} aria-hidden="true"
+                >↗</span
+              ></span
+            ></a
+          ></div>
+      ))
+    }</div
+  ><div {...stylex.attrs(styles.nav)}
+    ><span {...stylex.attrs(arcade.srOnly)} aria-live="polite" data-part="title">{rule.title}</span
+    ><button
+      type="button"
+      {...stylex.attrs(loadIn.piece, styles.step)}
+      data-cut="true"
+      aria-label="Previous rule"
+      disabled={initial === 0}
+      data-part="previous">←</button
+    ><span {...stylex.attrs(loadIn.veil, veil.dense)} data-cut="true"
+      ><span {...stylex.attrs(loadIn.piece, loadIn.words)} data-cut="true"
+        ><span {...stylex.attrs(number.root)} data-dir="up" data-part="number"
+          ><span {...stylex.attrs(number.digits)}>{pad(initial + 1)}</span></span
+        > / <Fragment set:html="<!-- -->" />{pad(rules.length)}</span
+      ></span
+    ><button
+      type="button"
+      {...stylex.attrs(loadIn.piece, styles.step)}
+      data-cut="true"
+      aria-label="Next rule"
+      disabled={initial === last}
+      data-part="next">→</button
+    ></div
+  ></rule-spread
+>
+
+<script>
+  import "./rule-spread.client";
+</script>

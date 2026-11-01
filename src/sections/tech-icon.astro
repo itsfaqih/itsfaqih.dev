@@ -1,0 +1,48 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { TECH_LOGOS } from "./tech-logos";
+import { instanceSuffix, MARKS } from "./tech-brand";
+import { icon, mark as markStyles } from "./tech-icon.styles";
+
+/**
+ * A tool's one-colour mark (drawn from its logo where simple-icons draws another shape), which
+ * `xstyle` can tint, over its logo in its own colours: the logo themed by scripts/tech-logos.py, or
+ * the mark in its brand colour where there is no such logo. The colours show while an ancestor sets
+ * --lit to 1 (iconLit), and the mark fades out for them. A logo wider than it is tall (the VoidZero
+ * marks in their parentheses) widens the icon to fit.
+ */
+type Props = { name: string; xstyle?: stylex.StyleXStyles };
+
+const { name, xstyle } = Astro.props;
+const mark = MARKS.get(name);
+const logo = TECH_LOGOS.get(name);
+const suffix = instanceSuffix();
+const [, , width = 1, height = 1] = logo?.viewBox.split(" ").map(Number) ?? [];
+const viewBox = mark?.viewBox ?? "0 0 24 24";
+const fillRule = mark?.evenOdd ? "evenodd" : undefined;
+---
+
+{
+  mark && (
+    <span
+      {...stylex.attrs(icon.pair, xstyle)}
+      style={width > height ? `--wide:${width / height}` : undefined}
+      aria-hidden="true"
+    >
+      {logo?.flat ? (
+        <svg {...stylex.attrs(icon.flat)} viewBox={logo.viewBox} set:html={logo.flat.replaceAll("$", suffix)} />
+      ) : (
+        <svg {...stylex.attrs(icon.flat)} viewBox={viewBox}>
+          <path d={mark.path} fill-rule={fillRule} />
+        </svg>
+      )}
+      {logo ? (
+        <svg {...stylex.attrs(icon.lit)} viewBox={logo.viewBox} set:html={logo.body.replaceAll("$", suffix)} />
+      ) : (
+        <svg {...stylex.attrs(icon.lit, markStyles.brand)} viewBox={viewBox}>
+          <path d={mark.path} fill-rule={fillRule} />
+        </svg>
+      )}
+    </span>
+  )
+}

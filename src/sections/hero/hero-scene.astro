@@ -1,0 +1,252 @@
+---
+import { toPath } from "./hero-morph";
+import { QUARTER_TOKENS, QUARTERS, QUEUE_Y, SLOT_X, TUMBLE } from "./hero-pieces";
+import { draw, SLIDE_MS as BACKENDS_MS, styles } from "./hero-prints.styles";
+import {
+  DEV_TOOLS_HIT_AT,
+  JOBS,
+  MEANDER,
+  settledAt,
+  settleVars,
+  TUMBLE_FLOAT_MS,
+} from "./hero-scenes";
+import Float from "./hero-float.astro";
+import Ink from "./hero-ink.astro";
+
+// One scene of the prints. `p` prefixes the halftone pattern's id.
+type Props = { index: number; p: string };
+
+const { index, p } = Astro.props;
+const snapshots = [
+  { x0: 20, slip: false },
+  { x0: 176, slip: true },
+];
+---
+
+{
+  index === 0 &&
+    TUMBLE.map((piece, i) => (
+      <Float at={settledAt(i, 0.5, 1 / 6)} ms={TUMBLE_FLOAT_MS[i]}>
+        <g {...draw(styles.settle)} style={settleVars(piece, i, 0.5, 1 / 6)}>
+          <Ink
+            p={p}
+            top={piece.top}
+            tag="path"
+            figure={{ ...draw(styles.token), "data-token": i, d: toPath(piece.outline) }}
+          />
+        </g>
+      </Float>
+    ))
+}
+{
+  index === 1 && (
+    <Float at={settledAt(0, 0.3, 0.18)}>
+      {QUARTERS.map((piece, i) => (
+        <g {...draw(styles.settle)} style={settleVars(piece, i, 0.3, 0.18)}>
+          <Ink
+            p={p}
+            top={piece.top}
+            tag="path"
+            figure={{
+              ...draw(styles.token),
+              "data-token": QUARTER_TOKENS.indexOf(i),
+              d: toPath(piece.outline),
+            }}
+          />
+        </g>
+      ))}
+      <path
+        {...draw(styles.inkLine, styles.ring)}
+        pathLength="1"
+        stroke-width="3"
+        d="M160 14 A86 86 0 1 1 159.99 14"
+      />
+    </Float>
+  )
+}
+{
+  index === 2 && (
+    <Fragment>
+      <path
+        {...draw(styles.inkLine, styles.ghost)}
+        d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`}
+      />
+      <Float at={DEV_TOOLS_HIT_AT}>
+        <Ink
+          p={p}
+          top="hue"
+          tag="polygon"
+          figure={{
+            ...draw(styles.token),
+            "data-token": 1,
+            points: "37.8,155.5 277.8,35.5 282.2,44.5 42.2,164.5",
+          }}
+        />
+        <Ink
+          p={p}
+          top="outline"
+          tag="circle"
+          figure={{ ...draw(styles.token), "data-token": 3, cx: "40", cy: "160", r: "14" }}
+        />
+        <Ink
+          p={p}
+          top="outline"
+          tag="rect"
+          figure={{
+            ...draw(styles.token),
+            "data-token": 2,
+            x: "264",
+            y: "24",
+            width: "32",
+            height: "32",
+          }}
+        />
+        <rect
+          {...draw(styles.hue, styles.screen, styles.cutHit)}
+          x="268"
+          y="28"
+          width="24"
+          height="24"
+        />
+      </Float>
+      <g {...draw(styles.viewBox, styles.cutGhost)}>
+        <circle {...draw(styles.inkLine)} stroke-width="1.6" stroke-dasharray="3 3" r="10" />
+      </g>
+      <Float at={DEV_TOOLS_HIT_AT}>
+        <g {...draw(styles.viewBox, styles.cutBall)}>
+          <Ink p={p} tag="circle" figure={{ ...draw(styles.token), "data-token": 0, r: "10" }} />
+        </g>
+      </Float>
+    </Fragment>
+  )
+}
+{
+  index === 3 && (
+    <g {...draw()} style={`--scene-duration:${BACKENDS_MS}ms`}>
+      {SLOT_X.map((x) => (
+        <rect
+          {...draw(styles.inkLine, styles.ghost)}
+          x={x - 14}
+          y="110"
+          width="28"
+          height="28"
+        />
+      ))}
+      <path {...draw(styles.inkLine, styles.ghost)} d="M200 124 H226 M220 118 L226 124 L220 130" />
+      <path
+        {...draw(styles.hueLine, styles.ghost)}
+        d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
+      />
+      <Float>
+        <Ink
+          p={p}
+          top="outline"
+          tag="rect"
+          figure={{
+            ...draw(styles.token),
+            "data-token": 2,
+            x: "230",
+            y: "92",
+            width: "64",
+            height: "64",
+          }}
+        />
+        <rect
+          {...draw(styles.hue, styles.screen, styles.queueWork, styles.token)}
+          data-token="3"
+          x="246"
+          y="108"
+          width="32"
+          height="32"
+        />
+        <rect {...draw(styles.ink, styles.queueOut)} x="298" y="119" width="10" height="10" />
+        <rect {...draw(styles.hue, styles.queueOutRetry)} x="298" y="119" width="10" height="10" />
+      </Float>
+      {JOBS.map((job, k) => (
+        <g {...draw(styles.queueJob)} style={`animation-name:hp-job-${k}`}>
+          <Ink
+            p={p}
+            top={job.top}
+            tag="circle"
+            figure={{
+              ...draw(k < 2 && styles.token),
+              "data-token": k < 2 ? k : undefined,
+              cx: "0",
+              cy: QUEUE_Y,
+              r: "11",
+            }}
+          />
+        </g>
+      ))}
+      <Float>
+        <path
+          {...draw(styles.inkLine, styles.queueReject)}
+          stroke-width="3.5"
+          stroke-linecap="round"
+          d="M252 114 L272 134 M272 114 L252 134"
+        />
+      </Float>
+      <path {...draw(styles.inkLine)} stroke-width="3" d="M16 165.5 H304" />
+    </g>
+  )
+}
+{
+  index === 4 && (
+    <Fragment>
+      <rect {...draw(styles.inkLine, styles.ghost)} x="20" y="34" width="124" height="132" />
+      <rect {...draw(styles.inkLine, styles.ghost)} x="176" y="34" width="124" height="132" />
+      {snapshots.map(({ x0, slip }) => {
+        const square = {
+          ...draw(styles.token),
+          "data-token": slip ? 1 : 0,
+          x: x0 + 62,
+          y: "92",
+          width: "34",
+          height: "34",
+        };
+        return (
+          <Float>
+            <Ink
+              p={p}
+              top="hue"
+              tag="circle"
+              figure={{
+                ...draw(styles.token),
+                "data-token": slip ? 3 : 2,
+                cx: x0 + 40,
+                cy: "74",
+                r: "18",
+              }}
+            />
+            {slip ? (
+              <g {...draw(styles.snapSlip)}>
+                <Ink p={p} tag="rect" figure={square} />
+              </g>
+            ) : (
+              <Ink p={p} tag="rect" figure={square} />
+            )}
+            <Ink
+              p={p}
+              tag="rect"
+              figure={{ ...draw(), x: x0 + 16, y: "146", width: "92", height: "8" }}
+            />
+            {slip && (
+              <g {...draw(styles.snapMark)}>
+                <circle {...draw(styles.hueLine)} stroke-width="1.8" cx="267" cy="95" r="8" />
+                <path {...draw(styles.hueLine)} stroke-width="1.8" d="M253 95 H281 M267 81 V109" />
+              </g>
+            )}
+          </Float>
+        );
+      })}
+      <path {...draw(styles.inkLine)} stroke-width="3" d="M152 94 H168 M152 104 H168" />
+      <path
+        {...draw(styles.hueLine, styles.snapNeq)}
+        stroke-width="3"
+        stroke-linecap="round"
+        d="M165 86 L155 112"
+      />
+      <rect {...draw(styles.hue, styles.snapScan)} x="20" y="26" width="3" height="148" />
+    </Fragment>
+  )
+}
