@@ -5,10 +5,11 @@ import { THEME_CLASSES } from "../theme";
 export const REST_AFTER_MS = 3500;
 
 /**
- * Runs before first paint: the theme, the intro gate, the rest fallback that settles the cut-ins
- * when the islands that play them are slow to arrive, and the cross-document view transitions'
- * types. Opening a rule from its tile dives into it (rule-open); leaving a rule for the index
- * zooms back out onto its tile (rule-close); every other page change fades through (page-fade).
+ * Runs before first paint: the theme, the intro gate, the header carried across pages, the rest
+ * fallback that settles the cut-ins when the islands that play them are slow to arrive, and the
+ * cross-document view transitions' types. Opening a rule from its tile dives into it (rule-open);
+ * leaving a rule for the index zooms back out onto its tile (rule-close); every other page change
+ * fades through (page-fade).
  * The transition's pictures live on the new page, so the dive's origin crosses in sessionStorage.
  */
 export const HEAD_SCRIPT = String.raw`(function () {
@@ -42,6 +43,15 @@ export const HEAD_SCRIPT = String.raw`(function () {
   } catch (e) {
     doc.classList.add("no-intro");
   }
+  // A page reached from another page of the site keeps the header as it was, so its island and
+  // parts play their drop-in only on the first page of a visit, or on a reload.
+  try {
+    var entry = performance.getEntriesByType("navigation")[0];
+    var sameSite = document.referrer.indexOf(location.origin + "/") === 0;
+    if (sameSite && !(entry && entry.type === "reload")) {
+      doc.classList.add("carried");
+    }
+  } catch (e) {}
   // Whatever plays the cut-ins cancels the fallback once it starts: an island once it hydrates, a
   // custom element once it watches them (cut-ins.ts).
   var rest = setTimeout(function () {

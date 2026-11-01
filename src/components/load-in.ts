@@ -8,8 +8,9 @@ const IN = ":is(.in)";
 const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
 const HELD = ":is(.js [data-cut]:not(.in) *)";
 // The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
-const READY = ":is(.js.no-intro *)";
 const BOOTING = ":is(.js:not(.no-intro) *)";
+// The header's parts skip their glitch on a page reached from another page of the site (.carried).
+const ARRIVING = ":is(.js.no-intro:not(.carried) *)";
 const STAGGER = `calc(min(var(--cut-order, 0), 12) * ${motion["--t-step"]})`;
 
 // Slices clip top and bottom only, with room at the sides for the colour split.
@@ -109,7 +110,7 @@ const deal = stylex.keyframes({
  * `deal` swaps the glitch for a dealt card, on the rule tiles. `veil` is for a [data-cut] that
  * wears a veil (see section.ts): it fades up while its words, a `piece` composed with `words`
  * inside it, glitch in. `islandPart` plays the glitch on the header island's parts once the page
- * is ready, staggered across the island.
+ * is ready, staggered across the island, on the visit's first page only.
  */
 export const loadIn = stylex.create({
   piece: {
@@ -176,7 +177,7 @@ export const loadIn = stylex.create({
     opacity: { default: null, [BOOTING]: 0 },
     animationName: {
       default: null,
-      [READY]: {
+      [ARRIVING]: {
         default: glitchIn,
         ":nth-child(2n)": glitchInAlt,
         [REDUCE]: `${fadeIn} !important`,
@@ -184,15 +185,15 @@ export const loadIn = stylex.create({
     },
     animationDuration: {
       default: null,
-      [READY]: { default: "560ms", [REDUCE]: "240ms !important" },
+      [ARRIVING]: { default: "560ms", [REDUCE]: "240ms !important" },
     },
     animationTimingFunction: {
       default: null,
-      [READY]: { default: "steps(1, end)", [REDUCE]: "ease !important" },
+      [ARRIVING]: { default: "steps(1, end)", [REDUCE]: "ease !important" },
     },
     animationDelay: {
       default: null,
-      [READY]: {
+      [ARRIVING]: {
         default: "0ms",
         ":nth-child(2)": "40ms",
         ":nth-child(3)": "80ms",
@@ -204,7 +205,7 @@ export const loadIn = stylex.create({
     },
     animationFillMode: {
       default: null,
-      [READY]: { default: "backwards", [REDUCE]: "backwards !important" },
+      [ARRIVING]: { default: "backwards", [REDUCE]: "backwards !important" },
     },
   },
 });
