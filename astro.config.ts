@@ -112,6 +112,27 @@ function pageFiles(outDir: string) {
   );
 }
 
+// Static imports only: a dynamic import() is fetched when the code asks for it.
+const STATIC_IMPORT = /(?:import|export)\s*(?:[^"';()]*?from\s*)?["']\.\/([^"']+?\.js)["']/g;
+
+// An island fetches its module, which imports chunks that import chunks: one round trip per
+// level, five deep for the header. Listing the whole closure up front fetches it in one.
+async function eagerModules(html: string, outDir: string) {
+  const roots = [...html.matchAll(/<astro-island\b[^>]*>/g)]
+    .filter(([tag]) => tag.includes('client="load"'))
+    .flatMap(([tag]) => [...tag.matchAll(/(?:component|renderer)-url="\/_astro\/([^"]+)"/g)])
+    .map(([, file]) => file!);
+  const seen = new Set<string>();
+  const visit = async (file: string): Promise<void> => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const code = await readFile(path.join(outDir, "_astro", file), "utf8");
+    await Promise.all([...code.matchAll(STATIC_IMPORT)].map(([, dep]) => visit(dep!)));
+  };
+  await Promise.all(roots.map(visit));
+  return [...seen].map((file) => `<link rel="modulepreload" href="/_astro/${file}">`).join("");
+}
+
 function finishPages(): AstroIntegration {
   return {
     name: "finish-pages",
@@ -134,6 +155,8 @@ function finishPages(): AstroIntegration {
             html = html.replace(tag, `<style>${await inlineCoreAssets(css!, outDir)}</style>`);
           }
           html = html.replace("</head>", () => `${sheet}</head>`);
+          const preloads = await eagerModules(html, outDir);
+          html = html.replace('<meta charset="utf-8">', (charset) => `${charset}${preloads}`);
           await writeFile(file, html);
         }
         const { module } = await runnerImport<typeof import("./scripts/og/share-assets.ts")>(

@@ -1,4 +1,3 @@
-import path from "node:path";
 import stylex from "@stylexjs/unplugin";
 import { defineConfig } from "vite-plus";
 
@@ -11,11 +10,6 @@ export default defineConfig({
         // plugin's dev-server hook starts an interval that only an HTTP server's close clears, and
         // the test server has none, so it is dropped to let the run exit.
         plugins: [{ ...stylex.vite({ devMode: "css-only" }), configureServer: undefined }],
-        resolve: {
-          alias: {
-            "astro:prefetch": path.join(import.meta.dirname, "tests/unit/astro-prefetch.ts"),
-          },
-        },
         test: {
           name: "unit",
           environment: "jsdom",

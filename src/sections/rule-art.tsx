@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { prefetch } from "astro:prefetch";
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { colorOf, VISIBLE_GUIDELINES } from "../data/guidelines";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { colorOf } from "../data/guidelines";
 import type { Guideline } from "../data/guidelines";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { fonts, motion, palette } from "../theme.stylex";
@@ -50,19 +49,6 @@ export function useRuleOpen() {
   const panel = useRef<HTMLElement>(null);
   const [opening, setOpening] = useState<{ rule: string; inPanel: boolean } | null>(null);
   const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
-  // The dive holds the old page frozen until the new one renders, so a rule whose page is still
-  // downloading opens late. Fetch every rule up front, once the page has settled.
-  useEffect(() => {
-    const fetchRules = () => {
-      for (const rule of VISIBLE_GUIDELINES) prefetch(rule.href);
-    };
-    if (typeof requestIdleCallback === "undefined") {
-      const timer = setTimeout(fetchRules, 600);
-      return () => clearTimeout(timer);
-    }
-    const idle = requestIdleCallback(fetchRules, { timeout: 1500 });
-    return () => cancelIdleCallback(idle);
-  }, []);
   return {
     panelProps: { ref: panel, "data-opening": opening?.inPanel ? "" : undefined },
     linkProps: (rule: Guideline) => ({
