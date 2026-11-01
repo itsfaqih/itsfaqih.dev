@@ -1,0 +1,108 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade";
+import { TEAM } from "./table-design";
+import { styles, view } from "./table-design.styles";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+// The first frame is the roster's starting state, "empty". The templates hold the rest, which
+// table-design.client.ts clones as the roster changes.
+---
+
+<table-states {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
+  <div {...stylex.attrs(styles.bar)}>
+    <label {...stylex.attrs(styles.search)}
+      ><Icon
+        name="MagnifyingGlass"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        {...stylex.attrs(styles.searchIcon)}
+      /><input
+        type="search"
+        enterkeyhint="search"
+        autocapitalize="none"
+        autocorrect="off"
+        {...stylex.attrs(styles.searchInput)}
+        value=""
+        placeholder="Search users"
+        aria-label="Search users"
+        data-part="search"
+      /></label
+    >
+  </div>
+  <table {...stylex.attrs(styles.table)}>
+    <caption {...stylex.attrs(arcade.srOnly)}>Team members</caption>
+    <colgroup><col /><col {...stylex.attrs(styles.colRole)} /></colgroup>
+    <thead>
+      <tr
+        ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+          >Role</th
+        ></tr
+      >
+    </thead>
+    <tbody {...stylex.attrs(styles.body)}
+      >{
+        careful ? (
+          <tr class={view.row} data-part="said"
+            ><td colspan="2" {...stylex.attrs(styles.td, styles.blank, styles.still)}
+              ><div {...stylex.attrs(styles.said)}
+                ><b class={view.saidTitle(false)} data-part="title">No users yet</b><span
+                  {...stylex.attrs(styles.saidHint)}
+                  data-part="hint">Add your first teammate.</span
+                ><button type="button" class={view.saidButton(true)} data-part="act">Add user</button
+                ></div
+              ></td
+            ></tr
+          >
+        ) : (
+          <tr class={view.row} data-part="blank"
+            ><td colspan="2" {...stylex.attrs(styles.td, styles.blank, styles.still)}>No data</td></tr
+          >
+        )
+      }</tbody
+    >
+  </table>
+  <template data-part="row"
+    ><tr class={view.row}
+      ><td {...stylex.attrs(styles.td)}></td><td {...stylex.attrs(styles.td, styles.dim)}></td></tr
+    ></template
+  >
+  {
+    careful ? (
+      <Fragment>
+        <template data-part="bones"
+          >{TEAM.map((user) => (
+            <tr class={view.row} aria-hidden="true"
+              ><td {...stylex.attrs(styles.td, styles.still)}
+                ><span {...stylex.attrs(styles.bone)} style={`--w:${user.name.length * 6}px`} /></td
+              ><td {...stylex.attrs(styles.td, styles.still)}
+                ><span {...stylex.attrs(styles.bone)} style="--w:44px" /></td
+              ></tr
+            >
+          ))}</template
+        >
+        <template data-part="retry"
+          ><Icon
+            name="ArrowClockwise"
+            size="1em"
+            weight="bold"
+            aria-hidden="true"
+            {...stylex.attrs(styles.btnIcon)}
+          /></template
+        >
+      </Fragment>
+    ) : (
+      <template data-part="spin"
+        ><span {...stylex.attrs(styles.spin)} role="img" aria-label="Loading"></span></template
+      >
+    )
+  }
+</table-states>
+
+<script>
+  import "./table-design.client";
+</script>

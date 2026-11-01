@@ -1,0 +1,67 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade";
+import { STAFF, URL_PAGES, URL_PER_PAGE } from "./table-design";
+import { styles, view } from "./table-design.styles";
+import TablePageNav from "./table-page-nav.astro";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+const page = 2;
+const query = careful ? `?page=${page}` : "";
+const shown = STAFF.slice((page - 1) * URL_PER_PAGE, page * URL_PER_PAGE);
+---
+
+<table-url {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
+  <div {...stylex.attrs(styles.bar)}>
+    <button type="button" {...stylex.attrs(styles.icon, styles.ring)} aria-label="Reload" data-hint="true" data-part="reload"
+      ><Icon
+        name="ArrowClockwise"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        {...stylex.attrs(styles.iconGlyph)}
+      /></button
+    >
+    <span {...stylex.attrs(styles.address)} data-part="address"
+      ><span {...stylex.attrs(styles.host)}>acme.app</span>/users{
+        query && <b {...stylex.attrs(styles.query)}>{query}</b>
+      }</span
+    >
+  </div>
+  <table {...stylex.attrs(styles.table)}>
+    <caption {...stylex.attrs(arcade.srOnly)} data-part="caption">Users, page <!-- -->{page}</caption>
+    <colgroup><col /><col {...stylex.attrs(styles.colRole)} /></colgroup>
+    <thead>
+      <tr
+        ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+          >Role</th
+        ></tr
+      >
+    </thead>
+    <tbody class={view.body(false)} data-part="rows">
+      {
+        shown.map((person) => (
+          <tr class={view.row}
+            ><td {...stylex.attrs(styles.td)}>{person.name}</td><td {...stylex.attrs(styles.td, styles.dim)}
+              >{person.role}</td
+            ></tr
+          >
+        ))
+      }
+    </tbody>
+  </table>
+  <TablePageNav page={page} pages={URL_PAGES} />
+  <p {...stylex.attrs(styles.note)} aria-live="polite" data-part="note">Pick a page, then reload.</p>
+  <template data-part="row"
+    ><tr class={view.row}
+      ><td {...stylex.attrs(styles.td)}></td><td {...stylex.attrs(styles.td, styles.dim)}></td></tr
+    ></template
+  >
+</table-url>
+
+<script>
+  import "./table-design.client";
+</script>

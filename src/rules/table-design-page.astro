@@ -1,0 +1,80 @@
+---
+import Code from "./code.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import { FILTERS, LESSONS, START_FILTER, TLDR, VIEW_NAMES } from "./table-design";
+import { styles } from "./table-design.styles";
+import TableActions from "./table-actions.astro";
+import TableLive from "./table-live.astro";
+import TableNumbers from "./table-numbers.astro";
+import TablePager from "./table-pager.astro";
+import TableSegments from "./table-segments.astro";
+import TableStates from "./table-states.astro";
+import TableUrl from "./table-url.astro";
+
+const [numbers, states, actions, pager, url] = LESSONS;
+---
+
+<RuleLanding id="table-design" learn="Design tables for scanning" tldr={TLDR} take="build tables the same way">
+  <Fragment slot="lead">Right-align numbers, pin actions to a fixed last column, and give every blank a next step.</Fragment>
+  <Fragment slot="intro">Make each column easy to run an eye down, since people scan for one value.</Fragment>
+
+  <RuleLesson lesson={numbers} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >People compare numbers by their last digits. Use tabular figures so every digit is the same width, and add thousands separators. Watch the right edge.</Fragment
+    >
+    <TableLive slot="extra" />
+    <TableNumbers slot="bad" careful={false} />
+    <TableNumbers slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={1} level={numbers.levels[0]} board="table"
+    >A revenue column holds <Code tone="prompt">9</Code>, <Code tone="prompt">120</Code> and <Code tone="prompt">12,500</Code>, and people scan it for the biggest. Place the numbers.</RuleQuiz
+  >
+
+  <RuleLesson lesson={states} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >A table is often loading, empty, failed or showing no matches. Draw each one. Use skeleton rows to keep the shape while it loads, and say why and what to do next in every blank. Pick a state, search, then press the buttons.</Fragment
+    >
+    <TableSegments slot="extra" label="Table state" options={VIEW_NAMES} value="empty" of="roster" />
+    <TableStates slot="bad" careful={false} />
+    <TableStates slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={2} level={states.levels[0]} board="table"
+    >The users table can show no rows for three reasons. Place the <b>Add user</b>button.</RuleQuiz
+  >
+
+  <RuleLesson lesson={actions} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >Give the column a fixed width and right-align it, so Edit sits in the same place on every row. Use icon buttons to save room, and name each one with a tooltip. Hover the rows, then delete one.</Fragment
+    >
+    <TableActions slot="bad" careful={false} />
+    <TableActions slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={3} level={actions.levels[0]} board="table"
+    >Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Place the buttons.</RuleQuiz
+  >
+
+  <RuleLesson lesson={pager} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >With one page, a pager is a row of dead arrows. Under an empty table, it reads Page 1 of 0. Filter the list and watch both.</Fragment
+    >
+    <TableSegments slot="extra" label="Filter by role" options={FILTERS} value={START_FILTER} of="filter" />
+    <TablePager slot="bad" careful={false} />
+    <TablePager slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={4} level={pager.levels[0]} board="table"
+    >The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Place the pager.</RuleQuiz
+  >
+
+  <RuleLesson lesson={url} costsStyle={styles.costs}>
+    <Fragment slot="body"
+      >With <Code tone="chip">?page=2</Code> in the address, a reload, the Back button and a shared link all land where you were. Reload each.</Fragment
+    >
+    <TableUrl slot="bad" careful={false} />
+    <TableUrl slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={5} level={url.levels[0]} board="table"
+    >You're on page 3 of the orders and send the link to a teammate. Place the page number.</RuleQuiz
+  >
+</RuleLanding>

@@ -1,0 +1,102 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade";
+import { CREW } from "./table-design";
+import { styles, view } from "./table-design.styles";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+---
+
+<table-actions {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
+  <table {...stylex.attrs(styles.table)}>
+    <caption {...stylex.attrs(arcade.srOnly)}>Team members with actions</caption>
+    <colgroup
+      ><col /><col {...stylex.attrs(styles.colRole)} />{careful && <col {...stylex.attrs(styles.colActs)} />}</colgroup
+    >
+    <thead>
+      <tr
+        ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+          >Role</th
+        >{
+          careful && (
+            <th scope="col" {...stylex.attrs(styles.th, styles.num)}
+              ><span {...stylex.attrs(arcade.srOnly)}>Actions</span></th
+            >
+          )
+        }</tr
+      >
+    </thead>
+    <tbody {...stylex.attrs(styles.body)}>
+      {
+        CREW.map(({ name, role }, at) => (
+          <tr class={view.row} data-name={name}
+            ><td class={view.nameCell(false)}
+              ><span data-hint={at === 0 ? "true" : undefined} data-part="name">{name}</span>{
+                !careful && (
+                  <span {...stylex.attrs(styles.inline)}
+                    ><button
+                      type="button"
+                      aria-label={`Edit ${name}`}
+                      aria-pressed="false"
+                      {...stylex.attrs(styles.inlineButton, styles.ring)}
+                      data-act="edit">Edit</button
+                    ><button
+                      type="button"
+                      aria-label={`Delete ${name}`}
+                      {...stylex.attrs(styles.inlineButton, styles.inlineDelete, styles.ring)}
+                      data-act="delete">Delete</button
+                    ></span
+                  >
+                )
+              }</td
+            ><td class={view.roleCell(false)}>{role}</td>{
+              careful && (
+                <td class={view.actsCell(false)}
+                  ><span {...stylex.attrs(styles.icons)}
+                    ><span class={view.tipped}
+                      ><button
+                        type="button"
+                        class={view.iconKey(false, false)}
+                        aria-label={`Edit ${name}`}
+                        aria-pressed="false"
+                        data-act="edit"
+                        ><Icon
+                          name="PencilSimple"
+                          size="1em"
+                          weight="bold"
+                          {...stylex.attrs(styles.iconGlyph)}
+                        /></button
+                      ><span {...stylex.attrs(styles.tip)} aria-hidden="true">Edit</span></span
+                    ><span class={view.tipped}
+                      ><button
+                        type="button"
+                        class={view.iconKey(true, false)}
+                        aria-label={`Delete ${name}`}
+                        data-act="delete"
+                        ><Icon name="Trash" size="1em" weight="bold" {...stylex.attrs(styles.iconGlyph)} /></button
+                      ><span {...stylex.attrs(styles.tip)} aria-hidden="true">Delete</span></span
+                    ></span
+                  ></td
+                >
+              )
+            }</tr
+          >
+        ))
+      }
+    </tbody>
+  </table>
+  <div {...stylex.attrs(styles.foot)}>
+    <span data-part="count">{CREW.length}<!-- --> of <!-- -->{CREW.length}<!-- --> users</span>
+  </div>
+  <template data-part="restore"
+    ><button type="button" {...stylex.attrs(styles.link, styles.ring)} data-act="restore">Restore</button
+    ></template
+  >
+</table-actions>
+
+<script>
+  import "./table-design.client";
+</script>
