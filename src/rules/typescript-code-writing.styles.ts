@@ -174,3 +174,19 @@ export const view = {
   /** Hides a line's squiggle and output until tsc first reaches it. */
   unrun: stylex.attrs(styles.unrun).class ?? "",
 };
+
+/** The choose boards: code versions stacked full width, each a card. */
+export const quiz = stylex.create({
+  stack: {
+    display: "grid",
+    gap: "10px",
+  },
+  snippet: {
+    paddingInline: "4px",
+  },
+  // The code every version builds on, set above the cards.
+  given: {
+    paddingBlock: "4px",
+    paddingInline: "17.5px",
+  },
+});

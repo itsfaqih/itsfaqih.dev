@@ -1,18 +1,34 @@
 ---
+import * as stylex from "@stylexjs/stylex";
 import Code from "./code.astro";
 import LessonText from "./lesson-text.astro";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
+import QuizChoice from "./quiz-choice.astro";
 import RuleQuiz from "./rule-quiz.astro";
 import TsBlank from "./ts-blank.astro";
 import TsChecked from "./ts-checked.astro";
 import TsCode from "./ts-code.astro";
 import TsHolds from "./ts-holds.astro";
+import TsPaint from "./ts-paint.astro";
 import { LESSONS, TLDR } from "./typescript-code-writing";
+import { quiz, styles } from "./typescript-code-writing.styles";
 
 const [named, extend, unions, edges, options, flags] = LESSONS;
 // Quiz rows are code: leads and plain rows painted, slot labels painted, held or left blank.
 const blanks = { lead: TsCode, label: TsBlank, text: TsCode };
+// Each code version in a choose board, painted like the lesson panes. A button holds only spans.
+// No-break spaces keep a signature whole, so a narrow card wraps it after the keywords.
+const typo = [
+  ["default", "export default function formatPrice(cents:\u00a0number)\u00a0{…}"],
+  ["named", "export function formatPrice(cents:\u00a0number)\u00a0{…}"],
+  ["local", "function formatPrice(cents:\u00a0number)\u00a0{…}"],
+] as const;
+const clash = [
+  ["and", ["type Admin = User & { id: number }"]],
+  ["extends", ["interface Admin extends User {", "  id: number", "}"]],
+  ["value", ["const Admin = { id: 0 }"]],
+] as const;
 ---
 
 <RuleLanding id="typescript-code-writing" learn="Let the compiler catch it" tldr={TLDR} take="write the precise form too">
@@ -26,9 +42,20 @@ const blanks = { lead: TsCode, label: TsBlank, text: TsCode };
     <TsChecked slot="bad" lines={named.bad.lines} />
     <TsChecked slot="good" lines={named.good.lines} />
   </RuleLesson>
-  <RuleQuiz n={1} level={named.levels[0]} board="code" marks={blanks}
-    >Three files import the price formatter, and one of them spells it<Fragment set:html="<!-- -->" /> <Code tone="prompt">formatPrcie</Code>. Place the name so the typo fails the build.</RuleQuiz
-  >
+  <RuleQuiz n={1} level={named.levels[0]}
+    >Three files import the price formatter, and one of them spells it<Fragment set:html="<!-- -->" /> <Code tone="prompt">formatPrcie</Code>. Pick the version where the typo fails the build.
+    <div slot="board" {...stylex.attrs(quiz.stack)}>
+      {
+        typo.map(([id, line]) => (
+          <QuizChoice level={named.levels[0]} id={id}
+            ><span {...stylex.attrs(styles.code, quiz.snippet)}
+              ><span {...stylex.attrs(styles.source)}><TsPaint text={line} /></span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={extend}>
     <Fragment slot="body"
@@ -37,9 +64,23 @@ const blanks = { lead: TsCode, label: TsBlank, text: TsCode };
     <TsChecked slot="bad" lines={extend.bad.lines} />
     <TsChecked slot="good" lines={extend.good.lines} />
   </RuleLesson>
-  <RuleQuiz n={2} level={extend.levels[0]} board="code" marks={{ label: TsCode, text: TsCode }}
-    ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Place Admin so the clash fails where it's declared.</RuleQuiz
-  >
+  <RuleQuiz n={2} level={extend.levels[0]}
+    ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Pick the Admin that fails where it's declared.
+    <div slot="board" {...stylex.attrs(quiz.stack)}>
+      <div {...stylex.attrs(styles.code, quiz.given)}>
+        <code {...stylex.attrs(styles.source)}><TsPaint text={"type User = {\u00a0id:\u00a0string;\u00a0name:\u00a0string\u00a0}"} /></code>
+      </div>
+      {
+        clash.map(([id, lines]) => (
+          <QuizChoice level={extend.levels[0]} id={id}
+            ><span {...stylex.attrs(styles.code, quiz.snippet)}
+              >{lines.map((line) => <span {...stylex.attrs(styles.source)}><TsPaint text={line} /></span>)}</span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={unions}>
     <Fragment slot="body"

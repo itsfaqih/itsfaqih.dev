@@ -45,35 +45,22 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     levels: [
       {
         name: "A typo",
-        piece: "formatPrice",
         answer: "named",
-        rows: [
+        choices: [
           {
-            depth: 0,
-            lead: "export default function",
-            slot: {
-              id: "default",
-              label: "export default function formatPrice",
-              note: "Each importer names a default export, so formatPrcie compiles and the stack trace says default.",
-            },
+            id: "default",
+            label: "export default function formatPrice",
+            note: "Each importer names a default export, so formatPrcie compiles and the stack trace says default.",
           },
           {
-            depth: 0,
-            lead: "export function",
-            slot: {
-              id: "named",
-              label: "export function formatPrice",
-              note: "Export it by name. Every import must spell formatPrice, so the typo fails where it's written.",
-            },
+            id: "named",
+            label: "export function formatPrice",
+            note: "Export it by name. Every import must spell formatPrice, so the typo fails where it's written.",
           },
           {
-            depth: 0,
-            lead: "function",
-            slot: {
-              id: "local",
-              label: "function formatPrice",
-              note: "Without export, all three imports fail, the correct ones too.",
-            },
+            id: "local",
+            label: "function formatPrice",
+            note: "Without export, all three imports fail, the correct ones too.",
           },
         ],
       },
@@ -119,33 +106,22 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     levels: [
       {
         name: "A clash",
-        piece: "Admin",
         answer: "extends",
-        rows: [
-          { depth: 0, text: "type User = { id: string; name: string }" },
+        choices: [
           {
-            depth: 0,
-            slot: {
-              id: "and",
-              label: "type Admin = User & { id: number }",
-              note: "It compiles. id becomes never, and the error shows up at the first Admin you write.",
-            },
+            id: "and",
+            label: "type Admin = User & { id: number }",
+            note: "It compiles. id becomes never, and the error shows up at the first Admin you write.",
           },
           {
-            depth: 0,
-            slot: {
-              id: "extends",
-              label: "interface Admin extends User { id: number }",
-              note: "Extend it. The clash fails right here, and the message names both types of id.",
-            },
+            id: "extends",
+            label: "interface Admin extends User { id: number }",
+            note: "Extend it. The clash fails right here, and the message names both types of id.",
           },
           {
-            depth: 0,
-            slot: {
-              id: "value",
-              label: "const Admin = { id: 0 }",
-              note: "That's a value, not a type. Nothing checks it against User at all.",
-            },
+            id: "value",
+            label: "const Admin = { id: 0 }",
+            note: "That's a value, not a type. Nothing checks it against User at all.",
           },
         ],
       },
