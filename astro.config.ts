@@ -115,13 +115,12 @@ function pageFiles(outDir: string) {
 // Static imports only: a dynamic import() is fetched when the code asks for it.
 const STATIC_IMPORT = /(?:import|export)\s*(?:[^"';()]*?from\s*)?["']\.\/([^"']+?\.js)["']/g;
 
-// An island fetches its module, which imports chunks that import chunks: one round trip per
-// level, five deep for the header. Listing the whole closure up front fetches it in one.
+// A component's module script imports chunks that import chunks: one round trip per level.
+// Listing the whole closure in the head fetches it in one.
 async function eagerModules(html: string, outDir: string) {
-  const roots = [...html.matchAll(/<astro-island\b[^>]*>/g)]
-    .filter(([tag]) => tag.includes('client="load"'))
-    .flatMap(([tag]) => [...tag.matchAll(/(?:component|renderer)-url="\/_astro\/([^"]+)"/g)])
-    .map(([, file]) => file!);
+  const roots = [...html.matchAll(/<script type="module" src="\/_astro\/([^"]+)"/g)].map(
+    ([, file]) => file!,
+  );
   const seen = new Set<string>();
   const visit = async (file: string): Promise<void> => {
     if (seen.has(file)) return;
