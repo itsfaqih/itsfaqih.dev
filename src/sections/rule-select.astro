@@ -1,0 +1,104 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { colorOf, ruleNumber, TOPICS, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
+import { arcade } from "../components/arcade";
+import { loadIn } from "../components/load-in";
+import { chips } from "./chips";
+import { beamClass, countClass, styles } from "./rule-select.styles";
+import RuleThumb from "./rule-thumb.astro";
+import RuleTile from "./rule-tile.astro";
+
+// The panel's screen for a picked rule. Its title scrambles in, letter by letter, from cells the
+// client fills with stand-in glyphs (rule-select.client.ts).
+const panelThumb = [styles.thumb, styles.panelThumb];
+const topics = ["All", ...TOPICS];
+const count = (topic: string) =>
+  topic === "All" ? RULES.length : RULES.filter((rule) => rule.label === topic).length;
+---
+
+<rule-select {...stylex.attrs(styles.select)}>
+  <aside
+    {...stylex.attrs(loadIn.piece, styles.panel)}
+    data-cut="true"
+    data-empty=""
+    aria-live="polite"
+    data-part="panel"
+  >
+    <div {...stylex.attrs(styles.plate, styles.standby)}><span>No.—</span><span>STANDBY</span></div>
+    <RuleThumb style={panelThumb} />
+    <h3 {...stylex.attrs(styles.title, styles.standby)}>Pick a rule</h3>
+    <p {...stylex.attrs(styles.blurb)}>Hover or focus a rule to preview it.</p>
+    <dl {...stylex.attrs(styles.facts)}>
+      <div {...stylex.attrs(styles.fact)}>
+        <dt {...stylex.attrs(styles.term)}>TOPIC</dt><dd
+          {...stylex.attrs(styles.value)}
+          data-part="topic">All</dd
+        >
+      </div>
+    </dl>
+  </aside>
+  <div>
+    <div {...stylex.attrs(styles.tools)}>
+      <label {...stylex.attrs(loadIn.piece, styles.search)} data-cut="true"
+        >FIND<input
+          {...stylex.attrs(styles.input)}
+          type="search"
+          enterkeyhint="search"
+          autocapitalize="none"
+          autocorrect="off"
+          placeholder="button, cache, null…"
+          aria-label="Search rules"
+          value=""
+          data-part="search"
+        /><kbd {...stylex.attrs(styles.key)}>/</kbd></label
+      >
+    </div>
+    <div {...stylex.attrs(chips.group)} role="group" aria-label="Filter by topic">
+      {
+        topics.map((name) => (
+          <button
+            type="button"
+            {...stylex.attrs(loadIn.piece, chips.chip)}
+            data-cut="true"
+            aria-pressed={String(name === "All")}
+            style={`--c:${colorOf(name)}`}
+            data-topic={name}
+          >
+            <i {...stylex.attrs(chips.dot)} />{name}<b class={countClass(name === "All")}>{count(name)}</b>
+          </button>
+        ))
+      }
+    </div>
+    <div {...stylex.attrs(styles.tiles)} data-part="tiles">
+      {RULES.map((rule) => <RuleTile rule={rule} />)}
+    </div>
+  </div>
+  <div class={beamClass(false)} aria-hidden="true" data-part="beam"></div>
+  <template data-part="deck">{RULES.map((rule) => <RuleTile rule={rule} />)}</template>
+  {
+    RULES.map((rule) => (
+      <template data-panel={rule.id}>
+        <div {...stylex.attrs(styles.plate)}><span>No.{ruleNumber(rule)}</span><span>{rule.label.toUpperCase()}</span></div>
+        <RuleThumb rule={rule} play at="panel" style={panelThumb} />
+        <h3 {...stylex.attrs(styles.title)}><span aria-hidden="true" data-part="scramble">{
+          rule.title.split(" ").map((word, index) => (
+            <Fragment>{index > 0 && " "}<span {...stylex.attrs(styles.word)}>{
+              Array.from(word, (char) => <span {...stylex.attrs(styles.cell)}>{char}</span>)
+            }</span></Fragment>
+          ))
+        }</span><span {...stylex.attrs(arcade.srOnly)}>{rule.title}</span></h3>
+        <p {...stylex.attrs(styles.blurb)}>{rule.description}</p>
+        <dl {...stylex.attrs(styles.facts)}>
+          <div {...stylex.attrs(styles.fact)}>
+            <dt {...stylex.attrs(styles.term)}>TOPIC</dt><dd {...stylex.attrs(styles.value)}>{rule.label}</dd>
+          </div>
+        </dl>
+      </template>
+    ))
+  }
+  <template data-part="empty"><p {...stylex.attrs(styles.empty)}></p></template>
+</rule-select>
+
+<script>
+  import "./rule-select.client";
+</script>
