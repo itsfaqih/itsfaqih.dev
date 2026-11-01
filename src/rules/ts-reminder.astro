@@ -1,0 +1,47 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import { REMINDER, reminderLines, reminderOf, type Way } from "./handling-timestamps";
+import { styles } from "./handling-timestamps.styles";
+import { host } from "./rule-landing.styles";
+import TsReaders from "./ts-readers.astro";
+import TsWire from "./ts-wire.astro";
+
+type Props = { way: Way };
+
+const { way } = Astro.props;
+const { wall, meant, stored, readings } = reminderOf(way, REMINDER.date, REMINDER.time);
+const id = `ts-${way}`;
+---
+
+<ts-reminder {...stylex.attrs(host.contents)} data-way={way}>
+  <div {...stylex.attrs(styles.view)}>
+    <div {...stylex.attrs(styles.form)}>
+      <span {...stylex.attrs(styles.formHead)}>New reminder · Rina, Jakarta</span><label
+        for={`${id}-date`}
+        {...stylex.attrs(arcade.srOnly)}>Date</label
+      ><input
+        id={`${id}-date`}
+        type="date"
+        required
+        {...stylex.attrs(styles.input)}
+        value={REMINDER.date}
+        data-part="date"
+      /><label for={`${id}-time`} {...stylex.attrs(arcade.srOnly)}>Time</label><input
+        data-hint="true"
+        id={`${id}-time`}
+        type="time"
+        required
+        {...stylex.attrs(styles.input)}
+        value={REMINDER.time}
+        data-part="time"
+      />
+    </div>
+    <TsWire lines={reminderLines(way, wall, meant)} />
+    <TsReaders readings={readings} utc={stored} />
+  </div>
+</ts-reminder>
+
+<script>
+  import "./ts-reminder.client";
+</script>

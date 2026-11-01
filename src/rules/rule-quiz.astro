@@ -1,5 +1,6 @@
 ---
 import * as stylex from "@stylexjs/stylex";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Level } from "./lesson";
 import { host, lessonKit, quizKit, quizView, shell, tree } from "./rule-landing.styles";
 
@@ -9,9 +10,14 @@ type Props = {
   level: Level;
   /** What the pieces go into, as in "Drag the piece into the tree". */
   board: string;
+  /** Renders each row's text, lead and slot label when they carry markup; plain text otherwise. */
+  cell?: (props: {
+    part: "text" | "lead" | "label";
+    value: string;
+  }) => ReturnType<AstroComponentFactory>;
 };
 
-const { n, level, board } = Astro.props;
+const { n, level, board, cell: Cell } = Astro.props;
 const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
 // The default slot is the prompt, its code in tone "prompt". The two templates hold what clearing
 // the level shows; rule-quiz.client.ts clones them.
@@ -41,18 +47,18 @@ const idle = { open: false, near: false, missed: false, cleared: false, seated: 
           level.rows.map((row) =>
             "slot" in row ? (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.lead ? quizKit.leadRow : null)}
-                >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{row.lead}</span>}<button
+                >{row.lead && <span {...stylex.attrs(quizKit.lead)}>{Cell ? <Cell part="lead" value={row.lead} /> : row.lead}</span>}<button
                   type="button"
                   class={quizView.slot({ ...idle, lead: row.lead !== undefined })}
                   disabled
                   data-slot={row.slot.id}
                   data-note={row.slot.note}
-                  data-part="slot">{row.slot.label}</button
+                  data-part="slot">{Cell ? <Cell part="label" value={row.slot.label} /> : row.slot.label}</button
                 ></li
               >
             ) : (
               <li style={`--d:${row.depth}`} {...stylex.attrs(tree.row, row.kind && tree[row.kind])}
-                >{row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
+                >{Cell ? <Cell part="text" value={row.text} /> : row.text}{row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>}</li
               >
             ),
           )

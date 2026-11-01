@@ -1,0 +1,18 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import { KINDS, paint, styles } from "./null-vs-undefined.styles";
+
+type Props = { part: "text" | "lead" | "label"; value: string };
+
+const { part, value } = Astro.props;
+// A slot's label is a blank for screen readers to read; the rest is code.
+---
+
+{
+  part === "label" ? (
+    <Fragment><span {...stylex.attrs(arcade.srOnly)}>{value}</span><span aria-hidden="true" {...stylex.attrs(styles.gap)} /></Fragment>
+  ) : (
+    <code {...stylex.attrs(styles.boardCode)}>{paint(value, KINDS).map((p) => (p.class ? <span class={p.class}>{p.text}</span> : p.text))}</code>
+  )
+}

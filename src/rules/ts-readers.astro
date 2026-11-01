@@ -1,0 +1,66 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import {
+  dayOf,
+  hourAngle,
+  minuteAngle,
+  offBy,
+  timeOf,
+  type Reading,
+  type Wall,
+} from "./handling-timestamps";
+import { styles, tsView } from "./handling-timestamps.styles";
+import { host } from "./rule-landing.styles";
+
+type Props = {
+  readings: Reading[];
+  /** The UTC moment the clocks swing from as they come on screen. */
+  utc: Wall;
+};
+
+const { readings, utc } = Astro.props;
+---
+
+<ts-readers
+  {...stylex.attrs(host.contents)}
+  data-times={readings.map((reading) => reading.shown).join()}
+  data-utc={utc}
+>
+  <div {...stylex.attrs(styles.readers)}>
+    {
+      readings.map((reading) => {
+        const off = offBy(reading);
+        return (
+          <div class={`ts-reader ${stylex.attrs(styles.reader).class}`}
+            ><span aria-hidden="true" {...stylex.attrs(styles.clock)}
+              >{off && <i class={tsView.ghost} style={`--a:${hourAngle(reading.truth)}deg`} />}<i
+                class={tsView.minute}
+                style={`--a:${minuteAngle(reading.shown)}deg`}
+              /><i class={tsView.hour(off !== null)} style={`--a:${hourAngle(reading.shown)}deg`} /></span
+            ><span {...stylex.attrs(styles.read)}
+              ><span {...stylex.attrs(styles.who)}
+                >{reading.person.who}<Fragment set:html="<!-- -->" /> · <Fragment set:html="<!-- -->" />{
+                  reading.person.city
+                }</span
+              ><b class={tsView.time(off !== null)}>{timeOf(reading.shown)}</b><span {...stylex.attrs(styles.date)}
+                >{dayOf(reading.shown)}</span
+              >{
+                off && (
+                  <span class={tsView.should}
+                    ><span class={tsView.srOnly}>{off}<Fragment set:html="<!-- -->" />, </span>should be<Fragment
+                      set:html="<!-- -->"
+                    /> <Fragment set:html="<!-- -->" />{timeOf(reading.truth)}</span
+                  >
+                )
+              }</span
+            ></div
+          >
+        );
+      })
+    }
+  </div>
+</ts-readers>
+
+<script>
+  import "./ts-readers.client";
+</script>
