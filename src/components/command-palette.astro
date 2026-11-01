@@ -1,6 +1,7 @@
 ---
 import * as stylex from "@stylexjs/stylex";
-import { colorOf, VISIBLE_GUIDELINES, type RuleId } from "../data/guidelines";
+import { colorOf, VISIBLE_GUIDELINES, type Guideline, type RuleId } from "../data/guidelines";
+import { SHOW_PROJECTS } from "../data/home";
 import { LINKS } from "../seo";
 import { boxScrollbar, boxScrollbarHost, marker } from "./box-scrollbar";
 import { styles, view } from "./command-palette.styles";
@@ -8,14 +9,29 @@ import { fluidHover } from "./fluid-hover";
 import Icon from "./icon.astro";
 import RuleIcon from "./rule-icon.astro";
 
+const PHOSPHOR = [
+  "House",
+  "BookOpen",
+  "Briefcase",
+  "Stack",
+  "FolderSimple",
+  "ChatCircle",
+  "GithubLogo",
+  "LinkedinLogo",
+  "DribbbleLogo",
+  "MediumLogo",
+] as const;
+
 type Command = {
   id: string;
   label: string;
   description: string;
   keywords: string[];
-  icon: "House" | "BookOpen" | "GithubLogo" | "LinkedinLogo" | "Envelope" | RuleId;
+  icon: (typeof PHOSPHOR)[number] | "Envelope" | RuleId;
   /** Overrides the group's hue, as a rule takes its topic's. */
   hue?: string;
+  /** Listed only while the root search has a query, so everything on the site is findable from it. */
+  searchOnly?: true;
 } & (
   | { href: string }
   | { external: string }
@@ -24,6 +40,16 @@ type Command = {
 );
 
 type Group = { label: string; hue: string; items: Command[] };
+
+const ruleCommand = (guideline: Guideline, id: string): Command => ({
+  id,
+  label: guideline.title,
+  description: `${guideline.label} • ${guideline.description}`,
+  icon: guideline.id,
+  keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
+  hue: colorOf(guideline.label),
+  href: guideline.href,
+});
 
 // Each section wears its own hue on its label and on the highlighted item's icon.
 const levels: { id: string; groups: Group[] }[] = [
@@ -50,7 +76,55 @@ const levels: { id: string; groups: Group[] }[] = [
             keywords: ["guidelines", "principles", "best practices"],
             submenu: "rule-of-thumb",
           },
+          {
+            id: "experience",
+            label: "Experience",
+            description: "Where I've worked",
+            icon: "Briefcase",
+            keywords: ["work", "jobs", "career", "history"],
+            href: "/#work",
+            searchOnly: true,
+          },
+          {
+            id: "stack",
+            label: "Stack",
+            description: "Tools I build with",
+            icon: "Stack",
+            keywords: ["tools", "tech", "technologies", "skills"],
+            href: "/#stack",
+            searchOnly: true,
+          },
+          ...(SHOW_PROJECTS
+            ? [
+                {
+                  id: "projects",
+                  label: "Projects",
+                  description: "Side projects",
+                  icon: "FolderSimple",
+                  keywords: ["side projects", "portfolio"],
+                  href: "/#projects",
+                  searchOnly: true,
+                } satisfies Command,
+              ]
+            : []),
+          {
+            id: "contact",
+            label: "Contact",
+            description: "Get in touch",
+            icon: "ChatCircle",
+            keywords: ["connect", "hire", "reach out", "email"],
+            href: "/#contact",
+            searchOnly: true,
+          },
         ],
+      },
+      {
+        label: "Rule of Thumb",
+        hue: "var(--cw)",
+        items: VISIBLE_GUIDELINES.map((guideline) => ({
+          ...ruleCommand(guideline, `rule-${guideline.id}`),
+          searchOnly: true,
+        })),
       },
       {
         label: "Links",
@@ -71,6 +145,24 @@ const levels: { id: string; groups: Group[] }[] = [
             icon: "LinkedinLogo",
             keywords: ["profile", "professional", "connect", "network"],
             external: LINKS.linkedin,
+          },
+          {
+            id: "dribbble",
+            label: "Dribbble",
+            description: "Open Dribbble profile in new tab",
+            icon: "DribbbleLogo",
+            keywords: ["design", "shots", "portfolio"],
+            external: LINKS.dribbble,
+            searchOnly: true,
+          },
+          {
+            id: "medium",
+            label: "Medium",
+            description: "Open Medium profile in new tab",
+            icon: "MediumLogo",
+            keywords: ["blog", "articles", "writing", "posts"],
+            external: LINKS.medium,
+            searchOnly: true,
           },
         ],
       },
@@ -105,17 +197,7 @@ const levels: { id: string; groups: Group[] }[] = [
             keywords: ["all", "list", "overview"],
             href: "/rule-of-thumb",
           },
-          ...VISIBLE_GUIDELINES.map(
-            (guideline): Command => ({
-              id: `rot-${guideline.id}`,
-              label: guideline.title,
-              description: `${guideline.label} • ${guideline.description}`,
-              icon: guideline.id,
-              keywords: [guideline.label.toLowerCase(), guideline.id.replace(/-/g, " ")],
-              hue: colorOf(guideline.label),
-              href: guideline.href,
-            }),
-          ),
+          ...VISIBLE_GUIDELINES.map((guideline) => ruleCommand(guideline, `rot-${guideline.id}`)),
         ],
       },
     ],
@@ -126,7 +208,6 @@ const levels: { id: string; groups: Group[] }[] = [
 // keeps a match from spanning two.
 const searchText = (command: Command) =>
   [command.label, command.description, ...command.keywords].join("\n").toLowerCase();
-const PHOSPHOR = ["House", "BookOpen", "GithubLogo", "LinkedinLogo"] as const;
 const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
   PHOSPHOR.some((name) => name === icon);
 ---
@@ -221,6 +302,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                               data-external={"external" in item ? item.external : undefined}
                               data-copy={"copy" in item ? item.copy : undefined}
                               data-submenu={"submenu" in item ? item.submenu : undefined}
+                              data-search-only={item.searchOnly}
                               class={view.item(selected)}
                               style={item.hue ? `--c:${item.hue}` : undefined}
                             >

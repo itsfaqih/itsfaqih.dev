@@ -8,6 +8,7 @@ export const LINKS = {
   github: "https://github.com/itsfaqih",
   linkedin: "https://www.linkedin.com/in/itsfaqih",
   dribbble: "https://dribbble.com/itsfaqih",
+  medium: "https://medium.com/@itsfaqih",
   email: "itsfaqih@gmail.com",
 };
 

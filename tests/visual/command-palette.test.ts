@@ -80,6 +80,37 @@ describe("the command palette", () => {
     await expect.poll(() => page.getByText('No results for "zzz"').isVisible()).toBe(true);
   });
 
+  it("finds every rule, home section and footer link from the root search", async () => {
+    const page = await openPalette();
+    const input = page.getByRole("combobox");
+    const listed = () =>
+      page
+        .getByRole("listbox")
+        .getByRole("option")
+        .evaluateAll((options) =>
+          options.map((option) => option.querySelector(".cmdk-name")?.textContent),
+        );
+    const unfiltered = ["Home", "Rule of Thumb", "GitHub", "LinkedIn", "Copy Email"];
+
+    expect(await listed()).toEqual(unfiltered);
+
+    await input.pressSequentially("experience");
+    expect(await listed()).toEqual(["Experience"]);
+
+    await input.fill("");
+    await input.pressSequentially("dribbble");
+    expect(await listed()).toEqual(["Dribbble"]);
+
+    await input.fill("");
+    expect(await listed()).toEqual(unfiltered);
+
+    await input.pressSequentially("button");
+    expect(await groupNames(page)).toEqual(["Rule of Thumb"]);
+    expect(await selectedOption(page)).toEqual(["Button Design"]);
+    await Promise.all([page.waitForURL(/button-design/), page.keyboard.press("Enter")]);
+    expect(pathname(page)).toBe("/rule-of-thumb/button-design");
+  });
+
   it("wraps the highlight and runs the highlighted command on Enter", async () => {
     const page = await openPalette();
 

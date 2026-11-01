@@ -87,8 +87,8 @@ class CommandPalette extends HTMLElement {
       const needle = query.toLowerCase();
       flat = [];
       const groups = current.groups.filter((group) => {
-        const matches = group.options.filter(
-          (option) => all || option.dataset.search!.includes(needle),
+        const matches = group.options.filter((option) =>
+          all ? option.dataset.searchOnly === undefined : option.dataset.search!.includes(needle),
         );
         group.element.replaceChildren(group.label, ...matches);
         flat.push(...matches);
