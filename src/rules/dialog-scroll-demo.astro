@@ -1,0 +1,32 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import DialogBox from "./dialog-box.astro";
+import DialogClose from "./dialog-close.astro";
+import { articleView, styles } from "./dialog-design.styles";
+import DialogKey from "./dialog-key.astro";
+import DialogWindow from "./dialog-window.astro";
+import { host } from "./rule-landing.styles";
+
+type Props = { sealed?: boolean };
+
+const { sealed = false } = Astro.props;
+---
+
+<dialog-scroll {...stylex.attrs(host.contents)} data-sealed={sealed ? "" : undefined}>
+  <DialogWindow>
+    <div slot="page" class={articleView(false)} data-part="page">
+      <div {...stylex.attrs(styles.spread)}><b {...stylex.attrs(styles.strong)}>Why we moved to Postgres</b><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.soft)}>Share</button></div>
+      {
+        [0, 1, 2, 3, 4, 5].map((block) => (
+          <div {...stylex.attrs(styles.para)}>{block % 3 === 1 && <span {...stylex.attrs(styles.figure)}></span>}{[96, 88, 92, 60].map((width) => <span style={`--w:${width - (block % 3) * 4}%`} {...stylex.attrs(styles.ghost)}></span>)}</div>
+        ))
+      }
+    </div>
+    <DialogBox id={`scroll-${sealed ? "good" : "bad"}-`} title="Share this post" part="dialog">
+      <DialogClose slot="close" />
+      <div {...stylex.attrs(styles.share)}><span {...stylex.attrs(styles.url)}>itsfaqih.dev/p/42</span><button type="button" data-stop="copy" {...stylex.attrs(styles.stop, styles.btn)}>Copy link</button></div>
+    </DialogBox>
+    <DialogKey slot="keys" part="scroll">Scroll</DialogKey>
+    <Fragment slot="read">Open Share, then scroll</Fragment>
+  </DialogWindow>
+</dialog-scroll>

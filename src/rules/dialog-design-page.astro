@@ -1,0 +1,69 @@
+---
+import DialogConfirmDemo from "./dialog-confirm-demo.astro";
+import { LESSONS, TLDR } from "./dialog-design";
+import DialogDraftDemo from "./dialog-draft-demo.astro";
+import DialogEscapeDemo from "./dialog-escape-demo.astro";
+import DialogFocusDemo from "./dialog-focus-demo.astro";
+import DialogNameDemo from "./dialog-name-demo.astro";
+import DialogScrollDemo from "./dialog-scroll-demo.astro";
+import Kbd from "./kbd.astro";
+import LessonText from "./lesson-text.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+
+const [focus, escape, safe, draft, scroll, name] = LESSONS;
+---
+
+<RuleLanding id="dialog-design" learn="Hold focus, let go cleanly" tldr={TLDR} take="build dialogs the same way">
+  <Fragment slot="lead">Trap Tab inside the dialog, lock the page behind it, and name it for screen readers.</Fragment>
+  <Fragment slot="intro">Give a dialog a way through and a way out, since it takes over the screen.</Fragment>
+
+  <RuleLesson lesson={focus}>
+    <Fragment slot="body">Move focus into the dialog when it opens. Let <Kbd>Tab</Kbd> cycle its controls and never reach the inert page behind. On close, return focus to the button that opened it. Press Tab in both.</Fragment>
+    <DialogFocusDemo slot="bad" />
+    <DialogFocusDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={1} level={focus.levels[0]} board="screen">You opened <b>Edit profile</b> from its button halfway down a settings page, then pressed Save. Place where focus goes.</RuleQuiz>
+
+  <RuleLesson lesson={escape}>
+    <Fragment slot="body">Close every dialog on <Kbd>Esc</Kbd>, every time, since keyboard users leave that way. Let a click outside close an info dialog too, as it has nothing to lose.</Fragment>
+    <DialogEscapeDemo slot="bad" />
+    <DialogEscapeDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={2} level={escape.levels[0]} board="screen">Three dialogs. Place the close on the one a click outside should close.</RuleQuiz>
+
+  <RuleLesson lesson={safe}>
+    <Fragment slot="body">Focus a form's first field so people can type at once. Focus Cancel on a confirm that destroys something, so a stray <Kbd>Enter</Kbd> backs out. Open both and press Enter.</Fragment>
+    <LessonText slot="extra" tip>Focus the destructive button only where speed matters more and the action can be undone.</LessonText>
+    <DialogConfirmDemo slot="bad" />
+    <DialogConfirmDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={3} level={safe.levels[0]} board="screen"><b>Delete Moonbase?</b> removes 214 files for good. Place where focus starts.</RuleQuiz>
+  <RuleQuiz n={4} level={safe.levels[1]!} board="screen"><b>Add contact</b> has Name and Email fields. Place where focus starts.</RuleQuiz>
+
+  <RuleLesson lesson={draft}>
+    <Fragment slot="body">A click outside is often a slip. Once a form has input, shake the dialog on that click instead of closing it, and ask before <Kbd>Esc</Kbd> or × discards the draft. Click the dim area in both.</Fragment>
+    <DialogDraftDemo slot="bad" />
+    <DialogDraftDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={5} level={draft.levels[0]} board="screen">Three dialogs, and a click lands on the dim area by mistake. Place the shake on the one that should stay open.</RuleQuiz>
+
+  <RuleLesson lesson={scroll}>
+    <Fragment slot="body">Stop the page under the dialog from scrolling, so it stays still. Keep the scrollbar's space so nothing shifts when the scrollbar hides. Open Share, then scroll.</Fragment>
+    <DialogScrollDemo slot="bad" />
+    <DialogScrollDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={6} level={scroll.levels[0]} board="screen"><b>Share</b> opens over a long article. Place the scroll lock so the article stays still.</RuleQuiz>
+
+  <RuleLesson lesson={name}>
+    <Fragment slot="body">Tell a screen reader that a dialog opened and what it's called. Mark it as a modal dialog, name it by its title and describe it by its text.</Fragment>
+    <DialogNameDemo slot="bad" />
+    <DialogNameDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={7} level={name.levels[0]} board="screen">A screen reader user presses Delete and <b>Delete Moonbase?</b> opens. Pick the version that tells them what opened.</RuleQuiz>
+</RuleLanding>
+
+<script>
+  import "./dialog-design.client";
+</script>

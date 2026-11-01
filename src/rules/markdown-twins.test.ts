@@ -4,7 +4,7 @@ import type { Tldr } from "./lesson";
 import { PUBLISHED_GUIDELINES } from "../data/guidelines";
 import * as buttonDesign from "./button-design-page";
 import * as dataLoading from "./data-loading-page";
-import * as dialogDesign from "./dialog-design-page";
+import * as dialogDesign from "./dialog-design";
 import * as handlingTimestamps from "./handling-timestamps-page";
 import * as nullVsUndefined from "./null-vs-undefined-page";
 import * as proximityPrinciple from "./proximity-principle";
