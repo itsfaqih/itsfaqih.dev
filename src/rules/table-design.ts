@@ -110,33 +110,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Scan for the biggest",
-        piece: "9 · 120 · 12,500",
         answer: "right",
-        rows: [
-          { depth: 0, text: "Revenue column", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "left",
-              label: "+ left-aligned",
-              note: "9 sits under the 1 of 12,500, so the digits that matter never line up.",
-            },
+            id: "left",
+            label: "Revenue left-aligned",
+            note: "9 sits under the 1 of 12,500, so the digits that matter never line up.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "center",
-              label: "+ centred",
-              note: "Each value sits by its own width, so no column of digits lines up at all.",
-            },
+            id: "center",
+            label: "Revenue centred",
+            note: "Each value sits by its own width, so no column of digits lines up at all.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "right",
-              label: "+ right-aligned, even-width digits",
-              note: "Ones sit under ones and thousands under thousands, so the longest number reads as the biggest.",
-            },
+            id: "right",
+            label: "Revenue right-aligned, with even-width digits",
+            note: "Ones sit under ones and thousands under thousands, so the longest number reads as the biggest.",
           },
         ],
       },
@@ -149,36 +138,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Fill the blank",
-        piece: "Add user",
         answer: "empty",
-        rows: [
-          { depth: 0, text: "Users table", kind: "comp" },
-          { depth: 1, text: '"Couldn\'t load users"', tag: "error" },
+        choices: [
           {
-            depth: 2,
-            slot: {
-              id: "error",
-              label: "+ its button",
-              note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
-            },
+            id: "error",
+            label: "Couldn't load users, with Add user",
+            note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
           },
-          { depth: 1, text: '"No users yet"', tag: "empty" },
           {
-            depth: 2,
-            slot: {
-              id: "empty",
-              label: "+ its button",
-              note: "Nothing here yet, so offer adding the first user.",
-            },
+            id: "empty",
+            label: "No users yet, with Add user",
+            note: "Nothing here yet, so offer adding the first user.",
           },
-          { depth: 1, text: '"No results for "zed""', tag: "search" },
           {
-            depth: 2,
-            slot: {
-              id: "search",
-              label: "+ its button",
-              note: "The users exist and the search hid them. Offer Clear search to bring them back.",
-            },
+            id: "search",
+            label: "No results for zed, with Add user",
+            note: "The users exist and the search hid them. Offer Clear search to bring them back.",
           },
         ],
       },
@@ -191,36 +166,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Place the actions",
-        piece: "Edit · Delete",
         answer: "last",
-        rows: [
-          { depth: 0, text: "A user row", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "first",
-              label: "+ a column of their own, first",
-              note: "The row now opens with buttons, which push every name one column right.",
-            },
+            id: "first",
+            label: "A column of their own, first",
+            note: "The row now opens with buttons, which push every name one column right.",
           },
-          { depth: 1, text: "Alice Johnson" },
           {
-            depth: 1,
-            slot: {
-              id: "name",
-              label: "+ in the name cell, after the text",
-              note: "Names differ in length, so Edit lands somewhere new on every row.",
-            },
+            id: "name",
+            label: "In the name cell, after the text",
+            note: "Names differ in length, so Edit lands somewhere new on every row.",
           },
-          { depth: 1, text: "alice@acme.com" },
-          { depth: 1, text: "Admin" },
           {
-            depth: 1,
-            slot: {
-              id: "last",
-              label: "+ a column of their own, last, fixed width",
-              note: "Fix the width and right-align the column, so Edit sits in the same place on every row.",
-            },
+            id: "last",
+            label: "A column of their own, last, fixed width",
+            note: "Fix the width and right-align the column, so Edit sits in the same place on every row.",
           },
         ],
       },
@@ -233,36 +194,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Count the pages",
-        piece: "pager",
         answer: "31",
-        rows: [
-          { depth: 0, text: "Users table, 25 rows a page", kind: "comp" },
-          { depth: 1, text: "Admins", tag: "25 users" },
+        choices: [
           {
-            depth: 2,
-            slot: {
-              id: "25",
-              label: "+ pager",
-              note: "25 rows fill exactly one page. The pager would read Page 1 of 1 with two dead arrows.",
-            },
+            id: "25",
+            label: "Admins, 25 users",
+            note: "25 rows fill exactly one page. The pager would read Page 1 of 1 with two dead arrows.",
           },
-          { depth: 1, text: "Everyone", tag: "31 users" },
           {
-            depth: 2,
-            slot: {
-              id: "31",
-              label: "+ pager",
-              note: "Add it here, since the last 6 rows go on page 2.",
-            },
+            id: "31",
+            label: "Everyone, 31 users",
+            note: "Add it here, since the last 6 rows go on page 2.",
           },
-          { depth: 1, text: "Owners", tag: "0 users" },
           {
-            depth: 2,
-            slot: {
-              id: "0",
-              label: "+ pager",
-              note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
-            },
+            id: "0",
+            label: "Owners, 0 users",
+            note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
           },
         ],
       },
@@ -275,33 +222,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Share page 3",
-        piece: "page 3",
         answer: "url",
-        rows: [
-          { depth: 0, text: "Orders page", kind: "comp" },
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "state",
-              label: "+ in memory",
-              note: "If you reload or press Back, you're on page 1. The link you sent opens on page 1 too.",
-            },
+            id: "state",
+            label: "In memory",
+            note: "If you reload or press Back, you're on page 1. The link you sent opens on page 1 too.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "url",
-              label: "+ in the link",
-              note: "Make the page part of the link, so a reload, Back and your teammate all land on page 3.",
-            },
+            id: "url",
+            label: "In the link",
+            note: "Make the page part of the link, so a reload, Back and your teammate all land on page 3.",
           },
           {
-            depth: 1,
-            slot: {
-              id: "storage",
-              label: "+ in this browser's storage",
-              note: "It survives your reload, but your teammate's browser has its own storage and opens page 1.",
-            },
+            id: "storage",
+            label: "In this browser's storage",
+            note: "It survives your reload, but your teammate's browser has its own storage and opens page 1.",
           },
         ],
       },
