@@ -38,27 +38,38 @@ const GLOW_REACH_WIDTH = 0.3;
 const GLOW_ALPHA = 0.95;
 const GLOW_LIFT = 0.45;
 const GLOW_FADE = 600;
+// A glow from inside a box has less edge to spread along, so it reaches this much further.
+const GLOW_SOURCE_REACH = 1.6;
 // Lit dots are filled in this many alpha steps, so a frame fills a few paths rather than one per dot.
 const TINT_STEPS = 12;
 
 type Box = { left: number; right: number; top: number; bottom: number };
-type Glow = { box: Element; hue: string; since: number };
+/** Part of a box, as fractions of its width and height: [left, top, right, bottom]. */
+export type GlowArea = readonly [left: number, top: number, right: number, bottom: number];
+type Glow = { box: Element; hue: string; from?: GlowArea; since: number };
 
-// Newest last. A glow stays until a newer one has fully faded in over it.
-let glows: Glow[] = [];
+// Each source's glows, newest last. A glow stays until a newer one has fully faded in over it.
+const glowSources = new Map<string, Glow[]>();
 let onGlow = () => {};
 
 /**
- * Tints the backdrop's dots around `box` in `hue`, a CSS colour, or clears the glow when `box` is
- * null. Call it again as the box moves, so the dots follow it.
+ * Tints the backdrop's dots around `box` in `hue`, a CSS colour, or clears the source's glow when
+ * `box` is null. With `from`, the glow spreads from that part of the box instead of its edges.
+ * Sources light the dots side by side, and a new glow fades in over the same source's last one.
+ * Call it again as the box moves, so the dots follow it.
  */
-export function glowDots(box: Element | null, hue = "") {
+export function glowDots(source: string, box: Element | null, hue = "", from?: GlowArea) {
+  const glows = glowSources.get(source) ?? [];
   const newest = glows.at(-1);
   if (box && newest?.box === box && newest.hue === hue) return onGlow();
-  const now = performance.now();
-  let covered = glows.length - 1;
-  while (covered > 0 && now - glows[covered]!.since < GLOW_FADE) covered--;
-  glows = box ? [...glows.slice(Math.max(0, covered)), { box, hue, since: now }] : [];
+  if (box) {
+    const now = performance.now();
+    let covered = glows.length - 1;
+    while (covered > 0 && now - glows[covered]!.since < GLOW_FADE) covered--;
+    glowSources.set(source, [...glows.slice(Math.max(0, covered)), { box, hue, from, since: now }]);
+  } else {
+    glowSources.delete(source);
+  }
   onGlow();
 }
 
@@ -221,26 +232,36 @@ export function animateDots(element: Element, withTide: boolean) {
     const phases = TIDE_WAVES.map(([, , speed]) => time * speed);
     const reach = Math.min(GLOW_REACH, innerWidth * GLOW_REACH_WIDTH);
     // Each glow's box and weight: a glow fades in over its first GLOW_FADE ms, and gives way as
-    // each newer one fades in over it.
-    const lit = glows.flatMap((glow, index) => {
-      const weight = glows
-        .slice(index + 1)
-        .reduce(
-          (left, newer) => left * (1 - Math.min(1, (now - newer.since) / GLOW_FADE)),
-          Math.min(1, (now - glow.since) / GLOW_FADE),
-        );
-      const box = glow.box.getBoundingClientRect();
-      const offscreen = box.bottom < -reach || box.top > innerHeight + reach || box.width === 0;
-      if (weight < 0.01 || offscreen) return [];
-      let colour = glowInk.get(glow.hue);
-      if (!colour) glowInk.set(glow.hue, (colour = inkOf(glow.hue)));
-      const paths: Path2D[] = [];
-      return [{ box, weight, colour, paths }];
-    });
+    // each newer one of its source fades in over it.
+    const lit = [...glowSources.values()].flatMap((glows) =>
+      glows.flatMap((glow, index) => {
+        const weight = glows
+          .slice(index + 1)
+          .reduce(
+            (left, newer) => left * (1 - Math.min(1, (now - newer.since) / GLOW_FADE)),
+            Math.min(1, (now - glow.since) / GLOW_FADE),
+          );
+        const rect = glow.box.getBoundingClientRect();
+        if (weight < 0.01 || rect.width === 0) return [];
+        const [left, top, right, bottom] = glow.from ?? [0, 0, 1, 1];
+        const box: Box = {
+          left: rect.left + rect.width * left,
+          right: rect.left + rect.width * right,
+          top: rect.top + rect.height * top,
+          bottom: rect.top + rect.height * bottom,
+        };
+        const spread = glow.from ? reach * GLOW_SOURCE_REACH : reach;
+        if (box.bottom < -spread || box.top > innerHeight + spread) return [];
+        let colour = glowInk.get(glow.hue);
+        if (!colour) glowInk.set(glow.hue, (colour = inkOf(glow.hue)));
+        const paths: Path2D[] = [];
+        return [{ box, spread, weight, colour, paths }];
+      }),
+    );
     const nearness = (glow: (typeof lit)[number], x: number, y: number) => {
       const dx = Math.max(glow.box.left - x, 0, x - glow.box.right);
       const dy = Math.max(glow.box.top - y, 0, y - glow.box.bottom);
-      const near = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
+      const near = Math.max(0, 1 - Math.hypot(dx, dy) / glow.spread);
       return near * near * glow.weight;
     };
 
@@ -251,11 +272,11 @@ export function animateDots(element: Element, withTide: boolean) {
     const regions: Box[] =
       moving || tiding
         ? [{ left: 0, right: innerWidth, top: 0, bottom: innerHeight }]
-        : lit.map(({ box }) => ({
-            left: box.left - reach,
-            right: box.right + reach,
-            top: box.top - reach,
-            bottom: box.bottom + reach,
+        : lit.map(({ box, spread }) => ({
+            left: box.left - spread,
+            right: box.right + spread,
+            top: box.top - spread,
+            bottom: box.bottom + spread,
           }));
     // Every drawn dot goes in one path of the theme's --dot; tints go on top, one path per hue and
     // alpha step.
@@ -358,7 +379,8 @@ export function animateDots(element: Element, withTide: boolean) {
     }
   };
 
-  const fading = (now: number) => glows.some((glow) => now - glow.since < GLOW_FADE);
+  const fading = (now: number) =>
+    [...glowSources.values()].some((glows) => glows.some((glow) => now - glow.since < GLOW_FADE));
   const tick = (now: number) => {
     draw(now);
     const live = (withTide && !still.matches) || presses.length || fading(now);
@@ -368,7 +390,7 @@ export function animateDots(element: Element, withTide: boolean) {
     if (!frame) frame = requestAnimationFrame(tick);
   };
   redraw = () => {
-    if (frame || glows.length) draw();
+    if (frame || glowSources.size) draw();
   };
   onGlow = wake;
 
@@ -412,7 +434,7 @@ export function animateDots(element: Element, withTide: boolean) {
     addEventListener("pointercancel", release, { capture: true, passive: true });
     addEventListener("blur", release);
   }
-  if (withTide || glows.length) wake();
+  if (withTide || glowSources.size) wake();
   return () => {
     onGlow = () => {};
     theme.disconnect();

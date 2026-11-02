@@ -1,6 +1,7 @@
 import "./hero-prints.client";
 import { SLIDES } from "../../data/home";
 import { reducedMotion, watchMedia } from "../../hooks/media-query";
+import { glowDots } from "../backdrop-dots";
 import { whenIntroDone } from "../intro.client";
 import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.styles";
 import { barClass, glyphClass, phraseClass } from "./hero.styles";
@@ -66,6 +67,7 @@ class HomeHero extends HTMLElement {
       pauseGlyph.className = glyphClass(held);
       bench.style.setProperty("--c", current.color);
       go.style.setProperty("--c", current.color);
+      glowDots("hero", prints, current.color, [0.3, 0.3, 0.7, 0.7]);
       prints.toggleAttribute("data-paused", !introDone || held);
       prints.show(index, run);
     };
@@ -120,6 +122,7 @@ class HomeHero extends HTMLElement {
     });
 
     this.#stop = () => {
+      glowDots("hero", null);
       controller.abort();
       unwatch();
       clearTimeout(timer);

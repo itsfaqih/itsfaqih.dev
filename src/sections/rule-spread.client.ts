@@ -103,7 +103,8 @@ class RuleSpread extends HTMLElement {
       activate(clamp(Math.round(position)));
       glow();
     };
-    const glow = () => glowDots(cards[active]!, cards[active]!.style.getPropertyValue("--c"));
+    const glow = () =>
+      glowDots("rule-spread", cards[active]!, cards[active]!.style.getPropertyValue("--c"));
     glow();
 
     const settle = () => {
@@ -254,7 +255,7 @@ class RuleSpread extends HTMLElement {
     });
 
     this.#stop = () => {
-      glowDots(null);
+      glowDots("rule-spread", null);
       controller.abort();
       unwatch();
       clearTimeout(deck.wheelTimer);
