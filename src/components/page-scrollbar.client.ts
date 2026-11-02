@@ -142,7 +142,6 @@ class PageScrollbar extends HTMLElement {
 
     const resize = new ResizeObserver(schedule);
     resize.observe(document.body);
-    html.classList.add("sb-own");
     layout();
 
     this.#stop = () => {
@@ -150,7 +149,6 @@ class PageScrollbar extends HTMLElement {
       resize.disconnect();
       cancelAnimationFrame(frame);
       clearTimeout(hideTimer);
-      html.classList.remove("sb-own");
     };
   }
 

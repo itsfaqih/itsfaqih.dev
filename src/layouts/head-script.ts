@@ -15,6 +15,9 @@ export const REST_AFTER_MS = 3500;
 export const HEAD_SCRIPT = String.raw`(function () {
   var doc = document.documentElement;
   doc.classList.add("js");
+  // page-scrollbar.client.ts draws the bar on these pointers. Its script arrives once the browser is
+  // idle, so the native bar goes here, or the page would widen when it did.
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) doc.classList.add("sb-own");
   // A saved choice wins; otherwise follow the system.
   var theme = "dark";
   try {

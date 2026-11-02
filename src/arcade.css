@@ -77,7 +77,8 @@ html.cur-on {
   --cursor-forbid: url("/cursors/none.svg#forbid") 0 0, none;
 }
 /* Global: keys on a class a script sets on html.
-   page-scrollbar.client.ts sets html.sb-own and draws its own bar; the native one belongs to <html>. */
+   the head script sets html.sb-own where page-scrollbar.client.ts draws its own bar; the native one
+   belongs to <html>. */
 html.sb-own {
   scrollbar-width: none;
 }

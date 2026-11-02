@@ -152,4 +152,33 @@ describe("the built site responds to a reader", () => {
     await entry.click();
     await expect.poll(() => entry.getAttribute("aria-expanded")).toBe("true");
   });
+
+  it("gives a page its full width from the first frame where scrollbars take up room", async () => {
+    const withScrollbars = await chromium.launch({ ignoreDefaultArgs: ["--hide-scrollbars"] });
+    try {
+      context = await withScrollbars.newContext({ viewport: { width: 1440, height: 900 } });
+      errors = [];
+      await context.addInitScript(() => {
+        sessionStorage.setItem("intro-seen", "1");
+        const measure = () => {
+          const html = document.documentElement;
+          const widths = new Set(html.dataset.widths?.split(","));
+          html.dataset.widths = [...widths.add(String(html.clientWidth))].join();
+          requestAnimationFrame(measure);
+        };
+        requestAnimationFrame(measure);
+      });
+      const page = await context.newPage();
+      await page.goto(new URL("/rule-of-thumb/button-design", inject("baseURL")).href, {
+        waitUntil: "networkidle",
+      });
+      await page.locator("a[href='/']").first().click();
+      await page.waitForURL(new URL("/", inject("baseURL")).href);
+      await hydrated(page);
+      expect(await page.locator("html").getAttribute("data-widths")).toBe("1440");
+    } finally {
+      await context.close();
+      await withScrollbars.close();
+    }
+  });
 });
