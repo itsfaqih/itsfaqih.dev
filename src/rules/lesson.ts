@@ -18,14 +18,8 @@ export type BoardRow =
   | { depth: number; text: string; kind?: TreeRow["kind"]; tag?: string }
   | { depth: number; slot: Slot; lead?: string };
 
-/** A candidate in a choose level. `label` names it for screen readers and the markdown twin. */
 type Choice = { id: string; label: string; note: string };
 
-/**
- * A quiz level. A place level hands the reader a piece to drop into one of its board's slots. A
- * choose level has no piece: the page draws the candidates, as versions side by side or as spots on
- * a mock screen, and the reader taps one.
- */
 export type Level = { name: string; answer: string } & (
   | { piece: string; rows: BoardRow[] }
   | { choices: [Choice, Choice, ...Choice[]] }

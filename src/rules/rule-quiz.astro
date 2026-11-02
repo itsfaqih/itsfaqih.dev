@@ -14,10 +14,6 @@ type Props = {
   /** The level's number across the page, for its `lv-N` anchor. */
   n: number;
   level: Level;
-  /**
-   * A place level: what the piece goes into, as in "Drag the piece into the tree". A choose level
-   * draws its board in the `board` slot, from QuizChoice buttons.
-   */
   board?: string;
   /** For rows that carry markup, such as painted code: what draws each lead, slot label and text row. */
   marks?: { lead?: Mark; label?: Mark; text?: Mark };
@@ -30,8 +26,6 @@ const place = "piece" in level ? level : null;
 const hint = place
   ? `Drag the piece into the ${board}. Or tap it, then tap a spot.`
   : "Tap the one that fits.";
-// The default slot is the prompt, its code in tone "prompt". The templates hold what clearing the
-// level shows; rule-quiz.client.ts clones them.
 ---
 
 <rule-quiz

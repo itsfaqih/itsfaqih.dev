@@ -175,12 +175,10 @@ export const view = {
   unrun: stylex.attrs(styles.unrun).class ?? "",
 };
 
-/** The choose boards: code versions stacked full width, each a card. */
 export const quiz = stylex.create({
   snippet: {
     paddingInline: "4px",
   },
-  // The code every version builds on, set above the cards.
   given: {
     paddingBlock: "4px",
     paddingInline: "17.5px",

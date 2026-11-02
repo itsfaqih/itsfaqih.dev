@@ -3,12 +3,6 @@ import { OUT, quizView, SNAP } from "./rule-landing.styles";
 
 type Drag = { x0: number; y0: number; lastX: number; lastT: number; rot: number; moved: boolean };
 
-/**
- * A quiz level (rule-quiz.astro). In a place level the reader drags the piece to a spot on the
- * board, or taps it and then a spot, or picks it up from the keyboard. A choose level has no piece,
- * and the reader taps a candidate. A wrong pick shakes and says why; the right one seats the piece,
- * or ticks the candidate, with a burst, and the level shows its stars.
- */
 class RuleQuiz extends HTMLElement {
   #stop?: () => void;
 
@@ -267,8 +261,8 @@ class RuleQuiz extends HTMLElement {
       piece.addEventListener(
         "click",
         (event) => {
-          // Pointer taps are handled on pointerup; this is Enter and Space.
-          if (event.detail === 0) pick(!picked);
+          const fromKeyboard = event.detail === 0;
+          if (fromKeyboard) pick(!picked);
         },
         { signal },
       );

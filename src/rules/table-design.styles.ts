@@ -711,10 +711,6 @@ export const view = {
   tipped: stylex.attrs(styles.tipped, tipped).class ?? "",
 };
 
-/**
- * The quiz boards. A button holds phrasing content only, so their tables are drawn from spans on
- * a grid, and nothing in them reacts to hover or focus.
- */
 export const quiz = stylex.create({
   sheet: {
     display: "grid",
@@ -761,7 +757,6 @@ export const quiz = stylex.create({
     whiteSpace: "nowrap",
     overflow: "hidden",
   },
-  // A header's first row of cells sits on the header's own rule.
   top: {
     borderTopWidth: 0,
   },
@@ -858,7 +853,6 @@ export const quiz = stylex.create({
     color: "var(--on-c)",
     whiteSpace: "nowrap",
   },
-  // Where a pager would go, drawn faint so it doesn't say how many pages there are.
   ghostPager: {
     display: "flex",
     gap: "6px",
@@ -897,7 +891,6 @@ export const quiz = stylex.create({
     gridTemplateColumns: { default: "auto 1fr auto auto", [PHONE]: "auto 1fr auto" },
     alignItems: "stretch",
   },
-  // A phone has no room for Role beside three spots, and the question doesn't need it.
   roomy: {
     display: { default: "flex", [PHONE]: "none" },
   },

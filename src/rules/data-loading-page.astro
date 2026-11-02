@@ -110,7 +110,7 @@ const TILES = [
   <RuleQuiz n={4} level={errors.levels[0]}
     >A dashboard loads five cards, and the revenue card fails to load. Tap where its error and Retry should go.
     <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <span {...stylex.attrs(quiz.page)}><QuizChoice level={errors.levels[0]} id="page" look="spot" /></span>
+      <span {...stylex.attrs(quiz.backdrop)}><QuizChoice level={errors.levels[0]} id="page" look="spot" /></span>
       <span {...stylex.attrs(styles.head, quiz.through)}
         ><span>Dashboard</span><span {...stylex.attrs(styles.status)}>4 of 5 loaded</span></span
       >
@@ -118,7 +118,7 @@ const TILES = [
         <span {...stylex.attrs(quiz.wide)}
           ><QuizChoice level={errors.levels[0]} id="inline" look="spot"
             ><span {...stylex.attrs(quiz.tile)}
-              ><span {...stylex.attrs(quiz.tileLabel)}>Revenue, this week</span><span {...stylex.attrs(quiz.hole)}
+              ><span {...stylex.attrs(quiz.tileLabel)}>Revenue, this week</span><span {...stylex.attrs(quiz.missingChart)}
               ></span></span
             ></QuizChoice
           ></span

@@ -6,20 +6,14 @@ import { quizKit, quizView } from "./rule-landing.styles";
 type Props = {
   level: Level;
   id: string;
-  /**
-   * "card" frames a version to set beside the others; "spot" rings a part of a mock screen, sized
-   * by what it holds.
-   */
   look?: "card" | "spot";
-  /** A short line under a card's version, such as "Tinted". */
   caption?: string;
 };
 
 const { level, id, look = "card", caption } = Astro.props;
 const choice = "choices" in level ? level.choices.find((candidate) => candidate.id === id) : undefined;
 if (!choice) throw new Error(`${level.name} has no choice "${id}"`);
-// The default slot is what the reader sees. A button holds phrasing content only, so it is drawn
-// from spans; QuizChoice styles the button, and the page styles what it draws.
+// A button holds phrasing content only, so the slot is drawn from spans.
 ---
 
 <button

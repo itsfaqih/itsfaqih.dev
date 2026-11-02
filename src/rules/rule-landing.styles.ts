@@ -975,7 +975,6 @@ export const quizKit = stylex.create({
   chooseBoard: {
     alignContent: "center",
   },
-  // Choose boards: versions side by side, or one above the next when each is wide.
   trio: {
     display: "grid",
     gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
@@ -985,7 +984,6 @@ export const quizKit = stylex.create({
     display: "grid",
     gap: "10px",
   },
-  // A choose level's candidate: a version set beside the others, or a spot on a mock screen.
   choice: {
     position: "relative",
     display: "grid",
@@ -1026,7 +1024,6 @@ export const quizKit = stylex.create({
     transitionDuration: motion["--t-fast-exit"],
     transitionTimingFunction: motion["--exit"],
   },
-  // Hover and focus ring the candidate in the rule's colour, while it can still be picked.
   choiceLive: {
     borderStyle: "solid",
     borderColor: {
@@ -1102,13 +1099,11 @@ export const quizKit = stylex.create({
   caption: {
     fontWeight: 700,
     fontSize: "13px",
-    // Whole pixels, so a board's height never leaves the quizzes below it on a sub-pixel.
     lineHeight: "17px",
     fontFamily: fonts["--display"],
     color: palette["--dim"],
     textWrap: "pretty",
   },
-  // The check a chosen candidate wears once the level clears.
   tick: {
     position: "absolute",
     top: "-11px",

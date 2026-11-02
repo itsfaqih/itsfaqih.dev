@@ -49,9 +49,10 @@ const responses = [
   ["text", "Already formatted", "Jan 10, 6:00 AM"],
 ] as const;
 
-// The axis runs from noon UTC on Jan 9 to noon UTC on Jan 11, so each lane's Jan 10 is half of it.
 const day = Date.parse(`${FILTER_DATE}T00:00:00Z`);
-const along = (instant: number) => `--at:${((instant - day + 12 * HOUR) / (2 * DAY)) * 100}%`;
+const axisStart = day - 12 * HOUR;
+const axisSpan = 2 * DAY;
+const along = (instant: number) => `--at:${((instant - axisStart) / axisSpan) * 100}%`;
 const lanes = [
   ["utc", "UTC report", "run by the server", day],
   ["rina", "Rina", "Jakarta, UTC+7", day - JAKARTA],

@@ -552,9 +552,7 @@ export const ringView = (behind: boolean) =>
 
 const SCRIM = { default: "rgb(6 6 10 / 0.55)", [LIGHT]: "rgb(20 20 30 / 0.32)" };
 
-/** The quiz boards: mock screens whose parts are the choices, and small dialogs set side by side. */
 export const quiz = stylex.create({
-  // A demo window sized by what it holds. Its layers share one grid cell, so they stack.
   screen: {
     display: "grid",
     overflow: "hidden",
@@ -567,7 +565,6 @@ export const quiz = stylex.create({
     fontFamily: fonts["--sans"],
     color: palette["--text"],
   },
-  // Room under the page's card for the dialog that opens over it.
   tall: {
     minHeight: "320px",
   },
@@ -608,7 +605,6 @@ export const quiz = stylex.create({
     width: "min(300px, 100% - 24px)",
     marginBottom: "14px",
   },
-  // On a phone the row's button drops under its text rather than out of the card.
   wrap: {
     flexWrap: "wrap",
   },
@@ -631,7 +627,6 @@ export const quiz = stylex.create({
     borderRadius: "4px",
     backgroundColor: `color-mix(in srgb, ${palette["--text"]} 12%, transparent)`,
   },
-  // Pictures of controls: they keep still and point at nothing on their own.
   key: {
     display: "inline-flex",
     alignItems: "center",
@@ -659,7 +654,6 @@ export const quiz = stylex.create({
   placeholder: {
     color: palette["--mute"],
   },
-  // A small dialog over a dim page, with the stray click on the dim part.
   mini: {
     position: "relative",
     display: "grid",
@@ -768,7 +762,6 @@ export const quiz = stylex.create({
     backgroundColor: "rgb(255 255 255 / 0.9)",
     boxShadow: "0 0 0 4px rgb(255 255 255 / 0.25)",
   },
-  // The layers pulled apart and seen from the side, back to front.
   layers: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -818,7 +811,6 @@ export const quiz = stylex.create({
     borderRadius: "5px",
     backgroundColor: `color-mix(in srgb, var(--c) 16%, ${palette["--panel"]})`,
   },
-  // The page's scrollbar, the one thing that moves when the article scrolls.
   thumb: {
     position: "absolute",
     top: "22%",
@@ -836,7 +828,6 @@ export const quiz = stylex.create({
     textAlign: "center",
     color: palette["--dim"],
   },
-  // What a screen reader says, one line per announcement.
   transcript: {
     display: "grid",
     gap: "6px",

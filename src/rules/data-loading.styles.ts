@@ -769,7 +769,6 @@ export const view = {
   time: cls(styles.time),
 };
 
-/** The quiz boards: versions of a card set side by side, and mock screens whose parts are the choices. */
 export const quiz = stylex.create({
   prices: {
     display: "grid",
@@ -788,7 +787,6 @@ export const quiz = stylex.create({
     fontSize: "13px",
     color: palette["--dim"],
   },
-  // Pictures of a spinner, so they hold still.
   still: {
     animationName: "none",
   },
@@ -804,9 +802,7 @@ export const quiz = stylex.create({
     paddingBlock: "14px",
     paddingInline: { default: "14px", [PHONE]: "12px" },
   },
-  // The page spot lies under the dashboard, so it rings the whole page and takes the clicks that land
-  // between the other spots.
-  page: {
+  backdrop: {
     position: "absolute",
     top: 0,
     right: 0,
@@ -851,8 +847,7 @@ export const quiz = stylex.create({
     color: palette["--text"],
     fontVariantNumeric: "tabular-nums",
   },
-  // Where the revenue chart would have drawn.
-  hole: {
+  missingChart: {
     height: "44px",
   },
   toastSpot: {
@@ -868,7 +863,6 @@ export const quiz = stylex.create({
   wallet: {
     overflow: "visible",
   },
-  // Room between a wallet part and the ring around it.
   inset: {
     paddingTop: "6px",
     paddingRight: "9px",

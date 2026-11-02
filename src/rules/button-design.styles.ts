@@ -600,7 +600,6 @@ export const view = {
     stylex.attrs(styles.holdFill, holding && styles.holdFillOn).class ?? "",
 };
 
-/** The quiz boards: versions set side by side, and mock screens whose parts are the choices. */
 export const quiz = stylex.create({
   mock: {
     display: "flex",
@@ -610,15 +609,13 @@ export const quiz = stylex.create({
     justifyContent: "center",
     minHeight: "64px",
   },
-  // Room above the key for its tooltip.
   tipRoom: {
     paddingTop: "40px",
   },
   end: {
     justifyContent: "flex-end",
   },
-  // Where a hidden button would sit.
-  gap: {
+  hiddenSlot: {
     width: "84px",
     height: "38px",
     borderWidth: "1.5px",
@@ -649,7 +646,6 @@ export const quiz = stylex.create({
     borderRadius: "8px",
     fontSize: "12px",
   },
-  // Room under the key for its padding rulers.
   ruled: {
     display: "inline-grid",
     paddingBottom: "26px",

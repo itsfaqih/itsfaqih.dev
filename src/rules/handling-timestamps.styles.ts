@@ -340,7 +340,6 @@ export const tsView = {
     ),
 };
 
-/** The quiz boards: tables and responses set as cards, and day lanes laid against one UTC axis. */
 export const quiz = stylex.create({
   table: {
     display: "grid",
@@ -360,7 +359,6 @@ export const quiz = stylex.create({
   line: {
     display: "block",
   },
-  // styles.str dims inside any [data-note], and every QuizChoice carries one.
   str: {
     display: "inline-block",
     whiteSpace: "nowrap",
@@ -375,7 +373,6 @@ export const quiz = stylex.create({
     backgroundColor: palette["--panel"],
     boxShadow: `0 0 0 1px ${palette["--hair"]}`,
   },
-  // A spot's border and padding, so the axis rows line up with the lanes inside the spots.
   rule: {
     paddingInline: "4.5px",
   },
@@ -414,7 +411,6 @@ export const quiz = stylex.create({
     height: "32px",
     borderRadius: "8px",
     backgroundColor: kit["--code-bg"],
-    // Midnight UTC on Jan 10 and Jan 11, a quarter and three quarters of the way along.
     backgroundImage: `linear-gradient(90deg, transparent calc(25% - 0.5px), ${palette["--hair"]} calc(25% - 0.5px) calc(25% + 0.5px), transparent calc(25% + 0.5px) calc(75% - 0.5px), ${palette["--hair"]} calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px))`,
   },
   ticks: {

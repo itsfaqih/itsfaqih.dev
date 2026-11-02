@@ -19,7 +19,6 @@ import RuleQuiz from "./rule-quiz.astro";
 import Ruler from "./button-ruler.astro";
 
 const [states, disabled, still, hierarchy, guard, icons] = LESSONS;
-// The quiz boards draw buttons as pictures, so they keep still and take no focus of their own.
 const key = [styles.key, styles.sm, styles.flat];
 ---
 
@@ -68,7 +67,7 @@ const key = [styles.key, styles.sm, styles.flat];
         ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(key, styles.faded)}>Publish</span></span></QuizChoice
       >
       <QuizChoice level={disabled.levels[0]} id="hide" caption="Hidden until it works"
-        ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(quiz.gap)}></span></span></QuizChoice
+        ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(quiz.hiddenSlot)}></span></span></QuizChoice
       >
       <QuizChoice level={disabled.levels[0]} id="say" caption="Readable, says why"
         ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}

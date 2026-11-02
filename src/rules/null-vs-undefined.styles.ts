@@ -467,7 +467,8 @@ const cls = (...rules: stylex.StyleXStyles[]) => stylex.attrs(...rules).class ??
 export const flowView = {
   srOnly: cls(arcade.srOnly),
   again:
-    stylex.attrs(button.base, buttonVariant["primary-neutral"], button.sm, styles.again).class ?? "",
+    stylex.attrs(button.base, buttonVariant["primary-neutral"], button.sm, styles.again).class ??
+    "",
   wire: cls(styles.wire),
   verb: cls(styles.verb),
   idle: cls(styles.idle),

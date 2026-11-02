@@ -18,8 +18,6 @@ import { quizKit } from "./rule-landing.styles";
 const [named, extend, unions, edges, options, flags] = LESSONS;
 // Quiz rows are code: leads and plain rows painted, slot labels painted, held or left blank.
 const blanks = { lead: TsCode, label: TsBlank, text: TsCode };
-// Each code version in a choose board, painted like the lesson panes. A button holds only spans.
-// No-break spaces keep a signature whole, so a narrow card wraps it after the keywords.
 const typo = [
   ["default", "export default function formatPrice(cents:\u00a0number)\u00a0{…}"],
   ["named", "export function formatPrice(cents:\u00a0number)\u00a0{…}"],
