@@ -37,6 +37,8 @@ const RULE_OPEN =
 const NARROW = "@media (max-width: 480px)";
 const REDUCE = "@media (prefers-reduced-motion: reduce)";
 const HOVER = "@media (hover: hover) and (pointer: fine)";
+export const TITLE_TRACKING = -0.05;
+export const TITLE_MARK_INSET = 0.06;
 
 export const shell = stylex.create({
   root: {
@@ -123,16 +125,20 @@ export const shell = stylex.create({
     gap: "16px",
     justifyItems: "start",
   },
-  // watchTitleFit caps the size with --fit.
+  titleFit: {
+    justifySelf: "stretch",
+    containerType: "inline-size",
+  },
   title: {
     width: "fit-content",
     maxWidth: "100%",
     marginBottom: "8px",
     fontWeight: 900,
-    fontSize: "min(clamp(44px, 7vw, 108px), var(--fit, 108px))",
+    // --word-em comes from titleWordEm, so the longest word fits its column at first paint.
+    fontSize: "min(clamp(44px, 7vw, 108px), round(down, calc(100cqi / var(--word-em)), 1px))",
     lineHeight: 0.94,
     fontFamily: fonts["--display"],
-    letterSpacing: "-0.05em",
+    letterSpacing: `${TITLE_TRACKING}em`,
     viewTransitionName: { default: null, [RULE_OPEN]: "rule-title" },
   },
   titleLine: {
@@ -141,7 +147,7 @@ export const shell = stylex.create({
     zIndex: { default: null, ":first-child": 1 },
   },
   titleMark: {
-    paddingInline: "0.06em",
+    paddingInline: `${TITLE_MARK_INSET}em`,
     borderRadius: "0.06em",
   },
   claim: {

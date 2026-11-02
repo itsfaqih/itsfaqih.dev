@@ -1,6 +1,6 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
-import { VISIBLE_GUIDELINES } from "../../src/data/guidelines";
+import { PUBLISHED_GUIDELINES, VISIBLE_GUIDELINES } from "../../src/data/guidelines";
 import { pageReady } from "./ready";
 
 // Drives the built site the way a reader does, across island hydration and page navigations.
@@ -180,5 +180,40 @@ describe("the built site responds to a reader", () => {
       await context.close();
       await withScrollbars.close();
     }
+  });
+
+  it("fits every rule's title in its column before any script runs", async () => {
+    context = await browser.newContext({ colorScheme: "light" });
+    errors = [];
+    await context.route("**/*.js", (route) => route.abort());
+    const page = await context.newPage();
+    const misfits: string[] = [];
+    for (const rule of PUBLISHED_GUIDELINES) {
+      for (const width of [320, 375, 768, 1024, 1280, 1366, 1440, 1920]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(new URL(rule.href, inject("baseURL")).href, { waitUntil: "load" });
+        const fits = await page.evaluate(async () => {
+          await document.fonts.load('900 40px "Unbounded"');
+          const title = document.querySelector("h1")!;
+          const texts = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+          const wordLines: number[] = [];
+          while (texts.nextNode()) {
+            const text = texts.currentNode;
+            for (const word of text.textContent!.matchAll(/\S+/g)) {
+              const range = document.createRange();
+              range.setStart(text, word.index);
+              range.setEnd(text, word.index + word[0].length);
+              wordLines.push(new Set([...range.getClientRects()].map(({ top }) => top)).size);
+            }
+          }
+          return (
+            wordLines.every((lines) => lines === 1) &&
+            title.scrollWidth <= title.parentElement!.clientWidth
+          );
+        });
+        if (!fits) misfits.push(`${rule.id} at ${width}px`);
+      }
+    }
+    expect(misfits).toEqual([]);
   });
 });

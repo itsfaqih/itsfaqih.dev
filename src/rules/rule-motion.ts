@@ -22,26 +22,6 @@ export function watchReveal(root: HTMLElement) {
   return () => observer.disconnect();
 }
 
-/** Caps the title's size with --fit so its longest word fits its column. Returns the stop. */
-export function watchTitleFit(title: HTMLElement) {
-  const column = title.parentElement!;
-  const fit = () => {
-    title.style.removeProperty("--fit");
-    // The root's break-word would split a long word instead of letting it overflow, hiding it here.
-    title.style.overflowWrap = "normal";
-    const width = title.scrollWidth;
-    title.style.removeProperty("overflow-wrap");
-    if (width <= column.clientWidth) return;
-    const size = parseFloat(getComputedStyle(title).fontSize);
-    title.style.setProperty("--fit", `${Math.floor((size * column.clientWidth) / width)}px`);
-  };
-  fit();
-  const resize = new ResizeObserver(fit);
-  resize.observe(column);
-  void document.fonts.ready.then(fit);
-  return () => resize.disconnect();
-}
-
 /**
  * The header island's label trades the page's tags for its title once the heading has scrolled
  * out of view, through data-swap on `label`. Returns the stop.

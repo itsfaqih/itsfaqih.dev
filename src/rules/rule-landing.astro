@@ -28,6 +28,7 @@ import {
   shell,
   takeKit,
 } from "./rule-landing.styles";
+import { titleWordEm } from "./title-fit";
 import ShareButton from "./share-button.astro";
 
 type Props = {
@@ -77,17 +78,22 @@ const [was, now] = rule.coverTag.split(" → ");
       <ShareButton />
     </div>
     <div {...stylex.attrs(veil.soft, shell.heroCopy)}>
-      <h1 {...stylex.attrs(heroType.title, shell.title)} data-part="title"
-        >{
-          head && (
-            <Fragment>
-              <span {...stylex.attrs(shell.titleLine)}>{head}</span>{" "}
-            </Fragment>
-          )
-        }<span {...stylex.attrs(shell.titleLine)}
-          ><span {...stylex.attrs(heroType.hl, shell.titleMark)}>{last}</span></span
-        ></h1
-      >
+      <div {...stylex.attrs(shell.titleFit)}>
+        <h1
+          {...stylex.attrs(heroType.title, shell.title)}
+          style={`--word-em: ${titleWordEm(rule.title)}`}
+          data-part="title"
+          >{
+            head && (
+              <Fragment>
+                <span {...stylex.attrs(shell.titleLine)}>{head}</span>{" "}
+              </Fragment>
+            )
+          }<span {...stylex.attrs(shell.titleLine)}
+            ><span {...stylex.attrs(heroType.hl, shell.titleMark)}>{last}</span></span
+          ></h1
+        >
+      </div>
       <p {...stylex.attrs(shell.claim, shell.in, shell.second)}>{rule.claim}</p>
       <p {...stylex.attrs(heroType.lead, shell.lead, shell.in, shell.third)}><slot name="lead" /></p>
     </div>

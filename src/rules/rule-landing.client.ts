@@ -1,7 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
 import { landingView } from "./rule-landing.styles";
-import { watchReveal, watchTitleFit, watchTitleSwap } from "./rule-motion";
+import { watchReveal, watchTitleSwap } from "./rule-motion";
 
 /** Shows `copied` on a button for 1600ms through `show`. */
 function flash(show: (copied: boolean) => void) {
@@ -35,7 +35,7 @@ class RuleLanding extends HTMLElement {
     const part = <T extends Element = HTMLElement>(name: string, root: ParentNode = this) =>
       root.querySelector<T>(`[data-part="${name}"]`)!;
     const title = part("title");
-    const stops = [watchReveal(this), watchTitleFit(title)];
+    const stops = [watchReveal(this)];
 
     const activity = document.importNode(
       part<HTMLTemplateElement>("activity").content.firstElementChild!,
