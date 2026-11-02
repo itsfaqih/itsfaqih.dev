@@ -602,15 +602,6 @@ export const view = {
 
 /** The quiz boards: versions set side by side, and mock screens whose parts are the choices. */
 export const quiz = stylex.create({
-  trio: {
-    display: "grid",
-    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
-    gap: "10px",
-  },
-  stack: {
-    display: "grid",
-    gap: "10px",
-  },
   mock: {
     display: "flex",
     flexWrap: "wrap",

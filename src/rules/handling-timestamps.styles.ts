@@ -342,10 +342,6 @@ export const tsView = {
 
 /** The quiz boards: tables and responses set as cards, and day lanes laid against one UTC axis. */
 export const quiz = stylex.create({
-  stack: {
-    display: "grid",
-    gap: "10px",
-  },
   table: {
     display: "grid",
     gridTemplateColumns: "max-content max-content minmax(0, 1fr)",

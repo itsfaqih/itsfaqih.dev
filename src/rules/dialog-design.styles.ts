@@ -554,15 +554,6 @@ const SCRIM = { default: "rgb(6 6 10 / 0.55)", [LIGHT]: "rgb(20 20 30 / 0.32)" }
 
 /** The quiz boards: mock screens whose parts are the choices, and small dialogs set side by side. */
 export const quiz = stylex.create({
-  trio: {
-    display: "grid",
-    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
-    gap: "10px",
-  },
-  stack: {
-    display: "grid",
-    gap: "10px",
-  },
   // A demo window sized by what it holds. Its layers share one grid cell, so they stack.
   screen: {
     display: "grid",
@@ -645,9 +636,6 @@ export const quiz = stylex.create({
     display: "inline-flex",
     alignItems: "center",
     cursor: "inherit",
-  },
-  soft: {
-    backgroundColor: palette["--panel"],
   },
   softInCard: {
     backgroundColor: palette["--bg"],

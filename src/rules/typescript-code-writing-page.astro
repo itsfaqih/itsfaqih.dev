@@ -13,6 +13,7 @@ import TsHolds from "./ts-holds.astro";
 import TsPaint from "./ts-paint.astro";
 import { LESSONS, TLDR } from "./typescript-code-writing";
 import { quiz, styles } from "./typescript-code-writing.styles";
+import { quizKit } from "./rule-landing.styles";
 
 const [named, extend, unions, edges, options, flags] = LESSONS;
 // Quiz rows are code: leads and plain rows painted, slot labels painted, held or left blank.
@@ -44,7 +45,7 @@ const clash = [
   </RuleLesson>
   <RuleQuiz n={1} level={named.levels[0]}
     >Three files import the price formatter, and one of them spells it<Fragment set:html="<!-- -->" /> <Code tone="prompt">formatPrcie</Code>. Pick the version where the typo fails the build.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       {
         typo.map(([id, line]) => (
           <QuizChoice level={named.levels[0]} id={id}
@@ -66,7 +67,7 @@ const clash = [
   </RuleLesson>
   <RuleQuiz n={2} level={extend.levels[0]}
     ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Pick the Admin that fails where it's declared.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       <div {...stylex.attrs(styles.code, quiz.given)}>
         <code {...stylex.attrs(styles.source)}><TsPaint text={"type User = {\u00a0id:\u00a0string;\u00a0name:\u00a0string\u00a0}"} /></code>
       </div>

@@ -8,6 +8,7 @@ import QuizChoice from "./quiz-choice.astro";
 import RuleQuiz from "./rule-quiz.astro";
 import { FILTERED, FILTERS, LESSONS, STAFF, START_FILTER, TLDR, VIEW_NAMES } from "./table-design";
 import { quiz, styles } from "./table-design.styles";
+import { quizKit } from "./rule-landing.styles";
 import TableActions from "./table-actions.astro";
 import TableLive from "./table-live.astro";
 import TableNumbers from "./table-numbers.astro";
@@ -56,7 +57,7 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={1} level={numbers.levels[0]}
     >A revenue column holds <Code tone="prompt">9</Code>, <Code tone="prompt">120</Code> and <Code tone="prompt">12,500</Code>, and people scan it for the biggest. Pick the column where the biggest stands out.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       {
         (
           [
@@ -93,7 +94,7 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={2} level={states.levels[0]}
     >The users table can show no rows for three reasons. Pick the one where <b>Add user</b> belongs.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       {
         blanks.map(({ id, caption, title, hint, query }) => (
           <QuizChoice level={states.levels[0]} id={id} caption={caption}
@@ -170,7 +171,7 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={4} level={pager.levels[0]}
     >The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Pick the table that needs a pager.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       {
         filters.map(({ id, caption, people, total }) => (
           <QuizChoice level={pager.levels[0]} id={id} caption={caption}

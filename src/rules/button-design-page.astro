@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import { LESSONS, TLDR } from "./button-design";
 import { quiz, styles } from "./button-design.styles";
+import { quizKit } from "./rule-landing.styles";
 import ButtonDelete from "./button-delete.astro";
 import ButtonHierarchy from "./button-hierarchy.astro";
 import ButtonIcons from "./button-icons.astro";
@@ -40,7 +41,7 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={1} level={states.levels[0]}
     >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Save</b>. Pick the Save that shows her where she is.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       <QuizChoice level={states.levels[0]} id="hover" caption="Changes on hover"
         ><span {...stylex.attrs(quiz.mock)}><span {...stylex.attrs(key, styles.hover)}>Save</span></span></QuizChoice
       >
@@ -62,7 +63,7 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={2} level={disabled.levels[0]}
     >Publish stays off because an older post already uses this URL. Nothing else on screen says so. Pick how Publish looks when someone hovers it.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       <QuizChoice level={disabled.levels[0]} id="fade" caption="Faded to 40%"
         ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(key, styles.faded)}>Publish</span></span></QuizChoice
       >
@@ -118,7 +119,7 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={4} level={hierarchy.levels[0]}
     >A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted. Pick the footer where <b>Checkout</b> reads as the next step.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       {
         (
           [

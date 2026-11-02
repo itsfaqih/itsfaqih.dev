@@ -975,6 +975,16 @@ export const quizKit = stylex.create({
   chooseBoard: {
     alignContent: "center",
   },
+  // Choose boards: versions side by side, or one above the next when each is wide.
+  trio: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
+    gap: "10px",
+  },
+  stack: {
+    display: "grid",
+    gap: "10px",
+  },
   // A choose level's candidate: a version set beside the others, or a spot on a mock screen.
   choice: {
     position: "relative",

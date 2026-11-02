@@ -2,6 +2,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { EARLY, HISTORY, LATE, LESSONS, money, TLDR } from "./data-loading";
 import { quiz, styles, view } from "./data-loading.styles";
+import { quizKit } from "./rule-landing.styles";
 import DataLoadingInbox from "./data-loading-inbox.astro";
 import DataLoadingParse from "./data-loading-parse.astro";
 import DataLoadingQuiz from "./data-loading-quiz.astro";
@@ -52,7 +53,7 @@ const TILES = [
   </RuleLesson>
   <RuleQuiz n={2} level={stale.levels[0]}
     >You return to a tab of prices loaded 5 minutes ago. They refetch on focus, which takes 600ms. Pick what the tab shows meanwhile.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       <QuizChoice level={stale.levels[0]} id="blank" caption="A full spinner"
         ><span {...stylex.attrs(quiz.prices)}
           ><span {...stylex.attrs(styles.head)}>Prices</span><span {...stylex.attrs(styles.spin, quiz.still, quiz.bigSpin)}

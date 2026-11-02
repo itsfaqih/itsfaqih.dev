@@ -716,11 +716,6 @@ export const view = {
  * a grid, and nothing in them reacts to hover or focus.
  */
 export const quiz = stylex.create({
-  trio: {
-    display: "grid",
-    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
-    gap: "10px",
-  },
   sheet: {
     display: "grid",
     alignContent: "start",

@@ -771,11 +771,6 @@ export const view = {
 
 /** The quiz boards: versions of a card set side by side, and mock screens whose parts are the choices. */
 export const quiz = stylex.create({
-  trio: {
-    display: "grid",
-    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [PHONE]: "minmax(0, 1fr)" },
-    gap: "10px",
-  },
   prices: {
     display: "grid",
     gridTemplateRows: "auto 52px auto",

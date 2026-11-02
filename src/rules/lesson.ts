@@ -19,7 +19,7 @@ export type BoardRow =
   | { depth: number; slot: Slot; lead?: string };
 
 /** A candidate in a choose level. `label` names it for screen readers and the markdown twin. */
-export type Choice = { id: string; label: string; note: string };
+type Choice = { id: string; label: string; note: string };
 
 /**
  * A quiz level. A place level hands the reader a piece to drop into one of its board's slots. A

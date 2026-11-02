@@ -21,6 +21,7 @@ import {
   wallOf,
 } from "./handling-timestamps";
 import { quiz, styles } from "./handling-timestamps.styles";
+import { quizKit } from "./rule-landing.styles";
 import LessonText from "./lesson-text.astro";
 import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
@@ -83,7 +84,7 @@ const lanes = [
   </RuleLesson>
   <RuleQuiz n={1} level={store.levels[0]}
     >Rina in Jakarta and Sam in New York order in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       {
         tables.map(([id, caption, rows]) => (
           <QuizChoice level={store.levels[0]} id={id} caption={caption}
@@ -121,7 +122,7 @@ const lanes = [
   </RuleLesson>
   <RuleQuiz n={2} level={zulu.levels[0]}
     >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Pick the response that gets him there.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       {
         responses.map(([id, caption, value]) => (
           <QuizChoice level={zulu.levels[0]} id={id} caption={caption}

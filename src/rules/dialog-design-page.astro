@@ -4,6 +4,7 @@ import Icon from "../components/icon.astro";
 import DialogConfirmDemo from "./dialog-confirm-demo.astro";
 import { DRAFT, LESSONS, TLDR } from "./dialog-design";
 import { quiz, styles } from "./dialog-design.styles";
+import { quizKit } from "./rule-landing.styles";
 import DialogDraftDemo from "./dialog-draft-demo.astro";
 import DialogEscapeDemo from "./dialog-escape-demo.astro";
 import DialogFocusDemo from "./dialog-focus-demo.astro";
@@ -71,7 +72,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   </RuleLesson>
   <RuleQuiz n={2} level={escape.levels[0]}
     >Three dialogs, and a click lands on the dim area around each. Pick the one that click should close.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       <QuizChoice level={escape.levels[0]} id="issue" caption="Title typed in"
         ><span {...stylex.attrs(quiz.mini)}
           ><span {...stylex.attrs(quiz.miniPanel)}
@@ -177,7 +178,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   </RuleLesson>
   <RuleQuiz n={5} level={draft.levels[0]}
     >Three dialogs, and a click lands on the dim area by mistake. Pick the one that should shake and stay open.
-    <div slot="board" {...stylex.attrs(quiz.trio)}>
+    <div slot="board" {...stylex.attrs(quizKit.trio)}>
       <QuizChoice level={draft.levels[0]} id="news" caption="Nothing to fill in"
         ><span {...stylex.attrs(quiz.mini)}
           ><span {...stylex.attrs(quiz.miniPanel)}
@@ -260,7 +261,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   </RuleLesson>
   <RuleQuiz n={7} level={name.levels[0]}
     >A screen reader user presses Delete and <b>Delete Moonbase?</b> opens. Pick what they should hear.
-    <div slot="board" {...stylex.attrs(quiz.stack)}>
+    <div slot="board" {...stylex.attrs(quizKit.stack)}>
       {
         (
           [

@@ -177,10 +177,6 @@ export const view = {
 
 /** The choose boards: code versions stacked full width, each a card. */
 export const quiz = stylex.create({
-  stack: {
-    display: "grid",
-    gap: "10px",
-  },
   snippet: {
     paddingInline: "4px",
   },
