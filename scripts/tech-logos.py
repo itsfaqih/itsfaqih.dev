@@ -95,6 +95,7 @@ LOGOS = {
     "Claude Code": "logos:claude-code",
     "OpenCode": "logos:opencode-icon",
     "OpenRouter": "logos:openrouter-icon",
+    "GitHub Actions": "logos:github-actions",
 }
 
 # Tools whose simple-icons mark is another drawing than the logo (an older Redis, MySQL's wordmark,
