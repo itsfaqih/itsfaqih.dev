@@ -6,6 +6,9 @@ import { whenIntroDone } from "../intro.client";
 import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.styles";
 import { barClass, glyphClass, phraseClass } from "./hero.styles";
 
+// The prints sit right on this glow, so it stays quieter than the page's others.
+const HERO_GLOW_STRENGTH = 0.6;
+
 /**
  * The home hero (hero.astro). The slides advance on a timer once the intro hands off; the pips
  * jump, the button pauses. Each slide gets its full time again when picked, and a pause keeps
@@ -67,7 +70,9 @@ class HomeHero extends HTMLElement {
       pauseGlyph.className = glyphClass(held);
       bench.style.setProperty("--c", current.color);
       go.style.setProperty("--c", current.color);
-      glowDots("hero", prints, current.color, [0.3, 0.3, 0.7, 0.7]);
+      // Held until the intro hands off, so the light turns on where it's seen.
+      if (introDone)
+        glowDots("hero", prints, current.color, [0.3, 0.3, 0.7, 0.7], HERO_GLOW_STRENGTH);
       prints.toggleAttribute("data-paused", !introDone || held);
       prints.show(index, run);
     };

@@ -1,14 +1,27 @@
 ---
 import { toPath } from "./hero-morph";
-import { QUARTER_TOKENS, QUARTERS, QUEUE_Y, SLOT_X, TUMBLE } from "./hero-pieces";
+import {
+  QUARTER_TOKENS,
+  QUARTERS,
+  QUEUE_Y,
+  SLOT_X,
+  TUMBLE,
+  WORKER_SIZE,
+  WORKER_TOKENS,
+  WORKER_X,
+  WORKER_Y,
+} from "./hero-pieces";
 import { draw, SLIDE_MS as BACKENDS_MS, styles } from "./hero-prints.styles";
 import {
-  DEV_TOOLS_HIT_AT,
   JOBS,
   MEANDER,
-  settledAt,
+  REJECT_MARK,
+  RETRY_GHOST,
+  RETRY_WORKER,
+  routeGhost,
   settleVars,
   TUMBLE_FLOAT_MS,
+  WORKER_FLOAT_MS,
 } from "./hero-scenes";
 import Float from "./hero-float.astro";
 import Ink from "./hero-ink.astro";
@@ -21,13 +34,15 @@ const snapshots = [
   { x0: 20, slip: false },
   { x0: 176, slip: true },
 ];
+const OUT_SIZE = 8;
+const WORK_SIZE = 20;
 ---
 
 {
   index === 0 &&
     TUMBLE.map((piece, i) => (
-      <Float at={settledAt(i, 0.5, 1 / 6)} ms={TUMBLE_FLOAT_MS[i]}>
-        <g {...draw(styles.settle)} style={settleVars(piece, i, 0.5, 1 / 6)}>
+      <Float ms={TUMBLE_FLOAT_MS[i]}>
+        <g {...draw(styles.viewBox, styles.settle)} style={settleVars(piece, i, 0.5, 1 / 6)}>
           <Ink
             p={p}
             top={piece.top}
@@ -40,9 +55,9 @@ const snapshots = [
 }
 {
   index === 1 && (
-    <Float at={settledAt(0, 0.3, 0.18)}>
+    <Float>
       {QUARTERS.map((piece, i) => (
-        <g {...draw(styles.settle)} style={settleVars(piece, i, 0.3, 0.18)}>
+        <g {...draw(styles.viewBox, styles.settle)} style={settleVars(piece, i, 0.3, 0.18)}>
           <Ink
             p={p}
             top={piece.top}
@@ -71,7 +86,7 @@ const snapshots = [
         {...draw(styles.inkLine, styles.ghost)}
         d={`M${MEANDER.map((pt) => pt.join(" ")).join(" L")}`}
       />
-      <Float at={DEV_TOOLS_HIT_AT}>
+      <Float>
         <Ink
           p={p}
           top="hue"
@@ -112,7 +127,7 @@ const snapshots = [
       <g {...draw(styles.viewBox, styles.cutGhost)}>
         <circle {...draw(styles.inkLine)} stroke-width="1.6" stroke-dasharray="3 3" r="10" />
       </g>
-      <Float at={DEV_TOOLS_HIT_AT}>
+      <Float>
         <g {...draw(styles.viewBox, styles.cutBall)}>
           <Ink p={p} tag="circle" figure={{ ...draw(styles.token), "data-token": 0, r: "10" }} />
         </g>
@@ -127,41 +142,52 @@ const snapshots = [
         <rect
           {...draw(styles.inkLine, styles.ghost)}
           x={x - 14}
-          y="110"
+          y={QUEUE_Y - 14}
           width="28"
           height="28"
         />
       ))}
-      <path {...draw(styles.inkLine, styles.ghost)} d="M200 124 H226 M220 118 L226 124 L220 130" />
-      <path
-        {...draw(styles.hueLine, styles.ghost)}
-        d="M241 91.9 C197.5 48.9 113.4 50.8 71.1 97.4 M72.1 88.8 L71.1 97.4 L79.5 95.6"
-      />
-      <Float>
-        <Ink
-          p={p}
-          top="outline"
-          tag="rect"
-          figure={{
-            ...draw(styles.token),
-            "data-token": 2,
-            x: "230",
-            y: "92",
-            width: "64",
-            height: "64",
-          }}
-        />
-        <rect
-          {...draw(styles.hue, styles.screen, styles.queueWork, styles.token)}
-          data-token="3"
-          x="246"
-          y="108"
-          width="32"
-          height="32"
-        />
-        <rect {...draw(styles.ink, styles.queueOut)} x="298" y="119" width="10" height="10" />
-        <rect {...draw(styles.hue, styles.queueOutRetry)} x="298" y="119" width="10" height="10" />
-      </Float>
+      {WORKER_Y.map((y) => <path {...draw(styles.inkLine, styles.ghost)} d={routeGhost(y)} />)}
+      <path {...draw(styles.hueLine, styles.ghost)} d={RETRY_GHOST} />
+      {WORKER_Y.map((y, w) => {
+        const out = {
+          x: WORKER_X + WORKER_SIZE / 2 + 4,
+          y: y - OUT_SIZE / 2,
+          width: OUT_SIZE,
+          height: OUT_SIZE,
+        };
+        return (
+          <Float ms={WORKER_FLOAT_MS[w]}>
+            <Ink
+              p={p}
+              top="outline"
+              tag="rect"
+              figure={{
+                ...draw(styles.token),
+                "data-token": WORKER_TOKENS[w],
+                x: WORKER_X - WORKER_SIZE / 2,
+                y: y - WORKER_SIZE / 2,
+                width: WORKER_SIZE,
+                height: WORKER_SIZE,
+              }}
+            />
+            <rect
+              {...draw(styles.hue, styles.screen, styles.queueWork)}
+              style={`animation-name:hp-work-${w}`}
+              x={WORKER_X - WORK_SIZE / 2}
+              y={y - WORK_SIZE / 2}
+              width={WORK_SIZE}
+              height={WORK_SIZE}
+            />
+            <rect
+              {...draw(styles.ink, styles.queueOut)}
+              style={`animation-name:hp-out-${w}`}
+              {...out}
+            />
+            {w === RETRY_WORKER && <rect {...draw(styles.hue, styles.queueOutRetry)} {...out} />}
+          </Float>
+        );
+      })}
       {JOBS.map((job, k) => (
         <g {...draw(styles.queueJob)} style={`animation-name:hp-job-${k}`}>
           <Ink
@@ -169,8 +195,8 @@ const snapshots = [
             top={job.top}
             tag="circle"
             figure={{
-              ...draw(k < 2 && styles.token),
-              "data-token": k < 2 ? k : undefined,
+              ...draw(k === 0 && styles.token),
+              "data-token": k === 0 ? 2 : undefined,
               cx: "0",
               cy: QUEUE_Y,
               r: "11",
@@ -178,15 +204,14 @@ const snapshots = [
           />
         </g>
       ))}
-      <Float>
+      <Float ms={WORKER_FLOAT_MS[0]}>
         <path
           {...draw(styles.inkLine, styles.queueReject)}
           stroke-width="3.5"
           stroke-linecap="round"
-          d="M252 114 L272 134 M272 114 L252 134"
+          d={REJECT_MARK}
         />
       </Float>
-      <path {...draw(styles.inkLine)} stroke-width="3" d="M16 165.5 H304" />
     </g>
   )
 }
@@ -219,7 +244,7 @@ const snapshots = [
               }}
             />
             {slip ? (
-              <g {...draw(styles.snapSlip)}>
+              <g {...draw(styles.viewBox, styles.snapSlip)} style="transform-origin:255px 109px">
                 <Ink p={p} tag="rect" figure={square} />
               </g>
             ) : (

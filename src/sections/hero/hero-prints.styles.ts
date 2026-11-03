@@ -57,7 +57,15 @@ const hit = stylex.keyframes({
   "0%, 22%": { opacity: 0, animationTimingFunction: "var(--spring)", transform: "scale(.2)" },
   "30%, to": { opacity: 1, transform: "none" },
 });
-const float = stylex.keyframes({ to: { transform: "translateY(-2px)" } });
+// A sine wave: it leaves rest already moving, so a piece the morph just set down doesn't stall.
+const SWAY_OUT = "cubic-bezier(0.61, 1, 0.88, 1)";
+const SWAY_IN = "cubic-bezier(0.12, 0, 0.39, 0)";
+const float = stylex.keyframes({
+  "0%": { animationTimingFunction: SWAY_OUT },
+  "25%": { animationTimingFunction: SWAY_IN, transform: "translateY(-2px)" },
+  "50%": { animationTimingFunction: SWAY_OUT, transform: "none" },
+  "75%": { animationTimingFunction: SWAY_IN, transform: "translateY(2px)" },
+});
 const slip = stylex.keyframes({
   "0%, 56%": {
     animationTimingFunction: "var(--spring)",
@@ -183,7 +191,7 @@ export const styles = stylex.create({
     animationTimingFunction: "linear",
     animationFillMode: "both",
   },
-  // Each job names its own keyframes inline.
+  // Each job, work square and output names its own keyframes inline.
   queueJob: {
     opacity: 0,
     animationName: still(null),
@@ -193,13 +201,13 @@ export const styles = stylex.create({
   },
   queueWork: {
     transform: "scale(0.72)",
-    animationName: still("hp-work"),
+    animationName: still(null),
     animationDuration: SCENE,
     animationFillMode: "both",
   },
   queueOut: {
     opacity: 0,
-    animationName: still("hp-out"),
+    animationName: still(null),
     animationDuration: SCENE,
     animationFillMode: "both",
   },
@@ -217,12 +225,8 @@ export const styles = stylex.create({
   },
   float: {
     animationName: still(float),
-    animationDuration: "var(--float-ms)",
-    animationTimingFunction: "var(--inout)",
-    animationDelay: "var(--float-at)",
+    animationDuration: "calc(var(--float-ms) * 3)",
     animationIterationCount: "infinite",
-    animationDirection: "alternate",
-    animationFillMode: "both",
   },
   snapSlip: {
     animationName: still(slip),

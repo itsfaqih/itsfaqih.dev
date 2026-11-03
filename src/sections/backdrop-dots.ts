@@ -40,25 +40,55 @@ const GLOW_LIFT = 0.45;
 const GLOW_FADE = 600;
 // A glow from inside a box has less edge to spread along, so it reaches this much further.
 const GLOW_SOURCE_REACH = 1.6;
+// A light turns on the first time its source enters the viewport: each dot flickers on like a tube,
+// the dots nearest the source first, scattered so they don't light as a ring.
+const BLIP: readonly (readonly [ms: number, level: number])[] = [
+  [0, 0],
+  [45, 1],
+  [90, 0.25],
+  [150, 1],
+  [200, 0.6],
+  [320, 1],
+];
+const BLIP_SPREAD = 350;
+const BLIP_SCATTER = 350;
+const BLIP_SPAN = BLIP_SPREAD + BLIP_SCATTER + BLIP[BLIP.length - 1]![0];
+// How far into the viewport a source rises from below before it turns on, so the blip plays in view.
+const BLIP_VIEW_INSET = 0.1;
+// Once on, each lit dot breathes between full and this much dimmer, on its own period and phase.
+const BREATH_DEPTH = 0.55;
+const BREATH_MIN_MS = 3200;
+const BREATH_MAX_MS = 5600;
+// Breathing is slow, so while nothing else moves the canvas redraws at about 30fps.
+const IDLE_FRAME_MS = 33;
 // Lit dots are filled in this many alpha steps, so a frame fills a few paths rather than one per dot.
-const TINT_STEPS = 12;
+const TINT_STEPS = 24;
 
 type Box = { left: number; right: number; top: number; bottom: number };
 /** Part of a box, as fractions of its width and height: [left, top, right, bottom]. */
 export type GlowArea = readonly [left: number, top: number, right: number, bottom: number];
-type Glow = { box: Element; hue: string; from?: GlowArea; since: number };
+type Glow = { box: Element; hue: string; from?: GlowArea; strength: number; since: number };
 
 // Each source's glows, newest last. A glow stays until a newer one has fully faded in over it.
 const glowSources = new Map<string, Glow[]>();
+// When each source's light turned on. A source not here yet hasn't entered the viewport.
+const turnedOn = new Map<string, number>();
 let onGlow = () => {};
 
 /**
  * Tints the backdrop's dots around `box` in `hue`, a CSS colour, or clears the source's glow when
  * `box` is null. With `from`, the glow spreads from that part of the box instead of its edges.
+ * `strength` scales how much the dots tint and swell, from 0 to 1.
  * Sources light the dots side by side, and a new glow fades in over the same source's last one.
  * Call it again as the box moves, so the dots follow it.
  */
-export function glowDots(source: string, box: Element | null, hue = "", from?: GlowArea) {
+export function glowDots(
+  source: string,
+  box: Element | null,
+  hue = "",
+  from?: GlowArea,
+  strength = 1,
+) {
   const glows = glowSources.get(source) ?? [];
   const newest = glows.at(-1);
   if (box && newest?.box === box && newest.hue === hue) return onGlow();
@@ -66,19 +96,34 @@ export function glowDots(source: string, box: Element | null, hue = "", from?: G
     const now = performance.now();
     let covered = glows.length - 1;
     while (covered > 0 && now - glows[covered]!.since < GLOW_FADE) covered--;
-    glowSources.set(source, [...glows.slice(Math.max(0, covered)), { box, hue, from, since: now }]);
+    // A source's first glow comes on with its blip; only a later one fades in over the last.
+    glowSources.set(source, [
+      ...glows.slice(Math.max(0, covered)),
+      { box, hue, from, strength, since: newest ? now : -Infinity },
+    ]);
   } else {
     glowSources.delete(source);
+    turnedOn.delete(source);
   }
   onGlow();
 }
 
 /** Whether grid step (p, q) holds a dot of the turned screen. */
 const onScreen = (p: number, q: number) => (3 * p + q) % 10 === 0;
-/** A steady 0..1 per dot of the page, for dithering the tide's two hues. */
+/** A steady 0..1 per dot of the page, for dithering and for setting dots apart in time. */
 const grain = (p: number, pageQ: number) => {
   const hash = Math.sin(p * 127.1 + pageQ * 311.7) * 43_758.5453;
   return hash - Math.floor(hash);
+};
+
+/** How far on a dot is, `ms` into its blip. */
+const blipLevel = (ms: number) => {
+  if (ms <= 0) return 0;
+  const end = BLIP.findIndex(([at]) => at >= ms);
+  if (end < 0) return 1;
+  const [fromMs, fromLevel] = BLIP[end - 1]!;
+  const [toMs, toLevel] = BLIP[end]!;
+  return fromLevel + ((toLevel - fromLevel) * (ms - fromMs)) / (toMs - fromMs);
 };
 
 export const styles = stylex.create({
@@ -192,6 +237,11 @@ export function animateDots(element: Element, withTide: boolean) {
   }[] = [];
   let drawn = performance.now();
   let frame = 0;
+  // What the last draw found: lit dots on screen, and a blip still playing.
+  let lighting = false;
+  let blipping = false;
+  // A wake always draws, however recent the last draw, so its change can't be skipped as it sleeps.
+  let woken = false;
 
   // Each dot keeps its hue while the page scrolls, keyed by its place on the turned screen.
   const hueOf = (p: number, pageQ: number) => {
@@ -233,7 +283,7 @@ export function animateDots(element: Element, withTide: boolean) {
     const reach = Math.min(GLOW_REACH, innerWidth * GLOW_REACH_WIDTH);
     // Each glow's box and weight: a glow fades in over its first GLOW_FADE ms, and gives way as
     // each newer one of its source fades in over it.
-    const lit = [...glowSources.values()].flatMap((glows) =>
+    const lit = [...glowSources].flatMap(([source, glows]) =>
       glows.flatMap((glow, index) => {
         const weight = glows
           .slice(index + 1)
@@ -252,17 +302,31 @@ export function animateDots(element: Element, withTide: boolean) {
         };
         const spread = glow.from ? reach * GLOW_SOURCE_REACH : reach;
         if (box.bottom < -spread || box.top > innerHeight + spread) return [];
+        let on = turnedOn.get(source);
+        if (on === undefined) {
+          // Above the viewport, half the glow's reach still leaves its brightest dots in view.
+          const seen = box.top <= innerHeight * (1 - BLIP_VIEW_INSET) && box.bottom >= -spread / 2;
+          if (!still.matches && !seen) return [];
+          on = still.matches ? -Infinity : now;
+          turnedOn.set(source, on);
+        }
         let colour = glowInk.get(glow.hue);
         if (!colour) glowInk.set(glow.hue, (colour = inkOf(glow.hue)));
         const paths: Path2D[] = [];
-        return [{ box, spread, weight, colour, paths }];
+        return [{ box, spread, weight: weight * glow.strength, on, colour, paths }];
       }),
     );
-    const nearness = (glow: (typeof lit)[number], x: number, y: number) => {
+    lighting = lit.length > 0;
+    blipping = lit.some(({ on }) => now - on < BLIP_SPAN);
+    const nearness = (glow: (typeof lit)[number], x: number, y: number, scatter: number) => {
       const dx = Math.max(glow.box.left - x, 0, x - glow.box.right);
       const dy = Math.max(glow.box.top - y, 0, y - glow.box.bottom);
       const near = Math.max(0, 1 - Math.hypot(dx, dy) / glow.spread);
-      return near * near * glow.weight;
+      const blip =
+        now - glow.on < BLIP_SPAN
+          ? blipLevel(now - glow.on - (1 - near) * BLIP_SPREAD - scatter * BLIP_SCATTER)
+          : 1;
+      return near * near * glow.weight * blip;
     };
 
     // Presses move dots off their places, so the canvas then draws the whole screen in place of the
@@ -325,8 +389,9 @@ export function animateDots(element: Element, withTide: boolean) {
             crest = Math.max(0, (level - TIDE_CREST) / (1 - TIDE_CREST)) ** 1.5;
           }
 
+          const scatter = lit.length ? grain(p, pageQ) : 0;
           let glowing = 0;
-          for (const glow of lit) glowing = Math.max(glowing, nearness(glow, x, y));
+          for (const glow of lit) glowing = Math.max(glowing, nearness(glow, x, y, scatter));
           const lift = Math.min(
             1,
             Math.max(gripped, swell * swell * TIDE_LIFT, glowing * GLOW_LIFT),
@@ -341,8 +406,16 @@ export function animateDots(element: Element, withTide: boolean) {
           const radius = DOT + lift * DOT_LIFT;
           base.moveTo(dotX + radius, dotY);
           base.arc(dotX, dotY, radius, 0, Math.PI * 2);
+          let breath = 1;
+          if (glowing >= 0.01 && !still.matches) {
+            const period = BREATH_MIN_MS + grain(pageQ, p) * (BREATH_MAX_MS - BREATH_MIN_MS);
+            const wave = Math.sin((now / period + scatter) * Math.PI * 2);
+            breath = 1 - BREATH_DEPTH * (0.5 + wave / 2);
+          }
           for (const glow of lit) {
-            const step = Math.round(nearness(glow, x, y) * GLOW_ALPHA * TINT_STEPS);
+            const step = Math.round(
+              nearness(glow, x, y, scatter) * breath * GLOW_ALPHA * TINT_STEPS,
+            );
             if (step < 1) continue;
             const path = (glow.paths[step] ??= new Path2D());
             path.moveTo(dotX + radius, dotY);
@@ -382,15 +455,21 @@ export function animateDots(element: Element, withTide: boolean) {
   const fading = (now: number) =>
     [...glowSources.values()].some((glows) => glows.some((glow) => now - glow.since < GLOW_FADE));
   const tick = (now: number) => {
-    draw(now);
-    const live = (withTide && !still.matches) || presses.length || fading(now);
+    const busy = (withTide && !still.matches) || presses.length || fading(now) || blipping;
+    if (busy || woken || now - drawn >= IDLE_FRAME_MS) draw(now);
+    woken = false;
+    const live = busy || blipping || (lighting && !still.matches);
     frame = live ? requestAnimationFrame(tick) : 0;
   };
   const wake = () => {
-    if (!frame) frame = requestAnimationFrame(tick);
+    if (frame) return;
+    woken = true;
+    frame = requestAnimationFrame(tick);
   };
   redraw = () => {
     if (frame || glowSources.size) draw();
+    // A scroll can bring a light into view while the loop sleeps.
+    if (lighting && !still.matches) wake();
   };
   onGlow = wake;
 

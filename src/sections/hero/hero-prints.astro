@@ -57,7 +57,6 @@ const topInk = { solid: [styles.ink], hue: [styles.hue, styles.screen], outline:
           Array.from({ length: TOKEN_COUNT }, () => (
             <g {...draw()}>
               <path
-                transform="translate(5 4)"
                 fill={`url(#${p}ht)`}
                 {...stylex.attrs(styles.part, styles.screen)}
               />

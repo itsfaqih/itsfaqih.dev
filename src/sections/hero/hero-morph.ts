@@ -1,5 +1,9 @@
 type Pt = readonly [number, number];
 export type Outline = Pt[];
+/** The coordinates a print is drawn in, on the scene. Its halftone's dots turn and scale with it. */
+export type Frame = { deg: number; scale: number; x: number; y: number };
+
+export const shifted = (x = 0, y = 0): Frame => ({ deg: 0, scale: 1, x, y });
 
 const OUTLINE_POINTS = 64;
 
@@ -74,18 +78,55 @@ export const collapsed = (outline: Outline): Outline => {
 export const dot = (x: number, y: number): Outline =>
   Array.from({ length: OUTLINE_POINTS }, () => [x, y]);
 
-export function moved(outline: Outline, dx: number, dy: number, deg = 0, scale = 1): Outline {
+export function boxCentre(outline: Outline): Pt {
   const xs = outline.map(([x]) => x);
   const ys = outline.map(([, y]) => y);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2];
+}
+
+const turnOf = ({ deg, scale }: Frame) => {
   const a = (deg * Math.PI) / 180;
-  const [cos, sin] = [Math.cos(a), Math.sin(a)];
+  return [scale * Math.cos(a), scale * Math.sin(a)] as const;
+};
+
+export function movedFrame(outline: Outline, dx: number, dy: number, deg = 0): Frame {
+  const [cx, cy] = boxCentre(outline);
+  const [cos, sin] = turnOf({ deg, scale: 1, x: 0, y: 0 });
+  return { deg, scale: 1, x: cx + dx - cx * cos + cy * sin, y: cy + dy - cx * sin - cy * cos };
+}
+
+export function moved(outline: Outline, dx: number, dy: number, deg = 0): Outline {
+  const frame = movedFrame(outline, dx, dy, deg);
+  const [cos, sin] = turnOf(frame);
+  return outline.map(([x, y]) => [frame.x + x * cos - y * sin, frame.y + x * sin + y * cos]);
+}
+
+export const frameOf = ({ a, b, e, f }: DOMMatrixReadOnly): Frame => ({
+  deg: (Math.atan2(b, a) * 180) / Math.PI,
+  scale: Math.hypot(a, b),
+  x: e,
+  y: f,
+});
+
+export const blendFrame = (from: Frame, to: Frame, t: number): Frame => ({
+  deg: from.deg + (to.deg - from.deg) * t,
+  scale: from.scale + (to.scale - from.scale) * t,
+  x: from.x + (to.x - from.x) * t,
+  y: from.y + (to.y - from.y) * t,
+});
+
+/** The outline in the frame's own coordinates, so whatever fills it lies in that frame. */
+export function inFrame(outline: Outline, frame: Frame): Outline {
+  const [cos, sin] = turnOf(frame);
+  const area = cos * cos + sin * sin;
   return outline.map(([x, y]) => {
-    const [ox, oy] = [(x - cx) * scale, (y - cy) * scale];
-    return [cx + dx + ox * cos - oy * sin, cy + dy + ox * sin + oy * cos];
+    const [ox, oy] = [x - frame.x, y - frame.y];
+    return [(ox * cos + oy * sin) / area, (oy * cos - ox * sin) / area];
   });
 }
+
+export const frameTransform = ({ deg, scale, x, y }: Frame) =>
+  `translate(${x} ${y}) rotate(${deg}) scale(${scale})`;
 
 export function traced(drawing: SVGGeometryElement, matrix: DOMMatrixReadOnly): Outline {
   const length = drawing.getTotalLength();

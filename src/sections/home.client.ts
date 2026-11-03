@@ -2,6 +2,9 @@ import { glowDots } from "./backdrop-dots";
 import { watchCutIns } from "./cut-ins";
 import { whenIntroDone } from "./intro.client";
 
+// The glow wraps the whole card, so at full strength it outshouts the card's own text.
+const CONTACT_GLOW_STRENGTH = 0.5;
+
 /**
  * The home page (home.astro). Its cut-ins wait for the intro to hand off, and its fixed lights tint
  * the backdrop's dots: orange and blue on opposite corners of the work history, purple around the
@@ -18,7 +21,7 @@ class HomePage extends HTMLElement {
     const light = () => {
       glowDots("work-top", work, "var(--ar)", [1, 0, 1, 0]);
       glowDots("work-bottom", work, "var(--cw)", [0, 1, 0, 1]);
-      glowDots("contact", contact, "var(--ax)");
+      glowDots("contact", contact, "var(--ax)", undefined, CONTACT_GLOW_STRENGTH);
     };
     light();
     // A row opening or closing moves these boxes with no scroll to redraw the dots.

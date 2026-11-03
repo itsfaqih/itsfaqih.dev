@@ -1,4 +1,16 @@
-import { blend, collapsed, type Outline, toPath, traced } from "./hero-morph";
+import {
+  blend,
+  blendFrame,
+  collapsed,
+  type Frame,
+  frameOf,
+  frameTransform,
+  inFrame,
+  type Outline,
+  shifted,
+  toPath,
+  traced,
+} from "./hero-morph";
 import { SCENE_TOKENS, type Token } from "./hero-pieces";
 import {
   easeInOut,
@@ -12,15 +24,19 @@ import {
 } from "./hero-prints.styles";
 import { reducedMotion } from "../../hooks/media-query";
 
+const HALFTONE_OFFSET = "translate(5 4)";
 const LANDING_T = 0.845;
 const landing = (u: number) => easeInOut(u * LANDING_T) / easeInOut(LANDING_T);
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
-type Drawn = { outline: Outline; inks: number[] };
+type Drawn = { outline: Outline; inks: number[]; frame: Frame };
 
 const inksOf = (top: TopInk) => TOPS.map((ink) => (ink === top ? 1 : 0));
-const drawnOf = (tokens: Token[]): Drawn[] =>
-  tokens.map(({ outline, top }) => ({ outline, inks: inksOf(top) }));
+const drawnAs = ({ outline, top, frame = shifted() }: Token): Drawn => ({
+  outline,
+  inks: inksOf(top),
+  frame,
+});
 
 function isShown(drawing: Element, scene: Element) {
   let opacity = 1;
@@ -31,14 +47,19 @@ function isShown(drawing: Element, scene: Element) {
 }
 
 function drawnIn(scene: SVGGElement, tokens: Token[]): Drawn[] {
-  return tokens.map(({ outline, top }, k) => {
+  return tokens.map((token, k) => {
+    const asToken = drawnAs(token);
     const drawing = [...scene.querySelectorAll<SVGGeometryElement>(`[data-token="${k}"]`)].at(-1);
     const toScene = scene.getCTM();
     const toScreen = drawing?.getCTM();
-    if (!drawing || !toScene || !toScreen) return { outline, inks: inksOf(top) };
+    if (!drawing || !toScene || !toScreen) return asToken;
     const matrix = DOMMatrix.fromMatrix(toScene).inverse().multiply(DOMMatrix.fromMatrix(toScreen));
     const drawn = traced(drawing, matrix);
-    return { outline: isShown(drawing, scene) ? drawn : collapsed(drawn), inks: inksOf(top) };
+    return {
+      ...asToken,
+      outline: isShown(drawing, scene) ? drawn : collapsed(drawn),
+      frame: frameOf(matrix),
+    };
   });
 }
 
@@ -151,7 +172,7 @@ class HeroPrints extends HTMLElement {
       this.#phase === "leaving"
         ? this.#drawn
         : drawnIn(leavingLayer, SCENE_TOKENS[this.#layerIndex]!.exit);
-    const to = drawnOf(SCENE_TOKENS[index]!.enter);
+    const to = SCENE_TOKENS[index]!.enter.map(drawnAs);
 
     const startedAt = performance.now();
     let mounted = false;
@@ -166,15 +187,22 @@ class HeroPrints extends HTMLElement {
           return {
             outline: blend(start.outline, to[k]!.outline, t),
             inks: start.inks.map((ink, i) => ink + (to[k]!.inks[i]! - ink) * t),
+            frame: blendFrame(start.frame, to[k]!.frame, t),
           };
         });
         morph.querySelectorAll<SVGGElement>(":scope > g").forEach((group, k) => {
-          const { outline, inks } = this.#drawn[k]!;
+          const { outline, inks, frame } = this.#drawn[k]!;
           const d = toPath(outline);
           group.querySelectorAll("path").forEach((path) => {
-            path.setAttribute("d", d);
             const ink = TOPS.findIndex((top) => top === path.dataset.top);
-            if (ink >= 0) path.style.opacity = String(inks[ink]);
+            if (ink >= 0) {
+              path.setAttribute("d", d);
+              path.style.opacity = String(inks[ink]);
+              return;
+            }
+            // The dots lie in the frame the scene draws them in, or they'd jump at each handoff.
+            path.setAttribute("d", toPath(inFrame(outline, frame)));
+            path.setAttribute("transform", `${frameTransform(frame)} ${HALFTONE_OFFSET}`);
           });
         });
       }
