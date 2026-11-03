@@ -1,0 +1,1 @@
+import{a as e,o as t}from"./stylex-shim.DISe5NdY.js";var n=t({"--yes":`#7dff6a`,"--yes-ink":`color-mix(in oklab, var(--yes) var(--ink-mix), #000)`,"--code-bg":`#121219`,"--grid":`color-mix(in srgb, var(--hair) 55%, transparent)`,"--t-fb":`160ms`}),r=e();export{r as n,n as t};

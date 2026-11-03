@@ -1,0 +1,53 @@
+import { createRequire } from "node:module";
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import crypto from "node:crypto";
+const require = createRequire(process.cwd() + "/x.js");
+const { chromium } = require("playwright");
+const [baseDir, newDir] = process.argv.slice(2);
+const serve = (root) => new Promise((ok) => {
+  const s = http.createServer((q, r) => {
+    let f = path.join(root, decodeURIComponent(q.url.split("?")[0]));
+    if (!path.extname(f)) f += ".html";
+    fs.readFile(f, (e, d) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { "content-type": f.endsWith(".html") ? "text/html" : f.endsWith(".js") ? "text/javascript" : f.endsWith(".pdf") ? "application/pdf" : "application/octet-stream" }); r.end(d); });
+  });
+  s.listen(0, "127.0.0.1", () => ok(s));
+});
+const b = await chromium.launch();
+const run = async (dir) => {
+  const s = await serve(dir), o = `http://127.0.0.1:${s.address().port}`, res = {};
+  const ctx = await b.newContext({ acceptDownloads: true, viewport: { width: 1280, height: 900 } });
+  const p = await ctx.newPage();
+  const dl = p.waitForEvent("download");
+  await p.goto(o + "/cv?download=1", { waitUntil: "load" });
+  const d = await dl;
+  res.autoFile = d.suggestedFilename();
+  res.autoHash = crypto.createHash("sha1").update(fs.readFileSync(await d.path())).digest("hex").length;
+  res.autoSize = fs.statSync(await d.path()).size;
+  await p.waitForTimeout(200);
+  res.urlAfter = new URL(p.url()).search;
+  await p.reload({ waitUntil: "load" });
+  const sw = p.locator('input[role="switch"]');
+  const read = () => p.evaluate(() => {
+    const a = document.querySelector("cv-page a[download]");
+    const host = document.querySelector("cv-page");
+    const vis = [...host.querySelectorAll("*")].filter((e) => e.offsetParent !== null).length;
+    return { href: new URL(a.href).pathname, file: a.download, ats: host.hasAttribute("data-ats"), vis, font: getComputedStyle(host).fontFamily.slice(0, 30), text: host.innerText.length };
+  });
+  res.design = await read();
+  await sw.check({ force: true });
+  await p.waitForTimeout(400);
+  res.ats = await read();
+  const dl2 = p.waitForEvent("download");
+  await p.locator("cv-page a[download]").click();
+  const d2 = await dl2;
+  res.atsFile = d2.suggestedFilename();
+  res.atsSize = fs.statSync(await d2.path()).size;
+  await ctx.close(); s.close();
+  return res;
+};
+const A = await run(baseDir), B = await run(newDir);
+console.log(JSON.stringify(A) === JSON.stringify(B) ? "SAME" : "DIFF");
+console.log(JSON.stringify(A)); if (JSON.stringify(A) !== JSON.stringify(B)) console.log(JSON.stringify(B));
+await b.close();

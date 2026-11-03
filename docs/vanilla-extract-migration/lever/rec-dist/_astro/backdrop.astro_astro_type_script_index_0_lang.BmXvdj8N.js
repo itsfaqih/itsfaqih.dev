@@ -1,0 +1,1 @@
+import{t as e}from"./backdrop-dots.CfX_qfLw.js";var t=class extends HTMLElement{#e;connectedCallback(){let t=this.querySelector(`template`),n=document.importNode(t.content.firstElementChild,!0);document.body.append(n);let r=e(n,this.hasAttribute(`data-tide`));this.#e=()=>{r?.(),n.remove()}}disconnectedCallback(){this.#e?.()}};customElements.define(`site-backdrop`,t);

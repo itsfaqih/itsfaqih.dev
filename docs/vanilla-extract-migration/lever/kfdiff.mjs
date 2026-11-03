@@ -1,0 +1,14 @@
+import { createRequire } from "node:module";
+const require = createRequire(process.cwd() + "/x.js");
+const { chromium } = require("playwright");
+import { readFileSync, writeFileSync } from "node:fs";
+const [a, b, out] = process.argv.slice(2);
+const br = await chromium.launch();
+const read = async (f) => { const p = await br.newPage(); await p.setContent(readFileSync(f, "utf8").replace(/<script[\s\S]*?<\/script>/g, ""), { waitUntil: "load" }); const r = await p.evaluate(() => { const o = []; const walk = (rules) => { for (const r of rules) { if (r.type === CSSRule.KEYFRAMES_RULE) o.push(r.name + "|" + [...r.cssRules].map((f) => f.keyText + "{" + f.style.cssText.split(/;\s*/).filter(Boolean).sort().join(";") + "}").join("")); else if (r.cssRules) walk(r.cssRules); } }; for (const s of document.styleSheets) walk(s.cssRules); return o; }); await p.close(); return r; };
+const A = await read(a), B = await read(b); await br.close();
+const body = (x) => x.slice(x.indexOf("|") + 1);
+const sa = new Set(A.map(body)), sb = new Set(B.map(body));
+const onlyA = A.filter((x) => !sb.has(body(x))), onlyB = B.filter((x) => !sa.has(body(x)));
+writeFileSync(out, JSON.stringify({ onlyA, onlyB }, null, 1));
+console.log(A.length, B.length, "onlyBase", onlyA.length, "onlyNew", onlyB.length);
+for (const x of onlyA) console.log("B", x.slice(0, 300)); for (const x of onlyB) console.log("N", x.slice(0, 300));

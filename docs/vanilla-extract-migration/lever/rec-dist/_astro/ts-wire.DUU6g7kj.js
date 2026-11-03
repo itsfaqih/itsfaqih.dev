@@ -1,0 +1,1 @@
+function e(e,t){let n=[...e.childNodes].filter(e=>e.nodeType!==Node.COMMENT_NODE);t.forEach((e,t)=>{let r=n[t],i=e.quoted?r.childNodes[2]:r;i.nodeValue!==e.text&&(i.nodeValue=e.text)})}export{e as t};

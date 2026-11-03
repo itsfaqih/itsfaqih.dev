@@ -1,0 +1,1 @@
+import"./table-design.client.CSLYcFo1.js";

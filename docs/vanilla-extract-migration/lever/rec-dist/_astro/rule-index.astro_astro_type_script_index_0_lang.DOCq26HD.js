@@ -1,0 +1,1 @@
+import{t as e}from"./cut-ins.pIMQmaJh.js";var t=class extends HTMLElement{#e;connectedCallback(){this.#e=e(this)}disconnectedCallback(){this.#e?.()}};customElements.define(`rule-index`,t);
