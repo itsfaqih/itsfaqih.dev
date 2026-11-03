@@ -1,4 +1,4 @@
-import { toc } from "./table-of-contents.view";
+import { tocLink } from "./table-of-contents.view";
 
 /** Fired on a table of contents entry before it scrolls to its heading, so a drawer can close first. */
 export const TOC_NAVIGATE = "toc-navigate";
@@ -11,7 +11,7 @@ class TableOfContents extends HTMLElement {
     const links = [...this.querySelectorAll("a")];
     const idOf = (link: HTMLAnchorElement) => decodeURIComponent(link.hash.slice(1));
     const activate = (id: string) => {
-      for (const link of links) link.className = toc.link(idOf(link) === id);
+      for (const link of links) link.className = tocLink(idOf(link) === id);
     };
 
     const observer = new IntersectionObserver(

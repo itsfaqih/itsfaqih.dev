@@ -1,6 +1,8 @@
-import { FADE_TRANSITION, SLIDE_TRANSITION } from "./post.view";
-import { SLIDE_MS } from "./post.css";
+import { EASE, SLIDE, SLIDE_MS } from "./post.css";
 import { TOC_NAVIGATE } from "./table-of-contents.client";
+
+const SLIDE_TRANSITION = `transform ${SLIDE} ${EASE}`;
+const FADE_TRANSITION = `opacity ${SLIDE} ${EASE}`;
 
 // Vaul's drag rules, for a drawer that slides up from the bottom.
 const VELOCITY_THRESHOLD = 0.4;

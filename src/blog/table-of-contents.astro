@@ -1,6 +1,9 @@
 ---
 import type { MarkdownHeading } from "astro";
-import { toc } from "./table-of-contents.view";
+import { cx } from "../cx";
+import { marker } from "../when";
+import { styles } from "./table-of-contents.css";
+import { tocLink } from "./table-of-contents.view";
 
 type Props = { headings: MarkdownHeading[] };
 
@@ -9,11 +12,11 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 
 {
   headings.length > 0 && (
-    <table-of-contents class={toc.host}>
+    <table-of-contents class={styles.host}>
       <nav>
-        <p class={toc.title}>On this page</p><ul class={toc.list}>
+        <p class={styles.title}>On this page</p><ul class={cx(styles.list, marker)}>
           {headings.map(({ depth, slug, text }) => (
-            <li class={toc.item} style={`padding-left:${(depth - 2) * 12}px`}><a href={`#${slug}`} class={toc.link(false)}><span class={toc.label}><span class={toc.layer}>{text}</span><span aria-hidden="true" class={toc.ghost}>{text}</span></span></a></li>
+            <li class={styles.item} style={`padding-left:${(depth - 2) * 12}px`}><a href={`#${slug}`} class={tocLink(false)}><span class={styles.label}><span class={styles.layer}>{text}</span><span aria-hidden="true" class={cx(styles.layer, styles.ghost)}>{text}</span></span></a></li>
           ))}
         </ul>
       </nav>
