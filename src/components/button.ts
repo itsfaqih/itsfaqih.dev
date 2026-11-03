@@ -105,6 +105,13 @@ const tone = stylex.create({
     "--c": `color-mix(in oklab, ${palette["--ax"]} 82%, #fff)`,
     "--lit": `color-mix(in oklab, ${palette["--ax"]} 68%, #fff)`,
   },
+  pink: {
+    "--c": palette["--ux"],
+    "--on-c": palette["--on-accent"],
+    "--key": `color-mix(in oklab, ${palette["--ux"]} 55%, #000)`,
+    "--ink": `color-mix(in oklab, ${palette["--ux"]} var(--ink-mix), #000)`,
+    "--lit": `color-mix(in oklab, ${palette["--ux"]} 82%, #fff)`,
+  },
   destructive: {
     "--c": palette["--no"],
     "--on-c": palette["--on-accent"],
@@ -149,13 +156,14 @@ const emphasis = stylex.create({
   },
 });
 
-/** The keys: brand, destructive and neutral, each filled, tinted or text (neutral is never tinted), plus purple filled and tinted. */
+/** The keys: brand, destructive and neutral, each filled, tinted or text (neutral is never tinted), plus purple filled and tinted and pink tinted. */
 export const buttonVariant = {
   "primary-brand": [tone.brand, emphasis.primary],
   "secondary-brand": [tone.brand, emphasis.secondary],
   "tertiary-brand": [tone.brand, emphasis.tertiary],
   "primary-purple": [tone.purple, tone.purpleFill, emphasis.primary],
   "secondary-purple": [tone.purple, emphasis.secondary],
+  "secondary-pink": [tone.pink, emphasis.secondary],
   "primary-destructive": [tone.destructive, emphasis.primary],
   "secondary-destructive": [tone.destructive, emphasis.secondary],
   "tertiary-destructive": [tone.destructive, emphasis.tertiary],

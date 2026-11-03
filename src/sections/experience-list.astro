@@ -1,6 +1,7 @@
 ---
 import * as stylex from "@stylexjs/stylex";
 import type { Job } from "./home-content";
+import { boxScrollbar, marker as barMarker } from "../components/box-scrollbar";
 import { loadIn } from "../components/load-in";
 import { techBrand } from "./tech-brand";
 import { marker, moreLabel, rowView, styles } from "./experience-list.styles";
@@ -42,23 +43,18 @@ const { jobs } = Astro.props;
             <h3 class={view.company}><CompanyLogo name={job.company} xstyle={styles.logo} />{job.company}<small {...stylex.attrs(styles.role)}>{job.role}</small></h3>
             <span class={view.chevron} aria-hidden="true" />
           </button>
-          <ul class={view.stack} aria-label={`${job.company} stack`}>
-            {job.stack.map((tool) => (
-              <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} xstyle={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
-            ))}
-            <li data-more="true" style="display:none">{isOpen ? (
-                <button
-                  type="button"
-                  data-label={moreLabel(0)}
-                  class={view.more}
-                  aria-label="Show 0 more tools"
-                  aria-expanded="false"
-                />
-              ) : (
-                <span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" />
-              )}</li>
-          </ul>
-          <div id={`job-${index}`} {...stylex.attrs(styles.body)}>{isOpen && achievements()}</div>
+          <div data-stack="true" class={view.frame}>
+            <ul class={view.stack} aria-label={`${job.company} stack`}>
+              {job.stack.map((tool) => (
+                <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} xstyle={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
+              ))}
+              <li data-more="true" style="display:none"><span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" /></li>
+            </ul>
+            <div hidden aria-hidden="true" {...stylex.attrs(boxScrollbar.track, styles.stackBar, barMarker)}>
+              <div {...stylex.attrs(boxScrollbar.thumb)} />
+            </div>
+          </div>
+          <div id={`job-${index}`} data-body="true" {...stylex.attrs(styles.body)}>{isOpen && achievements()}</div>
           <template>{achievements()}</template>
         </div>
       );

@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import { boxScrollbarHost } from "../components/box-scrollbar";
 import { cursors, fonts, motion, palette } from "../theme.stylex";
 import { icon, iconLit, techBadge } from "./tech-icon.styles";
 
@@ -152,9 +153,50 @@ export const styles = stylex.create({
     transitionTimingFunction: `${motion["--moderate"]}, ${motion["--fast"]}`,
   },
   // Closed: the stack sits on the right. Open: it fills the left column under the head and the
-  // achievements take the right column.
-  stack: {
+  // achievements take the right column. Unpositioned while closed, so the head's cover stays on top.
+  stackFrame: {
     gridArea: { default: "1 / 2", [STACKED]: "auto" },
+    minWidth: 0,
+  },
+  // The list inside is taken out of flow, so the achievements alone set the row's height. The fades
+  // lie over the list rather than mask it, so a badge gliding in isn't cut off.
+  stackFrameOpen: {
+    "--ground": { default: palette["--panel-2"], [LIGHT]: palette["--panel"] },
+    gridArea: { default: "2 / 1", [STACKED]: "auto" },
+    position: "relative",
+    alignSelf: { default: "stretch", [STACKED]: null },
+    minHeight: { default: "76px", [STACKED]: null },
+    // While badges glide in from their old spots, only the bottom edge clips.
+    clipPath: {
+      default: null,
+      ":has(> [data-gliding])": "inset(-400px -1000px 0 -1000px)",
+    },
+    "::before": {
+      content: '""',
+      position: "absolute",
+      insetInline: 0,
+      top: 0,
+      zIndex: 1,
+      height: "44px",
+      pointerEvents: "none",
+      backgroundImage: "linear-gradient(to bottom, var(--ground), transparent)",
+      opacity: "var(--fade-top, 0)",
+    },
+    "::after": {
+      content: '""',
+      position: "absolute",
+      insetInline: 0,
+      bottom: 0,
+      zIndex: 1,
+      height: "44px",
+      pointerEvents: "none",
+      backgroundImage: "linear-gradient(to top, var(--ground), transparent)",
+      opacity: "var(--fade-bottom, 1)",
+    },
+  },
+  // Above the fades, so the thumb keeps its colour near either end.
+  stackBar: { zIndex: 2 },
+  stack: {
     display: "flex",
     flexWrap: "wrap",
     gap: "6px",
@@ -163,8 +205,18 @@ export const styles = stylex.create({
     listStyle: "none",
   },
   stackOpen: {
-    gridArea: { default: "2 / 1", [STACKED]: "auto" },
+    position: { default: "absolute", [STACKED]: "static" },
+    inset: { default: 0, [STACKED]: null },
+    maxHeight: { default: null, [STACKED]: "160px" },
     alignContent: "start",
+    overflowX: { default: "hidden", ":is([data-gliding])": "visible" },
+    overflowY: { default: "auto", ":is([data-gliding])": "visible" },
+    // Room for the scrollbar's thumb beside the badges.
+    paddingInlineEnd: "14px",
+    outlineWidth: { default: null, ":focus-visible": "2px" },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
+    outlineOffset: { default: null, ":focus-visible": "-2px" },
   },
   pill: {
     paddingTop: "5px",
@@ -219,31 +271,6 @@ export const styles = stylex.create({
       content: "attr(data-label)",
     },
   },
-  moreButton: {
-    backgroundColor: "transparent",
-    cursor: cursors["--cursor-point"],
-    borderColor: {
-      default: palette["--hair"],
-      ":hover": { default: null, [HOVER]: palette["--hair-hover"] },
-    },
-    color: {
-      default: palette["--mute"],
-      ":hover": { default: null, [HOVER]: palette["--dim"] },
-    },
-    transitionProperty: "border-color, color",
-    transitionDuration: {
-      default: motion["--t-fast-exit"],
-      ":hover": { default: null, [HOVER]: motion["--t-fast"] },
-    },
-    transitionTimingFunction: {
-      default: motion["--exit"],
-      ":hover": { default: null, [HOVER]: motion["--fast"] },
-    },
-    outlineWidth: { default: null, ":focus-visible": "2px" },
-    outlineStyle: { default: null, ":focus-visible": "solid" },
-    outlineColor: { default: null, ":focus-visible": palette["--focus"] },
-    outlineOffset: { default: null, ":focus-visible": "2px" },
-  },
   markClosed: {
     color: {
       default: palette["--mute"],
@@ -292,14 +319,15 @@ export const rowView = (isOpen: boolean) => ({
   head: stylex.attrs(styles.head, iconLit.hover, !isOpen && styles.headCover).class ?? "",
   company: stylex.attrs(styles.company, isOpen && iconLit.on).class ?? "",
   chevron: stylex.attrs(styles.chevron, isOpen && styles.chevronOpen).class ?? "",
-  stack: stylex.attrs(styles.stack, isOpen && styles.stackOpen).class ?? "",
+  frame: stylex.attrs(styles.stackFrame, isOpen && styles.stackFrameOpen).class ?? "",
+  stack:
+    stylex.attrs(styles.stack, isOpen && styles.stackOpen, isOpen && boxScrollbarHost.box).class ??
+    "",
   pill:
     stylex.attrs(techBadge.badge, styles.pill, isOpen ? styles.pillOpen : styles.pillClosed)
       .class ?? "",
   mark: stylex.attrs(icon.pair, isOpen ? styles.markOpen : styles.markClosed).class ?? "",
-  more: isOpen
-    ? (stylex.attrs(styles.pill, styles.more, styles.moreButton).class ?? "")
-    : (stylex.attrs(styles.pill, styles.more, styles.pillClosed).class ?? ""),
+  more: stylex.attrs(styles.pill, styles.more, styles.pillClosed).class ?? "",
 });
 
 export const moreLabel = (count: number) => `+${count} more`;

@@ -5,6 +5,7 @@ import { SHOW_PROJECTS } from "../data/home";
 import { LINKS } from "../seo";
 import { arcade } from "../components/arcade";
 import { button, buttonVariant } from "../components/button";
+import Icon from "../components/icon.astro";
 import { hoverHold } from "../components/hover-hold";
 import { loadIn } from "../components/load-in";
 import Backdrop from "./backdrop.astro";
@@ -60,6 +61,11 @@ const footerVeil = stylex.attrs(loadIn.veil, veil.dense);
           ><small {...eyebrow} data-cut="true" data-eyebrow="true" style="--c:var(--ux)"
             ><span {...words} data-cut="true">Experience</span></small
           ><span {...titleText} data-cut="true">Where I've worked</span></h2
+        ><a
+          {...stylex.attrs(loadIn.piece, button.base, buttonVariant["secondary-pink"], button.iconEnd, styles.overDots)}
+          href="/cv"
+          data-cut="true"
+          >View CV<Icon name="ArrowRight" size={18} weight="bold" /></a
         ></div
       ><ExperienceList jobs={EXPERIENCE} /></section
     ><StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />{
@@ -101,7 +107,7 @@ const footerVeil = stylex.attrs(loadIn.veil, veil.dense);
           {...stylex.attrs(loadIn.piece, section.eyebrow)}
           data-cut="true"
           data-eyebrow="true"
-          style="--c:var(--ax)">Contact</small
+          style="--c:var(--ax)">Connect</small
         ><span {...titleText} data-cut="true"
           >Ready to bring the next level of care to your product?</span
         ></h2

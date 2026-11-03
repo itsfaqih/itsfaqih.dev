@@ -12,6 +12,10 @@ const LIFT_EASE = `${motion["--moderate"]}, ${motion["--moderate"]}, ${motion["-
 const marquee = stylex.keyframes({ to: { transform: "translate(-50%)" } });
 
 export const styles = stylex.create({
+  // A tinted key over the backdrop's lit dots: blurred, so its label doesn't read through them.
+  overDots: {
+    backdropFilter: "blur(8px)",
+  },
   // The custom element stands in for the block the root used to be.
   root: {
     display: "block",
