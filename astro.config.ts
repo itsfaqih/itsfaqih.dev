@@ -8,6 +8,8 @@ import { defineConfig } from "astro/config";
 import type { AstroIntegration } from "astro";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
+import browserslist from "browserslist";
+import { browserslistToTargets, Features, transform } from "lightningcss";
 import rehypeSlug from "rehype-slug";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import { runnerImport, type Plugin } from "vite-plus";
@@ -98,6 +100,27 @@ const serverOwnsCss = (): Plugin => {
     buildEnd() {
       if (emptied === 0)
         this.error("Emptied no .vanilla.css module, so its rules would ship twice.");
+    },
+  };
+};
+
+// vanilla-extract prints CSS as written, and Safari still needs prefixes such as
+// -webkit-box-decoration-break. oklch() and oklab() stay as written: lowered to lab(), they shade
+// anti-aliased edges one step differently.
+const lowerForBrowsers = (): Plugin => {
+  const targets = browserslistToTargets(browserslist());
+  return {
+    name: "lower-for-browsers",
+    enforce: "pre",
+    transform(code, id) {
+      if (!id.includes(".vanilla.css")) return undefined;
+      const lowered = transform({
+        code: Buffer.from(code),
+        exclude: Features.OklabColors,
+        filename: id,
+        targets,
+      });
+      return { code: lowered.code.toString(), map: null };
     },
   };
 };
@@ -203,6 +226,6 @@ export default defineConfig({
     // simple-icons is bundled rather than loaded from node_modules, so roundIconPaths rounds the
     // marks the prerender renders too.
     resolve: { tsconfigPaths: true, noExternal: ["simple-icons"] },
-    plugins: [roundIconPaths(), vanillaExtractPlugin(), serverOwnsCss()],
+    plugins: [roundIconPaths(), vanillaExtractPlugin(), lowerForBrowsers(), serverOwnsCss()],
   },
 });
