@@ -1,4 +1,4 @@
-import { toc } from "./table-of-contents.styles";
+import { toc } from "./table-of-contents.view";
 
 /** Fired on a table of contents entry before it scrolls to its heading, so a drawer can close first. */
 export const TOC_NAVIGATE = "toc-navigate";

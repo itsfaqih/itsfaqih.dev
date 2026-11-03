@@ -1,10 +1,10 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import { colorOf, ruleNumber, TOPICS, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
-import { arcade } from "../components/arcade";
-import { loadIn } from "../components/load-in";
-import { chips } from "./chips";
-import { beamClass, countClass, styles } from "./rule-select.styles";
+import { arcade } from "../components/arcade.css";
+import { loadIn } from "../components/load-in.css";
+import { chips } from "./chips.css";
+import { beamClass, countClass } from "./rule-select.view";
+import { styles } from "./rule-select.css";
 import RuleThumb from "./rule-thumb.astro";
 import RuleTile from "./rule-tile.astro";
 
@@ -16,32 +16,32 @@ const count = (topic: string) =>
   topic === "All" ? RULES.length : RULES.filter((rule) => rule.label === topic).length;
 ---
 
-<rule-select {...stylex.attrs(styles.select)}>
+<rule-select class={styles.select}>
   <aside
-    {...stylex.attrs(loadIn.piece, styles.panel)}
+    class:list={[loadIn.piece, styles.panel]}
     data-cut="true"
     data-empty=""
     aria-live="polite"
     data-part="panel"
   >
-    <div {...stylex.attrs(styles.plate, styles.standby)}><span>No.—</span><span>STANDBY</span></div>
+    <div class:list={[styles.plate, styles.standby]}><span>No.—</span><span>STANDBY</span></div>
     <RuleThumb style={panelThumb} />
-    <h3 {...stylex.attrs(styles.title, styles.standby)}>Pick a rule</h3>
-    <p {...stylex.attrs(styles.blurb)}>Hover or focus a rule to preview it.</p>
-    <dl {...stylex.attrs(styles.facts)}>
-      <div {...stylex.attrs(styles.fact)}>
-        <dt {...stylex.attrs(styles.term)}>TOPIC</dt><dd
-          {...stylex.attrs(styles.value)}
+    <h3 class:list={[styles.title, styles.standby]}>Pick a rule</h3>
+    <p class={styles.blurb}>Hover or focus a rule to preview it.</p>
+    <dl class={styles.facts}>
+      <div class={styles.fact}>
+        <dt class={styles.term}>TOPIC</dt><dd
+          class={styles.value}
           data-part="topic">All</dd
         >
       </div>
     </dl>
   </aside>
   <div>
-    <div {...stylex.attrs(styles.tools)}>
-      <label {...stylex.attrs(loadIn.piece, styles.search)} data-cut="true"
+    <div class={styles.tools}>
+      <label class:list={[loadIn.piece, styles.search]} data-cut="true"
         >FIND<input
-          {...stylex.attrs(styles.input)}
+          class={styles.input}
           type="search"
           enterkeyhint="search"
           autocapitalize="none"
@@ -50,26 +50,26 @@ const count = (topic: string) =>
           aria-label="Search rules"
           value=""
           data-part="search"
-        /><kbd {...stylex.attrs(styles.key)}>/</kbd></label
+        /><kbd class={styles.key}>/</kbd></label
       >
     </div>
-    <div {...stylex.attrs(chips.group)} role="group" aria-label="Filter by topic">
+    <div class={chips.group} role="group" aria-label="Filter by topic">
       {
         topics.map((name) => (
           <button
             type="button"
-            {...stylex.attrs(loadIn.piece, chips.chip)}
+            class:list={[loadIn.piece, chips.chip]}
             data-cut="true"
             aria-pressed={String(name === "All")}
             style={`--c:${colorOf(name)}`}
             data-topic={name}
           >
-            <i {...stylex.attrs(chips.dot)} />{name}<b class={countClass(name === "All")}>{count(name)}</b>
+            <i class={chips.dot} />{name}<b class={countClass(name === "All")}>{count(name)}</b>
           </button>
         ))
       }
     </div>
-    <div {...stylex.attrs(styles.tiles)} data-part="tiles">
+    <div class={styles.tiles} data-part="tiles">
       {RULES.map((rule) => <RuleTile rule={rule} />)}
     </div>
   </div>
@@ -78,25 +78,25 @@ const count = (topic: string) =>
   {
     RULES.map((rule) => (
       <template data-panel={rule.id}>
-        <div {...stylex.attrs(styles.plate)}><span>No.{ruleNumber(rule)}</span><span>{rule.label.toUpperCase()}</span></div>
+        <div class={styles.plate}><span>No.{ruleNumber(rule)}</span><span>{rule.label.toUpperCase()}</span></div>
         <RuleThumb rule={rule} play at="panel" style={panelThumb} />
-        <h3 {...stylex.attrs(styles.title)}><span aria-hidden="true" data-part="scramble">{
+        <h3 class={styles.title}><span aria-hidden="true" data-part="scramble">{
           rule.title.split(" ").map((word, index) => (
-            <Fragment>{index > 0 && " "}<span {...stylex.attrs(styles.word)}>{
-              Array.from(word, (char) => <span {...stylex.attrs(styles.cell)}>{char}</span>)
+            <Fragment>{index > 0 && " "}<span class={styles.word}>{
+              Array.from(word, (char) => <span class={styles.cell}>{char}</span>)
             }</span></Fragment>
           ))
-        }</span><span {...stylex.attrs(arcade.srOnly)}>{rule.title}</span></h3>
-        <p {...stylex.attrs(styles.blurb)}>{rule.description}</p>
-        <dl {...stylex.attrs(styles.facts)}>
-          <div {...stylex.attrs(styles.fact)}>
-            <dt {...stylex.attrs(styles.term)}>TOPIC</dt><dd {...stylex.attrs(styles.value)}>{rule.label}</dd>
+        }</span><span class={arcade.srOnly}>{rule.title}</span></h3>
+        <p class={styles.blurb}>{rule.description}</p>
+        <dl class={styles.facts}>
+          <div class={styles.fact}>
+            <dt class={styles.term}>TOPIC</dt><dd class={styles.value}>{rule.label}</dd>
           </div>
         </dl>
       </template>
     ))
   }
-  <template data-part="empty"><p {...stylex.attrs(styles.empty)}></p></template>
+  <template data-part="empty"><p class={styles.empty}></p></template>
 </rule-select>
 
 <script>

@@ -1,10 +1,12 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import type { Job } from "./home-content";
-import { boxScrollbar, marker as barMarker } from "../components/box-scrollbar";
-import { loadIn } from "../components/load-in";
+import { boxScrollbar } from "../components/box-scrollbar.css";
+import { marker as barMarker } from "../when";
+import { loadIn } from "../components/load-in.css";
 import { techBrand } from "./tech-brand";
-import { marker, moreLabel, rowView, styles } from "./experience-list.styles";
+import { marker } from "../when";
+import { moreLabel, rowView } from "./experience-list.view";
+import { styles } from "./experience-list.css";
 import CompanyLogo from "./company-logo.astro";
 import TechIcon from "./tech-icon.astro";
 
@@ -15,21 +17,21 @@ type Props = { jobs: Job[] };
 const { jobs } = Astro.props;
 ---
 
-<experience-list {...stylex.attrs(styles.list)}
+<experience-list class={styles.list}
   >{
     jobs.map((job, index) => {
       const isOpen = index === 0;
       const view = rowView(isOpen);
       const achievements = () => (
-        <ul {...stylex.attrs(styles.achievements)}>
+        <ul class={styles.achievements}>
           {job.achievements.map((item, at) => (
-            <li {...stylex.attrs(styles.achievement)} style={`--j:${at}`}>{item}</li>
+            <li class={styles.achievement} style={`--j:${at}`}>{item}</li>
           ))}
         </ul>
       );
       return (
         <div
-          {...stylex.attrs(loadIn.piece, styles.row, marker)}
+          class:list={[loadIn.piece, styles.row, marker]}
           data-cut="true"
           data-on={isOpen ? "" : undefined}
         >
@@ -39,8 +41,8 @@ const { jobs } = Astro.props;
             aria-expanded={isOpen ? "true" : "false"}
             aria-controls={`job-${index}`}
           >
-            <span {...stylex.attrs(styles.years)}>{job.years}</span>
-            <h3 class={view.company}><CompanyLogo name={job.company} xstyle={styles.logo} />{job.company}<small {...stylex.attrs(styles.role)}>{job.role}</small></h3>
+            <span class={styles.years}>{job.years}</span>
+            <h3 class={view.company}><CompanyLogo name={job.company} xstyle={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></h3>
             <span class={view.chevron} aria-hidden="true" />
           </button>
           <div data-stack="true" class={view.frame}>
@@ -50,11 +52,11 @@ const { jobs } = Astro.props;
               ))}
               <li data-more="true" style="display:none"><span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" /></li>
             </ul>
-            <div hidden aria-hidden="true" {...stylex.attrs(boxScrollbar.track, styles.stackBar, barMarker)}>
-              <div {...stylex.attrs(boxScrollbar.thumb)} />
+            <div hidden aria-hidden="true" class:list={[boxScrollbar.track, styles.stackBar, barMarker]}>
+              <div class={boxScrollbar.thumb} />
             </div>
           </div>
-          <div id={`job-${index}`} data-body="true" {...stylex.attrs(styles.body)}>{isOpen && achievements()}</div>
+          <div id={`job-${index}`} data-body="true" class={styles.body}>{isOpen && achievements()}</div>
           <template>{achievements()}</template>
         </div>
       );

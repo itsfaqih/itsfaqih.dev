@@ -1,19 +1,13 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import type { StackGroup, StackUse } from "./home-content";
-import { chips } from "./chips";
+import { chips } from "./chips.css";
 import { ringOf } from "./company-logos";
 import { techBrand } from "./tech-brand";
-import { iconLit, techBadge } from "./tech-icon.styles";
-import { section, veil } from "./section";
-import { loadIn } from "../components/load-in";
-import {
-  countClass,
-  groupLabelClass,
-  groupWordsClass,
-  styles,
-  toolClass,
-} from "./stack-showcase.styles";
+import { iconLit, techBadge } from "./tech-icon.css";
+import { section, veil } from "./section.css";
+import { loadIn } from "../components/load-in.css";
+import { countClass, groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.view";
+import { styles } from "./stack-showcase.css";
 import CompanyLogo from "./company-logo.astro";
 import TechIcon from "./tech-icon.astro";
 
@@ -41,49 +35,49 @@ const lists = (tool: string) =>
   ].filter(({ uses }) => uses.length > 0);
 ---
 
-<stack-showcase {...stylex.attrs(styles.host)}
-  ><section id="stack" {...stylex.attrs(section.block, styles.section)}
-    ><div {...stylex.attrs(section.head)}
-      ><h2 {...stylex.attrs(section.title, veil.soft)}
+<stack-showcase class={styles.host}
+  ><section id="stack" class:list={[section.block, styles.section]}
+    ><div class={section.head}
+      ><h2 class:list={[section.title, veil.soft]}
         ><small
-          {...stylex.attrs(loadIn.veil, section.eyebrow, veil.dense, veil.fit)}
+          class:list={[loadIn.veil, section.eyebrow, veil.dense, veil.fit]}
           data-cut="true"
           data-eyebrow="true"
           style="--c:var(--ar)"
-          ><span {...stylex.attrs(loadIn.piece, loadIn.words)} data-cut="true">Tools I use</span
+          ><span class:list={[loadIn.piece, loadIn.words]} data-cut="true">Tools I use</span
           ></small
-        ><span {...stylex.attrs(loadIn.piece, section.titleText)} data-cut="true">Stack</span></h2
+        ><span class:list={[loadIn.piece, section.titleText]} data-cut="true">Stack</span></h2
       ></div
-    ><div {...stylex.attrs(styles.filter)}
-      ><div {...stylex.attrs(styles.row)}
-        ><span {...stylex.attrs(styles.spacer)}></span><div
-          {...stylex.attrs(chips.group, styles.chips)}
+    ><div class={styles.filter}
+      ><div class={styles.row}
+        ><span class={styles.spacer}></span><div
+          class:list={[chips.group, styles.chips]}
           ><button
             type="button"
-            {...stylex.attrs(loadIn.piece, chips.chip)}
+            class:list={[loadIn.piece, chips.chip]}
             data-cut="true"
             aria-pressed="true"
             style="--c:var(--go)"
             data-chip=""
-            ><i {...stylex.attrs(chips.dot)}></i>All<b class={countClass(true)}>{allTools.length}</b
+            ><i class={chips.dot}></i>All<b class={countClass(true)}>{allTools.length}</b
             ></button
           ></div
         ></div
       >{
         FILTER_ROWS.filter((row) => placesOf(row.kind).length > 0).map((row) => (
-          <div {...stylex.attrs(styles.row)}>
-            <h3 {...stylex.attrs(loadIn.veil, veil.dense, styles.rowLabel)} data-cut="true">
-              <span {...stylex.attrs(loadIn.piece, loadIn.words)} data-cut="true">{row.label}</span>
+          <div class={styles.row}>
+            <h3 class:list={[loadIn.veil, veil.dense, styles.rowLabel]} data-cut="true">
+              <span class:list={[loadIn.piece, loadIn.words]} data-cut="true">{row.label}</span>
             </h3>
             <div
-              {...stylex.attrs(chips.group, styles.chips)}
+              class:list={[chips.group, styles.chips]}
               role="group"
               aria-label={`Filter by ${row.label.toLowerCase()}`}
             >
               {placesOf(row.kind).map((name) => (
                 <button
                   type="button"
-                  {...stylex.attrs(loadIn.piece, chips.chip, row.kind === "work" && styles.ringChip)}
+                  class:list={[loadIn.piece, chips.chip, row.kind === "work" && styles.ringChip]}
                   data-cut="true"
                   aria-pressed="false"
                   style={`--c:${row.color}${row.kind === "work" ? `;${ringOf(name)}` : ""}`}
@@ -91,7 +85,7 @@ const lists = (tool: string) =>
                 >{row.kind === "work" ? (
                     <CompanyLogo name={name} xstyle={styles.chipLogo} />
                   ) : (
-                    <i {...stylex.attrs(chips.dot)} />
+                    <i class={chips.dot} />
                   )}{name}<b class={countClass(false)}>{
                     allTools.filter((tool) => usedAt[tool]!.includes(name)).length
                   }</b></button>
@@ -100,14 +94,14 @@ const lists = (tool: string) =>
           </div>
         ))
       }</div
-    ><div {...stylex.attrs(styles.groups)} data-part="groups"
+    ><div class={styles.groups} data-part="groups"
       >{
         groups.map((group) => (
-          <div {...stylex.attrs(styles.group)}>
+          <div class={styles.group}>
             <h3 class={groupLabelClass(false)} data-cut="true">
               <span class={groupWordsClass(false)} data-cut="true">{group.label}</span>
             </h3>
-            <ul {...stylex.attrs(styles.tools)}>
+            <ul class={styles.tools}>
               {group.tools.map((tool) => (
                 <li
                   class={toolClass(false)}
@@ -126,24 +120,24 @@ const lists = (tool: string) =>
       ><div
         id="stack-peek"
         role="tooltip"
-        {...stylex.attrs(techBadge.brand, iconLit.on, styles.peek)}></div
+        class:list={[techBadge.brand, iconLit.on, styles.peek]}></div
       ></template
     >{
       groups.flatMap((group) =>
         group.tools.map((tool) => (
           <template data-peek={tool} data-style={techBrand(tool)}>
-            <header {...stylex.attrs(styles.peekHead)}>{tool}<small {...stylex.attrs(styles.peekGroup)}>{group.label}</small></header>
+            <header class={styles.peekHead}>{tool}<small class={styles.peekGroup}>{group.label}</small></header>
             {lists(tool).length === 0 && (
-              <p {...stylex.attrs(styles.peekNote)}>Not part of a role or project listed on this site.</p>
+              <p class={styles.peekNote}>Not part of a role or project listed on this site.</p>
             )}
             {lists(tool).map(({ title, uses }) => (
               <Fragment>
-                <h4 {...stylex.attrs(styles.useTitle)}>{title}</h4>
-                <ul {...stylex.attrs(styles.uses)}>
+                <h4 class={styles.useTitle}>{title}</h4>
+                <ul class={styles.uses}>
                   {uses.map((use) => (
-                    <li {...stylex.attrs(styles.use)}>
-                      <b {...stylex.attrs(styles.useName)}>{use.name}</b>
-                      <span {...stylex.attrs(styles.useDetail)}>{use.detail}</span>
+                    <li class={styles.use}>
+                      <b class={styles.useName}>{use.name}</b>
+                      <span class={styles.useDetail}>{use.detail}</span>
                     </li>
                   ))}
                 </ul>

@@ -1,10 +1,9 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { styles } from "./dialog-design.styles";
+import { styles } from "./dialog-design.css";
 
 type Props = { part: string; hint?: boolean };
 
 const { part, hint = false } = Astro.props;
 ---
 
-<button type="button" data-hint={hint ? "true" : undefined} {...stylex.attrs(styles.key)} data-part={part}><slot /></button>
+<button type="button" data-hint={hint ? "true" : undefined} class={styles.key} data-part={part}><slot /></button>

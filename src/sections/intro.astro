@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import { SLIDES } from "../data/home";
-import { marker, styles } from "./intro.styles";
+import { marker } from "../when";
+import { styles } from "./intro.css";
 
 // The home intro: the name slams in, cuts flash through what I build, then the shutters split.
 // It plays once per session; the head script (src/layouts/head-script.ts) sets .no-intro whenever
@@ -9,15 +9,15 @@ import { marker, styles } from "./intro.styles";
 const words = SLIDES.slice(0, 4);
 ---
 
-<home-intro {...stylex.attrs(styles.root, marker)} aria-hidden="true"
-  ><div {...stylex.attrs(styles.shutter, styles.top)}></div><div
-    {...stylex.attrs(styles.shutter, styles.bottom)}
-  ></div><div {...stylex.attrs(styles.stage)}
-    ><div {...stylex.attrs(styles.name)}>FAQIH MUNTASHIR</div><div {...stylex.attrs(styles.slot)}
+<home-intro class:list={[styles.root, marker]} aria-hidden="true"
+  ><div class:list={[styles.shutter, styles.top]}></div><div
+    class:list={[styles.shutter, styles.bottom]}
+  ></div><div class={styles.stage}
+    ><div class={styles.name}>FAQIH MUNTASHIR</div><div class={styles.slot}
       >{
         words.map(({ tab, color }, index) => (
           <span
-            {...stylex.attrs(styles.cut, index === words.length - 1 && styles.lastCut)}
+            class:list={[styles.cut, index === words.length - 1 && styles.lastCut]}
             style={`--i:${index};--c:${color}`}
           >{tab.toUpperCase()}</span>
         ))

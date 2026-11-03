@@ -1,7 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
-import { OUT, TABBED } from "./rule-landing.styles";
+import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
-import { STEP, view } from "./typescript-code-writing.styles";
+import { STEP, view } from "./typescript-code-writing.view";
 
 type Phase = "idle" | "run" | "done";
 

@@ -1,6 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
 import { brandFor, styleOf } from "./tech-brand";
-
 /* Each employer's icon mark, one path per brand colour. EvidenceCare's is redrawn from its site's
    mark with the navy outline thickened to stay visible at chip size, and its navy turns to the text
    colour on dark as in its own reversed logo. Jatis Mobile's and Mitra Integrasi Informatika's are
@@ -129,9 +127,3 @@ export function ringOf(name: string) {
   };
   return styleOf({ "--ring-dark": ring("--brand-dark"), "--ring-light": ring("--brand-light") });
 }
-
-export const companyLogo = stylex.create({
-  part: {
-    fill: "var(--brand)",
-  },
-});

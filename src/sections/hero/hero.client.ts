@@ -3,8 +3,8 @@ import { SLIDES } from "../../data/home";
 import { reducedMotion, watchMedia } from "../../hooks/media-query";
 import { glowDots } from "../backdrop-dots";
 import { whenIntroDone } from "../intro.client";
-import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.styles";
-import { barClass, glyphClass, phraseClass } from "./hero.styles";
+import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.view";
+import { barClass, glyphClass, phraseClass } from "./hero.view";
 
 // The prints sit right on this glow, so it stays quieter than the page's others.
 const HERO_GLOW_STRENGTH = 0.6;

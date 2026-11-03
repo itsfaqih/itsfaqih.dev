@@ -1,40 +1,40 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
-import { button, buttonVariant } from "../components/button";
+import { cx } from "../cx";
+import { arcade } from "../components/arcade.css";
+import { button } from "../components/button.css";
+import { buttonVariant } from "../components/button";
 import TsPaint from "./ts-paint.astro";
 import type { Line } from "./typescript-code-writing";
-import { styles } from "./typescript-code-writing.styles";
+import { styles } from "./typescript-code-writing.css";
 
 type Props = { lines: Line[] };
 
 const { lines } = Astro.props;
 const errors = lines.filter((line) => line.note?.error).length;
-const cls = (...list: stylex.StyleXStyles[]) => stylex.attrs(...list).class ?? "";
 // Rendered as tsc left it; ts-checked.client.ts may hide the output until tsc runs.
 ---
 
-<ts-checked {...stylex.attrs(styles.view)}>
-  <div {...stylex.attrs(styles.code)}>
-    <i aria-hidden="true" class={`ts-cursor ${cls(styles.cursor)}`}></i>{
+<ts-checked class={styles.view}>
+  <div class={styles.code}>
+    <i aria-hidden="true" class={`ts-cursor ${styles.cursor}`}></i>{
       lines.map((line) => (
-        <div class={`ts-ln ${cls(styles.line, line.hot && styles.hot)}`}>
-          <code {...stylex.attrs(styles.source)}>{line.c ? <TsPaint text={line.c} /> : " "}{line.note?.error && (
-              <i class={`ts-sq ${cls(styles.squiggle, line.note.tone === "yes" && styles.squiggleYes)}`}></i>
+        <div class={`ts-ln ${cx(styles.line, line.hot && styles.hot)}`}>
+          <code class={styles.source}>{line.c ? <TsPaint text={line.c} /> : " "}{line.note?.error && (
+              <i class={`ts-sq ${cx(styles.squiggle, line.note.tone === "yes" && styles.squiggleYes)}`}></i>
             )}</code>{line.note && (
             <span
-              class={`ts-out ${cls(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes)}`}
-              ><span {...stylex.attrs(arcade.srOnly)}>{line.note.error ? "error: " : "gives "}</span>{line.note.text}</span
+              class={`ts-out ${cx(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes)}`}
+              ><span class={arcade.srOnly}>{line.note.error ? "error: " : "gives "}</span>{line.note.text}</span
             >
           )}
         </div>
       ))
     }
   </div>
-  <div {...stylex.attrs(styles.term)}>
-    <span {...stylex.attrs(styles.command)}>$ tsc</span><span aria-live="polite" {...stylex.attrs(styles.summary)}
+  <div class={styles.term}>
+    <span class={styles.command}>$ tsc</span><span aria-live="polite" class={styles.summary}
       >{errors === 1 ? "1 error" : `${errors} errors`}</span
-    ><button type="button" {...stylex.attrs(button.base, buttonVariant["primary-neutral"], button.sm, styles.run)}
+    ><button type="button" class:list={[button.base, buttonVariant["primary-neutral"], button.sm, styles.run]}
       >Run tsc</button
     >
   </div>

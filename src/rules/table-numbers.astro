@@ -1,39 +1,39 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import { ACCOUNTS, DIGITS, MRR, money } from "./table-design";
-import { styles, view } from "./table-design.styles";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 
 type Props = { careful: boolean };
 
 const { careful } = Astro.props;
 ---
 
-<table-numbers {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
-  <table {...stylex.attrs(styles.table)}>
-    <caption {...stylex.attrs(arcade.srOnly)}>Monthly revenue by account</caption>
-    <colgroup><col /><col {...stylex.attrs(styles.colMoney)} /></colgroup>
+<table-numbers class={styles.card} data-careful={careful ? "true" : undefined}>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly}>Monthly revenue by account</caption>
+    <colgroup><col /><col class={styles.colMoney} /></colgroup>
     <thead>
       <tr
-        ><th scope="col" {...stylex.attrs(styles.th)}>Account</th><th
+        ><th scope="col" class={styles.th}>Account</th><th
           scope="col"
-          {...stylex.attrs(styles.th, careful && styles.num)}>MRR ($)</th
+          class:list={[styles.th, careful && styles.num]}>MRR ($)</th
         ></tr
       >
     </thead>
-    <tbody {...stylex.attrs(styles.body)}>
+    <tbody class={styles.body}>
       {
         ACCOUNTS.map((account, at) => {
           const value = MRR[at] ?? 0;
           return (
             <tr class={view.row}
-              ><td {...stylex.attrs(styles.td)}>{account}</td><td
-                {...stylex.attrs(styles.td, careful ? styles.num : styles.ragged)}
+              ><td class={styles.td}>{account}</td><td
+                class:list={[styles.td, careful ? styles.num : styles.ragged]}
                 >{
                   careful ? (
                     <Fragment
-                      ><span {...stylex.attrs(arcade.srOnly)}>{money(value)}</span><span
-                        {...stylex.attrs(styles.reels)}
+                      ><span class={arcade.srOnly}>{money(value)}</span><span
+                        class={styles.reels}
                         aria-hidden="true"
                         >{[...money(value)].map((char) =>
                           /\d/.test(char) ? (

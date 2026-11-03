@@ -10,17 +10,8 @@ import {
   WORKER_Y,
   workerOf,
 } from "./hero-pieces";
-import {
-  easeInOut,
-  INOUT,
-  OUT,
-  pct,
-  SCENE_MS,
-  SLIDE_MS,
-  SPRING,
-  type TopInk,
-  vars,
-} from "./hero-prints.styles";
+import { easeInOut, OUT, pct, SCENE_MS, SLIDE_MS, type TopInk, vars } from "./hero-prints.view";
+import { INOUT, SPRING } from "./hero-prints.css";
 
 export const MEANDER = [
   [40, 160],

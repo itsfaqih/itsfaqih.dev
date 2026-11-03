@@ -1,9 +1,9 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import NullCodeBlock from "./null-code-block.astro";
 import { arrived, DEMOS, TITLE, verdictOf, type Demo, type Way } from "./null-vs-undefined";
-import { flowView, KINDS, paint, styles } from "./null-vs-undefined.styles";
-import { host } from "./rule-landing.styles";
+import { flowView, KINDS, paint } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
+import { host } from "./rule-landing.css";
 
 type Props = { demo: Demo; way: Way };
 
@@ -16,16 +16,16 @@ const intent = DEMOS[demo].intent(TITLE);
 // "not sent yet" when the demo starts below the fold, and plays the save once it is on screen.
 ---
 
-<null-flow {...stylex.attrs(host.contents)} data-demo={demo} data-way={way}>
-  <div {...stylex.attrs(styles.view)}>
+<null-flow class={host.contents} data-demo={demo} data-way={way}>
+  <div class={styles.view}>
     <NullCodeBlock lines={lines(way)} />
-    <div {...stylex.attrs(styles.flow)} data-part="flow">
-      <div {...stylex.attrs(styles.form)} data-part="form">
+    <div class={styles.flow} data-part="flow">
+      <div class={styles.form} data-part="form">
         {
           demo === "clear" ? (
-            <Fragment><span {...stylex.attrs(styles.label)}>Reviewer</span><span {...stylex.attrs(styles.none)}>None</span><button type="button" class={flowView.again} data-part="again">Reset</button></Fragment>
+            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.none}>None</span><button type="button" class={flowView.again} data-part="again">Reset</button></Fragment>
           ) : (
-            <Fragment><label {...stylex.attrs(styles.field)}><span {...stylex.attrs(styles.label)}>Title</span><input data-hint="true" spellcheck="false" {...stylex.attrs(styles.input)} value={TITLE} data-part="input" /></label><button type="button" class={flowView.again} data-part="save">Reset</button></Fragment>
+            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input data-hint="true" spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button type="button" class={flowView.again} data-part="save">Reset</button></Fragment>
           )
         }
       </div>
@@ -60,17 +60,17 @@ const intent = DEMOS[demo].intent(TITLE);
     demo === "clear" && (
       <Fragment>
         <template data-part="chip"
-          ><span {...stylex.attrs(styles.chip)}
+          ><span class={styles.chip}
             >Rina<button
               data-hint="true"
               type="button"
               aria-label="Remove reviewer Rina"
-              {...stylex.attrs(styles.remove)}
+              class={styles.remove}
               data-part="remove">✕</button
             ></span
           ></template
         >
-        <template data-part="none"><span {...stylex.attrs(styles.none)}>None</span></template>
+        <template data-part="none"><span class={styles.none}>None</span></template>
       </Fragment>
     )
   }

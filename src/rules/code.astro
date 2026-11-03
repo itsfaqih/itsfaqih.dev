@@ -1,14 +1,14 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { codeTone, type Tone } from "./rule-landing.styles";
+import { type ClassValue } from "../cx";
+import { codeTone, type Tone } from "./rule-landing.view";
 
 type Props = {
   /** Where the code sits: "chip" in lesson copy, "prompt" in a quiz prompt, "wrap" elsewhere. */
   tone?: Tone;
-  style?: stylex.StyleXStyles;
+  style?: ClassValue;
 };
 
 const { tone = "plain", style } = Astro.props;
 ---
 
-<code {...stylex.attrs(codeTone(tone), style)}><slot /></code>
+<code class:list={[codeTone(tone), style]}><slot /></code>

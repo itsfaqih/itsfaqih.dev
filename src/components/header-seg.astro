@@ -1,6 +1,6 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { segView, styles, type Seg } from "./header.styles";
+import { segView, type Seg } from "./header.view";
+import { styles } from "./header.css";
 
 type Props = { name: Seg };
 
@@ -9,5 +9,5 @@ const view = segView(name, { scrolled: false, open: false, live: false });
 ---
 
 <div class={view.seg} data-compact={view.compact} inert={!view.on} data-seg={name}>
-  <div {...stylex.attrs(styles.clip)}><div class={view.row}><slot /></div></div>
+  <div class={styles.clip}><div class={view.row}><slot /></div></div>
 </div>

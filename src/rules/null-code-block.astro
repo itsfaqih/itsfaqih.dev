@@ -1,31 +1,29 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import type { Line } from "./null-vs-undefined";
-import { KINDS, OUT_KINDS, paint, styles } from "./null-vs-undefined.styles";
+import { KINDS, OUT_KINDS, paint } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
 
 type Props = { lines: Line[] };
 
 const { lines } = Astro.props;
 ---
 
-<div {...stylex.attrs(styles.code)}>
+<div class={styles.code}>
   {
     lines.map((line) => (
-      <div {...stylex.attrs(styles.line, line.hot && styles.hot)}
-        ><code {...stylex.attrs(styles.source)}>{
+      <div class:list={[styles.line, line.hot && styles.hot]}
+        ><code class={styles.source}>{
           line.c
             ? paint(line.c, KINDS).map((part) => (part.class ? <span class={part.class}>{part.text}</span> : part.text))
             : " "
         }</code>{
           line.out && (
             <span
-              {...stylex.attrs(
-                styles.out,
+              class:list={[styles.out,
                 line.tone === "no" && styles.outNo,
-                line.tone === "yes" && styles.outYes,
-              )}
-              ><span {...stylex.attrs(arcade.srOnly)}>gives </span>{
+                line.tone === "yes" && styles.outYes]}
+              ><span class={arcade.srOnly}>gives </span>{
                 paint(line.out, OUT_KINDS).map((part) =>
                   part.class ? <span class={part.class}>{part.text}</span> : part.text,
                 )

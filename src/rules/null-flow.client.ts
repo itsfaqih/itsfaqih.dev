@@ -8,8 +8,8 @@ import {
   type Row,
   type Way,
 } from "./null-vs-undefined";
-import { flowView, KINDS, paint } from "./null-vs-undefined.styles";
-import { TABBED } from "./rule-landing.styles";
+import { flowView, KINDS, paint } from "./null-vs-undefined.view";
+import { TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SEND_MS = 460;

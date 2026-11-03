@@ -1,5 +1,5 @@
 import { reducedMotion } from "../hooks/media-query";
-import { palette } from "../theme.stylex";
+import { palette } from "../theme.vars.css";
 import { DRAFT } from "./dialog-design";
 import {
   articleView,
@@ -9,7 +9,7 @@ import {
   readView,
   ringView,
   scrimView,
-} from "./dialog-design.styles";
+} from "./dialog-design.view";
 import { onceOnScreen } from "./rule-motion";
 
 /**

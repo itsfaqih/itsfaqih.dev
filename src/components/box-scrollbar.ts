@@ -1,7 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
-
 import { reducedMotion } from "../hooks/media-query";
-import { cursors, motion, palette } from "../theme.stylex";
 
 const REVEAL_PX = 24;
 const LINGER_MS = 900;
@@ -134,69 +131,3 @@ export function watchBoxScrollbar(box: HTMLElement, track: HTMLElement) {
     thumb.removeEventListener("pointercancel", onThumbUp);
   };
 }
-
-const FINE = "@media (hover: hover) and (pointer: fine)";
-
-/** Goes on the scrolling box: hides its native bar where the box scrollbar takes over, a fine pointer. */
-export const boxScrollbarHost = stylex.create({
-  box: {
-    scrollbarWidth: { default: null, [FINE]: "none" },
-    "::-webkit-scrollbar": { display: { default: null, [FINE]: "none" } },
-  },
-});
-
-const REDUCE = "@media (prefers-reduced-motion: reduce)";
-
-export const marker = stylex.defaultMarker();
-
-// watchBoxScrollbar sets data-shown, data-gold and data-dragging on the track.
-export const boxScrollbar = stylex.create({
-  track: {
-    "--sb-hue": palette["--go"],
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1,
-    width: "18px",
-    pointerEvents: { default: "none", ":is([data-shown])": "auto" },
-  },
-  thumb: {
-    position: "absolute",
-    top: 0,
-    right: "4px",
-    width: {
-      default: "5px",
-      [stylex.when.ancestor(":is([data-shown]:hover, [data-dragging])")]: "8px",
-    },
-    borderRadius: {
-      default: "2.5px",
-      [stylex.when.ancestor(":is([data-shown]:hover, [data-dragging])")]: "4px",
-    },
-    backgroundColor: {
-      default: `color-mix(in oklab, var(--sb-hue) ${palette["--eyebrow-mix"]}, #000)`,
-      [stylex.when.ancestor("[data-gold]")]: palette["--go-ink"],
-      "@media (forced-colors: active)": {
-        default: "CanvasText",
-        [stylex.when.ancestor("[data-gold]")]: palette["--go-ink"],
-      },
-    },
-    opacity: { default: 0, [stylex.when.ancestor("[data-shown]")]: 1 },
-    cursor: {
-      default: cursors["--cursor-grab"],
-      [stylex.when.ancestor("[data-dragging]")]: cursors["--cursor-grabbing"],
-    },
-    transitionProperty: {
-      default: "opacity, width, background-color",
-      [REDUCE]: "opacity, background-color",
-    },
-    transitionDuration: {
-      default: motion["--t-fast-exit"],
-      [stylex.when.ancestor("[data-shown]")]: motion["--t-fast"],
-    },
-    transitionTimingFunction: {
-      default: motion["--exit"],
-      [stylex.when.ancestor("[data-shown]")]: motion["--fast"],
-    },
-  },
-});

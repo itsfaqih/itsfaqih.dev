@@ -1,6 +1,6 @@
 import { whenIdle } from "../hooks/idle";
 import { watchBoxScrollbar } from "./box-scrollbar";
-import { ISLAND_HOME_MS, LIST_PADDING, view, type Step } from "./command-palette.styles";
+import { ISLAND_HOME_MS, LIST_PADDING, view, type Step } from "./command-palette.view";
 import { placeHighlight } from "./fluid-hover";
 
 const PLACEHOLDER = {
@@ -128,7 +128,8 @@ class CommandPalette extends HTMLElement {
       // One fill follows the highlighted option, whether the pointer or the arrow keys moved it, and
       // springs between options instead of blinking (fluid-hover.ts). A fresh fill fades in where it
       // lands instead of sliding there.
-      if (selected) placeHighlight(current.highlight, { y: selected.offsetTop, h: selected.offsetHeight });
+      if (selected)
+        placeHighlight(current.highlight, { y: selected.offsetTop, h: selected.offsetHeight });
       else current.highlight.removeAttribute("data-on");
       if (selected && selected !== shown) selected.scrollIntoView({ block: "nearest" });
       shown = selected;

@@ -1,6 +1,6 @@
 import { reducedMotion } from "../hooks/media-query";
 import { Demo } from "./data-loading-demo";
-import { type Sweep, view } from "./data-loading.styles";
+import { type Sweep, view } from "./data-loading.view";
 import { onceOnScreen } from "./rule-motion";
 
 /**
@@ -16,7 +16,10 @@ class DataLoadingWaterfall extends Demo {
     });
     if (reducedMotion()) return;
     this.#show("armed", 0);
-    signal.addEventListener("abort", onceOnScreen(this, () => this.#show("run", 1)));
+    signal.addEventListener(
+      "abort",
+      onceOnScreen(this, () => this.#show("run", 1)),
+    );
   }
 
   /** `run` numbers each sweep; a new number restarts the plot's animations on a fresh copy. */

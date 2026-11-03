@@ -1,8 +1,8 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import PageContainer from "../components/page-container.astro";
-import { marker, styles } from "./blog-index.styles";
+import { marker } from "../when";
+import { styles } from "./blog-index.css";
 import { BLOG_DATE_FORMATTER, type Post } from "./posts";
 
 // The blog's post list. It has no state, so it ships no JS.
@@ -11,30 +11,30 @@ type Props = { posts: Post[] };
 const { posts } = Astro.props;
 ---
 
-<div {...stylex.attrs(styles.page)}>
+<div class={styles.page}>
   <PageContainer maxWidth="3xl" style={styles.container}>
-    <div {...stylex.attrs(styles.intro)}>
-      <div {...stylex.attrs(styles.label)}>
-        <div {...stylex.attrs(styles.labelIcon)}><Icon name="FileText" size={20} /></div><span {...stylex.attrs(styles.labelText)}>Blog</span>
-      </div><h1 {...stylex.attrs(styles.title)}>Thoughts &amp; Tutorials</h1><p {...stylex.attrs(styles.lede)}>Exploring web development, design patterns, and the technologies that power modern applications.</p>
+    <div class={styles.intro}>
+      <div class={styles.label}>
+        <div class={styles.labelIcon}><Icon name="FileText" size={20} /></div><span class={styles.labelText}>Blog</span>
+      </div><h1 class={styles.title}>Thoughts &amp; Tutorials</h1><p class={styles.lede}>Exploring web development, design patterns, and the technologies that power modern applications.</p>
     </div><div>
       {
         posts.length === 0 ? (
-          <div {...stylex.attrs(styles.empty)}>
-            <Icon name="FileText" size={48} {...stylex.attrs(styles.emptyIcon)} /><p {...stylex.attrs(styles.muted, styles.emptyText)}>No posts yet. Check back soon!</p>
+          <div class={styles.empty}>
+            <Icon name="FileText" size={48} class={styles.emptyIcon} /><p class:list={[styles.muted, styles.emptyText]}>No posts yet. Check back soon!</p>
           </div>
         ) : (
           posts.map((post) => (
-            <article {...stylex.attrs(styles.post)}>
-              <a href={`/blog/${post.id}`} {...stylex.attrs(styles.postLink, marker)}>
-                <div {...stylex.attrs(styles.card)}>
-                  <div {...stylex.attrs(styles.cardRow)}>
-                    <div {...stylex.attrs(styles.cardBody)}>
-                      <div {...stylex.attrs(styles.date)}>
-                        <Icon name="CalendarBlank" size={14} {...stylex.attrs(styles.muted)} /><time {...stylex.attrs(styles.muted, styles.small)}>{BLOG_DATE_FORMATTER.format(post.data.publishedAt)}</time>
-                      </div><h2 {...stylex.attrs(styles.postTitle)}>{post.data.title}</h2>{post.data.summary && <p {...stylex.attrs(styles.summary)}>{post.data.summary}</p>}
-                    </div><div {...stylex.attrs(styles.arrowSlot)}>
-                      <div {...stylex.attrs(styles.arrowWell)}><Icon name="ArrowRight" size={20} {...stylex.attrs(styles.arrow)} /></div>
+            <article class={styles.post}>
+              <a href={`/blog/${post.id}`} class:list={[styles.postLink, marker]}>
+                <div class={styles.card}>
+                  <div class={styles.cardRow}>
+                    <div class={styles.cardBody}>
+                      <div class={styles.date}>
+                        <Icon name="CalendarBlank" size={14} class={styles.muted} /><time class:list={[styles.muted, styles.small]}>{BLOG_DATE_FORMATTER.format(post.data.publishedAt)}</time>
+                      </div><h2 class={styles.postTitle}>{post.data.title}</h2>{post.data.summary && <p class={styles.summary}>{post.data.summary}</p>}
+                    </div><div class={styles.arrowSlot}>
+                      <div class={styles.arrowWell}><Icon name="ArrowRight" size={20} class={styles.arrow} /></div>
                     </div>
                   </div>
                 </div>
@@ -43,8 +43,8 @@ const { posts } = Astro.props;
           ))
         )
       }
-    </div><div {...stylex.attrs(styles.footer)}>
-      <a href="/" {...stylex.attrs(styles.backLink, marker)}><Icon name="ArrowRight" size={16} {...stylex.attrs(styles.backArrow)} />Back to Home</a>
+    </div><div class={styles.footer}>
+      <a href="/" class:list={[styles.backLink, marker]}><Icon name="ArrowRight" size={16} class={styles.backArrow} />Back to Home</a>
     </div>
   </PageContainer>
 </div>

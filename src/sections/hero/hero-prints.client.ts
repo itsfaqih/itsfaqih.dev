@@ -21,7 +21,7 @@ import {
   TOKEN_STAGGER_MS,
   type TopInk,
   TOPS,
-} from "./hero-prints.styles";
+} from "./hero-prints.view";
 import { reducedMotion } from "../../hooks/media-query";
 
 const HALFTONE_OFFSET = "translate(5 4)";

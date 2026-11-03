@@ -1,6 +1,6 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { draw, styles, type TopInk } from "./hero-prints.styles";
+import { draw, type TopInk } from "./hero-prints.view";
+import { styles } from "./hero-prints.css";
 
 // A figure printed in two passes: the halftone screen offset beneath it, then its top ink.
 type Props = {
@@ -13,23 +13,23 @@ type Props = {
 const { p, top = "solid", tag: Figure, figure } = Astro.props;
 ---
 
-<g transform="translate(5 4)" fill={`url(#${p}ht)`} {...stylex.attrs(styles.part, styles.screen)}
+<g transform="translate(5 4)" fill={`url(#${p}ht)`} class:list={[styles.part, styles.screen]}
   ><Figure {...figure} /></g
 >{
   top === "solid" && (
-    <g {...draw(styles.ink)}>
+    <g class={draw(styles.ink)}>
       <Figure {...figure} />
     </g>
   )
 }{
   top === "hue" && (
-    <g {...draw(styles.hue, styles.screen)}>
+    <g class={draw(styles.hue, styles.screen)}>
       <Figure {...figure} />
     </g>
   )
 }{
   top === "outline" && (
-    <g {...draw(styles.inkLine)} stroke-width="3">
+    <g class={draw(styles.inkLine)} stroke-width="3">
       <Figure {...figure} />
     </g>
   )

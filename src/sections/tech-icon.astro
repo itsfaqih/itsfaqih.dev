@@ -1,8 +1,8 @@
 ---
-import * as stylex from "@stylexjs/stylex";
+import { type ClassValue } from "../cx";
 import { TECH_LOGOS } from "./tech-logos";
 import { instanceSuffix, MARKS } from "./tech-brand";
-import { icon, mark as markStyles } from "./tech-icon.styles";
+import { icon, mark as markStyles } from "./tech-icon.css";
 
 /**
  * A tool's one-colour mark (drawn from its logo where simple-icons draws another shape), which
@@ -11,7 +11,7 @@ import { icon, mark as markStyles } from "./tech-icon.styles";
  * --lit to 1 (iconLit), and the mark fades out for them. A logo wider than it is tall (the VoidZero
  * marks in their parentheses) widens the icon to fit.
  */
-type Props = { name: string; xstyle?: stylex.StyleXStyles };
+type Props = { name: string; xstyle?: ClassValue };
 
 const { name, xstyle } = Astro.props;
 const mark = MARKS.get(name);
@@ -25,21 +25,21 @@ const fillRule = mark?.evenOdd ? "evenodd" : undefined;
 {
   mark && (
     <span
-      {...stylex.attrs(icon.pair, xstyle)}
+      class:list={[icon.pair, xstyle]}
       style={width > height ? `--wide:${width / height}` : undefined}
       aria-hidden="true"
     >
       {logo?.flat ? (
-        <svg {...stylex.attrs(icon.flat)} viewBox={logo.viewBox} set:html={logo.flat.replaceAll("$", suffix)} />
+        <svg class={icon.flat} viewBox={logo.viewBox} set:html={logo.flat.replaceAll("$", suffix)} />
       ) : (
-        <svg {...stylex.attrs(icon.flat)} viewBox={viewBox}>
+        <svg class={icon.flat} viewBox={viewBox}>
           <path d={mark.path} fill-rule={fillRule} />
         </svg>
       )}
       {logo ? (
-        <svg {...stylex.attrs(icon.lit)} viewBox={logo.viewBox} set:html={logo.body.replaceAll("$", suffix)} />
+        <svg class={icon.lit} viewBox={logo.viewBox} set:html={logo.body.replaceAll("$", suffix)} />
       ) : (
-        <svg {...stylex.attrs(icon.lit, markStyles.brand)} viewBox={viewBox}>
+        <svg class:list={[icon.lit, markStyles.brand]} viewBox={viewBox}>
           <path d={mark.path} fill-rule={fillRule} />
         </svg>
       )}

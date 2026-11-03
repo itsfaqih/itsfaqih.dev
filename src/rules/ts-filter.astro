@@ -1,5 +1,4 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import {
   FATE,
   FILTER_DATE,
@@ -10,8 +9,9 @@ import {
   timeOf,
   type Way,
 } from "./handling-timestamps";
-import { styles, tsView } from "./handling-timestamps.styles";
-import { host } from "./rule-landing.styles";
+import { styles } from "./handling-timestamps.css";
+import { tsView } from "./handling-timestamps.view";
+import { host } from "./rule-landing.css";
 import TsWire from "./ts-wire.astro";
 
 type Props = { way: Way };
@@ -20,27 +20,27 @@ const { way } = Astro.props;
 const { from, orders } = filterOf(way, FILTER_DATE);
 ---
 
-<ts-filter {...stylex.attrs(host.contents)} data-way={way}>
-  <div {...stylex.attrs(styles.view)}>
-    <label {...stylex.attrs(styles.form)}
-      ><span {...stylex.attrs(styles.formHead)}>Rina's orders on</span><input
+<ts-filter class={host.contents} data-way={way}>
+  <div class={styles.view}>
+    <label class={styles.form}
+      ><span class={styles.formHead}>Rina's orders on</span><input
         data-hint="true"
         type="date"
         required
-        {...stylex.attrs(styles.input)}
+        class={styles.input}
         value={FILTER_DATE}
       /></label
     >
     <TsWire lines={filterLines(way, from)} />
-    <ul {...stylex.attrs(styles.orders)}>
+    <ul class={styles.orders}>
       {
         orders.map((order) => (
           <li class={tsView.order(order.fate)}
-            ><span {...stylex.attrs(styles.orderId)}>#<Fragment set:html="<!-- -->" />{order.id}</span><span
+            ><span class={styles.orderId}>#<Fragment set:html="<!-- -->" />{order.id}</span><span
               class={tsView.when(order.fate)}
               >{shortDay(order.wall)}<Fragment set:html="<!-- -->" />, <Fragment set:html="<!-- -->" />{
                 timeOf(order.wall)
-              }<small {...stylex.attrs(styles.utc)}
+              }<small class={styles.utc}
                 >{shortDay(order.instant)}<Fragment set:html="<!-- -->" />, <Fragment set:html="<!-- -->" />{
                   hhmm(order.instant)
                 }<Fragment set:html="<!-- -->" /> UTC</small

@@ -1,6 +1,6 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { dialogView, styles } from "./dialog-design.styles";
+import { dialogView } from "./dialog-design.view";
+import { styles } from "./dialog-design.css";
 
 type Props = {
   /** Prefixes the title's and body's ids, which name and describe the dialog. */
@@ -27,7 +27,7 @@ const { id, title, body, bare = false, top = false, part } = Astro.props;
   class={dialogView(top, false)}
   data-part={part}
 >
-  <div {...stylex.attrs(styles.head)}><p id={`${id}t`} {...stylex.attrs(styles.title)}>{title}</p><slot name="close" /></div>
-  {body && <p id={`${id}d`} {...stylex.attrs(styles.body)} data-part="body">{body}</p>}
+  <div class={styles.head}><p id={`${id}t`} class={styles.title}>{title}</p><slot name="close" /></div>
+  {body && <p id={`${id}d`} class={styles.body} data-part="body">{body}</p>}
   <slot />
 </div>

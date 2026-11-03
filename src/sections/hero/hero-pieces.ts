@@ -10,7 +10,7 @@ import {
   sector,
   shifted,
 } from "./hero-morph";
-import type { TopInk } from "./hero-prints.styles";
+import type { TopInk } from "./hero-prints.view";
 
 export const QUEUE_Y = 88;
 export const SLOT_X = [44, 86, 128, 170] as const;

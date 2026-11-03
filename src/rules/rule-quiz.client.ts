@@ -1,5 +1,6 @@
 import { reducedMotion } from "../hooks/media-query";
-import { OUT, quizView, SNAP } from "./rule-landing.styles";
+import { OUT } from "./rule-landing.css";
+import { quizView, SNAP } from "./rule-landing.view";
 
 type Drag = { x0: number; y0: number; lastX: number; lastT: number; rot: number; moved: boolean };
 

@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import type { Level } from "./lesson";
-import { quizKit, quizView } from "./rule-landing.styles";
+import { quizKit } from "./rule-landing.css";
+import { quizView } from "./rule-landing.view";
 
 type Props = {
   level: Level;
@@ -24,7 +24,7 @@ if (!choice) throw new Error(`${level.name} has no choice "${id}"`);
   data-slot={choice.id}
   data-note={choice.note}
   data-look={look}
-  ><span {...stylex.attrs(quizKit.choiceBody)}><slot /></span>{
-    caption && <span {...stylex.attrs(quizKit.caption)}>{caption}</span>
+  ><span class={quizKit.choiceBody}><slot /></span>{
+    caption && <span class={quizKit.caption}>{caption}</span>
   }</button
 >

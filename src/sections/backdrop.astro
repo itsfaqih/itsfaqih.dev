@@ -1,6 +1,5 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { styles } from "./backdrop-dots";
+import { styles } from "./backdrop-dots.css";
 
 type Props = {
   /** Slow waves swell the dots across the page. */
@@ -10,10 +9,10 @@ type Props = {
 const { tide = false } = Astro.props;
 ---
 
-<site-backdrop data-tide={tide ? "" : undefined} {...stylex.attrs(styles.host)}>
+<site-backdrop data-tide={tide ? "" : undefined} class={styles.host}>
   <template>
-    <div {...stylex.attrs(styles.root)} data-backdrop aria-hidden="true">
-      <i {...stylex.attrs(styles.layer, styles.grid)}></i><canvas {...stylex.attrs(styles.layer)}
+    <div class={styles.root} data-backdrop aria-hidden="true">
+      <i class:list={[styles.layer, styles.grid]}></i><canvas class={styles.layer}
       ></canvas>
     </div>
   </template>

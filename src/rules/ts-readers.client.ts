@@ -8,8 +8,8 @@ import {
   type Reading,
   type Wall,
 } from "./handling-timestamps";
-import { tsView } from "./handling-timestamps.styles";
-import { OUT, TABBED } from "./rule-landing.styles";
+import { tsView } from "./handling-timestamps.view";
+import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 function swing(root: Element, from: Wall[], to: Wall[], duration: number, step: number) {
@@ -63,7 +63,9 @@ function paint(card: Element, reading: Reading) {
   const off = offBy(reading);
   const clock = card.firstElementChild!;
   const read = card.lastElementChild!;
-  let ghost = clock.firstElementChild!.classList.contains("ts-min") ? null : clock.firstElementChild;
+  let ghost = clock.firstElementChild!.classList.contains("ts-min")
+    ? null
+    : clock.firstElementChild;
   if (off && !ghost) {
     ghost = document.createElement("i");
     ghost.className = tsView.ghost;

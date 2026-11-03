@@ -1,8 +1,8 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import { AXIS, SWEEP, type Waterfall } from "./data-loading";
-import { styles, view } from "./data-loading.styles";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
 
 type Props = Waterfall;
 
@@ -11,19 +11,19 @@ const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 const deferred = bars.some((bar) => bar.kind === "defer");
 ---
 
-<data-loading-waterfall {...stylex.attrs(styles.view)}
-  ><div {...stylex.attrs(styles.wf)} style={`--sweep:${SWEEP}ms`}
-    ><ul {...stylex.attrs(styles.lanes)} aria-hidden="true"
-      >{bars.map((bar) => <li {...stylex.attrs(styles.label)}>{bar.label}</li>)}</ul
-    ><div {...stylex.attrs(styles.plot)} data-part="plot"
-      ><ul {...stylex.attrs(styles.lanes)}
+<data-loading-waterfall class={styles.view}
+  ><div class={styles.wf} style={`--sweep:${SWEEP}ms`}
+    ><ul class={styles.lanes} aria-hidden="true"
+      >{bars.map((bar) => <li class={styles.label}>{bar.label}</li>)}</ul
+    ><div class={styles.plot} data-part="plot"
+      ><ul class={styles.lanes}
         >{
           bars.map((bar) => (
-            <li {...stylex.attrs(styles.lane)}
+            <li class={styles.lane}
               ><span
-                {...stylex.attrs(styles.bar, styles[bar.kind])}
+                class:list={[styles.bar, styles[bar.kind]]}
                 style={`left:${pct(bar.from)};width:${pct(bar.to - bar.from)}`}></span
-              ><span {...stylex.attrs(arcade.srOnly)}
+              ><span class={arcade.srOnly}
                 ><Fragment
                   set:html={`${bar.label}<!-- -->: <!-- -->${bar.from}<!-- --> to <!-- -->${bar.to}<!-- -->ms${bar.kind === "defer" ? "<!-- -->, deferred" : ""}`}
                 /></span
@@ -35,26 +35,26 @@ const deferred = bars.some((bar) => bar.kind === "defer");
         class={view.paint("still")}
         style={`left:${pct(paint)};--at:${(paint / AXIS) * SWEEP}ms`}
         data-part="paint"
-        ><b {...stylex.attrs(styles.paintTag, paint > AXIS * 0.6 && styles.paintTagEnd)}
-          ><span {...stylex.attrs(styles.long)}>on screen </span>{paint}<!-- -->ms</b
+        ><b class:list={[styles.paintTag, paint > AXIS * 0.6 && styles.paintTagEnd]}
+          ><span class={styles.long}>on screen </span>{paint}<!-- -->ms</b
         ></span
       ><span class={view.cover("still")} aria-hidden="true" data-part="cover"></span><span
-        {...stylex.attrs(styles.grid)}
+        class={styles.grid}
         aria-hidden="true"></span
       ></div
-    ><span {...stylex.attrs(styles.axis)} aria-hidden="true"
+    ><span class={styles.axis} aria-hidden="true"
       >{
         [0, 250, 500, 750, 1000].map((ms) => (
-          <i {...stylex.attrs(styles.tick)} style={`left:${pct(ms)}`}>{ms}</i>
+          <i class={styles.tick} style={`left:${pct(ms)}`}>{ms}</i>
         ))
       }</span
     ></div
-  ><div {...stylex.attrs(styles.ctl)}
-    ><span {...stylex.attrs(styles.note)}
-      ><i {...stylex.attrs(styles.key, styles.keyReq)}></i> request<!-- --> <i
-        {...stylex.attrs(styles.key, styles.keyCode)}></i> code{
+  ><div class={styles.ctl}
+    ><span class={styles.note}
+      ><i class:list={[styles.key, styles.keyReq]}></i> request<!-- --> <i
+        class:list={[styles.key, styles.keyCode]}></i> code{
         deferred && (
-          <Fragment><i {...stylex.attrs(styles.key, styles.keyDefer)}></i> deferred</Fragment>
+          <Fragment><i class:list={[styles.key, styles.keyDefer]}></i> deferred</Fragment>
         )
       }</span
     ><button data-hint="true" type="button" class={view.ctlButton} data-part="replay">Replay</button

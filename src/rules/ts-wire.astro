@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import type { WireLine } from "./handling-timestamps";
-import { styles, tsView } from "./handling-timestamps.styles";
+import { styles } from "./handling-timestamps.css";
+import { tsView } from "./handling-timestamps.view";
 
 type Props = { lines: WireLine[] };
 
@@ -10,7 +10,7 @@ const { lines } = Astro.props;
 // patch each piece in place (ts-wire.ts).
 ---
 
-<div {...stylex.attrs(styles.wire)}>
+<div class={styles.wire}>
   {
     lines.map((line) => (
       <code
@@ -19,7 +19,7 @@ const { lines } = Astro.props;
         >{
           line.c.map((part, index) =>
             part.quoted ? (
-              <span {...stylex.attrs(styles.str)}
+              <span class={styles.str}
                 >"<Fragment set:html="<!-- -->" />{part.text}<Fragment set:html="<!-- -->" />"</span
               >
             ) : (

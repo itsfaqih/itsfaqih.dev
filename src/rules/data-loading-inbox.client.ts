@@ -1,6 +1,6 @@
 import { inboxRows, SPIN_DELAY } from "./data-loading";
 import { Demo, el, write } from "./data-loading-demo";
-import { view } from "./data-loading.styles";
+import { view } from "./data-loading.view";
 
 /**
  * An inbox (data-loading-inbox.astro) whose server replies in 80ms or 1.2s. The skeleton shows at

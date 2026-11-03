@@ -22,7 +22,7 @@ import {
   VIEW_NAMES,
   viewOf,
 } from "./table-design";
-import { view } from "./table-design.styles";
+import { view } from "./table-design.view";
 
 type Store<T> = {
   get: () => T;

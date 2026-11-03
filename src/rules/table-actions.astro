@@ -1,52 +1,52 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import { CREW } from "./table-design";
-import { styles, view } from "./table-design.styles";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 
 type Props = { careful: boolean };
 
 const { careful } = Astro.props;
 ---
 
-<table-actions {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
-  <table {...stylex.attrs(styles.table)}>
-    <caption {...stylex.attrs(arcade.srOnly)}>Team members with actions</caption>
+<table-actions class={styles.card} data-careful={careful ? "true" : undefined}>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly}>Team members with actions</caption>
     <colgroup
-      ><col /><col {...stylex.attrs(styles.colRole)} />{careful && <col {...stylex.attrs(styles.colActs)} />}</colgroup
+      ><col /><col class={styles.colRole} />{careful && <col class={styles.colActs} />}</colgroup
     >
     <thead>
       <tr
-        ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+        ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
           >Role</th
         >{
           careful && (
-            <th scope="col" {...stylex.attrs(styles.th, styles.num)}
-              ><span {...stylex.attrs(arcade.srOnly)}>Actions</span></th
+            <th scope="col" class:list={[styles.th, styles.num]}
+              ><span class={arcade.srOnly}>Actions</span></th
             >
           )
         }</tr
       >
     </thead>
-    <tbody {...stylex.attrs(styles.body)}>
+    <tbody class={styles.body}>
       {
         CREW.map(({ name, role }, at) => (
           <tr class={view.row} data-name={name}
             ><td class={view.nameCell(false)}
               ><span data-hint={at === 0 ? "true" : undefined} data-part="name">{name}</span>{
                 !careful && (
-                  <span {...stylex.attrs(styles.inline)}
+                  <span class={styles.inline}
                     ><button
                       type="button"
                       aria-label={`Edit ${name}`}
                       aria-pressed="false"
-                      {...stylex.attrs(styles.inlineButton, styles.ring)}
+                      class:list={[styles.inlineButton, styles.ring]}
                       data-act="edit">Edit</button
                     ><button
                       type="button"
                       aria-label={`Delete ${name}`}
-                      {...stylex.attrs(styles.inlineButton, styles.inlineDelete, styles.ring)}
+                      class:list={[styles.inlineButton, styles.inlineDelete, styles.ring]}
                       data-act="delete">Delete</button
                     ></span
                   >
@@ -55,7 +55,7 @@ const { careful } = Astro.props;
             ><td class={view.roleCell(false)}>{role}</td>{
               careful && (
                 <td class={view.actsCell(false)}
-                  ><span {...stylex.attrs(styles.icons)}
+                  ><span class={styles.icons}
                     ><span class={view.tipped}
                       ><button
                         type="button"
@@ -67,17 +67,17 @@ const { careful } = Astro.props;
                           name="PencilSimple"
                           size="1em"
                           weight="bold"
-                          {...stylex.attrs(styles.iconGlyph)}
+                          class={styles.iconGlyph}
                         /></button
-                      ><span {...stylex.attrs(styles.tip)} aria-hidden="true">Edit</span></span
+                      ><span class={styles.tip} aria-hidden="true">Edit</span></span
                     ><span class={view.tipped}
                       ><button
                         type="button"
                         class={view.iconKey(true, false)}
                         aria-label={`Delete ${name}`}
                         data-act="delete"
-                        ><Icon name="Trash" size="1em" weight="bold" {...stylex.attrs(styles.iconGlyph)} /></button
-                      ><span {...stylex.attrs(styles.tip)} aria-hidden="true">Delete</span></span
+                        ><Icon name="Trash" size="1em" weight="bold" class={styles.iconGlyph} /></button
+                      ><span class={styles.tip} aria-hidden="true">Delete</span></span
                     ></span
                   ></td
                 >
@@ -88,11 +88,11 @@ const { careful } = Astro.props;
       }
     </tbody>
   </table>
-  <div {...stylex.attrs(styles.foot)}>
+  <div class={styles.foot}>
     <span data-part="count">{CREW.length}<!-- --> of <!-- -->{CREW.length}<!-- --> users</span>
   </div>
   <template data-part="restore"
-    ><button type="button" {...stylex.attrs(styles.link, styles.ring)} data-act="restore">Restore</button
+    ><button type="button" class:list={[styles.link, styles.ring]} data-act="restore">Restore</button
     ></template
   >
 </table-actions>

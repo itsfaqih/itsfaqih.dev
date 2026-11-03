@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { fluidHover } from "../components/fluid-hover";
-import { styles, view } from "./button-design.styles";
+import { fluidHover } from "../components/fluid-hover.css";
+import { styles } from "./button-design.css";
+import { view } from "./button-design.view";
 
 type Props = { careful?: boolean };
 
@@ -16,23 +16,21 @@ const key = [styles.key, styles.sm, styles.live];
 // mount fresh, so their step-in plays again: the confirm row, the drain and the hold fill.
 ---
 
-<button-delete {...stylex.attrs(styles.stage)} data-careful={careful ? "true" : undefined}>
+<button-delete class={styles.stage} data-careful={careful ? "true" : undefined}>
   {
     careful && (
-      <div role="group" aria-label="Guard" {...stylex.attrs(fluidHover.group, styles.guards)}>
+      <div role="group" aria-label="Guard" class:list={[fluidHover.group, styles.guards]}>
         <span
           aria-hidden="true"
           data-part="pill"
-          {...stylex.attrs(fluidHover.highlight, styles.guardPill, styles.guardSlide)}
+          class:list={[fluidHover.highlight, styles.guardPill, styles.guardSlide]}
         />
         {GUARDS.map(({ id, label }) => (
           <button
             type="button"
             aria-pressed={id === "confirm" ? "true" : "false"}
-            {...stylex.attrs(
-              styles.guard,
-              id === "confirm" && [styles.guardOn, styles.guardPill],
-            )}
+            class:list={[styles.guard,
+              id === "confirm" && [styles.guardOn, styles.guardPill]]}
             data-guard={id}>{label}</button
           >
         ))}
@@ -40,9 +38,9 @@ const key = [styles.key, styles.sm, styles.live];
     )
   }
   <div class={view.project("idle")} data-part="project">
-    <span {...stylex.attrs(styles.projectCopy, styles.stepIn)}
+    <span class:list={[styles.projectCopy, styles.stepIn]}
       ><b class={view.projectName(false)} data-part="name">Moonbase</b><small
-        {...stylex.attrs(styles.projectMeta)}
+        class={styles.projectMeta}
         data-part="meta">214 files · edited 2h ago</small
       ></span
     ><button
@@ -54,18 +52,18 @@ const key = [styles.key, styles.sm, styles.live];
     >
   </div>
   <template data-part="new-confirm"
-    ><span {...stylex.attrs(styles.row, styles.projectRow, styles.stepIn)}
+    ><span class:list={[styles.row, styles.projectRow, styles.stepIn]}
       ><button
         type="button"
-        {...stylex.attrs(key, styles.text)}
+        class:list={[key, styles.text]}
         data-autofocus="true"
         data-step="idle">Cancel</button
-      ><button type="button" {...stylex.attrs(key, styles.red)} data-step="deleted"
+      ><button type="button" class:list={[key, styles.red]} data-step="deleted"
         >Delete project</button
       ></span
     ></template
   >
-  <template data-part="new-drain"><span aria-hidden="true" {...stylex.attrs(styles.drain)}></span></template>
+  <template data-part="new-drain"><span aria-hidden="true" class={styles.drain}></span></template>
   <template data-part="new-fill"
     ><span aria-hidden="true" class={view.holdFill(false)}></span></template
   >

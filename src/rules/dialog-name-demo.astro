@@ -1,12 +1,11 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import DialogBox from "./dialog-box.astro";
-import { styles } from "./dialog-design.styles";
+import { styles } from "./dialog-design.css";
 import DialogField from "./dialog-field.astro";
 import DialogKey from "./dialog-key.astro";
 import DialogWindow from "./dialog-window.astro";
-import { host } from "./rule-landing.styles";
+import { host } from "./rule-landing.css";
 
 type Props = { sealed?: boolean };
 
@@ -15,19 +14,19 @@ const { sealed = false } = Astro.props;
 // reader would say.
 ---
 
-<dialog-name {...stylex.attrs(host.contents)} data-sealed={sealed ? "" : undefined}>
+<dialog-name class={host.contents} data-sealed={sealed ? "" : undefined}>
   <DialogWindow>
-    <div slot="page" {...stylex.attrs(styles.page)} data-part="page">
-      <div {...stylex.attrs(styles.spread)}><span {...stylex.attrs(styles.logo)}></span><span style="--w:34%" {...stylex.attrs(styles.ghost)}></span></div>
-      <div {...stylex.attrs(styles.card, styles.spreadInCard)}><span {...stylex.attrs(styles.project)}><b {...stylex.attrs(styles.strong)}>report.pdf</b><small {...stylex.attrs(styles.meta)}>2.4 MB · shared</small></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.soft, styles.softInCard)}>Rename</button></div>
-      <span style="--w:58%" {...stylex.attrs(styles.ghost)}></span>
+    <div slot="page" class={styles.page} data-part="page">
+      <div class={styles.spread}><span class={styles.logo}></span><span style="--w:34%" class={styles.ghost}></span></div>
+      <div class:list={[styles.card, styles.spreadInCard]}><span class={styles.project}><b class={styles.strong}>report.pdf</b><small class={styles.meta}>2.4 MB · shared</small></span><button data-hint="true" type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft, styles.softInCard]}>Rename</button></div>
+      <span style="--w:58%" class={styles.ghost}></span>
     </div>
     <DialogBox id={`name-${sealed ? "good" : "bad"}-`} bare={!sealed} title="Rename file" body="Pick a name your team will find." part="dialog">
       <DialogField name="name" label="Name" value="report.pdf" />
-      <div {...stylex.attrs(styles.acts)}><button type="button" data-stop="cancel" {...stylex.attrs(styles.stop, styles.btn, styles.plain)}>Cancel</button><button type="button" data-stop="save" {...stylex.attrs(styles.stop, styles.btn)}>Save</button></div>
+      <div class={styles.acts}><button type="button" data-stop="cancel" class:list={[styles.stop, styles.btn, styles.plain]}>Cancel</button><button type="button" data-stop="save" class:list={[styles.stop, styles.btn]}>Save</button></div>
     </DialogBox>
     <DialogKey slot="keys" part="tab">Tab</DialogKey>
     <Fragment slot="read">Open Rename to hear it</Fragment>
   </DialogWindow>
-  <template data-part="speech"><span {...stylex.attrs(styles.speech)}><Icon name="SpeakerHigh" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(styles.speaker)} /></span></template>
+  <template data-part="speech"><span class={styles.speech}><Icon name="SpeakerHigh" size="1em" weight="bold" aria-hidden="true" class={styles.speaker} /></span></template>
 </dialog-name>

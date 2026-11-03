@@ -1,9 +1,9 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import { FILTERED, FILTERS, PER_PAGE, START_FILTER } from "./table-design";
-import { host } from "./rule-landing.styles";
-import { styles, view } from "./table-design.styles";
+import { host } from "./rule-landing.css";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 import TablePageNav from "./table-page-nav.astro";
 
 type Props = { careful: boolean };
@@ -12,31 +12,31 @@ const { careful } = Astro.props;
 // Picking a filter mounts its table afresh on page 1, from that filter's template.
 ---
 
-<table-pager {...stylex.attrs(host.contents)} data-careful={careful ? "true" : undefined}>
+<table-pager class={host.contents} data-careful={careful ? "true" : undefined}>
   {
     ([START_FILTER, ...FILTERS.map(([filter]) => filter)] as const).map((filter, at) => {
       const people = FILTERED[filter];
       const pages = Math.ceil(people.length / PER_PAGE);
       const shown = people.slice(0, PER_PAGE);
       const card = (
-        <div {...stylex.attrs(styles.card)} data-part="card">
-          <table {...stylex.attrs(styles.table)}>
-            <caption {...stylex.attrs(arcade.srOnly)} data-part="caption">Users, page <!-- -->1</caption>
-            <colgroup><col /><col {...stylex.attrs(styles.colRole)} /></colgroup>
+        <div class={styles.card} data-part="card">
+          <table class={styles.table}>
+            <caption class={arcade.srOnly} data-part="caption">Users, page <!-- -->1</caption>
+            <colgroup><col /><col class={styles.colRole} /></colgroup>
             <thead>
               <tr
-                ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+                ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
                   >Role</th
                 ></tr
               >
             </thead>
-            <tbody {...stylex.attrs(styles.body)} data-part="rows">
+            <tbody class={styles.body} data-part="rows">
               {
                 shown.length === 0 ? (
                   <tr class={view.row}
-                    ><td colspan="2" {...stylex.attrs(styles.td, styles.blank, styles.still)}
-                      ><div {...stylex.attrs(styles.said)}
-                        ><b {...stylex.attrs(styles.saidTitle)}>No owners</b><span {...stylex.attrs(styles.saidHint)}
+                    ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}
+                      ><div class={styles.said}
+                        ><b class={styles.saidTitle}>No owners</b><span class={styles.saidHint}
                           >Nobody has the Owner role yet.</span
                         ></div
                       ></td
@@ -45,7 +45,7 @@ const { careful } = Astro.props;
                 ) : (
                   shown.map((person) => (
                     <tr class={view.row}
-                      ><td {...stylex.attrs(styles.td)}>{person.name}</td><td {...stylex.attrs(styles.td, styles.dim)}
+                      ><td class={styles.td}>{person.name}</td><td class:list={[styles.td, styles.dim]}
                         >{person.role}</td
                       ></tr
                     >
@@ -62,7 +62,7 @@ const { careful } = Astro.props;
   }
   <template data-part="row"
     ><tr class={view.row}
-      ><td {...stylex.attrs(styles.td)}></td><td {...stylex.attrs(styles.td, styles.dim)}></td></tr
+      ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
     ></template
   >
 </table-pager>

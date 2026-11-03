@@ -3,7 +3,7 @@
 /* Global: @font-face has no StyleX form. */
 @import "./fonts.css";
 /* Global: Lenis styles its own markup and the html classes it sets. */
-@import "lenis/dist/lenis.css";
+@import "lenis/dist/lenis.css" layer(global);
 /* Global: html-level rules, view transitions and the reduced-motion blanket. */
 @import "./arcade.css";
 

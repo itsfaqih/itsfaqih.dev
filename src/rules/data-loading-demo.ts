@@ -1,4 +1,4 @@
-import { view } from "./data-loading.styles";
+import { view } from "./data-loading.view";
 
 type Step = readonly [at: number, run: () => void];
 

@@ -1,27 +1,27 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
-import { styles, view } from "./table-design.styles";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 
 type Props = { page: number; pages: number };
 
 const { page, pages } = Astro.props;
 ---
 
-<nav {...stylex.attrs(styles.pager)} aria-label="Pages" data-part="nav"
-  ><span>Page <!-- -->{page}<!-- --> of <!-- -->{pages}</span><span {...stylex.attrs(styles.pages)}
+<nav class={styles.pager} aria-label="Pages" data-part="nav"
+  ><span>Page <!-- -->{page}<!-- --> of <!-- -->{pages}</span><span class={styles.pages}
     ><button
       type="button"
       aria-label="Previous page"
       disabled={page <= 1}
-      {...stylex.attrs(styles.page, styles.ring)}
+      class:list={[styles.page, styles.ring]}
       data-step="-1"
       ><Icon
         name="CaretLeft"
         size="1em"
         weight="bold"
         aria-hidden="true"
-        {...stylex.attrs(styles.pageIcon)}
+        class={styles.pageIcon}
       /></button
     >{
       Array.from({ length: pages }, (_, at) => at + 1).map((n) => (
@@ -36,14 +36,14 @@ const { page, pages } = Astro.props;
       type="button"
       aria-label="Next page"
       disabled={page >= pages}
-      {...stylex.attrs(styles.page, styles.ring)}
+      class:list={[styles.page, styles.ring]}
       data-step="1"
       ><Icon
         name="CaretRight"
         size="1em"
         weight="bold"
         aria-hidden="true"
-        {...stylex.attrs(styles.pageIcon)}
+        class={styles.pageIcon}
       /></button
     ></span
   ></nav

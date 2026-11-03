@@ -1,6 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { type Hint, watchHintReader, watchHints } from "./hints";
-import { lessonView, OUT, type SideKey, TABBED } from "./rule-landing.styles";
+import { lessonView, type SideKey } from "./rule-landing.view";
+import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SVG = "http://www.w3.org/2000/svg";

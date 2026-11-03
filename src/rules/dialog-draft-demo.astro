@@ -1,13 +1,13 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import DialogBox from "./dialog-box.astro";
 import DialogClose from "./dialog-close.astro";
 import { DRAFT } from "./dialog-design";
-import { scrimView, styles } from "./dialog-design.styles";
+import { scrimView } from "./dialog-design.view";
+import { styles } from "./dialog-design.css";
 import DialogField from "./dialog-field.astro";
 import DialogKey from "./dialog-key.astro";
 import DialogWindow from "./dialog-window.astro";
-import { host } from "./rule-landing.styles";
+import { host } from "./rule-landing.css";
 
 type Props = { sealed?: boolean };
 
@@ -15,27 +15,27 @@ const { sealed = false } = Astro.props;
 const id = `draft-${sealed ? "good" : "bad"}-`;
 ---
 
-<dialog-draft {...stylex.attrs(host.contents)} data-sealed={sealed ? "" : undefined}>
+<dialog-draft class={host.contents} data-sealed={sealed ? "" : undefined}>
   <DialogWindow>
-    <div slot="page" {...stylex.attrs(styles.page)} data-part="page">
-      <div {...stylex.attrs(styles.spread)}><span {...stylex.attrs(styles.logo)}></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.soft)}>New issue</button></div>
+    <div slot="page" class={styles.page} data-part="page">
+      <div class={styles.spread}><span class={styles.logo}></span><button data-hint="true" type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>New issue</button></div>
       {
         [66, 52, 74].map((width) => (
-          <div {...stylex.attrs(styles.mail)}><span {...stylex.attrs(styles.tag)}></span><span style={`--w:${width}%`} {...stylex.attrs(styles.ghost)}></span></div>
+          <div class={styles.mail}><span class={styles.tag}></span><span style={`--w:${width}%`} class={styles.ghost}></span></div>
         ))
       }
     </div>
     <DialogBox id={id} title="New issue" part="dialog">
       <DialogClose slot="close" />
       <DialogField name="title" label="Title" value={DRAFT} placeholder="Export button does nothing" />
-      <div {...stylex.attrs(styles.acts)}><button type="button" data-stop="create" {...stylex.attrs(styles.stop, styles.btn)}>Create</button></div>
+      <div class={styles.acts}><button type="button" data-stop="create" class:list={[styles.stop, styles.btn]}>Create</button></div>
     </DialogBox>
     {
       sealed && (
         <>
           <div aria-hidden="true" class={scrimView(true, false)} data-part="scrim-top" />
           <DialogBox id={`${id}top-`} top title="Discard this draft?" body={`You'll lose ${DRAFT.length} characters.`} part="confirm">
-            <div {...stylex.attrs(styles.acts)}><button type="button" data-stop="keep" {...stylex.attrs(styles.stop, styles.btn, styles.plain)}>Keep editing</button><button type="button" data-stop="discard" {...stylex.attrs(styles.stop, styles.btn, styles.red)}>Discard</button></div>
+            <div class={styles.acts}><button type="button" data-stop="keep" class:list={[styles.stop, styles.btn, styles.plain]}>Keep editing</button><button type="button" data-stop="discard" class:list={[styles.stop, styles.btn, styles.red]}>Discard</button></div>
           </DialogBox>
         </>
       )

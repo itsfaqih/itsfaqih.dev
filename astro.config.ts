@@ -9,8 +9,7 @@ import type { AstroIntegration } from "astro";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
 import rehypeSlug from "rehype-slug";
-import stylex from "@stylexjs/unplugin";
-import { Features } from "lightningcss";
+import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import { runnerImport, type Plugin } from "vite-plus";
 import { CODE_OPTIONS, codeFile } from "./src/components/code-file.ts";
 import { PUBLISHED_GUIDELINES } from "./src/data/guidelines.ts";
@@ -82,17 +81,17 @@ function rehypeHighlightCode() {
   };
 }
 
-// StyleX collects every module's rules, server-only components included, so its sheet is written
-// into the pages once both builds are done, after the global CSS like the stylesheet it extends.
-const stylexPlugin = stylex.vite({
-  devMode: "css-only",
-  // Ship oklch() and oklab() as written, like the plain CSS. Lowered to lab(), they shade
-  // anti-aliased edges one step differently.
-  lightningcssOptions: { exclude: Features.OklabColors, minify: true },
+// A client script reads class names from a .css.ts module, and its component's frontmatter imports
+// the same module. Left alone, every page would carry that module's rules a second time.
+const serverOwnsCss = (): Plugin => ({
+  name: "server-owns-css",
+  enforce: "pre",
+  apply: "build",
+  applyToEnvironment: (environment) => environment.name === "client",
+  load: (id) => (id.includes(".vanilla.css") ? "" : undefined),
 });
 
 async function inlineCoreAssets(css: string, outDir: string) {
-  // Quoted or not: StyleX's sheet is printed after Vite's minify pass.
   for (const [url, , asset] of css.matchAll(
     /url\((["']?)(\/(?:fonts\/[^)"']+-core\.woff2|cursors\/[^)#"']+\.svg))\1\)/g,
   )) {
@@ -137,12 +136,6 @@ function finishPages(): AstroIntegration {
         const outDir = fileURLToPath(dir);
         const pages = await pageFiles(outDir);
         if (!pages.length) throw new Error(`No pages in ${outDir} to finish`);
-        // SAFETY: the Vite plugin object keeps the unplugin's collector, which reads the rules
-        // every environment's transforms stored.
-        const collect = (stylexPlugin as { __stylexCollectCss?: () => string }).__stylexCollectCss;
-        const stylexCss = collect?.();
-        if (!stylexCss) throw new Error("StyleX collected no CSS");
-        const sheet = `<style>${await inlineCoreAssets(stylexCss, outDir)}</style>`;
         for (const page of pages) {
           const file = path.join(outDir, page);
           let html = await readFile(file, "utf8");
@@ -150,7 +143,6 @@ function finishPages(): AstroIntegration {
           for (const [tag, css] of styles) {
             html = html.replace(tag, `<style>${await inlineCoreAssets(css!, outDir)}</style>`);
           }
-          html = html.replace("</head>", () => `${sheet}</head>`);
           const preloads = await eagerModules(html, outDir);
           html = html.replace('<meta charset="utf-8">', (charset) => `${charset}${preloads}`);
           await writeFile(file, html);
@@ -200,9 +192,6 @@ export default defineConfig({
     // simple-icons is bundled rather than loaded from node_modules, so roundIconPaths rounds the
     // marks the prerender renders too.
     resolve: { tsconfigPaths: true, noExternal: ["simple-icons"] },
-    plugins: [
-      roundIconPaths(),
-      { ...stylexPlugin, generateBundle: undefined, writeBundle: undefined },
-    ],
+    plugins: [roundIconPaths(), vanillaExtractPlugin(), serverOwnsCss()],
   },
 });

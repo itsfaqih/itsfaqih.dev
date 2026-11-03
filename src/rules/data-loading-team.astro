@@ -1,8 +1,9 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { button, buttonVariant } from "../components/button";
+import { button } from "../components/button.css";
+import { buttonVariant } from "../components/button";
 import { TEAM } from "./data-loading";
-import { styles, view } from "./data-loading.styles";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
 
 type Props = {
   /** Show a failure in the card with Retry, instead of a toast over an empty card. */
@@ -13,25 +14,25 @@ const { inline = false } = Astro.props;
 // The templates hold what a failure shows; data-loading-team.client.ts clones them.
 ---
 
-<data-loading-team {...stylex.attrs(styles.view)} data-inline={inline ? "" : undefined}
-  ><div {...stylex.attrs(styles.card)} data-part="card"
-    ><div {...stylex.attrs(styles.head)}
-      ><span>Team</span><span {...stylex.attrs(styles.status)}>3 members</span></div
-    ><div {...stylex.attrs(styles.body)} data-part="body"
-      ><ul {...stylex.attrs(styles.people)}
+<data-loading-team class={styles.view} data-inline={inline ? "" : undefined}
+  ><div class={styles.card} data-part="card"
+    ><div class={styles.head}
+      ><span>Team</span><span class={styles.status}>3 members</span></div
+    ><div class={styles.body} data-part="body"
+      ><ul class={styles.people}
         >{
           TEAM.map(([name, role]) => (
-            <li {...stylex.attrs(styles.person)}
-              ><i aria-hidden="true" {...stylex.attrs(styles.avatar)}>{name.charAt(0)}</i><b
-                {...stylex.attrs(styles.personName)}>{name}</b
-              ><span {...stylex.attrs(styles.personRole)}>{role}</span></li
+            <li class={styles.person}
+              ><i aria-hidden="true" class={styles.avatar}>{name.charAt(0)}</i><b
+                class={styles.personName}>{name}</b
+              ><span class={styles.personRole}>{role}</span></li
             >
           ))
         }</ul
       ></div
     ></div
-  ><div {...stylex.attrs(styles.ctl)}
-    ><span {...stylex.attrs(styles.note)}>The next request fails</span><button
+  ><div class={styles.ctl}
+    ><span class={styles.note}>The next request fails</span><button
       data-hint="true"
       type="button"
       class={view.ctlButton}
@@ -40,21 +41,21 @@ const { inline = false } = Astro.props;
   ><template data-part="failed"
     >{
       inline ? (
-        <div {...stylex.attrs(styles.error)} role="alert"
-          ><b {...stylex.attrs(styles.errorTitle)}>Couldn't load the team.</b><span
-            {...stylex.attrs(styles.errorText)}>The server didn't answer. Your other cards are fine.</span
+        <div class={styles.error} role="alert"
+          ><b class={styles.errorTitle}>Couldn't load the team.</b><span
+            class={styles.errorText}>The server didn't answer. Your other cards are fine.</span
           ><button
             type="button"
-            {...stylex.attrs(button.base, buttonVariant["primary-brand"], button.sm, styles.errorButton)}
+            class:list={[button.base, buttonVariant["primary-brand"], button.sm, styles.errorButton]}
             data-part="retry">Retry</button
-          ><code {...stylex.attrs(styles.errorCode)}>logged · req 7f3a</code></div
+          ><code class={styles.errorCode}>logged · req 7f3a</code></div
         >
       ) : (
-        <p {...stylex.attrs(styles.empty)}>No members yet</p>
+        <p class={styles.empty}>No members yet</p>
       )
     }</template
   ><template data-part="toast"
-    ><p {...stylex.attrs(styles.toast)} role="status">Something went wrong</p></template
+    ><p class={styles.toast} role="status">Something went wrong</p></template
   ></data-loading-team
 >
 

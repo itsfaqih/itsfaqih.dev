@@ -1,6 +1,5 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { styles } from "./button-design.styles";
+import { styles } from "./button-design.css";
 
 type Props = { careful?: boolean };
 
@@ -9,16 +8,16 @@ const key = [styles.key, styles.sm, styles.live];
 const inRow = styles.cardRowKey;
 ---
 
-<div {...stylex.attrs(styles.stage)}>
-  <div {...stylex.attrs(styles.card)}>
-    <span {...stylex.attrs(styles.cardTitle)}>Spring launch notes</span>
-    <span {...stylex.attrs(styles.cardSub)}>Draft · 1,240 words</span>
-    <div {...stylex.attrs(styles.row, styles.cardRow)}>
-      <button type="button" {...stylex.attrs(key, careful ? styles.text : styles.plain, inRow)}
+<div class={styles.stage}>
+  <div class={styles.card}>
+    <span class={styles.cardTitle}>Spring launch notes</span>
+    <span class={styles.cardSub}>Draft · 1,240 words</span>
+    <div class:list={[styles.row, styles.cardRow]}>
+      <button type="button" class:list={[key, careful ? styles.text : styles.plain, inRow]}
         >Cancel</button
       >
-      <button type="button" {...stylex.attrs(key, careful && styles.tint, inRow)}>Save draft</button>
-      <button type="button" {...stylex.attrs(key, !careful && styles.red, inRow)}>Publish</button>
+      <button type="button" class:list={[key, careful && styles.tint, inRow]}>Save draft</button>
+      <button type="button" class:list={[key, !careful && styles.red, inRow]}>Publish</button>
     </div>
   </div>
 </div>

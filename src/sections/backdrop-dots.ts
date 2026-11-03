@@ -1,9 +1,4 @@
-import * as stylex from "@stylexjs/stylex";
-
-// The dots sit on a halftone screen like the hero's prints: a square grid turned by atan(1/3),
-// about 18°. At that angle the screen repeats every ten steps of U, so it still tiles.
-const U = 5;
-const TILE = U * 10;
+import { TILE, U } from "./backdrop-dots.css";
 const PALETTE = ["--cw", "--ux", "--ar", "--ts", "--ax", "--go"];
 // A press draws the dots around it in and colours them, and lets go once the button comes up.
 const PRESS_RADIUS = 200;
@@ -125,35 +120,6 @@ const blipLevel = (ms: number) => {
   const [toMs, toLevel] = BLIP[end]!;
   return fromLevel + ((toLevel - fromLevel) * (ms - fromMs)) / (toMs - fromMs);
 };
-
-export const styles = stylex.create({
-  // The custom element that holds the screen's template takes no box.
-  host: {
-    display: "none",
-  },
-  root: {
-    position: "fixed",
-    inset: 0,
-    zIndex: -1,
-    pointerEvents: "none",
-    // Fade the grid toward the middle so it frames the content instead of sitting under copy.
-    mask: "radial-gradient(ellipse 75% 65% at 50% 45%, rgb(0 0 0 / 0.45), #000)",
-  },
-  layer: {
-    position: "absolute",
-    inset: 0,
-    width: "100%",
-    height: "100%",
-  },
-  // The resting screen in the theme's --dot, under the canvas's lit dots. It is one tile taller, so
-  // sliding it up by a part of a tile never bares the bottom edge.
-  grid: {
-    height: `calc(100% + ${TILE}px)`,
-    willChange: "transform",
-    backgroundPosition: "0 0",
-    backgroundSize: `${TILE}px ${TILE}px`,
-  },
-});
 
 /**
  * Livens the backdrop's grid and canvas under `element`: the grid slides with the page, the tide
