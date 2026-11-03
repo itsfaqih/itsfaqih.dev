@@ -1,0 +1,122 @@
+---
+import * as stylex from "@stylexjs/stylex";
+import { arcade } from "../components/arcade";
+import { button, buttonVariant } from "../components/button";
+import Icon from "../components/icon.astro";
+import { CV, CV_PDF } from "../data/cv";
+import Backdrop from "../sections/backdrop.astro";
+import { styles } from "./cv-page.styles";
+
+const external = { target: "_blank", rel: "noopener noreferrer" };
+const heading = stylex.attrs(styles.heading);
+const section = stylex.attrs(styles.section);
+const entry = stylex.attrs(styles.entry);
+const entryTitle = stylex.attrs(styles.entryTitle);
+const text = stylex.attrs(styles.text);
+const label = stylex.attrs(styles.label);
+const list = stylex.attrs(styles.list);
+const point = stylex.attrs(styles.point);
+const link = stylex.attrs(styles.link);
+const designOnly = stylex.attrs(styles.designOnly);
+const atsOnly = stylex.attrs(styles.atsOnly);
+// A parser reads a link's text, not its target, so the ATS version writes the address out.
+const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
+---
+
+<cv-page class={`arc ${stylex.attrs(arcade.root, arcade.scan, styles.root).class}`}>
+  <Backdrop />
+  <div {...stylex.attrs(arcade.wrap, styles.column)}>
+    <div {...stylex.attrs(styles.bar)}>
+      <a
+        {...stylex.attrs(button.base, buttonVariant["primary-brand"], button.iconStart)}
+        href={CV_PDF.design.href}
+        download={CV_PDF.design.fileName}
+        ><Icon name="DownloadSimple" size={18} weight="bold" />Download</a
+      >
+      <label {...stylex.attrs(styles.switch)}>
+        <input {...stylex.attrs(styles.track)} type="checkbox" role="switch" autocomplete="off" />
+        ATS friendly
+      </label>
+    </div>
+    <article {...stylex.attrs(styles.sheet)}>
+      <header {...stylex.attrs(styles.head)}>
+        <div>
+          <h1 {...stylex.attrs(styles.name)}>{CV.name}</h1>
+          <p {...stylex.attrs(styles.role)}>{CV.headline}</p>
+          <p {...stylex.attrs(styles.line)}>
+            {CV.location} | <a {...link} href={`mailto:${CV.email}`}>{CV.email}</a>
+          </p>
+          <p {...stylex.attrs(styles.line)}>
+            {
+              CV.links.map(({ label: name, href }, index) => (
+                <>
+                  {index > 0 && " | "}
+                  <a {...link} href={href} {...external}>
+                    <span {...designOnly}>{name}</span>
+                    <span {...atsOnly}>{address(href)}</span>
+                  </a>
+                </>
+              ))
+            }
+          </p>
+        </div>
+      </header>
+
+      <section {...section}>
+        {CV.summary.map((paragraph) => <p {...text}>{paragraph}</p>)}
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Professional Experience</h2>
+        {
+          CV.experience.map(({ title, points }) => (
+            <div {...entry}>
+              <h3 {...entryTitle}>{title}</h3>
+              <ul {...list}>
+                {points.map((item) => (
+                  <li {...point}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Skills &amp; Competencies</h2>
+        <p {...text}>{CV.skills}</p>
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Tech Stack &amp; Tools</h2>
+        {
+          CV.stack.map((group) => (
+            <p {...text}>
+              <span {...label}>{group.label}:</span> {group.text}
+            </p>
+          ))
+        }
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Education</h2>
+        <h3 {...entryTitle}>{CV.education.title}</h3>
+        <p {...text}>{CV.education.detail}</p>
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Achievements</h2>
+        <ul {...list}>{CV.achievements.map((item) => <li {...point}>{item}</li>)}</ul>
+      </section>
+
+      <section {...section}>
+        <h2 {...heading}>Languages</h2>
+        <ul {...list}>{CV.languages.map((item) => <li {...point}>{item}</li>)}</ul>
+      </section>
+    </article>
+  </div>
+</cv-page>
+
+<script>
+  import "./cv-page.client";
+</script>

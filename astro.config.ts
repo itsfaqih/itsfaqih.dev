@@ -159,6 +159,10 @@ function finishPages(): AstroIntegration {
           path.join(import.meta.dirname, "scripts/og/share-assets.ts"),
         );
         await module.writeShareAssets(outDir);
+        const cv = await runnerImport<typeof import("./scripts/cv/export-pdf.ts")>(
+          path.join(import.meta.dirname, "scripts/cv/export-pdf.ts"),
+        );
+        await cv.module.writeCvPdfs(outDir);
         // Cloudflare Pages reads response headers from _headers. A Markdown twin names its page.
         await writeFile(
           path.join(outDir, "_headers"),

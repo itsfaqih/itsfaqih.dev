@@ -140,6 +140,17 @@ function cardFor(page: BuiltPage): OgCard {
     };
   }
 
+  if (page.path === "/cv") {
+    return {
+      kind: "page",
+      hue: "var(--go)",
+      eyebrow: "CV",
+      title: "Faqih Muntashir",
+      lede: page.description,
+      footer: { kind: "domain" },
+    };
+  }
+
   if (page.path === "/blog") {
     return {
       kind: "page",

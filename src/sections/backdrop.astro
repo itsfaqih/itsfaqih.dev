@@ -12,7 +12,7 @@ const { tide = false } = Astro.props;
 
 <site-backdrop data-tide={tide ? "" : undefined} {...stylex.attrs(styles.host)}>
   <template>
-    <div {...stylex.attrs(styles.root)} aria-hidden="true">
+    <div {...stylex.attrs(styles.root)} data-backdrop aria-hidden="true">
       <i {...stylex.attrs(styles.layer, styles.grid)}></i><canvas {...stylex.attrs(styles.layer)}
       ></canvas>
     </div>
