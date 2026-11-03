@@ -1,1 +1,0 @@
-import{r as e,t}from"./data-loading-demo.7SJOB38D.js";var n=class extends t{setup(t){let n=this.query(`result`),r=this.query(`fetch`),i=n.firstElementChild.cloneNode(!0);r.addEventListener(`click`,()=>{r.disabled=!0,n.replaceChildren(e(!1)),this.play([[450,()=>{r.disabled=!1,n.replaceChildren(i.cloneNode(!0))}]])},{signal:t})}};customElements.define(`data-loading-parse`,n);

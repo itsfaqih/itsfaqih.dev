@@ -1,4 +1,5 @@
 // usage: vp node perf.mjs <baseDist> <newDist> <out.json> rounds=10 scenarios=desktop,mobile routes=/,/cv
+// toggleMs is invalid on the StyleX build: .light alone does not flip its tokens. toggle8.mjs swaps each build's real theme classes.
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
