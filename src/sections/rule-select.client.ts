@@ -3,7 +3,8 @@ import { colorOf, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
 import { reducedMotion } from "../hooks/media-query";
 import { isTransitioning, watchRuleOpen } from "./rule-open";
-import { beamClass, countClass } from "./rule-select.view";
+import { countClass } from "./chips.view";
+import { beamClass } from "./rule-select.view";
 
 type Point = [x: number, y: number];
 

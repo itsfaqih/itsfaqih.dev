@@ -83,13 +83,24 @@ function rehypeHighlightCode() {
 
 // A client script reads class names from a .css.ts module, and its component's frontmatter imports
 // the same module. Left alone, every page would carry that module's rules a second time.
-const serverOwnsCss = (): Plugin => ({
-  name: "server-owns-css",
-  enforce: "pre",
-  apply: "build",
-  applyToEnvironment: (environment) => environment.name === "client",
-  load: (id) => (id.includes(".vanilla.css") ? "" : undefined),
-});
+const serverOwnsCss = (): Plugin => {
+  let emptied = 0;
+  return {
+    name: "server-owns-css",
+    enforce: "pre",
+    apply: "build",
+    applyToEnvironment: (environment) => environment.name === "client",
+    load(id) {
+      if (!id.includes(".vanilla.css")) return undefined;
+      emptied += 1;
+      return "";
+    },
+    buildEnd() {
+      if (emptied === 0)
+        this.error("Emptied no .vanilla.css module, so its rules would ship twice.");
+    },
+  };
+};
 
 async function inlineCoreAssets(css: string, outDir: string) {
   for (const [url, , asset] of css.matchAll(

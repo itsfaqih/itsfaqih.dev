@@ -1,4 +1,5 @@
 ---
+import { LAYER_ORDER } from "../layers";
 import "../styles.css";
 import CommandPalette from "../components/command-palette.astro";
 import Header from "../components/header.astro";
@@ -26,7 +27,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
 <html lang="en" class={site.html}>
   <head>
     <meta charset="utf-8" />
-    <style is:inline set:html="@layer base, global, under5, under4, under3, under2, under1;"></style>
+    <style is:inline set:html={`@layer ${LAYER_ORDER.join(", ")};`}></style>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
