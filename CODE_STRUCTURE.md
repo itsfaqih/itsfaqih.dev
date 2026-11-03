@@ -15,14 +15,14 @@ This document outlines the principles for structuring code and files in this pro
 
 **Exception 1:** If the code is too long and hurts readability, it's fine to extract it into a function — but keep it in the same file. The goal is **readability**, not creating unnecessary abstractions across files.
 
-**Exception 2 (Astro):** vanilla-extract compiles `.css.ts` modules only, and an `.astro` file's browser code runs from a `<script>`. Put a component's styles in `<name>.css.ts` and its custom element in `<name>.client.ts`, beside the `.astro` file. Class helpers that run at request time or in the browser go in `<name>.view.ts`, because a `.css.ts` module exports only serializable values. This is a framework constraint, not reuse, so it does not count against the rules below.
+**Exception 2 (Astro):** vanilla-extract compiles `.css.ts` modules only, and an `.astro` file's browser code runs from a `<script>`. Put a component's styles in `<name>.css.ts` and its custom element in `<name>.client.ts`, beside the `.astro` file. Class helpers that run at request time or in the browser, and plain values the `.astro` file and its client share, go in `<name>.view.ts`, because a `.css.ts` module exports only serializable values. This is a framework constraint, not reuse, so it does not count against the rules below.
 
 ```
 src/components/
 ├── header.astro        ← markup, and a <script> that imports header.client.ts
 ├── header.client.ts    ← the <site-header> custom element
 ├── header.css.ts       ← styles for both
-└── header.view.ts      ← class helpers for both
+└── header.view.ts      ← class helpers and values for both
 ```
 
 ### 2. Prefer Fewer Files
@@ -193,19 +193,19 @@ Without suffixes, you'd see multiple `user.ts` files and have to guess which one
 
 ### Common Type Suffixes
 
-| Type           | Suffix       | Example            |
-| -------------- | ------------ | ------------------ |
-| Schema         | `.schema.ts` | `user.schema.ts`   |
-| Hook           | `.hook.ts`   | `idle.hook.ts`     |
-| Utility        | `.util.ts`   | `date.util.ts`     |
-| Type           | `.type.ts`   | `api.type.ts`      |
-| Constant       | `.const.ts`  | `routes.const.ts`  |
-| Styles         | `.css.ts`    | `header.css.ts`    |
-| Class helpers  | `.view.ts`   | `header.view.ts`   |
-| CSS variables  | `.vars.css.ts` | `theme.vars.css.ts` |
-| Token values   | `.tokens.ts` | `theme.tokens.ts`  |
-| State markers  | `.markers.ts` | `table-design.markers.ts` |
-| Custom element | `.client.ts` | `header.client.ts` |
+| Type           | Suffix         | Example                   |
+| -------------- | -------------- | ------------------------- |
+| Schema         | `.schema.ts`   | `user.schema.ts`          |
+| Hook           | `.hook.ts`     | `idle.hook.ts`            |
+| Utility        | `.util.ts`     | `date.util.ts`            |
+| Type           | `.type.ts`     | `api.type.ts`             |
+| Constant       | `.const.ts`    | `routes.const.ts`         |
+| Styles         | `.css.ts`      | `header.css.ts`           |
+| View helpers   | `.view.ts`     | `header.view.ts`          |
+| CSS variables  | `.vars.css.ts` | `theme.vars.css.ts`       |
+| Token values   | `.tokens.ts`   | `theme.tokens.ts`         |
+| State markers  | `.markers.ts`  | `table-design.markers.ts` |
+| Custom element | `.client.ts`   | `header.client.ts`        |
 
 ---
 
@@ -217,7 +217,7 @@ Without suffixes, you'd see multiple `user.ts` files and have to guess which one
 | Code is too long                  | Extract to function, keep in same file         |
 | Code reused in same file          | Extract to function, keep in same file         |
 | Code reused across files          | Extract to new file at lowest common ancestor  |
-| Astro: styles or browser code     | Move to `.css.ts` or `.client.ts` beside it |
+| Astro: styles or browser code     | Move to `.css.ts` or `.client.ts` beside it    |
 | Deciding where to put shared file | As close as possible to the files that need it |
 
 ---
