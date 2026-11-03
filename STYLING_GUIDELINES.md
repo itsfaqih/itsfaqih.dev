@@ -48,7 +48,7 @@ The server build owns the rules. The `serverOwnsCss` plugin in `astro.config.ts`
 
 ### 2. Decide Overrides with Cascade Layers
 
-`cx` joins class names and merges nothing. When two classes on one element set the same property, the cascade decides, and the order of the arguments to `cx` has no effect. Do not rely on source order across modules. An unrelated import can change it.
+`cx` joins class names and merges nothing. When two classes on one element set the same property, the cascade decides, and the order of the arguments to `cx` has no effect. Do not rely on source order across modules. An unrelated import can change it. `tests/visual/css-order.test.ts` fails when two classes on one element in a built page conflict at the same layer, condition and state.
 
 Name the loser instead. A style that another class on the same element overrides goes whole in a layer from `src/layers.css.ts`:
 
