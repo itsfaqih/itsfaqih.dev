@@ -2,6 +2,23 @@ export const SITE_ORIGIN = "https://itsfaqih.dev";
 
 export const OG_DIR = "/og";
 
+/**
+ * Pages that share a looping video beside their card, served from public/og at the card's path
+ * with .mp4. scripts/og/video renders them; a page left out shares its card alone.
+ */
+const OG_VIDEO_PAGES = new Set([
+  "/",
+  "/rule-of-thumb",
+  "/rule-of-thumb/proximity-principle",
+  "/rule-of-thumb/typescript-code-writing",
+  "/rule-of-thumb/null-vs-undefined",
+  "/rule-of-thumb/button-design",
+  "/rule-of-thumb/table-design",
+  "/rule-of-thumb/dialog-design",
+  "/rule-of-thumb/data-loading",
+  "/rule-of-thumb/handling-timestamps",
+]);
+
 const SITE_NAME = "Faqih Muntashir";
 
 export const LINKS = {
@@ -41,7 +58,8 @@ export type SharedPage = {
 
 export function pageHead(page: SharedPage) {
   const url = SITE_ORIGIN + page.path;
-  const image = `${SITE_ORIGIN}${OG_DIR}${page.path === "/" ? "/home" : page.path}.png`;
+  const card = `${SITE_ORIGIN}${OG_DIR}${page.path === "/" ? "/home" : page.path}`;
+  const image = `${card}.png`;
 
   const meta = [
     { title: page.title },
@@ -58,6 +76,15 @@ export function pageHead(page: SharedPage) {
     { property: "og:image:height", content: "630" },
     { property: "og:image:type", content: "image/png" },
     { property: "og:image:alt", content: page.title },
+    ...(OG_VIDEO_PAGES.has(page.path)
+      ? [
+          { property: "og:video", content: `${card}.mp4` },
+          { property: "og:video:secure_url", content: `${card}.mp4` },
+          { property: "og:video:type", content: "video/mp4" },
+          { property: "og:video:width", content: "1200" },
+          { property: "og:video:height", content: "630" },
+        ]
+      : []),
     ...(page.type === "article"
       ? [
           ...(page.section ? [{ property: "article:section", content: page.section }] : []),

@@ -53,6 +53,15 @@ describe("pageHead", () => {
     ]);
   });
 
+  it("shares a video beside the card on pages that have one", () => {
+    expect(metaContent(pageHead(home), "og:video")).toEqual(["https://itsfaqih.dev/og/home.mp4"]);
+    expect(metaContent(pageHead(rule), "og:video:secure_url")).toEqual([
+      "https://itsfaqih.dev/og/rule-of-thumb/button-design.mp4",
+    ]);
+    expect(metaContent(pageHead(rule), "og:video:type")).toEqual(["video/mp4"]);
+    expect(metaContent(pageHead({ ...home, path: "/blog" }), "og:video")).toEqual([]);
+  });
+
   it("sets one title and one description", () => {
     const head = pageHead(rule);
     expect(head.meta.filter((tag) => "title" in tag)).toEqual([{ title: "Button Design" }]);

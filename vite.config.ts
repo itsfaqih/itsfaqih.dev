@@ -4,7 +4,13 @@ import { defineConfig } from "vite-plus";
 // and vitest.config.ts holds the test projects.
 const config = defineConfig({
   fmt: {
-    ignorePatterns: ["tools/oxlint/anti-slop/**", "src/fonts.css", "dist/**", ".astro/**"],
+    ignorePatterns: [
+      "tools/oxlint/anti-slop/**",
+      "src/fonts.css",
+      "scripts/og/video/vendor/**",
+      "dist/**",
+      ".astro/**",
+    ],
   },
   lint: {
     ignorePatterns: [
@@ -21,6 +27,7 @@ const config = defineConfig({
       ".roo/**",
       ".windsurf/**",
       "tools/oxlint/anti-slop/**",
+      "scripts/og/video/vendor/**",
       "dist/**",
       ".astro/**",
     ],

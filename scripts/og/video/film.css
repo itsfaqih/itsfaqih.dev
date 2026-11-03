@@ -1,0 +1,61 @@
+@import url("./fonts.css");
+
+/* The site's dark palette, the theme every share card is drawn in. */
+:root {
+  --bg: #0e0e13;
+  --panel: #17171f;
+  --panel-2: #20202b;
+  --hair: #2c2c3a;
+  --text: #f4f4f8;
+  --dim: #a1a1b5;
+  --mute: #87879d;
+  --cw: #4dd4ff;
+  --ux: #ff6ad5;
+  --ar: #ffb02e;
+  --ts: #7dff6a;
+  --ax: #bca2ff;
+  --go: #ffe14d;
+  --on-accent: #111;
+  --dot: #2e2e3c;
+  --ink-mix: 100%;
+  --display: "Unbounded", system-ui, sans-serif;
+  --sans: "Geist", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+body {
+  color: var(--text);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+
+.stage {
+  position: relative;
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+  background-color: var(--bg);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

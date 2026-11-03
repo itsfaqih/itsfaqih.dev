@@ -23,6 +23,7 @@ tests/visual/__diff__
 /.vscode/
 /plans/
 /redesign/
+/scripts/og/video/out/
 /shots/
 /*.png
 .astro

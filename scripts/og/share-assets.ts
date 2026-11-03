@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   colorOf,
@@ -15,6 +15,7 @@ type BuiltPage = {
   noindex: boolean;
   description: string;
   imagePath: string;
+  videoPath?: string;
   publishedTime?: string;
   headline?: string;
 };
@@ -36,6 +37,19 @@ export async function writeShareAssets(outDir: string) {
       await mkdir(path.dirname(file), { recursive: true });
       await writeFile(file, await renderCard(card));
     }),
+  );
+  await Promise.all(
+    pages.flatMap(({ path: pagePath, videoPath }) =>
+      videoPath
+        ? [
+            access(path.join(outDir, videoPath)).catch(() => {
+              throw new Error(
+                `${pagePath} shares ${videoPath}, but public${videoPath} is missing. Render it with scripts/og/video.`,
+              );
+            }),
+          ]
+        : [],
+    ),
   );
   await writeFile(path.join(outDir, "sitemap.xml"), sitemap(pages));
 }
@@ -73,6 +87,10 @@ function readPage(file: string, html: string): BuiltPage {
       `${file} shares ${image}, but the build draws cards only under ${OG_IMAGE_BASE}.`,
     );
   }
+  const video = meta.get("og:video");
+  if (video && !video.startsWith(OG_IMAGE_BASE)) {
+    throw new Error(`${file} shares ${video}, but share videos live only under ${OG_IMAGE_BASE}.`);
+  }
   if (canonical !== SITE_ORIGIN + pagePath) {
     throw new Error(`${file} names ${canonical} as canonical, not ${SITE_ORIGIN + pagePath}.`);
   }
@@ -84,6 +102,7 @@ function readPage(file: string, html: string): BuiltPage {
     noindex: /\bnoindex\b/.test(meta.get("robots") ?? ""),
     description: required("og:description", meta.get("og:description")),
     imagePath: new URL(image).pathname,
+    videoPath: video ? new URL(video).pathname : undefined,
     publishedTime: meta.get("article:published_time"),
     headline: schema?.headline,
   };
