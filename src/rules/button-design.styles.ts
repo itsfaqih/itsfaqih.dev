@@ -107,6 +107,12 @@ export const styles = stylex.create({
     },
     color: palette["--text"],
   },
+  // `plain` without its drop, for a key whose drop comes from `live`.
+  plainFace: {
+    "--face": palette["--soft-key"],
+    "--lit": palette["--soft-key-hover"],
+    color: palette["--text"],
+  },
   hover: {
     backgroundColor: "var(--lit)",
   },

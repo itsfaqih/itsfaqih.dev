@@ -19,7 +19,7 @@ const { sealed = false } = Astro.props;
   <DialogWindow>
     <div slot="page" {...stylex.attrs(styles.page)} data-part="page">
       <div {...stylex.attrs(styles.spread)}><span {...stylex.attrs(styles.logo)}></span><span style="--w:34%" {...stylex.attrs(styles.ghost)}></span></div>
-      <div {...stylex.attrs(styles.spread, styles.card)}><span {...stylex.attrs(styles.project)}><b {...stylex.attrs(styles.strong)}>report.pdf</b><small {...stylex.attrs(styles.meta)}>2.4 MB · shared</small></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.soft, styles.softInCard)}>Rename</button></div>
+      <div {...stylex.attrs(styles.card, styles.spreadInCard)}><span {...stylex.attrs(styles.project)}><b {...stylex.attrs(styles.strong)}>report.pdf</b><small {...stylex.attrs(styles.meta)}>2.4 MB · shared</small></span><button data-hint="true" type="button" data-stop="trigger" {...stylex.attrs(styles.stop, styles.btn, styles.soft, styles.softInCard)}>Rename</button></div>
       <span style="--w:58%" {...stylex.attrs(styles.ghost)}></span>
     </div>
     <DialogBox id={`name-${sealed ? "good" : "bad"}-`} bare={!sealed} title="Rename file" body="Pick a name your team will find." part="dialog">

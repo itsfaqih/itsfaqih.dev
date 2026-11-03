@@ -49,6 +49,11 @@ export const styles = stylex.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  // The spread's alignment for a `card`, which stays a grid.
+  spreadInCard: {
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   logo: {
     flexGrow: 0,
     flexShrink: 0,
@@ -543,7 +548,7 @@ export const readView = (tone: ReadTone) =>
   stylex.attrs(styles.read, tone === "no" && styles.readNo, tone === "yes" && styles.readYes)
     .class ?? "";
 export const cardView = (gone: boolean) =>
-  stylex.attrs(styles.spread, styles.card, gone && styles.gone).class ?? "";
+  stylex.attrs(styles.card, styles.spreadInCard, gone && styles.gone).class ?? "";
 export const articleView = (locked: boolean) =>
   stylex.attrs(styles.page, styles.article, locked && styles.locked).class ?? "";
 // The ring shares no property with a stop's own look, so it joins that look's classes as is.

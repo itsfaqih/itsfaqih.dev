@@ -17,8 +17,7 @@ const tipId = `still-tip-${careful ? "good" : "bad"}`;
         {...stylex.attrs(
           styles.key,
           styles.sm,
-          styles.plain,
-          !careful && styles.live,
+          careful ? styles.plain : [styles.plainFace, styles.live],
           styles.off,
           marker,
         )}
