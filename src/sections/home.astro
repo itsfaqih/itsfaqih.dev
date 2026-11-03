@@ -25,7 +25,6 @@ const eyebrow = cx(loadIn.veil, section.eyebrow, veil.dense, veil.fit);
 const words = cx(loadIn.piece, loadIn.words);
 const titleText = cx(loadIn.piece, section.titleText);
 const external = { target: "_blank", rel: "noopener noreferrer" };
-const footerLink = styles.footerLink;
 const footerVeil = cx(loadIn.veil, veil.dense);
 ---
 
@@ -128,13 +127,13 @@ const footerVeil = cx(loadIn.veil, veil.dense);
         ><span class={words} data-cut="true">© 2026 Faqih Muntashir</span></span
       ><span class={footerVeil} data-cut="true"
         ><span class={words} data-cut="true"
-          ><a class={footerLink} href={LINKS.github} {...external}>GitHub</a> <Fragment
+          ><a class={styles.footerLink} href={LINKS.github} {...external}>GitHub</a> <Fragment
             set:html="<!-- -->·<!-- -->"
-          /> <a class={footerLink} href={LINKS.linkedin} {...external}>LinkedIn</a> <Fragment
+          /> <a class={styles.footerLink} href={LINKS.linkedin} {...external}>LinkedIn</a> <Fragment
             set:html="<!-- -->·<!-- -->"
-          /> <a class={footerLink} href={LINKS.dribbble} {...external}>Dribbble</a> <Fragment
+          /> <a class={styles.footerLink} href={LINKS.dribbble} {...external}>Dribbble</a> <Fragment
             set:html="<!-- -->·<!-- -->"
-          /> <a class={footerLink} href={LINKS.medium} {...external}>Medium</a></span
+          /> <a class={styles.footerLink} href={LINKS.medium} {...external}>Medium</a></span
         ></span
       ></footer
     ></div

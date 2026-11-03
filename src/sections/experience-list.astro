@@ -42,13 +42,13 @@ const { jobs } = Astro.props;
             aria-controls={`job-${index}`}
           >
             <span class={styles.years}>{job.years}</span>
-            <h3 class={view.company}><CompanyLogo name={job.company} xstyle={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></h3>
+            <h3 class={view.company}><CompanyLogo name={job.company} class={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></h3>
             <span class={view.chevron} aria-hidden="true" />
           </button>
           <div data-stack="true" class={view.frame}>
             <ul class={view.stack} aria-label={`${job.company} stack`}>
               {job.stack.map((tool) => (
-                <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} xstyle={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
+                <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} class={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
               ))}
               <li data-more="true" style="display:none"><span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" /></li>
             </ul>

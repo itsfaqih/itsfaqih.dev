@@ -6,14 +6,14 @@ import { icon, mark as markStyles } from "./tech-icon.css";
 
 /**
  * A tool's one-colour mark (drawn from its logo where simple-icons draws another shape), which
- * `xstyle` can tint, over its logo in its own colours: the logo themed by scripts/tech-logos.py, or
+ * `class` can tint, over its logo in its own colours: the logo themed by scripts/tech-logos.py, or
  * the mark in its brand colour where there is no such logo. The colours show while an ancestor sets
  * --lit to 1 (iconLit), and the mark fades out for them. A logo wider than it is tall (the VoidZero
  * marks in their parentheses) widens the icon to fit.
  */
-type Props = { name: string; xstyle?: ClassValue };
+type Props = { name: string; class?: ClassValue };
 
-const { name, xstyle } = Astro.props;
+const { name, class: className } = Astro.props;
 const mark = MARKS.get(name);
 const logo = TECH_LOGOS.get(name);
 const suffix = instanceSuffix();
@@ -25,7 +25,7 @@ const fillRule = mark?.evenOdd ? "evenodd" : undefined;
 {
   mark && (
     <span
-      class:list={[icon.pair, xstyle]}
+      class:list={[icon.pair, className]}
       style={width > height ? `--wide:${width / height}` : undefined}
       aria-hidden="true"
     >

@@ -21,7 +21,7 @@ const { rule, direction } = Astro.props;
   style={`--c:${colorOf(rule.label)}`}
   data-rule-open
   data-part="pager"
-  ><RuleThumb rule={rule} style={pager.thumb} /><span class={pager.meta}
+  ><RuleThumb rule={rule} class={pager.thumb} /><span class={pager.meta}
     ><span class={pager.dir}>{direction === "Next" ? "Next rule →" : "← Previous rule"}</span
     ><span class={pager.number}
       >No.<!-- -->{ruleNumber(rule)}<!-- --> · <!-- -->{rule.label}</span

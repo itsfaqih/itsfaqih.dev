@@ -39,7 +39,7 @@ const rule = rules[initial]!;
           ><span class={styles.plate}><span>No.<Fragment set:html="<!-- -->" />{ruleNumber(item)}</span><span>▶ DEMO</span></span><RuleThumb
               rule={item}
               play={index === initial}
-              style={styles.thumb}
+              class={styles.thumb}
             />{/* .t names the title for the rule-open view transition in arcade.css. */}<span
               class={`t ${styles.title}`}>{item.title}</span
             ><span class={styles.summary}>{item.description}</span><span

@@ -9,17 +9,6 @@ import Backdrop from "../sections/backdrop.astro";
 import { styles } from "./cv-page.css";
 
 const external = { target: "_blank", rel: "noopener noreferrer" };
-const heading = styles.heading;
-const section = styles.section;
-const entry = styles.entry;
-const entryTitle = styles.entryTitle;
-const text = styles.text;
-const label = styles.label;
-const list = styles.list;
-const point = styles.point;
-const link = styles.link;
-const designOnly = styles.designOnly;
-const atsOnly = styles.atsOnly;
 // A parser reads a link's text, not its target, so the ATS version writes the address out.
 const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
 ---
@@ -45,16 +34,16 @@ const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replac
           <h1 class={styles.name}>{CV.name}</h1>
           <p class={styles.role}>{CV.headline}</p>
           <p class={styles.line}>
-            {CV.location} | <a class={link} href={`mailto:${CV.email}`}>{CV.email}</a>
+            {CV.location} | <a class={styles.link} href={`mailto:${CV.email}`}>{CV.email}</a>
           </p>
           <p class={styles.line}>
             {
               CV.links.map(({ label: name, href }, index) => (
                 <>
                   {index > 0 && " | "}
-                  <a class={link} href={href} {...external}>
-                    <span class={designOnly}>{name}</span>
-                    <span class={atsOnly}>{address(href)}</span>
+                  <a class={styles.link} href={href} {...external}>
+                    <span class={styles.designOnly}>{name}</span>
+                    <span class={styles.atsOnly}>{address(href)}</span>
                   </a>
                 </>
               ))
@@ -63,19 +52,19 @@ const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replac
         </div>
       </header>
 
-      <section class={section}>
-        {CV.summary.map((paragraph) => <p class={text}>{paragraph}</p>)}
+      <section class={styles.section}>
+        {CV.summary.map((paragraph) => <p class={styles.text}>{paragraph}</p>)}
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Professional Experience</h2>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Professional Experience</h2>
         {
           CV.experience.map(({ title, points }) => (
-            <div class={entry}>
-              <h3 class={entryTitle}>{title}</h3>
-              <ul class={list}>
+            <div class={styles.entry}>
+              <h3 class={styles.entryTitle}>{title}</h3>
+              <ul class={styles.list}>
                 {points.map((item) => (
-                  <li class={point}>{item}</li>
+                  <li class={styles.point}>{item}</li>
                 ))}
               </ul>
             </div>
@@ -83,36 +72,36 @@ const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replac
         }
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Skills &amp; Competencies</h2>
-        <p class={text}>{CV.skills}</p>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Skills &amp; Competencies</h2>
+        <p class={styles.text}>{CV.skills}</p>
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Tech Stack &amp; Tools</h2>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Tech Stack &amp; Tools</h2>
         {
           CV.stack.map((group) => (
-            <p class={text}>
-              <span class={label}>{group.label}:</span> {group.text}
+            <p class={styles.text}>
+              <span class={styles.label}>{group.label}:</span> {group.text}
             </p>
           ))
         }
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Education</h2>
-        <h3 class={entryTitle}>{CV.education.title}</h3>
-        <p class={text}>{CV.education.detail}</p>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Education</h2>
+        <h3 class={styles.entryTitle}>{CV.education.title}</h3>
+        <p class={styles.text}>{CV.education.detail}</p>
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Achievements</h2>
-        <ul class={list}>{CV.achievements.map((item) => <li class={point}>{item}</li>)}</ul>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Achievements</h2>
+        <ul class={styles.list}>{CV.achievements.map((item) => <li class={styles.point}>{item}</li>)}</ul>
       </section>
 
-      <section class={section}>
-        <h2 class={heading}>Languages</h2>
-        <ul class={list}>{CV.languages.map((item) => <li class={point}>{item}</li>)}</ul>
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Languages</h2>
+        <ul class={styles.list}>{CV.languages.map((item) => <li class={styles.point}>{item}</li>)}</ul>
       </section>
     </article>
   </div>

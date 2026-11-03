@@ -5,10 +5,10 @@ import { text } from "./rule-landing.css";
 type Props = {
   /** A side note under the lesson copy. */
   tip?: boolean;
-  style?: ClassValue;
+  class?: ClassValue;
 };
 
-const { tip = false, style } = Astro.props;
+const { tip = false, class: className } = Astro.props;
 ---
 
-<p class:list={[text.lesson, tip && text.tip, style]}><slot /></p>
+<p class:list={[text.lesson, tip && text.tip, className]}><slot /></p>

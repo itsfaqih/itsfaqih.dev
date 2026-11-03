@@ -6,18 +6,18 @@ import { styleOf } from "./tech-brand";
 import { icon, techBadge } from "./tech-icon.css";
 
 /**
- * An employer's mark in one colour, which `xstyle` can tint, over the mark in its own colours as
+ * An employer's mark in one colour, which `class` can tint, over the mark in its own colours as
  * toneOf sets them for the theme. The colours show while an ancestor sets --lit to 1 (iconLit).
  */
-type Props = { name: string; xstyle?: ClassValue };
+type Props = { name: string; class?: ClassValue };
 
-const { name, xstyle } = Astro.props;
+const { name, class: className } = Astro.props;
 const logo = LOGOS.get(name);
 ---
 
 {
   logo && (
-    <span class:list={[icon.pair, xstyle]} aria-hidden="true">
+    <span class:list={[icon.pair, className]} aria-hidden="true">
       <svg class={icon.flat} viewBox={logo.viewBox}>
         {logo.parts.map((part) => (
           <path d={part.d} fill-rule={part.evenOdd ? "evenodd" : undefined} />

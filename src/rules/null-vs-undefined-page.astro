@@ -21,9 +21,9 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
 >
   <Fragment slot="lead">Send <Code>null</Code> to clear a field. Leave a field out to keep it.</Fragment>
   <Fragment slot="intro"
-    >Give <Code tone="wrap" style={styles.introCode}>undefined</Code> and<Fragment set:html="<!-- -->" /> <Code
+    >Give <Code tone="wrap" class={styles.introCode}>undefined</Code> and<Fragment set:html="<!-- -->" /> <Code
       tone="wrap"
-      style={styles.introCode}>null</Code
+      class={styles.introCode}>null</Code
     > one meaning each, so no code has to guess which it got.</Fragment
   >
 

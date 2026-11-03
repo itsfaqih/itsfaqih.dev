@@ -45,7 +45,7 @@ const cells = [
   <Fragment slot="lead">Right-align numbers, pin actions to a fixed last column, and give every blank a next step.</Fragment>
   <Fragment slot="intro">Make each column easy to run an eye down, since people scan for one value.</Fragment>
 
-  <RuleLesson lesson={numbers} costsStyle={styles.costs}>
+  <RuleLesson lesson={numbers} costsClass={styles.costs}>
     <Fragment slot="body"
       >People compare numbers by their last digits. Use tabular figures so every digit is the same width, and add thousands separators. Watch the right edge.</Fragment
     >
@@ -82,7 +82,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={states} costsStyle={styles.costs}>
+  <RuleLesson lesson={states} costsClass={styles.costs}>
     <Fragment slot="body"
       >A table is often loading, empty, failed or showing no matches. Draw each one. Use skeleton rows to keep the shape while it loads, and say why and what to do next in every blank. Pick a state, search, then press the buttons.</Fragment
     >
@@ -121,7 +121,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={actions} costsStyle={styles.costs}>
+  <RuleLesson lesson={actions} costsClass={styles.costs}>
     <Fragment slot="body"
       >Give the column a fixed width and right-align it, so Edit sits in the same place on every row. Use icon buttons to save room, and name each one with a tooltip. Hover the rows, then delete one.</Fragment
     >
@@ -159,7 +159,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={pager} costsStyle={styles.costs}>
+  <RuleLesson lesson={pager} costsClass={styles.costs}>
     <Fragment slot="body"
       >With one page, a pager is a row of dead arrows. Under an empty table, it reads Page 1 of 0. Filter the list and watch both.</Fragment
     >
@@ -202,7 +202,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={url} costsStyle={styles.costs}>
+  <RuleLesson lesson={url} costsClass={styles.costs}>
     <Fragment slot="body"
       >With <Code tone="chip">?page=2</Code> in the address, a reload, the Back button and a shared link all land where you were. Reload each.</Fragment
     >

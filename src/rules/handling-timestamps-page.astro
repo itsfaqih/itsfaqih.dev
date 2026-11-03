@@ -72,7 +72,7 @@ const lanes = [
     >Keep one moment as one value until it reaches the screen of Rina in Jakarta (UTC+7) or Sam in New York (UTC−5).</Fragment
   >
 
-  <RuleLesson lesson={store} costsStyle={styles.costs}>
+  <RuleLesson lesson={store} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores each writer's local time, so one moment becomes two values. Store UTC to keep it one.</Fragment
     >
@@ -107,7 +107,7 @@ const lanes = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={zulu} costsStyle={styles.costs}>
+  <RuleLesson lesson={zulu} costsClass={styles.costs}>
     <Fragment slot="body"
       >An ISO string without a <Code tone="chip">Z</Code> has no zone, so each browser reads it as local time. Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code tone="chip">Z</Code> so each browser converts it to its own zone.</Fragment
     >
@@ -138,7 +138,7 @@ const lanes = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={local} costsStyle={styles.costs}>
+  <RuleLesson lesson={local} costsClass={styles.costs}>
     <Fragment slot="body"
       >The server knows its own time zone, not the reader's, so a time it formats is right only where it runs. Send UTC and let each browser format it.</Fragment
     >
@@ -155,7 +155,7 @@ const lanes = [
     >The order is stored as <Code tone="prompt">2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam 1:00 AM. Place the formatting.</RuleQuiz
   >
 
-  <RuleLesson lesson={input} costsStyle={styles.costs}>
+  <RuleLesson lesson={input} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina sets a reminder for 7:00 AM. From <Code tone="chip">2026-01-01T07:00:00</Code> the server can't tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code tone="chip">Z</Code>, or the local time with its offset. Both name one moment.</Fragment
     >
@@ -169,7 +169,7 @@ const lanes = [
     >Rina's browser has her 7:00 AM and its <Code tone="prompt">+07:00</Code> offset. Place the offset.</RuleQuiz
   >
 
-  <RuleLesson lesson={filter} costsStyle={styles.costs}>
+  <RuleLesson lesson={filter} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs 07:00 to 07:00 her time, so orders before 07:00 go missing and the next morning's show up.</Fragment
     >

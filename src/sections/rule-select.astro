@@ -25,7 +25,7 @@ const count = (topic: string) =>
     data-part="panel"
   >
     <div class:list={[styles.plate, styles.standby]}><span>No.—</span><span>STANDBY</span></div>
-    <RuleThumb style={panelThumb} />
+    <RuleThumb class={panelThumb} />
     <h3 class:list={[styles.title, styles.standby]}>Pick a rule</h3>
     <p class={styles.blurb}>Hover or focus a rule to preview it.</p>
     <dl class={styles.facts}>
@@ -79,7 +79,7 @@ const count = (topic: string) =>
     RULES.map((rule) => (
       <template data-panel={rule.id}>
         <div class={styles.plate}><span>No.{ruleNumber(rule)}</span><span>{rule.label.toUpperCase()}</span></div>
-        <RuleThumb rule={rule} play at="panel" style={panelThumb} />
+        <RuleThumb rule={rule} play at="panel" class={panelThumb} />
         <h3 class={styles.title}><span aria-hidden="true" data-part="scramble">{
           rule.title.split(" ").map((word, index) => (
             <Fragment>{index > 0 && " "}<span class={styles.word}>{

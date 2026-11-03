@@ -9,4 +9,4 @@ type Props = { text: string; tone?: Tone };
 const { text, tone = "plain" } = Astro.props;
 ---
 
-<Code tone={tone} style={styles.boardCode}><TsPaint text={text} /></Code>
+<Code tone={tone} class={styles.boardCode}><TsPaint text={text} /></Code>

@@ -10,10 +10,10 @@ type Props = {
   /** The most tree rows either pane shows, which sizes the panes on phones; 0 for other demos. */
   rows?: number;
   /** Applied last to the row of cost tags under each pane. */
-  costsStyle?: ClassValue;
+  costsClass?: ClassValue;
 };
 
-const { lesson, rows = 0, costsStyle } = Astro.props;
+const { lesson, rows = 0, costsClass } = Astro.props;
 const SIDES: readonly SideKey[] = ["bad", "good"];
 const MARK = { bad: "✕", good: "✓" } as const;
 // Slots: "body" (the lesson copy, its code in tone "chip"), "extra" (a block under it), and "bad"
@@ -57,7 +57,7 @@ const MARK = { bad: "✕", good: "✓" } as const;
               >{lesson[key].label}</figcaption
             >
             {key === "bad" ? <slot name="bad" /> : <slot name="good" />}
-            <div class:list={[lessonKit.costs, costsStyle]}>
+            <div class:list={[lessonKit.costs, costsClass]}>
               {lesson[key].costs.map((cost) => (
                 <span class:list={[lessonKit.cost, lessonKit.costIn, lessonKit[`${key}Cost`]]}>
                   {cost}

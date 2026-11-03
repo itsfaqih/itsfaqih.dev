@@ -5,7 +5,6 @@ type Props = { careful?: boolean };
 
 const { careful = false } = Astro.props;
 const key = [styles.key, styles.sm, styles.live];
-const inRow = styles.cardRowKey;
 ---
 
 <div class={styles.stage}>
@@ -13,11 +12,11 @@ const inRow = styles.cardRowKey;
     <span class={styles.cardTitle}>Spring launch notes</span>
     <span class={styles.cardSub}>Draft · 1,240 words</span>
     <div class:list={[styles.row, styles.cardRow]}>
-      <button type="button" class:list={[key, careful ? styles.text : styles.plain, inRow]}
+      <button type="button" class:list={[key, careful ? styles.text : styles.plain, styles.cardRowKey]}
         >Cancel</button
       >
-      <button type="button" class:list={[key, careful && styles.tint, inRow]}>Save draft</button>
-      <button type="button" class:list={[key, !careful && styles.red, inRow]}>Publish</button>
+      <button type="button" class:list={[key, careful && styles.tint, styles.cardRowKey]}>Save draft</button>
+      <button type="button" class:list={[key, !careful && styles.red, styles.cardRowKey]}>Publish</button>
     </div>
   </div>
 </div>

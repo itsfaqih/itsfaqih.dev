@@ -93,7 +93,7 @@ const [was, now] = rule.coverTag.split(" → ");
     <div class:list={[cover.box, shell.in, shell.coverIn, shell.third]} data-part="cover">
       <div class={cover.card}>
         <div class={cover.sheet}>
-          <RuleThumb rule={rule} play at="cover" style={cover.thumb} />
+          <RuleThumb rule={rule} play at="cover" class={cover.thumb} />
           <div class={cover.tear}></div>
           <div aria-hidden="true" class={cover.stub}>
             <span class={cover.was}>{was}</span><span class={cover.to}

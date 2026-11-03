@@ -83,7 +83,7 @@ const lists = (tool: string) =>
                   style={`--c:${row.color}${row.kind === "work" ? `;${ringOf(name)}` : ""}`}
                   data-chip={name}
                 >{row.kind === "work" ? (
-                    <CompanyLogo name={name} xstyle={styles.chipLogo} />
+                    <CompanyLogo name={name} class={styles.chipLogo} />
                   ) : (
                     <i class={chips.dot} />
                   )}{name}<b class={countClass(false)}>{

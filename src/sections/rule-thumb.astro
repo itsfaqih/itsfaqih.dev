@@ -54,10 +54,10 @@ type Props = {
   play?: boolean;
   /** Where the screen sits. The select panel and a rule's cover show it large, with a bigger chip. */
   at?: "card" | "panel" | "cover";
-  style?: ClassValue;
+  class?: ClassValue;
 };
 
-const { rule, play = false, at = "card", style } = Astro.props;
+const { rule, play = false, at = "card", class: className } = Astro.props;
 const art = rule && ART_IDS.has(rule.id) ? rule.id : undefined;
 // On a rule's cover the art sits in layers (depth), and the data-loading screen takes that page's
 // demo card styles, and its slide in place of the sweep.
@@ -82,7 +82,7 @@ const rows = [
 ---
 
 <div
-  class={`thumb ${cx(screen.root, !rule && screen.blank, z && depth.dots, style)}`}
+  class={`thumb ${cx(screen.root, !rule && screen.blank, z && depth.dots, className)}`}
   style={rule && `--c:${colorOf(rule.label)}`}
   aria-hidden="true"
   data-play={play ? "" : undefined}
