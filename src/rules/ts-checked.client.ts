@@ -1,7 +1,10 @@
 import { reducedMotion } from "../hooks/media-query";
 import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
-import { STEP, view } from "./typescript-code-writing.view";
+import { styles } from "./typescript-code-writing.css";
+
+/** How far apart, in ms, tsc reaches each line. */
+const STEP = 110;
 
 type Phase = "idle" | "run" | "done";
 
@@ -27,7 +30,7 @@ class TsChecked extends HTMLElement {
     let stopWatch = () => {};
 
     const show = (phase: Phase) => {
-      for (const mark of marks) mark.classList.toggle(view.unrun, phase === "idle");
+      for (const mark of marks) mark.classList.toggle(styles.unrun, phase === "idle");
       summary.textContent =
         phase === "idle" ? "not run yet" : phase === "run" ? "checking…" : verdict;
       run.disabled = phase === "run";
