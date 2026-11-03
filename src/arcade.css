@@ -1,6 +1,6 @@
-/* The global rules that remain, each where StyleX cannot reach: html and the classes scripts set
+/* The global rules that remain, each where a class cannot reach: html and the classes scripts set
    on it, view-transition pseudo-elements, @property registrations, and the reduced-motion blanket.
-   Each rule says why it is global. Everything else styles itself with StyleX. */
+   Each rule says why it is global. Everything else styles itself with vanilla-extract. */
 
 @layer global {
   /* Global: color-scheme on html follows the theme class the inline script sets there. */
@@ -89,7 +89,7 @@
   }
 
   /* Global (to the end of the stack-filter block): view transitions are pseudo-elements of html,
-     keyed on its attributes and transition types, which StyleX cannot target.
+     keyed on its attributes and transition types, which a class cannot target.
      Every same-site page change is a cross-document view transition; the head script
      (src/layouts/head-script.ts) gives each one its type.
      Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
@@ -227,7 +227,7 @@
     }
   }
 
-  /* Global: @property has no StyleX form. --hue is registered so the hero prints' ink (hero-prints.astro)
+  /* Global: @property registers for the whole document. --hue is registered so the hero prints' ink (hero-prints.astro)
      eases to the next slide's colour. */
 
   /* Global: a pseudo-element keyed on the attribute the CV page's switch sets. The ATS version previews

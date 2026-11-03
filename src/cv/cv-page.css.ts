@@ -5,7 +5,7 @@ const PRINT = "print";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 
 // The switch's mode, which the page's script sets on <cv-page>. Its rules nest inside the media
-// queries they share a property with, because StyleX lets a media query beat a bare selector.
+// queries they share a property with, because a style's media queries come after its selectors.
 const ATS = ":is([data-ats] *)";
 const PLAIN = "Arial, Helvetica, sans-serif";
 const INK = "#000";

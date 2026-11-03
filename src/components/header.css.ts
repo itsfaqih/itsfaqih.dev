@@ -344,8 +344,8 @@ export const styles = {
         borderRadius: "999px",
         // A pointer that can hover gets the island's one gliding fill; a touch press lights the button.
         backgroundColor: "transparent",
-        // `background: none` minifies to a 0 0 position at rest, and the press's background shorthand
-        // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so the press sets initial.
+        // The rest position is 0 0. The press sets initial, which computes to 0% 0%, as a
+        // background shorthand would.
         backgroundPosition: "0 0",
         color: palette["--dim"],
         font: "inherit",
@@ -423,7 +423,7 @@ export const styles = {
       },
     },
   }),
-  // Each sets its own timing whole: a later StyleX key replaces the glyph's, conditions and all.
+  // Each sets its own timing whole, so none of the glyph's conditions carry over.
   sunInLight: style({
     transitionDuration: motion["--t-moderate"],
     transitionTimingFunction: motion["--moderate"],

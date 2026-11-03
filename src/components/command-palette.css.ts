@@ -450,8 +450,8 @@ export const styles = {
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "999px",
-    // `background: none` minifies to a 0 0 position at rest, and the hover's background shorthand
-    // resets it to 0% 0%. StyleX would minify a literal 0% 0% back to 0 0, so hover sets initial.
+    // The rest position is 0 0. The hover sets initial, which computes to 0% 0%, as a
+    // background shorthand would.
     backgroundPosition: "0 0",
     backgroundColor: "transparent",
     color: palette["--dim"],

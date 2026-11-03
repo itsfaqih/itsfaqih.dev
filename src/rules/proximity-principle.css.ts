@@ -5,7 +5,6 @@ export const styles = {
     flexWrap: "wrap",
     gap: "6px",
   }),
-  // Not the padding shorthand, which StyleX emits at class specificity, below the kit's code padding.
   suffix: style({
     paddingBlock: "4px",
     paddingInline: "8px",
