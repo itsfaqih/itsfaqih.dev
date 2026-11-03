@@ -1,9 +1,9 @@
 ---
+import { row } from "./table-design.markers";
 import { arcade } from "../components/arcade.css";
 import { FILTERED, FILTERS, PER_PAGE, START_FILTER } from "./table-design";
 import { host } from "./rule-landing.css";
 import { styles } from "./table-design.css";
-import { view } from "./table-design.view";
 import TablePageNav from "./table-page-nav.astro";
 
 type Props = { careful: boolean };
@@ -33,7 +33,7 @@ const { careful } = Astro.props;
             <tbody class={styles.body} data-part="rows">
               {
                 shown.length === 0 ? (
-                  <tr class={view.row}
+                  <tr class={row}
                     ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}
                       ><div class={styles.said}
                         ><b class={styles.saidTitle}>No owners</b><span class={styles.saidHint}
@@ -44,7 +44,7 @@ const { careful } = Astro.props;
                   >
                 ) : (
                   shown.map((person) => (
-                    <tr class={view.row}
+                    <tr class={row}
                       ><td class={styles.td}>{person.name}</td><td class:list={[styles.td, styles.dim]}
                         >{person.role}</td
                       ></tr
@@ -61,7 +61,7 @@ const { careful } = Astro.props;
     })
   }
   <template data-part="row"
-    ><tr class={view.row}
+    ><tr class={row}
       ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
     ></template
   >

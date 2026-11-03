@@ -29,7 +29,7 @@ export const lessonView = {
     cx(hintKit.label, hintKit[tilt], onPanel && hintKit.onPanel, gone && hintKit.gone),
 };
 
-export type SlotState = {
+type SlotState = {
   lead: boolean;
   open: boolean;
   near: boolean;

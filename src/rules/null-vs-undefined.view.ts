@@ -1,4 +1,3 @@
-import { arcade } from "../components/arcade.css";
 import { button } from "../components/button.css";
 import { buttonVariant } from "../components/button";
 import type { Verdict } from "./null-vs-undefined";
@@ -17,7 +16,7 @@ export const OUT_KINDS = [
   styles.kw,
 ];
 
-export type Painted = { text: string; class?: string };
+type Painted = { text: string; class?: string };
 
 /** Colours a line of code: a match of TOKEN's nth capture group gets the class of `kinds[n]`. */
 export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
@@ -35,14 +34,9 @@ export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
 
 /** Classes the save demo (null-flow.astro) and its element share. */
 export const flowView = {
-  srOnly: arcade.srOnly,
   again: cx(button.base, buttonVariant["primary-neutral"], button.sm, styles.again),
-  wire: styles.wire,
-  verb: styles.verb,
-  idle: styles.idle,
   body: (typing: boolean) => cx(styles.body, typing && styles.typing),
   packet: (dropping: boolean) => cx(styles.packet, dropping && styles.dropping),
-  record: styles.record,
   cell: (verdict: Verdict | undefined, ran: boolean) =>
     cx(
       styles.cell,
@@ -50,7 +44,6 @@ export const flowView = {
       (verdict === "wiped" || verdict === "lost") && styles.cellLost,
       ran && verdict !== undefined && styles.flashing,
     ),
-  name: styles.name,
   value: (bad: boolean, landing: boolean) =>
     cx(styles.value, bad && styles.valueLost, landing && styles.landing),
   nul: (bad: boolean) => cx(styles.nul, bad && styles.nulLost),

@@ -1,8 +1,8 @@
 ---
+import { row } from "./table-design.markers";
 import { arcade } from "../components/arcade.css";
 import { ACCOUNTS, DIGITS, MRR, money } from "./table-design";
 import { styles } from "./table-design.css";
-import { view } from "./table-design.view";
 
 type Props = { careful: boolean };
 
@@ -26,7 +26,7 @@ const { careful } = Astro.props;
         ACCOUNTS.map((account, at) => {
           const value = MRR[at] ?? 0;
           return (
-            <tr class={view.row}
+            <tr class={row}
               ><td class={styles.td}>{account}</td><td
                 class:list={[styles.td, careful ? styles.num : styles.ragged]}
                 >{
@@ -37,9 +37,9 @@ const { careful } = Astro.props;
                         aria-hidden="true"
                         >{[...money(value)].map((char) =>
                           /\d/.test(char) ? (
-                            <span class={view.reel}
-                              ><span class={view.strip} style={`--n:${char}`}
-                                >{DIGITS.map((digit) => <span class={view.digit}>{digit}</span>)}</span
+                            <span class={styles.reel}
+                              ><span class={styles.strip} style={`--n:${char}`}
+                                >{DIGITS.map((digit) => <span class={styles.digit}>{digit}</span>)}</span
                               ></span
                             >
                           ) : (

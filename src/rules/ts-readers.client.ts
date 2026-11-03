@@ -1,3 +1,5 @@
+import { arcade } from "../components/arcade.css";
+import { styles } from "./handling-timestamps.css";
 import { reducedMotion } from "../hooks/media-query";
 import {
   dayOf,
@@ -46,9 +48,9 @@ const comment = () => document.createComment("");
 
 function shouldOf(off: string, truth: string) {
   const should = document.createElement("span");
-  should.className = tsView.should;
+  should.className = styles.should;
   const sr = document.createElement("span");
-  sr.className = tsView.srOnly;
+  sr.className = arcade.srOnly;
   sr.append(off, comment(), ", ");
   should.append(sr, "should be", comment(), " ", comment(), truth);
   return should;

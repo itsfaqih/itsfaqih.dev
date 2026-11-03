@@ -22,7 +22,7 @@ const { delay = false } = Astro.props;
         inboxRows(0).map(([from, subject]) => (
           <li class={view.mailRow(false)}
             ><i aria-hidden="true" class={view.avatar(false)}>{from.charAt(0)}</i><span
-              class={view.mailText}
+              class={styles.mailText}
               ><b class={view.mailFrom(false)}>{from}</b><em class={view.mailSubject(false)}
                 >{subject}</em
               ></span

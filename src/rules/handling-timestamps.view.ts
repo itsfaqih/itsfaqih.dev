@@ -1,4 +1,3 @@
-import { arcade } from "../components/arcade.css";
 import type { Fate } from "./handling-timestamps";
 import { marker } from "../when";
 import { cx } from "../cx";
@@ -6,7 +5,6 @@ import { styles } from "./handling-timestamps.css";
 
 /** Class names for what the custom elements draw and redraw. */
 export const tsView = {
-  srOnly: arcade.srOnly,
   // The marker lets a quoted string ask whether its line is a note.
   line: (note: boolean, hot: boolean) =>
     cx(styles.line, note && styles.note, hot && styles.hot, marker),
@@ -14,7 +12,6 @@ export const tsView = {
   minute: `ts-min ${cx(styles.hand, styles.minuteHand)}`,
   hour: (off: boolean) => `ts-hour ${cx(styles.hand, off && styles.hourOff)}`,
   time: (off: boolean) => cx(styles.time, off && styles.off),
-  should: styles.should,
   order: (fate: Fate) =>
     cx(
       styles.order,

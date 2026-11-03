@@ -29,8 +29,8 @@ const intent = DEMOS[demo].intent(TITLE);
           )
         }
       </div>
-      <div class={flowView.wire} data-part="wire"
-        ><span class={flowView.verb}>PATCH /tasks/12</span><code class={flowView.body(false)}
+      <div class={styles.wire} data-part="wire"
+        ><span class={styles.verb}>PATCH /tasks/12</span><code class={flowView.body(false)}
           >{
             paint(JSON.stringify(body), KINDS).map((p) =>
               p.class ? <span class={p.class}>{p.text}</span> : p.text,
@@ -38,7 +38,7 @@ const intent = DEMOS[demo].intent(TITLE);
           }</code
         ><i aria-hidden="true" class={flowView.packet(false)}></i></div
       >
-      <dl class={flowView.record} data-part="record">
+      <dl class={styles.record} data-part="record">
         {
           fields.map((field, index) => {
             const verdict = verdictOf(field, before, after, intent);
@@ -46,7 +46,7 @@ const intent = DEMOS[demo].intent(TITLE);
             const value = after[field];
             return (
               <div style={`--i:${index}`} class={flowView.cell(verdict, false)}
-                ><dt class={flowView.name}>{field}</dt><dd class={flowView.value(bad, false)}
+                ><dt class={styles.name}>{field}</dt><dd class={flowView.value(bad, false)}
                   >{value === null ? <span class={flowView.nul(bad)}>null</span> : value}</dd
                 ><span class={flowView.tag(verdict)}>{verdict}</span></div
               >

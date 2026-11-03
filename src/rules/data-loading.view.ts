@@ -18,7 +18,6 @@ export const view = {
   sub: (blank: boolean) => cx(styles.sub, blank && styles.hidden),
   mailRow: (skeleton: boolean) => cx(styles.mailRow, skeleton && styles.mailRowStill),
   avatar: (skeleton: boolean) => cx(styles.avatar, skeleton && styles.bone),
-  mailText: styles.mailText,
   mailFrom: (skeleton: boolean) => cx(styles.mailLine, styles.mailFrom, skeleton && styles.bone),
   mailSubject: (skeleton: boolean) =>
     cx(styles.mailLine, styles.mailSubject, skeleton && styles.bone),
@@ -31,6 +30,4 @@ export const view = {
       !online && careful && styles.balanceWait,
     ),
   histRow: (fresh: boolean) => cx(styles.histRow, fresh && styles.histRowNew),
-  histAmount: styles.histAmount,
-  time: styles.time,
 };

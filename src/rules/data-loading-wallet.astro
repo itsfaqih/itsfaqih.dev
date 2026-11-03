@@ -32,7 +32,7 @@ const { careful = false } = Astro.props;
         >{
           HISTORY.map((row) => (
             <li class={view.histRow(false)}
-              ><span>{row.label}</span><b class={view.histAmount}
+              ><span>{row.label}</span><b class={styles.histAmount}
                 >{row.amount < 0 ? "−" : "+"}<!-- -->{money(Math.abs(row.amount))}</b
               ></li
             >

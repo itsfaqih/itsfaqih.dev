@@ -1,4 +1,5 @@
 ---
+import { arcade } from "../components/arcade.css";
 import {
   dayOf,
   hourAngle,
@@ -46,8 +47,8 @@ const { readings, utc } = Astro.props;
                 >{dayOf(reading.shown)}</span
               >{
                 off && (
-                  <span class={tsView.should}
-                    ><span class={tsView.srOnly}>{off}<Fragment set:html="<!-- -->" />, </span>should be<Fragment
+                  <span class={styles.should}
+                    ><span class={arcade.srOnly}>{off}<Fragment set:html="<!-- -->" />, </span>should be<Fragment
                       set:html="<!-- -->"
                     /> <Fragment set:html="<!-- -->" />{timeOf(reading.truth)}</span
                   >

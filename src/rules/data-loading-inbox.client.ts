@@ -1,3 +1,4 @@
+import { styles } from "./data-loading.css";
 import { inboxRows, SPIN_DELAY } from "./data-loading";
 import { Demo, el, write } from "./data-loading-demo";
 import { view } from "./data-loading.view";
@@ -29,7 +30,7 @@ class DataLoadingInbox extends Demo {
         avatar,
         el(
           "span",
-          view.mailText,
+          styles.mailText,
           el("b", view.mailFrom(this.#skeleton), from),
           el("em", view.mailSubject(this.#skeleton), subject),
         ),
