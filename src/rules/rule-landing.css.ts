@@ -1873,8 +1873,6 @@ export const island = {
         borderColor: "currentcolor",
         borderRadius: "999px",
         backgroundColor: "transparent",
-        // The rest position is 0 0. The hover sets initial, which computes to 0% 0%, as a
-        // background shorthand would.
         backgroundPosition: "0 0",
         color: palette["--dim"],
         font: "inherit",

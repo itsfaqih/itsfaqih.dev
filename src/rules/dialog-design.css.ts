@@ -55,7 +55,6 @@ export const styles = {
     alignItems: "center",
     justifyContent: "space-between",
   }),
-  // The spread's alignment for a `card`, which stays a grid.
   spreadInCard: style({
     alignItems: "center",
     justifyContent: "space-between",

@@ -227,8 +227,6 @@
     }
   }
 
-  /* Global: @property registers for the whole document. --hue is registered so the hero prints' ink (hero-prints.astro)
-     eases to the next slide's colour. */
 
   /* Global: a pseudo-element keyed on the attribute the CV page's switch sets. The ATS version previews
      plain paper, which the scanlines would stripe. */
@@ -328,6 +326,8 @@
     transform: scale(0.96);
   }
 }
+/* Global: @property registers for the whole document. --hue is registered so the hero prints' ink
+   (hero-prints.astro) eases to the next slide's colour. */
 @property --hue {
   syntax: "<color>";
   inherits: true;

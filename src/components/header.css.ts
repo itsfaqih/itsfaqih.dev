@@ -344,8 +344,6 @@ export const styles = {
         borderRadius: "999px",
         // A pointer that can hover gets the island's one gliding fill; a touch press lights the button.
         backgroundColor: "transparent",
-        // The rest position is 0 0. The press sets initial, which computes to 0% 0%, as a
-        // background shorthand would.
         backgroundPosition: "0 0",
         color: palette["--dim"],
         font: "inherit",
@@ -423,7 +421,6 @@ export const styles = {
       },
     },
   }),
-  // Each sets its own timing whole, so none of the glyph's conditions carry over.
   sunInLight: style({
     transitionDuration: motion["--t-moderate"],
     transitionTimingFunction: motion["--moderate"],

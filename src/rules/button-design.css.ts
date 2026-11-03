@@ -173,7 +173,6 @@ export const styles = {
       },
     },
   }),
-  // `plain` without its drop, for a key whose drop comes from `live`.
   plainFace: style({
     "@layer": {
       [under1]: {

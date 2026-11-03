@@ -7,17 +7,21 @@ type Rule = { scope: string; className: string; state: string; declarations: Map
 const GROUPING = /^@(layer|media|supports|container)\b/;
 const SINGLE_CLASS = /^\.([\w-]+)((?::[\w-]+(?:\([^()]*\))?|\[[^\]]*\])*)$/;
 
-/** Index just past the `}` closing the block whose `{` is at `open`. */
 function blockEnd(css: string, open: number) {
   let depth = 0;
+  let quote = "";
   for (let at = open; at < css.length; at += 1) {
-    if (css[at] === "{") depth += 1;
-    if (css[at] === "}" && --depth === 0) return at + 1;
+    const char = css[at]!;
+    if (quote) {
+      if (char === "\\") at += 1;
+      else if (char === quote) quote = "";
+    } else if (char === '"' || char === "'") quote = char;
+    else if (char === "{") depth += 1;
+    else if (char === "}" && --depth === 0) return at + 1;
   }
   return css.length;
 }
 
-/** The single-class rules of minified CSS. Strings holding braces only occur in `@font-face`. */
 function parseRules(css: string, scope = ""): Rule[] {
   const found: Rule[] = [];
   let at = 0;
@@ -46,10 +50,6 @@ function parseRules(css: string, scope = ""): Rule[] {
   return found;
 }
 
-/**
- * Pairs of classes on one element that set a property differently at the same layer, condition and
- * state. Stylesheet order alone would pick the winner, and an unrelated import can change that order.
- */
 function orderDependentPairs(html: string) {
   const css = [...html.matchAll(/<style[^>]*>(.*?)<\/style>/gs)].map((m) => m[1]).join("");
   const byClass = new Map<string, Rule[]>();

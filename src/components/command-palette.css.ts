@@ -450,8 +450,6 @@ export const styles = {
     borderStyle: "none",
     borderColor: "currentcolor",
     borderRadius: "999px",
-    // The rest position is 0 0. The hover sets initial, which computes to 0% 0%, as a
-    // background shorthand would.
     backgroundPosition: "0 0",
     backgroundColor: "transparent",
     color: palette["--dim"],

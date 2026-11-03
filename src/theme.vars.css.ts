@@ -19,7 +19,6 @@ export const cursors = createGlobalThemeContract(cursorTokens, literalNames);
 createGlobalTheme(":root", palette, { "@layer": "global", ...paletteTokens });
 createGlobalTheme(":root", fonts, { "@layer": "global", ...fontTokens });
 createGlobalTheme(":root", motion, { "@layer": "global", ...motionTokens });
-// In the global layer, so print-cursor's html.cur-on replaces these by specificity.
 createGlobalTheme(":root", cursors, { "@layer": "global", ...cursorTokens });
 
 // The same cabinet on paper. Panels go white, hairlines and hard shadows go grey, and accents
