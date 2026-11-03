@@ -16,8 +16,9 @@ composes it by hand from the pieces below, with proximity as the worked example.
 | `<Kbd>`                                   | `kbd.astro`                                                                           |
 | `<Tree rows>`                             | `tree.astro`                                                                          |
 | `onceOnScreen`, `watchReveal`             | `rule-motion.ts`                                                                      |
-| `OUT`, `SNAP`, `TABBED`, view helpers     | `rule-landing.styles.ts`                                                              |
-| `kit` tokens                              | `rule-landing.stylex.ts`                                                              |
+| `OUT`, `TABBED`                           | `rule-landing.css.ts`                                                                 |
+| `SNAP`, view helpers                      | `rule-landing.view.ts`                                                                |
+| `kit` tokens                              | `rule-landing.vars.css.ts`                                                            |
 | `Lesson<S>`, `Level`, `Tldr`              | `lesson.ts`                                                                           |
 
 The frame's behavior lives in three custom elements. `<rule-landing>` runs the reveals, the title
@@ -39,7 +40,7 @@ seat and the stars. A page adds no script for any of that.
 3. **Demos as `.astro` components with custom elements.** Each demo is its own `.astro` file beside
    the page, with its behavior in a `<name>.client.ts` element. Follow the custom-element pattern in
    `docs/astro-migration.md`.
-4. **Page styles in `src/rules/<id>.styles.ts`.** `stylex.create` cannot live in `.astro`.
+4. **Page styles in `src/rules/<id>.css.ts`.** vanilla-extract compiles `.css.ts` modules only, not `.astro`. Class helpers go in `<id>.view.ts`.
 5. **Route.** `src/pages/rule-of-thumb/<id>.astro` renders `<RulePage id><Page /></RulePage>`.
    `rule-page.astro` wraps the page in the site layout with the rule's head tags. The rule needs a
    published entry in `src/data/guidelines.ts`, or `RuleLanding` throws.
