@@ -1,26 +1,12 @@
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
-import { style, keyframes } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2, under3 } from "../layers.css";
 const TABLET = "(max-width: 820px)";
 const PHONE = "(max-width: 640px)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
-const TOUCH = "(pointer: coarse)";
-
-const stepIn = keyframes({
-  from: { opacity: 0, translate: "0 4px" },
-});
-const fade = keyframes({
-  from: { opacity: 0 },
-});
-const drain = keyframes({
-  to: { transform: "scaleX(0)" },
-});
-
-export const HOLD_MS = 1200;
-export const UNDO_MS = 5000;
 
 export const styles = {
   stage: style({
@@ -278,100 +264,9 @@ export const styles = {
     fontFamily: fonts["--mono"],
     color: palette["--mute"],
   }),
-  fullRow: style({
-    gridColumn: "1 / -1",
-  }),
-  slug: style({
-    display: "flex",
-    alignItems: "center",
-    selectors: {
-      "&:focus-within": {
-        outline: `3px solid ${palette["--focus"]}`,
-        outlineOffset: "1px",
-      },
-    },
-  }),
-  slugBase: style({
-    color: palette["--mute"],
-  }),
-  slugInput: style({
-    flex: 1,
-    minWidth: 0,
-    height: "100%",
-    padding: 0,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    fontWeight: "inherit",
-    fontSize: "inherit",
-    fontFamily: "inherit",
-    color: "inherit",
-    outline: "none",
-  }),
-  form: style({
-    gridTemplateColumns: "minmax(0, 1fr) auto",
-    alignItems: "end",
-    justifyItems: "stretch",
-    gap: "12px",
-    width: "min(100%, 360px)",
-    marginInline: "auto",
-    "@media": {
-      [PHONE]: {
-        gridTemplateColumns: "minmax(0, 1fr)",
-      },
-    },
-  }),
-  field: style({
-    display: "grid",
-    gap: "6px",
-    minWidth: 0,
-    fontWeight: 600,
-    fontSize: "12px",
-    lineHeight: "normal",
-    fontFamily: fonts["--sans"],
-    color: palette["--dim"],
-  }),
-  input: style({
-    "@layer": {
-      [under1]: {
-        height: "38px",
-        minWidth: 0,
-        paddingBlock: 0,
-        paddingInline: "12px",
-        borderWidth: "1.5px",
-        borderStyle: "solid",
-        borderColor: palette["--hair"],
-        borderRadius: "10px",
-        backgroundColor: palette["--panel"],
-        fontWeight: 500,
-        // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
-        fontSize: "14px",
-        lineHeight: "normal",
-        fontFamily: fonts["--sans"],
-        color: palette["--text"],
-        selectors: {
-          "&:focus-visible": {
-            outline: `3px solid ${palette["--focus"]}`,
-            outlineOffset: "1px",
-          },
-        },
-        "@media": {
-          [TOUCH]: {
-            fontSize: "16px",
-          },
-        },
-      },
-    },
-  }),
   steps: style({
     display: "flex",
     gap: "10px",
-  }),
-  formEnd: style({
-    "@media": {
-      [PHONE]: {
-        justifySelf: "start",
-      },
-    },
   }),
   off: style({
     boxShadow: `0 4px 0 ${palette["--soft-key-drop"]}`,
@@ -380,10 +275,6 @@ export const styles = {
     vars: {
       "--face": palette["--soft-key"],
     },
-  }),
-  faded: style({
-    opacity: 0.35,
-    cursor: cursors["--cursor-point"],
   }),
   tip: style({
     position: "relative",
@@ -434,10 +325,6 @@ export const styles = {
         },
       },
     },
-  }),
-  tooltipOpen: style({
-    opacity: 1,
-    translate: "-50% 0",
   }),
   card: style({
     display: "grid",
@@ -528,154 +415,6 @@ export const styles = {
   dotOn: style({
     borderColor: "var(--c-ink)",
     backgroundColor: "var(--c)",
-  }),
-  project: style({
-    "@layer": {
-      [under2]: {
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexWrap: "wrap",
-        rowGap: "14px",
-        columnGap: "20px",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "min(100%, 420px)",
-        minHeight: "80px",
-        paddingBlock: "16px",
-        paddingInline: "18px",
-        borderRadius: "14px",
-        backgroundColor: palette["--panel"],
-        boxShadow: `0 0 0 1px ${palette["--hair"]}`,
-      },
-    },
-  }),
-  confirm: style({
-    "@layer": {
-      [under1]: {
-        boxShadow: `0 0 0 1.5px color-mix(in srgb, ${palette["--no"]} 55%, transparent)`,
-      },
-    },
-  }),
-  deleted: style({
-    backgroundColor: "transparent",
-    boxShadow: `0 0 0 1.5px ${palette["--hair"]} inset`,
-  }),
-  stepIn: style({
-    animationName: stepIn,
-    animationDuration: "200ms",
-    animationTimingFunction: motion["--out"],
-    "@media": {
-      [REDUCE]: {
-        animationName: fade,
-        animationDuration: "160ms",
-        animationTimingFunction: "ease",
-      },
-    },
-  }),
-  guards: style({
-    display: "inline-flex",
-    gap: "2px",
-    padding: "3px",
-    borderRadius: "10px",
-    backgroundColor: palette["--panel-2"],
-  }),
-  guard: style({
-    "@layer": {
-      [under1]: {
-        height: "28px",
-        paddingBlock: 0,
-        paddingInline: "12px",
-        borderWidth: 0,
-        borderRadius: "7px",
-        backgroundColor: "transparent",
-        fontWeight: 600,
-        fontSize: "12px",
-        lineHeight: "normal",
-        fontFamily: fonts["--sans"],
-        color: palette["--dim"],
-        cursor: cursors["--cursor"],
-        selectors: {
-          "&:focus-visible": {
-            outline: `3px solid ${palette["--focus"]}`,
-          },
-        },
-      },
-    },
-  }),
-  guardOn: style({
-    color: palette["--text"],
-  }),
-  guardPill: style({
-    borderRadius: "7px",
-    backgroundColor: palette["--panel"],
-    boxShadow: `0 1px 0 ${palette["--hair"]}, 0 0 0 1px ${palette["--hair"]}`,
-  }),
-  guardSlide: style({
-    transitionDuration: motion["--t-moderate"],
-    transitionTimingFunction: motion["--moderate"],
-  }),
-  hold: style({
-    overflow: "hidden",
-    isolation: "isolate",
-    touchAction: "none",
-    userSelect: "none",
-    WebkitTouchCallout: "none",
-  }),
-  holdFill: style({
-    "@layer": {
-      [under1]: {
-        position: "absolute",
-        inset: 0,
-        zIndex: -1,
-        backgroundColor: `color-mix(in srgb, ${palette["--no"]} 34%, transparent)`,
-        transformOrigin: "left center",
-        transform: "scaleX(0)",
-        transition: `transform 200ms ${motion["--out"]}`,
-      },
-    },
-  }),
-  holdFillOn: style({
-    transform: "scaleX(1)",
-    transition: `transform ${HOLD_MS}ms linear`,
-  }),
-  drain: style({
-    position: "absolute",
-    insetInline: 0,
-    bottom: 0,
-    height: "3px",
-    backgroundColor: palette["--no"],
-    transformOrigin: "left center",
-    animationName: drain,
-    animationDuration: `${UNDO_MS}ms`,
-    animationTimingFunction: "linear",
-    animationFillMode: "forwards",
-  }),
-  projectRow: style({
-    marginLeft: "auto",
-  }),
-  projectCopy: style({
-    display: "grid",
-    gap: "2px",
-  }),
-  projectName: style({
-    "@layer": {
-      [under1]: {
-        fontWeight: 700,
-        fontSize: "14px",
-        lineHeight: "normal",
-        fontFamily: fonts["--display"],
-        letterSpacing: "-0.02em",
-        color: palette["--text"],
-      },
-    },
-  }),
-  projectGone: style({
-    color: palette["--no-ink"],
-  }),
-  projectMeta: style({
-    fontSize: "13px",
-    color: palette["--mute"],
   }),
   icons: style({
     display: "flex",
@@ -800,19 +539,8 @@ export const quiz = {
       },
     },
   }),
-  tipRoom: style({
-    paddingTop: "40px",
-  }),
   end: style({
     justifyContent: "flex-end",
-  }),
-  hiddenSlot: style({
-    width: "84px",
-    height: "38px",
-    borderWidth: "1.5px",
-    borderStyle: "dashed",
-    borderColor: palette["--hair"],
-    borderRadius: "10px",
   }),
   screen: style({
     display: "grid",

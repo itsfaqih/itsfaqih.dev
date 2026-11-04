@@ -3,10 +3,8 @@ import Icon from "../components/icon.astro";
 import { LESSONS, TLDR } from "./button-design";
 import { quiz, styles } from "./button-design.css";
 import { quizKit } from "./rule-landing.css";
-import ButtonDelete from "./button-delete.astro";
 import ButtonHierarchy from "./button-hierarchy.astro";
 import ButtonIcons from "./button-icons.astro";
-import ButtonPublish from "./button-publish.astro";
 import ButtonStates from "./button-states.astro";
 import ButtonStill from "./button-still.astro";
 import ButtonToggle from "./button-toggle.astro";
@@ -17,7 +15,7 @@ import QuizChoice from "./quiz-choice.astro";
 import RuleQuiz from "./rule-quiz.astro";
 import Ruler from "./button-ruler.astro";
 
-const [states, disabled, still, hierarchy, guard, icons] = LESSONS;
+const [states, still, hierarchy, icons] = LESSONS;
 const key = [styles.key, styles.sm, styles.flat];
 ---
 
@@ -27,8 +25,8 @@ const key = [styles.key, styles.sm, styles.flat];
   tldr={TLDR}
   take="build buttons the same way"
 >
-  <Fragment slot="lead">Style every state, say why it's off, and guard anything destructive.</Fragment>
-  <Fragment slot="intro">Give each state and refusal a visible change, so no press feels lost.</Fragment>
+  <Fragment slot="lead">Style every state, weigh each variant, and line up the icon.</Fragment>
+  <Fragment slot="intro">Give each state a visible change, so no press feels lost.</Fragment>
 
   <RuleLesson lesson={states}>
     <Fragment slot="body"
@@ -52,34 +50,6 @@ const key = [styles.key, styles.sm, styles.flat];
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={disabled}>
-    <Fragment slot="body"
-      >A disabled button that only fades leaves people guessing, most of all when the form looks done. Show the no-entry cursor, keep the label readable, and put the reason in a tooltip. Find out why Publish is off in both, then fix it.</Fragment
-    >
-    <ButtonPublish slot="bad" />
-    <ButtonPublish slot="good" careful />
-  </RuleLesson>
-  <RuleQuiz n={2} level={disabled.levels[0]}
-    >Publish stays off because an older post already uses this URL. Nothing else on screen says so. Pick how Publish looks when someone hovers it.
-    <div slot="board" class={quizKit.trio}>
-      <QuizChoice level={disabled.levels[0]} id="fade" caption="Faded to 40%"
-        ><span class:list={[quiz.mock, quiz.tipRoom]}><span class:list={[key, styles.faded]}>Publish</span></span></QuizChoice
-      >
-      <QuizChoice level={disabled.levels[0]} id="hide" caption="Hidden until it works"
-        ><span class:list={[quiz.mock, quiz.tipRoom]}><span class={quiz.hiddenSlot}></span></span></QuizChoice
-      >
-      <QuizChoice level={disabled.levels[0]} id="say" caption="Readable, says why"
-        ><span class:list={[quiz.mock, quiz.tipRoom]}
-          ><span class={styles.tip}
-            ><span class:list={[key, styles.off]}>Publish</span><span class:list={[styles.tooltip, styles.tooltipOpen]}
-              >That URL is taken</span
-            ></span
-          ></span
-        ></QuizChoice
-      >
-    </div>
-  </RuleQuiz>
-
   <RuleLesson lesson={still}>
     <Fragment slot="body"
       >A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press, and let the tooltip do the talking. Hover Back in both.</Fragment
@@ -87,7 +57,7 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonStill slot="bad" />
     <ButtonStill slot="good" careful />
   </RuleLesson>
-  <RuleQuiz n={3} level={still.levels[0]}
+  <RuleQuiz n={2} level={still.levels[0]}
     >A pager sits on page 1 of 5, so <b>Previous</b> is disabled. Tap the control that should light up on hover.
     <div slot="board" class={quiz.screen}>
       <span class={styles.small}>Page 1 of 5</span>
@@ -115,7 +85,7 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonHierarchy slot="bad" />
     <ButtonHierarchy slot="good" careful />
   </RuleLesson>
-  <RuleQuiz n={4} level={hierarchy.levels[0]}
+  <RuleQuiz n={3} level={hierarchy.levels[0]}
     >A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted. Pick the footer where <b>Checkout</b> reads as the next step.
     <div slot="board" class={quizKit.stack}>
       {
@@ -138,32 +108,6 @@ const key = [styles.key, styles.sm, styles.flat];
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={guard}>
-    <Fragment slot="body"
-      >Never let one stray click delete anything. Confirm with a red button that names what goes, ask people to hold the button down, or delete at once and offer Undo. Try all three.</Fragment
-    >
-    <ButtonDelete slot="bad" />
-    <ButtonDelete slot="good" careful />
-  </RuleLesson>
-  <RuleQuiz n={5} level={guard.levels[0]}
-    >A project page has three actions. Tap the one a stray click would make you regret, so it asks first.
-    <div slot="board" class={quiz.screen}>
-      <span class={styles.cardTitle}>Atlas</span>
-      <span class={styles.cardSub}>214 files, edited 2 hours ago</span>
-      <span class={quiz.bar}>
-        <QuizChoice level={guard.levels[0]} id="rename" look="spot"
-          ><span class:list={[key, styles.plain]}>Rename</span></QuizChoice
-        >
-        <QuizChoice level={guard.levels[0]} id="archive" look="spot"
-          ><span class:list={[key, styles.plain]}>Archive</span></QuizChoice
-        >
-        <QuizChoice level={guard.levels[0]} id="delete" look="spot"
-          ><span class:list={[key, styles.red]}>Delete</span></QuizChoice
-        >
-      </span>
-    </div>
-  </RuleQuiz>
-
   <RuleLesson lesson={icons}>
     <Fragment slot="body"
       >Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.</Fragment
@@ -172,7 +116,7 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonIcons slot="bad" />
     <ButtonIcons slot="good" careful />
   </RuleLesson>
-  <RuleQuiz n={6} level={icons.levels[0]}
+  <RuleQuiz n={4} level={icons.levels[0]}
     >Every button in this toolbar has 16px of padding on both sides. Tap the one that will look lopsided.
     <div slot="board" class={quiz.screen}>
       <span class={quiz.bar}>

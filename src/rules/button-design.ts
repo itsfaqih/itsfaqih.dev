@@ -36,40 +36,6 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    title: "Say why it's off",
-    bad: {
-      label: "Just faded",
-      costs: ["0 reasons", "1.6:1 contrast", "hand cursor"],
-    },
-    good: {
-      label: "Say why",
-      costs: ["1 reason", "6.4:1 contrast", "cursor: not-allowed"],
-    },
-    levels: [
-      {
-        name: "Can't be pressed",
-        answer: "say",
-        choices: [
-          {
-            id: "fade",
-            label: "Publish faded to 40%",
-            note: "Fading says no, but not why. The form looks done, so they're left guessing.",
-          },
-          {
-            id: "hide",
-            label: "Publish hidden",
-            note: "They can't find Publish at all, let alone learn the URL is taken.",
-          },
-          {
-            id: "say",
-            label: "Publish readable, with a tooltip that says the URL is taken",
-            note: "Keep the label readable and say why on hover, so they know to change the URL.",
-          },
-        ],
-      },
-    ],
-  },
-  {
     title: "Keep a disabled button still on hover",
     bad: {
       label: "Lights up",
@@ -138,40 +104,6 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    title: "Guard the destructive action",
-    bad: {
-      label: "One click",
-      costs: ["1 click", "0 warnings"],
-    },
-    good: {
-      label: "Guard it",
-      costs: ["3 guards", "0 stray deletes"],
-    },
-    levels: [
-      {
-        name: "Worth a confirm",
-        answer: "delete",
-        choices: [
-          {
-            id: "rename",
-            label: "Rename",
-            note: "A rename loses nothing, and you can rename it back. A confirm only slows people down.",
-          },
-          {
-            id: "archive",
-            label: "Archive",
-            note: "Archive comes back in one click. Offer Undo after, rather than asking first.",
-          },
-          {
-            id: "delete",
-            label: "Delete",
-            note: "Nothing brings these back. Ask first, name what goes, and land focus on Cancel.",
-          },
-        ],
-      },
-    ],
-  },
-  {
     title: "Optical alignment over mathematical alignment",
     bad: {
       label: "Even padding",
@@ -209,9 +141,7 @@ export const LESSONS: Lesson[] = [
 
 export const TLDR = [
   ["Any button", "Give hover, press and focus a look, in 100 to 200ms"],
-  ["Not available yet", "Show the no-entry cursor and a tooltip that says why"],
   ["Hovering a disabled button", "Keep its colour and drop still"],
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
-  ["It deletes something", "Make it red, then confirm by name, hold, or offer Undo"],
   ["An icon beside the label", "Take 4px off the icon's side"],
 ] as const satisfies Tldr;
