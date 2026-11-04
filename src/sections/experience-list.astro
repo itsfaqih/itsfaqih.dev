@@ -17,7 +17,7 @@ type Props = { jobs: Job[] };
 const { jobs } = Astro.props;
 ---
 
-<experience-list class={styles.list}
+<experience-list class={styles.list} data-sound="none"
   >{
     jobs.map((job, index) => {
       const isOpen = index === 0;
@@ -52,6 +52,7 @@ const { jobs } = Astro.props;
               ))}
               <li data-more="true" style="display:none"><span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" /></li>
             </ul>
+            <span aria-hidden="true" class={view.hint}>Scroll down</span>
             <div hidden aria-hidden="true" class:list={[boxScrollbar.track, styles.stackBar, barMarker]}>
               <div class={boxScrollbar.thumb} />
             </div>

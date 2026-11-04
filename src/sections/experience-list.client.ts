@@ -1,5 +1,6 @@
 import { watchBoxScrollbar } from "../components/box-scrollbar";
 import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { moreLabel, rowView } from "./experience-list.view";
 
 const MAX_ROWS = 2;
@@ -92,6 +93,7 @@ type Row = {
   frame: HTMLElement;
   stack: HTMLUListElement;
   track: HTMLElement;
+  hint: HTMLElement;
   pills: HTMLElement[];
   more: HTMLElement;
   moreLabel: HTMLElement;
@@ -104,6 +106,7 @@ type Row = {
  * The work history (experience-list.astro). A row's head opens it and closes the one open, and the
  * list glides to the new layout. A closed row holds its tools to two rows, the second ending in a
  * pill counting the rest. The open row shows them all, scrolling within the achievements' height.
+ * Opening a row plays a page turn, and closing the open one a flick.
  */
 class ExperienceList extends HTMLElement {
   #stop?: () => void;
@@ -123,7 +126,8 @@ class ExperienceList extends HTMLElement {
         chevron: element.querySelector(":scope > button > span:last-child")!,
         frame,
         stack,
-        track: frame.querySelector(":scope > [aria-hidden]")!,
+        track: frame.querySelector(":scope > div[aria-hidden]")!,
+        hint: frame.querySelector(":scope > span[aria-hidden]")!,
         pills,
         more,
         moreLabel: more.querySelector(":scope > *")!,
@@ -189,6 +193,7 @@ class ExperienceList extends HTMLElement {
       row.chevron.className = view.chevron;
       row.frame.className = view.frame;
       row.stack.className = view.stack;
+      row.hint.className = view.hint;
       row.stack.removeAttribute("data-gliding");
       row.stack.scrollTop = 0;
       for (const pill of row.pills) {
@@ -219,6 +224,7 @@ class ExperienceList extends HTMLElement {
       const before = reducedMotion() ? null : snapshotOf(this);
       const was = open;
       open = open === index ? -1 : index;
+      play(open === -1 ? "fold" : "turn");
       for (const at of new Set([was, open])) {
         const row = rows[at];
         if (!row) continue;
