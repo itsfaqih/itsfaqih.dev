@@ -62,10 +62,19 @@ uv run scripts/fonts.py
 
 The build does not process fonts. The script cuts Geist, Geist Mono and Unbounded down to the weights, OpenType features and characters the site uses, writes two files per family to `public/fonts/` and their `@font-face` rules to `src/fonts.css`, and rebuilds the OG card fonts in `scripts/og/fonts/`; commit what it writes. The build inlines each `-core.woff2` (ASCII and common punctuation) into every page. A page fetches the family's `-extended.woff2` (Latin-1, Latin Extended-A and a few symbols) only when it draws one of those characters. Edit `FAMILIES` or `FEATURES` in the script and rerun it when a family is set at a weight outside its range or draws a character outside its two files, when a page turns on an OpenType feature or sets a `lang` other than English, or when a font is upgraded. Each run lists the characters in `src/` that no file has; a system font draws those.
 
+## Sounds
+
+```bash
+vp node scripts/sounds.ts
+vp run build && vp node scripts/verify-sounds.ts --shots <dir>
+```
+
+Every press of a link or button plays a short clip from [soundcn](https://soundcn.xyz), a registry of CC0 sound effects, and the header's speaker button mutes them (saved as `localStorage.sound`). `scripts/sounds.ts` maps each cue to its registry item, refuses any item not licensed CC0, and writes `public/sounds/<cue>.mp3`; commit what it writes. `src/hooks/sound.ts` holds the cues and their volumes. A control that plays its own cue carries `data-sound="none"`, or `data-sound="<cue>"` to swap the tap for another. `scripts/verify-sounds.ts` drives the built site in Chromium, logs which clip each interaction plays, fails on any console warning, and with `--shots` saves the header in both themes at 1440px and 390px.
+
 ## Source layout
 
 - `src/pages/`: Astro's file-based pages. Each is a thin `.astro` file that picks the layout, the head tags and the page component.
-- `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the header, command palette, cursor and scrollbar, with the `@layer` order statement as its first style), and `head-script.ts`, which sets the theme, the intro classes and the view-transition types before first paint.
+- `src/layouts/`: `site.astro`, the document every page shares (head tags, theme-color, the inline head script, the header, command palette, cursor and scrollbar, with the `@layer` order statement as its first style), and `head-script.ts`, which sets the theme, the sound toggle's glyph, the intro classes and the view-transition types before first paint.
 - `src/sections/`: the home page (`home.astro`) and the pieces the rule pages share with it.
 - `src/rules/`: the Rule of Thumb index, each rule's page component, the `RuleLanding` frame and `rule-page.astro`. `docs/rule-pages.md` explains how a rule page is built.
 - `src/blog/`: the post list, the post frame and its table of contents.
