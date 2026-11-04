@@ -220,6 +220,8 @@ export const styles = {
     "@media": {
       [REDUCE]: {
         animationName: "none !important",
+        opacity: "var(--rest-opacity)",
+        transform: "translateX(var(--rest-x))",
       },
     },
   }),

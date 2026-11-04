@@ -14,6 +14,7 @@ import {
 import { draw, SLIDE_MS as BACKENDS_MS } from "./hero-prints.view";
 import { styles } from "./hero-prints.css";
 import {
+  jobRest,
   JOBS,
   MEANDER,
   REJECT_MARK,
@@ -190,7 +191,7 @@ const WORK_SIZE = 20;
         );
       })}
       {JOBS.map((job, k) => (
-        <g class={draw(styles.queueJob)} style={`animation-name:hp-job-${k}`}>
+        <g class={draw(styles.queueJob)} style={`animation-name:hp-job-${k};${jobRest(job)}`}>
           <Ink
             p={p}
             top={job.top}

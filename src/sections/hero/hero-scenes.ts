@@ -202,6 +202,12 @@ export const JOBS: { top: TopInk; stops: JobStop[] }[] = [
     .map(joiner),
 ];
 
+// With animation off a job stays where it opens the scene, so the queue still holds work.
+export const jobRest = ({ stops }: (typeof JOBS)[number]) => {
+  const { x, opacity = 1 } = stops[0]!;
+  return vars({ "rest-x": `${x}px`, "rest-opacity": opacity });
+};
+
 export const RETRY_WORKER = workerOf(HUE_PASSES);
 const REJECTED_AT = intoWorkerAt(HUE_REJECTED);
 
