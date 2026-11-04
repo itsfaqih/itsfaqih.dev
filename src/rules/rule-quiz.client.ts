@@ -173,6 +173,7 @@ class RuleQuiz extends HTMLElement {
 
     if (piece) {
       const pick = (value: boolean) => {
+        if (picked && !value) play("place");
         picked = value;
         sync();
         if (!picked) return;
@@ -209,6 +210,7 @@ class RuleQuiz extends HTMLElement {
         dragging = false;
         if (target && !cancelled) drop(target);
         else {
+          play("place");
           flyHome(piece);
           sync();
         }
@@ -220,6 +222,7 @@ class RuleQuiz extends HTMLElement {
         (event) => {
           if (placed !== null || event.button !== 0) return;
           piece.setPointerCapture(event.pointerId);
+          if (!picked) play("lift");
           drag = {
             x0: event.clientX,
             y0: event.clientY,
@@ -254,6 +257,7 @@ class RuleQuiz extends HTMLElement {
           piece.style.transform = `translate(${dx}px, ${dy}px) rotate(${drag.rot}deg) scale(1.05)`;
           const target = nearest(event.clientX, event.clientY);
           if (target !== near) {
+            if (target) play("move");
             near = target;
             sync();
           }
@@ -266,7 +270,9 @@ class RuleQuiz extends HTMLElement {
         "click",
         (event) => {
           const fromKeyboard = event.detail === 0;
-          if (fromKeyboard) pick(!picked);
+          if (!fromKeyboard) return;
+          if (!picked) play("lift");
+          pick(!picked);
         },
         { signal },
       );

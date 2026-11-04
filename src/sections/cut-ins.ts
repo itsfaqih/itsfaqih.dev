@@ -11,12 +11,13 @@ function isShownEnough(entry: IntersectionObserverEntry) {
 /**
  * Cut-ins: every [data-cut] under `root`, including ones added later, gets .in once 30% of it is
  * on screen, with --cut-order set to its place among the elements arriving in the same frame.
- * Every [data-loop] pauses while off-screen. Returns the stop.
+ * Every [data-loop] pauses while off-screen. `onArrive` runs once per frame that brings any in.
+ * Returns the stop.
  *
  * It fires `cut-ins` on `root` first, which cancels the head script's rest fallback
  * (head-script.ts) the way an island's `astro:hydrate` does.
  */
-export function watchCutIns(root: HTMLElement) {
+export function watchCutIns(root: HTMLElement, onArrive?: () => void) {
   root.dispatchEvent(new Event("cut-ins", { bubbles: true }));
   const cuts = new IntersectionObserver(
     (entries) => {
@@ -27,6 +28,7 @@ export function watchCutIns(root: HTMLElement) {
         entry.target.classList.add("in");
         cuts.unobserve(entry.target);
       }
+      if (order > 0) onArrive?.();
     },
     { threshold: VISIBLE_STEPS },
   );
