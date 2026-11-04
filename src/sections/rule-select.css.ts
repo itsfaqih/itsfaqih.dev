@@ -288,11 +288,9 @@ export const styles = {
         zIndex: 2,
         borderRadius: "14px",
         pointerEvents: "none",
-        // The halftone over the hue, as two layers so the colour sits under the dots. Positions are
-        // written per axis: the minifier folds 0% 0% into 0 0, which computes to 0px 0px.
+        // The halftone over the hue, as two layers so the colour sits under the dots.
         backgroundImage: `${palette["--halftone"]}, none`,
-        backgroundPositionX: "0, 0%",
-        backgroundPositionY: "0, 0%",
+        backgroundPosition: "0 0, 0 0",
         backgroundSize: "25px 25px, auto",
         backgroundColor: "var(--c)",
         opacity: 0,
@@ -425,8 +423,7 @@ export const styles = {
   // Only while a rule is picked: with no hue there is no light to carry.
   beamHue: style({
     backgroundImage: `${palette["--halftone"]}, none`,
-    backgroundPositionX: "0, 0%",
-    backgroundPositionY: "0, 0%",
+    backgroundPosition: "0 0, 0 0",
     backgroundSize: "25px 25px, auto",
     backgroundColor: "var(--c)",
   }),

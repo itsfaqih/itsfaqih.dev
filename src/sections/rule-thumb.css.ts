@@ -23,9 +23,7 @@ export const screen = {
         // A dot screen over the hue, as two layers so the colour sits under the dots.
         backgroundImage:
           "radial-gradient(circle, color-mix(in srgb, var(--c) 16%, transparent) 0.8px, transparent 1.2px), none",
-        // Written per axis: the minifier folds a 0% 0% position into 0 0, which computes to 0px 0px.
-        backgroundPositionX: "0, 0%",
-        backgroundPositionY: "0, 0%",
+        backgroundPosition: "0 0, 0 0",
         backgroundSize: "8px 8px, auto",
         backgroundColor: "color-mix(in srgb, var(--c) 9%, #101017)",
         boxShadow:
