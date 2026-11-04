@@ -2,8 +2,7 @@ import { CV_PDF } from "../data/cv";
 
 /**
  * The CV page (cv-page.astro). The switch swaps the page to its ATS-friendly version and points the
- * download at that version's PDF. Arriving with ?download=1 downloads the PDF once, and the
- * parameter comes off the URL so a reload or a shared link only shows the page.
+ * download at that version's PDF.
  */
 class CvPage extends HTMLElement {
   #stop?: () => void;
@@ -23,12 +22,6 @@ class CvPage extends HTMLElement {
       },
       { signal: controller.signal },
     );
-
-    const url = new URL(location.href);
-    if (url.searchParams.get("download") !== "1") return;
-    download.click();
-    url.searchParams.delete("download");
-    history.replaceState(history.state, "", url);
   }
 
   disconnectedCallback() {
