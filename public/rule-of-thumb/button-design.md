@@ -7,10 +7,8 @@ Make a button show what it does and what it's doing.
 | Situation                  | Do this                                                      |
 | -------------------------- | ------------------------------------------------------------ |
 | Any button                 | Give hover, press and focus a look, in 100 to 200ms          |
-| Not available yet          | Show the no-entry cursor and a tooltip that says why         |
 | Hovering a disabled button | Keep its colour and drop still                               |
 | Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
-| It deletes something       | Make it red, then confirm by name, hold, or offer Undo       |
 | An icon beside the label   | Take 4px off the icon's side                                 |
 
 ## Give every state a look
@@ -42,24 +40,6 @@ button:focus-visible {
 }
 ```
 
-## Say why it's off
-
-A button that only fades leaves people guessing, most of all when the form looks done and the cause sits off screen, such as a URL an older post already uses. Show the no-entry cursor, keep the label readable, and put the reason in a tooltip. Mark it disabled for assistive tech while it still takes hover and focus, so it can show its tooltip. Dim the text colour and keep it fully opaque.
-
-```html
-<button type="button" aria-disabled="true" aria-describedby="publish-why">Publish</button>
-<span role="tooltip" id="publish-why">That URL is taken</span>
-```
-
-```css
-button[aria-disabled="true"] {
-  cursor: not-allowed;
-  color: var(--text-dim);
-}
-```
-
-The click handler checks the state itself, since `aria-disabled` blocks nothing.
-
 ## Keep a disabled button still on hover
 
 A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press, and let the tooltip do the talking. Scope the hover and press looks to buttons that can act.
@@ -83,49 +63,6 @@ A tint is the brand colour at low strength, such as `color-mix(in srgb, var(--br
 <button class="text">Cancel</button>
 <button class="tinted">Save draft</button>
 <button class="filled">Publish</button>
-```
-
-## Guard the destructive action
-
-Put a guard between every delete and the click that starts it. Pick one: a confirm with a red button that names what goes, a button people hold down, or an instant delete with Undo. A confirm lands focus on Cancel, the safe answer. A hold fills the button as it counts down and stops on release. Undo keeps the data until its window closes.
-
-Confirm by name:
-
-```html
-<div role="alertdialog" aria-labelledby="confirm-title">
-  <p><b id="confirm-title">Delete Moonbase?</b> Its 214 files go too. You can't undo this.</p>
-  <button class="text" autofocus>Cancel</button>
-  <button class="filled red">Delete project</button>
-</div>
-```
-
-Hold to delete:
-
-```ts
-let timer = 0;
-const start = () => (timer = setTimeout(deleteProject, 1200));
-const stop = () => clearTimeout(timer);
-
-button.addEventListener("pointerdown", start);
-button.addEventListener("pointerup", stop);
-button.addEventListener("pointercancel", stop);
-button.addEventListener(
-  "keydown",
-  (e) => (e.key === " " || e.key === "Enter") && !e.repeat && start(),
-);
-button.addEventListener("keyup", stop);
-```
-
-Undo after:
-
-```ts
-function remove() {
-  hideProject();
-  const commit = setTimeout(deleteProject, 5000);
-  toast("Moonbase deleted", {
-    action: { label: "Undo", onClick: () => (clearTimeout(commit), showProject()) },
-  });
-}
 ```
 
 ## Optical alignment over mathematical alignment
