@@ -7,8 +7,14 @@ const TABLET = "(max-width: 960px)";
 
 const NARROW = "(max-width: 480px)";
 const TINY = "(max-width: 380px)";
+// The unfolded island needs 412px for the sound toggle beside the nav and Connect, and 490px for
+// the brand as well once the menu opens.
+const NO_ROOM_FOR_SOUND = "(max-width: 420px)";
+const NO_ROOM_FOR_BRAND = "(max-width: 500px)";
 const DARK = ":is(.dark *)";
 const LIGHT = ":is(.light *)";
+const SOUND_OFF = ":is(.sound-off *)";
+const SOUND_ON = ":is(:root:not(.sound-off) *)";
 // The root script adds .js, and .no-intro once the home intro has handed off (or never plays).
 const ARRIVING = ":is(.js.no-intro:not(.from-site) *)";
 const WAITING = ":is(.js:not(.no-intro) *)";
@@ -179,11 +185,11 @@ export const styles = {
     filter: "none",
     transition: ROW_IN,
   }),
-  // Narrow phones: the open menu has no room for the brand as well as the close button.
+  // Phones: the open menu has no room for the brand as well as the close button.
   homeFolded: style({
     gridTemplateColumns: "1fr",
     "@media": {
-      [NARROW]: {
+      [NO_ROOM_FOR_BRAND]: {
         gridTemplateColumns: "0fr",
       },
     },
@@ -193,13 +199,13 @@ export const styles = {
     filter: "none",
     transition: ROW_IN,
     "@media": {
-      [NARROW]: {
+      [NO_ROOM_FOR_BRAND]: {
         opacity: 0,
         filter: "blur(4px)",
         visibility: "hidden",
         transition: `${ROW_OUT}, visibility 0s ${motion["--t-moderate-exit"]}`,
       },
-      [`${NARROW} and ${REDUCE}`]: {
+      [`${NO_ROOM_FOR_BRAND} and ${REDUCE}`]: {
         filter: "none",
       },
     },
@@ -439,6 +445,44 @@ export const styles = {
     transitionTimingFunction: motion["--moderate"],
     selectors: {
       [`&${DARK}`]: {
+        opacity: 0,
+        transform: "rotate(-90deg) scale(0.6)",
+        filter: "blur(4px)",
+        transitionDuration: motion["--t-moderate-exit"],
+        transitionTimingFunction: motion["--exit"],
+      },
+    },
+  }),
+  soundTool: style({
+    "@media": {
+      [NO_ROOM_FOR_SOUND]: {
+        selectors: {
+          "site-header:not([data-scrolled]) &": {
+            display: "none",
+          },
+        },
+      },
+    },
+  }),
+  // The root's .sound-off comes from the head script (src/layouts/head-script.ts) on first paint.
+  speakerWhenOff: style({
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
+    selectors: {
+      [`&${SOUND_OFF}`]: {
+        opacity: 0,
+        transform: "rotate(90deg) scale(0.6)",
+        filter: "blur(4px)",
+        transitionDuration: motion["--t-moderate-exit"],
+        transitionTimingFunction: motion["--exit"],
+      },
+    },
+  }),
+  slashWhenOn: style({
+    transitionDuration: motion["--t-moderate"],
+    transitionTimingFunction: motion["--moderate"],
+    selectors: {
+      [`&${SOUND_ON}`]: {
         opacity: 0,
         transform: "rotate(-90deg) scale(0.6)",
         filter: "blur(4px)",

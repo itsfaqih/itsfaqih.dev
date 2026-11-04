@@ -1,5 +1,6 @@
 import { reducedMotion } from "../hooks/media-query";
-import { followTheme, toggleTheme } from "../hooks/theme-store";
+import { play, soundOn, toggleSound, watchSound } from "../hooks/sound";
+import { followTheme, readTheme, toggleTheme } from "../hooks/theme-store";
 import { watchFluidHover } from "./fluid-hover";
 import { menuGlyphs, SEGS, segView, type HeaderState } from "./header.view";
 
@@ -124,6 +125,7 @@ class SiteHeader extends HTMLElement {
         "keydown",
         (event) => {
           if (event.key !== "Escape") return;
+          play("close");
           set({ open: false });
           toggle.focus();
         },
@@ -171,7 +173,14 @@ class SiteHeader extends HTMLElement {
       },
       { signal },
     );
-    toggle.addEventListener("click", () => set({ open: !state.open }), { signal });
+    toggle.addEventListener(
+      "click",
+      () => {
+        play(state.open ? "close" : "open");
+        set({ open: !state.open });
+      },
+      { signal },
+    );
     part("search").addEventListener(
       "click",
       () =>
@@ -185,12 +194,23 @@ class SiteHeader extends HTMLElement {
       "click",
       () => {
         const box = themeButton.getBoundingClientRect();
+        play(readTheme() === "light" ? "off" : "on");
         toggleTheme({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
       },
       { signal },
     );
 
     const root = document.documentElement;
+    const soundButton = part("sound");
+    soundButton.addEventListener("click", toggleSound, { signal });
+    const showSound = () => {
+      const on = soundOn();
+      root.classList.toggle("sound-off", !on);
+      soundButton.setAttribute("aria-pressed", String(on));
+    };
+    showSound();
+    const unwatchSound = watchSound(showSound);
+
     let away = root.hasAttribute("data-island-away");
     const landing = new MutationObserver(() => {
       const home = away && !root.hasAttribute("data-island-away");
@@ -206,6 +226,7 @@ class SiteHeader extends HTMLElement {
       activity.disconnect();
       landing.disconnect();
       unfollowTheme();
+      unwatchSound();
       cancelAnimationFrame(frame);
     };
   }
