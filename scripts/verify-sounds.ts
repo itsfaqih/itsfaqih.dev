@@ -242,29 +242,6 @@ try {
   await right.click();
   await expectHeard(page, "a quiz hit plays success, no tap", ["success"]);
 
-  // The home page's cut-ins: the first ones arrive before any gesture, so only later ones sound.
-  await open(page, "/");
-  await expectHeard(page, "the home page's first cut-ins, before a gesture, play nothing", []);
-  await page.keyboard.press("Shift");
-  const buzzes: string[] = [];
-  for (let step = 0; step < 12; step++) {
-    await page.mouse.wheel(0, 500);
-    await page.waitForTimeout(350);
-    buzzes.push(...(await heard(page)));
-  }
-  check(
-    buzzes.length > 0 && buzzes.every((cue) => cue === "buzz"),
-    "scrolling the home page buzzes as cut-ins arrive",
-    `heard ${JSON.stringify(buzzes)}`,
-  );
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await open(page, "/");
-  await page.keyboard.press("Shift");
-  for (let step = 0; step < 12; step++) await page.mouse.wheel(0, 500);
-  await page.waitForTimeout(600);
-  await expectHeard(page, "with reduced motion the cut-ins fade in silently", []);
-  await page.emulateMedia({ reducedMotion: null });
-
   const sound = page.locator('site-header [data-part="sound"]');
   await page.evaluate(() => scrollTo(0, 0));
   await page.waitForTimeout(400);

@@ -16,7 +16,6 @@ const SOURCES = {
   lift: "card-slide-4",
   place: "drop-002",
   flicker: "glitch-001",
-  buzz: "scratch-005",
 };
 
 // The fields read from a registry item; the checks below reject anything else.
