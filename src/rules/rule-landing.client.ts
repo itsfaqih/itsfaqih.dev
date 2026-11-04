@@ -1,4 +1,5 @@
 import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
 import { landingView } from "./rule-landing.view";
 import { watchReveal, watchTitleSwap } from "./rule-motion";
@@ -36,6 +37,14 @@ class RuleLanding extends HTMLElement {
       root.querySelector<T>(`[data-part="${name}"]`)!;
     const title = part("title");
     const stops = [watchReveal(this)];
+
+    // The dive into this rule plays on this page, so this page voices it: the one clicked from is
+    // gone by then. The head script types it on pagereveal, which can come before or after this.
+    const voiceDive = () => {
+      if (isTransitioning("rule-open")) play("dive");
+    };
+    if (document.documentElement.dataset.vt) voiceDive();
+    else addEventListener("pagereveal", voiceDive, { once: true, signal });
 
     const activity = document.importNode(
       part<HTMLTemplateElement>("activity").content.firstElementChild!,
