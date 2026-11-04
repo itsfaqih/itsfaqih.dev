@@ -17,7 +17,7 @@ type Props = { jobs: Job[] };
 const { jobs } = Astro.props;
 ---
 
-<experience-list class={styles.list}
+<experience-list class={styles.list} data-sound="none"
   >{
     jobs.map((job, index) => {
       const isOpen = index === 0;

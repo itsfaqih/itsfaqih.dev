@@ -1,5 +1,6 @@
 import { watchBoxScrollbar } from "../components/box-scrollbar";
 import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { moreLabel, rowView } from "./experience-list.view";
 
 const MAX_ROWS = 2;
@@ -105,6 +106,7 @@ type Row = {
  * The work history (experience-list.astro). A row's head opens it and closes the one open, and the
  * list glides to the new layout. A closed row holds its tools to two rows, the second ending in a
  * pill counting the rest. The open row shows them all, scrolling within the achievements' height.
+ * Opening a row plays a page turn, and closing the open one a flick.
  */
 class ExperienceList extends HTMLElement {
   #stop?: () => void;
@@ -222,6 +224,7 @@ class ExperienceList extends HTMLElement {
       const before = reducedMotion() ? null : snapshotOf(this);
       const was = open;
       open = open === index ? -1 : index;
+      play(open === -1 ? "fold" : "turn");
       for (const at of new Set([was, open])) {
         const row = rows[at];
         if (!row) continue;

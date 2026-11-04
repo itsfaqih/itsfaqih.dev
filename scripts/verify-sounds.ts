@@ -279,6 +279,16 @@ try {
   await expectHeard(page, "with reduced motion the page fades in without the dive", []);
   await page.emulateMedia({ reducedMotion: null });
 
+  // The work history on the home page turns to a job's page as it opens.
+  await open(page, "/");
+  const jobs = page.locator("experience-list > * > button");
+  await jobs.nth(1).scrollIntoViewIfNeeded();
+  await jobs.nth(1).click();
+  await expectHeard(page, "opening a job plays turn, no tap", ["turn"]);
+  await page.waitForTimeout(500);
+  await jobs.nth(1).click();
+  await expectHeard(page, "closing the open job plays fold", ["fold"]);
+
   const sound = page.locator('site-header [data-part="sound"]');
   await page.evaluate(() => scrollTo(0, 0));
   await page.waitForTimeout(400);

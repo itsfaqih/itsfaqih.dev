@@ -17,6 +17,8 @@ const SOURCES = {
   place: "drop-002",
   flicker: "glitch-001",
   dive: "maximize-006",
+  turn: "book-flip-2",
+  fold: "book-flip-3",
 };
 
 // The fields read from a registry item; the checks below reject anything else.

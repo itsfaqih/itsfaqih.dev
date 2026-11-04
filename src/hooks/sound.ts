@@ -14,7 +14,9 @@ export type Cue =
   | "lift"
   | "place"
   | "flicker"
-  | "dive";
+  | "dive"
+  | "turn"
+  | "fold";
 
 /**
  * Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. A cue with a `gap`
@@ -39,6 +41,10 @@ const CUES: Record<Cue, { gain: number; gap?: number; late?: number }> = {
   flicker: { gain: 0.12 },
   // The page it lands on loads the clip while the dive runs, and 620ms of zoom covers a later start.
   dive: { gain: 0.3, late: 250 },
+  // Opening a job in the work history turns to its page, about as long as the glide; closing the
+  // open one is a quicker flick.
+  turn: { gain: 0.4 },
+  fold: { gain: 0.3 },
 };
 // Past this a cue still decoding is dropped: a late sound reads as lag.
 const LATE_MS = 150;
