@@ -3,7 +3,7 @@ import { watchCutIns } from "./cut-ins";
 import { whenIntroDone } from "./intro.client";
 
 // The glow wraps the whole card, so at full strength it outshouts the card's own text.
-const CONTACT_GLOW_STRENGTH = 0.5;
+const CONTACT_GLOW_STRENGTH = 0.7;
 
 /**
  * The home page (home.astro). Its cut-ins wait for the intro to hand off, and its fixed lights tint

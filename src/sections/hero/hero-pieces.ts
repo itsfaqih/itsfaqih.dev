@@ -12,12 +12,12 @@ import {
 } from "./hero-morph";
 import type { TopInk } from "./hero-prints.view";
 
-export const QUEUE_Y = 88;
+export const WORKER_Y = [55, 103, 151] as const;
+export const QUEUE_Y = WORKER_Y[1];
 export const SLOT_X = [44, 86, 128, 170] as const;
 export const SLOT_GAP = SLOT_X[1] - SLOT_X[0];
 export const WORKER_X = 260;
 export const WORKER_SIZE = 40;
-export const WORKER_Y = [40, 88, 136] as const;
 export const WORKER_TOKENS = [0, 1, 3] as const;
 // It starts at the bottom box so the job that fails (advance 1) lands on the top box, whose way back
 // to the queue is clear.

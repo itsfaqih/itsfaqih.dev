@@ -42,8 +42,8 @@ function meanderKeyframes() {
 
 const ARC = [
   [WORKER_X, WORKER_Y[0]],
-  [228, -10],
-  [80, -10],
+  [228, WORKER_Y[0] - 50],
+  [80, WORKER_Y[0] - 50],
   [SLOT_X[0], QUEUE_Y],
 ] as const;
 
