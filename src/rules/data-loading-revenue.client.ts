@@ -1,6 +1,6 @@
 import { money, REVENUE } from "./data-loading";
 import { Demo, el, spinner } from "./data-loading-demo";
-import { view } from "./data-loading.styles";
+import { view } from "./data-loading.view";
 
 /**
  * A revenue card (data-loading-revenue.astro) that refetches in 900ms. Without `data-swr` the

@@ -1,0 +1,525 @@
+import { cursors, fonts, motion, palette } from "../theme.vars.css";
+import { kit } from "./rule-landing.vars.css";
+import { style, keyframes } from "@vanilla-extract/css";
+import { when } from "../when";
+import { under1, under2 } from "../layers.css";
+const PHONE = "(max-width: 640px)";
+const MOTION = "(prefers-reduced-motion: no-preference)";
+const HOVER = "(hover: hover) and (pointer: fine)";
+const TOUCH = "(pointer: coarse)";
+
+const flash = keyframes({
+  from: { opacity: 1 },
+  to: { opacity: 0 },
+});
+const typeIn = keyframes({
+  from: { opacity: 0, transform: "translate(-8px)" },
+});
+const drop = keyframes({
+  from: { opacity: 1, transform: "translateY(-14px)" },
+  "70%": { opacity: 1 },
+  to: { opacity: 0, transform: "translateY(16px)" },
+});
+const land = keyframes({
+  from: { opacity: 0, transform: "translateY(6px)" },
+});
+
+export const styles = {
+  kw: style({
+    color: "var(--c-ink)",
+  }),
+  str: style({
+    "@layer": {
+      [under1]: {
+        color: `color-mix(in oklab, ${palette["--ar"]} ${palette["--ink-mix"]}, #000)`,
+      },
+    },
+  }),
+  com: style({
+    color: palette["--mute"],
+  }),
+  nul: style({
+    "@layer": {
+      [under1]: {
+        paddingBlock: 0,
+        paddingInline: "3px",
+        borderRadius: "4px",
+        backgroundColor: "color-mix(in srgb, var(--c) 20%, transparent)",
+        boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--c) 70%, transparent)",
+        fontWeight: 700,
+        color: "var(--c-ink)",
+      },
+    },
+  }),
+  und: style({
+    "@layer": {
+      [under1]: {
+        paddingBlock: 0,
+        paddingInline: "3px",
+        borderRadius: "4px",
+        outlineWidth: "1px",
+        outlineStyle: "dashed",
+        outlineColor: palette["--mute"],
+        outlineOffset: "-1px",
+        fontWeight: 700,
+        color: palette["--dim"],
+      },
+    },
+  }),
+  inherit: style({
+    color: "inherit",
+  }),
+  introCode: style({
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "6px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    fontSize: "0.88em",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  }),
+  view: style({
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "14px",
+    alignContent: "start",
+  }),
+  code: style({
+    display: "grid",
+    gap: "2px",
+    fontSize: "12.5px",
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+    "@media": {
+      [PHONE]: {
+        fontSize: "12px",
+      },
+    },
+  }),
+  line: style({
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "2px",
+    columnGap: "12px",
+    alignItems: "center",
+    minHeight: "26px",
+    paddingBlock: "1px",
+    paddingInline: "8px",
+    borderRadius: "6px",
+    "@media": {
+      [PHONE]: {
+        paddingInline: "6px",
+      },
+    },
+  }),
+  hot: style({
+    selectors: {
+      [`&${when.ancestor('[data-side="bad"]')}`]: {
+        backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
+        boxShadow: `inset 2px 0 0 ${palette["--no"]}`,
+      },
+      [`&${when.ancestor('[data-side="good"]')}`]: {
+        backgroundColor: "color-mix(in srgb, var(--c) 10%, transparent)",
+        boxShadow: "inset 2px 0 0 var(--c)",
+      },
+    },
+  }),
+  source: style({
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: "auto",
+    minWidth: 0,
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    color: palette["--text"],
+  }),
+  out: style({
+    "@layer": {
+      [under2]: {
+        maxWidth: "100%",
+        marginLeft: "auto",
+        paddingBlock: "1px",
+        paddingInline: "8px",
+        borderRadius: "6px",
+        backgroundColor: palette["--panel-2"],
+        fontWeight: 600,
+        fontSize: "11.5px",
+        lineHeight: 1.6,
+        fontFamily: fonts["--mono"],
+        color: palette["--dim"],
+        overflowWrap: "anywhere",
+        selectors: {
+          "&::before": {
+            content: '"→ "',
+            color: palette["--mute"],
+          },
+        },
+      },
+    },
+  }),
+  outNo: style({
+    "@layer": {
+      [under1]: {
+        backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+        color: palette["--no-ink"],
+      },
+    },
+  }),
+  outYes: style({
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
+  }),
+  flow: style({
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gap: "10px",
+  }),
+  form: style({
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "8px",
+    columnGap: "10px",
+    alignItems: "center",
+    minHeight: "58px",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel"],
+    boxShadow: palette["--raise"],
+  }),
+  label: style({
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+  }),
+  field: style({
+    display: "flex",
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "160px",
+    gap: "10px",
+    alignItems: "center",
+    minWidth: 0,
+  }),
+  input: style({
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "0%",
+    minWidth: 0,
+    height: "38px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+    backgroundColor: palette["--panel-2"],
+    fontWeight: 600,
+    // Under 16px, iOS zooms the page in on focus and leaves it zoomed.
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+    transition: `border-color ${kit["--t-fb"]} ease`,
+    selectors: {
+      "&:focus-visible": {
+        borderColor: "var(--c)",
+        outlineWidth: "3px",
+        outlineStyle: "solid",
+        outlineColor: "color-mix(in srgb, var(--c) 30%, transparent)",
+        outlineOffset: 0,
+      },
+    },
+    "@media": {
+      [TOUCH]: {
+        fontSize: "16px",
+      },
+    },
+  }),
+  chip: style({
+    display: "inline-flex",
+    gap: "4px",
+    alignItems: "center",
+    height: "34px",
+    paddingTop: 0,
+    paddingRight: "4px",
+    paddingBottom: 0,
+    paddingLeft: "12px",
+    borderRadius: "999px",
+    backgroundColor: palette["--soft-key"],
+    boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: "normal",
+    fontFamily: fonts["--sans"],
+    color: palette["--text"],
+  }),
+  remove: style({
+    display: "grid",
+    alignItems: "center",
+    justifyItems: "center",
+    width: "26px",
+    height: "26px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderColor: "currentcolor",
+    borderRadius: "999px",
+    backgroundColor: "transparent",
+    fontSize: "12px",
+    color: palette["--dim"],
+    cursor: cursors["--cursor-point"],
+    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
+    selectors: {
+      "&:focus-visible": {
+        outlineWidth: "3px",
+        outlineStyle: "solid",
+        outlineColor: palette["--focus"],
+        outlineOffset: "1px",
+      },
+      "&:active": {
+        transform: "scale(0.92)",
+      },
+    },
+    "@media": {
+      [HOVER]: {
+        selectors: {
+          "&:hover": {
+            backgroundColor: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
+            color: palette["--no-ink"],
+          },
+        },
+      },
+    },
+  }),
+  none: style({
+    display: "inline-flex",
+    alignItems: "center",
+    height: "34px",
+    paddingBlock: 0,
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "999px",
+    fontSize: "14px",
+    color: palette["--mute"],
+  }),
+  again: style({
+    marginLeft: "auto",
+    selectors: {
+      "&:disabled": {
+        opacity: 0.5,
+      },
+    },
+  }),
+  wire: style({
+    position: "relative",
+    display: "flex",
+    flexWrap: "wrap",
+    rowGap: "4px",
+    columnGap: "10px",
+    alignItems: "baseline",
+    minHeight: "38px",
+    paddingBlock: "8px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dashed",
+    borderColor: palette["--hair"],
+    borderRadius: "10px",
+    fontSize: "12px",
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+  }),
+  verb: style({
+    fontWeight: 700,
+    color: "var(--c-ink)",
+  }),
+  idle: style({
+    color: palette["--mute"],
+  }),
+  body: style({
+    minWidth: 0,
+    overflowWrap: "anywhere",
+    color: palette["--text"],
+  }),
+  typing: style({
+    "@media": {
+      [MOTION]: {
+        animationName: typeIn,
+        animationDuration: "180ms",
+        animationTimingFunction: motion["--out"],
+        animationFillMode: "both",
+      },
+    },
+  }),
+  packet: style({
+    position: "absolute",
+    bottom: "-4px",
+    left: "50%",
+    width: "6px",
+    height: "6px",
+    marginLeft: "-3px",
+    backgroundColor: "var(--c)",
+    opacity: 0,
+  }),
+  dropping: style({
+    "@media": {
+      [MOTION]: {
+        animationName: drop,
+        animationDuration: "260ms",
+        animationTimingFunction: motion["--out"],
+        animationDelay: "180ms",
+        animationFillMode: "both",
+      },
+    },
+  }),
+  record: style({
+    display: "grid",
+    gridAutoColumns: "minmax(0, 1fr)",
+    gridAutoFlow: "column",
+    gap: "2px",
+    marginBlock: 0,
+    marginInline: 0,
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  }),
+  cell: style({
+    position: "relative",
+    display: "grid",
+    gap: "2px",
+    alignContent: "start",
+    minWidth: 0,
+    paddingBlock: "8px",
+    paddingInline: "10px",
+    borderRadius: "9px",
+    isolation: "isolate",
+    selectors: {
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: -1,
+        borderRadius: "inherit",
+        opacity: 0,
+      },
+    },
+    "@media": {
+      [PHONE]: {
+        paddingInline: "8px",
+      },
+    },
+  }),
+  cellSaved: style({
+    selectors: {
+      "&::after": {
+        backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 22%, transparent)`,
+      },
+    },
+  }),
+  cellLost: style({
+    selectors: {
+      "&::after": {
+        backgroundColor: `color-mix(in srgb, ${palette["--no"]} 24%, transparent)`,
+      },
+    },
+  }),
+  flashing: style({
+    selectors: {
+      "&::after": {
+        animationName: flash,
+        animationDuration: "640ms",
+        animationTimingFunction: motion["--out"],
+        animationDelay: "calc(var(--i) * 40ms)",
+        animationFillMode: "both",
+      },
+    },
+  }),
+  name: style({
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+  }),
+  value: style({
+    "@layer": {
+      [under1]: {
+        minHeight: "21px",
+        marginBlock: 0,
+        marginInline: 0,
+        fontWeight: 600,
+        fontSize: "13px",
+        lineHeight: 1.6,
+        fontFamily: fonts["--mono"],
+        color: palette["--text"],
+        overflowWrap: "anywhere",
+      },
+    },
+  }),
+  valueLost: style({
+    color: palette["--no-ink"],
+  }),
+  landing: style({
+    "@media": {
+      [MOTION]: {
+        animationName: land,
+        animationDuration: "240ms",
+        animationTimingFunction: motion["--out"],
+        animationDelay: "calc(var(--i) * 40ms)",
+        animationFillMode: "both",
+      },
+    },
+  }),
+  nulLost: style({
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${palette["--no"]} 70%, transparent)`,
+    color: palette["--no-ink"],
+  }),
+  tag: style({
+    justifySelf: "start",
+    paddingBlock: "1px",
+    paddingInline: "6px",
+    borderRadius: "5px",
+    fontWeight: 700,
+    fontSize: "10px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+  }),
+  tagKept: style({
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
+  }),
+  tagLost: style({
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
+  }),
+  boardCode: style({
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  }),
+  gap: style({
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "3.2em",
+    height: "1.1em",
+    marginLeft: "8px",
+    borderBottomWidth: "2px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "color-mix(in srgb, var(--c) 55%, transparent)",
+    selectors: {
+      [`&${when.ancestor("[data-off]")}`]: {
+        display: "none",
+      },
+    },
+  }),
+};

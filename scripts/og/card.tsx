@@ -3,6 +3,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { Resvg } from "@resvg/resvg-js";
 import satori, { type Font } from "satori";
 import { SLIDES } from "../../src/data/home";
+import { palette } from "../../src/theme.tokens";
 import type { OgNode } from "./jsx-runtime";
 
 const CARD_SIZE = { width: 1200, height: 630 } as const;
@@ -40,29 +41,17 @@ async function loadFonts(): Promise<Font[]> {
   );
 }
 
-async function loadTokens() {
-  const source = await readFile(new URL("../../src/theme.stylex.ts", import.meta.url), "utf8");
-  const palette = source.match(/palette = stylex\.defineVars\(\{([\s\S]*?)\n\}\);/)?.[1];
-  if (!palette)
-    throw new Error("src/theme.stylex.ts has no `palette = stylex.defineVars({…});` block.");
-  return new Map(
-    [...palette.matchAll(/"--([\w-]+)":\s*"(#[0-9a-f]{3,8})"/gi)].map(([, k, v]) => [k!, v!]),
-  );
-}
-
-let assets: Promise<{ fonts: Font[]; tokens: Map<string, string> }> | undefined;
+let fontsLoaded: Promise<Font[]> | undefined;
 
 export async function renderCard(card: OgCard): Promise<Buffer> {
-  assets ??= Promise.all([loadFonts(), loadTokens()]).then(([fonts, tokens]) => ({
-    fonts,
-    tokens,
-  }));
-  const { fonts, tokens } = await assets;
+  fontsLoaded ??= loadFonts();
+  const fonts = await fontsLoaded;
   const hex = (hue: Hue) => {
     const token = hue.match(/^var\(--([\w-]+)\)$/)?.[1];
     if (!token) return hue;
-    const value = tokens.get(token);
-    if (!value) throw new Error(`src/theme.stylex.ts has no --${token} hex for the share card`);
+    const value = new Map(Object.entries(palette)).get(`--${token}`);
+    if (!value || !/^#[0-9a-f]{3,8}$/i.test(value))
+      throw new Error(`src/theme.tokens.ts has no --${token} hex for the share card`);
     return value;
   };
   const ink = {

@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
-import { styles, TAKEN, view } from "./button-design.styles";
+import { styles } from "./button-design.css";
+import { TAKEN, view } from "./button-design.view";
 
 type Props = { careful?: boolean };
 
@@ -11,28 +11,28 @@ const tipId = "publish-tip";
 ---
 
 <button-publish
-  {...stylex.attrs(styles.stage, styles.form)}
+  class:list={[styles.stage, styles.form]}
   data-careful={careful ? "true" : undefined}
 >
-  <label {...stylex.attrs(styles.field, styles.fullRow)}>
+  <label class:list={[styles.field, styles.fullRow]}>
     <span>Title</span>
-    <input value="Spring launch" {...stylex.attrs(styles.input)} />
+    <input value="Spring launch" class={styles.input} />
   </label>
-  <label {...stylex.attrs(styles.field)}>
+  <label class={styles.field}>
     <span>URL</span>
-    <span {...stylex.attrs(styles.input, styles.slug)}
-      ><span aria-hidden="true" {...stylex.attrs(styles.slugBase)}>/blog/</span><input
+    <span class:list={[styles.input, styles.slug]}
+      ><span aria-hidden="true" class={styles.slugBase}>/blog/</span><input
         value={TAKEN}
         aria-label="URL after /blog/"
         spellcheck="false"
-        {...stylex.attrs(styles.slugInput)}
+        class={styles.slugInput}
         data-part="slug"
       /></span
     >
   </label>
   {
     careful ? (
-      <span {...stylex.attrs(styles.tip, styles.formEnd)}
+      <span class:list={[styles.tip, styles.formEnd]}
         ><button
           data-hint="true"
           type="button"
@@ -55,7 +55,7 @@ const tipId = "publish-tip";
     )
   }
   <template data-part="check"
-    ><Icon name="Check" size="1em" weight="bold" {...stylex.attrs(styles.icon)} /></template
+    ><Icon name="Check" size="1em" weight="bold" class={styles.icon} /></template
   >
 </button-publish>
 

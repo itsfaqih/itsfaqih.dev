@@ -1,4 +1,4 @@
-import { view } from "./button-design.styles";
+import { view } from "./button-design.view";
 
 /** A lesson's on/off switch (button-toggle.astro); the demo's styles read its aria-pressed. */
 class ButtonToggle extends HTMLElement {

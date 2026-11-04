@@ -1,4 +1,5 @@
 ---
+import { LAYER_ORDER } from "../layers";
 import "../styles.css";
 import CommandPalette from "../components/command-palette.astro";
 import Header from "../components/header.astro";
@@ -7,7 +8,7 @@ import PrintCursor from "../components/print-cursor.astro";
 import { pageHead, type SharedPage } from "../seo";
 import { THEME_COLORS } from "../theme";
 import { HEAD_SCRIPT } from "./head-script";
-import { site } from "./site.stylex";
+import { site } from "./site.css";
 
 type Props = {
   /** The page's sharing metadata. Without it the page gets the site title and no sharing tags. */
@@ -26,6 +27,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
 <html lang="en" class={site.html}>
   <head>
     <meta charset="utf-8" />
+    <style is:inline set:html={`@layer ${LAYER_ORDER.join(", ")};`}></style>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
@@ -54,16 +56,6 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
       ))
     }
     <script is:inline set:html={HEAD_SCRIPT} />
-    {
-      import.meta.env.DEV && (
-        <>
-          <link rel="stylesheet" href="/virtual:stylex.css" />
-          {/* Re-fetches the sheet whenever a newly transformed module (a component script, an HMR edit)
-              adds rules; without it the sheet stays as first served. */}
-          <script is:inline type="module" src="/@id/virtual:stylex:css-only" />
-        </>
-      )
-    }
   </head>
   <body class={site.body}>
     <Header path={path} />

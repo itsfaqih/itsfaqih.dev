@@ -1,11 +1,12 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import { colorOf, VISIBLE_GUIDELINES, type Guideline, type RuleId } from "../data/guidelines";
 import { SHOW_PROJECTS } from "../data/home";
 import { LINKS } from "../seo";
-import { boxScrollbar, boxScrollbarHost, marker } from "./box-scrollbar";
-import { styles, view } from "./command-palette.styles";
-import { fluidHover } from "./fluid-hover";
+import { boxScrollbar, boxScrollbarHost } from "./box-scrollbar.css";
+import { marker } from "../when";
+import { styles } from "./command-palette.css";
+import { view } from "./command-palette.view";
+import { fluidHover } from "./fluid-hover.css";
 import Icon from "./icon.astro";
 import RuleIcon from "./rule-icon.astro";
 
@@ -211,35 +212,35 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
   PHOSPHOR.some((name) => name === icon);
 ---
 
-<command-palette {...stylex.attrs(styles.host)}>
-  <span data-part="guard" tabindex="0" aria-hidden="true" hidden {...stylex.attrs(styles.guard)}></span>
+<command-palette class={styles.host}>
+  <span data-part="guard" tabindex="0" aria-hidden="true" hidden class={styles.guard}></span>
   <div
     data-pour
     role="presentation"
     aria-hidden="true"
     hidden
     style="user-select: none"
-    {...stylex.attrs(styles.backdrop)}
+    class={styles.backdrop}
   >
   </div>
-  <dialog data-pour tabindex="-1" aria-modal="true" {...stylex.attrs(styles.dialog, styles.stage)}>
-    <div aria-hidden="true" {...stylex.attrs(styles.drop)}></div>
-    <div data-cmd-panel {...stylex.attrs(styles.panel)}>
-      <div {...stylex.attrs(styles.surface)}>
-        <div {...stylex.attrs(styles.body)}>
+  <dialog data-pour tabindex="-1" aria-modal="true" class:list={[styles.dialog, styles.stage]}>
+    <div aria-hidden="true" class={styles.drop}></div>
+    <div data-cmd-panel class={styles.panel}>
+      <div class={styles.surface}>
+        <div class={styles.body}>
           <div data-part="crumb" inert class={view.crumb(false)}>
-            <div {...stylex.attrs(styles.crumbClip)}>
-              <div {...stylex.attrs(styles.crumb)}>
-                <button type="button" data-part="back" {...stylex.attrs(styles.crumbBack)}
+            <div class={styles.crumbClip}>
+              <div class={styles.crumb}>
+                <button type="button" data-part="back" class={styles.crumbBack}
                   ><Icon name="CaretLeft" size={12} weight="bold" />Back</button
-                ><span aria-hidden="true" {...stylex.attrs(styles.crumbSlash)}>/</span><b
-                  {...stylex.attrs(styles.crumbLevel)}>Rule of Thumb</b
+                ><span aria-hidden="true" class={styles.crumbSlash}>/</span><b
+                  class={styles.crumbLevel}>Rule of Thumb</b
                 >
               </div>
             </div>
           </div>
 
-          <div {...stylex.attrs(styles.search)}>
+          <div class={styles.search}>
             <Icon name="MagnifyingGlass" size={18} weight="bold" /><input
               role="combobox"
               aria-expanded="true"
@@ -252,18 +253,18 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
               enterkeyhint="search"
               autocapitalize="none"
               autocorrect="off"
-              {...stylex.attrs(styles.input)}
-            /><kbd {...stylex.attrs(styles.kbd)}>Esc</kbd>
+              class={styles.input}
+            /><kbd class={styles.kbd}>Esc</kbd>
           </div>
 
-          <div {...stylex.attrs(styles.listFrame)}>
+          <div class={styles.listFrame}>
             <div
               id="cmd-listbox"
               role="listbox"
               aria-label="Commands"
-              {...stylex.attrs(styles.list, boxScrollbarHost.box)}
+              class:list={[styles.list, boxScrollbarHost.box]}
             >
-              <div data-part="ghosts" aria-hidden="true" inert {...stylex.attrs(styles.ghosts)}>
+              <div data-part="ghosts" aria-hidden="true" inert class={styles.ghosts}>
               </div>
               {
                 levels.map((level, levelIndex) => (
@@ -276,9 +277,9 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                     <span
                       data-part="highlight"
                       aria-hidden="true"
-                      {...stylex.attrs(fluidHover.highlight, styles.highlight)}
+                      class:list={[fluidHover.highlight, styles.highlight]}
                     />
-                    <div data-part="empty" {...stylex.attrs(styles.empty)} />
+                    <div data-part="empty" class={styles.empty} />
                     {level.groups.map((group, groupIndex) => (
                       <div
                         role="group"
@@ -286,7 +287,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                         class={view.group(groupIndex > 0)}
                         style={`--c:${group.hue}`}
                       >
-                        <div role="presentation" {...stylex.attrs(styles.label)}>
+                        <div role="presentation" class={styles.label}>
                           {group.label}
                         </div>
                         {group.items.map((item, itemIndex) => {
@@ -321,16 +322,16 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                                   <RuleIcon id={item.icon} />
                                 )}
                               </span>
-                              <span {...stylex.attrs(styles.text)}>
-                                <span class={`cmdk-name ${stylex.attrs(styles.name).class}`}>
+                              <span class={styles.text}>
+                                <span class={`cmdk-name ${styles.name}`}>
                                   {item.label}
                                 </span>
-                                <span {...stylex.attrs(styles.description)}>
+                                <span class={styles.description}>
                                   {item.description}
                                 </span>
                               </span>
                               {"copy" in item && (
-                                <span data-part="copied" hidden {...stylex.attrs(styles.done)}>
+                                <span data-part="copied" hidden class={styles.done}>
                                   Copied!
                                 </span>
                               )}
@@ -349,27 +350,27 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                 ))
               }
             </div>
-            <div hidden aria-hidden="true" {...stylex.attrs(boxScrollbar.track, marker)}>
-              <div {...stylex.attrs(boxScrollbar.thumb)}></div>
+            <div hidden aria-hidden="true" class:list={[boxScrollbar.track, marker]}>
+              <div class={boxScrollbar.thumb}></div>
             </div>
           </div>
 
-          <div data-part="foot" {...stylex.attrs(styles.foot)}>
-            <span {...stylex.attrs(styles.hint)}
-              ><kbd {...stylex.attrs(styles.kbd)}>↑</kbd><kbd
-                {...stylex.attrs(styles.kbd, styles.lastKey)}>↓</kbd
+          <div data-part="foot" class={styles.foot}>
+            <span class={styles.hint}
+              ><kbd class={styles.kbd}>↑</kbd><kbd
+                class:list={[styles.kbd, styles.lastKey]}>↓</kbd
               >Navigate</span
-            ><span {...stylex.attrs(styles.hint)}
-              ><kbd {...stylex.attrs(styles.kbd, styles.lastKey)}>↵</kbd>Select</span
-            ><span data-part="back-hint" {...stylex.attrs(styles.hint)}
-              ><kbd {...stylex.attrs(styles.kbd, styles.lastKey)}>←</kbd>Back</span
+            ><span class={styles.hint}
+              ><kbd class:list={[styles.kbd, styles.lastKey]}>↵</kbd>Select</span
+            ><span data-part="back-hint" class={styles.hint}
+              ><kbd class:list={[styles.kbd, styles.lastKey]}>←</kbd>Back</span
             >
           </div>
         </div>
       </div>
     </div>
   </dialog>
-  <span data-part="guard" tabindex="0" aria-hidden="true" hidden {...stylex.attrs(styles.guard)}></span>
+  <span data-part="guard" tabindex="0" aria-hidden="true" hidden class={styles.guard}></span>
 </command-palette>
 
 <script>

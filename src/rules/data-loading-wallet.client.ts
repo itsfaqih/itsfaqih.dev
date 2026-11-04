@@ -1,6 +1,7 @@
+import { styles } from "./data-loading.css";
 import { HISTORY, money, type Payment, SPENT } from "./data-loading";
 import { Demo, el, spinner, write } from "./data-loading-demo";
-import { type Signal, view } from "./data-loading.styles";
+import { type Signal, view } from "./data-loading.view";
 
 /**
  * A wallet opened from its disk cache with no signal (data-loading-wallet.astro). Getting signal
@@ -26,12 +27,7 @@ class DataLoadingWallet extends Demo {
         "li",
         view.histRow(row === SPENT),
         el("span", "", row.label),
-        el(
-          "b",
-          view.histAmount,
-          row.amount < 0 ? "−" : "+",
-          money(Math.abs(row.amount)),
-        ),
+        el("b", styles.histAmount, row.amount < 0 ? "−" : "+", money(Math.abs(row.amount))),
       );
 
     const show = (next: Signal) => {

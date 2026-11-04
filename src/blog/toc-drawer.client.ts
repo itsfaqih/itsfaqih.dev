@@ -1,12 +1,16 @@
-import { FADE_TRANSITION, SLIDE_MS, SLIDE_TRANSITION } from "./post.styles";
+import { EASE, SLIDE, SLIDE_MS } from "./post.css";
 import { TOC_NAVIGATE } from "./table-of-contents.client";
+
+const SLIDE_TRANSITION = `transform ${SLIDE} ${EASE}`;
+const FADE_TRANSITION = `opacity ${SLIDE} ${EASE}`;
 
 // Vaul's drag rules, for a drawer that slides up from the bottom.
 const VELOCITY_THRESHOLD = 0.4;
 const CLOSE_THRESHOLD = 0.25;
 const SCROLL_LOCK_MS = 100;
 
-const translateY = (element: Element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).m42;
+const translateY = (element: Element) =>
+  new DOMMatrixReadOnly(getComputedStyle(element).transform).m42;
 
 /**
  * The post's table of contents drawer (toc-drawer.astro). Open, its layer joins the end of the body
@@ -76,9 +80,11 @@ class TocDrawer extends HTMLElement {
       inerted = [];
       trigger.focus({ preventScroll: true });
       closing = true;
-      Promise.allSettled(content.getAnimations().map((animation) => animation.finished)).then(() => {
-        if (closing) unmount();
-      });
+      Promise.allSettled(content.getAnimations().map((animation) => animation.finished)).then(
+        () => {
+          if (closing) unmount();
+        },
+      );
     };
 
     // A press anywhere on the drawer can drag it down. Vaul's rules decide when a move drags and
@@ -105,7 +111,11 @@ class TocDrawer extends HTMLElement {
         preventedAt = now;
         return false;
       }
-      for (let element = target instanceof Element ? target : null; element; element = element.parentElement) {
+      for (
+        let element = target instanceof Element ? target : null;
+        element;
+        element = element.parentElement
+      ) {
         if (element.scrollHeight > element.clientHeight) {
           if (element.scrollTop !== 0) {
             preventedAt = now;
@@ -152,7 +162,10 @@ class TocDrawer extends HTMLElement {
       const velocity = Math.abs(moved) / (Date.now() - pressedAt);
       if (moved > 0) reset();
       else if (velocity > VELOCITY_THRESHOLD) close();
-      else if (Math.abs(swipe) >= Math.min(content.getBoundingClientRect().height, innerHeight) * CLOSE_THRESHOLD)
+      else if (
+        Math.abs(swipe) >=
+        Math.min(content.getBoundingClientRect().height, innerHeight) * CLOSE_THRESHOLD
+      )
         close();
       else reset();
     };

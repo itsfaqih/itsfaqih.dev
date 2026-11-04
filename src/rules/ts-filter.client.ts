@@ -1,5 +1,13 @@
-import { FATE, filterLines, filterOf, hhmm, shortDay, timeOf, type Way } from "./handling-timestamps";
-import { tsView } from "./handling-timestamps.styles";
+import {
+  FATE,
+  filterLines,
+  filterOf,
+  hhmm,
+  shortDay,
+  timeOf,
+  type Way,
+} from "./handling-timestamps";
+import { tsView } from "./handling-timestamps.view";
 import { patchLine } from "./ts-wire";
 
 const texts = (element: Element) =>

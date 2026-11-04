@@ -1,5 +1,4 @@
 import { OPENING_KEY } from "../sections/rule-open";
-import { THEME_CLASSES } from "../theme";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
 export const REST_AFTER_MS = 3500;
@@ -25,9 +24,8 @@ export const HEAD_SCRIPT = String.raw`(function () {
     if (saved === "dark" || saved === "light") theme = saved;
     else if (matchMedia("(prefers-color-scheme: light)").matches) theme = "light";
   } catch (e) {}
-  var themes = ${JSON.stringify(THEME_CLASSES)};
-  doc.classList.remove.apply(doc.classList, themes.light.concat(themes.dark));
-  doc.classList.add.apply(doc.classList, themes[theme]);
+  doc.classList.remove("light", "dark");
+  doc.classList.add(theme);
   // The metas' media queries follow the system, which a saved choice can contradict.
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
     meta.media = meta.dataset.theme === theme ? "all" : "not all";

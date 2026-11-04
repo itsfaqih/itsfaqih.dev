@@ -1,9 +1,10 @@
 ---
-import * as stylex from "@stylexjs/stylex";
+import { row } from "./table-design.markers";
 import Icon from "../components/icon.astro";
-import { arcade } from "../components/arcade";
+import { arcade } from "../components/arcade.css";
 import { TEAM } from "./table-design";
-import { styles, view } from "./table-design.styles";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 
 type Props = { careful: boolean };
 
@@ -12,21 +13,21 @@ const { careful } = Astro.props;
 // table-design.client.ts clones as the roster changes.
 ---
 
-<table-states {...stylex.attrs(styles.card)} data-careful={careful ? "true" : undefined}>
-  <div {...stylex.attrs(styles.bar)}>
-    <label {...stylex.attrs(styles.search)}
+<table-states class={styles.card} data-careful={careful ? "true" : undefined}>
+  <div class={styles.bar}>
+    <label class={styles.search}
       ><Icon
         name="MagnifyingGlass"
         size="1em"
         weight="bold"
         aria-hidden="true"
-        {...stylex.attrs(styles.searchIcon)}
+        class={styles.searchIcon}
       /><input
         type="search"
         enterkeyhint="search"
         autocapitalize="none"
         autocorrect="off"
-        {...stylex.attrs(styles.searchInput)}
+        class={styles.searchInput}
         value=""
         placeholder="Search users"
         aria-label="Search users"
@@ -34,24 +35,24 @@ const { careful } = Astro.props;
       /></label
     >
   </div>
-  <table {...stylex.attrs(styles.table)}>
-    <caption {...stylex.attrs(arcade.srOnly)}>Team members</caption>
-    <colgroup><col /><col {...stylex.attrs(styles.colRole)} /></colgroup>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly}>Team members</caption>
+    <colgroup><col /><col class={styles.colRole} /></colgroup>
     <thead>
       <tr
-        ><th scope="col" {...stylex.attrs(styles.th)}>Name</th><th scope="col" {...stylex.attrs(styles.th)}
+        ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
           >Role</th
         ></tr
       >
     </thead>
-    <tbody {...stylex.attrs(styles.body)}
+    <tbody class={styles.body}
       >{
         careful ? (
-          <tr class={view.row} data-part="said"
-            ><td colspan="2" {...stylex.attrs(styles.td, styles.blank, styles.still)}
-              ><div {...stylex.attrs(styles.said)}
+          <tr class={row} data-part="said"
+            ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}
+              ><div class={styles.said}
                 ><b class={view.saidTitle(false)} data-part="title">No users yet</b><span
-                  {...stylex.attrs(styles.saidHint)}
+                  class={styles.saidHint}
                   data-part="hint">Add your first teammate.</span
                 ><button type="button" class={view.saidButton(true)} data-part="act">Add user</button
                 ></div
@@ -59,16 +60,16 @@ const { careful } = Astro.props;
             ></tr
           >
         ) : (
-          <tr class={view.row} data-part="blank"
-            ><td colspan="2" {...stylex.attrs(styles.td, styles.blank, styles.still)}>No data</td></tr
+          <tr class={row} data-part="blank"
+            ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}>No data</td></tr
           >
         )
       }</tbody
     >
   </table>
   <template data-part="row"
-    ><tr class={view.row}
-      ><td {...stylex.attrs(styles.td)}></td><td {...stylex.attrs(styles.td, styles.dim)}></td></tr
+    ><tr class={row}
+      ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
     ></template
   >
   {
@@ -76,11 +77,11 @@ const { careful } = Astro.props;
       <Fragment>
         <template data-part="bones"
           >{TEAM.map((user) => (
-            <tr class={view.row} aria-hidden="true"
-              ><td {...stylex.attrs(styles.td, styles.still)}
-                ><span {...stylex.attrs(styles.bone)} style={`--w:${user.name.length * 6}px`} /></td
-              ><td {...stylex.attrs(styles.td, styles.still)}
-                ><span {...stylex.attrs(styles.bone)} style="--w:44px" /></td
+            <tr class={row} aria-hidden="true"
+              ><td class:list={[styles.td, styles.still]}
+                ><span class={styles.bone} style={`--w:${user.name.length * 6}px`} /></td
+              ><td class:list={[styles.td, styles.still]}
+                ><span class={styles.bone} style="--w:44px" /></td
               ></tr
             >
           ))}</template
@@ -91,13 +92,13 @@ const { careful } = Astro.props;
             size="1em"
             weight="bold"
             aria-hidden="true"
-            {...stylex.attrs(styles.btnIcon)}
+            class={styles.btnIcon}
           /></template
         >
       </Fragment>
     ) : (
       <template data-part="spin"
-        ><span {...stylex.attrs(styles.spin)} role="img" aria-label="Loading"></span></template
+        ><span class={styles.spin} role="img" aria-label="Loading"></span></template
       >
     )
   }

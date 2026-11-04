@@ -3,7 +3,7 @@ import Code from "./code.astro";
 import Kbd from "./kbd.astro";
 import LessonText from "./lesson-text.astro";
 import { LESSONS, TLDR } from "./proximity-principle";
-import { styles } from "./proximity-principle.styles";
+import { styles } from "./proximity-principle.css";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
@@ -74,10 +74,10 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Fragment slot="body"
       >Code used almost everywhere, like a button, belongs to no page. Give it a folder named for its type, and a suffix so <Kbd>⌘P</Kbd> finds it.</Fragment
     >
-    <LessonText slot="extra" style={styles.suffixes}
-      ><Code tone="chip" style={styles.suffix}>user.schema.ts</Code><Code tone="chip" style={styles.suffix}
+    <LessonText slot="extra" class={styles.suffixes}
+      ><Code tone="chip" class={styles.suffix}>user.schema.ts</Code><Code tone="chip" class={styles.suffix}
         >auth.service.ts</Code
-      ><Code tone="chip" style={styles.suffix}>dashboard.page.ts</Code></LessonText
+      ><Code tone="chip" class={styles.suffix}>dashboard.page.ts</Code></LessonText
     >
     <Tree slot="bad" rows={global.bad.tree} />
     <Tree slot="good" rows={global.good.tree} />

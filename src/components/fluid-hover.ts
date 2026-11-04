@@ -1,8 +1,3 @@
-import * as stylex from "@stylexjs/stylex";
-import { motion } from "../theme.stylex";
-
-const REDUCE = "@media (prefers-reduced-motion: reduce)";
-
 /**
  * One hover highlight per group of alternatives (Fluid Functionalism's fluid hover). The pointer
  * lights the `[data-fluid-item]` under it, and a single highlight springs to that item's box, so it
@@ -80,35 +75,3 @@ export function placeHighlight(
   }
   highlight.setAttribute("data-on", "");
 }
-
-export const fluidHover = stylex.create({
-  group: {
-    position: "relative",
-    isolation: "isolate",
-  },
-  // Sized from the item's box on a leaf with nothing inside, so it reflows nothing around it.
-  highlight: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: -1,
-    width: "var(--w, 0px)",
-    height: "var(--h, 0px)",
-    transform: "translate(var(--x, 0px), var(--y, 0px))",
-    pointerEvents: "none",
-    opacity: { default: 0, ":is([data-on])": 1 },
-    transitionProperty: {
-      default: "opacity, transform, width, height",
-      ":is([data-fresh])": "opacity",
-      [REDUCE]: "opacity",
-    },
-    transitionDuration: {
-      default: motion["--t-fast-exit"],
-      ":is([data-on])": motion["--t-fast"],
-    },
-    transitionTimingFunction: {
-      default: motion["--exit"],
-      ":is([data-on])": motion["--fast"],
-    },
-  },
-});

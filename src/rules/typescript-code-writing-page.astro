@@ -1,5 +1,4 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Code from "./code.astro";
 import LessonText from "./lesson-text.astro";
 import RuleLanding from "./rule-landing.astro";
@@ -12,8 +11,8 @@ import TsCode from "./ts-code.astro";
 import TsHolds from "./ts-holds.astro";
 import TsPaint from "./ts-paint.astro";
 import { LESSONS, TLDR } from "./typescript-code-writing";
-import { quiz, styles } from "./typescript-code-writing.styles";
-import { quizKit } from "./rule-landing.styles";
+import { quiz, styles } from "./typescript-code-writing.css";
+import { quizKit } from "./rule-landing.css";
 
 const [named, extend, unions, edges, options, flags] = LESSONS;
 // Quiz rows are code: leads and plain rows painted, slot labels painted, held or left blank.
@@ -43,12 +42,12 @@ const clash = [
   </RuleLesson>
   <RuleQuiz n={1} level={named.levels[0]}
     >Three files import the price formatter, and one of them spells it<Fragment set:html="<!-- -->" /> <Code tone="prompt">formatPrcie</Code>. Pick the version where the typo fails the build.
-    <div slot="board" {...stylex.attrs(quizKit.stack)}>
+    <div slot="board" class={quizKit.stack}>
       {
         typo.map(([id, line]) => (
           <QuizChoice level={named.levels[0]} id={id}
-            ><span {...stylex.attrs(styles.code, quiz.snippet)}
-              ><span {...stylex.attrs(styles.source)}><TsPaint text={line} /></span></span
+            ><span class:list={[styles.code, quiz.snippet]}
+              ><span class={styles.source}><TsPaint text={line} /></span></span
             ></QuizChoice
           >
         ))
@@ -65,15 +64,15 @@ const clash = [
   </RuleLesson>
   <RuleQuiz n={2} level={extend.levels[0]}
     ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Pick the Admin that fails where it's declared.
-    <div slot="board" {...stylex.attrs(quizKit.stack)}>
-      <div {...stylex.attrs(styles.code, quiz.given)}>
-        <code {...stylex.attrs(styles.source)}><TsPaint text={"type User = {\u00a0id:\u00a0string;\u00a0name:\u00a0string\u00a0}"} /></code>
+    <div slot="board" class={quizKit.stack}>
+      <div class:list={[styles.code, quiz.given]}>
+        <code class={styles.source}><TsPaint text={"type User = {\u00a0id:\u00a0string;\u00a0name:\u00a0string\u00a0}"} /></code>
       </div>
       {
         clash.map(([id, lines]) => (
           <QuizChoice level={extend.levels[0]} id={id}
-            ><span {...stylex.attrs(styles.code, quiz.snippet)}
-              >{lines.map((line) => <span {...stylex.attrs(styles.source)}><TsPaint text={line} /></span>)}</span
+            ><span class:list={[styles.code, quiz.snippet]}
+              >{lines.map((line) => <span class={styles.source}><TsPaint text={line} /></span>)}</span
             ></QuizChoice
           >
         ))

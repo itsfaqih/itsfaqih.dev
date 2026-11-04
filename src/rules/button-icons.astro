@@ -1,7 +1,6 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
-import { styles } from "./button-design.styles";
+import { styles } from "./button-design.css";
 import Ruler from "./button-ruler.astro";
 
 type Props = { careful?: boolean };
@@ -12,23 +11,23 @@ const pad = [styles.pads, !careful && styles.even];
 const near = careful ? 12 : 16;
 ---
 
-<div {...stylex.attrs(styles.stage, styles.icons)}>
-  <button type="button" {...stylex.attrs(key, styles.tint, styles.lead, pad)} data-pad="lead"
+<div class:list={[styles.stage, styles.icons]}>
+  <button type="button" class:list={[key, styles.tint, styles.lead, pad]} data-pad="lead"
     ><Icon
       name="Plus"
       size="1em"
       weight="bold"
       aria-hidden="true"
-      {...stylex.attrs(styles.icon)}
+      class={styles.icon}
     />New project<Ruler pads={[near, 16]} /></button
   >
-  <button type="button" {...stylex.attrs(key, styles.trail, pad)} data-pad="trail"
+  <button type="button" class:list={[key, styles.trail, pad]} data-pad="trail"
     >Continue<Icon
       name="ArrowRight"
       size="1em"
       weight="bold"
       aria-hidden="true"
-      {...stylex.attrs(styles.icon)}
+      class={styles.icon}
     /><Ruler pads={[16, near]} /></button
   >
 </div>

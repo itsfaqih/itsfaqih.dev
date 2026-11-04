@@ -1,9 +1,10 @@
 ---
-import { draw, styles, vars } from "./hero-prints.styles";
+import { draw, vars } from "./hero-prints.view";
+import { styles } from "./hero-prints.css";
 
 type Props = { ms?: number };
 
 const { ms = 1600 } = Astro.props;
 ---
 
-<g {...draw(styles.float)} style={vars({ "float-ms": `${ms}ms` })}><slot /></g>
+<g class={draw(styles.float)} style={vars({ "float-ms": `${ms}ms` })}><slot /></g>

@@ -1,12 +1,12 @@
 ---
 import Code from "./code.astro";
 import TsPaint from "./ts-paint.astro";
-import { styles } from "./typescript-code-writing.styles";
-import type { Tone } from "./rule-landing.styles";
+import { styles } from "./typescript-code-writing.css";
+import type { Tone } from "./rule-landing.view";
 
 type Props = { text: string; tone?: Tone };
 
 const { text, tone = "plain" } = Astro.props;
 ---
 
-<Code tone={tone} style={styles.boardCode}><TsPaint text={text} /></Code>
+<Code tone={tone} class={styles.boardCode}><TsPaint text={text} /></Code>

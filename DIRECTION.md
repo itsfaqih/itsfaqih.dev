@@ -157,7 +157,7 @@ Only one house-style trait is shared: numbered items ("No.002"). The page avoids
 Shots: `shots/rot/r1-index`, `shots/rot/r1-article`, `shots/rot/r1-proximity`.
 
 - **Squint (1440).** The eye lands on the H1, then the cover, then "View Markdown", then the first demo. The cover is the brightest thing in the hero but sits second because of the H1's size. That is the intended order.
-- **Type.** H1 46px, then H2 Unbounded 28px, then H3 Inter 20px (about 1.4× each step). Display tracking is tightened. The 768px column keeps body text near 70ch. The H2 override beats the StyleX classes, which the shots confirm.
+- **Type.** H1 46px, then H2 Unbounded 28px, then H3 Inter 20px (about 1.4× each step). Display tracking is tightened. The 768px column keeps body text near 70ch. The H2 override beats the component classes, which the shots confirm.
 - **Color.** Neutrals carry the page, with one topic hue per article: the crumb, the cover and the active tick. Yellow appears only on "Email me". There are three hues on screen, counting the demo's blue.
 - **Space.** The hero, the first section and the pager follow 24/48/64 steps.
 - **Gaps found:**
@@ -176,7 +176,7 @@ Shots: `shots/rot/r2-null`, `shots/rot/r2-data`. Motion: `shots/rot/r2-motion`, 
 - **Motion, article.** The crumb, H1, lead and actions enter at 380ms `--snap` with 60ms steps, and the cover at 420ms, +120ms. The cover loops twice and then holds the still frame. The rail ticks transition at 300ms.
 - **Explained findings:**
   - `long-entrance` flags the cover's two 3.2s loops. They are an illustration, not an entrance: the H1 is readable by about 500ms.
-  - `layout-property`, `reduce-*` and the canvas all come from the existing Button Design demo (StyleX classes, its own cursor canvas). They were not touched in this pass.
+  - `layout-property`, `reduce-*` and the canvas all come from the existing Button Design demo (component classes, its own cursor canvas). They were not touched in this pass.
   - Everything inside `.arc` stops under reduced motion.
 - **Mobile (390).** The hero leads with the H1 and the actions. The 240px cover follows on the same left edge. The pager stacks to one column. Nothing overflows.
 - **Spinner fix.** It holds at every size in the LOAD frames.
@@ -500,7 +500,7 @@ Every moment uses linear easing because scroll is the clock, and scrolling back 
 Shots: `shots/deck/dl-1440-s1-*.png` (first build).
 
 - **Gap: the cards didn't pin.** The hold was `padding-bottom`, but a sticky box stays inside its parent's content box, so the card scrolled away. Moved the hold into a `::after` spacer.
-- **Gap: empty space at the bottom of each card.** The sections' own `mb-20` (StyleX) stayed inside the card, about 80px. It is now zeroed with `!important` inside cards only.
+- **Gap: empty space at the bottom of each card.** The sections' own `mb-20` (a component class) stayed inside the card, about 80px. It is now zeroed with `!important` inside cards only.
 - **Gap: the code panels broke out of the card at 390.** The global `[data-rule-of-thumb-card]` full-bleed rule (`calc(50% - 50vw)`) applies on narrow pages. Inside a card the panel now bleeds to the card edge (-12px).
 - **Gap: ← → overshot by about 110px.** The target came from the heading's box, which `card-rise` was transforming. It now aims at the wrapper.
 - **Squint:** the eye lands on the pinned card's heading, then the incoming card's heading as it climbs. That's the intended reading order.

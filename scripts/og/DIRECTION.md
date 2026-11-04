@@ -12,7 +12,7 @@ The build draws one 1200×630 card per page with Satori (see `card.tsx`). The ca
 
 ## Anchors
 
-1. **The site's v5 arcade system** (`src/arcade.css`, `DIRECTION.md` at the repo root). Taken: the palette itself (the card reads the dark `palette` tokens from `src/theme.stylex.ts` at build time, so it never copies a hex), Unbounded 900 headings at -0.04em, and the rule tile's coloured top edge.
+1. **The site's v5 arcade system** (`src/arcade.css`, `DIRECTION.md` at the repo root). Taken: the palette itself (the card reads the dark `palette` tokens from `src/theme.tokens.ts` at build time, so it never copies a hex), Unbounded 900 headings at -0.04em, and the rule tile's coloured top edge.
 2. **recent:i3io5ld-grokipedia-book-covers.** Thirty spines read as one shelf because frame, title position and mark never move; only the colour changes. Taken: every card shares one frame (top bar, mono eyebrow, title block, footer). Only the hue and the words change, so a feed of several rules reads as one series.
 3. **shaders:section.film-festival.** A ~190px display line over 11px mono metadata, with nothing in between but one mid size. Taken: the jump from a 76 to 104px Unbounded title to 24px Geist Mono labels, metadata pinned to the top and bottom edges, and a band that bleeds off both sides (the home card's ticker).
 4. **The home hero** (`src/sections/home.astro`). Taken from `src/data/home.ts`, which the page and the card share: the first slide, "I build interfaces that feel right." with the highlight on its pink block, and the striped ticker with each word on its own topic hue. Also the green status dot before "Full-stack engineer · Yogyakarta".

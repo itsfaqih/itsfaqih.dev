@@ -1,6 +1,6 @@
 import { reducedMotion } from "../hooks/media-query";
 import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
-import { landingView } from "./rule-landing.styles";
+import { landingView } from "./rule-landing.view";
 import { watchReveal, watchTitleSwap } from "./rule-motion";
 
 /** Shows `copied` on a button for 1600ms through `show`. */

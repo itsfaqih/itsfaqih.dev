@@ -1,6 +1,6 @@
 ---
 import { render } from "astro:content";
-import { post as classes } from "../../blog/post.styles";
+import { styles } from "../../blog/post.css";
 import { BLOG_DATE_FORMATTER, BLOG_DESCRIPTION, getAllPosts, type Post } from "../../blog/posts";
 import ProseH2 from "../../blog/prose-h2.astro";
 import ProseP from "../../blog/prose-p.astro";
@@ -8,7 +8,9 @@ import TableOfContents from "../../blog/table-of-contents.astro";
 import TocDrawer from "../../blog/toc-drawer.astro";
 import CodeBlock from "../../components/code-block.astro";
 import Icon from "../../components/icon.astro";
+import { cx } from "../../cx";
 import Site from "../../layouts/site.astro";
+import { marker } from "../../when";
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
@@ -35,49 +37,49 @@ const { title, summary, publishedAt } = post.data;
     publishedAt: publishedAt.toISOString().slice(0, 10),
   }}
 >
-  <div class={classes.page}>
-    <div class={classes.shell}>
-      <div class={classes.layout}>
+  <div class={styles.page}>
+    <div class={styles.shell}>
+      <div class={styles.layout}>
         <div>
-          <a href="/blog" class={classes.backLinkTop}
-            ><Icon name="ArrowLeft" size={16} class={classes.backArrow} />Back to Blog</a
+          <a href="/blog" class={cx(styles.backLink, styles.backLinkTop, marker)}
+            ><Icon name="ArrowLeft" size={16} class={styles.backArrow} />Back to Blog</a
           >
 
           <article>
-            <header class={classes.header}>
-              <div class={classes.meta}>
-                <div class={classes.metaItem}>
+            <header class={styles.header}>
+              <div class={styles.meta}>
+                <div class={cx(styles.metaItem, styles.small, styles.muted)}>
                   <Icon name="CalendarBlank" size={14} /><time>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
                 </div>
-                <div class={classes.metaItem}>
+                <div class={cx(styles.metaItem, styles.small, styles.muted)}>
                   <Icon name="Clock" size={14} /><span>5 min read</span>
                 </div>
               </div>
 
-              <h1 class={classes.title}>{title}</h1>
+              <h1 class={styles.title}>{title}</h1>
 
-              {summary && <p class={classes.summary}>{summary}</p>}
+              {summary && <p class={styles.summary}>{summary}</p>}
             </header>
 
-            <div class={classes.rule}></div>
+            <div class={styles.rule}></div>
 
-            <div class={classes.body}>
+            <div class={styles.body}>
               <Content components={{ p: ProseP, h2: ProseH2, pre: CodeBlock }} />
             </div>
           </article>
 
-          <footer class={classes.footer}>
-            <div class={classes.footerRow}>
-              <a href="/blog" class={classes.backLink}
-                ><Icon name="ArrowLeft" size={16} class={classes.backArrow} />Back to all posts</a
+          <footer class={styles.footer}>
+            <div class={styles.footerRow}>
+              <a href="/blog" class={cx(styles.backLink, marker)}
+                ><Icon name="ArrowLeft" size={16} class={styles.backArrow} />Back to all posts</a
               >
 
-              <p class={classes.thanks}>Thanks for reading!</p>
+              <p class={cx(styles.small, styles.muted)}>Thanks for reading!</p>
             </div>
           </footer>
         </div>
 
-        <div class={classes.tocRail}>
+        <div class={styles.tocRail}>
           <TableOfContents headings={headings} />
         </div>
       </div>

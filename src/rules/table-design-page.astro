@@ -1,5 +1,4 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import Code from "./code.astro";
 import RuleLanding from "./rule-landing.astro";
@@ -7,8 +6,8 @@ import RuleLesson from "./rule-lesson.astro";
 import QuizChoice from "./quiz-choice.astro";
 import RuleQuiz from "./rule-quiz.astro";
 import { FILTERED, FILTERS, LESSONS, STAFF, START_FILTER, TLDR, VIEW_NAMES } from "./table-design";
-import { quiz, styles } from "./table-design.styles";
-import { quizKit } from "./rule-landing.styles";
+import { quiz, styles } from "./table-design.css";
+import { quizKit } from "./rule-landing.css";
 import TableActions from "./table-actions.astro";
 import TableLive from "./table-live.astro";
 import TableNumbers from "./table-numbers.astro";
@@ -46,7 +45,7 @@ const cells = [
   <Fragment slot="lead">Right-align numbers, pin actions to a fixed last column, and give every blank a next step.</Fragment>
   <Fragment slot="intro">Make each column easy to run an eye down, since people scan for one value.</Fragment>
 
-  <RuleLesson lesson={numbers} costsStyle={styles.costs}>
+  <RuleLesson lesson={numbers} costsClass={styles.costs}>
     <Fragment slot="body"
       >People compare numbers by their last digits. Use tabular figures so every digit is the same width, and add thousands separators. Watch the right edge.</Fragment
     >
@@ -56,7 +55,7 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={1} level={numbers.levels[0]}
     >A revenue column holds <Code tone="prompt">9</Code>, <Code tone="prompt">120</Code> and <Code tone="prompt">12,500</Code>, and people scan it for the biggest. Pick the column where the biggest stands out.
-    <div slot="board" {...stylex.attrs(quizKit.trio)}>
+    <div slot="board" class={quizKit.trio}>
       {
         (
           [
@@ -66,12 +65,12 @@ const cells = [
           ] as const
         ).map(([id, caption, align]) => (
           <QuizChoice level={numbers.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(quiz.sheet, quiz.money)}
-              ><span {...stylex.attrs(quiz.th)}>Account</span><span {...stylex.attrs(quiz.th, align)}>Revenue</span>{
+            ><span class:list={[quiz.sheet, quiz.money]}
+              ><span class={quiz.th}>Account</span><span class:list={[quiz.th, align]}>Revenue</span>{
                 revenue.map(([account, value], at) => (
                   <Fragment
-                    ><span {...stylex.attrs(quiz.td, at === 0 && quiz.top)}>{account}</span><span
-                      {...stylex.attrs(quiz.td, align, at === 0 && quiz.top)}>{value}</span
+                    ><span class:list={[quiz.td, at === 0 && quiz.top]}>{account}</span><span
+                      class:list={[quiz.td, align, at === 0 && quiz.top]}>{value}</span
                     ></Fragment
                   >
                 ))
@@ -83,7 +82,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={states} costsStyle={styles.costs}>
+  <RuleLesson lesson={states} costsClass={styles.costs}>
     <Fragment slot="body"
       >A table is often loading, empty, failed or showing no matches. Draw each one. Use skeleton rows to keep the shape while it loads, and say why and what to do next in every blank. Pick a state, search, then press the buttons.</Fragment
     >
@@ -93,27 +92,27 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={2} level={states.levels[0]}
     >The users table can show no rows for three reasons. Pick the one where <b>Add user</b> belongs.
-    <div slot="board" {...stylex.attrs(quizKit.trio)}>
+    <div slot="board" class={quizKit.trio}>
       {
         blanks.map(({ id, caption, title, hint, query }) => (
           <QuizChoice level={states.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(quiz.sheet)}
-              ><span {...stylex.attrs(quiz.bar)}
-                ><span {...stylex.attrs(quiz.search)}
+            ><span class={quiz.sheet}
+              ><span class={quiz.bar}
+                ><span class={quiz.search}
                   ><Icon
                     name="MagnifyingGlass"
                     size="1em"
                     weight="bold"
                     aria-hidden="true"
-                    {...stylex.attrs(quiz.glyph)}
-                  />{query ? <span {...stylex.attrs(quiz.typed)}>{query}</span> : "Search users"}</span
+                    class={quiz.glyph}
+                  />{query ? <span class={quiz.typed}>{query}</span> : "Search users"}</span
                 ></span
-              ><span {...stylex.attrs(quiz.people)}
-                ><span {...stylex.attrs(quiz.th)}>Name</span><span {...stylex.attrs(quiz.th)}>Role</span></span
-              ><span {...stylex.attrs(quiz.said)}
-                ><span {...stylex.attrs(quiz.saidTitle, id === "error" && quiz.error)}>{title}</span><span
-                  {...stylex.attrs(quiz.saidHint)}>{hint}</span
-                ><span {...stylex.attrs(quiz.key)}>Add user</span></span
+              ><span class={quiz.people}
+                ><span class={quiz.th}>Name</span><span class={quiz.th}>Role</span></span
+              ><span class={quiz.said}
+                ><span class:list={[quiz.saidTitle, id === "error" && quiz.error]}>{title}</span><span
+                  class={quiz.saidHint}>{hint}</span
+                ><span class={quiz.key}>Add user</span></span
               ></span
             ></QuizChoice
           >
@@ -122,7 +121,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={actions} costsStyle={styles.costs}>
+  <RuleLesson lesson={actions} costsClass={styles.costs}>
     <Fragment slot="body"
       >Give the column a fixed width and right-align it, so Edit sits in the same place on every row. Use icon buttons to save room, and name each one with a tooltip. Hover the rows, then delete one.</Fragment
     >
@@ -131,25 +130,25 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={3} level={actions.levels[0]}
     >Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Tap where the buttons go.
-    <div slot="board" {...stylex.attrs(quiz.screen, quiz.row)}>
-      <span {...stylex.attrs(quiz.head)}></span>
-      <span {...stylex.attrs(quiz.head)}>Name</span>
-      <span {...stylex.attrs(quiz.head, quiz.roomy)}>Role</span>
-      <span {...stylex.attrs(quiz.head)}></span>
+    <div slot="board" class:list={[quiz.screen, quiz.row]}>
+      <span class={quiz.head}></span>
+      <span class={quiz.head}>Name</span>
+      <span class:list={[quiz.head, quiz.roomy]}>Role</span>
+      <span class={quiz.head}></span>
       {
         cells.map((cell) => (
-          <span {...stylex.attrs(quiz.cell, "role" in cell && [quiz.dim, quiz.roomy])}
+          <span class:list={[quiz.cell, "role" in cell && [quiz.dim, quiz.roomy]]}
             >{"text" in cell && cell.text}{
               "spot" in cell && (
                 <QuizChoice level={actions.levels[0]} id={cell.spot} look="spot"
-                  ><span {...stylex.attrs(quiz.ghostKeys)}
+                  ><span class={quiz.ghostKeys}
                     ><Icon
                       name="PencilSimple"
                       size="1em"
                       weight="bold"
                       aria-hidden="true"
-                      {...stylex.attrs(quiz.ghostKey)}
-                    /><Icon name="Trash" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(quiz.ghostKey)} /></span
+                      class={quiz.ghostKey}
+                    /><Icon name="Trash" size="1em" weight="bold" aria-hidden="true" class={quiz.ghostKey} /></span
                   ></QuizChoice
                 >
               )
@@ -160,7 +159,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={pager} costsStyle={styles.costs}>
+  <RuleLesson lesson={pager} costsClass={styles.costs}>
     <Fragment slot="body"
       >With one page, a pager is a row of dead arrows. Under an empty table, it reads Page 1 of 0. Filter the list and watch both.</Fragment
     >
@@ -170,31 +169,31 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={4} level={pager.levels[0]}
     >The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Pick the table that needs a pager.
-    <div slot="board" {...stylex.attrs(quizKit.trio)}>
+    <div slot="board" class={quizKit.trio}>
       {
         filters.map(({ id, caption, people, total }) => (
           <QuizChoice level={pager.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(quiz.sheet)}
-              ><span {...stylex.attrs(quiz.th)}>Name</span>{
+            ><span class={quiz.sheet}
+              ><span class={quiz.th}>Name</span>{
                 people.slice(0, shown).map((person, at) => (
-                  <span {...stylex.attrs(quiz.td, at === 0 && quiz.top)}
-                    ><span {...stylex.attrs(quiz.clip)}>{person.name}</span></span
+                  <span class:list={[quiz.td, at === 0 && quiz.top]}
+                    ><span class={quiz.clip}>{person.name}</span></span
                   >
                 ))
               }{
                 total === 0 ? (
-                  <span {...stylex.attrs(quiz.said)}
-                    ><span {...stylex.attrs(quiz.saidTitle)}>No owners</span><span {...stylex.attrs(quiz.saidHint)}
+                  <span class={quiz.said}
+                    ><span class={quiz.saidTitle}>No owners</span><span class={quiz.saidHint}
                       >Nobody has the Owner role yet.</span
                     ></span
                   >
                 ) : (
-                  <span {...stylex.attrs(quiz.td, quiz.more)}>{total - shown} more rows</span>
+                  <span class:list={[quiz.td, quiz.more]}>{total - shown} more rows</span>
                 )
-              }<span {...stylex.attrs(quiz.ghostPager)}
-                ><Icon name="CaretLeft" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(quiz.glyph)} /><span
-                  {...stylex.attrs(quiz.ghostPage)}></span
-                ><Icon name="CaretRight" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(quiz.glyph)} /></span
+              }<span class={quiz.ghostPager}
+                ><Icon name="CaretLeft" size="1em" weight="bold" aria-hidden="true" class={quiz.glyph} /><span
+                  class={quiz.ghostPage}></span
+                ><Icon name="CaretRight" size="1em" weight="bold" aria-hidden="true" class={quiz.glyph} /></span
               ></span
             ></QuizChoice
           >
@@ -203,7 +202,7 @@ const cells = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={url} costsStyle={styles.costs}>
+  <RuleLesson lesson={url} costsClass={styles.costs}>
     <Fragment slot="body"
       >With <Code tone="chip">?page=2</Code> in the address, a reload, the Back button and a shared link all land where you were. Reload each.</Fragment
     >
@@ -212,19 +211,19 @@ const cells = [
   </RuleLesson>
   <RuleQuiz n={5} level={url.levels[0]}
     >You're on page 3 of the orders and send the link to a teammate. Tap where the page number should live.
-    <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <div {...stylex.attrs(quiz.chrome)}>
-        <span {...stylex.attrs(quiz.reload)}
-          ><Icon name="ArrowClockwise" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(quiz.ghostKey)} /></span
+    <div slot="board" class={quiz.screen}>
+      <div class={quiz.chrome}>
+        <span class={quiz.reload}
+          ><Icon name="ArrowClockwise" size="1em" weight="bold" aria-hidden="true" class={quiz.ghostKey} /></span
         >
         <QuizChoice level={url.levels[0]} id="url" look="spot"
-          ><span {...stylex.attrs(quiz.address)}><span {...stylex.attrs(quiz.host)}>acme.app</span>/orders</span></QuizChoice
+          ><span class={quiz.address}><span class={quiz.host}>acme.app</span>/orders</span></QuizChoice
         >
       </div>
-      <div {...stylex.attrs(quiz.page)}>
+      <div class={quiz.page}>
         <QuizChoice level={url.levels[0]} id="state" look="spot"
-          ><span {...stylex.attrs(quiz.sheet, quiz.people)}
-            ><span {...stylex.attrs(quiz.th)}>Order</span><span {...stylex.attrs(quiz.th)}>Total</span>{
+          ><span class:list={[quiz.sheet, quiz.people]}
+            ><span class={quiz.th}>Order</span><span class={quiz.th}>Total</span>{
               (
                 [
                   ["#1027", "$84.00"],
@@ -233,27 +232,27 @@ const cells = [
                 ] as const
               ).map(([order, total], at) => (
                 <Fragment
-                  ><span {...stylex.attrs(quiz.td, at === 0 && quiz.top)}>{order}</span><span
-                    {...stylex.attrs(quiz.td, quiz.right, at === 0 && quiz.top)}>{total}</span
+                  ><span class:list={[quiz.td, at === 0 && quiz.top]}>{order}</span><span
+                    class:list={[quiz.td, quiz.right, at === 0 && quiz.top]}>{total}</span
                   ></Fragment
                 >
               ))
             }</span
-          ><span {...stylex.attrs(quiz.pager)}
-            ><span>Page 3 of 5</span><span {...stylex.attrs(quiz.pages)}
+          ><span class={quiz.pager}
+            ><span>Page 3 of 5</span><span class={quiz.pages}
               >{
-                [1, 2, 3, 4, 5].map((n) => <span {...stylex.attrs(quiz.pageKey, n === 3 && quiz.pageOn)}>{n}</span>)
+                [1, 2, 3, 4, 5].map((n) => <span class:list={[quiz.pageKey, n === 3 && quiz.pageOn]}>{n}</span>)
               }</span
             ></span
           ></QuizChoice
         >
       </div>
-      <div {...stylex.attrs(quiz.drawer)}>
+      <div class={quiz.drawer}>
         <QuizChoice level={url.levels[0]} id="storage" look="spot"
-          ><span {...stylex.attrs(quiz.drawerTitle)}>Storage, acme.app</span><span {...stylex.attrs(quiz.sheet, quiz.store)}
-            ><span {...stylex.attrs(quiz.th)}>Key</span><span {...stylex.attrs(quiz.th)}>Value</span><span
-              {...stylex.attrs(quiz.td, quiz.top, quiz.dim)}>theme</span
-            ><span {...stylex.attrs(quiz.td, quiz.top, quiz.dim)}>dark</span></span
+          ><span class={quiz.drawerTitle}>Storage, acme.app</span><span class:list={[quiz.sheet, quiz.store]}
+            ><span class={quiz.th}>Key</span><span class={quiz.th}>Value</span><span
+              class:list={[quiz.td, quiz.top, quiz.dim]}>theme</span
+            ><span class:list={[quiz.td, quiz.top, quiz.dim]}>dark</span></span
           ></QuizChoice
         >
       </div>

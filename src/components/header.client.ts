@@ -1,7 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { followTheme, toggleTheme } from "../hooks/theme-store";
 import { watchFluidHover } from "./fluid-hover";
-import { menuGlyphs, SEGS, segView, type HeaderState } from "./header.styles";
+import { menuGlyphs, SEGS, segView, type HeaderState } from "./header.view";
 
 // The capsule's width folds on a spring, but a grid column never opens past its content, so the
 // spring's overshoot is lost and the capsule would stop dead. Its ground carries the rest: it keeps

@@ -1,5 +1,6 @@
 import { placeHighlight } from "../components/fluid-hover";
-import { HOLD_MS, type Step, UNDO_MS, view } from "./button-design.styles";
+import { HOLD_MS, UNDO_MS } from "./button-design.css";
+import { type Step, view } from "./button-design.view";
 
 const GUARDS = ["confirm", "hold", "undo"] as const;
 type Guard = (typeof GUARDS)[number];

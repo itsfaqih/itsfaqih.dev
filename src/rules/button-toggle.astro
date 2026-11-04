@@ -1,8 +1,9 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { button, buttonVariant } from "../components/button";
-import { styles, view } from "./button-design.styles";
-import { host } from "./rule-landing.styles";
+import { button } from "../components/button.css";
+import { buttonVariant } from "../components/button";
+import { styles } from "./button-design.css";
+import { view } from "./button-design.view";
+import { host } from "./rule-landing.css";
 
 type Props = {
   label: string;
@@ -13,11 +14,11 @@ type Props = {
 const { label, name } = Astro.props;
 ---
 
-<button-toggle {...stylex.attrs(host.contents)}
+<button-toggle class={host.contents}
   ><button
     data-hint="true"
     type="button"
-    {...stylex.attrs(button.base, buttonVariant["primary-neutral"], button.sm, styles.toggle)}
+    class:list={[button.base, buttonVariant["primary-neutral"], button.sm, styles.toggle]}
     data-toggle={name}
     aria-pressed="false"
     ><span class={view.dot(false)} aria-hidden="true"></span>{label}</button

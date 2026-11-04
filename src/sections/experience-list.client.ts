@@ -1,6 +1,6 @@
 import { watchBoxScrollbar } from "../components/box-scrollbar";
 import { reducedMotion } from "../hooks/media-query";
-import { moreLabel, rowView } from "./experience-list.styles";
+import { moreLabel, rowView } from "./experience-list.view";
 
 const MAX_ROWS = 2;
 // A badge fades out of its old spot fast and settles into its new one slower.

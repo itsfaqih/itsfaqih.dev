@@ -1,9 +1,9 @@
-import * as stylex from "@stylexjs/stylex";
 import { reducedMotion, watchMedia } from "../hooks/media-query";
 import { glowDots } from "./backdrop-dots";
 import { watchRuleOpen } from "./rule-open";
-import { number, pad } from "./rule-spread.styles";
-
+import { number } from "./rule-spread.css";
+import { pad } from "./rule-spread.view";
+import { cx, type ClassValue } from "../cx";
 const STEP = 0.68;
 const RUBBER = 0.35;
 const STIFFNESS = 140;
@@ -22,9 +22,9 @@ type Grab = {
   dragging: boolean;
 };
 
-const digits = (value: number, ...more: stylex.StyleXStyles[]) => {
+const digits = (value: number, ...more: ClassValue[]) => {
   const span = document.createElement("span");
-  span.className = stylex.attrs(number.digits, ...more).class ?? "";
+  span.className = cx(number.digits, ...more);
   span.textContent = pad(value);
   return span;
 };

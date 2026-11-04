@@ -1,6 +1,6 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { styles, marker } from "./button-design.styles";
+import { styles } from "./button-design.css";
+import { marker } from "../when";
 
 type Props = { careful?: boolean };
 
@@ -8,27 +8,24 @@ const { careful = false } = Astro.props;
 const tipId = `still-tip-${careful ? "good" : "bad"}`;
 ---
 
-<div {...stylex.attrs(styles.stage)}>
-  <div {...stylex.attrs(styles.steps)}>
-    <span {...stylex.attrs(styles.tip)}
+<div class={styles.stage}>
+  <div class={styles.steps}>
+    <span class={styles.tip}
       ><button
         data-hint="true"
         type="button"
-        {...stylex.attrs(
-          styles.key,
+        class:list={[styles.key,
           styles.sm,
-          styles.plain,
-          !careful && styles.live,
+          careful ? styles.plain : [styles.plainFace, styles.live],
           styles.off,
-          marker,
-        )}
+          marker]}
         aria-disabled="true"
         aria-describedby={tipId}>Back</button
-      ><span role="tooltip" id={tipId} {...stylex.attrs(styles.tooltip)}
+      ><span role="tooltip" id={tipId} class={styles.tooltip}
         >This is the first step</span
       ></span
     >
-    <button type="button" {...stylex.attrs(styles.key, styles.sm, styles.live)}>Next</button>
+    <button type="button" class:list={[styles.key, styles.sm, styles.live]}>Next</button>
   </div>
-  <small {...stylex.attrs(styles.small)}>Step 1 of 3</small>
+  <small class={styles.small}>Step 1 of 3</small>
 </div>

@@ -1,23 +1,22 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import type { TreeRow } from "./lesson";
-import { tree } from "./rule-landing.styles";
+import { tree } from "./rule-landing.css";
 
 type Props = { rows: TreeRow[] };
 
 const { rows } = Astro.props;
 ---
 
-<ul {...stylex.attrs(tree.list, tree.inPane)}>
+<ul class:list={[tree.list, tree.inPane]}>
   {
     rows.map((row) => (
       <li
         data-k={row.k ?? row.text}
         data-moved={row.moved ? "true" : undefined}
-        {...stylex.attrs(tree.row, row.kind && tree[row.kind])}
+        class:list={[tree.row, row.kind && tree[row.kind]]}
         style={`--d:${row.depth}`}
-        ><span {...stylex.attrs(row.moved && tree.moved)}>{row.text}</span>{
-          row.tag && <span {...stylex.attrs(tree.calls)}>{row.tag}</span>
+        ><span class:list={[row.moved && tree.moved]}>{row.text}</span>{
+          row.tag && <span class={tree.calls}>{row.tag}</span>
         }</li
       >
     ))

@@ -1,4 +1,4 @@
-import { THEME_CLASSES, type Theme } from "../theme";
+import type { Theme } from "../theme";
 import { reducedMotion } from "./media-query";
 
 const THEME_CHANGE_EVENT = "theme-change";
@@ -12,8 +12,8 @@ export function readTheme(): Theme {
 
 function applyThemeClass(theme: Theme) {
   const root = document.documentElement;
-  root.classList.remove(...THEME_CLASSES.light, ...THEME_CLASSES.dark);
-  root.classList.add(...THEME_CLASSES[theme]);
+  root.classList.remove("light", "dark");
+  root.classList.add(theme);
   // The metas' media queries follow the system, which a saved choice can contradict (see the
   // head script in src/layouts/head-script.ts).
   for (const meta of root.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {

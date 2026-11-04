@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { arcade } from "../components/arcade";
-import { KINDS, paint, styles } from "./null-vs-undefined.styles";
+import { arcade } from "../components/arcade.css";
+import { KINDS, paint } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
 
 type Props = { text: string; tone: "plain" | "wrap" };
 
@@ -11,8 +11,8 @@ const { text, tone } = Astro.props;
 
 {
   tone === "wrap" ? (
-    <Fragment><span {...stylex.attrs(arcade.srOnly)}>{text}</span><span aria-hidden="true" {...stylex.attrs(styles.gap)} /></Fragment>
+    <Fragment><span class={arcade.srOnly}>{text}</span><span aria-hidden="true" class={styles.gap} /></Fragment>
   ) : (
-    <code {...stylex.attrs(styles.boardCode)}>{paint(text, KINDS).map((p) => (p.class ? <span class={p.class}>{p.text}</span> : p.text))}</code>
+    <code class={styles.boardCode}>{paint(text, KINDS).map((p) => (p.class ? <span class={p.class}>{p.text}</span> : p.text))}</code>
   )
 }

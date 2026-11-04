@@ -1,14 +1,13 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../../components/icon.astro";
-import { styles } from "./counter.styles";
+import { styles } from "./counter.css";
 ---
 
-<blog-counter {...stylex.attrs(styles.counter)}
-  ><button data-part="decrease" {...stylex.attrs(styles.button, styles.decrease)} aria-label="Decrease count"
+<blog-counter class={styles.counter}
+  ><button data-part="decrease" class:list={[styles.button, styles.decrease]} aria-label="Decrease count"
     ><Icon name="Minus" size={18} /></button
-  ><div {...stylex.attrs(styles.display)}><span data-part="count" {...stylex.attrs(styles.count)}>0</span></div
-  ><button data-part="increase" {...stylex.attrs(styles.button, styles.increase)} aria-label="Increase count"
+  ><div class={styles.display}><span data-part="count" class={styles.count}>0</span></div
+  ><button data-part="increase" class:list={[styles.button, styles.increase]} aria-label="Increase count"
     ><Icon name="Plus" size={18} /></button
   ></blog-counter
 >

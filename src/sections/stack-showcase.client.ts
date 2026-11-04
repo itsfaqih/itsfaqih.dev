@@ -1,4 +1,5 @@
-import { countClass, groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.styles";
+import { countClass } from "./chips.view";
+import { groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.view";
 
 const HEADER_HEIGHT = 72;
 const CARD_GAP = 10;

@@ -1,3 +1,4 @@
+import { styles } from "./table-design.css";
 import { reducedMotion } from "../hooks/media-query";
 import {
   CREW,
@@ -22,7 +23,7 @@ import {
   VIEW_NAMES,
   viewOf,
 } from "./table-design";
-import { view } from "./table-design.styles";
+import { view } from "./table-design.view";
 
 type Store<T> = {
   get: () => T;
@@ -190,7 +191,7 @@ function roll(reels: Element, text: string) {
     const old = reels.children[at]!;
     const digit = /\d/.test(char);
     const strip = old.firstElementChild;
-    if (digit && old.className === view.reel && strip instanceof HTMLElement) {
+    if (digit && old.className === styles.reel && strip instanceof HTMLElement) {
       strip.style.setProperty("--n", char);
       return;
     }
@@ -200,13 +201,13 @@ function roll(reels: Element, text: string) {
     }
     const next = document.createElement("span");
     if (digit) {
-      next.className = view.reel;
+      next.className = styles.reel;
       const fresh = document.createElement("span");
-      fresh.className = view.strip;
+      fresh.className = styles.strip;
       fresh.style.setProperty("--n", char);
       for (const n of DIGITS) {
         const cell = document.createElement("span");
-        cell.className = view.digit;
+        cell.className = styles.digit;
         cell.textContent = n;
         fresh.append(cell);
       }
@@ -239,7 +240,7 @@ class TableNumbers extends HTMLElement {
         }
         if (hot !== at) return;
         flash = document.createElement("i");
-        flash.className = view.flash;
+        flash.className = styles.flash;
         flash.setAttribute("aria-hidden", "true");
         cell.prepend(flash);
       });

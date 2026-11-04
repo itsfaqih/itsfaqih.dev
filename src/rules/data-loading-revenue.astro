@@ -1,7 +1,7 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import { money, REVENUE } from "./data-loading";
-import { styles, view } from "./data-loading.styles";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
 
 type Props = {
   /** Keep the old value on screen while refetching, instead of blanking it. */
@@ -11,22 +11,22 @@ type Props = {
 const { swr = false } = Astro.props;
 ---
 
-<data-loading-revenue {...stylex.attrs(styles.view)} data-swr={swr ? "" : undefined}
-  ><div {...stylex.attrs(styles.card)}
-    ><div {...stylex.attrs(styles.head)}
+<data-loading-revenue class={styles.view} data-swr={swr ? "" : undefined}
+  ><div class={styles.card}
+    ><div class={styles.head}
       ><span>Revenue, this week</span><span
-        {...stylex.attrs(styles.status)}
+        class={styles.status}
         aria-live="polite"
         data-part="status">Updated 5 min ago</span
       ></div
-    ><div {...stylex.attrs(styles.figure)} data-part="figure"
+    ><div class={styles.figure} data-part="figure"
       ><b class={view.amount(false)}>{money(REVENUE[0] ?? 0)}</b><span
         class={view.sub(false)}
         data-part="sub">12% over last week</span
       ></div
     ></div
-  ><div {...stylex.attrs(styles.ctl)}
-    ><span {...stylex.attrs(styles.note)}>Refetch takes 900ms</span><button
+  ><div class={styles.ctl}
+    ><span class={styles.note}>Refetch takes 900ms</span><button
       data-hint="true"
       type="button"
       class={view.ctlButton}

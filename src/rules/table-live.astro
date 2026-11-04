@@ -1,23 +1,23 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
-import { arcade } from "../components/arcade";
-import { host } from "./rule-landing.styles";
-import { styles, view } from "./table-design.styles";
+import { arcade } from "../components/arcade.css";
+import { host } from "./rule-landing.css";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
 ---
 
-<table-live {...stylex.attrs(host.contents)}>
-  <button type="button" {...stylex.attrs(styles.live, styles.ring)} aria-pressed="false"
+<table-live class={host.contents}>
+  <button type="button" class:list={[styles.live, styles.ring]} aria-pressed="false"
     ><span class={view.dot(true)} aria-hidden="true"></span>Live<Icon
       name="Pause"
       size="1em"
       weight="bold"
       aria-hidden="true"
-      {...stylex.attrs(styles.liveIcon)}
-    /><span {...stylex.attrs(arcade.srOnly)}>, pause updates</span></button
+      class={styles.liveIcon}
+    /><span class={arcade.srOnly}>, pause updates</span></button
   >
   <template data-part="play"
-    ><Icon name="Play" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(styles.liveIcon)} /></template
+    ><Icon name="Play" size="1em" weight="bold" aria-hidden="true" class={styles.liveIcon} /></template
   >
 </table-live>
 

@@ -1,15 +1,15 @@
-/* The only global CSS. Components style themselves with StyleX; what is left here is what StyleX
-   cannot express, each rule with its reason. */
-/* Global: @font-face has no StyleX form. */
+/* The only global CSS. Components style themselves with vanilla-extract; what is left here is what
+   a class cannot express, each rule with its reason. */
+/* Global: @font-face belongs to the whole document. */
 @import "./fonts.css";
 /* Global: Lenis styles its own markup and the html classes it sets. */
-@import "lenis/dist/lenis.css";
+@import "lenis/dist/lenis.css" layer(global);
 /* Global: html-level rules, view transitions and the reduced-motion blanket. */
 @import "./arcade.css";
 
 /* Global: no class reaches every button. A press is never a text selection, so a button's label,
    and everything inside it, stays unselectable; links styled as buttons or cards opt in with
-   userSelect in their own StyleX. Layered so a component can still allow selection. */
+   userSelect in their own style. Layered so a component can still allow selection. */
 @layer base {
   :is(
     button,

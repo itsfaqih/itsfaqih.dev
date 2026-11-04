@@ -1,5 +1,5 @@
 import { openSync } from "fontkit";
-import { TITLE_MARK_INSET, TITLE_TRACKING } from "./rule-landing.styles";
+import { TITLE_MARK_INSET, TITLE_TRACKING } from "./rule-landing.css";
 
 // The static cut of the weight shell.title is set at. fontkit can't vary the woff2 the page loads.
 const font = openSync("scripts/og/fonts/unbounded-900.ttf");

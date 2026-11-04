@@ -1,5 +1,4 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Code from "./code.astro";
 import {
   DAY,
@@ -20,8 +19,8 @@ import {
   utcIso,
   wallOf,
 } from "./handling-timestamps";
-import { quiz, styles } from "./handling-timestamps.styles";
-import { quizKit } from "./rule-landing.styles";
+import { quiz, styles } from "./handling-timestamps.css";
+import { quizKit } from "./rule-landing.css";
 import LessonText from "./lesson-text.astro";
 import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
@@ -73,7 +72,7 @@ const lanes = [
     >Keep one moment as one value until it reaches the screen of Rina in Jakarta (UTC+7) or Sam in New York (UTC−5).</Fragment
   >
 
-  <RuleLesson lesson={store} costsStyle={styles.costs}>
+  <RuleLesson lesson={store} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores each writer's local time, so one moment becomes two values. Store UTC to keep it one.</Fragment
     >
@@ -85,19 +84,19 @@ const lanes = [
   </RuleLesson>
   <RuleQuiz n={1} level={store.levels[0]}
     >Rina in Jakarta and Sam in New York order in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.
-    <div slot="board" {...stylex.attrs(quizKit.stack)}>
+    <div slot="board" class={quizKit.stack}>
       {
         tables.map(([id, caption, rows]) => (
           <QuizChoice level={store.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(quiz.table)}
-                ><span {...stylex.attrs(styles.th, quiz.head)}>id</span><span {...stylex.attrs(styles.th, quiz.head)}
+            ><span class={quiz.table}
+                ><span class:list={[styles.th, quiz.head]}>id</span><span class:list={[styles.th, quiz.head]}
                   >by</span
-                ><span {...stylex.attrs(styles.th, quiz.head)}>created_at</span>{
+                ><span class:list={[styles.th, quiz.head]}>created_at</span>{
                   rows.map((row) => (
                     <Fragment
-                      ><span {...stylex.attrs(styles.td, quiz.cell)}>{row.id}</span><span
-                        {...stylex.attrs(styles.td, quiz.cell)}>{row.by.who}</span
-                      ><span {...stylex.attrs(styles.td, quiz.cell)}>{digits(row.at).replace("T", " ")}</span></Fragment
+                      ><span class:list={[styles.td, quiz.cell]}>{row.id}</span><span
+                        class:list={[styles.td, quiz.cell]}>{row.by.who}</span
+                      ><span class:list={[styles.td, quiz.cell]}>{digits(row.at).replace("T", " ")}</span></Fragment
                     >
                   ))
                 }</span
@@ -108,29 +107,29 @@ const lanes = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={zulu} costsStyle={styles.costs}>
+  <RuleLesson lesson={zulu} costsClass={styles.costs}>
     <Fragment slot="body"
       >An ISO string without a <Code tone="chip">Z</Code> has no zone, so each browser reads it as local time. Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code tone="chip">Z</Code> so each browser converts it to its own zone.</Fragment
     >
-    <div slot="bad" {...stylex.attrs(styles.view)}>
+    <div slot="bad" class={styles.view}>
       <TsWire lines={responseLines("bad")} />
       <TsReaders readings={NO_Z} utc={MOMENT} />
     </div>
-    <div slot="good" {...stylex.attrs(styles.view)}>
+    <div slot="good" class={styles.view}>
       <TsWire lines={responseLines("good")} />
       <TsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
   <RuleQuiz n={2} level={zulu.levels[0]}
     >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Pick the response that gets him there.
-    <div slot="board" {...stylex.attrs(quizKit.stack)}>
+    <div slot="board" class={quizKit.stack}>
       {
         responses.map(([id, caption, value]) => (
           <QuizChoice level={zulu.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(styles.wire)}
-                ><span {...stylex.attrs(styles.line, quiz.line)}>GET /orders/42</span><span
-                  {...stylex.attrs(styles.line, quiz.line)}
-                  >{'{ "createdAt": '}<span {...stylex.attrs(quiz.str)}>"{value}"</span>{" }"}</span
+            ><span class={styles.wire}
+                ><span class:list={[styles.line, quiz.line]}>GET /orders/42</span><span
+                  class:list={[styles.line, quiz.line]}
+                  >{'{ "createdAt": '}<span class={quiz.str}>"{value}"</span>{" }"}</span
                 ></span
               ></QuizChoice
           >
@@ -139,15 +138,15 @@ const lanes = [
     </div>
   </RuleQuiz>
 
-  <RuleLesson lesson={local} costsStyle={styles.costs}>
+  <RuleLesson lesson={local} costsClass={styles.costs}>
     <Fragment slot="body"
       >The server knows its own time zone, not the reader's, so a time it formats is right only where it runs. Send UTC and let each browser format it.</Fragment
     >
-    <div slot="bad" {...stylex.attrs(styles.view)}>
+    <div slot="bad" class={styles.view}>
       <TsWire lines={formatLines("bad")} />
       <TsReaders readings={SERVER_TIME} utc={MOMENT} />
     </div>
-    <div slot="good" {...stylex.attrs(styles.view)}>
+    <div slot="good" class={styles.view}>
       <TsWire lines={formatLines("good")} />
       <TsReaders readings={RIGHT} utc={MOMENT} />
     </div>
@@ -156,7 +155,7 @@ const lanes = [
     >The order is stored as <Code tone="prompt">2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam 1:00 AM. Place the formatting.</RuleQuiz
   >
 
-  <RuleLesson lesson={input} costsStyle={styles.costs}>
+  <RuleLesson lesson={input} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina sets a reminder for 7:00 AM. From <Code tone="chip">2026-01-01T07:00:00</Code> the server can't tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code tone="chip">Z</Code>, or the local time with its offset. Both name one moment.</Fragment
     >
@@ -170,7 +169,7 @@ const lanes = [
     >Rina's browser has her 7:00 AM and its <Code tone="prompt">+07:00</Code> offset. Place the offset.</RuleQuiz
   >
 
-  <RuleLesson lesson={filter} costsStyle={styles.costs}>
+  <RuleLesson lesson={filter} costsClass={styles.costs}>
     <Fragment slot="body"
       >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs 07:00 to 07:00 her time, so orders before 07:00 go missing and the next morning's show up.</Fragment
     >
@@ -179,28 +178,28 @@ const lanes = [
   </RuleLesson>
   <RuleQuiz n={6} level={filter.levels[0]}
     >Three filters for Jan 10 each need a start. Tap the Jan 10 that starts at 17:00 UTC on Jan 9.
-    <div slot="board" {...stylex.attrs(quiz.screen)}>
+    <div slot="board" class={quiz.screen}>
       {
         lanes.map(([id, who, where, start]) => (
           <QuizChoice level={filter.levels[0]} id={id} look="spot"
-            ><span {...stylex.attrs(quiz.lane)}
-              ><span {...stylex.attrs(quiz.who)}
-                >{who}<span {...stylex.attrs(quiz.where)}>{where}</span></span
-              ><span {...stylex.attrs(quiz.track)}
-                ><span style={along(start)} {...stylex.attrs(quiz.day)}>Jan 10</span><span
+            ><span class={quiz.lane}
+              ><span class={quiz.who}
+                >{who}<span class={quiz.where}>{where}</span></span
+              ><span class={quiz.track}
+                ><span style={along(start)} class={quiz.day}>Jan 10</span><span
                   style={along(day)}
-                  {...stylex.attrs(quiz.mark)}></span
+                  class={quiz.mark}></span
                 ></span
               ></span
             ></QuizChoice
           >
         ))
       }
-      <span {...stylex.attrs(quiz.lane, quiz.rule)}
-        ><span {...stylex.attrs(quiz.axisWho)}>UTC</span><span {...stylex.attrs(quiz.ticks)}
-          ><span style={along(day)} {...stylex.attrs(quiz.tick)}>Jan 10, 00:00</span><span
+      <span class:list={[quiz.lane, quiz.rule]}
+        ><span class={quiz.axisWho}>UTC</span><span class={quiz.ticks}
+          ><span style={along(day)} class={quiz.tick}>Jan 10, 00:00</span><span
             style={along(day + DAY)}
-            {...stylex.attrs(quiz.tick)}>Jan 11, 00:00</span
+            class={quiz.tick}>Jan 11, 00:00</span
           ></span
         ></span
       >

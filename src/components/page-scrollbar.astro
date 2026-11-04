@@ -1,10 +1,10 @@
 ---
-import * as stylex from "@stylexjs/stylex";
-import { marker, styles } from "./page-scrollbar.styles";
+import { marker } from "../when";
+import { styles } from "./page-scrollbar.css";
 ---
 
-<page-scrollbar {...stylex.attrs(styles.track, marker)} aria-hidden="true"
-  ><div data-part="thumb" {...stylex.attrs(styles.thumb)}></div></page-scrollbar
+<page-scrollbar class:list={[styles.track, marker]} aria-hidden="true"
+  ><div data-part="thumb" class={styles.thumb}></div></page-scrollbar
 >
 
 <script>

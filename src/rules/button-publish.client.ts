@@ -1,4 +1,4 @@
-import { TAKEN, view } from "./button-design.styles";
+import { TAKEN, view } from "./button-design.view";
 
 /**
  * The post form (button-publish.astro). Publish is off while the URL is empty or taken. The faded

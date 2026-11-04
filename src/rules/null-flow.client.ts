@@ -1,3 +1,4 @@
+import { styles } from "./null-vs-undefined.css";
 import { reducedMotion } from "../hooks/media-query";
 import {
   arrived,
@@ -8,8 +9,8 @@ import {
   type Row,
   type Way,
 } from "./null-vs-undefined";
-import { flowView, KINDS, paint } from "./null-vs-undefined.styles";
-import { TABBED } from "./rule-landing.styles";
+import { flowView, KINDS, paint } from "./null-vs-undefined.view";
+import { TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SEND_MS = 460;
@@ -85,11 +86,11 @@ class NullFlow extends HTMLElement {
       const body = JSON.stringify(demo.body(way, title));
       if (wireKey !== `w${runs}`) {
         wireKey = `w${runs}`;
-        const fresh = el("div", flowView.wire);
+        const fresh = el("div", styles.wire);
         fresh.dataset.part = "wire";
         const packet = el("i", "");
         packet.setAttribute("aria-hidden", "true");
-        fresh.append(el("span", flowView.verb, "PATCH /tasks/12"), el("span", ""), packet);
+        fresh.append(el("span", styles.verb, "PATCH /tasks/12"), el("span", ""), packet);
         wire.replaceWith(fresh);
         wire = fresh;
         json = "";
@@ -97,8 +98,8 @@ class NullFlow extends HTMLElement {
       const middle = wire.children[1]!;
       const packet = wire.lastElementChild!;
       if (phase === "idle") {
-        if (middle.tagName !== "SPAN" || middle.className !== flowView.idle)
-          middle.replaceWith(el("span", flowView.idle, "not sent yet"));
+        if (middle.tagName !== "SPAN" || middle.className !== styles.idle)
+          middle.replaceWith(el("span", styles.idle, "not sent yet"));
         json = "";
       } else {
         let code: Element = middle;
@@ -123,7 +124,7 @@ class NullFlow extends HTMLElement {
       const after = { ...demo.before, ...arrived(demo.body(way, title)) };
       const row: Row = phase === "done" ? after : demo.before;
       const ran = runs > 0;
-      const fresh = el("dl", flowView.record);
+      const fresh = el("dl", styles.record);
       fresh.dataset.part = "record";
       demo.fields.forEach((field, index) => {
         const verdict =
@@ -135,7 +136,7 @@ class NullFlow extends HTMLElement {
         const dd = el("dd", flowView.value(bad, ran && phase === "done"));
         if (value === null) dd.append(el("span", flowView.nul(bad), "null"));
         else if (value !== undefined) dd.textContent = value;
-        cell.append(el("dt", flowView.name, field), dd);
+        cell.append(el("dt", styles.name, field), dd);
         if (verdict) cell.append(el("span", flowView.tag(verdict), verdict));
         fresh.append(cell);
       });

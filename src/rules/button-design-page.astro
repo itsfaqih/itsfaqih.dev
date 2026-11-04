@@ -1,9 +1,8 @@
 ---
-import * as stylex from "@stylexjs/stylex";
 import Icon from "../components/icon.astro";
 import { LESSONS, TLDR } from "./button-design";
-import { quiz, styles } from "./button-design.styles";
-import { quizKit } from "./rule-landing.styles";
+import { quiz, styles } from "./button-design.css";
+import { quizKit } from "./rule-landing.css";
 import ButtonDelete from "./button-delete.astro";
 import ButtonHierarchy from "./button-hierarchy.astro";
 import ButtonIcons from "./button-icons.astro";
@@ -40,15 +39,15 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={1} level={states.levels[0]}
     >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Save</b>. Pick the Save that shows her where she is.
-    <div slot="board" {...stylex.attrs(quizKit.trio)}>
+    <div slot="board" class={quizKit.trio}>
       <QuizChoice level={states.levels[0]} id="hover" caption="Changes on hover"
-        ><span {...stylex.attrs(quiz.mock)}><span {...stylex.attrs(key, styles.hover)}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.hover]}>Save</span></span></QuizChoice
       >
       <QuizChoice level={states.levels[0]} id="press" caption="Changes on press"
-        ><span {...stylex.attrs(quiz.mock)}><span {...stylex.attrs(key, styles.press)}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.press]}>Save</span></span></QuizChoice
       >
       <QuizChoice level={states.levels[0]} id="focus" caption="Changes on focus"
-        ><span {...stylex.attrs(quiz.mock)}><span {...stylex.attrs(key, styles.focus)}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.focus]}>Save</span></span></QuizChoice
       >
     </div>
   </RuleQuiz>
@@ -62,17 +61,17 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={2} level={disabled.levels[0]}
     >Publish stays off because an older post already uses this URL. Nothing else on screen says so. Pick how Publish looks when someone hovers it.
-    <div slot="board" {...stylex.attrs(quizKit.trio)}>
+    <div slot="board" class={quizKit.trio}>
       <QuizChoice level={disabled.levels[0]} id="fade" caption="Faded to 40%"
-        ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(key, styles.faded)}>Publish</span></span></QuizChoice
+        ><span class:list={[quiz.mock, quiz.tipRoom]}><span class:list={[key, styles.faded]}>Publish</span></span></QuizChoice
       >
       <QuizChoice level={disabled.levels[0]} id="hide" caption="Hidden until it works"
-        ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}><span {...stylex.attrs(quiz.hiddenSlot)}></span></span></QuizChoice
+        ><span class:list={[quiz.mock, quiz.tipRoom]}><span class={quiz.hiddenSlot}></span></span></QuizChoice
       >
       <QuizChoice level={disabled.levels[0]} id="say" caption="Readable, says why"
-        ><span {...stylex.attrs(quiz.mock, quiz.tipRoom)}
-          ><span {...stylex.attrs(styles.tip)}
-            ><span {...stylex.attrs(key, styles.off)}>Publish</span><span {...stylex.attrs(styles.tooltip, styles.tooltipOpen)}
+        ><span class:list={[quiz.mock, quiz.tipRoom]}
+          ><span class={styles.tip}
+            ><span class:list={[key, styles.off]}>Publish</span><span class:list={[styles.tooltip, styles.tooltipOpen]}
               >That URL is taken</span
             ></span
           ></span
@@ -90,19 +89,19 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={3} level={still.levels[0]}
     >A pager sits on page 1 of 5, so <b>Previous</b> is disabled. Tap the control that should light up on hover.
-    <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <span {...stylex.attrs(styles.small)}>Page 1 of 5</span>
-      <span {...stylex.attrs(quiz.bar)}>
+    <div slot="board" class={quiz.screen}>
+      <span class={styles.small}>Page 1 of 5</span>
+      <span class={quiz.bar}>
         <QuizChoice level={still.levels[0]} id="prev" look="spot"
-          ><span {...stylex.attrs(key, quiz.pageKey, styles.off)}>Previous</span></QuizChoice
+          ><span class:list={[key, quiz.pageKey, styles.off]}>Previous</span></QuizChoice
         >
         <QuizChoice level={still.levels[0]} id="current" look="spot"
-          ><span {...stylex.attrs(key, quiz.pageKey, styles.tint)}>1</span></QuizChoice
+          ><span class:list={[key, quiz.pageKey, styles.tint]}>1</span></QuizChoice
         >
-        <span {...stylex.attrs(key, quiz.pageKey, styles.text)}>2</span>
-        <span {...stylex.attrs(key, quiz.pageKey, styles.text)}>3</span>
+        <span class:list={[key, quiz.pageKey, styles.text]}>2</span>
+        <span class:list={[key, quiz.pageKey, styles.text]}>3</span>
         <QuizChoice level={still.levels[0]} id="next" look="spot"
-          ><span {...stylex.attrs(key, quiz.pageKey, styles.plain)}>Next</span></QuizChoice
+          ><span class:list={[key, quiz.pageKey, styles.plain]}>Next</span></QuizChoice
         >
       </span>
     </div>
@@ -118,7 +117,7 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={4} level={hierarchy.levels[0]}
     >A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted. Pick the footer where <b>Checkout</b> reads as the next step.
-    <div slot="board" {...stylex.attrs(quizKit.stack)}>
+    <div slot="board" class={quizKit.stack}>
       {
         (
           [
@@ -128,10 +127,10 @@ const key = [styles.key, styles.sm, styles.flat];
           ] as const
         ).map(([id, caption, look]) => (
           <QuizChoice level={hierarchy.levels[0]} id={id} caption={caption}
-            ><span {...stylex.attrs(quiz.mock, quiz.end)}
-              ><span {...stylex.attrs(key, styles.text)}>Continue shopping</span><span {...stylex.attrs(key, styles.tint)}
+            ><span class:list={[quiz.mock, quiz.end]}
+              ><span class:list={[key, styles.text]}>Continue shopping</span><span class:list={[key, styles.tint]}
                 >Edit cart</span
-              ><span {...stylex.attrs(key, look)}>Checkout</span></span
+              ><span class:list={[key, look]}>Checkout</span></span
             ></QuizChoice
           >
         ))
@@ -148,18 +147,18 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={5} level={guard.levels[0]}
     >A project page has three actions. Tap the one a stray click would make you regret, so it asks first.
-    <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <span {...stylex.attrs(styles.cardTitle)}>Atlas</span>
-      <span {...stylex.attrs(styles.cardSub)}>214 files, edited 2 hours ago</span>
-      <span {...stylex.attrs(quiz.bar)}>
+    <div slot="board" class={quiz.screen}>
+      <span class={styles.cardTitle}>Atlas</span>
+      <span class={styles.cardSub}>214 files, edited 2 hours ago</span>
+      <span class={quiz.bar}>
         <QuizChoice level={guard.levels[0]} id="rename" look="spot"
-          ><span {...stylex.attrs(key, styles.plain)}>Rename</span></QuizChoice
+          ><span class:list={[key, styles.plain]}>Rename</span></QuizChoice
         >
         <QuizChoice level={guard.levels[0]} id="archive" look="spot"
-          ><span {...stylex.attrs(key, styles.plain)}>Archive</span></QuizChoice
+          ><span class:list={[key, styles.plain]}>Archive</span></QuizChoice
         >
         <QuizChoice level={guard.levels[0]} id="delete" look="spot"
-          ><span {...stylex.attrs(key, styles.red)}>Delete</span></QuizChoice
+          ><span class:list={[key, styles.red]}>Delete</span></QuizChoice
         >
       </span>
     </div>
@@ -175,26 +174,26 @@ const key = [styles.key, styles.sm, styles.flat];
   </RuleLesson>
   <RuleQuiz n={6} level={icons.levels[0]}
     >Every button in this toolbar has 16px of padding on both sides. Tap the one that will look lopsided.
-    <div slot="board" {...stylex.attrs(quiz.screen)}>
-      <span {...stylex.attrs(quiz.bar)}>
+    <div slot="board" class={quiz.screen}>
+      <span class={quiz.bar}>
         <QuizChoice level={icons.levels[0]} id="text" look="spot"
-          ><span {...stylex.attrs(quiz.ruled)}
-            ><span {...stylex.attrs(key, styles.plain, styles.even)}>Save<Ruler pads={[16, 16]} /></span></span
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.even]}>Save<Ruler pads={[16, 16]} /></span></span
           ></QuizChoice
         >
         <QuizChoice level={icons.levels[0]} id="lead" look="spot"
-          ><span {...stylex.attrs(quiz.ruled)}
-            ><span {...stylex.attrs(key, styles.tint, styles.even)}
-              ><Icon name="Plus" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(styles.icon)} />New project<Ruler
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.tint, styles.even]}
+              ><Icon name="Plus" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />New project<Ruler
                 pads={[16, 16]}
               /></span
             ></span
           ></QuizChoice
         >
         <QuizChoice level={icons.levels[0]} id="only" look="spot"
-          ><span {...stylex.attrs(quiz.ruled)}
-            ><span {...stylex.attrs(key, styles.plain, styles.even)}
-              ><Icon name="MagnifyingGlass" size="1em" weight="bold" aria-hidden="true" {...stylex.attrs(styles.icon)} /><Ruler
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.even]}
+              ><Icon name="MagnifyingGlass" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler
                 pads={[16, 16]}
               /></span
             ></span
