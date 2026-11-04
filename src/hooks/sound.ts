@@ -13,8 +13,7 @@ export type Cue =
   | "error"
   | "lift"
   | "place"
-  | "flicker"
-  | "buzz";
+  | "flicker";
 
 /**
  * Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. A cue with a `gap`
@@ -35,8 +34,6 @@ const CUES: Record<Cue, { gain: number; gap?: number }> = {
   lift: { gain: 0.35 },
   place: { gain: 0.2 },
   flicker: { gain: 0.12 },
-  // A fast scroll brings in batch after batch of cut-ins; one buzz covers a burst of them.
-  buzz: { gain: 0.15, gap: 300 },
 };
 // Past this a cue still decoding is dropped: a late sound reads as lag.
 const LATE_MS = 150;
