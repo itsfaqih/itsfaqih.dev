@@ -52,7 +52,16 @@ const optionNames = (page: Page, group: string) =>
 const selectedOption = (page: Page) =>
   page
     .getByRole("option", { selected: true })
-    .evaluateAll((options) => options.map((option) => option.querySelector(".cmdk-name")?.textContent));
+    .evaluateAll((options) =>
+      options.map((option) => option.querySelector(".cmdk-name")?.textContent),
+    );
+const listedOptions = (page: Page) =>
+  page
+    .getByRole("listbox")
+    .getByRole("option")
+    .evaluateAll((options) =>
+      options.map((option) => option.querySelector(".cmdk-name")?.textContent),
+    );
 const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
 
 describe("the command palette", () => {
@@ -83,13 +92,7 @@ describe("the command palette", () => {
   it("finds every rule, home section and footer link from the root search", async () => {
     const page = await openPalette();
     const input = page.getByRole("combobox");
-    const listed = () =>
-      page
-        .getByRole("listbox")
-        .getByRole("option")
-        .evaluateAll((options) =>
-          options.map((option) => option.querySelector(".cmdk-name")?.textContent),
-        );
+    const listed = () => listedOptions(page);
     const unfiltered = ["Home", "Rule of Thumb", "GitHub", "LinkedIn", "Copy Email"];
 
     expect(await listed()).toEqual(unfiltered);
@@ -111,6 +114,27 @@ describe("the command palette", () => {
     expect(pathname(page)).toBe("/rule-of-thumb/button-design");
   });
 
+  it("answers similar words with every way to reach me, the exact word first", async () => {
+    const page = await openPalette();
+    const input = page.getByRole("combobox");
+    const listed = () => listedOptions(page);
+    const reach = ["Connect", "LinkedIn", "Copy Email"];
+
+    await input.pressSequentially("connect");
+    await expect.poll(listed).toEqual(reach);
+    await expect.poll(() => selectedOption(page)).toEqual(["Connect"]);
+
+    await input.fill("");
+    await input.pressSequentially("contact");
+    await expect.poll(listed).toEqual(reach);
+    await expect.poll(() => selectedOption(page)).toEqual(["Connect"]);
+
+    await input.fill("");
+    await input.pressSequentially("email");
+    await expect.poll(async () => (await listed())[0]).toBe("Copy Email");
+    await expect.poll(() => selectedOption(page)).toEqual(["Copy Email"]);
+  });
+
   it("wraps the highlight and runs the highlighted command on Enter", async () => {
     const page = await openPalette();
 
@@ -119,7 +143,10 @@ describe("the command palette", () => {
     await page.keyboard.press("ArrowDown");
     expect(await selectedOption(page)).toEqual(["Home"]);
 
-    await Promise.all([page.waitForURL((url) => url.pathname === "/"), page.keyboard.press("Enter")]);
+    await Promise.all([
+      page.waitForURL((url) => url.pathname === "/"),
+      page.keyboard.press("Enter"),
+    ]);
     expect(pathname(page)).toBe("/");
   });
 

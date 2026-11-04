@@ -16,6 +16,24 @@ const box = (stage: HTMLElement, name: string, rect: DOMRect) => {
   stage.style.setProperty(`--${name}-h`, `${rect.height}px`);
 };
 
+/**
+ * How well a query hits a command's search text, its label on the first line. Lower ranks first and
+ * -1 misses: the label beats the rest, and a whole word beats the start of one.
+ */
+function searchRank(text: string, needle: string) {
+  const [label, ...rest] = text.split("\n");
+  const others = rest.join(" ");
+  const wholeWord = (words: string) => ` ${words} `.includes(` ${needle} `);
+  const wordStart = (words: string) => ` ${words}`.includes(` ${needle}`);
+  return [
+    wholeWord(label!),
+    wordStart(label!),
+    wholeWord(others),
+    wordStart(others),
+    text.includes(needle),
+  ].indexOf(true);
+}
+
 // One level's server-rendered parts. Its groups and options are kept here while filtered out of the DOM.
 const readLevel = (element: HTMLElement) => ({
   element,
@@ -83,16 +101,29 @@ class CommandPalette extends HTMLElement {
 
     const render = () => {
       const current = levels[level]!;
-      const all = !query.trim();
-      const needle = query.toLowerCase();
+      const needle = query.trim().toLowerCase();
+      const rankOf = (option: HTMLElement) =>
+        needle
+          ? searchRank(option.dataset.search!, needle)
+          : option.dataset.searchOnly === undefined
+            ? 0
+            : -1;
+      const hits = current.groups
+        .map((group) => ({
+          group,
+          options: group.options
+            .map((option) => ({ option, rank: rankOf(option) }))
+            .filter(({ rank }) => rank >= 0)
+            .sort((a, b) => a.rank - b.rank),
+        }))
+        .filter(({ options }) => options.length > 0)
+        .sort((a, b) => a.options[0]!.rank - b.options[0]!.rank);
       flat = [];
-      const groups = current.groups.filter((group) => {
-        const matches = group.options.filter((option) =>
-          all ? option.dataset.searchOnly === undefined : option.dataset.search!.includes(needle),
-        );
+      const groups = hits.map(({ group, options }) => {
+        const matches = options.map(({ option }) => option);
         group.element.replaceChildren(group.label, ...matches);
         flat.push(...matches);
-        return matches.length > 0;
+        return group;
       });
       groups.forEach((group, index) => {
         const later = view.group(index > 0);

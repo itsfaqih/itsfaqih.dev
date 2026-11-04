@@ -23,6 +23,9 @@ const PHOSPHOR = [
   "MediumLogo",
 ] as const;
 
+// Whichever word someone reaches for, every way to reach me answers it.
+const REACH_WORDS = ["contact", "connect", "reach out", "get in touch", "talk", "message", "hire"];
+
 type Command = {
   id: string;
   label: string;
@@ -108,11 +111,11 @@ const levels: { id: string; groups: Group[] }[] = [
               ]
             : []),
           {
-            id: "contact",
-            label: "Contact",
+            id: "connect",
+            label: "Connect",
             description: "Get in touch",
             icon: "ChatCircle",
-            keywords: ["connect", "hire", "reach out", "email"],
+            keywords: [...REACH_WORDS, "email"],
             href: "/#contact",
             searchOnly: true,
           },
@@ -143,7 +146,7 @@ const levels: { id: string; groups: Group[] }[] = [
             label: "LinkedIn",
             description: "Open LinkedIn profile in new tab",
             icon: "LinkedinLogo",
-            keywords: ["profile", "professional", "connect", "network"],
+            keywords: ["profile", "professional", "network", ...REACH_WORDS],
             external: LINKS.linkedin,
           },
           {
@@ -175,7 +178,7 @@ const levels: { id: string; groups: Group[] }[] = [
             label: "Copy Email",
             description: `Copy ${LINKS.email} to clipboard`,
             icon: "Envelope",
-            keywords: ["email", "contact", "mail", "clipboard"],
+            keywords: ["email", "mail", "clipboard", ...REACH_WORDS],
             copy: LINKS.email,
           },
         ],
