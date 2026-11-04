@@ -6,6 +6,7 @@ import { quizKit } from "./rule-landing.css";
 import ButtonHierarchy from "./button-hierarchy.astro";
 import ButtonIcons from "./button-icons.astro";
 import ButtonStates from "./button-states.astro";
+import ButtonCursor from "./button-cursor.astro";
 import ButtonStill from "./button-still.astro";
 import ButtonToggle from "./button-toggle.astro";
 import Kbd from "./kbd.astro";
@@ -58,22 +59,31 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonStill slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={2} level={still.levels[0]}
-    >A pager sits on page 1 of 5, so <b>Previous</b> is disabled. Tap the control that should light up on hover.
-    <div slot="board" class={quiz.screen}>
-      <span class={styles.small}>Page 1 of 5</span>
-      <span class={quiz.bar}>
-        <QuizChoice level={still.levels[0]} id="prev" look="spot"
-          ><span class:list={[key, quiz.pageKey, styles.off]}>Previous</span></QuizChoice
-        >
-        <QuizChoice level={still.levels[0]} id="current" look="spot"
-          ><span class:list={[key, quiz.pageKey, styles.tint]}>1</span></QuizChoice
-        >
-        <span class:list={[key, quiz.pageKey, styles.text]}>2</span>
-        <span class:list={[key, quiz.pageKey, styles.text]}>3</span>
-        <QuizChoice level={still.levels[0]} id="next" look="spot"
-          ><span class:list={[key, quiz.pageKey, styles.plain]}>Next</span></QuizChoice
-        >
-      </span>
+    ><b>Pay</b> stays off until Ana adds a card. She hovers it. Pick what she should see.
+    <div slot="board" class={quizKit.trio}>
+      <QuizChoice level={still.levels[0]} id="hand" caption="Lights up, hand cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.plain, quiz.lit]}>Pay $48</span><ButtonCursor kind="hand" /></span
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={still.levels[0]} id="mixed" caption="Lights up, no‑entry cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.off, quiz.lit]}>Pay $48</span><ButtonCursor
+              kind="forbid"
+            /></span
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={still.levels[0]} id="still" caption="Stays put, no‑entry cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.off]}>Pay $48</span><ButtonCursor kind="forbid" /></span
+          ></span
+        ></QuizChoice
+      >
     </div>
   </RuleQuiz>
 

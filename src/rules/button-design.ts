@@ -47,23 +47,23 @@ export const LESSONS: Lesson[] = [
     },
     levels: [
       {
-        name: "Page 1 of 5",
-        answer: "next",
+        name: "Pay, before a card",
+        answer: "still",
         choices: [
           {
-            id: "prev",
-            label: "Previous, disabled",
-            note: "There's no page before 1. Lighting it up invites a click that does nothing.",
+            id: "hand",
+            label: "Lights up, hand cursor",
+            note: "Everything says press. She clicks, and nothing happens.",
           },
           {
-            id: "current",
-            label: "1, the current page",
-            note: "They're already on page 1, so a click there goes nowhere either.",
+            id: "mixed",
+            label: "Lights up, no-entry cursor",
+            note: "The colour says yes while the cursor says no. People believe the colour and click anyway.",
           },
           {
-            id: "next",
-            label: "Next",
-            note: "Next can act, so it lights up. The disabled one stays still, and the difference shows which works.",
+            id: "still",
+            label: "Stays put, no-entry cursor",
+            note: "Nothing moves, and the cursor says no. The button agrees with itself, so nobody clicks for nothing.",
           },
         ],
       },
