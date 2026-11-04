@@ -66,6 +66,8 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
     <script>
       import "../components/favicon-cycle";
       import "../components/smooth-scroll";
+      import { voiceControls } from "../hooks/sound";
+      voiceControls();
     </script>
   </body>
 </html>
