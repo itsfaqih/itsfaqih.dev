@@ -5,25 +5,19 @@ import { marker } from "../when";
 type Props = { careful?: boolean };
 
 const { careful = false } = Astro.props;
-const tipId = `still-tip-${careful ? "good" : "bad"}`;
 ---
 
 <div class={styles.stage}>
   <div class={styles.steps}>
-    <span class={styles.tip}
-      ><button
-        data-hint="true"
-        type="button"
-        class:list={[styles.key,
-          styles.sm,
-          careful ? styles.plain : [styles.plainFace, styles.live],
-          styles.off,
-          marker]}
-        aria-disabled="true"
-        aria-describedby={tipId}>Back</button
-      ><span role="tooltip" id={tipId} class={styles.tooltip}
-        >This is the first step</span
-      ></span
+    <button
+      data-hint="true"
+      type="button"
+      class:list={[styles.key,
+        styles.sm,
+        careful ? styles.plain : [styles.plainFace, styles.live],
+        styles.off,
+        marker]}
+      aria-disabled="true">Back</button
     >
     <button type="button" class:list={[styles.key, styles.sm, styles.live]}>Next</button>
   </div>

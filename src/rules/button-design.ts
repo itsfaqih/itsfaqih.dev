@@ -43,7 +43,7 @@ export const LESSONS: Lesson[] = [
     },
     good: {
       label: "Stays still",
-      costs: ["0 changes on hover", "tooltip only"],
+      costs: ["0 changes on hover", "0 changes on press"],
     },
     levels: [
       {
