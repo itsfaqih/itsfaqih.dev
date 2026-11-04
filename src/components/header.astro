@@ -65,6 +65,7 @@ const glyphs = menuGlyphs(false);
         aria-label="Search the site"
         data-fluid-item="true"
         data-part="search"
+        data-sound="none"
         class:list={[styles.find, styles.ring]}
         ><Icon name="MagnifyingGlass" size={16} weight="bold" /><kbd
           class:list={[styles.findKey, styles.wideOnly]}>⌘K</kbd
@@ -74,6 +75,7 @@ const glyphs = menuGlyphs(false);
         aria-label="Switch theme"
         data-fluid-item="true"
         data-part="theme"
+        data-sound="none"
         class:list={[styles.find, styles.ring, styles.iconButton]}
         ><Icon
           name="Sun"
@@ -85,6 +87,25 @@ const glyphs = menuGlyphs(false);
           size={16}
           weight="bold"
           class:list={[styles.glyph, styles.moonInDark]}
+        /></button
+      ><button
+        type="button"
+        aria-label="Sound"
+        aria-pressed="true"
+        data-fluid-item="true"
+        data-part="sound"
+        data-sound="none"
+        class:list={[styles.find, styles.ring, styles.iconButton, styles.soundTool]}
+        ><Icon
+          name="SpeakerHigh"
+          size={16}
+          weight="bold"
+          class:list={[styles.glyph, styles.speakerWhenOff]}
+        /><Icon
+          name="SpeakerSlash"
+          size={16}
+          weight="bold"
+          class:list={[styles.glyph, styles.slashWhenOn]}
         /></button
       >
     </Seg>
@@ -99,6 +120,7 @@ const glyphs = menuGlyphs(false);
         aria-label="Open menu"
         data-fluid-item="true"
         data-part="menu"
+        data-sound="none"
         ><Icon name="List" size={16} weight="bold" class={glyphs.list} data-part="list" /><Icon
           name="X"
           size={16}

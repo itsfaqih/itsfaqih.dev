@@ -11,11 +11,11 @@ const { headings } = Astro.props;
 ---
 
 <toc-drawer class={styles.drawerHost}>
-  <button data-part="trigger" class={styles.tocButton} aria-label="Table of Contents" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="toc-drawer" data-state="closed"><Icon name="List" size={24} /></button>
+  <button data-part="trigger" data-sound="none" class={styles.tocButton} aria-label="Table of Contents" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="toc-drawer" data-state="closed"><Icon name="List" size={24} /></button>
   <template data-part="layer">
     <span data-part="guard" tabindex="0" aria-hidden="true" class={styles.guard}></span>
     <div data-part="overlay" data-state="open" class={styles.overlay}></div>
-    <dialog id="toc-drawer" data-part="content" data-state="open" aria-labelledby="toc-drawer-title" tabindex="-1" class={styles.drawer}>
+    <dialog id="toc-drawer" data-part="content" data-sound="none" data-state="open" aria-labelledby="toc-drawer-title" tabindex="-1" class={styles.drawer}>
       <div class={styles.drawerPanel}>
         <div aria-hidden="true" class={styles.handle}></div>
         <div class={styles.drawerBody}>

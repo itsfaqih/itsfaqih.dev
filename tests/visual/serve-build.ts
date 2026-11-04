@@ -16,6 +16,7 @@ const contentTypes = new Map([
   [".jpg", "image/jpeg"],
   [".webp", "image/webp"],
   [".woff2", "font/woff2"],
+  [".mp3", "audio/mpeg"],
   [".json", "application/json"],
   [".md", "text/markdown; charset=utf-8"],
   [".xml", "application/xml"],

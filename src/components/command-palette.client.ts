@@ -1,4 +1,5 @@
 import { whenIdle } from "../hooks/idle";
+import { play } from "../hooks/sound";
 import { watchBoxScrollbar } from "./box-scrollbar";
 import { ISLAND_HOME_MS, LIST_PADDING, view, type Step } from "./command-palette.view";
 import { placeHighlight } from "./fluid-hover";
@@ -214,6 +215,7 @@ class CommandPalette extends HTMLElement {
     };
 
     const enterSubmenu = () => {
+      play("enter");
       switchLevel("rule-of-thumb", "left");
       step = "in";
       highlighted = 0;
@@ -223,6 +225,7 @@ class CommandPalette extends HTMLElement {
     };
 
     const goBack = () => {
+      play("back");
       switchLevel("root", "right");
       step = "out";
       highlighted = 0;
@@ -240,15 +243,18 @@ class CommandPalette extends HTMLElement {
       const { href, external, copy, submenu } = option.dataset;
       if (submenu) enterSubmenu();
       else if (href) {
+        play("enter");
         location.assign(href);
         close();
       } else if (external) {
+        play("enter");
         window.open(external, "_blank", "noopener,noreferrer");
         close();
       } else if (copy) {
         try {
           await navigator.clipboard.writeText(copy);
           copied = true;
+          play("success");
           render();
           copiedTimer = window.setTimeout(close, 1500);
         } catch (error) {
@@ -275,6 +281,7 @@ class CommandPalette extends HTMLElement {
     const open = () => {
       if (isOpen) return;
       isOpen = true;
+      play("open");
       clearTimeout(resetTimer);
       clearTimeout(homeTimer);
       if (closing) {
@@ -365,6 +372,12 @@ class CommandPalette extends HTMLElement {
       });
     };
 
+    // Closing after an option runs stays quiet; the option already sounded.
+    const dismiss = () => {
+      if (isOpen) play("close");
+      close();
+    };
+
     const controller = new AbortController();
     const { signal } = controller;
     document.addEventListener(
@@ -374,14 +387,14 @@ class CommandPalette extends HTMLElement {
           event.preventDefault();
           // The header's search button opens the palette with a synthetic ⌘K, the only untrusted one.
           if (!event.isTrusted || !isOpen) open();
-          else close();
+          else dismiss();
         } else if (event.key === "Escape" && isOpen) {
-          close();
+          dismiss();
         }
       },
       { signal },
     );
-    backdrop.addEventListener("click", close, { signal });
+    backdrop.addEventListener("click", dismiss, { signal });
     back.addEventListener("click", goBack, { signal });
     endGuard!.addEventListener("focus", () => (crumb.inert ? input : back).focus(), { signal });
     startGuard!.addEventListener(
@@ -413,6 +426,7 @@ class CommandPalette extends HTMLElement {
             event.preventDefault();
             if (total === 0) return;
             highlighted = (highlighted + (event.key === "ArrowDown" ? 1 : total - 1)) % total;
+            if (total > 1) play("move");
             render();
             break;
           }
@@ -455,6 +469,7 @@ class CommandPalette extends HTMLElement {
         const index = option instanceof HTMLElement ? flat.indexOf(option) : -1;
         if (index < 0 || index === Math.min(highlighted, flat.length - 1)) return;
         highlighted = index;
+        play("move");
         render();
       },
       { signal },

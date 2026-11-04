@@ -4,11 +4,11 @@ import { OPENING_KEY } from "../sections/rule-open";
 export const REST_AFTER_MS = 3500;
 
 /**
- * Runs before first paint: the theme, the intro gate, the header carried across pages, the rest
- * fallback that settles the cut-ins when the islands that play them are slow to arrive, and the
- * cross-document view transitions' types. Opening a rule from its tile dives into it (rule-open);
- * leaving a rule for the index zooms back out onto its tile (rule-close); every other page change
- * fades through (page-fade).
+ * Runs before first paint: the theme, the sound toggle's glyph, the intro gate, the header carried
+ * across pages, the rest fallback that settles the cut-ins when the islands that play them are slow
+ * to arrive, and the cross-document view transitions' types. Opening a rule from its tile dives
+ * into it (rule-open); leaving a rule for the index zooms back out onto its tile (rule-close); every
+ * other page change fades through (page-fade).
  * The transition's pictures live on the new page, so the dive's origin crosses in sessionStorage.
  */
 export const HEAD_SCRIPT = String.raw`(function () {
@@ -30,6 +30,9 @@ export const HEAD_SCRIPT = String.raw`(function () {
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
     meta.media = meta.dataset.theme === theme ? "all" : "not all";
   });
+  try {
+    if (localStorage.getItem("sound") === "off") doc.classList.add("sound-off");
+  } catch (e) {}
   try {
     // The home intro plays once per session, only when the visit lands on home,
     // and never under reduced motion.

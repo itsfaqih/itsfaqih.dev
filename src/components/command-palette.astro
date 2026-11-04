@@ -215,7 +215,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
   PHOSPHOR.some((name) => name === icon);
 ---
 
-<command-palette class={styles.host}>
+<command-palette class={styles.host} data-sound="none">
   <span data-part="guard" tabindex="0" aria-hidden="true" hidden class={styles.guard}></span>
   <div
     data-pour
