@@ -5,13 +5,13 @@ import path from "node:path";
 const SOURCES = {
   tap: "click-004",
   move: "click-002",
-  open: "open-001",
-  close: "close-001",
+  open: "open-002",
+  close: "close-002",
   enter: "select-001",
   back: "back-001",
   on: "switch-on",
   off: "switch-off",
-  success: "coin-collect",
+  success: "success-chime",
   error: "error-buzz",
 };
 
