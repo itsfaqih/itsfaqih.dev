@@ -1,0 +1,30 @@
+import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
+const require = createRequire(process.cwd() + "/x.js");
+const { chromium } = require("playwright");
+const [baseDir, newDir, runs = "3"] = process.argv.slice(2);
+const sides = { base: { dir: baseDir, port: 4395 }, new: { dir: newDir, port: 4396 } };
+const browser = await chromium.launch();
+const out = { base: [], new: [] };
+const one = async (k) => {
+  const { dir, port } = sides[k];
+  const t0 = Date.now();
+  const p = spawn("vp", ["exec", "astro", "dev", "--port", String(port)], { cwd: dir, detached: true, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1" } });
+  let ready = null;
+  await new Promise((res) => { const on = (b) => { if (!ready && /ready in|Local|localhost/.test(String(b))) { ready = Date.now() - t0; res(); } }; p.stdout.on("data", on); p.stderr.on("data", on); setTimeout(res, 60000); });
+  const page = await browser.newPage();
+  const t1 = Date.now();
+  await page.goto(`http://localhost:${port}/`, { waitUntil: "load", timeout: 180000 });
+  const first = Date.now() - t1;
+  const t2 = Date.now();
+  await page.goto(`http://localhost:${port}/`, { waitUntil: "load", timeout: 180000 });
+  const second = Date.now() - t2;
+  const styled = await page.evaluate(() => [...document.styleSheets].length + [...document.querySelectorAll("style")].length);
+  await page.close();
+  try { process.kill(-p.pid, "SIGTERM"); } catch {}
+  await new Promise((res) => setTimeout(res, 800));
+  out[k].push({ ready, first, second, styled });
+};
+for (let i = 0; i < +runs; i++) for (const k of i % 2 ? ["new", "base"] : ["base", "new"]) await one(k);
+await browser.close();
+console.log(JSON.stringify(out));

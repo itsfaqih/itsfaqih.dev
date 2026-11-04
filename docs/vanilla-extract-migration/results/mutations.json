@@ -1,0 +1,1 @@
+{"marker mutant": {"sites": 19, "jobs": 1, "diffEls": 18, "realItems": 69}, "marker clean": {"sites": 19, "jobs": 1, "diffEls": 0, "realItems": 0}, "rule-page mutant": {"sites": 1, "jobs": 1, "diffEls": 4, "realItems": 48}, "rule-page clean": {"sites": 1, "jobs": 1, "diffEls": 0, "realItems": 0}}

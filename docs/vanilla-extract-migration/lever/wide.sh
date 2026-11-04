@@ -1,0 +1,10 @@
+#!/bin/bash
+cd "/Users/itsfaqih/.t3/worktrees/itsfaqih.dev/refactor-vanilla-extract"
+L=/private/tmp/claude-501/-Users-itsfaqih--t3-worktrees-itsfaqih-dev-refactor-vanilla-extract/5bdd764b-8769-431c-ab46-6c3c4dbc7f3c/scratchpad/lever; D=/private/tmp/claude-501/-Users-itsfaqih--t3-worktrees-itsfaqih-dev-refactor-vanilla-extract/5bdd764b-8769-431c-ab46-6c3c4dbc7f3c/scratchpad/diff; B=/private/tmp/claude-501/-Users-itsfaqih--t3-worktrees-itsfaqih-dev-refactor-vanilla-extract/5bdd764b-8769-431c-ab46-6c3c4dbc7f3c/scratchpad/base/dist; N=/private/tmp/claude-501/-Users-itsfaqih--t3-worktrees-itsfaqih-dev-refactor-vanilla-extract/5bdd764b-8769-431c-ab46-6c3c4dbc7f3c/scratchpad/diff/fix-dist
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $D/final-dist $D/wk-prefix-control.json engine=webkit routes=/,/cv,/rule-of-thumb/button-design widths=1440,390 motion=reduce pointer=fine conc=3 | tail -1; echo webkit-prefix-control=$?
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $N $D/wk-new.json engine=webkit widths=1440,961,960,959,641,640,639,481,480,479,390 motion=reduce pointer=fine,coarse conc=3 | tail -1; echo webkit=$?
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $B $D/wk-ctl.json engine=webkit widths=1440,960,639,480,390 motion=reduce pointer=fine conc=3 | tail -1; echo webkit-ctl=$?
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $N $D/ff-new.json engine=firefox widths=1440,961,960,959,641,640,639,481,480,479,390 motion=reduce pointer=fine conc=3 | tail -1; echo firefox=$?
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $B $D/ff-ctl.json engine=firefox widths=1440,960,639,480,390 motion=reduce pointer=fine conc=3 | tail -1; echo firefox-ctl=$?
+python3 ~/.agents/tools/gate-slot.py -- vp node $L/site-diff.mjs $B $N $D/bp-new.json widths=1440,961,960,959,861,860,859,821,820,819,721,720,719,641,640,639,481,480,479,401,400,399,390,381,380,379 motion=reduce pointer=fine conc=4 | tail -1; echo bp=$?
+echo DONE
