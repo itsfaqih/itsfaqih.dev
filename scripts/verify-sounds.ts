@@ -112,10 +112,16 @@ try {
   await chip.click();
   await expectHeard(page, "a button click plays tap", ["tap"]);
   await tiles.nth(0).hover();
-  await page.waitForTimeout(60);
+  await expectHeard(page, "entering the rule grid plays move, then the lamp's two flicker crackles", [
+    "move",
+    "flicker",
+    "flicker",
+  ]);
   await tiles.nth(1).hover();
-  await expectHeard(page, "moving across rule tiles plays move per tile", ["move", "move"]);
-  await tiles.nth(1).hover({ position: { x: 4, y: 4 } });
+  await page.waitForTimeout(60);
+  await tiles.nth(2).hover();
+  await expectHeard(page, "moving across lit tiles plays move per tile, no flicker", ["move", "move"]);
+  await tiles.nth(2).hover({ position: { x: 4, y: 4 } });
   await expectHeard(page, "staying on one tile plays nothing", []);
 
   const theme = page.locator('site-header [data-part="theme"]');
@@ -176,22 +182,88 @@ try {
   await page.keyboard.press("Enter");
   await expectHeard(page, "Enter on a focused button plays tap once", ["tap"]);
 
-  await open(page, "/rule-of-thumb/button-design");
+  await open(page, "/rule-of-thumb/proximity-principle");
   const quiz = page.locator("rule-quiz").first();
   await quiz.scrollIntoViewIfNeeded();
   await page.waitForTimeout(600);
   const answer = await quiz.getAttribute("data-answer");
   const piece = quiz.locator('[data-part="piece"]');
-  const hasPiece = (await piece.count()) > 0;
+  check((await piece.count()) === 1, "the quiz has a piece to pick up");
   const wrong = quiz.locator(`[data-slot]:not([data-slot="${answer}"])`).first();
-  if (hasPiece) await piece.click();
-  await expectHeard(page, "picking up the quiz piece plays nothing", []);
+  const right = quiz.locator(`[data-slot="${answer}"]`);
+  await piece.click();
+  await expectHeard(page, "picking up the quiz piece plays lift", ["lift"]);
+  await page.keyboard.press("Escape");
+  await expectHeard(page, "Esc puts the piece back with place", ["place"]);
+  await piece.click();
+  await expectHeard(page, "picking it up again plays lift", ["lift"]);
   await wrong.click();
   await expectHeard(page, "a quiz miss plays error, no tap", ["error"]);
   await page.waitForTimeout(500);
-  if (hasPiece) await piece.click();
-  await quiz.locator(`[data-slot="${answer}"]`).click();
+  const from = (await piece.boundingBox())!;
+  const over = (await wrong.boundingBox())!;
+  const slotBoxes = await Promise.all(
+    (await quiz.locator("[data-slot]").all()).map(async (slot) => (await slot.boundingBox())!),
+  );
+  const [cx, cy] = [from.x + from.width / 2, from.y + from.height / 2];
+  // Somewhere on screen well past the quiz's 48px snap reach of every slot.
+  const spots: [number, number][] = [
+    [cx, cy + 220],
+    [cx, cy - 220],
+    [cx - 360, cy],
+    [cx + 360, cy],
+  ];
+  const away = spots.find(([x, y]) =>
+    slotBoxes.every(
+      (box) =>
+        Math.hypot(
+          Math.max(box.x - x, 0, x - box.x - box.width),
+          Math.max(box.y - y, 0, y - box.y - box.height),
+        ) > 120,
+    ),
+  )!;
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  await page.mouse.move(over.x + over.width / 2, over.y + over.height / 2, { steps: 12 });
+  await page.mouse.move(away[0], away[1], { steps: 12 });
+  await page.mouse.up();
+  const dragged = await heard(page);
+  check(
+    dragged[0] === "lift" &&
+      dragged.at(-1) === "place" &&
+      dragged.slice(1, -1).length > 0 &&
+      dragged.slice(1, -1).every((cue) => cue === "move"),
+    "dragging the piece plays lift, move over slots, place when let go away from them",
+    `heard ${JSON.stringify(dragged)}`,
+  );
+  await page.waitForTimeout(500);
+  await piece.click();
+  await expectHeard(page, "a third pickup plays lift", ["lift"]);
+  await right.click();
   await expectHeard(page, "a quiz hit plays success, no tap", ["success"]);
+
+  // The home page's cut-ins: the first ones arrive before any gesture, so only later ones sound.
+  await open(page, "/");
+  await expectHeard(page, "the home page's first cut-ins, before a gesture, play nothing", []);
+  await page.keyboard.press("Shift");
+  const buzzes: string[] = [];
+  for (let step = 0; step < 12; step++) {
+    await page.mouse.wheel(0, 500);
+    await page.waitForTimeout(350);
+    buzzes.push(...(await heard(page)));
+  }
+  check(
+    buzzes.length > 0 && buzzes.every((cue) => cue === "buzz"),
+    "scrolling the home page buzzes as cut-ins arrive",
+    `heard ${JSON.stringify(buzzes)}`,
+  );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "/");
+  await page.keyboard.press("Shift");
+  for (let step = 0; step < 12; step++) await page.mouse.wheel(0, 500);
+  await page.waitForTimeout(600);
+  await expectHeard(page, "with reduced motion the cut-ins fade in silently", []);
+  await page.emulateMedia({ reducedMotion: null });
 
   const sound = page.locator('site-header [data-part="sound"]');
   await page.evaluate(() => scrollTo(0, 0));

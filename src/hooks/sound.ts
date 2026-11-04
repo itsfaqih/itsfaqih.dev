@@ -10,12 +10,20 @@ export type Cue =
   | "on"
   | "off"
   | "success"
-  | "error";
+  | "error"
+  | "lift"
+  | "place"
+  | "flicker"
+  | "buzz";
 
-/** Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. */
-const CUES: Record<Cue, { gain: number }> = {
+/**
+ * Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. A cue with a `gap`
+ * drops a repeat that comes sooner than that many milliseconds after the last one.
+ */
+const CUES: Record<Cue, { gain: number; gap?: number }> = {
   tap: { gain: 0.3 },
-  move: { gain: 0.15 },
+  // Sweeping the pointer across a grid would otherwise fire a click per tile.
+  move: { gain: 0.15, gap: 40 },
   open: { gain: 0.35 },
   close: { gain: 0.35 },
   enter: { gain: 0.35 },
@@ -24,9 +32,12 @@ const CUES: Record<Cue, { gain: number }> = {
   off: { gain: 0.4 },
   success: { gain: 0.3 },
   error: { gain: 0.25 },
+  lift: { gain: 0.35 },
+  place: { gain: 0.2 },
+  flicker: { gain: 0.12 },
+  // A fast scroll brings in batch after batch of cut-ins; one buzz covers a burst of them.
+  buzz: { gain: 0.15, gap: 300 },
 };
-// Sweeping the pointer across a grid would otherwise fire a click per tile.
-const MOVE_GAP_MS = 40;
 // Past this a cue still decoding is dropped: a late sound reads as lag.
 const LATE_MS = 150;
 const SOUND_CHANGE_EVENT = "sound-change";
@@ -50,7 +61,7 @@ let context: AudioContext | undefined;
 const bytes = new Map<Cue, Promise<ArrayBuffer | undefined>>();
 const decoding = new Map<Cue, Promise<AudioBuffer | undefined>>();
 const decoded = new Map<Cue, AudioBuffer>();
-let lastMoveAt = -Infinity;
+const lastPlayedAt = new Map<Cue, number>();
 
 // A clip that fails to load stays silent until the next page load.
 function fetchClips() {
@@ -95,13 +106,16 @@ export function play(cue: Cue) {
   // An AudioContext made before a gesture is refused, and Chromium logs a warning for it.
   if (!soundOn() || navigator.userActivation?.hasBeenActive === false) return;
   const calledAt = performance.now();
-  if (cue === "move") {
-    if (calledAt - lastMoveAt < MOVE_GAP_MS) return;
-    lastMoveAt = calledAt;
+  const { gap } = CUES[cue];
+  if (gap !== undefined) {
+    if (calledAt - (lastPlayedAt.get(cue) ?? -Infinity) < gap) return;
+    lastPlayedAt.set(cue, calledAt);
   }
   if (!context) {
     context = new AudioContext();
-    for (const each of CUE_NAMES) void decode(context, each);
+    // The rest wait, or decoding them all at once makes this first cue miss LATE_MS.
+    const made = context;
+    void decode(made, cue).then(() => CUE_NAMES.forEach((each) => void decode(made, each)));
   }
   const ctx = context;
   if (ctx.state === "suspended") void ctx.resume().catch(() => {});

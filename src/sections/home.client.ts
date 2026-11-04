@@ -1,3 +1,5 @@
+import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { glowDots } from "./backdrop-dots";
 import { watchCutIns } from "./cut-ins";
 import { whenIntroDone } from "./intro.client";
@@ -30,7 +32,10 @@ class HomePage extends HTMLElement {
     // The intro holds the cut-ins, so the head script's rest fallback must stand down now.
     this.dispatchEvent(new Event("cut-ins", { bubbles: true }));
     whenIntroDone(controller.signal, () => {
-      unwatch = watchCutIns(this);
+      // The glitch buzzes as it tears in; reduced motion swaps it for a plain fade, which doesn't.
+      unwatch = watchCutIns(this, () => {
+        if (!reducedMotion()) play("buzz");
+      });
     });
     this.#stop = () => {
       controller.abort();

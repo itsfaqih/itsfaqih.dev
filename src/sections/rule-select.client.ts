@@ -242,15 +242,32 @@ class RuleSelect extends HTMLElement {
       follow();
     };
 
-    const light = (id: string, tile: HTMLElement) => {
+    // Whether the latest light came from a pointer that moved, as `select` decides for `move`.
+    let lightVoiced = false;
+    const light = (id: string, tile: HTMLElement, voiced = true) => {
       litTile = tile;
       litId = id;
+      lightVoiced = voiced;
     };
 
     const select = (id: string, voiced = true) => {
       if (selectedId !== id && voiced) play("move");
       selectedId = id;
     };
+    // The beam's stutter (beamOn in rule-select.css.ts) catches at 20% and 60% of its 260ms, and
+    // crackles each time. Keyed to the animation, it stays quiet wherever the stutter doesn't run.
+    let crackles: number[] = [];
+    const quiet = () => crackles.splice(0).forEach((timer) => clearTimeout(timer));
+    beam.addEventListener(
+      "animationstart",
+      (event) => {
+        if (event.target !== beam || !lightVoiced) return;
+        quiet();
+        crackles = [52, 156].map((ms) => window.setTimeout(() => play("flicker"), ms));
+      },
+      { signal },
+    );
+    beam.addEventListener("animationcancel", quiet, { signal });
     // A tile also enters under a still pointer, as when the palette over the grid closes. Only a
     // pointer that moved onto it sounds.
     let restingAt = "";
@@ -264,8 +281,9 @@ class RuleSelect extends HTMLElement {
       tile.addEventListener(
         "pointerenter",
         (event) => {
-          select(id, `${event.clientX},${event.clientY}` !== restingAt);
-          if (event.pointerType !== "touch") light(id, tile);
+          const moved = `${event.clientX},${event.clientY}` !== restingAt;
+          select(id, moved);
+          if (event.pointerType !== "touch") light(id, tile, moved);
           paint();
         },
         { signal },
@@ -341,6 +359,7 @@ class RuleSelect extends HTMLElement {
       controller.abort();
       stopAim();
       stopScramble();
+      quiet();
     };
   }
 
