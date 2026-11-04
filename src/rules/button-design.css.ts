@@ -276,56 +276,6 @@ export const styles = {
       "--face": palette["--soft-key"],
     },
   }),
-  tip: style({
-    position: "relative",
-    display: "inline-grid",
-  }),
-  tooltip: style({
-    "@layer": {
-      [under1]: {
-        position: "absolute",
-        bottom: "calc(100% + 12px)",
-        left: "50%",
-        zIndex: 2,
-        paddingBlock: "6px",
-        paddingInline: "10px",
-        borderRadius: "8px",
-        backgroundColor: palette["--text"],
-        fontWeight: 600,
-        fontSize: "12px",
-        lineHeight: "normal",
-        fontFamily: fonts["--sans"],
-        whiteSpace: "nowrap",
-        color: palette["--bg"],
-        pointerEvents: "none",
-        opacity: 0,
-        translate: "-50% 4px",
-        transition: `opacity 150ms ease, translate 200ms ${motion["--out"]}`,
-        selectors: {
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            top: "100%",
-            left: "50%",
-            translate: "-50% 0",
-            borderWidth: "5px",
-            borderStyle: "solid",
-            borderColor: "transparent",
-            borderTopColor: palette["--text"],
-          },
-          [`&${when.siblingBefore(":is(:hover, :focus-visible)")}`]: {
-            opacity: 1,
-            translate: "-50% 0",
-          },
-        },
-        "@media": {
-          [REDUCE]: {
-            translate: "-50% 0",
-          },
-        },
-      },
-    },
-  }),
   card: style({
     display: "grid",
     gap: "4px",

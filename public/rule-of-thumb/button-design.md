@@ -42,7 +42,7 @@ button:focus-visible {
 
 ## Keep a disabled button still on hover
 
-A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press, and let the tooltip do the talking. Scope the hover and press looks to buttons that can act.
+A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press. Scope the hover and press looks to buttons that can act.
 
 ```css
 button:hover:not(:disabled, [aria-disabled="true"]) {
