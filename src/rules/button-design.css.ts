@@ -508,14 +508,23 @@ export const quiz = {
     gap: "8px",
     alignItems: "center",
   }),
-  pageKey: style({
-    height: "32px",
-    borderRadius: "8px",
-    fontSize: "12px",
-    vars: {
-      "--pl": "12px",
-      "--pr": "12px",
-    },
+  // A button with a drawn cursor resting on its right half.
+  hovered: style({
+    position: "relative",
+    display: "inline-flex",
+  }),
+  // A hover held still for a picture: stronger than the live one, which motion makes easy to see.
+  lit: style({
+    backgroundColor: `color-mix(in oklab, ${palette["--soft-key"]} 80%, ${palette["--text"]})`,
+  }),
+  cursor: style({
+    position: "absolute",
+    left: "62%",
+    top: "52%",
+    width: "22px",
+    height: "22px",
+    pointerEvents: "none",
+    filter: "drop-shadow(0 1px 1px rgb(0 0 0 / 0.35))",
   }),
   ruled: style({
     display: "inline-grid",
