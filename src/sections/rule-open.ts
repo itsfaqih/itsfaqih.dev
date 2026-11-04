@@ -3,9 +3,12 @@ import { reducedMotion } from "../hooks/media-query";
 /** Where a tile's click leaves the dive for the head script on the rule page (head-script.ts). */
 export const OPENING_KEY = "rule-open";
 
-export function isTransitioning() {
+/** Whether a view transition is running: any, or one of `type` (rule-open, rule-close, page-fade). */
+export function isTransitioning(type?: string) {
   try {
-    return document.documentElement.matches(":active-view-transition");
+    return document.documentElement.matches(
+      type ? `:active-view-transition-type(${type})` : ":active-view-transition",
+    );
   } catch {
     return false;
   }

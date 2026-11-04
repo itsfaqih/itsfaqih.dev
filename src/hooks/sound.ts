@@ -13,13 +13,15 @@ export type Cue =
   | "error"
   | "lift"
   | "place"
-  | "flicker";
+  | "flicker"
+  | "dive";
 
 /**
  * Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. A cue with a `gap`
- * drops a repeat that comes sooner than that many milliseconds after the last one.
+ * drops a repeat that comes sooner than that many milliseconds after the last one. `late` is how
+ * long a cue still loading may wait to start, in place of LATE_MS.
  */
-const CUES: Record<Cue, { gain: number; gap?: number }> = {
+const CUES: Record<Cue, { gain: number; gap?: number; late?: number }> = {
   tap: { gain: 0.3 },
   // Sweeping the pointer across a grid would otherwise fire a click per tile.
   move: { gain: 0.15, gap: 40 },
@@ -27,13 +29,16 @@ const CUES: Record<Cue, { gain: number; gap?: number }> = {
   close: { gain: 0.35 },
   enter: { gain: 0.35 },
   back: { gain: 0.35 },
-  on: { gain: 0.4 },
+  // Turning sound back on loads its clip from cold, and it's the one cue someone waits to hear.
+  on: { gain: 0.4, late: 400 },
   off: { gain: 0.4 },
   success: { gain: 0.3 },
   error: { gain: 0.25 },
   lift: { gain: 0.35 },
   place: { gain: 0.2 },
   flicker: { gain: 0.12 },
+  // The page it lands on loads the clip while the dive runs, and 620ms of zoom covers a later start.
+  dive: { gain: 0.3, late: 250 },
 };
 // Past this a cue still decoding is dropped: a late sound reads as lag.
 const LATE_MS = 150;
@@ -61,22 +66,27 @@ const decoded = new Map<Cue, AudioBuffer>();
 const lastPlayedAt = new Map<Cue, number>();
 
 // A clip that fails to load stays silent until the next page load.
-function fetchClips() {
-  for (const cue of CUE_NAMES) {
-    if (bytes.has(cue)) continue;
-    const clip = fetch(`/sounds/${cue}.mp3`)
+function fetchClip(cue: Cue) {
+  let clip = bytes.get(cue);
+  if (!clip) {
+    clip = fetch(`/sounds/${cue}.mp3`)
       .then((response) => (response.ok ? response.arrayBuffer() : undefined))
       .catch(() => undefined);
     bytes.set(cue, clip);
   }
+  return clip;
 }
 
+function fetchClips() {
+  for (const cue of CUE_NAMES) void fetchClip(cue);
+}
+
+// Fetches only `cue`'s clip if it hasn't come yet: one asked for before the idle fetch, as on a
+// page a dive lands on, would otherwise queue behind all the others.
 function decode(context: AudioContext, cue: Cue) {
-  fetchClips();
   let pending = decoding.get(cue);
   if (pending) return pending;
-  pending = bytes
-    .get(cue)!
+  pending = fetchClip(cue)
     .then((loaded) => loaded && context.decodeAudioData(loaded))
     .then(
       (buffer) => {
@@ -118,10 +128,14 @@ export function play(cue: Cue) {
   if (ctx.state === "suspended") void ctx.resume().catch(() => {});
   const buffer = decoded.get(cue);
   if (buffer) start(ctx, cue, buffer);
-  else
+  else {
+    // Timed from here, not the call: the browser's first AudioContext can take ~170ms to make
+    // while its audio service starts, and that once-a-session wait shouldn't drop the sound.
+    const askedAt = performance.now();
     void decode(ctx, cue).then((ready) => {
-      if (ready && performance.now() - calledAt <= LATE_MS) start(ctx, cue, ready);
+      if (ready && performance.now() - askedAt <= (CUES[cue].late ?? LATE_MS)) start(ctx, cue, ready);
     });
+  }
 }
 
 /** Saves and applies the other setting. Turning off plays `off` first; turning on plays `on`. */
@@ -134,8 +148,8 @@ export function toggleSound() {
   } catch {}
   dispatchEvent(new Event(SOUND_CHANGE_EVENT));
   if (next === "on") {
-    fetchClips();
     play("on");
+    fetchClips();
   }
 }
 
