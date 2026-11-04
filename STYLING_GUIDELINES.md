@@ -167,4 +167,4 @@ vp exec astro build
 
 The vanilla-extract Vite plugin must be active in `astro.config.ts`. The build inlines each page's CSS into its `<head>`, with the `@layer` order statement first. A built page must start with that `<style>` block. `astro dev` serves the same rules as separate sheets.
 
-vanilla-extract prints CSS as written, so the `lowerForBrowsers` plugin in `astro.config.ts` runs every `.vanilla.css` module through lightningcss with the default `browserslist` targets. That step adds the vendor prefixes Safari needs, such as `-webkit-box-decoration-break` and `-webkit-user-select`. Write the standard property and let the step add its prefix.
+vanilla-extract prints CSS as written, so the `lowerForBrowsers` plugin in `astro.config.ts` runs every `.vanilla.css` module through lightningcss with the default `browserslist` targets. That step adds the vendor prefixes Safari needs, such as `-webkit-box-decoration-break` and `-webkit-user-select`. Write the standard property and let the step add its prefix. Plain CSS in `src/styles.css` skips this step, so it writes its prefixes by hand.
