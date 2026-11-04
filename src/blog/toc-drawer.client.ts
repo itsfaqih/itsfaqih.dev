@@ -1,3 +1,4 @@
+import { play } from "../hooks/sound";
 import { EASE, SLIDE, SLIDE_MS } from "./post.css";
 import { TOC_NAVIGATE } from "./table-of-contents.client";
 
@@ -53,6 +54,7 @@ class TocDrawer extends HTMLElement {
     const open = () => {
       if (isOpen) return;
       isOpen = true;
+      play("open");
       closing = false;
       openedAt = Date.now();
       setState("open");
@@ -71,6 +73,7 @@ class TocDrawer extends HTMLElement {
     const close = () => {
       if (!isOpen) return;
       isOpen = false;
+      play("close");
       dragging = false;
       start = null;
       setState("closed");

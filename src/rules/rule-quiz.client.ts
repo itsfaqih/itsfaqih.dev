@@ -1,4 +1,5 @@
 import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { OUT } from "./rule-landing.css";
 import { quizView, SNAP } from "./rule-landing.view";
 
@@ -134,6 +135,7 @@ class RuleQuiz extends HTMLElement {
       if (placed !== null) return;
       picked = false;
       if (id === answer) {
+        play("success");
         const from = piece && { rect: piece.getBoundingClientRect(), rot: drag?.rot ?? 0 };
         if (piece) piece.style.transform = "";
         placed = id;
@@ -153,6 +155,7 @@ class RuleQuiz extends HTMLElement {
         return;
       }
       mistakes += 1;
+      play("error");
       miss = { id, at: performance.now() };
       if (piece) flyHome(piece);
       sync();

@@ -2,6 +2,7 @@ import Fuse from "fuse.js";
 import { colorOf, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
 import { reducedMotion } from "../hooks/media-query";
+import { play } from "../hooks/sound";
 import { isTransitioning, watchRuleOpen } from "./rule-open";
 import { countClass } from "./chips.view";
 import { beamClass } from "./rule-select.view";
@@ -246,11 +247,24 @@ class RuleSelect extends HTMLElement {
       litId = id;
     };
 
+    const select = (id: string, voiced = true) => {
+      if (selectedId !== id && voiced) play("move");
+      selectedId = id;
+    };
+    // A tile also enters under a still pointer, as when the palette over the grid closes. Only a
+    // pointer that moved onto it sounds.
+    let restingAt = "";
+    document.addEventListener(
+      "pointermove",
+      (event) => (restingAt = `${event.clientX},${event.clientY}`),
+      { capture: true, passive: true, signal },
+    );
+
     function watchTile(tile: HTMLElement, id: string) {
       tile.addEventListener(
         "pointerenter",
         (event) => {
-          selectedId = id;
+          select(id, `${event.clientX},${event.clientY}` !== restingAt);
           if (event.pointerType !== "touch") light(id, tile);
           paint();
         },
@@ -259,7 +273,7 @@ class RuleSelect extends HTMLElement {
       tile.addEventListener(
         "focus",
         () => {
-          selectedId = id;
+          select(id);
           if (tile.matches(":focus-visible")) light(id, tile);
           paint();
         },
