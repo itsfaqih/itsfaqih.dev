@@ -101,7 +101,9 @@ export function play(cue: Cue) {
   }
   if (!context) {
     context = new AudioContext();
-    for (const each of CUE_NAMES) void decode(context, each);
+    // The rest wait, or decoding them all at once makes this first cue miss LATE_MS.
+    const made = context;
+    void decode(made, cue).then(() => CUE_NAMES.forEach((each) => void decode(made, each)));
   }
   const ctx = context;
   if (ctx.state === "suspended") void ctx.resume().catch(() => {});
