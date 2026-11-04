@@ -10,6 +10,8 @@ const { values } = parseArgs({ options: { shots: { type: "string" } } });
 declare global {
   interface Window {
     played: string[];
+    playedAt: number[];
+    revealedAt: number;
     activeAtHover: boolean[];
   }
 }
@@ -33,6 +35,8 @@ function recordPlays() {
     return buffer;
   };
   window.played = [];
+  window.playedAt = [];
+  addEventListener("pagereveal", () => (window.revealedAt = performance.now()));
   window.activeAtHover = [];
   document.addEventListener(
     "pointerover",
@@ -45,6 +49,7 @@ function recordPlays() {
   const start = AudioBufferSourceNode.prototype.start;
   AudioBufferSourceNode.prototype.start = function (...args) {
     window.played.push((this.buffer && tags.get(this.buffer)) ?? "untagged");
+    window.playedAt.push(performance.now());
     return start.apply(this, args);
   };
 }
@@ -241,6 +246,38 @@ try {
   await expectHeard(page, "a third pickup plays lift", ["lift"]);
   await right.click();
   await expectHeard(page, "a quiz hit plays success, no tap", ["success"]);
+
+  // The dive: the rule page it lands on plays it, so read what that page heard.
+  await open(page, "/rule-of-thumb");
+  const tile = page.locator("[data-cut][href^='/rule-of-thumb/']").first();
+  await tile.hover();
+  await page.waitForTimeout(300);
+  await tile.click();
+  await page.waitForURL(/\/rule-of-thumb\/.+/);
+  await page.waitForTimeout(800);
+  const landed = await page.evaluate(() => ({
+    played: window.played.splice(0),
+    after: Math.round(window.playedAt[0]! - window.revealedAt),
+  }));
+  check(
+    JSON.stringify(landed.played) === '["dive"]' && landed.after < 250,
+    "a tile's dive into a rule plays dive on the rule page as the transition starts",
+    JSON.stringify(landed),
+  );
+  await page.locator("main a[href='/rule-of-thumb']").first().click();
+  await page.waitForURL(/\/rule-of-thumb$/);
+  await page.waitForTimeout(800);
+  await expectHeard(page, "zooming back out to the index plays no dive", []);
+  await page.goto(page.url().replace(/\/rule-of-thumb$/, "/rule-of-thumb/proximity-principle"));
+  await page.waitForTimeout(800);
+  await expectHeard(page, "loading a rule page directly plays nothing", []);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page, "/rule-of-thumb");
+  await tile.click();
+  await page.waitForURL(/\/rule-of-thumb\/.+/);
+  await page.waitForTimeout(800);
+  await expectHeard(page, "with reduced motion the page fades in without the dive", []);
+  await page.emulateMedia({ reducedMotion: null });
 
   const sound = page.locator('site-header [data-part="sound"]');
   await page.evaluate(() => scrollTo(0, 0));
