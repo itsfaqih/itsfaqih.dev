@@ -11,6 +11,7 @@ export const rowView = (isOpen: boolean) => ({
   pill: cx(techBadge.badge, styles.pill, isOpen ? styles.pillOpen : styles.pillClosed),
   mark: cx(icon.pair, isOpen ? styles.markOpen : styles.markClosed),
   more: cx(styles.pill, styles.more, styles.pillClosed),
+  hint: cx(styles.hint, isOpen && styles.hintOpen),
 });
 
 export const moreLabel = (count: number) => `+${count} more`;

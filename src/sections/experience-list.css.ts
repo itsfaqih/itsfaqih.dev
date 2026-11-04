@@ -240,6 +240,44 @@ export const styles = {
       },
     },
   }),
+  // Sits on the bottom fade of the open row's tools while more lie below, and leaves with the fade
+  // as the list reaches its end. A closed row's tools never scroll, so it has none.
+  hint: style({
+    display: "none",
+  }),
+  // A chip in the row's own tone, so the badges sliding under it don't break up its words.
+  hintOpen: style({
+    position: "absolute",
+    left: "50%",
+    bottom: "2px",
+    zIndex: 2,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    paddingBlock: "4px",
+    paddingInline: "10px",
+    borderRadius: "999px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: palette["--hair"],
+    backgroundColor: "var(--ground)",
+    transform: "translateX(-50%)",
+    whiteSpace: "nowrap",
+    pointerEvents: "none",
+    font: `500 11px ${fonts["--display"]}`,
+    letterSpacing: "0.02em",
+    color: palette["--mute"],
+    opacity: "var(--fade-bottom, 0)",
+    selectors: {
+      "&::after": {
+        content: '"↓"',
+        fontFamily: fonts["--sans"],
+      },
+      "*:has(> [data-gliding]) > &": {
+        opacity: 0,
+      },
+    },
+  }),
   // Above the fades, so the thumb keeps its colour near either end.
   stackBar: style({
     zIndex: 2,

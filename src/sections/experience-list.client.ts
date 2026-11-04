@@ -92,6 +92,7 @@ type Row = {
   frame: HTMLElement;
   stack: HTMLUListElement;
   track: HTMLElement;
+  hint: HTMLElement;
   pills: HTMLElement[];
   more: HTMLElement;
   moreLabel: HTMLElement;
@@ -123,7 +124,8 @@ class ExperienceList extends HTMLElement {
         chevron: element.querySelector(":scope > button > span:last-child")!,
         frame,
         stack,
-        track: frame.querySelector(":scope > [aria-hidden]")!,
+        track: frame.querySelector(":scope > div[aria-hidden]")!,
+        hint: frame.querySelector(":scope > span[aria-hidden]")!,
         pills,
         more,
         moreLabel: more.querySelector(":scope > *")!,
@@ -189,6 +191,7 @@ class ExperienceList extends HTMLElement {
       row.chevron.className = view.chevron;
       row.frame.className = view.frame;
       row.stack.className = view.stack;
+      row.hint.className = view.hint;
       row.stack.removeAttribute("data-gliding");
       row.stack.scrollTop = 0;
       for (const pill of row.pills) {
