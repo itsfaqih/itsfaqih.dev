@@ -16,8 +16,8 @@ export type Cue =
   | "flicker"
   | "dive"
   | "rise"
-  | "turn"
-  | "fold";
+  | "expand"
+  | "collapse";
 
 /**
  * Each cue's clip is public/sounds/<cue>.mp3, written by scripts/sounds.ts. A cue with a `gap`
@@ -44,10 +44,9 @@ const CUES: Record<Cue, { gain: number; gap?: number; late?: number }> = {
   dive: { gain: 0.3, late: 250 },
   // The dive run backwards, as leaving a rule zooms back out onto its tile on the index.
   rise: { gain: 0.3, late: 250 },
-  // Opening a job in the work history turns to its page, about as long as the glide; closing the
-  // open one is a quicker flick.
-  turn: { gain: 0.4 },
-  fold: { gain: 0.3 },
+  // Opening and closing a job in the work history. Matched in loudness to open and close.
+  expand: { gain: 0.46 },
+  collapse: { gain: 0.42 },
 };
 // Past this a cue still decoding is dropped: a late sound reads as lag.
 const LATE_MS = 150;
