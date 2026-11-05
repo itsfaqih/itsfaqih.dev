@@ -4,19 +4,35 @@ import { styles } from "./button-design.css";
 type Props = { careful?: boolean };
 
 const { careful = false } = Astro.props;
-const key = [styles.key, styles.sm, styles.live];
+const key = [styles.key, styles.sm, styles.live, styles.cardRowKey, styles.squinted];
+// Each note names what squinting leaves of its button, and shows only while Squint is on.
+const KEYS = [
+  { label: "Cancel", look: careful ? styles.text : styles.plain, note: careful ? "fades out" : "heavy" },
+  { label: "Save draft", look: careful && styles.tint, note: careful ? "lighter" : "heavy" },
+  { label: "Publish", look: !careful && styles.red, note: careful ? "seen first" : "heavy and red" },
+];
+const say = careful
+  ? "Blurred, only weight is left. Publish is the heaviest, so the eye lands there first."
+  : "Blurred, only weight is left. Three equal blobs give the eye nowhere to land, and the red one reads as danger.";
 ---
 
 <div class={styles.stage}>
   <div class={styles.card}>
-    <span class={styles.cardTitle}>Spring launch notes</span>
-    <span class={styles.cardSub}>Draft · 1,240 words</span>
+    <span class:list={[styles.cardTitle, styles.squinted]}>Spring launch notes</span>
+    <span class:list={[styles.cardSub, styles.squinted]}>Draft · 1,240 words</span>
     <div class:list={[styles.row, styles.cardRow]}>
-      <button type="button" class:list={[key, careful ? styles.text : styles.plain, styles.cardRowKey]}
-        >Cancel</button
-      >
-      <button type="button" class:list={[key, careful && styles.tint, styles.cardRowKey]}>Save draft</button>
-      <button type="button" class:list={[key, !careful && styles.red, styles.cardRowKey]}>Publish</button>
+      {
+        KEYS.map(({ label, look, note }) => (
+          <span class={styles.pin}
+            ><button type="button" class:list={[key, look]}>{label}</button><span class={styles.squintNote}
+              >{note}<svg viewBox="0 0 14 22" class={styles.squintArrow} aria-hidden="true"
+                ><path pathLength="1" d="M7 1c-4 5 4 9 0 15M3.5 12.5 7 17l3.5-4.5" /></svg
+              ></span
+            ></span
+          >
+        ))
+      }
     </div>
   </div>
+  <p class={styles.squintSay}>{say}</p>
 </div>

@@ -7,6 +7,8 @@ const TABLET = "(max-width: 820px)";
 const PHONE = "(max-width: 640px)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
+const SQUINT = when.ancestor(':has([data-toggle="squint"][aria-pressed="true"])');
+const NOTE_INK = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
 
 export const styles = {
   stage: style({
@@ -285,12 +287,6 @@ export const styles = {
     borderRadius: "14px",
     backgroundColor: palette["--panel"],
     boxShadow: `0 0 0 1px ${palette["--hair"]}`,
-    transition: "filter 200ms ease",
-    selectors: {
-      [`&${when.ancestor(':has([data-toggle="squint"][aria-pressed="true"])')}`]: {
-        filter: "blur(5px)",
-      },
-    },
     "@media": {
       [PHONE]: {
         paddingBlock: "14px",
@@ -323,9 +319,130 @@ export const styles = {
   cardRow: style({
     marginTop: "16px",
     gap: "8px",
+    transition: "margin-top 200ms ease, row-gap 200ms ease",
+    selectors: {
+      // Room above each row for the notes Squint pins to the buttons.
+      [`&${SQUINT}`]: {
+        marginTop: "36px",
+        rowGap: "38px",
+      },
+    },
     "@media": {
       [PHONE]: {
         gap: "6px",
+        selectors: {
+          [`&${SQUINT}`]: {
+            rowGap: "38px",
+          },
+        },
+      },
+      [REDUCE]: {
+        transition: "none",
+      },
+    },
+  }),
+  squinted: style({
+    transition: "filter 200ms ease",
+    selectors: {
+      [`&${SQUINT}`]: {
+        filter: "blur(5px)",
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        transition: "none",
+      },
+    },
+  }),
+  pin: style({
+    position: "relative",
+    display: "flex",
+    flexShrink: 0,
+    "@media": {
+      [PHONE]: {
+        flexGrow: 1,
+      },
+    },
+  }),
+  squintNote: style({
+    position: "absolute",
+    bottom: "calc(100% + 2px)",
+    left: "50%",
+    display: "grid",
+    justifyItems: "center",
+    gap: "2px",
+    fontWeight: 600,
+    fontSize: "13px",
+    lineHeight: 1,
+    fontFamily: fonts["--display"],
+    whiteSpace: "nowrap",
+    color: NOTE_INK,
+    textShadow: `0 0 3px ${palette["--panel"]}, 0 0 3px ${palette["--panel"]}`,
+    pointerEvents: "none",
+    visibility: "hidden",
+    opacity: 0,
+    transform: "translate(-50%, 4px)",
+    transition: "opacity 200ms ease, transform 200ms ease, visibility 0s 200ms",
+    selectors: {
+      [`&${SQUINT}`]: {
+        // Inherit, so a note in the hidden pane stays hidden with it.
+        visibility: "inherit",
+        opacity: 1,
+        transform: "translate(-50%, 0)",
+        transition: "opacity 220ms ease 120ms, transform 220ms ease 120ms",
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        transition: "none",
+        selectors: {
+          [`&${SQUINT}`]: {
+            transition: "none",
+          },
+        },
+      },
+    },
+  }),
+  squintArrow: style({
+    width: "14px",
+    height: "22px",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    strokeDasharray: 1,
+    strokeDashoffset: 1,
+    transition: "stroke-dashoffset 0s 200ms",
+    selectors: {
+      [`&${SQUINT}`]: {
+        strokeDashoffset: 0,
+        transition: "stroke-dashoffset 500ms ease 220ms",
+      },
+      // The middle arrow bends the other way, so the three read as drawn by hand.
+      [`:nth-child(2) > * > &`]: {
+        scale: "-1 1",
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        strokeDashoffset: 0,
+        transition: "none",
+      },
+    },
+  }),
+  squintSay: style({
+    display: "none",
+    maxWidth: "min(100%, 380px)",
+    margin: 0,
+    fontSize: "13px",
+    lineHeight: 1.45,
+    textAlign: "center",
+    textWrap: "pretty",
+    color: palette["--mute"],
+    selectors: {
+      [`&${SQUINT}`]: {
+        display: "block",
       },
     },
   }),
