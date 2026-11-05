@@ -39,6 +39,17 @@ export const EARLY: Waterfall = {
   paint: 520,
 };
 
+/** The quiz's request: how long it takes, and how far it can slide along the axis. */
+export const SLIDE = { request: 500, render: 20, code: 300, max: 500, from: 330 } as const;
+
+/** When the rows show for a request that starts at `start`: once both the code and the data are in. */
+export const rowsAt = (start: number) =>
+  Math.max(start + SLIDE.request, SLIDE.code) + SLIDE.render;
+
+/** Which of the quiz's answers a start time is. */
+export const slideChoice = (start: number) =>
+  start === 0 ? "nav" : start < SLIDE.code ? "early" : "late";
+
 export const REVENUE = [48210, 49875, 47930, 51402];
 
 export const MAIL = [
@@ -108,35 +119,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Twenty orders",
-        piece: "request orders",
-        answer: "loader",
-        rows: [
-          at("0ms", "You click Orders"),
+        answer: "nav",
+        choices: [
           {
-            depth: 1,
-            slot: {
-              id: "loader",
-              label: "as you navigate",
-              note: "Start it with the navigation, while the page's code loads. One request covers the list.",
-            },
+            id: "nav",
+            label: "Starts as you navigate",
+            note: "It starts with the navigation and runs while the code loads. The rows show at 520ms, as soon as they can.",
           },
-          at("300ms", "Code loaded, the page renders"),
           {
-            depth: 1,
-            slot: {
-              id: "effect",
-              label: "after the page renders",
-              note: "It waits for the code and the first render, so the data shows 300ms later than it could.",
-            },
+            id: "early",
+            label: "Starts before the code loads",
+            note: "Closer, but nothing makes it wait. Start it as you navigate, at 0ms, and the rows show at 520ms.",
           },
-          at("320ms", "Each row renders"),
           {
-            depth: 1,
-            slot: {
-              id: "rows",
-              label: "after each row renders",
-              note: "Twenty requests where one would do, each after its row renders.",
-            },
+            id: "late",
+            label: "Starts once the code loads",
+            note: "It waits for the page's code, which it doesn't need. Every millisecond it waits lands on the rows.",
           },
         ],
       },

@@ -6,6 +6,7 @@ import { quizKit } from "./rule-landing.css";
 import DataLoadingInbox from "./data-loading-inbox.astro";
 import DataLoadingParse from "./data-loading-parse.astro";
 import DataLoadingQuiz from "./data-loading-quiz.astro";
+import DataLoadingSlide from "./data-loading-slide.astro";
 import DataLoadingRevenue from "./data-loading-revenue.astro";
 import DataLoadingTeam from "./data-loading-team.astro";
 import DataLoadingWallet from "./data-loading-wallet.astro";
@@ -40,9 +41,10 @@ const TILES = [
     <DataLoadingWaterfall slot="bad" {...LATE} />
     <DataLoadingWaterfall slot="good" {...EARLY} />
   </RuleLesson>
-  <DataLoadingQuiz n={1} level={early.levels[0]}
-    >The orders page lists 20 orders, one row each. Place the request.</DataLoadingQuiz
-  >
+  <RuleQuiz n={1} level={early.levels[0]} hint="Drag the amber bar, then press Check. Arrow keys work too."
+    >The orders page lists 20 orders. Drag <b>GET /orders</b> to when it should start. The rows render once both the code and the data are in.
+    <DataLoadingSlide slot="board" level={early.levels[0]} />
+  </RuleQuiz>
 
   <RuleLesson lesson={stale}>
     <Fragment slot="body"
