@@ -267,7 +267,7 @@ try {
   await page.locator("main a[href='/rule-of-thumb']").first().click();
   await page.waitForURL(/\/rule-of-thumb$/);
   await page.waitForTimeout(800);
-  await expectHeard(page, "zooming back out to the index plays no dive", []);
+  await expectHeard(page, "All rules zooms back out to the index with rise", ["rise"]);
   await page.goto(page.url().replace(/\/rule-of-thumb$/, "/rule-of-thumb/proximity-principle"));
   await page.waitForTimeout(800);
   await expectHeard(page, "loading a rule page directly plays nothing", []);

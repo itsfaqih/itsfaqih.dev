@@ -15,6 +15,7 @@ export type Cue =
   | "place"
   | "flicker"
   | "dive"
+  | "rise"
   | "turn"
   | "fold";
 
@@ -41,6 +42,8 @@ const CUES: Record<Cue, { gain: number; gap?: number; late?: number }> = {
   flicker: { gain: 0.12 },
   // The page it lands on loads the clip while the dive runs, and 620ms of zoom covers a later start.
   dive: { gain: 0.3, late: 250 },
+  // The dive run backwards, as leaving a rule zooms back out onto its tile on the index.
+  rise: { gain: 0.3, late: 250 },
   // Opening a job in the work history turns to its page, about as long as the glide; closing the
   // open one is a quicker flick.
   turn: { gain: 0.4 },

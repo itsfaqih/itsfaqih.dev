@@ -108,6 +108,14 @@ class RuleSelect extends HTMLElement {
 
     const controller = new AbortController();
     const { signal } = controller;
+
+    // Leaving a rule zooms back out onto its tile here, so this page voices it, as a rule page
+    // voices the dive in. The head script types it on pagereveal, which can come before or after.
+    const voiceRise = () => {
+      if (isTransitioning("rule-close")) play("rise");
+    };
+    if (document.documentElement.dataset.vt) voiceRise();
+    else addEventListener("pagereveal", voiceRise, { once: true, signal });
     let query = "";
     let category = "All";
     let selectedId: string | null = null;
