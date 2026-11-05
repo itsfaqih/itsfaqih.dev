@@ -32,6 +32,11 @@ const fade = keyframes({
 const jump = keyframes({
   "from, 40%": { color: palette["--no-ink"] },
 });
+const wobble = keyframes({
+  "25%": { translate: "-4px 0" },
+  "50%": { translate: "4px 0" },
+  "75%": { translate: "-2px 0" },
+});
 const toastFade = keyframes({
   "0%, 100%": { opacity: 0 },
   "8%, 86%": { opacity: 1 },
@@ -884,6 +889,95 @@ export const styles = {
 };
 
 export const quiz = {
+  slide: style({
+    display: "grid",
+    gap: "14px",
+  }),
+  // Room under the paint tag; the lanes stay the waterfall's.
+  slidePlot: style({
+    overflow: "visible",
+  }),
+  track: style({
+    cursor: cursors["--cursor-point"],
+    touchAction: "none",
+    selectors: {
+      [`&${when.ancestor("[data-locked]")}`]: {
+        cursor: "default",
+      },
+    },
+  }),
+  // The request is the one bar that moves: taller, with a grip, and a wider reach than it draws.
+  handle: style({
+    top: "3px",
+    height: "20px",
+    borderRadius: "6px",
+    cursor: cursors["--cursor-grab"],
+    outline: "none",
+    transitionProperty: "left, box-shadow",
+    transitionDuration: "90ms",
+    transitionTimingFunction: "linear",
+    selectors: {
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: "-8px -4px",
+      },
+      "&::after": {
+        content: '"⇆"',
+        position: "absolute",
+        inset: 0,
+        display: "grid",
+        placeItems: "center",
+        fontSize: "12px",
+        lineHeight: 1,
+        color: "var(--on-c, #111)",
+      },
+      "&:focus-visible": {
+        outline: `3px solid ${palette["--focus"]}`,
+        outlineOffset: "2px",
+      },
+      [`&${when.ancestor("[data-dragging]")}`]: {
+        cursor: cursors["--cursor-grabbing"],
+        transitionDuration: "0s",
+      },
+      [`&${when.ancestor("[data-locked]")}`]: {
+        cursor: "default",
+      },
+    },
+  }),
+  slideFoot: style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  }),
+  readout: style({
+    fontWeight: 600,
+    fontSize: "12px",
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+  }),
+  // The quiz sets data-state on Check: missed shakes it, seated wears the tick.
+  check: style({
+    position: "relative",
+    selectors: {
+      '&[data-state="missed"]': {
+        animationName: wobble,
+        animationDuration: "320ms",
+        animationTimingFunction: motion["--cut"],
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        selectors: {
+          '&[data-state="missed"]': {
+            animationName: "none",
+          },
+        },
+      },
+    },
+  }),
   prices: style({
     display: "grid",
     gridTemplateRows: "auto 52px auto",

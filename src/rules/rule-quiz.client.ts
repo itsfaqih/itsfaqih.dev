@@ -4,6 +4,8 @@ import { OUT } from "./rule-landing.css";
 import { quizView, SNAP } from "./rule-landing.view";
 
 type Drag = { x0: number; y0: number; lastX: number; lastT: number; rot: number; moved: boolean };
+/** A slot as it was when chosen. A `check` slot rewrites its id and note as its board changes. */
+type Pick = { slot: HTMLButtonElement; id: string; note: string };
 
 class RuleQuiz extends HTMLElement {
   #stop?: () => void;
@@ -28,12 +30,11 @@ class RuleQuiz extends HTMLElement {
         slot,
       ]),
     );
-    const notes = new Map([...slots].map(([id, slot]) => [id, slot.dataset.note!]));
     let said = say.firstElementChild!;
     let saidKey = "hint";
 
-    let placed: string | null = null;
-    let miss: { id: string; at: number } | null = null;
+    let placed: Pick | null = null;
+    let miss: (Pick & { at: number }) | null = null;
     let shook = 0;
     let mistakes = 0;
     let picked = false;
@@ -46,22 +47,26 @@ class RuleQuiz extends HTMLElement {
       const cleared = placed !== null;
       const open = !cleared && (!piece || picked || dragging);
       for (const [id, slot] of slots) {
-        const seated = placed === id;
-        const missed = miss?.id === id;
-        slot.className = piece
-          ? quizView.slot({
-              lead: slot.previousElementSibling !== null,
-              open,
-              near: near === id,
-              missed,
-              cleared,
-              seated,
-            })
-          : quizView.choice(slot.dataset.look === "spot" ? "spot" : "card", {
-              missed,
-              cleared,
-              seated,
-            });
+        const seated = placed?.slot === slot;
+        const missed = miss?.slot === slot;
+        // A check button draws itself from its board's styles, so it only takes the state.
+        if (slot.dataset.look === "check")
+          slot.dataset.state = seated ? "seated" : missed ? "missed" : cleared ? "off" : "";
+        else
+          slot.className = piece
+            ? quizView.slot({
+                lead: slot.previousElementSibling !== null,
+                open,
+                near: near === id,
+                missed,
+                cleared,
+                seated,
+              })
+            : quizView.choice(slot.dataset.look === "spot" ? "spot" : "card", {
+                missed,
+                cleared,
+                seated,
+              });
         if (missed && miss!.at !== shook) {
           // A second miss on the same slot keeps its class, so the shake restarts by hand.
           shook = miss!.at;
@@ -82,10 +87,10 @@ class RuleQuiz extends HTMLElement {
         }
       }
 
-      const shown = placed ?? miss?.id;
-      const text = shown ? notes.get(shown) : undefined;
+      const shown = placed ?? miss;
+      const text = shown?.note;
       say.className = quizView.say(cleared, text !== undefined);
-      const key = text !== undefined ? `${shown}-${miss?.at ?? 0}` : "hint";
+      const key = shown ? `${shown.id}-${miss?.at ?? 0}` : "hint";
       if (key !== saidKey) {
         saidKey = key;
         const fresh = document.createElement("p");
@@ -131,14 +136,15 @@ class RuleQuiz extends HTMLElement {
       piece.animate([{ transform }, { transform: "none" }], { duration: 360, easing: OUT });
     };
 
-    const drop = (id: string) => {
+    const drop = (slot: HTMLButtonElement) => {
       if (placed !== null) return;
       picked = false;
-      if (id === answer) {
+      const chosen = { slot, id: slot.dataset.slot!, note: slot.dataset.note! };
+      if (chosen.id === answer) {
         play("success");
         const from = piece && { rect: piece.getBoundingClientRect(), rot: drag?.rot ?? 0 };
         if (piece) piece.style.transform = "";
-        placed = id;
+        placed = chosen;
         miss = null;
         sync();
         if (!from || !seat || reducedMotion()) return;
@@ -156,7 +162,7 @@ class RuleQuiz extends HTMLElement {
       }
       mistakes += 1;
       play("error");
-      miss = { id, at: performance.now() };
+      miss = { ...chosen, at: performance.now() };
       if (piece) flyHome(piece);
       sync();
     };
@@ -165,8 +171,10 @@ class RuleQuiz extends HTMLElement {
       "click",
       (event) => {
         const slot =
-          event.target instanceof Element ? event.target.closest<HTMLElement>("[data-slot]") : null;
-        if (slot) drop(slot.dataset.slot!);
+          event.target instanceof Element
+            ? event.target.closest<HTMLButtonElement>("[data-slot]")
+            : null;
+        if (slot) drop(slot);
       },
       { signal },
     );
@@ -208,7 +216,7 @@ class RuleQuiz extends HTMLElement {
           return;
         }
         dragging = false;
-        if (target && !cancelled) drop(target);
+        if (target && !cancelled) drop(slots.get(target)!);
         else {
           play("place");
           flyHome(piece);

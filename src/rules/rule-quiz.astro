@@ -15,17 +15,19 @@ type Props = {
   n: number;
   level: Level;
   board?: string;
+  /** What the quiz asks for before a first try, in place of the default for its kind. */
+  hint?: string;
   /** For rows that carry markup, such as painted code: what draws each lead, slot label and text row. */
   marks?: { lead?: Mark; label?: Mark; text?: Mark };
 };
 
-const { n, level, board = "board", marks = {} } = Astro.props;
+const { n, level, board = "board", marks = {}, hint: asked } = Astro.props;
 const { lead: Lead, label: Label, text: Text } = marks;
 const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
 const place = "piece" in level ? level : null;
-const hint = place
+const hint = asked ?? (place
   ? `Drag the piece into the ${board}. Or tap it, then tap a spot.`
-  : "Tap the one that fits.";
+  : "Tap the one that fits.");
 ---
 
 <rule-quiz

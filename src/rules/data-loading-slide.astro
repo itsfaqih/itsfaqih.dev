@@ -1,0 +1,76 @@
+---
+import { arcade } from "../components/arcade.css";
+import type { Level } from "./lesson";
+import { AXIS, rowsAt, SLIDE, slideChoice } from "./data-loading";
+import { quiz, styles } from "./data-loading.css";
+import { slideView } from "./data-loading.view";
+
+// The first quiz's board (data-loading-slide.client.ts): GET /orders slides along the axis, and the
+// rows' paint line follows it. Check sends the spot it's in to the quiz as that spot's answer.
+type Props = { level: Level };
+
+const { level } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
+const start = SLIDE.from;
+const shown = rowsAt(start);
+const id = slideChoice(start);
+---
+
+<data-loading-slide class={quiz.slide} data-notes={JSON.stringify(notes)}
+  ><div class={styles.wf}
+    ><ul class={styles.lanes} aria-hidden="true"
+      ><li class={styles.label}>app.js</li><li class={styles.label}>GET /orders</li><li class={styles.label}>render rows</li></ul
+    ><div class:list={[styles.plot, quiz.slidePlot]}
+      ><ul class={styles.lanes}
+        ><li class={styles.lane}
+          ><span class:list={[styles.bar, styles.code]} style={`left:0;width:${pct(SLIDE.code)}`}></span
+          ><span class={arcade.srOnly}>app.js: 0 to {SLIDE.code}ms</span></li
+        ><li class:list={[styles.lane, quiz.track]} data-part="track"
+          ><span
+            role="slider"
+            tabindex="0"
+            class:list={[styles.bar, styles.req, quiz.handle]}
+            style={`left:${pct(start)};width:${pct(SLIDE.request)}`}
+            aria-label="When GET /orders starts"
+            aria-valuemin="0"
+            aria-valuemax={SLIDE.max}
+            aria-valuenow={start}
+            aria-valuetext={`${start}ms, rows show at ${shown}ms`}
+            data-part="handle"></span
+          ></li
+        ><li class={styles.lane}
+          ><span
+            class:list={[styles.bar, styles.render]}
+            style={`left:${pct(shown - SLIDE.render)};width:${pct(SLIDE.render)}`}
+            data-part="rows"></span
+          ></li
+        ></ul
+      ><span class={styles.paint} style={`left:${pct(shown)}`} data-part="paint"
+        ><b class={slideView.tag(shown)} data-part="tag">{shown}ms</b></span
+      ><span class={styles.grid} aria-hidden="true"></span></div
+    ><span class={styles.axis} aria-hidden="true"
+      >{
+        [0, 250, 500, 750, 1000].map((ms) => (
+          <i class={styles.tick} style={`left:${pct(ms)}`}>{ms}</i>
+        ))
+      }</span
+    ></div
+  ><div class={quiz.slideFoot}
+    ><span class={quiz.readout} aria-hidden="true"
+      >starts at <b data-part="start">{start}ms</b></span
+    ><button
+      type="button"
+      class={slideView.check}
+      data-part="slot"
+      data-look="check"
+      data-slot={id}
+      data-note={notes[id]}>Check</button
+    ></div
+  ></data-loading-slide
+>
+
+<script>
+  import "./data-loading-slide.client";
+</script>

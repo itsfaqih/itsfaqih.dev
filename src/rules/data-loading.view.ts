@@ -1,7 +1,13 @@
 import { button } from "../components/button.css";
 import { buttonVariant } from "../components/button";
 import { cx } from "../cx";
-import { styles } from "./data-loading.css";
+import { quiz, styles } from "./data-loading.css";
+/** The slide quiz's paint tag, which turns to sit left of the line near the axis's end. */
+export const slideView = {
+  tag: (at: number) => cx(styles.paintTag, at > 600 && styles.paintTagEnd),
+  check: cx(button.base, buttonVariant["primary-brand"], button.sm, quiz.check),
+};
+
 export type Sweep = "still" | "armed" | "run";
 export type Signal = "offline" | "connecting" | "online";
 
