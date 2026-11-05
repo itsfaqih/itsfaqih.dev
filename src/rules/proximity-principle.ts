@@ -27,7 +27,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     levels: [
       {
         name: "One caller",
-        piece: "toCents()",
+        piece: "normalizeEmail()",
         answer: "inline",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
@@ -36,17 +36,17 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 2,
             slot: {
               id: "lib",
-              label: "+ money.ts",
+              label: "+ strings.ts",
               note: "A new file and an import for a single caller. lib/ is utils/ under another name.",
             },
           },
-          { depth: 1, text: "routes/orders/", kind: "dir" },
-          { depth: 2, text: "refund.ts", tag: "uses it" },
+          { depth: 1, text: "routes/users/", kind: "dir" },
+          { depth: 2, text: "signup.ts", tag: "uses it" },
           {
             depth: 3,
             slot: {
               id: "inline",
-              label: "↳ inline, above refund()",
+              label: "↳ inline, above signup()",
               note: "Keep it where it's used, with nothing to import or open.",
             },
           },
@@ -55,7 +55,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 2,
             slot: {
               id: "utils",
-              label: "+ to-cents.ts",
+              label: "+ normalize-email.ts",
               note: "Three folders from its only caller. Extract it when a second file needs it, not before.",
             },
           },
@@ -92,25 +92,25 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     levels: [
       {
         name: "A handler's own parts",
-        piece: "types · schema · priceItems()",
+        piece: "types · template · inviteLink()",
         answer: "file",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
-          { depth: 1, text: "routes/orders/", kind: "dir" },
+          { depth: 1, text: "routes/teams/", kind: "dir" },
           {
             depth: 2,
             slot: {
               id: "folder",
-              label: "+ create-order/ index, types, schema, helpers",
+              label: "+ send-invite/ index, types, template, helpers",
               note: "Five files for one handler, so five tabs to read it.",
             },
           },
-          { depth: 2, text: "create-order.ts" },
+          { depth: 2, text: "send-invite.ts" },
           {
             depth: 3,
             slot: {
               id: "file",
-              label: "↳ inside create-order.ts",
+              label: "↳ inside send-invite.ts",
               note: "Keep the whole handler in one file.",
             },
           },
@@ -118,7 +118,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 1,
             slot: {
               id: "kinds",
-              label: "+ types/, schemas/, helpers/",
+              label: "+ types/, templates/, helpers/",
               note: "Sorted by kind, one handler now spans four folders.",
             },
           },
@@ -150,8 +150,8 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     },
     levels: [
       {
-        name: "A slow export",
-        piece: "buildReport()",
+        name: "A big import",
+        piece: "parseCsv()",
         answer: "worker",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
@@ -160,25 +160,25 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 2,
             slot: {
               id: "service",
-              label: "+ reports.service.ts",
-              note: "A new file, but it still runs on the main thread. Every request still waits 2 s.",
+              label: "+ imports.service.ts",
+              note: "A new file, but it still runs on the main thread. Every request still waits 3 s.",
             },
           },
-          { depth: 1, text: "routes/reports/", kind: "dir" },
-          { depth: 2, text: "export.ts", tag: "uses it" },
+          { depth: 1, text: "routes/imports/", kind: "dir" },
+          { depth: 2, text: "upload.ts", tag: "uses it" },
           {
             depth: 3,
             slot: {
               id: "inline",
-              label: "↳ inline, in export.ts",
-              note: "It runs on the main thread, so every other request waits 2 s for it.",
+              label: "↳ inline, in upload.ts",
+              note: "It runs on the main thread, so every other request waits 3 s for it.",
             },
           },
           {
             depth: 2,
             slot: {
               id: "worker",
-              label: "+ build-report.worker.ts",
+              label: "+ parse-csv.worker.ts",
               note: "Extract it even when used once. A worker thread runs it, and other requests keep going.",
             },
           },
@@ -214,38 +214,38 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     levels: [
       {
         name: "Two callers",
-        piece: "getCart()",
-        answer: "shop",
+        piece: "getInvoice()",
+        answer: "billing",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
-          { depth: 1, text: "routes/shop/", kind: "dir" },
+          { depth: 1, text: "routes/billing/", kind: "dir" },
           {
             depth: 2,
             slot: {
-              id: "shop",
-              label: "+ cart.ts",
-              note: "Move it to routes/shop/, the nearest folder both callers share, so the path names its owner.",
+              id: "billing",
+              label: "+ invoice.ts",
+              note: "Move it to routes/billing/, the nearest folder both callers share, so the path names its owner.",
             },
           },
-          { depth: 2, text: "cart/", kind: "dir" },
-          { depth: 3, text: "summary.ts", tag: "uses it" },
+          { depth: 2, text: "invoices/", kind: "dir" },
+          { depth: 3, text: "list.ts", tag: "uses it" },
           {
             depth: 3,
             slot: {
-              id: "cart",
-              label: "+ cart.ts",
-              note: "checkout/ would reach into cart/ for it. Move it up to the folder both share.",
+              id: "invoices",
+              label: "+ invoice.ts",
+              note: "refunds/ would reach into invoices/ for it. Move it up to the folder both share.",
             },
           },
-          { depth: 2, text: "checkout/", kind: "dir" },
-          { depth: 3, text: "charge.ts", tag: "uses it" },
+          { depth: 2, text: "refunds/", kind: "dir" },
+          { depth: 3, text: "create.ts", tag: "uses it" },
           { depth: 1, text: "shared/", kind: "dir" },
           {
             depth: 2,
             slot: {
               id: "shared",
-              label: "+ cart.ts",
-              note: "shared/ holds everything, so the path no longer says the shop owns it.",
+              label: "+ invoice.ts",
+              note: "shared/ holds everything, so the path no longer says billing owns it.",
             },
           },
         ],
@@ -283,16 +283,16 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     levels: [
       {
         name: "Twelve callers",
-        piece: "require-auth.ts",
-        answer: "middleware",
+        piece: "user.schema.ts",
+        answer: "schemas",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
           {
             depth: 1,
             slot: {
-              id: "middleware",
-              label: "+ middleware/require-auth.ts",
-              note: "Give it a type folder. middleware/ says what it is, and ⌘P finds it.",
+              id: "schemas",
+              label: "+ schemas/user.schema.ts",
+              note: "Give it a type folder. schemas/ says what it is, and ⌘P finds it.",
             },
           },
           { depth: 1, text: "routes/", kind: "dir" },
@@ -300,17 +300,17 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 2,
             slot: {
               id: "routes",
-              label: "+ require-auth.ts",
-              note: "routes/ is the lowest common ancestor, but a middleware is not a route.",
+              label: "+ user.schema.ts",
+              note: "routes/ is the lowest common ancestor, but a schema is not a route.",
             },
           },
-          { depth: 2, text: "settings/", kind: "dir", tag: "uses it" },
+          { depth: 2, text: "signup/", kind: "dir", tag: "uses it" },
           {
             depth: 3,
             slot: {
-              id: "settings",
-              label: "+ require-auth.ts",
-              note: "Its first caller doesn't own it. Eleven other routes would import from settings/.",
+              id: "signup",
+              label: "+ user.schema.ts",
+              note: "Its first caller doesn't own it. Eleven other routes would import from signup/.",
             },
           },
           { depth: 2, text: "… 11 more routes", kind: "more", tag: "uses it" },

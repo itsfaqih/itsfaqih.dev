@@ -18,17 +18,17 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "hover",
-            label: "Save, changes on hover",
+            label: "Send, changes on hover",
             note: "Hover needs a mouse. Mia never hovers, so she still can't tell where she is.",
           },
           {
             id: "press",
-            label: "Save, changes on press",
+            label: "Send, changes on press",
             note: "Press comes after she has found the button. She needs to see where she is before she presses Enter.",
           },
           {
             id: "focus",
-            label: "Save, changes on focus",
+            label: "Send, changes on focus",
             note: "Focus is where the keyboard is. Give it a look, and every Tab lands somewhere she can see.",
           },
         ],
@@ -120,12 +120,12 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "text",
-            label: "Save, text only",
+            label: "Rename, text only",
             note: "With no icon, there's no hidden white space. Even padding already looks even.",
           },
           {
             id: "lead",
-            label: "New project, with a plus icon",
+            label: "Download, with a download icon",
             note: "Trim the icon's side. The icon's own white space makes up the rest.",
           },
           {

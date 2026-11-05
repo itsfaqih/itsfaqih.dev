@@ -8,7 +8,7 @@ const BIG_STEP = 50;
 const TICK = 50;
 
 /**
- * The first quiz's board (data-loading-slide.astro). Dragging GET /orders, or its arrow keys, moves
+ * The first quiz's board (data-loading-slide.astro). Dragging GET /invoices, or its arrow keys, moves
  * its start in 10ms steps; the rows' bar and paint line follow, and Check carries the answer that
  * start is. The quiz locks Check once cleared, and the bar locks with it.
  */

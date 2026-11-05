@@ -31,7 +31,7 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={inline.good.tree} />
   </RuleLesson>
   <RuleQuiz n={1} level={inline.levels[0]} board="tree"
-    >Only <Code tone="prompt">refund.ts</Code> calls <Code tone="prompt">toCents()</Code>. Place it.</RuleQuiz
+    >Only <Code tone="prompt">signup.ts</Code> calls <Code tone="prompt">normalizeEmail()</Code>. Place it.</RuleQuiz
   >
 
   <RuleLesson lesson={fewer} rows={rows(fewer)}>
@@ -42,7 +42,7 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={fewer.good.tree} />
   </RuleLesson>
   <RuleQuiz n={2} level={fewer.levels[0]} board="tree"
-    ><Code tone="prompt">createOrder</Code> has its own types, schema and a helper. Nothing else uses them. Place them.</RuleQuiz
+    ><Code tone="prompt">sendInvite</Code> has its own types, an email template and a helper. Nothing else uses them. Place them.</RuleQuiz
   >
 
   <RuleLesson lesson={constraint} rows={rows(constraint)}>
@@ -53,7 +53,7 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={constraint.good.tree} />
   </RuleLesson>
   <RuleQuiz n={3} level={constraint.levels[0]} board="tree"
-    ><Code tone="prompt">buildReport()</Code> blocks for 2 s of CPU, and only <Code tone="prompt">export.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
+    ><Code tone="prompt">parseCsv()</Code> takes 3 s of CPU on a large upload, and only <Code tone="prompt">upload.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
   >
 
   <RuleLesson lesson={ancestor} rows={rows(ancestor)}>
@@ -67,7 +67,7 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={ancestor.good.tree} />
   </RuleLesson>
   <RuleQuiz n={4} level={ancestor.levels[0]} board="tree"
-    ><Code tone="prompt">cart/summary.ts</Code> and <Code tone="prompt">checkout/charge.ts</Code> now both call<Fragment set:html="<!-- -->" /> <Code tone="prompt">getCart()</Code>. Move it.</RuleQuiz
+    ><Code tone="prompt">invoices/list.ts</Code> and <Code tone="prompt">refunds/create.ts</Code> now both call<Fragment set:html="<!-- -->" /> <Code tone="prompt">getInvoice()</Code>. Move it.</RuleQuiz
   >
 
   <RuleLesson lesson={global} rows={rows(global)}>
@@ -83,6 +83,6 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={global.good.tree} />
   </RuleLesson>
   <RuleQuiz n={5} level={global.levels[0]} board="tree"
-    >Twelve routes use <Code tone="prompt">require-auth.ts</Code>. Place it.</RuleQuiz
+    >Twelve routes validate input with <Code tone="prompt">user.schema.ts</Code>. Place it.</RuleQuiz
   >
 </RuleLanding>

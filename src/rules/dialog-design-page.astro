@@ -1,7 +1,7 @@
 ---
 import Icon from "../components/icon.astro";
 import DialogConfirmDemo from "./dialog-confirm-demo.astro";
-import { DRAFT, LESSONS, TLDR } from "./dialog-design";
+import { LESSONS, REPLY, REVIEW, TLDR } from "./dialog-design";
 import { quiz, styles } from "./dialog-design.css";
 import { quizKit } from "./rule-landing.css";
 import DialogDraftDemo from "./dialog-draft-demo.astro";
@@ -31,7 +31,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogFocusDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={1} level={focus.levels[0]}
-    >You opened <b>Edit profile</b> from its button halfway down a settings page, then pressed Save. Tap where focus goes.
+    >You opened <b>Add card</b> from its button halfway down a billing page, then pressed Save. Tap where focus goes.
     <div slot="board" class={quiz.screen}>
       <span class:list={[styles.page, quiz.page]}>
         <QuizChoice level={focus.levels[0]} id="body" look="spot"
@@ -41,20 +41,20 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
             ></span
           ></QuizChoice
         >
-        <b class={styles.strong}>Settings</b>
+        <b class={styles.strong}>Billing</b>
         <span style="--w:64%" class={styles.ghost}></span>
         <span class:list={[styles.card, styles.spread, quiz.wrap]}
           ><span class={styles.project}
-            ><b class={styles.strong}>Profile</b><small class={styles.meta}>Ada Lovelace</small></span
+            ><b class={styles.strong}>Payment method</b><small class={styles.meta}>Visa ending 4242</small></span
           ><QuizChoice level={focus.levels[0]} id="trigger" look="spot"
-            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Edit profile</span></QuizChoice
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Add card</span></QuizChoice
           ></span
         >
         <span class:list={[styles.card, styles.spread, quiz.wrap]}
           ><span class={styles.project}
-            ><b class={styles.strong}>Password</b><small class={styles.meta}>changed 3 months ago</small></span
+            ><b class={styles.strong}>Invoices</b><small class={styles.meta}>12 this year</small></span
           ><QuizChoice level={focus.levels[0]} id="next" look="spot"
-            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Change password</span></QuizChoice
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Download all</span></QuizChoice
           ></span
         >
         <span style="--w:52%" class={styles.ghost}></span>
@@ -71,13 +71,13 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   <RuleQuiz n={2} level={escape.levels[0]}
     >Three dialogs, and a click lands on the dim area around each. Pick the one that click should close.
     <div slot="board" class={quizKit.trio}>
-      <QuizChoice level={escape.levels[0]} id="issue" caption="Title typed in"
+      <QuizChoice level={escape.levels[0]} id="issue" caption="Text typed in"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>New issue</span><Icon {...x} class={quiz.miniX} /></span
-            ><span class={quiz.miniField}>{DRAFT}</span><span class={quiz.miniActs}
-              ><span class={quiz.miniBtn}>Create</span></span
+              ><span class={quiz.miniTitle}>Reply</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{REPLY}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Send</span></span
             ></span
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
@@ -86,9 +86,9 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>What's new</span><Icon {...x} class={quiz.miniX} /></span
+              ><span class={quiz.miniTitle}>Keyboard shortcuts</span><Icon {...x} class={quiz.miniX} /></span
             ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
-              class={quiz.miniActs}><span class={quiz.miniBtn}>Got it</span></span
+              class={quiz.miniActs}><span class={quiz.miniBtn}>Done</span></span
             ></span
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
@@ -96,8 +96,8 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
       <QuizChoice level={escape.levels[0]} id="profile" caption="Nothing changed yet"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
-            ><span class={quiz.miniHead}><span class={quiz.miniTitle}>Edit profile</span></span><span
-              class={quiz.miniField}>Ada Lovelace</span
+            ><span class={quiz.miniHead}><span class={quiz.miniTitle}>Edit address</span></span><span
+              class={quiz.miniField}>12 Baker St</span
             ><span class={quiz.miniActs}
               ><span class:list={[quiz.miniBtn, quiz.miniPlain]}>Cancel</span><span class={quiz.miniBtn}>Save</span></span
             ></span
@@ -114,23 +114,23 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogConfirmDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={3} level={safe.levels[0]}
-    ><b>Delete Moonbase?</b> removes 214 files for good. Tap where focus starts.
+    ><b>Delete your account?</b> erases it and its 38 invoices for good. Tap where focus starts.
     <div slot="board" class:list={[quiz.screen, quiz.tall]}>
       <span class:list={[quiz.layer, styles.page, quiz.page]}>
         <span class={styles.spread}><span class={styles.logo}></span><span style="--w:30%" class={styles.ghost}></span></span>
         <span class:list={[styles.card, styles.spread, quiz.wrap]}
           ><span class={styles.project}
-            ><b class={styles.strong}>Moonbase</b><small class={styles.meta}>214 files · edited 2h ago</small></span
+            ><b class={styles.strong}>Your account</b><small class={styles.meta}>Member since 2021</small></span
           ><QuizChoice level={safe.levels[0]} id="trigger" look="spot"
-            ><span class:list={[btn, styles.red, styles.redTint]}>Delete project</span></QuizChoice
+            ><span class:list={[btn, styles.red, styles.redTint]}>Delete account</span></QuizChoice
           ></span
         >
         <span style="--w:62%" class={styles.ghost}></span>
       </span>
       <span aria-hidden="true" class:list={[quiz.layer, quiz.scrim]}></span>
       <span class:list={[quiz.layer, quiz.panel, quiz.low]}>
-        <span class={styles.head}><span class={styles.title}>Delete Moonbase?</span></span>
-        <span class={styles.body}>Its 214 files go too. This can't be undone.</span>
+        <span class={styles.head}><span class={styles.title}>Delete your account?</span></span>
+        <span class={styles.body}>Its 38 invoices go too. This can't be undone.</span>
         <span class={styles.acts}
           ><QuizChoice level={safe.levels[0]} id="cancel" look="spot"
             ><span class:list={[btn, styles.plain, quiz.plain]}>Cancel</span></QuizChoice
@@ -181,20 +181,20 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>What's new</span><Icon {...x} class={quiz.miniX} /></span
+              ><span class={quiz.miniTitle}>About</span><Icon {...x} class={quiz.miniX} /></span
             ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
-              class={quiz.miniActs}><span class={quiz.miniBtn}>Got it</span></span
+              class={quiz.miniActs}><span class={quiz.miniBtn}>Close</span></span
             ></span
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
       >
-      <QuizChoice level={draft.levels[0]} id="issue" caption="Title typed in"
+      <QuizChoice level={draft.levels[0]} id="issue" caption="Text typed in"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>New issue</span><Icon {...x} class={quiz.miniX} /></span
-            ><span class={quiz.miniField}>{DRAFT}</span><span class={quiz.miniActs}
-              ><span class={quiz.miniBtn}>Create</span></span
+              ><span class={quiz.miniTitle}>Write a review</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{REVIEW}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Post</span></span
             ></span
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
@@ -217,7 +217,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogScrollDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={6} level={scroll.levels[0]}
-    ><b>Share</b> opens over a long article. Here are its layers, pulled apart. Tap the one to lock so the article stays still.
+    ><b>Sort</b> opens over a long product list. Here are its layers, pulled apart. Tap the one to lock so the list stays still.
     <div slot="board" class={quiz.layers}>
       <span class={quiz.layerCol}
         ><span class={quiz.tilt}
@@ -243,8 +243,8 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
           ><QuizChoice level={scroll.levels[0]} id="panel" look="spot"
             ><span class:list={[quiz.slab, quiz.slabPanel]}
               ><span class={quiz.miniHead}
-                ><span class={quiz.miniTitle}>Share</span><Icon {...x} class={quiz.miniX} /></span
-              ><span class={quiz.miniField}>itsfaqih.dev/p/42</span></span
+                ><span class={quiz.miniTitle}>Sort</span><Icon {...x} class={quiz.miniX} /></span
+              ><span class={quiz.miniField}>Price, low to high</span></span
             ></QuizChoice
           ></span
         ><span class={quiz.layerName}>The dialog panel</span></span
@@ -265,7 +265,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
           [
             ["plain", "A plain box", ["Cancel, button"]],
             ["role", "Marked as a dialog", ["dialog", "Cancel, button"]],
-            ["named", "Named and described", ["Delete Moonbase?, dialog", "Its 214 files go too. This can't be undone.", "Cancel, button"]],
+            ["named", "Named and described", ["Delete Moonbase?, dialog", "Its 38 invoices go too. This can't be undone.", "Cancel, button"]],
           ] as const
         ).map(([id, caption, lines]) => (
           <QuizChoice level={name.levels[0]} id={id} caption={caption}

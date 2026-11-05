@@ -59,7 +59,7 @@ const MARKS = [
 ] as const;
 type Mark = (typeof MARKS)[number][0];
 
-/** A field the "A new task" board types with one of MARKS. */
+/** A field the "A new invoice" board types with one of MARKS. */
 const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<Mark, string>>): PickField => ({
   name,
   line: `${name}: ${type}`,
@@ -72,35 +72,35 @@ const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<M
   })),
 });
 
-export const NEW_TASK: readonly PickField[] = [
-  typed("assignee", "User", "nul", {
-    opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
-    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
+export const NEW_INVOICE: readonly PickField[] = [
+  typed("coupon", "Coupon", "nul", {
+    opt: "?: lets a caller leave the coupon out and never decide. Make it required, so they pass a coupon or null on purpose.",
+    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no coupon\" is a null someone wrote.",
   }),
-  typed("color", "string", "opt", {
-    und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
-    nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
+  typed("memo", "string", "opt", {
+    und: "Now every caller has to write memo: undefined just to leave it blank. ?: lets them leave it out.",
+    nul: "Now every caller has to pass a memo or null, when most have none. ?: lets them leave it out.",
   }),
 ];
-const NEW_TASK_CLEAR =
-  "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
+const NEW_INVOICE_CLEAR =
+  "Every caller has to pass a coupon, or null on purpose. The memo can be left out.";
 
-/** Replies to `GET /users/bo?fields=name,manager`, each a JSON body. */
+/** Replies to `GET /products/9?fields=name,discount`, each a JSON body. */
 export const REPLIES: [Choice, Choice, ...Choice[]] = [
   {
     id: "all",
-    label: '{ "name": "Bo", "manager": null, "phone": null }',
-    note: "phone: null claims Bo has no phone. Nobody asked, so you don't know that, and the app won't ask him for one.",
+    label: '{ "name": "Lamp", "discount": null, "weight": null }',
+    note: "weight: null claims the lamp has no weight. Nobody asked, so you don't know that, and the client may store it as fact.",
   },
   {
     id: "name",
-    label: '{ "name": "Bo" }',
-    note: "manager was asked for. With no key, it reads as not loaded, so the client fetches it again on every view.",
+    label: '{ "name": "Lamp" }',
+    note: "discount was asked for. With no key, it reads as not loaded, so the client fetches it again on every view.",
   },
   {
     id: "asked",
-    label: '{ "name": "Bo", "manager": null }',
-    note: "null answers the question, since Bo has no manager. phone was never asked for, so its key isn't there.",
+    label: '{ "name": "Lamp", "discount": null }',
+    note: "null answers the question, since the lamp has no discount. weight was never asked for, so its key isn't there.",
   },
 ];
 
@@ -150,23 +150,23 @@ const patched = (
 
 export const MATCH: readonly PickField[] = [
   patched(
-    "title",
-    '"Ship v1"',
+    "name",
+    '"Ana"',
     "val",
     {
-      nul: "null wipes the title instead of renaming it.",
-      und: "undefined drops out of the JSON, so the rename never arrives.",
+      nul: "null wipes the name instead of changing it.",
+      und: "undefined drops out of the JSON, so the new name never arrives.",
     },
-    '"Ship v2"',
+    '"Ana Li"',
   ),
-  patched("assignee", '"Rina"', "und", { nul: "assignee: null unassigns Rina, which nobody asked for." }),
-  patched("due", '"Mar 3"', "nul", {
-    und: "undefined drops out of the JSON, so the server never hears about the clear and keeps Mar 3.",
+  patched("email", '"ana@x.io"', "und", { nul: "email: null wipes the email, which nobody asked for." }),
+  patched("phone", '"0812 555"', "nul", {
+    und: "undefined drops out of the JSON, so the server never hears about the clear and keeps the number.",
   }),
-  patched("notes", '"Check copy"', "und", { nul: "notes: null wipes notes nobody touched." }),
+  patched("city", '"Bandung"', "und", { nul: "city: null wipes a city nobody touched." }),
 ];
 const MATCH_CLEAR =
-  "It matches. The new title went out, and null cleared the date. assignee and notes stayed undefined, so they dropped out of the JSON and the server left them alone.";
+  "It matches. The new name went out, and null cleared the phone. email and city stayed undefined, so they dropped out of the JSON and the server left them alone.";
 
 export const LESSONS: Lesson<CodeSide>[] = [
   {
@@ -249,40 +249,40 @@ export const LESSONS: Lesson<CodeSide>[] = [
     good: { label: "Only changes", costs: ["0 fields wiped"] },
     levels: [
       {
-        name: "Only the title",
+        name: "Two changes",
         piece: "undefined",
-        answer: "due",
+        answer: "stock",
         rows: [
           { depth: 0, text: "const changes = {" },
           {
             depth: 1,
-            lead: "title:",
+            lead: "price:",
             slot: {
-              id: "title",
-              label: "title:",
-              note: "undefined drops out of the JSON, so the rename never reaches the server.",
+              id: "price",
+              label: "price:",
+              note: "undefined drops out of the JSON, so the new price never reaches the server.",
             },
           },
           {
             depth: 1,
-            lead: "reviewer:",
+            lead: "discount:",
             slot: {
-              id: "reviewer",
-              label: "reviewer:",
-              note: "The removal drops out of the JSON, so the reviewer stays.",
+              id: "discount",
+              label: "discount:",
+              note: "The removal drops out of the JSON, so the discount stays.",
             },
           },
           {
             depth: 1,
-            lead: "due:",
+            lead: "stock:",
             slot: {
-              id: "due",
-              label: "due:",
-              note: "Leave it undefined so the server leaves due alone.",
+              id: "stock",
+              label: "stock:",
+              note: "Leave it undefined so the server leaves stock alone.",
             },
           },
           { depth: 0, text: "}" },
-          { depth: 0, text: 'patch("/tasks/12", changes)' },
+          { depth: 0, text: 'patch("/products/3", changes)' },
         ],
       },
     ],
@@ -315,9 +315,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "A new task",
-        answer: pickChoice(NEW_TASK.map((field) => field.answer)),
-        choices: pickChoices(NEW_TASK, NEW_TASK_CLEAR),
+        name: "A new invoice",
+        answer: pickChoice(NEW_INVOICE.map((field) => field.answer)),
+        choices: pickChoices(NEW_INVOICE, NEW_INVOICE_CLEAR),
       },
     ],
   },
@@ -355,28 +355,28 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "Two sign-ups",
+        name: "Two lookups",
         piece: "null",
-        answer: "bo",
+        answer: "missing",
         rows: [
-          { depth: 0, text: "const seen = new Map([" },
-          { depth: 1, text: '["ana@x.io", { id: 7 }],' },
+          { depth: 0, text: "const products = new Map([" },
+          { depth: 1, text: '["sku-1", { price: 1200 }],' },
           {
             depth: 1,
-            lead: '["bo@x.io",',
+            lead: '["sku-2",',
             slot: {
-              id: "bo",
-              label: '["bo@x.io",',
-              note: "Cache null to record that nobody has it, so the next lookup is skipped.",
+              id: "missing",
+              label: '["sku-2",',
+              note: "Cache null to record that no product has it, so the next lookup is skipped.",
             },
           },
           {
             depth: 1,
-            lead: '["cy@x.io",',
+            lead: '["sku-3",',
             slot: {
-              id: "cy",
-              label: '["cy@x.io",',
-              note: "Says nobody has cy@x.io before anyone checked. Cy can't sign in until the cache clears.",
+              id: "unchecked",
+              label: '["sku-3",',
+              note: "Says no product has sku-3 before anyone checked. It can't be sold until the cache clears.",
             },
           },
           { depth: 0, text: "])" },

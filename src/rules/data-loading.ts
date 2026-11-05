@@ -40,7 +40,7 @@ export const EARLY: Waterfall = {
 };
 
 /** The quiz's request: how long it takes, and how far it can slide along the axis. */
-export const SLIDE = { request: 500, render: 20, code: 300, max: 500, from: 330 } as const;
+export const SLIDE = { request: 400, render: 20, code: 250, max: 500, from: 280 } as const;
 
 /** When the rows show for a request that starts at `start`: once both the code and the data are in. */
 export const rowsAt = (start: number) =>
@@ -118,18 +118,18 @@ export const LESSONS: Lesson[] = [
     good: { label: "Fetch on navigation", costs: ["data at 520ms", "0 waterfalls"] },
     levels: [
       {
-        name: "Twenty orders",
+        name: "Twelve invoices",
         answer: "nav",
         choices: [
           {
             id: "nav",
             label: "Starts as you navigate",
-            note: "It starts with the navigation and runs while the code loads. The rows show at 520ms, as soon as they can.",
+            note: "It starts with the navigation and runs while the code loads. The rows show at 420ms, as soon as they can.",
           },
           {
             id: "early",
             label: "Starts before the code loads",
-            note: "Closer, but nothing makes it wait. Start it as you navigate, at 0ms, and the rows show at 520ms.",
+            note: "Closer, but nothing makes it wait. Start it as you navigate, at 0ms, and the rows show at 420ms.",
           },
           {
             id: "late",
@@ -174,26 +174,26 @@ export const LESSONS: Lesson[] = [
     good: { label: "Wait 200ms", costs: ["0 flashes"] },
     levels: [
       {
-        name: "A quick reply",
+        name: "As you type",
         piece: "spinner",
         answer: "delay",
         rows: [
-          at("0ms", "You press Refresh"),
+          at("0ms", "You type a letter in search"),
           {
             depth: 1,
             slot: {
               id: "now",
               label: "show it at once",
-              note: "Most replies land at 80ms, so the spinner flashes on almost every click.",
+              note: "Most suggestions land at 60ms, so the spinner flashes on almost every keystroke.",
             },
           },
-          at("80ms", "Most replies land"),
+          at("60ms", "Most suggestions land"),
           {
             depth: 1,
             slot: {
               id: "delay",
               label: "show it at 200ms, if still waiting",
-              note: "Wait 200ms. Quick replies never show it. Slow ones get it when the wait is real.",
+              note: "Wait 200ms. Quick suggestions never show it. Slow ones get it when the wait is real.",
             },
           },
           {
@@ -201,10 +201,10 @@ export const LESSONS: Lesson[] = [
             slot: {
               id: "late",
               label: "show it at 1s, if still waiting",
-              note: "A slow reply sits for a full second with no sign the click worked.",
+              note: "A slow search sits for a full second with no sign it heard the keystroke.",
             },
           },
-          at("2000ms", "A slow reply lands"),
+          at("1500ms", "A slow search lands"),
         ],
       },
     ],
@@ -247,30 +247,30 @@ export const LESSONS: Lesson[] = [
         piece: "check the shape",
         answer: "fetch",
         rows: [
-          at("0ms", "The user arrives from the server"),
+          at("0ms", "The order arrives from the server"),
           {
             depth: 1,
             slot: {
               id: "fetch",
               label: "as soon as it arrives",
-              note: "Check it here. A missing photo gets its fallback once, and everything after can trust the data.",
+              note: "Check it here. A missing coupon gets its fallback once, and everything after can trust the data.",
             },
           },
-          at("40ms", "The profile page renders"),
+          at("40ms", "The checkout page renders"),
           {
             depth: 1,
             slot: {
               id: "page",
-              label: "in the profile page",
-              note: "The data got this far unchecked, and every other screen that loads a user skips the check.",
+              label: "in the checkout page",
+              note: "The data got this far unchecked, and every other screen that loads an order skips the check.",
             },
           },
-          at("42ms", "The avatar reads the photo"),
+          at("42ms", "The receipt reads the coupon"),
           {
             depth: 1,
             slot: {
               id: "avatar",
-              label: "in the avatar, as a fallback",
+              label: "in the receipt, as a fallback",
               note: "The fallback hides the gap two screens from where it came in, and every other reader still trusts it.",
             },
           },
@@ -285,22 +285,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Offline on day 3",
-        answer: "history",
+        answer: "orders",
         choices: [
           {
-            id: "balance",
-            label: "Balance, $2,140",
-            note: "It's $310 now. You'd plan with $1,830 you no longer have.",
+            id: "stock",
+            label: "Desk lamp, 3 in stock",
+            note: "They sold out on day 2. You'd order a lamp nobody can ship.",
           },
           {
-            id: "history",
-            label: "Last week's payments, updated 2 days ago",
-            note: "Persist it with the date. Past payments don't change.",
+            id: "orders",
+            label: "Your past orders, updated 2 days ago",
+            note: "Persist them with the date. Past orders don't change.",
           },
           {
-            id: "rate",
-            label: "Rate, 1 USD = 16,240 IDR",
-            note: "Rates move by the minute. A two-day-old rate prices every transfer wrong.",
+            id: "price",
+            label: "Desk lamp sale price, $48",
+            note: "The sale ended on day 2. A two-day-old price shows a total checkout won't charge.",
           },
         ],
       },

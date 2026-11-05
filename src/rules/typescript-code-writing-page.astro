@@ -23,9 +23,9 @@ const typo = [
   ["local", "function formatPrice(cents:\u00a0number)\u00a0{…}"],
 ] as const;
 const clash = [
-  ["and", ["type Admin = User & { id: number }"]],
-  ["extends", ["interface Admin extends User {", "  id: number", "}"]],
-  ["value", ["const Admin = { id: 0 }"]],
+  ["and", ["type Invoice = Order & { total: string }"]],
+  ["extends", ["interface Invoice extends Order {", "  total: string", "}"]],
+  ["value", ['const Invoice = { total: "0" }']],
 ] as const;
 ---
 
@@ -63,10 +63,10 @@ const clash = [
     <TsChecked slot="good" lines={extend.good.lines} />
   </RuleLesson>
   <RuleQuiz n={2} level={extend.levels[0]}
-    ><Code tone="prompt">Admin</Code> builds on <Code tone="prompt">User</Code>, but gives <Code tone="prompt">id</Code> a number where User has a string. Pick the Admin that fails where it's declared.
+    ><Code tone="prompt">Invoice</Code> builds on <Code tone="prompt">Order</Code>, but gives <Code tone="prompt">total</Code> a string where Order has a number. Pick the Invoice that fails where it's declared.
     <div slot="board" class={quizKit.stack}>
       <div class:list={[styles.code, quiz.given]}>
-        <code class={styles.source}><TsPaint text={"type User = {\u00a0id:\u00a0string;\u00a0name:\u00a0string\u00a0}"} /></code>
+        <code class={styles.source}><TsPaint text={"type Order = {\u00a0id:\u00a0string;\u00a0total:\u00a0number\u00a0}"} /></code>
       </div>
       {
         clash.map(([id, lines]) => (
@@ -91,7 +91,7 @@ const clash = [
     <TsChecked slot="good" lines={unions.good.lines} />
   </RuleLesson>
   <RuleQuiz n={3} level={unions.levels[0]} board="code" marks={blanks}
-    >You loop over the roles at runtime and want a <Code tone="prompt">Role</Code> type that matches the list. Place <Code tone="prompt">as const</Code>.</RuleQuiz
+    >You loop over the invoice statuses at runtime and want a <Code tone="prompt">Status</Code> type that matches the list. Place <Code tone="prompt">as const</Code>.</RuleQuiz
   >
 
   <RuleLesson lesson={edges}>
@@ -102,7 +102,7 @@ const clash = [
     <TsChecked slot="good" lines={edges.good.lines} />
   </RuleLesson>
   <RuleQuiz n={4} level={edges.levels[0]} board="code" marks={blanks}
-    ><Code tone="prompt">getUser</Code> is the module's public API, and <Code tone="prompt">find</Code> can return<Fragment set:html="<!-- -->" /> <Code tone="prompt">undefined</Code>. Place <Code tone="prompt">: User</Code>.</RuleQuiz
+    ><Code tone="prompt">findOrder</Code> is the module's public API, and <Code tone="prompt">find</Code> can return<Fragment set:html="<!-- -->" /> <Code tone="prompt">undefined</Code>. Place <Code tone="prompt">: Order</Code>.</RuleQuiz
   >
 
   <RuleLesson lesson={options}>
@@ -127,6 +127,6 @@ const clash = [
     <TsChecked slot="good" lines={flags.good.lines} />
   </RuleLesson>
   <RuleQuiz n={6} level={flags.levels[0]} board="code" marks={blanks}
-    ><Code tone="prompt">users[0].name</Code> crashed in production on an empty list. <Code tone="prompt">strict</Code> <Fragment set:html="<!-- -->" />is already on. Set the flag that fails the build.</RuleQuiz
+    ><Code tone="prompt">cells[1].trim()</Code> crashed in production on a CSV row with no comma. <Code tone="prompt">strict</Code> <Fragment set:html="<!-- -->" />is already on. Set the flag that fails the build.</RuleQuiz
   >
 </RuleLanding>
