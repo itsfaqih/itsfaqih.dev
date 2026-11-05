@@ -38,10 +38,10 @@ cell.textContent = row.revenue.toLocaleString("en-US", { minimumFractionDigits: 
 
 A table is often loading, empty, failed or showing no matches. Draw each one, and in every blank state say why and what to do next:
 
-- **Loading**: skeleton rows at the real row height, which keep the table's shape.
-- **Empty**: "No users yet" and an Add user button.
-- **Error**: "Couldn't load users" and a Retry button alone, so the failure stays in view.
-- **No results**: `No results for "xyz"` and a Clear search button.
+- **Loading.** Skeleton rows at the real row height keep the table's shape.
+- **Empty.** "No users yet" and an Add user button.
+- **Error.** "Couldn't load users" and a Retry button alone, so the failure stays in view.
+- **No results.** `No results for "xyz"` and a Clear search button.
 
 ```tsx
 const blank = {

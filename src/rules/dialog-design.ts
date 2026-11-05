@@ -65,7 +65,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "profile",
             label: "Edit profile, nothing changed yet",
-            note: "Let Esc and Cancel close it, since it's a form one keystroke from holding input.",
+            note: "Let Esc and Cancel close it. It's a form, and one keystroke would give it input to lose.",
           },
         ],
       },
@@ -154,7 +154,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "preview",
             label: "Image preview, nothing to fill in",
-            note: "It holds no input, so a click outside should just close it.",
+            note: "It holds no input, so a click outside should close it.",
           },
         ],
       },

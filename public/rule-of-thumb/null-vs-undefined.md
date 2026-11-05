@@ -56,7 +56,7 @@ patch("/tasks/12", draft); // body: { "title": "Ship v2" }
 
 ## Force the decision
 
-When every caller must decide, make the field required and nullable. A caller who leaves it out gets a type error, and "nobody" is a `null` someone wrote on purpose. A `?:` field lets a caller skip it silently.
+When every caller must decide, make the field required and nullable. A caller who leaves it out gets a type error, and "nobody" is a `null` someone wrote on purpose. A `?:` field lets a caller skip it with no error.
 
 ```ts
 type Task = {

@@ -101,7 +101,7 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
 
   <RuleLesson lesson={force}>
     <Fragment slot="body"
-      ><Code tone="chip">?:</Code> lets a caller skip a field silently. When every caller must decide, make it required and nullable. A caller who leaves it out gets a type error, and "nobody" is a<Fragment set:html="<!-- -->" /> <Code tone="chip">null</Code> someone wrote on purpose.</Fragment
+      ><Code tone="chip">?:</Code> lets a caller skip a field with no error. When every caller must decide, make it required and nullable. A caller who leaves it out gets a type error, and "nobody" is a<Fragment set:html="<!-- -->" /> <Code tone="chip">null</Code> someone wrote on purpose.</Fragment
     >
     <NullCodeBlock slot="bad" lines={force.bad.lines!} />
     <NullCodeBlock slot="good" lines={force.good.lines!} />

@@ -28,7 +28,7 @@ id  by    created_at
 
 ## Return it with a Z
 
-End every ISO 8601 string with `Z`, so each browser converts it to its own zone. A string with no zone reads as local time, which shows Rina and Sam both 6:00 AM, and both are wrong.
+End every ISO 8601 string with `Z`, so each browser converts it to its own zone. A browser reads a string with no zone as local time, so Rina and Sam both see 6:00 AM, and both are wrong.
 
 ```json
 { "createdAt": "2026-01-10T06:00:00.000Z" }

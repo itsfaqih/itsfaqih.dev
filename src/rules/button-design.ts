@@ -53,17 +53,17 @@ export const LESSONS: Lesson[] = [
           {
             id: "hand",
             label: "Lights up, hand cursor",
-            note: "Everything says press. She clicks, and nothing happens.",
+            note: "Everything looks pressable. She clicks, and nothing happens.",
           },
           {
             id: "mixed",
             label: "Lights up, no-entry cursor",
-            note: "The colour says yes while the cursor says no. People believe the colour and click anyway.",
+            note: "The colour looks clickable while the cursor shows it isn't. People trust the colour and click anyway.",
           },
           {
             id: "still",
             label: "Stays put, no-entry cursor",
-            note: "Nothing moves, and the cursor says no. The button agrees with itself, so nobody clicks for nothing.",
+            note: "Nothing moves on hover, and the cursor shows it's off, so nobody clicks it.",
           },
         ],
       },

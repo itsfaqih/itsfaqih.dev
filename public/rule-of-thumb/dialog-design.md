@@ -28,7 +28,7 @@ Trap focus in the dialog. Move focus in when it opens, let `Tab` cycle its contr
 
 ## Let Escape close it
 
-Close every dialog on `Esc`, every time, since keyboard users leave that way. Let a click outside close an info dialog too, as it has nothing to lose. A `<dialog>` opened with `showModal()` closes on `Esc` already. A custom dialog listens while it's open and removes the listener on close:
+Close every dialog on `Esc`, every time, since keyboard users leave that way. Let a click outside close an info dialog too, since closing it loses nothing. A `<dialog>` opened with `showModal()` closes on `Esc` already. A custom dialog listens while it's open and removes the listener on close:
 
 ```ts
 function onKeyDown(event: KeyboardEvent) {
