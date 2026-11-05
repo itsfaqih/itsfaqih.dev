@@ -5,7 +5,7 @@ import { AXIS, rowsAt, SLIDE, slideChoice } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
 import { slideView } from "./data-loading.view";
 
-// The first quiz's board (data-loading-slide.client.ts): GET /orders slides along the axis, and the
+// The first quiz's board (data-loading-slide.client.ts): GET /invoices slides along the axis, and the
 // rows' paint line follows it. Check sends the spot it's in to the quiz as that spot's answer.
 type Props = { level: Level };
 
@@ -21,7 +21,7 @@ const id = slideChoice(start);
 <data-loading-slide class={quiz.slide} data-notes={JSON.stringify(notes)}
   ><div class={styles.wf}
     ><ul class={styles.lanes} aria-hidden="true"
-      ><li class={styles.label}>app.js</li><li class={styles.label}>GET /orders</li><li class={styles.label}>render rows</li></ul
+      ><li class={styles.label}>app.js</li><li class={styles.label}>GET /invoices</li><li class={styles.label}>render rows</li></ul
     ><div class:list={[styles.plot, quiz.slidePlot]}
       ><ul class={styles.lanes}
         ><li class={styles.lane}
@@ -33,7 +33,7 @@ const id = slideChoice(start);
             tabindex="0"
             class:list={[styles.bar, styles.req, quiz.handle]}
             style={`left:${pct(start)};width:${pct(SLIDE.request)}`}
-            aria-label="When GET /orders starts"
+            aria-label="When GET /invoices starts"
             aria-valuemin="0"
             aria-valuemax={SLIDE.max}
             aria-valuenow={start}

@@ -1,5 +1,5 @@
 ---
-import { EARLY, HISTORY, LATE, LESSONS, money, TLDR } from "./data-loading";
+import { EARLY, LATE, LESSONS, TLDR } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 import { quizKit } from "./rule-landing.css";
@@ -28,6 +28,11 @@ const TILES = [
   ["Refunds", "12"],
   ["Signups", "342"],
 ] as const;
+const ORDERS = [
+  ["#1042 Notebook", "$12"],
+  ["#1038 Pens", "$6"],
+  ["#1031 Desk mat", "$24"],
+] as const;
 ---
 
 <RuleLanding id="data-loading" learn="Fast first paint, smooth updates" tldr={TLDR} take="load data the same way">
@@ -42,7 +47,7 @@ const TILES = [
     <DataLoadingWaterfall slot="good" {...EARLY} />
   </RuleLesson>
   <RuleQuiz n={1} level={early.levels[0]} hint="Drag the amber bar, then press Check. Arrow keys work too."
-    >The orders page lists 20 orders. Drag <b>GET /orders</b> to when it should start. The rows render once both the code and the data are in.
+    >The invoices page lists 12 invoices. Drag <b>GET /invoices</b> to when it should start. The rows render once both the code and the data are in.
     <DataLoadingSlide slot="board" level={early.levels[0]} />
   </RuleQuiz>
 
@@ -99,7 +104,7 @@ const TILES = [
     <DataLoadingInbox slot="good" delay />
   </RuleLesson>
   <DataLoadingQuiz n={3} level={flicker.levels[0]}
-    >Most replies to this list land in 80ms. A few take 2s. Place the spinner.</DataLoadingQuiz
+    >Search suggestions update as you type. Most land in 60ms, and a few take 1.5s. Place the spinner.</DataLoadingQuiz
   >
 
   <RuleLesson lesson={errors}>
@@ -152,7 +157,7 @@ const TILES = [
     <DataLoadingParse slot="good" parse />
   </RuleLesson>
   <DataLoadingQuiz n={5} level={boundary.levels[0]}
-    >The server sometimes leaves out the user's photo, and the avatar reads it two screens deep. Place the check.</DataLoadingQuiz
+    >The server sometimes leaves out an order's coupon, and the receipt reads it two screens deep. Place the check.</DataLoadingQuiz
   >
 
   <RuleLesson lesson={persist}>
@@ -163,38 +168,36 @@ const TILES = [
     <DataLoadingWallet slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={6} level={persist.levels[0]}
-    >A banking app persists its cache. On day 2 you spend $1,830 on a laptop. On day 3 you open the app with no signal. Tap what it may show from the cache.
+    >A shop app persists its cache. On day 2 the desk lamp sells out and its sale ends. On day 3 you open the app with no signal. Tap what it may show from the cache.
     <div slot="board" class:list={[styles.card, quiz.wallet]}>
       <span class={styles.head}
-        ><span>Wallet</span><span class={view.signal("offline")}>No signal, day 3</span></span
+        ><span>Shop</span><span class={view.signal("offline")}>No signal, day 3</span></span
       >
-      <QuizChoice level={persist.levels[0]} id="balance" look="spot"
+      <QuizChoice level={persist.levels[0]} id="stock" look="spot"
         ><span class:list={[styles.balance, quiz.inset]}
-          ><span class={styles.balanceLabel}>Balance</span><b class:list={[styles.balanceValue, quiz.still]}
-            >{money(2140)}</b
+          ><span class={styles.balanceLabel}>Desk lamp in stock</span><b class:list={[styles.balanceValue, quiz.still]}
+            >3</b
           ></span
         ></QuizChoice
       >
-      <QuizChoice level={persist.levels[0]} id="history" look="spot"
+      <QuizChoice level={persist.levels[0]} id="orders" look="spot"
         ><span class:list={[styles.hist, quiz.inset]}
           ><span class={styles.histHead}
-            ><span>Recent</span><span class={styles.stamp}>Updated 2 days ago</span></span
+            ><span>Your orders</span><span class={styles.stamp}>Updated 2 days ago</span></span
           ><span class={styles.histList}
             >{
-              HISTORY.map((row) => (
+              ORDERS.map(([label, total]) => (
                 <span class={quiz.row}
-                  ><span>{row.label}</span><b class={styles.histAmount}
-                    >{row.amount < 0 ? "−" : "+"}{money(Math.abs(row.amount))}</b
-                  ></span
+                  ><span>{label}</span><b class={styles.histAmount}>{total}</b></span
                 >
               ))
             }</span
           ></span
         ></QuizChoice
       >
-      <QuizChoice level={persist.levels[0]} id="rate" look="spot"
+      <QuizChoice level={persist.levels[0]} id="price" look="spot"
         ><span class:list={[quiz.rate, quiz.inset]}
-          ><span>Transfer rate</span><b class={styles.histAmount}>1 USD = 16,240 IDR</b></span
+          ><span>Desk lamp, on sale</span><b class={styles.histAmount}>$48</b></span
         ></QuizChoice
       >
     </div>

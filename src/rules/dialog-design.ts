@@ -1,6 +1,9 @@
 import type { Lesson, Tldr } from "./lesson";
 
 export const DRAFT = "Checkout fails on Safari 17 when a coupon is set";
+/** What the quizzes' typed-in dialogs hold. */
+export const REPLY = "Thanks, I'll look at it tonight";
+export const REVIEW = "Bright and warm, but the cable is short";
 
 export const LESSONS: Lesson[] = [
   {
@@ -25,12 +28,12 @@ export const LESSONS: Lesson[] = [
           },
           {
             id: "trigger",
-            label: "Edit profile button",
+            label: "Add card button",
             note: "Return focus here, where they left off. One Tab continues down the page.",
           },
           {
             id: "next",
-            label: "Change password button",
+            label: "Download all button",
             note: "Close, but they never picked it, so a screen reader announces it without warning.",
           },
         ],
@@ -54,17 +57,17 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "issue",
-            label: "New issue, title typed in",
-            note: `One stray click throws away the ${DRAFT.length} characters they typed.`,
+            label: "Reply, text typed in",
+            note: `One stray click throws away the ${REPLY.length} characters they typed.`,
           },
           {
             id: "news",
-            label: "What's new, nothing to fill in",
+            label: "Keyboard shortcuts, nothing to fill in",
             note: "Close it on a click outside, since there is nothing to lose.",
           },
           {
             id: "profile",
-            label: "Edit profile, nothing changed yet",
+            label: "Edit address, nothing changed yet",
             note: "Let Esc and Cancel close it. It's a form, and one keystroke would give it input to lose.",
           },
         ],
@@ -88,7 +91,7 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "trigger",
-            label: "Delete project, on the page behind",
+            label: "Delete account, on the page behind",
             note: "Focus stays behind the dim layer. Tab moves through the page, and Enter reopens the dialog.",
           },
           {
@@ -99,7 +102,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "delete",
             label: "Delete",
-            note: "One Enter deletes 214 files before anyone has read the title.",
+            note: "One Enter deletes the account and its 38 invoices before anyone has read the title.",
           },
         ],
       },
@@ -143,13 +146,13 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "news",
-            label: "What's new, nothing to fill in",
+            label: "About, nothing to fill in",
             note: "Nothing typed, nothing lost. Shaking it blocks a safe way out.",
           },
           {
             id: "issue",
-            label: "New issue, title typed in",
-            note: `Shake it and keep the ${DRAFT.length} characters. Esc or × asks before it drops them.`,
+            label: "Write a review, text typed in",
+            note: `Shake it and keep the ${REVIEW.length} characters. Esc or × asks before it drops them.`,
           },
           {
             id: "preview",
@@ -183,12 +186,12 @@ export const LESSONS: Lesson[] = [
           {
             id: "scrim",
             label: "The dim layer",
-            note: "The dim layer never scrolled. The article under it still does.",
+            note: "The dim layer never scrolled. The list under it still does.",
           },
           {
             id: "panel",
             label: "The dialog panel",
-            note: "A long dialog gets cut off, and the article behind it still scrolls.",
+            note: "A long dialog gets cut off, and the list behind it still scrolls.",
           },
         ],
       },

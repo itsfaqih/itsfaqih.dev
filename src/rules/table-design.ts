@@ -114,17 +114,17 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "left",
-            label: "Revenue left-aligned",
+            label: "Size left-aligned",
             note: "9 sits under the 1 of 12,500, so the digits that matter never line up.",
           },
           {
             id: "center",
-            label: "Revenue centred",
+            label: "Size centred",
             note: "Each value sits by its own width, so no column of digits lines up at all.",
           },
           {
             id: "right",
-            label: "Revenue right-aligned, with even-width digits",
+            label: "Size right-aligned, with even-width digits",
             note: "Ones sit under ones and thousands under thousands, so the longest number reads as the biggest.",
           },
         ],
@@ -142,18 +142,18 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "error",
-            label: "Couldn't load users, with Add user",
-            note: "The list failed to load, so it isn't empty. Offer Retry, since Add user hides the failure.",
+            label: "Couldn't load invoices, with New invoice",
+            note: "The list failed to load, so it isn't empty. Offer Retry, since New invoice hides the failure.",
           },
           {
             id: "empty",
-            label: "No users yet, with Add user",
-            note: "Nothing here yet, so offer adding the first user.",
+            label: "No invoices yet, with New invoice",
+            note: "Nothing here yet, so offer creating the first invoice.",
           },
           {
             id: "search",
-            label: "No results for zed, with Add user",
-            note: "The users exist and the search hid them. Offer Clear search to bring them back.",
+            label: "No results for zed, with New invoice",
+            note: "The invoices exist and the search hid them. Offer Clear search to bring them back.",
           },
         ],
       },
@@ -171,12 +171,12 @@ export const LESSONS: Lesson[] = [
           {
             id: "first",
             label: "A column of their own, first",
-            note: "The row now opens with buttons, which push every name one column right.",
+            note: "The row now opens with buttons, which push every product name one column right.",
           },
           {
             id: "name",
             label: "In the name cell, after the text",
-            note: "Names differ in length, so Edit lands somewhere new on every row.",
+            note: "Product names differ in length, so Edit lands somewhere new on every row.",
           },
           {
             id: "last",
@@ -198,17 +198,17 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "25",
-            label: "Admins, 25 users",
+            label: "Shipped, 25 orders",
             note: "25 rows fill exactly one page. The pager would read Page 1 of 1 with two dead arrows.",
           },
           {
             id: "31",
-            label: "Everyone, 31 users",
+            label: "All, 31 orders",
             note: "Add it here, since the last 6 rows go on page 2.",
           },
           {
             id: "0",
-            label: "Owners, 0 users",
+            label: "Refunded, 0 orders",
             note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
           },
         ],

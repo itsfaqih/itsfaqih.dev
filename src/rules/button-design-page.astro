@@ -37,16 +37,16 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonStates slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={1} level={states.levels[0]}
-    >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Save</b>. Pick the Save that shows her where she is.
+    >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Send</b>. Pick the Send that shows her where she is.
     <div slot="board" class={quizKit.trio}>
       <QuizChoice level={states.levels[0]} id="hover" caption="Changes on hover"
-        ><span class={quiz.mock}><span class:list={[key, styles.hover]}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.hover]}>Send</span></span></QuizChoice
       >
       <QuizChoice level={states.levels[0]} id="press" caption="Changes on press"
-        ><span class={quiz.mock}><span class:list={[key, styles.press]}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.press]}>Send</span></span></QuizChoice
       >
       <QuizChoice level={states.levels[0]} id="focus" caption="Changes on focus"
-        ><span class={quiz.mock}><span class:list={[key, styles.focus]}>Save</span></span></QuizChoice
+        ><span class={quiz.mock}><span class:list={[key, styles.focus]}>Send</span></span></QuizChoice
       >
     </div>
   </RuleQuiz>
@@ -127,18 +127,18 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonIcons slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={4} level={icons.levels[0]}
-    >Every button in this toolbar has 16px of padding on both sides. Tap the one that will look lopsided.
+    >Every button in this file toolbar has 16px of padding on both sides. Tap the one that will look lopsided.
     <div slot="board" class={quiz.screen}>
       <span class={quiz.bar}>
         <QuizChoice level={icons.levels[0]} id="text" look="spot"
           ><span class={quiz.ruled}
-            ><span class:list={[key, styles.plain, styles.even]}>Save<Ruler pads={[16, 16]} /></span></span
+            ><span class:list={[key, styles.plain, styles.even]}>Rename<Ruler pads={[16, 16]} /></span></span
           ></QuizChoice
         >
         <QuizChoice level={icons.levels[0]} id="lead" look="spot"
           ><span class={quiz.ruled}
             ><span class:list={[key, styles.tint, styles.even]}
-              ><Icon name="Plus" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />New project<Ruler
+              ><Icon name="DownloadSimple" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />Download<Ruler
                 pads={[16, 16]}
               /></span
             ></span

@@ -12,17 +12,17 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "local",
-            label: "Rina 13:00, Sam 01:00, each local clock",
-            note: "Same second, two values 12 hours apart. Sort by time and Sam's order comes first.",
+            label: "Yuki 18:00, Lena 10:00, each local clock",
+            note: "Same second, two values 8 hours apart. Sort by time and Lena's comment comes first.",
           },
           {
             id: "server",
-            label: "Both 01:00, the server's clock in New York",
+            label: "Both 17:00, the server's clock in Singapore",
             note: "One value today, but no zone is stored. Move the server and old rows mean another moment.",
           },
           {
             id: "utc",
-            label: "Both 06:00 UTC",
+            label: "Both 09:00 UTC",
             note: "Store UTC. One moment is one value, wherever the writer or the server is.",
           },
         ],
@@ -40,18 +40,18 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "bare",
-            label: "createdAt 2026-01-10T06:00:00, no zone",
-            note: "No zone, so Sam's browser reads it as 6:00 AM New York time, five hours late.",
+            label: "paidAt 2026-03-04T11:30:00, no zone",
+            note: "No zone, so Yuki's browser reads it as 11:30 AM Tokyo time, nine hours early.",
           },
           {
             id: "z",
-            label: "createdAt 2026-01-10T06:00:00Z, ending in Z",
-            note: "The Z says UTC, so each browser converts it. Sam sees 1:00 AM and Rina 1:00 PM.",
+            label: "paidAt 2026-03-04T11:30:00Z, ending in Z",
+            note: "The Z says UTC, so each browser converts it. Yuki sees 8:30 PM and Lena 12:30 PM.",
           },
           {
             id: "text",
-            label: "createdAt Jan 10, 6:00 AM, already formatted",
-            note: "A formatted string can't be converted again, so everyone sees the server's 6:00 AM.",
+            label: "paidAt Mar 4, 11:30 AM, already formatted",
+            note: "A formatted string can't be converted again, so everyone sees the server's 11:30 AM.",
           },
         ],
       },
@@ -73,16 +73,16 @@ export const LESSONS: Lesson[] = [
             slot: {
               id: "sql",
               label: "in the database query",
-              note: "The query formats in one zone for everyone, so Rina and Sam can't both be right.",
+              note: "The query formats in one zone for everyone, so Yuki and Lena can't both be right.",
             },
           },
-          { depth: 0, text: "API", kind: "dir", tag: "runs in New York" },
+          { depth: 0, text: "API", kind: "dir", tag: "runs in Singapore" },
           {
             depth: 1,
             slot: {
               id: "api",
               label: "on the server",
-              note: "The server uses New York time. Sam gets 1:00 AM, and so does Rina.",
+              note: "The server uses Singapore time. Yuki and Lena both get 5:00 PM, and both are wrong.",
             },
           },
           { depth: 0, text: "Each reader's browser", kind: "dir" },
@@ -90,8 +90,8 @@ export const LESSONS: Lesson[] = [
             depth: 1,
             slot: {
               id: "browser",
-              label: "when the order renders",
-              note: "Format here. Each browser knows its own zone, so one UTC string becomes 1:00 PM for Rina and 1:00 AM for Sam.",
+              label: "when the comment renders",
+              note: "Format here. Each browser knows its own zone, so one UTC string becomes 6:00 PM for Yuki and 10:00 AM for Lena.",
             },
           },
         ],
@@ -104,18 +104,18 @@ export const LESSONS: Lesson[] = [
     good: { label: "Send UTC or offset", costs: ["0 h off"] },
     levels: [
       {
-        name: "7:00 in Jakarta",
+        name: "9:30 in Berlin",
         piece: "→ UTC",
         answer: "client",
         rows: [
-          { depth: 0, text: "Rina's browser", kind: "dir", tag: "UTC+7" },
-          { depth: 1, text: '`picked = "2026-01-01T07:00"`' },
+          { depth: 0, text: "Lena's browser", kind: "dir", tag: "UTC+1" },
+          { depth: 1, text: '`picked = "2026-03-12T09:30"`' },
           {
             depth: 1,
             slot: {
               id: "client",
               label: "before the request",
-              note: "Convert here. Her browser knows she's at UTC+7, so it sends 2026-01-01T00:00:00.000Z and the server has nothing to guess.",
+              note: "Convert here. Lena's browser knows it's at UTC+1, so it sends 2026-03-12T08:30:00.000Z and the server has nothing to guess.",
             },
           },
           { depth: 0, text: "API", kind: "dir" },
@@ -124,7 +124,7 @@ export const LESSONS: Lesson[] = [
             slot: {
               id: "api",
               label: "when the request arrives",
-              note: "The string has no zone, so the server reads 07:00 as UTC, 7 hours late.",
+              note: "The string has no zone, so the server reads 09:30 as UTC, an hour late.",
             },
           },
           { depth: 0, text: "Database", kind: "dir" },
@@ -132,28 +132,28 @@ export const LESSONS: Lesson[] = [
             depth: 1,
             slot: {
               id: "db",
-              label: "on insert, as Asia/Jakarta",
-              note: "Right for Rina, but it assumes everyone lives in Jakarta. Sam's reminders fire 12 hours off.",
+              label: "on insert, as Europe/Berlin",
+              note: "Right for Lena, but it assumes everyone lives in Berlin. Yuki's meetings land 8 hours off.",
             },
           },
         ],
       },
       {
         name: "One offset",
-        piece: "+07:00",
+        piece: "+09:00",
         answer: "body",
         rows: [
-          { depth: 0, text: "POST /reminders, from Rina", kind: "dir" },
+          { depth: 0, text: "POST /bookings, from Yuki", kind: "dir" },
           {
             depth: 1,
-            lead: '`at: "2026-01-01T07:00:00`',
+            lead: '`at: "2026-03-12T18:00:00`',
             slot: {
               id: "body",
               label: '…"',
-              note: "Send it with the time, so the server knows the exact moment and stores 00:00 UTC.",
+              note: "Send it with the time, so the server knows the exact moment and stores 09:00 UTC.",
             },
           },
-          { depth: 0, text: "Database, reminders", kind: "dir" },
+          { depth: 0, text: "Database, bookings", kind: "dir" },
           {
             depth: 1,
             lead: "`at_offset`",
@@ -163,14 +163,14 @@ export const LESSONS: Lesson[] = [
               note: "The column keeps an offset you don't need. Store only the UTC moment.",
             },
           },
-          { depth: 0, text: "GET /reminders, to Sam", kind: "dir" },
+          { depth: 0, text: "GET /bookings, to Lena", kind: "dir" },
           {
             depth: 1,
-            lead: '`at: "2026-01-01T07:00:00`',
+            lead: '`at: "2026-03-12T18:00:00`',
             slot: {
               id: "reply",
               label: '…"',
-              note: "Sam gets Rina's offset, and every writer's zone leaks into replies. Return UTC with a Z.",
+              note: "Lena gets Yuki's offset, and every writer's zone leaks into replies. Return UTC with a Z.",
             },
           },
         ],
@@ -183,23 +183,23 @@ export const LESSONS: Lesson[] = [
     good: { label: "Use her midnight", costs: ["3 of 3", "0 extra"] },
     levels: [
       {
-        name: "Whose Jan 10?",
-        answer: "rina",
+        name: "Whose Mar 4?",
+        answer: "yuki",
         choices: [
           {
             id: "utc",
-            label: "UTC report, Jan 10 from 00:00 UTC on Jan 10 to 00:00 UTC on Jan 11",
-            note: "The UTC day starts at 00:00Z. From 17:00 the day before, the report counts 7 hours of Jan 9.",
+            label: "UTC report, Mar 4 from 00:00 UTC on Mar 4 to 00:00 UTC on Mar 5",
+            note: "The UTC day starts at 00:00Z. From 15:00 the day before, the report counts 9 hours of Mar 3.",
           },
           {
-            id: "rina",
-            label: "Rina in Jakarta, Jan 10 from 17:00 UTC on Jan 9 to 17:00 UTC on Jan 10",
-            note: "Use it for Rina. Midnight in Jakarta is 17:00 UTC the day before, so her whole Jan 10 is in range.",
+            id: "yuki",
+            label: "Yuki in Tokyo, Mar 4 from 15:00 UTC on Mar 3 to 15:00 UTC on Mar 4",
+            note: "Use it for Yuki. Midnight in Tokyo is 15:00 UTC the day before, so all of Yuki's Mar 4 is in range.",
           },
           {
-            id: "sam",
-            label: "Sam in New York, Jan 10 from 05:00 UTC on Jan 10 to 05:00 UTC on Jan 11",
-            note: "Sam's Jan 10 starts at 05:00 UTC. From 17:00 the day before, he gets 12 hours of Jan 9.",
+            id: "lena",
+            label: "Lena in Berlin, Mar 4 from 23:00 UTC on Mar 3 to 23:00 UTC on Mar 4",
+            note: "Lena's Mar 4 starts at 23:00 UTC on Mar 3. From 15:00, the filter gets 8 hours of Mar 3.",
           },
         ],
       },

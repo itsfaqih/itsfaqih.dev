@@ -5,7 +5,7 @@ import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import QuizChoice from "./quiz-choice.astro";
 import RuleQuiz from "./rule-quiz.astro";
-import { FILTERED, FILTERS, LESSONS, STAFF, START_FILTER, TLDR, VIEW_NAMES } from "./table-design";
+import { FILTERS, LESSONS, START_FILTER, TLDR, VIEW_NAMES } from "./table-design";
 import { quiz, styles } from "./table-design.css";
 import { quizKit } from "./rule-landing.css";
 import TableActions from "./table-actions.astro";
@@ -17,26 +17,26 @@ import TableStates from "./table-states.astro";
 import TableUrl from "./table-url.astro";
 
 const [numbers, states, actions, pager, url] = LESSONS;
-const revenue = [
-  ["Acme", "120"],
-  ["Globex", "12,500"],
-  ["Initech", "9"],
+const sizes = [
+  ["report.pdf", "120"],
+  ["backup.zip", "12,500"],
+  ["notes.txt", "9"],
 ] as const;
 const blanks = [
-  { id: "error", caption: "Error", title: "Couldn't load users", hint: "The server didn't answer.", query: "" },
-  { id: "empty", caption: "Empty", title: "No users yet", hint: "Add your first teammate.", query: "" },
+  { id: "error", caption: "Error", title: "Couldn't load invoices", hint: "The server didn't answer.", query: "" },
+  { id: "empty", caption: "Empty", title: "No invoices yet", hint: "Create your first invoice.", query: "" },
   { id: "search", caption: "No results", title: 'No results for "zed"', hint: "Check the spelling, or clear the search.", query: "zed" },
 ] as const;
 const filters = [
-  { id: "25", caption: "Admins, 25 users", people: FILTERED.admin, total: 25 },
-  { id: "31", caption: "Everyone, 31 users", people: STAFF, total: 31 },
-  { id: "0", caption: "Owners, 0 users", people: FILTERED.owner, total: 0 },
+  { id: "25", caption: "Shipped, 25 orders", orders: ["#1042", "#1039", "#1031"], total: 25 },
+  { id: "31", caption: "All, 31 orders", orders: ["#1044", "#1043", "#1042"], total: 31 },
+  { id: "0", caption: "Refunded, 0 orders", orders: [], total: 0 },
 ] as const;
 const shown = 3;
 const cells = [
   { spot: "first" },
-  { text: "Alice Johnson", spot: "name" },
-  { text: "Admin", role: true },
+  { text: "Desk lamp, brass", spot: "name" },
+  { text: "$48.00", role: true },
   { spot: "last" },
 ] as const;
 ---
@@ -54,7 +54,7 @@ const cells = [
     <TableNumbers slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={1} level={numbers.levels[0]}
-    >A revenue column holds <Code tone="prompt">9</Code>, <Code tone="prompt">120</Code> and <Code tone="prompt">12,500</Code>, and people scan it for the biggest. Pick the column where the biggest stands out.
+    >A size column in KB holds <Code tone="prompt">9</Code>, <Code tone="prompt">120</Code> and <Code tone="prompt">12,500</Code>, and people scan it for the biggest file. Pick the column where the biggest stands out.
     <div slot="board" class={quizKit.trio}>
       {
         (
@@ -66,10 +66,10 @@ const cells = [
         ).map(([id, caption, align]) => (
           <QuizChoice level={numbers.levels[0]} id={id} caption={caption}
             ><span class:list={[quiz.sheet, quiz.money]}
-              ><span class={quiz.th}>Account</span><span class:list={[quiz.th, align]}>Revenue</span>{
-                revenue.map(([account, value], at) => (
+              ><span class={quiz.th}>File</span><span class:list={[quiz.th, align]}>KB</span>{
+                sizes.map(([file, value], at) => (
                   <Fragment
-                    ><span class:list={[quiz.td, at === 0 && quiz.top]}>{account}</span><span
+                    ><span class:list={[quiz.td, at === 0 && quiz.top]}>{file}</span><span
                       class:list={[quiz.td, align, at === 0 && quiz.top]}>{value}</span
                     ></Fragment
                   >
@@ -91,7 +91,7 @@ const cells = [
     <TableStates slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={2} level={states.levels[0]}
-    >The users table can show no rows for three reasons. Pick the one where <b>Add user</b> belongs.
+    >The invoices table can show no rows for three reasons. Pick the one where <b>New invoice</b> belongs.
     <div slot="board" class={quizKit.trio}>
       {
         blanks.map(({ id, caption, title, hint, query }) => (
@@ -105,14 +105,14 @@ const cells = [
                     weight="bold"
                     aria-hidden="true"
                     class={quiz.glyph}
-                  />{query ? <span class={quiz.typed}>{query}</span> : "Search users"}</span
+                  />{query ? <span class={quiz.typed}>{query}</span> : "Search invoices"}</span
                 ></span
               ><span class={quiz.people}
-                ><span class={quiz.th}>Name</span><span class={quiz.th}>Role</span></span
+                ><span class={quiz.th}>Customer</span><span class={quiz.th}>Total</span></span
               ><span class={quiz.said}
                 ><span class:list={[quiz.saidTitle, id === "error" && quiz.error]}>{title}</span><span
                   class={quiz.saidHint}>{hint}</span
-                ><span class={quiz.key}>Add user</span></span
+                ><span class={quiz.key}>New invoice</span></span
               ></span
             ></QuizChoice
           >
@@ -129,11 +129,11 @@ const cells = [
     <TableActions slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={3} level={actions.levels[0]}
-    >Each user row gets <b>Edit</b> and <b>Delete</b>. Names run from 6 to 22 characters. Tap where the buttons go.
+    >Each product row gets <b>Edit</b> and <b>Delete</b>. Product names run from 4 to 30 characters. Tap where the buttons go.
     <div slot="board" class:list={[quiz.screen, quiz.row]}>
       <span class={quiz.head}></span>
-      <span class={quiz.head}>Name</span>
-      <span class:list={[quiz.head, quiz.roomy]}>Role</span>
+      <span class={quiz.head}>Product</span>
+      <span class:list={[quiz.head, quiz.roomy]}>Price</span>
       <span class={quiz.head}></span>
       {
         cells.map((cell) => (
@@ -168,23 +168,23 @@ const cells = [
     <TablePager slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={4} level={pager.levels[0]}
-    >The table shows 25 rows per page. Three filters return 25, 31 and 0 users. Pick the table that needs a pager.
+    >The orders table shows 25 rows per page. Three filters return 25, 31 and 0 orders. Pick the table that needs a pager.
     <div slot="board" class={quizKit.trio}>
       {
-        filters.map(({ id, caption, people, total }) => (
+        filters.map(({ id, caption, orders, total }) => (
           <QuizChoice level={pager.levels[0]} id={id} caption={caption}
             ><span class={quiz.sheet}
-              ><span class={quiz.th}>Name</span>{
-                people.slice(0, shown).map((person, at) => (
+              ><span class={quiz.th}>Order</span>{
+                orders.map((order, at) => (
                   <span class:list={[quiz.td, at === 0 && quiz.top]}
-                    ><span class={quiz.clip}>{person.name}</span></span
+                    ><span class={quiz.clip}>{order}</span></span
                   >
                 ))
               }{
                 total === 0 ? (
                   <span class={quiz.said}
-                    ><span class={quiz.saidTitle}>No owners</span><span class={quiz.saidHint}
-                      >Nobody has the Owner role yet.</span
+                    ><span class={quiz.saidTitle}>No refunds</span><span class={quiz.saidHint}
+                      >No order has been refunded yet.</span
                     ></span
                   >
                 ) : (

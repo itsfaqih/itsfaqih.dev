@@ -110,18 +110,18 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
         choices: [
           {
             id: "and",
-            label: "type Admin = User & { id: number }",
-            note: "It compiles. id becomes never, and the error shows up at the first Admin you write.",
+            label: "type Invoice = Order & { total: string }",
+            note: "It compiles. total becomes never, and the error shows up at the first Invoice you write.",
           },
           {
             id: "extends",
-            label: "interface Admin extends User { id: number }",
-            note: "Extend it. The clash fails right here, and the message names both types of id.",
+            label: "interface Invoice extends Order { total: string }",
+            note: "Extend it. The clash fails right here, and the message names both types of total.",
           },
           {
             id: "value",
-            label: "const Admin = { id: 0 }",
-            note: "That's a value, not a type. Nothing checks it against User at all.",
+            label: 'const Invoice = { total: "0" }',
+            note: "That's a value, not a type. Nothing checks it against Order at all.",
           },
         ],
       },
@@ -165,38 +165,38 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     },
     levels: [
       {
-        name: "The role list",
+        name: "The status list",
         piece: "as const",
         answer: "roles",
         rows: [
           {
             depth: 0,
-            lead: 'const ROLES = ["ADMIN", "EDITOR"]',
+            lead: 'const STATUSES = ["draft", "paid"]',
             slot: {
               id: "roles",
-              label: 'const ROLES = ["ADMIN", "EDITOR"]',
-              note: "Freeze the list. ROLES becomes a readonly tuple, so Role is the union, with no enum and no extra JavaScript.",
+              label: 'const STATUSES = ["draft", "paid"]',
+              note: "Freeze the list. STATUSES becomes a readonly tuple, so Status is the union, with no enum and no extra JavaScript.",
             },
           },
           {
             depth: 0,
-            lead: 'let role = "ADMIN"',
+            lead: 'let status = "draft"',
             slot: {
               id: "role",
-              label: 'let role = "ADMIN"',
-              note: 'role is a let you mean to change. Frozen to "ADMIN", the next assignment fails.',
+              label: 'let status = "draft"',
+              note: 'status is a let you mean to change. Frozen to "draft", the next assignment fails.',
             },
           },
           {
             depth: 0,
-            lead: "const limit = 3",
+            lead: "const retries = 3",
             slot: {
               id: "limit",
-              label: "const limit = 3",
-              note: "A const 3 is already the literal 3. ROLES stays string[], so Role is any string.",
+              label: "const retries = 3",
+              note: "A const 3 is already the literal 3. STATUSES stays string[], so Status is any string.",
             },
           },
-          { depth: 0, text: "type Role = (typeof ROLES)[number]" },
+          { depth: 0, text: "type Status = (typeof STATUSES)[number]" },
         ],
       },
     ],
@@ -239,37 +239,37 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     levels: [
       {
         name: "The contract",
-        piece: ": User",
+        piece: ": Order",
         answer: "ret",
         rows: [
           {
             depth: 0,
-            lead: "export function getUser(id: string)",
+            lead: "export function findOrder(id: string)",
             slot: {
               id: "ret",
-              label: "export function getUser(id: string)",
-              note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside getUser.",
+              label: "export function findOrder(id: string)",
+              note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside findOrder.",
             },
           },
-          { depth: 1, text: "return users.find((u) => u.id === id)" },
-          { depth: 0, text: "// profile.ts" },
+          { depth: 1, text: "return orders.find((o) => o.id === id)" },
+          { depth: 0, text: "// refund.ts" },
           {
             depth: 0,
-            lead: "const user",
+            lead: "const order",
             slot: {
               id: "local",
-              label: "const user",
-              note: "The error moves into this caller, and every other caller still gets User | undefined.",
+              label: "const order",
+              note: "The error moves into this caller, and every other caller still gets Order | undefined.",
             },
           },
-          { depth: 1, text: "= getUser(params.id)" },
+          { depth: 1, text: "= findOrder(req.params.id)" },
           {
             depth: 0,
-            lead: "users.map((u",
+            lead: "orders.map((o",
             slot: {
               id: "param",
-              label: "users.map((u",
-              note: "Skip the label. map already knows u is a User, and the label catches nothing.",
+              label: "orders.map((o",
+              note: "Skip the label. map already knows o is an Order, and the label catches nothing.",
             },
           },
         ],
@@ -389,7 +389,7 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
             slot: {
               id: "any",
               label: '"noImplicitAny":',
-              note: "strict already turns it on. users[0] still reads as User, so the crash ships.",
+              note: "strict already turns it on. cells[1] still reads as string, so the crash ships.",
             },
           },
           {
@@ -398,7 +398,7 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
             slot: {
               id: "index",
               label: '"noUncheckedIndexedAccess":',
-              note: "Turn it on. users[0] becomes User | undefined, and .name fails with TS18048 before it ships.",
+              note: "Turn it on. cells[1] becomes string | undefined, and .trim() fails with TS18048 before it ships.",
             },
           },
           {
@@ -407,7 +407,7 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
             slot: {
               id: "verbatim",
               label: '"verbatimModuleSyntax":',
-              note: "It makes type imports say import type. Keep it, but users[0] still reads as User.",
+              note: "It makes type imports say import type. Keep it, but cells[1] still reads as string.",
             },
           },
           { depth: 0, text: "}" },

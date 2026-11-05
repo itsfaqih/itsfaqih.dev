@@ -3,17 +3,14 @@ import Code from "./code.astro";
 import {
   DAY,
   digits,
-  FILTER_DATE,
   formatLines,
   HOUR,
-  JAKARTA,
   LESSONS,
   MOMENT,
   NO_Z,
-  ordersOf,
+  type Person,
   responseLines,
   RIGHT,
-  SAM,
   SERVER_TIME,
   TLDR,
   utcIso,
@@ -35,27 +32,39 @@ import TsWire from "./ts-wire.astro";
 const [store, zulu, local, input, filter] = LESSONS;
 const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
 
-const serverClock = wallOf(MOMENT, SAM.tz);
+// Quizzes use other people, zones and dates than the lessons, so they test the rule, not recall.
+const YUKI: Person = { who: "Yuki", city: "Tokyo", tz: "Asia/Tokyo" };
+const LENA: Person = { who: "Lena", city: "Berlin", tz: "Europe/Berlin" };
+const POSTED = Date.parse("2026-03-04T09:00:00.000Z");
+const PAID = Date.parse("2026-03-04T11:30:00.000Z");
+const comments = [
+  { id: 7, by: YUKI },
+  { id: 8, by: LENA },
+];
 const tables = [
-  ["local", "Each writer's clock", ordersOf("bad")],
-  ["server", "The server's clock, New York", ordersOf("good").map((row) => ({ ...row, at: serverClock }))],
-  ["utc", "UTC", ordersOf("good")],
+  [
+    "local",
+    "Each writer's clock",
+    comments.map((row) => ({ ...row, at: wallOf(POSTED, row.by.tz) })).sort((a, b) => a.at - b.at),
+  ],
+  ["server", "The server's clock, Singapore", comments.map((row) => ({ ...row, at: wallOf(POSTED, "Asia/Singapore") }))],
+  ["utc", "UTC", comments.map((row) => ({ ...row, at: POSTED }))],
 ] as const;
 
 const responses = [
-  ["bare", "No zone", digits(MOMENT)],
-  ["z", "Ends in Z", utcIso(MOMENT).replace(".000", "")],
-  ["text", "Already formatted", "Jan 10, 6:00 AM"],
+  ["bare", "No zone", digits(PAID)],
+  ["z", "Ends in Z", utcIso(PAID).replace(".000", "")],
+  ["text", "Already formatted", "Mar 4, 11:30 AM"],
 ] as const;
 
-const day = Date.parse(`${FILTER_DATE}T00:00:00Z`);
+const day = Date.parse("2026-03-04T00:00:00Z");
 const axisStart = day - 12 * HOUR;
 const axisSpan = 2 * DAY;
 const along = (instant: number) => `--at:${((instant - axisStart) / axisSpan) * 100}%`;
 const lanes = [
   ["utc", "UTC report", "run by the server", day],
-  ["rina", "Rina", "Jakarta, UTC+7", day - JAKARTA],
-  ["sam", "Sam", "New York, UTC−5", day + 5 * HOUR],
+  ["yuki", "Yuki", "Tokyo, UTC+9", day - 9 * HOUR],
+  ["lena", "Lena", "Berlin, UTC+1", day - HOUR],
 ] as const;
 ---
 
@@ -83,7 +92,7 @@ const lanes = [
     <TsOrders slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={1} level={store.levels[0]}
-    >Rina in Jakarta and Sam in New York order in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">created_at</Code> stores.
+    >Yuki in Tokyo and Lena in Berlin post a comment in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">posted_at</Code> stores.
     <div slot="board" class={quizKit.stack}>
       {
         tables.map(([id, caption, rows]) => (
@@ -91,7 +100,7 @@ const lanes = [
             ><span class={quiz.table}
                 ><span class:list={[styles.th, quiz.head]}>id</span><span class:list={[styles.th, quiz.head]}
                   >by</span
-                ><span class:list={[styles.th, quiz.head]}>created_at</span>{
+                ><span class:list={[styles.th, quiz.head]}>posted_at</span>{
                   rows.map((row) => (
                     <Fragment
                       ><span class:list={[styles.td, quiz.cell]}>{row.id}</span><span
@@ -121,15 +130,15 @@ const lanes = [
     </div>
   </RuleLesson>
   <RuleQuiz n={2} level={zulu.levels[0]}
-    >The order was placed at 06:00 UTC. Sam in New York should see 1:00 AM. Pick the response that gets him there.
+    >The payment went through at 11:30 UTC. Yuki in Tokyo should see 8:30 PM. Pick the response that gets Yuki there.
     <div slot="board" class={quizKit.stack}>
       {
         responses.map(([id, caption, value]) => (
           <QuizChoice level={zulu.levels[0]} id={id} caption={caption}
             ><span class={styles.wire}
-                ><span class:list={[styles.line, quiz.line]}>GET /orders/42</span><span
+                ><span class:list={[styles.line, quiz.line]}>GET /payments/7</span><span
                   class:list={[styles.line, quiz.line]}
-                  >{'{ "createdAt": '}<span class={quiz.str}>"{value}"</span>{" }"}</span
+                  >{'{ "paidAt": '}<span class={quiz.str}>"{value}"</span>{" }"}</span
                 ></span
               ></QuizChoice
           >
@@ -152,7 +161,7 @@ const lanes = [
     </div>
   </RuleLesson>
   <RuleQuiz n={3} level={local.levels[0]} board="flow" marks={marks}
-    >The order is stored as <Code tone="prompt">2026-01-10 06:00:00</Code> UTC. Rina should see 1:00 PM and Sam 1:00 AM. Place the formatting.</RuleQuiz
+    >A comment is stored as <Code tone="prompt">2026-03-04 09:00:00</Code> UTC. Yuki in Tokyo should see 6:00 PM and Lena in Berlin 10:00 AM. Place the formatting.</RuleQuiz
   >
 
   <RuleLesson lesson={input} costsClass={styles.costs}>
@@ -163,10 +172,10 @@ const lanes = [
     <TsReminder slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={4} level={input.levels[0]} board="flow" marks={marks}
-    >Rina picks Jan 1, 7:00 AM for a reminder. Place the conversion to UTC.</RuleQuiz
+    >Lena in Berlin books a meeting for Mar 12, 9:30 AM. Place the conversion to UTC.</RuleQuiz
   >
   <RuleQuiz n={5} level={input.levels[1]!} board="flow" marks={marks}
-    >Rina's browser has her 7:00 AM and its <Code tone="prompt">+07:00</Code> offset. Place the offset.</RuleQuiz
+    >Yuki books a table for 6:00 PM in Tokyo. The browser has that time and its <Code tone="prompt">+09:00</Code> offset. Place the offset.</RuleQuiz
   >
 
   <RuleLesson lesson={filter} costsClass={styles.costs}>
@@ -177,7 +186,7 @@ const lanes = [
     <TsFilter slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={6} level={filter.levels[0]}
-    >Three filters for Jan 10 each need a start. Tap the Jan 10 that starts at 17:00 UTC on Jan 9.
+    >Three filters for Mar 4 each need a start. Tap the Mar 4 that starts at 15:00 UTC on Mar 3.
     <div slot="board" class={quiz.screen}>
       {
         lanes.map(([id, who, where, start]) => (
@@ -186,7 +195,7 @@ const lanes = [
               ><span class={quiz.who}
                 >{who}<span class={quiz.where}>{where}</span></span
               ><span class={quiz.track}
-                ><span style={along(start)} class={quiz.day}>Jan 10</span><span
+                ><span style={along(start)} class={quiz.day}>Mar 4</span><span
                   style={along(day)}
                   class={quiz.mark}></span
                 ></span
@@ -197,9 +206,9 @@ const lanes = [
       }
       <span class:list={[quiz.lane, quiz.rule]}
         ><span class={quiz.axisWho}>UTC</span><span class={quiz.ticks}
-          ><span style={along(day)} class={quiz.tick}>Jan 10, 00:00</span><span
+          ><span style={along(day)} class={quiz.tick}>Mar 4, 00:00</span><span
             style={along(day + DAY)}
-            class={quiz.tick}>Jan 11, 00:00</span
+            class={quiz.tick}>Mar 5, 00:00</span
           ></span
         ></span
       >
