@@ -84,7 +84,7 @@ describe("the built site responds to a reader", () => {
     await quiz.scrollIntoViewIfNeeded();
     const status = quiz.locator("[aria-live]");
     await expect.poll(() => status.innerText()).toContain("Tap the one that fits");
-    const right = quiz.getByRole("button", { name: "Both 06:00 UTC" });
+    const right = quiz.getByRole("button", { name: "Both 09:00 UTC" });
     await right.click();
     await expect.poll(() => status.innerText()).toContain("Store UTC");
     await expect.poll(() => quiz.getByText("Clear", { exact: true }).isVisible()).toBe(true);
