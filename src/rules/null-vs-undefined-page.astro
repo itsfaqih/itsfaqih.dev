@@ -3,9 +3,10 @@ import Code from "./code.astro";
 import NullBoardCell from "./null-board-cell.astro";
 import NullCodeBlock from "./null-code-block.astro";
 import NullFlow from "./null-flow.astro";
-import NullMarkBoard from "./null-mark-board.astro";
-import { LESSONS, NEW_TASK, TLDR } from "./null-vs-undefined";
+import NullPickBoard from "./null-pick-board.astro";
+import { LESSONS, MATCH, NEW_TASK, NICKNAMES, REPLIES, TLDR } from "./null-vs-undefined";
 import { styles } from "./null-vs-undefined.css";
+import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
@@ -35,9 +36,18 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullCodeBlock slot="bad" lines={missing.bad.lines!} />
     <NullCodeBlock slot="good" lines={missing.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={1} level={missing.levels[0]} board="code" marks={marks}
-    >The client asked for <Code tone="prompt">?fields=name,manager</Code>. Bo has no manager. Nobody asked for his phone. Pick the key to leave out.</RuleQuiz
-  >
+  <RuleQuiz n={1} level={missing.levels[0]}
+    >The client asked for <Code tone="prompt">?fields=name,manager</Code>. Bo has no manager. Nobody asked for his phone. Pick the reply to send.
+    <div slot="board" class={styles.choiceStack}>
+      {
+        REPLIES.map((reply) => (
+          <QuizChoice level={missing.levels[0]} id={reply.id}
+            ><span class={styles.choiceCode}><NullBoardCell text={reply.label} tone="plain" /></span></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={optional}>
     <Fragment slot="body"
@@ -46,9 +56,18 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullCodeBlock slot="bad" lines={optional.bad.lines!} />
     <NullCodeBlock slot="good" lines={optional.good.lines!} />
   </RuleLesson>
-  <RuleQuiz n={2} level={optional.levels[0]} board="code" marks={marks}
-    >Signing up, people may skip the nickname, and most callers never have one. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">?: string</Code>.</RuleQuiz
-  >
+  <RuleQuiz n={2} level={optional.levels[0]}
+    >The form calls <Code tone="prompt">signUp({"{"} email, password {"}"})</Code> when the nickname box is empty. Pick the<Fragment set:html="<!-- -->" /> <Code tone="prompt">nickname</Code> line that lets that call compile.
+    <div slot="board" class={styles.choiceStack}>
+      {
+        NICKNAMES.map((nickname) => (
+          <QuizChoice level={optional.levels[0]} id={nickname.id}
+            ><span class={styles.choiceCode}><NullBoardCell text={nickname.label} tone="plain" /></span></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={clear}>
     <Fragment slot="body"
@@ -57,9 +76,17 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullFlow slot="bad" demo="clear" way="bad" />
     <NullFlow slot="good" demo="clear" way="good" />
   </RuleLesson>
-  <RuleQuiz n={3} level={clear.levels[0]} board="code" marks={marks}
-    >The user cleared the due date and never opened the assignee or notes. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">null</Code>.</RuleQuiz
-  >
+  <RuleQuiz n={3} level={clear.levels[0]} hint="Pick a value for each field, then press Check."
+    >Set each field of the patch so the server ends up with the Wanted task. Press Check to send it.
+    <NullPickBoard
+      slot="board"
+      level={clear.levels[0]}
+      head={'patch("/tasks/12", {'}
+      close="})"
+      fields={MATCH}
+      noun="value"
+    />
+  </RuleQuiz>
 
   <RuleLesson lesson={untouched}>
     <Fragment slot="body"
@@ -81,7 +108,15 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
   </RuleLesson>
   <RuleQuiz n={5} level={force.levels[0]} hint="Pick a mark for each field, then press Check."
     >Every new task must name an assignee or say there's none. The colour is optional and falls back to grey. How should each field be typed?
-    <NullMarkBoard slot="board" level={force.levels[0]} head="type NewTask = {" fixed={["title: string"]} fields={NEW_TASK} />
+    <NullPickBoard
+      slot="board"
+      level={force.levels[0]}
+      head="type NewTask = {"
+      fixed={["title: string"]}
+      close="}"
+      fields={NEW_TASK}
+      noun="mark"
+    />
   </RuleQuiz>
 
   <RuleLesson lesson={lookup}>

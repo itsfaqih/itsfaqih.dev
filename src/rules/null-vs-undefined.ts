@@ -1,4 +1,4 @@
-import type { Lesson, Side, Tldr } from "./lesson";
+import type { Choice, Lesson, Side, Tldr } from "./lesson";
 
 /** A line of a code pane: its source, and what it gives, toned as the ✕ or ✓ outcome. */
 export type Line = { c: string; out?: string; tone?: "no" | "yes"; hot?: boolean };
@@ -6,68 +6,167 @@ export type Line = { c: string; out?: string; tone?: "no" | "yes"; hot?: boolean
 /** Panes that show code carry their lines; the two live demos draw their own. */
 type CodeSide = Side & { lines?: Line[] };
 
-/** The marks the "A new task" board picks between, by the key its answer ids spell them with. */
-export const MARKS = [
-  ["opt", "?:"],
-  ["und", "| undefined"],
-  ["nul", "| null"],
-] as const;
-export type Mark = (typeof MARKS)[number][0];
-/** A field on a mark board: what it's typed as, its mark, and why each other mark is wrong. */
-export type MarkField = {
-  name: string;
-  type: string;
-  answer: Mark;
-  notes: Partial<Record<Mark, string>>;
+/** One way to fill a field on a pick board (null-pick-board.astro). */
+export type FieldOption = {
+  /** How the board's answer ids spell this option. */
+  key: string;
+  /** The segment's text. */
+  label: string;
+  /** The field's line once this is picked. */
+  line: string;
+  /** On a board with records, what the field holds after the send. Left out, it keeps `now`. */
+  lands?: string;
+  /** Why it's wrong. The field's answer has none. */
+  note?: string;
 };
 
-/** Writes `field` as `mark` types it; no mark leaves it bare. */
-export const marked = ({ name, type }: MarkField, mark?: Mark) =>
-  mark === "opt" ? `${name}?: ${type}` : `${name}: ${type}${mark ? ` ${MARKS.find(([key]) => key === mark)![1]}` : ""}`;
+/** A field on a pick board: its line before a pick, its options, and the right one's key. */
+export type PickField = {
+  name: string;
+  line: string;
+  answer: string;
+  options: readonly FieldOption[];
+  /** What the field holds before the send. A board whose fields have it shows Now, Wanted and Result. */
+  now?: string;
+};
 
-/** The choice id a set of marks, one per field, makes. */
-export const markChoice = (marks: readonly Mark[]) => marks.join("-");
+/** The choice id a set of options, one per field, makes. */
+export const pickChoice = (keys: readonly string[]) => keys.join("-");
 
-/** Every way to mark `fields`; a wrong set's note is its first wrong field's. */
-type MarkSet = { id: string; label: string; note: string };
-function markChoices(fields: readonly MarkField[], clear: string): [MarkSet, MarkSet, ...MarkSet[]] {
-  const sets = fields.reduce<Mark[][]>(
-    (all) => all.flatMap((set) => MARKS.map(([mark]) => [...set, mark])),
+/** Every way to fill `fields`; a wrong set's note is its first wrong field's. */
+type PickSet = { id: string; label: string; note: string };
+function pickChoices(fields: readonly PickField[], clear: string): [PickSet, PickSet, ...PickSet[]] {
+  const sets = fields.reduce<FieldOption[][]>(
+    (all, field) => all.flatMap((set) => field.options.map((option) => [...set, option])),
     [[]],
   );
   const [first, second, ...rest] = sets.map((set) => {
-    const wrong = fields.findIndex((field, index) => field.answer !== set[index]);
+    const wrong = set.find((option, index) => option.key !== fields[index]!.answer);
     return {
-      id: markChoice(set),
-      label: fields.map((field, index) => marked(field, set[index])).join(", "),
-      note: wrong === -1 ? clear : fields[wrong]!.notes[set[wrong]!]!,
+      id: pickChoice(set.map((option) => option.key)),
+      label: set.map((option) => option.line).join(", "),
+      note: wrong ? wrong.note! : clear,
     };
   });
   return [first!, second!, ...rest];
 }
 
-export const NEW_TASK: readonly MarkField[] = [
-  {
-    name: "assignee",
-    type: "User",
-    answer: "nul",
-    notes: {
-      opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
-      und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
-    },
-  },
-  {
-    name: "color",
-    type: "string",
-    answer: "opt",
-    notes: {
-      und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
-      nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
-    },
-  },
+/** The marks the "A new task" board offers, by the key its answer ids spell them with. */
+const MARKS = [
+  ["opt", "?:"],
+  ["und", "| undefined"],
+  ["nul", "| null"],
+] as const;
+type Mark = (typeof MARKS)[number][0];
+
+/** A field the "A new task" board types with one of MARKS. */
+const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<Mark, string>>): PickField => ({
+  name,
+  line: `${name}: ${type}`,
+  answer,
+  options: MARKS.map(([key, label]) => ({
+    key,
+    label,
+    line: key === "opt" ? `${name}?: ${type}` : `${name}: ${type} ${label}`,
+    note: notes[key],
+  })),
+});
+
+export const NEW_TASK: readonly PickField[] = [
+  typed("assignee", "User", "nul", {
+    opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
+    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
+  }),
+  typed("color", "string", "opt", {
+    und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
+    nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
+  }),
 ];
 const NEW_TASK_CLEAR =
   "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
+
+/** Replies to `GET /users/bo?fields=name,manager`, each a JSON body. */
+export const REPLIES: [Choice, Choice, ...Choice[]] = [
+  {
+    id: "all",
+    label: '{ "name": "Bo", "manager": null, "phone": null }',
+    note: "phone: null claims Bo has no phone. Nobody asked, so you don't know that, and the app won't ask him for one.",
+  },
+  {
+    id: "name",
+    label: '{ "name": "Bo" }',
+    note: "manager was asked for. With no key, it reads as not loaded, so the client fetches it again on every view.",
+  },
+  {
+    id: "asked",
+    label: '{ "name": "Bo", "manager": null }',
+    note: "null answers the question, since Bo has no manager. phone was never asked for, so its key isn't there.",
+  },
+];
+
+/** Ways to type the nickname a sign-up form may leave out. */
+export const NICKNAMES: [Choice, Choice, ...Choice[]] = [
+  {
+    id: "nul",
+    label: "nickname: string | null",
+    note: "The key is still required, so every caller must write nickname: null, even the ones that never had one.",
+  },
+  {
+    id: "und",
+    label: "nickname: string | undefined",
+    note: "Close, but the key is still required. Callers must write nickname: undefined, and leaving it out is TS2741.",
+  },
+  {
+    id: "opt",
+    label: "nickname?: string",
+    note: "The ? makes the key optional. The form leaves it out, and inside signUp it reads undefined.",
+  },
+];
+
+/** What a field on a board with records holds after `option` is sent. */
+export const landed = (field: PickField, option: FieldOption) => option.lands ?? field.now;
+
+/** How a record shows a field that was cleared. */
+const NONE = "—";
+
+/** A field the "Make it match" patch sets to null or undefined, or to `value` when it offers one. */
+const patched = (
+  name: string,
+  now: string,
+  answer: string,
+  notes: { val?: string; nul?: string; und?: string },
+  value?: string,
+): PickField => ({
+  name,
+  line: `${name}:`,
+  answer,
+  now,
+  options: [
+    ...(value === undefined ? [] : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
+    { key: "nul", label: "null", line: `${name}: null,`, lands: NONE, note: notes.nul },
+    { key: "und", label: "undefined", line: `${name}: undefined,`, note: notes.und },
+  ],
+});
+
+export const MATCH: readonly PickField[] = [
+  patched(
+    "title",
+    '"Ship v1"',
+    "val",
+    {
+      nul: "null wipes the title instead of renaming it.",
+      und: "undefined drops out of the JSON, so the rename never arrives.",
+    },
+    '"Ship v2"',
+  ),
+  patched("assignee", '"Rina"', "und", { nul: "assignee: null unassigns Rina, which nobody asked for." }),
+  patched("due", '"Mar 3"', "nul", {
+    und: "undefined drops out of the JSON, so the server never hears about the clear and keeps Mar 3.",
+  }),
+  patched("notes", '"Check copy"', "und", { nul: "notes: null wipes notes nobody touched." }),
+];
+const MATCH_CLEAR =
+  "It matches. The new title went out, and null cleared the date. assignee and notes stayed undefined, so they dropped out of the JSON and the server left them alone.";
 
 export const LESSONS: Lesson<CodeSide>[] = [
   {
@@ -94,33 +193,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "Fields you asked for",
-        piece: "omit the key",
-        answer: "phone",
-        rows: [
-          { depth: 0, text: "// GET /users/bo?fields=name,manager" },
-          { depth: 0, text: "{" },
-          { depth: 1, text: '"name": "Bo",' },
-          {
-            depth: 1,
-            lead: '"manager":',
-            slot: {
-              id: "manager",
-              label: '"manager":',
-              note: "A missing manager reads as not loaded, so the client fetches it again on every view.",
-            },
-          },
-          {
-            depth: 1,
-            lead: '"phone":',
-            slot: {
-              id: "phone",
-              label: '"phone":',
-              note: "Nobody asked, so send nothing. A missing key means no value was given.",
-            },
-          },
-          { depth: 0, text: "}" },
-        ],
+        name: "Which reply",
+        answer: "asked",
+        choices: REPLIES,
       },
     ],
   },
@@ -150,40 +225,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "A skippable field",
-        piece: "?: string",
-        answer: "nickname",
-        rows: [
-          { depth: 0, text: "type SignUp = {" },
-          {
-            depth: 1,
-            lead: "email",
-            slot: {
-              id: "email",
-              label: "email: string",
-              note: "Every sign-up needs an email. Optional lets a caller forget it with no error.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "nickname",
-            slot: {
-              id: "nickname",
-              label: "nickname: string",
-              note: "Make it optional. Callers with no nickname leave it out, and it reads undefined.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "password",
-            slot: {
-              id: "password",
-              label: "password: string",
-              note: "A sign-up with no password should fail where it's written, not at the first login.",
-            },
-          },
-          { depth: 0, text: "}" },
-        ],
+        name: "Leave it out",
+        answer: "opt",
+        choices: NICKNAMES,
       },
     ],
   },
@@ -193,41 +237,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     good: { label: "= null", costs: ["1 field cleared"] },
     levels: [
       {
-        name: "The date picker",
-        piece: "null",
-        answer: "due",
-        rows: [
-          { depth: 0, text: 'patch("/tasks/12", {' },
-          { depth: 1, text: 'title: "Ship v2",' },
-          {
-            depth: 1,
-            lead: "assignee:",
-            slot: {
-              id: "assignee",
-              label: "assignee:",
-              note: "Sends assignee: null and unassigns Rina. Nobody asked for that.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "due:",
-            slot: {
-              id: "due",
-              label: "due:",
-              note: "Send null to clear it, since they cleared it on purpose.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "notes:",
-            slot: {
-              id: "notes",
-              label: "notes:",
-              note: "Sends notes: null and wipes notes the user never opened.",
-            },
-          },
-          { depth: 0, text: "})" },
-        ],
+        name: "Make it match",
+        answer: pickChoice(MATCH.map((field) => field.answer)),
+        choices: pickChoices(MATCH, MATCH_CLEAR),
       },
     ],
   },
@@ -304,8 +316,8 @@ export const LESSONS: Lesson<CodeSide>[] = [
     levels: [
       {
         name: "A new task",
-        answer: markChoice(NEW_TASK.map((field) => field.answer)),
-        choices: markChoices(NEW_TASK, NEW_TASK_CLEAR),
+        answer: pickChoice(NEW_TASK.map((field) => field.answer)),
+        choices: pickChoices(NEW_TASK, NEW_TASK_CLEAR),
       },
     ],
   },

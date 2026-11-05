@@ -55,8 +55,11 @@ export const flowView = {
     ),
 };
 
-/** Classes the "A new task" board (null-mark-board.astro) and its element share. */
-export const markView = {
-  key: (on: boolean) => cx(styles.markKey, on && styles.markKeyOn),
-  check: cx(button.base, buttonVariant["primary-brand"], button.sm, styles.markCheck),
+/** Classes a pick board (null-pick-board.astro) and its element share. */
+export const pickView = {
+  key: (on: boolean) => cx(styles.pickKey, on && styles.pickKeyOn),
+  check: cx(button.base, buttonVariant["primary-brand"], button.sm, styles.pickCheck),
+  /** A Result line, tinted by whether it matches Wanted; unsent, it waits for Check. */
+  result: (hit?: boolean) =>
+    cx(styles.pickRecordLine, hit === undefined ? styles.pickUnsent : hit ? styles.pickHit : styles.pickMiss),
 };

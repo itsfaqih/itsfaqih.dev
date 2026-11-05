@@ -1,0 +1,94 @@
+---
+import type { Level } from "./lesson";
+import { landed, type PickField } from "./null-vs-undefined";
+import { KINDS, paint, pickView } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
+
+// A quiz board (null-pick-board.client.ts): each field picks one of its options, its line rewrites to
+// match, and Check sends the set to the quiz as that choice's answer.
+type Props = {
+  level: Level;
+  head: string;
+  fixed?: readonly string[];
+  close: string;
+  fields: readonly PickField[];
+  /** What a field picks, for "Pick a mark for color first." */
+  noun: string;
+};
+
+const { level, head, fixed = [], close, fields, noun } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const painted = (source: string) =>
+  paint(source, KINDS)
+    .map((part) => (part.class ? `<span class="${part.class}">${escape(part.text)}</span>` : escape(part.text)))
+    .join("");
+// Fields that know what they hold now get Now, Wanted and Result records; Check fills Result.
+const records = fields.every((field) => field.now !== undefined);
+const wanted = (field: PickField) => landed(field, field.options.find((option) => option.key === field.answer)!);
+const shown = [
+  { title: "Now", values: fields.map((field) => field.now) },
+  { title: "Wanted", values: fields.map(wanted) },
+];
+---
+
+<null-pick-board
+  class={styles.pickBoard}
+  data-notes={JSON.stringify(notes)}
+  data-fields={JSON.stringify(fields)}
+  data-noun={noun}
+  >{
+    records && (
+      <div class={styles.pickRecords}
+        >{
+          shown.map(({ title, values }) => (
+            <div class={styles.pickRecord}
+              ><h4 class={styles.pickRecordHead}>{title}</h4><code class={styles.pickRecordCode}
+                >{
+                  fields.map((field, index) => (
+                    <span class={styles.pickRecordLine} set:html={painted(`${field.name}: ${values[index]}`)} />
+                  ))
+                }</code
+              ></div
+            >
+          ))
+        }<div class={styles.pickRecord}
+          ><h4 class={styles.pickRecordHead}>Result</h4><code class={styles.pickRecordCode} data-part="result"
+            ><span class={pickView.result()}>Not sent yet.</span></code
+          ></div
+        ></div
+      >
+    )
+  }<div class={styles.pickCode}
+    ><code class={styles.pickLine} set:html={painted(head)}
+    />{fixed.map((line) => <code class:list={[styles.pickLine, styles.pickIn]} set:html={painted(line)} />)}{
+      fields.map((field) => (
+        <div class={styles.pickRow}
+          ><code class:list={[styles.pickLine, styles.pickIn]} data-part="line" set:html={painted(field.line)}
+          /><span class={styles.pickSeg} role="group" aria-label={field.name} data-field={field.name}
+            >{
+              field.options.map((option) => (
+                <button type="button" class={pickView.key(false)} aria-pressed="false" data-key={option.key}>{option.label}</button>
+              ))
+            }</span
+          ></div
+        >
+      ))
+    }<code class={styles.pickLine} set:html={painted(close)} /></div
+  ><div class={styles.pickFoot}
+    ><span class={styles.pickLeft} data-part="left">{fields.length} left to pick.</span><button
+      type="button"
+      class={pickView.check}
+      aria-disabled="true"
+      data-part="slot"
+      data-look="check"
+      data-slot=""
+      data-note="">Check</button
+    ></div
+  ></null-pick-board
+>
+
+<script>
+  import "./null-pick-board.client";
+</script>
