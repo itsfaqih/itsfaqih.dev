@@ -46,7 +46,7 @@ const { jobs } = Astro.props;
             <span class={view.chevron} aria-hidden="true" />
           </button>
           <div data-stack="true" class={view.frame}>
-            <ul class={view.stack} aria-label={`${job.company} stack`}>
+            <ul data-own-scroll class={view.stack} aria-label={`${job.company} stack`}>
               {job.stack.map((tool) => (
                 <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} class={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
               ))}
