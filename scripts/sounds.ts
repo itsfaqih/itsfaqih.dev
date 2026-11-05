@@ -18,8 +18,8 @@ const SOURCES = {
   place: "drop-002",
   flicker: "glitch-001",
   dive: "maximize-006",
-  turn: "book-flip-2",
-  fold: "book-flip-3",
+  expand: "open-004",
+  collapse: "close-004",
 };
 
 /** Cues played as another cue's clip run backwards, made with ffmpeg once the sources are in. */

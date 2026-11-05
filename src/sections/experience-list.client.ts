@@ -224,7 +224,7 @@ class ExperienceList extends HTMLElement {
       const before = reducedMotion() ? null : snapshotOf(this);
       const was = open;
       open = open === index ? -1 : index;
-      play(open === -1 ? "fold" : "turn");
+      play(open === -1 ? "collapse" : "expand");
       for (const at of new Set([was, open])) {
         const row = rows[at];
         if (!row) continue;
