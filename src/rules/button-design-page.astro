@@ -59,19 +59,19 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonStill slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={2} level={still.levels[0]}
-    ><b>Pay</b> stays off until Ana adds a card. She hovers it. Pick what she should see.
+    >Ana opens a new doc. <b>Undo edit</b> stays off until she changes something, and she hovers it. Pick what she should see.
     <div slot="board" class={quizKit.trio}>
       <QuizChoice level={still.levels[0]} id="hand" caption="Lights up, hand cursor"
         ><span class={quiz.mock}
           ><span class={quiz.hovered}
-            ><span class:list={[key, styles.plain, quiz.lit]}>Pay $48</span><ButtonCursor kind="hand" /></span
+            ><span class:list={[key, styles.plain, quiz.lit]}>Undo edit</span><ButtonCursor kind="hand" /></span
           ></span
         ></QuizChoice
       >
       <QuizChoice level={still.levels[0]} id="mixed" caption="Lights up, no‑entry cursor"
         ><span class={quiz.mock}
           ><span class={quiz.hovered}
-            ><span class:list={[key, styles.off, quiz.lit]}>Pay $48</span><ButtonCursor
+            ><span class:list={[key, styles.off, quiz.lit]}>Undo edit</span><ButtonCursor
               kind="forbid"
             /></span
           ></span
@@ -80,7 +80,7 @@ const key = [styles.key, styles.sm, styles.flat];
       <QuizChoice level={still.levels[0]} id="still" caption="Stays put, no‑entry cursor"
         ><span class={quiz.mock}
           ><span class={quiz.hovered}
-            ><span class:list={[key, styles.off]}>Pay $48</span><ButtonCursor kind="forbid" /></span
+            ><span class:list={[key, styles.off]}>Undo edit</span><ButtonCursor kind="forbid" /></span
           ></span
         ></QuizChoice
       >
