@@ -3,13 +3,15 @@ import { styles } from "./button-design.css";
 
 type Props = {
   pads: [left: number, right: number];
+  /** The top padding, drawn as a vertical line beside the key. */
+  top?: number;
 };
 
-const { pads } = Astro.props;
+const { pads, top } = Astro.props;
 ---
 
 <span aria-hidden="true" class={styles.dims}
   ><span class:list={[styles.dim, styles.dimLeft]}>{pads[0]}</span><span
     class:list={[styles.dim, styles.dimRight]}>{pads[1]}</span
   ></span
->
+>{top !== undefined && <span aria-hidden="true" class={styles.dimTop}>{top}</span>}

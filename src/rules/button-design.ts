@@ -137,6 +137,40 @@ export const LESSONS: Lesson[] = [
       },
     ],
   },
+  {
+    title: "Pad an icon button the same on every side",
+    bad: {
+      label: "Text padding",
+      costs: ["16 | 11px", "48 × 38px"],
+    },
+    good: {
+      label: "Square",
+      costs: ["11px every side", "38 × 38px"],
+    },
+    levels: [
+      {
+        name: "Play beside Subtitles",
+        answer: "fit",
+        choices: [
+          {
+            id: "wide",
+            label: "16px sides, 11px top and bottom",
+            note: "Play stretches into a wide pill that looks like it lost its label.",
+          },
+          {
+            id: "tall",
+            label: "16px on every side",
+            note: "Play is square, but 48px tall beside a 38px Subtitles, so the bar no longer lines up.",
+          },
+          {
+            id: "fit",
+            label: "11px on every side",
+            note: "A 16px icon with 11px all round makes a 38px square, as tall as Subtitles.",
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const TLDR = [
@@ -144,4 +178,5 @@ export const TLDR = [
   ["Hovering a disabled button", "Keep its colour and drop still"],
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
   ["An icon beside the label", "Take 4px off the icon's side"],
+  ["A button with only an icon", "Pad every side the same, so it's square"],
 ] as const satisfies Tldr;

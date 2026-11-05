@@ -8,6 +8,8 @@ const PHONE = "(max-width: 640px)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
 const SQUINT = when.ancestor(':has([data-toggle="squint"][aria-pressed="true"])');
+const RING = when.ancestor(':has([data-toggle="ring"][aria-pressed="true"])');
+const HATCH = `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`;
 const NOTE_INK = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
 
 export const styles = {
@@ -543,6 +545,28 @@ export const styles = {
     backgroundRepeat: "no-repeat",
     backgroundSize: "1px 7px, 1px 7px, 100% 1px",
   }),
+  // The same dimension line turned upright, measuring the top padding beside the key.
+  dimTop: style({
+    position: "absolute",
+    top: 0,
+    left: "calc(100% + 8px)",
+    display: "flex",
+    alignItems: "center",
+    height: "var(--pv, 11px)",
+    paddingLeft: "11px",
+    fontWeight: 500,
+    fontSize: "10px",
+    lineHeight: 1,
+    fontFamily: fonts["--mono"],
+    color: palette["--focus"],
+    pointerEvents: "none",
+    userSelect: "none",
+    backgroundImage:
+      "linear-gradient(currentcolor, currentcolor), linear-gradient(currentcolor, currentcolor), linear-gradient(currentcolor, currentcolor)",
+    backgroundPosition: "left top, left bottom, 3px 0",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "7px 1px, 7px 1px, 1px 100%",
+  }),
   dimLeft: style({
     left: 0,
     width: "var(--pl)",
@@ -564,7 +588,7 @@ export const styles = {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
         borderBottomLeftRadius: "10px",
-        backgroundImage: `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`,
+        backgroundImage: HATCH,
         opacity: 0,
         transition: "opacity 150ms ease",
       },
@@ -579,7 +603,7 @@ export const styles = {
         borderTopRightRadius: "10px",
         borderBottomRightRadius: "10px",
         borderBottomLeftRadius: 0,
-        backgroundImage: `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`,
+        backgroundImage: HATCH,
         opacity: 0,
         transition: "opacity 150ms ease",
       },
@@ -587,6 +611,44 @@ export const styles = {
         opacity: 1,
       },
       [`&${when.ancestor(':has([data-toggle="pads"][aria-pressed="true"])')}::after`]: {
+        opacity: 1,
+      },
+    },
+  }),
+  // An icon with no label: its padding sets the height too, so all four sides can match.
+  iconOnly: style({
+    height: "auto",
+    paddingBlock: "var(--pv, 11px)",
+  }),
+  square: style({
+    vars: {
+      "--pl": "11px",
+      "--pr": "11px",
+    },
+  }),
+  tall: style({
+    vars: {
+      "--pv": "16px",
+    },
+  }),
+  // Hatches the padding on all four sides: a hatched layer with the content box cut out.
+  ring: style({
+    selectors: {
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: 0,
+        padding: "inherit",
+        borderRadius: "inherit",
+        backgroundImage: HATCH,
+        maskImage: "linear-gradient(#000 0 0), linear-gradient(#000 0 0)",
+        maskClip: "content-box, border-box",
+        maskComposite: "exclude",
+        opacity: 0,
+        transition: "opacity 150ms ease",
+        pointerEvents: "none",
+      },
+      [`&${RING}::before`]: {
         opacity: 1,
       },
     },

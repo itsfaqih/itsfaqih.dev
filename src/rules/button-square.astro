@@ -1,0 +1,27 @@
+---
+import Icon from "../components/icon.astro";
+import { styles } from "./button-design.css";
+import Ruler from "./button-ruler.astro";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+const key = [styles.key, styles.sm, styles.live, styles.plain, styles.iconOnly, styles.ring, careful && styles.square];
+const side = careful ? 11 : 16;
+const ACTIONS = [
+  ["Edit", "PencilSimple"],
+  ["Share", "ShareNetwork"],
+  ["Delete", "Trash"],
+] as const;
+---
+
+<div class:list={[styles.stage, styles.icons]}>
+  {
+    ACTIONS.map(([label, icon], i) => (
+        <button type="button" aria-label={label} class:list={key}>
+          <Icon name={icon} size="1em" weight="bold" aria-hidden="true" class={styles.icon} />
+          <Ruler pads={[side, side]} top={i === ACTIONS.length - 1 ? 11 : undefined} />
+        </button>
+      ))
+    }
+</div>
