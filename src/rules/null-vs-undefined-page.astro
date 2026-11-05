@@ -3,7 +3,7 @@ import Code from "./code.astro";
 import NullBoardCell from "./null-board-cell.astro";
 import NullCodeBlock from "./null-code-block.astro";
 import NullFlow from "./null-flow.astro";
-import NullMarkBoard from "./null-mark-board.astro";
+import NullPickBoard from "./null-pick-board.astro";
 import { LESSONS, NEW_TASK, TLDR } from "./null-vs-undefined";
 import { styles } from "./null-vs-undefined.css";
 import RuleLanding from "./rule-landing.astro";
@@ -81,7 +81,15 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
   </RuleLesson>
   <RuleQuiz n={5} level={force.levels[0]} hint="Pick a mark for each field, then press Check."
     >Every new task must name an assignee or say there's none. The colour is optional and falls back to grey. How should each field be typed?
-    <NullMarkBoard slot="board" level={force.levels[0]} head="type NewTask = {" fixed={["title: string"]} fields={NEW_TASK} />
+    <NullPickBoard
+      slot="board"
+      level={force.levels[0]}
+      head="type NewTask = {"
+      fixed={["title: string"]}
+      close="}"
+      fields={NEW_TASK}
+      noun="mark"
+    />
   </RuleQuiz>
 
   <RuleLesson lesson={lookup}>

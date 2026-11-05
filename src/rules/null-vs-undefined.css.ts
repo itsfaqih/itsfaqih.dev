@@ -533,26 +533,26 @@ export const styles = {
       },
     },
   }),
-  // The "A new task" board (null-mark-board.astro): the type, a mark picker per field, and Check.
-  markBoard: style({
+  // A pick board (null-pick-board.astro): the code, a picker per field, and Check.
+  pickBoard: style({
     display: "grid",
     gap: "14px",
   }),
-  markCode: style({
+  pickCode: style({
     display: "grid",
     gap: "6px",
     fontSize: "13px",
     lineHeight: 1.4,
     fontFamily: fonts["--mono"],
   }),
-  markLine: style({
+  pickLine: style({
     minHeight: "28px",
     display: "flex",
     alignItems: "center",
     whiteSpace: "pre",
     color: palette["--text"],
   }),
-  markIn: style({
+  pickIn: style({
     paddingLeft: "20px",
     "@media": {
       [PHONE]: {
@@ -560,7 +560,7 @@ export const styles = {
       },
     },
   }),
-  markRow: style({
+  pickRow: style({
     display: "flex",
     flexWrap: "wrap",
     alignItems: "center",
@@ -568,7 +568,7 @@ export const styles = {
     rowGap: "6px",
     columnGap: "12px",
   }),
-  markSeg: style({
+  pickSeg: style({
     display: "inline-flex",
     gap: "4px",
     paddingBlock: "4px",
@@ -581,7 +581,7 @@ export const styles = {
       },
     },
   }),
-  markKey: style({
+  pickKey: style({
     "@layer": {
       [under1]: {
         minHeight: "32px",
@@ -624,27 +624,27 @@ export const styles = {
       },
     },
   }),
-  markKeyOn: style({
+  pickKeyOn: style({
     backgroundColor: "var(--c)",
     backgroundPosition: "initial",
     boxShadow: "0 3px 0 var(--key-c)",
     color: "var(--on-c)",
   }),
-  markFoot: style({
+  pickFoot: style({
     display: "flex",
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
     gap: "10px",
   }),
-  markLeft: style({
+  pickLeft: style({
     fontWeight: 600,
     fontSize: "12px",
     fontFamily: fonts["--mono"],
     color: palette["--dim"],
   }),
   // The quiz sets data-state on Check: missed shakes it, seated wears the tick.
-  markCheck: style({
+  pickCheck: style({
     position: "relative",
     marginLeft: "auto",
     selectors: {

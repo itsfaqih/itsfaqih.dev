@@ -6,65 +6,81 @@ export type Line = { c: string; out?: string; tone?: "no" | "yes"; hot?: boolean
 /** Panes that show code carry their lines; the two live demos draw their own. */
 type CodeSide = Side & { lines?: Line[] };
 
-/** The marks the "A new task" board picks between, by the key its answer ids spell them with. */
-export const MARKS = [
-  ["opt", "?:"],
-  ["und", "| undefined"],
-  ["nul", "| null"],
-] as const;
-export type Mark = (typeof MARKS)[number][0];
-/** A field on a mark board: what it's typed as, its mark, and why each other mark is wrong. */
-export type MarkField = {
-  name: string;
-  type: string;
-  answer: Mark;
-  notes: Partial<Record<Mark, string>>;
+/** One way to fill a field on a pick board (null-pick-board.astro). */
+export type FieldOption = {
+  /** How the board's answer ids spell this option. */
+  key: string;
+  /** The segment's text. */
+  label: string;
+  /** The field's line once this is picked. */
+  line: string;
+  /** On a board with records, what the field holds after the send. Left out, it keeps `now`. */
+  lands?: string;
+  /** Why it's wrong. The field's answer has none. */
+  note?: string;
 };
 
-/** Writes `field` as `mark` types it; no mark leaves it bare. */
-export const marked = ({ name, type }: MarkField, mark?: Mark) =>
-  mark === "opt" ? `${name}?: ${type}` : `${name}: ${type}${mark ? ` ${MARKS.find(([key]) => key === mark)![1]}` : ""}`;
+/** A field on a pick board: its line before a pick, its options, and the right one's key. */
+export type PickField = {
+  name: string;
+  line: string;
+  answer: string;
+  options: readonly FieldOption[];
+  /** What the field holds before the send. A board whose fields have it shows Now, Wanted and Result. */
+  now?: string;
+};
 
-/** The choice id a set of marks, one per field, makes. */
-export const markChoice = (marks: readonly Mark[]) => marks.join("-");
+/** The choice id a set of options, one per field, makes. */
+export const pickChoice = (keys: readonly string[]) => keys.join("-");
 
-/** Every way to mark `fields`; a wrong set's note is its first wrong field's. */
-type MarkSet = { id: string; label: string; note: string };
-function markChoices(fields: readonly MarkField[], clear: string): [MarkSet, MarkSet, ...MarkSet[]] {
-  const sets = fields.reduce<Mark[][]>(
-    (all) => all.flatMap((set) => MARKS.map(([mark]) => [...set, mark])),
+/** Every way to fill `fields`; a wrong set's note is its first wrong field's. */
+type PickSet = { id: string; label: string; note: string };
+function pickChoices(fields: readonly PickField[], clear: string): [PickSet, PickSet, ...PickSet[]] {
+  const sets = fields.reduce<FieldOption[][]>(
+    (all, field) => all.flatMap((set) => field.options.map((option) => [...set, option])),
     [[]],
   );
   const [first, second, ...rest] = sets.map((set) => {
-    const wrong = fields.findIndex((field, index) => field.answer !== set[index]);
+    const wrong = set.find((option, index) => option.key !== fields[index]!.answer);
     return {
-      id: markChoice(set),
-      label: fields.map((field, index) => marked(field, set[index])).join(", "),
-      note: wrong === -1 ? clear : fields[wrong]!.notes[set[wrong]!]!,
+      id: pickChoice(set.map((option) => option.key)),
+      label: set.map((option) => option.line).join(", "),
+      note: wrong ? wrong.note! : clear,
     };
   });
   return [first!, second!, ...rest];
 }
 
-export const NEW_TASK: readonly MarkField[] = [
-  {
-    name: "assignee",
-    type: "User",
-    answer: "nul",
-    notes: {
-      opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
-      und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
-    },
-  },
-  {
-    name: "color",
-    type: "string",
-    answer: "opt",
-    notes: {
-      und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
-      nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
-    },
-  },
+/** The marks the "A new task" board offers, by the key its answer ids spell them with. */
+const MARKS = [
+  ["opt", "?:"],
+  ["und", "| undefined"],
+  ["nul", "| null"],
+] as const;
+type Mark = (typeof MARKS)[number][0];
+
+/** A field the "A new task" board types with one of MARKS. */
+const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<Mark, string>>): PickField => ({
+  name,
+  line: `${name}: ${type}`,
+  answer,
+  options: MARKS.map(([key, label]) => ({
+    key,
+    label,
+    line: key === "opt" ? `${name}?: ${type}` : `${name}: ${type} ${label}`,
+    note: notes[key],
+  })),
+});
+
+export const NEW_TASK: readonly PickField[] = [
+  typed("assignee", "User", "nul", {
+    opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
+    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
+  }),
+  typed("color", "string", "opt", {
+    und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
+    nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
+  }),
 ];
 const NEW_TASK_CLEAR =
   "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
@@ -304,8 +320,8 @@ export const LESSONS: Lesson<CodeSide>[] = [
     levels: [
       {
         name: "A new task",
-        answer: markChoice(NEW_TASK.map((field) => field.answer)),
-        choices: markChoices(NEW_TASK, NEW_TASK_CLEAR),
+        answer: pickChoice(NEW_TASK.map((field) => field.answer)),
+        choices: pickChoices(NEW_TASK, NEW_TASK_CLEAR),
       },
     ],
   },

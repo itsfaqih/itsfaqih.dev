@@ -1,27 +1,26 @@
 import { play } from "../hooks/sound";
-import { MARKS, marked, markChoice, type Mark, type MarkField } from "./null-vs-undefined";
-import { KINDS, markView, paint } from "./null-vs-undefined.view";
-
-const isMark = (key: string | undefined): key is Mark => MARKS.some(([mark]) => mark === key);
+import { pickChoice, type FieldOption, type PickField } from "./null-vs-undefined";
+import { KINDS, paint, pickView } from "./null-vs-undefined.view";
 
 /**
- * A mark board (null-mark-board.astro). Each field's segments pick its mark and rewrite its line;
+ * A pick board (null-pick-board.astro). Each field's segments pick its option and rewrite its line;
  * once every field has one, Check carries the choice that set is. The quiz locks Check once
  * cleared, and the segments lock with it.
  */
-class NullMarkBoard extends HTMLElement {
+class NullPickBoard extends HTMLElement {
   #stop?: () => void;
 
   connectedCallback() {
     const controller = new AbortController();
     const { signal } = controller;
-    const fields: MarkField[] = JSON.parse(this.dataset.fields!);
+    const fields: PickField[] = JSON.parse(this.dataset.fields!);
     const notes: Record<string, string> = JSON.parse(this.dataset.notes!);
+    const noun = this.dataset.noun!;
     const check = this.querySelector<HTMLButtonElement>('[data-look="check"]')!;
     const left = this.querySelector<HTMLElement>('[data-part="left"]')!;
     const lines = [...this.querySelectorAll<HTMLElement>('[data-part="line"]')];
     const groups = [...this.querySelectorAll<HTMLElement>("[data-field]")];
-    const marks: (Mark | undefined)[] = fields.map(() => undefined);
+    const picks: (FieldOption | undefined)[] = fields.map(() => undefined);
 
     const paintLine = (line: HTMLElement, source: string) => {
       line.replaceChildren(
@@ -35,20 +34,20 @@ class NullMarkBoard extends HTMLElement {
       );
     };
 
-    const set = (index: number, mark: Mark) => {
-      marks[index] = mark;
-      paintLine(lines[index]!, marked(fields[index]!, mark));
-      groups[index]!.querySelectorAll<HTMLButtonElement>("[data-mark]").forEach((key) => {
-        const on = key.dataset.mark === mark;
+    const set = (index: number, option: FieldOption) => {
+      picks[index] = option;
+      paintLine(lines[index]!, option.line);
+      groups[index]!.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((key) => {
+        const on = key.dataset.key === option.key;
         key.setAttribute("aria-pressed", String(on));
-        key.className = markView.key(on);
+        key.className = pickView.key(on);
       });
-      const picked = marks.filter(isMark);
+      const picked = picks.filter((pick) => pick !== undefined);
       const unpicked = fields.length - picked.length;
       check.setAttribute("aria-disabled", String(unpicked > 0));
       left.textContent = unpicked > 0 ? `${unpicked} left to pick.` : "Press Check to try it.";
       if (unpicked > 0) return;
-      const id = markChoice(picked);
+      const id = pickChoice(picked.map((pick) => pick.key));
       check.dataset.slot = id;
       check.dataset.note = notes[id];
     };
@@ -57,24 +56,24 @@ class NullMarkBoard extends HTMLElement {
       group.addEventListener(
         "click",
         (event) => {
-          const key = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("[data-mark]") : null;
-          const mark = key?.dataset.mark;
-          if (!isMark(mark) || check.disabled || key?.getAttribute("aria-pressed") === "true") return;
+          const key = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("[data-key]") : null;
+          const option = fields[index]!.options.find((candidate) => candidate.key === key?.dataset.key);
+          if (!option || check.disabled || key?.getAttribute("aria-pressed") === "true") return;
           play("tap");
-          set(index, mark);
+          set(index, option);
         },
         { signal },
       ),
     );
 
-    // Until every field has a mark, Check has no answer to carry, so the quiz never hears it.
+    // Until every field has a pick, Check has no answer to carry, so the quiz never hears it.
     check.addEventListener(
       "click",
       (event) => {
         if (check.getAttribute("aria-disabled") !== "true") return;
         event.stopPropagation();
         play("error");
-        left.textContent = `Pick a mark for ${fields.filter((_, index) => !marks[index]).map((field) => field.name).join(" and ")} first.`;
+        left.textContent = `Pick a ${noun} for ${fields.filter((_, index) => !picks[index]).map((field) => field.name).join(" and ")} first.`;
       },
       { signal },
     );
@@ -83,7 +82,7 @@ class NullMarkBoard extends HTMLElement {
     const lock = new MutationObserver(() => {
       if (!check.disabled) return;
       left.textContent = "";
-      this.querySelectorAll<HTMLButtonElement>("[data-mark]").forEach((key) => {
+      this.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((key) => {
         key.disabled = true;
       });
     });
@@ -100,4 +99,4 @@ class NullMarkBoard extends HTMLElement {
   }
 }
 
-customElements.define("null-mark-board", NullMarkBoard);
+customElements.define("null-pick-board", NullPickBoard);
