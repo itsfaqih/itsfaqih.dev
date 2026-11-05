@@ -34,7 +34,7 @@ export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
 
 /** Classes the save demo (null-flow.astro) and its element share. */
 export const flowView = {
-  again: cx(button.base, buttonVariant["primary-neutral"], button.sm, styles.again),
+  button: cx(button.base, buttonVariant["primary-neutral"], button.sm, styles.button),
   body: (typing: boolean) => cx(styles.body, typing && styles.typing),
   packet: (dropping: boolean) => cx(styles.packet, dropping && styles.dropping),
   cell: (verdict: Verdict | undefined, ran: boolean) =>
@@ -53,4 +53,10 @@ export const flowView = {
       (verdict === "saved" || verdict === "kept") && styles.tagKept,
       (verdict === "wiped" || verdict === "lost") && styles.tagLost,
     ),
+};
+
+/** Classes the "A new task" board (null-mark-board.astro) and its element share. */
+export const markView = {
+  key: (on: boolean) => cx(styles.markKey, on && styles.markKeyOn),
+  check: cx(button.base, buttonVariant["primary-brand"], button.sm, styles.markCheck),
 };

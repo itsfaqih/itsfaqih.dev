@@ -20,6 +20,11 @@ const drop = keyframes({
   "70%": { opacity: 1 },
   to: { opacity: 0, transform: "translateY(16px)" },
 });
+const wobble = keyframes({
+  "25%": { translate: "-4px 0" },
+  "50%": { translate: "4px 0" },
+  "75%": { translate: "-2px 0" },
+});
 const land = keyframes({
   from: { opacity: 0, transform: "translateY(6px)" },
 });
@@ -308,13 +313,19 @@ export const styles = {
     fontSize: "14px",
     color: palette["--mute"],
   }),
-  again: style({
+  button: style({
     marginLeft: "auto",
     selectors: {
-      "&:disabled": {
+      "&:disabled, &[aria-disabled=true]": {
         opacity: 0.5,
+        cursor: cursors["--cursor-forbid"],
       },
     },
+  }),
+  // Sits under the record, apart from the form, so the form's own button only ever saves.
+  ctl: style({
+    display: "flex",
+    justifyContent: "flex-end",
   }),
   wire: style({
     position: "relative",
@@ -519,6 +530,137 @@ export const styles = {
     selectors: {
       [`&${when.ancestor("[data-off]")}`]: {
         display: "none",
+      },
+    },
+  }),
+  // The "A new task" board (null-mark-board.astro): the type, a mark picker per field, and Check.
+  markBoard: style({
+    display: "grid",
+    gap: "14px",
+  }),
+  markCode: style({
+    display: "grid",
+    gap: "6px",
+    fontSize: "13px",
+    lineHeight: 1.4,
+    fontFamily: fonts["--mono"],
+  }),
+  markLine: style({
+    minHeight: "28px",
+    display: "flex",
+    alignItems: "center",
+    whiteSpace: "pre",
+    color: palette["--text"],
+  }),
+  markIn: style({
+    paddingLeft: "20px",
+    "@media": {
+      [PHONE]: {
+        paddingLeft: "14px",
+      },
+    },
+  }),
+  markRow: style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    rowGap: "6px",
+    columnGap: "12px",
+  }),
+  markSeg: style({
+    display: "inline-flex",
+    gap: "4px",
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+    "@media": {
+      [PHONE]: {
+        marginLeft: "14px",
+      },
+    },
+  }),
+  markKey: style({
+    "@layer": {
+      [under1]: {
+        minHeight: "32px",
+        paddingBlock: 0,
+        paddingInline: "10px",
+        borderWidth: 0,
+        borderStyle: "none",
+        borderColor: "currentcolor",
+        borderRadius: "9px",
+        backgroundColor: "transparent",
+        backgroundPosition: "0px 0px",
+        fontWeight: 600,
+        fontSize: "12px",
+        lineHeight: "normal",
+        fontFamily: fonts["--mono"],
+        color: palette["--dim"],
+        whiteSpace: "nowrap",
+        cursor: cursors["--cursor-point"],
+        transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, box-shadow ${kit["--t-fb"]} ease`,
+        selectors: {
+          "&:focus-visible": {
+            outlineWidth: "3px",
+            outlineStyle: "solid",
+            outlineColor: palette["--focus"],
+            outlineOffset: "2px",
+          },
+          "&:disabled": {
+            cursor: "default",
+          },
+        },
+        "@media": {
+          [HOVER]: {
+            selectors: {
+              "&:hover:enabled": {
+                color: palette["--text"],
+              },
+            },
+          },
+        },
+      },
+    },
+  }),
+  markKeyOn: style({
+    backgroundColor: "var(--c)",
+    backgroundPosition: "initial",
+    boxShadow: "0 3px 0 var(--key-c)",
+    color: "var(--on-c)",
+  }),
+  markFoot: style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  }),
+  markLeft: style({
+    fontWeight: 600,
+    fontSize: "12px",
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+  }),
+  // The quiz sets data-state on Check: missed shakes it, seated wears the tick.
+  markCheck: style({
+    position: "relative",
+    marginLeft: "auto",
+    selectors: {
+      '&[aria-disabled="true"]': {
+        opacity: 0.55,
+      },
+    },
+    "@media": {
+      [MOTION]: {
+        selectors: {
+          '&[data-state="missed"]': {
+            animationName: wobble,
+            animationDuration: "320ms",
+            animationTimingFunction: motion["--cut"],
+          },
+        },
       },
     },
   }),

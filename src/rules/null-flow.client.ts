@@ -59,27 +59,20 @@ class NullFlow extends HTMLElement {
     let json = "";
 
     const syncForm = () => {
+      const reset = part<HTMLButtonElement>("reset");
+      // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
+      const fresh = phase === "idle" && (clear || title === TITLE);
+      reset.setAttribute("aria-disabled", String(phase === "sent" || fresh));
       if (clear) {
+        const shown = form.firstElementChild!.nextElementSibling!;
         const cleared = phase !== "idle";
-        const label = form.firstElementChild!;
-        let again = form.querySelector<HTMLButtonElement>('[data-part="again"]');
-        if (cleared && !again) {
-          again = el("button", flowView.again, "Reset");
-          again.type = "button";
-          again.dataset.part = "again";
-          const none = part<HTMLTemplateElement>("none").content.firstElementChild!;
-          label.nextElementSibling!.replaceWith(document.importNode(none, true), again);
-        } else if (!cleared && again) {
-          again.remove();
-          const chip = part<HTMLTemplateElement>("chip").content.firstElementChild!;
-          label.nextElementSibling!.replaceWith(document.importNode(chip, true));
+        if (cleared === (shown.querySelector('[data-part="remove"]') !== null)) {
+          const fill = part<HTMLTemplateElement>(cleared ? "none" : "chip").content.firstElementChild!;
+          shown.replaceWith(document.importNode(fill, true));
         }
-        if (again) again.disabled = phase === "sent";
         return;
       }
-      const save = part<HTMLButtonElement>("save");
-      save.disabled = phase === "sent";
-      save.textContent = phase === "done" ? "Reset" : "Save";
+      part<HTMLButtonElement>("save").disabled = phase === "sent";
     };
 
     const syncWire = () => {
@@ -164,7 +157,7 @@ class NullFlow extends HTMLElement {
       }
       sync();
     };
-    const reset = () => {
+    const rewind = () => {
       touched = true;
       clearTimeout(timer);
       phase = "idle";
@@ -175,16 +168,10 @@ class NullFlow extends HTMLElement {
       "click",
       (event) => {
         const target = event.target instanceof Element ? event.target.closest("button") : null;
-        if (!target) return;
-        const name = target.dataset.part;
-        if (name === "remove") {
-          touched = true;
-          send();
-        } else if (name === "again" || (name === "save" && phase === "done")) reset();
-        else if (name === "save") {
-          touched = true;
-          send();
-        }
+        const name = target?.dataset.part;
+        if (name !== "remove" && name !== "save") return;
+        touched = true;
+        send();
       },
       { signal },
     );
@@ -194,12 +181,24 @@ class NullFlow extends HTMLElement {
         "input",
         () => {
           title = input.value;
-          if (phase === "done") reset();
+          if (phase === "done") rewind();
           else sync();
         },
         { signal },
       );
     }
+    part("reset").addEventListener(
+      "click",
+      () => {
+        if (part("reset").getAttribute("aria-disabled") === "true") return;
+        if (!clear) {
+          title = TITLE;
+          part<HTMLInputElement>("input").value = TITLE;
+        }
+        rewind();
+      },
+      { signal },
+    );
 
     let stopRewind = () => {};
     if (

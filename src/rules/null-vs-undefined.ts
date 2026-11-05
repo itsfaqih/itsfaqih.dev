@@ -6,6 +6,69 @@ export type Line = { c: string; out?: string; tone?: "no" | "yes"; hot?: boolean
 /** Panes that show code carry their lines; the two live demos draw their own. */
 type CodeSide = Side & { lines?: Line[] };
 
+/** The marks the "A new task" board picks between, by the key its answer ids spell them with. */
+export const MARKS = [
+  ["opt", "?:"],
+  ["und", "| undefined"],
+  ["nul", "| null"],
+] as const;
+export type Mark = (typeof MARKS)[number][0];
+/** A field on a mark board: what it's typed as, its mark, and why each other mark is wrong. */
+export type MarkField = {
+  name: string;
+  type: string;
+  answer: Mark;
+  notes: Partial<Record<Mark, string>>;
+};
+
+/** Writes `field` as `mark` types it; no mark leaves it bare. */
+export const marked = ({ name, type }: MarkField, mark?: Mark) =>
+  mark === "opt" ? `${name}?: ${type}` : `${name}: ${type}${mark ? ` ${MARKS.find(([key]) => key === mark)![1]}` : ""}`;
+
+/** The choice id a set of marks, one per field, makes. */
+export const markChoice = (marks: readonly Mark[]) => marks.join("-");
+
+/** Every way to mark `fields`; a wrong set's note is its first wrong field's. */
+type MarkSet = { id: string; label: string; note: string };
+function markChoices(fields: readonly MarkField[], clear: string): [MarkSet, MarkSet, ...MarkSet[]] {
+  const sets = fields.reduce<Mark[][]>(
+    (all) => all.flatMap((set) => MARKS.map(([mark]) => [...set, mark])),
+    [[]],
+  );
+  const [first, second, ...rest] = sets.map((set) => {
+    const wrong = fields.findIndex((field, index) => field.answer !== set[index]);
+    return {
+      id: markChoice(set),
+      label: fields.map((field, index) => marked(field, set[index])).join(", "),
+      note: wrong === -1 ? clear : fields[wrong]!.notes[set[wrong]!]!,
+    };
+  });
+  return [first!, second!, ...rest];
+}
+
+export const NEW_TASK: readonly MarkField[] = [
+  {
+    name: "assignee",
+    type: "User",
+    answer: "nul",
+    notes: {
+      opt: "?: lets a caller leave the assignee out and never decide. Make it required, so they pass a user or null on purpose.",
+      und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no assignee\" is a null someone wrote.",
+    },
+  },
+  {
+    name: "color",
+    type: "string",
+    answer: "opt",
+    notes: {
+      und: "Now every caller has to write color: undefined just to get grey. ?: lets them leave it out.",
+      nul: "Now every caller has to pass a colour or null, when most just want grey. ?: lets them leave it out.",
+    },
+  },
+];
+const NEW_TASK_CLEAR =
+  "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
+
 export const LESSONS: Lesson<CodeSide>[] = [
   {
     title: "Tell missing from empty",
@@ -241,39 +304,8 @@ export const LESSONS: Lesson<CodeSide>[] = [
     levels: [
       {
         name: "A new task",
-        piece: "| null",
-        answer: "assignee",
-        rows: [
-          { depth: 0, text: "type NewTask = {" },
-          {
-            depth: 1,
-            lead: "title: string",
-            slot: {
-              id: "title",
-              label: "title: string",
-              note: "Now a task can have no title, and every list that shows one needs a fallback.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "assignee: User",
-            slot: {
-              id: "assignee",
-              label: "assignee: User",
-              note: "Require it, so callers pass a user or null on purpose.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "color?: string",
-            slot: {
-              id: "color",
-              label: "color?: string",
-              note: "Missing and null now both mean grey.",
-            },
-          },
-          { depth: 0, text: "}" },
-        ],
+        answer: markChoice(NEW_TASK.map((field) => field.answer)),
+        choices: markChoices(NEW_TASK, NEW_TASK_CLEAR),
       },
     ],
   },

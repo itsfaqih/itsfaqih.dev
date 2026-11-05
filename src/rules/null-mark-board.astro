@@ -1,0 +1,53 @@
+---
+import type { Level } from "./lesson";
+import { MARKS, marked, type MarkField } from "./null-vs-undefined";
+import { KINDS, markView, paint } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
+
+// A quiz board (null-mark-board.client.ts): each field picks ?:, | undefined or | null, its line
+// rewrites to match, and Check sends the set to the quiz as that choice's answer.
+type Props = { level: Level; head: string; fields: readonly MarkField[]; fixed?: readonly string[] };
+
+const { level, head, fields, fixed = [] } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const painted = (source: string) =>
+  paint(source, KINDS)
+    .map((part) => (part.class ? `<span class="${part.class}">${escape(part.text)}</span>` : escape(part.text)))
+    .join("");
+---
+
+<null-mark-board class={styles.markBoard} data-notes={JSON.stringify(notes)} data-fields={JSON.stringify(fields)}
+  ><div class={styles.markCode}
+    ><code class={styles.markLine} set:html={painted(head)}
+    />{fixed.map((line) => <code class:list={[styles.markLine, styles.markIn]} set:html={painted(line)} />)}{
+      fields.map((field) => (
+        <div class={styles.markRow}
+          ><code class:list={[styles.markLine, styles.markIn]} data-part="line" set:html={painted(marked(field))}
+          /><span class={styles.markSeg} role="group" aria-label={field.name} data-field={field.name}
+            >{
+              MARKS.map(([key, text]) => (
+                <button type="button" class={markView.key(false)} aria-pressed="false" data-mark={key}>{text}</button>
+              ))
+            }</span
+          ></div
+        >
+      ))
+    }<code class={styles.markLine}>{"}"}</code></div
+  ><div class={styles.markFoot}
+    ><span class={styles.markLeft} data-part="left">{fields.length} left to pick.</span><button
+      type="button"
+      class={markView.check}
+      aria-disabled="true"
+      data-part="slot"
+      data-look="check"
+      data-slot=""
+      data-note="">Check</button
+    ></div
+  ></null-mark-board
+>
+
+<script>
+  import "./null-mark-board.client";
+</script>
