@@ -138,8 +138,10 @@ function arc(label: Box, end: Point, bow: number) {
   const dy = end.y - start.y;
   const nx = -dy * 0.32 * bow;
   const ny = dx * 0.32 * bow;
-  const c1 = { x: start.x + dx * 0.2 + nx, y: start.y + dy * 0.2 + ny };
-  const c2 = { x: start.x + dx * 0.72 + nx * 0.55, y: start.y + dy * 0.72 + ny * 0.55 };
+  // The start lies on the line from the label's centre to `end`, so a first control point on that
+  // line makes the tail leave straight out of the word. The bow bends only the far half.
+  const c1 = { x: start.x + dx * 0.2, y: start.y + dy * 0.2 };
+  const c2 = { x: start.x + dx * 0.72 + nx, y: start.y + dy * 0.72 + ny };
   const along = Array.from({ length: 29 }, (_, i) => {
     const t = (i + 1) / 30;
     const u = 1 - t;
@@ -378,22 +380,23 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           });
         if (!sits) return undefined;
         const end = landing(t, edge);
-        // A full bend first, away from the target, then half a bend when a neighbour sits close.
-        const way = (
+        // A full bend first, away from the target, then gentler ones when a neighbour sits close.
+        const tiers =
           dir === 0
             ? [[0]]
             : [
                 [1, -1],
                 [0.5, -0.5],
-              ]
-        )
-          .flatMap((bows) =>
-            bows
-              .map((bow) => arc(label, end, bow))
-              .sort((a, b) => OUTWARD[edge](b) - OUTWARD[edge](a)),
-          )
-          .find((way) => !way.along.some(threaded.has));
-        return way && { label, way };
+                [0.25, -0.25],
+              ];
+        for (const bows of tiers) {
+          const way = bows
+            .map((bow) => arc(label, end, bow))
+            .sort((a, b) => OUTWARD[edge](b) - OUTWARD[edge](a))
+            .find((way) => !way.along.some(threaded.has));
+          if (way) return { label, way };
+        }
+        return undefined;
       };
       const roam = () => {
         const spots: { label: Box; cost: number }[] = [];
