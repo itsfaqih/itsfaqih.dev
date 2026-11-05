@@ -18,7 +18,7 @@ export type BoardRow =
   | { depth: number; text: string; kind?: TreeRow["kind"]; tag?: string }
   | { depth: number; slot: Slot; lead?: string };
 
-type Choice = { id: string; label: string; note: string };
+export type Choice = { id: string; label: string; note: string };
 
 export type Level = { name: string; answer: string } & (
   | { piece: string; rows: BoardRow[] }

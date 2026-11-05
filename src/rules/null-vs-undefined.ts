@@ -1,4 +1,4 @@
-import type { Lesson, Side, Tldr } from "./lesson";
+import type { Choice, Lesson, Side, Tldr } from "./lesson";
 
 /** A line of a code pane: its source, and what it gives, toned as the ✕ or ✓ outcome. */
 export type Line = { c: string; out?: string; tone?: "no" | "yes"; hot?: boolean };
@@ -85,6 +85,44 @@ export const NEW_TASK: readonly PickField[] = [
 const NEW_TASK_CLEAR =
   "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
 
+/** Replies to `GET /users/bo?fields=name,manager`, each a JSON body. */
+export const REPLIES: [Choice, Choice, ...Choice[]] = [
+  {
+    id: "all",
+    label: '{ "name": "Bo", "manager": null, "phone": null }',
+    note: "phone: null claims Bo has no phone. Nobody asked, so you don't know that, and the app won't ask him for one.",
+  },
+  {
+    id: "name",
+    label: '{ "name": "Bo" }',
+    note: "manager was asked for. With no key, it reads as not loaded, so the client fetches it again on every view.",
+  },
+  {
+    id: "asked",
+    label: '{ "name": "Bo", "manager": null }',
+    note: "null answers the question, since Bo has no manager. phone was never asked for, so its key isn't there.",
+  },
+];
+
+/** Ways to type the nickname a sign-up form may leave out. */
+export const NICKNAMES: [Choice, Choice, ...Choice[]] = [
+  {
+    id: "nul",
+    label: "nickname: string | null",
+    note: "The key is still required, so every caller must write nickname: null, even the ones that never had one.",
+  },
+  {
+    id: "und",
+    label: "nickname: string | undefined",
+    note: "Close, but the key is still required. Callers must write nickname: undefined, and leaving it out is TS2741.",
+  },
+  {
+    id: "opt",
+    label: "nickname?: string",
+    note: "The ? makes the key optional. The form leaves it out, and inside signUp it reads undefined.",
+  },
+];
+
 /** What a field on a board with records holds after `option` is sent. */
 export const landed = (field: PickField, option: FieldOption) => option.lands ?? field.now;
 
@@ -155,33 +193,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "Fields you asked for",
-        piece: "omit the key",
-        answer: "phone",
-        rows: [
-          { depth: 0, text: "// GET /users/bo?fields=name,manager" },
-          { depth: 0, text: "{" },
-          { depth: 1, text: '"name": "Bo",' },
-          {
-            depth: 1,
-            lead: '"manager":',
-            slot: {
-              id: "manager",
-              label: '"manager":',
-              note: "A missing manager reads as not loaded, so the client fetches it again on every view.",
-            },
-          },
-          {
-            depth: 1,
-            lead: '"phone":',
-            slot: {
-              id: "phone",
-              label: '"phone":',
-              note: "Nobody asked, so send nothing. A missing key means no value was given.",
-            },
-          },
-          { depth: 0, text: "}" },
-        ],
+        name: "Which reply",
+        answer: "asked",
+        choices: REPLIES,
       },
     ],
   },
@@ -211,40 +225,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     },
     levels: [
       {
-        name: "A skippable field",
-        piece: "?: string",
-        answer: "nickname",
-        rows: [
-          { depth: 0, text: "type SignUp = {" },
-          {
-            depth: 1,
-            lead: "email",
-            slot: {
-              id: "email",
-              label: "email: string",
-              note: "Every sign-up needs an email. Optional lets a caller forget it with no error.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "nickname",
-            slot: {
-              id: "nickname",
-              label: "nickname: string",
-              note: "Make it optional. Callers with no nickname leave it out, and it reads undefined.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "password",
-            slot: {
-              id: "password",
-              label: "password: string",
-              note: "A sign-up with no password should fail where it's written, not at the first login.",
-            },
-          },
-          { depth: 0, text: "}" },
-        ],
+        name: "Leave it out",
+        answer: "opt",
+        choices: NICKNAMES,
       },
     ],
   },

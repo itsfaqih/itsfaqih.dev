@@ -517,6 +517,17 @@ export const styles = {
     whiteSpace: "pre-wrap",
     overflowWrap: "anywhere",
   }),
+  // Choices that are a line of code each, stacked so the line stays whole.
+  choiceStack: style({
+    display: "grid",
+    gap: "10px",
+  }),
+  choiceCode: style({
+    display: "grid",
+    fontSize: "13px",
+    lineHeight: 1.6,
+    fontFamily: fonts["--mono"],
+  }),
   gap: style({
     flexGrow: 0,
     flexShrink: 0,
