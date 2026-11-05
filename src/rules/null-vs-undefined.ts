@@ -104,7 +104,7 @@ export const REPLIES: [Choice, Choice, ...Choice[]] = [
   },
 ];
 
-/** Ways to type the nickname a sign-up form may leave out. */
+/** Ways to type the nickname a sign-up call may leave out. */
 export const NICKNAMES: [Choice, Choice, ...Choice[]] = [
   {
     id: "nul",
@@ -119,7 +119,7 @@ export const NICKNAMES: [Choice, Choice, ...Choice[]] = [
   {
     id: "opt",
     label: "nickname?: string",
-    note: "The ? makes the key optional. The form leaves it out, and inside signUp it reads undefined.",
+    note: "The ? makes the key optional. The caller leaves it out, and inside signUp it reads undefined.",
   },
 ];
 
@@ -298,7 +298,7 @@ export const LESSONS: Lesson<CodeSide>[] = [
         { c: "  assignee?: User", hot: true },
         { c: "}" },
         { c: "save({ title })", out: "0 errors", tone: "no" },
-        { c: '// shows "Unassigned". Nobody chose it.' },
+        { c: "// saved unassigned. Nobody chose it." },
       ],
     },
     good: {
@@ -430,7 +430,7 @@ export const DEMOS = {
     body: (way: Way): Body => ({ reviewer: way === "bad" ? undefined : null }),
     intent: (): Row => ({ reviewer: null }),
     lines: (way: Way): Line[] => [
-      { c: "// ✕ on the reviewer chip" },
+      { c: "// remove the reviewer" },
       { c: `changes.reviewer = ${way === "bad" ? "undefined" : "null"}`, hot: true },
       { c: 'patch("/tasks/12", changes)' },
     ],
@@ -444,7 +444,7 @@ export const DEMOS = {
     lines: (way: Way): Line[] =>
       way === "bad"
         ? [
-            { c: "const draft = { title: input.value,", hot: true },
+            { c: "const draft = { title,", hot: true },
             { c: "  assignee: null, due: null }", hot: true },
             { c: "" },
             { c: 'patch("/tasks/12", draft)' },
@@ -452,7 +452,7 @@ export const DEMOS = {
         : [
             { c: "const draft: Partial<Task> = {}", hot: true },
             { c: "" },
-            { c: "draft.title = input.value" },
+            { c: "draft.title = title" },
             { c: 'patch("/tasks/12", draft)' },
           ],
   },

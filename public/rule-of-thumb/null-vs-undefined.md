@@ -37,7 +37,7 @@ welcome("Ana"); // "Hi, Ana"
 
 ## Clear with null
 
-When the user empties a field, send `null`. JSON drops keys set to `undefined`, so only `null` carries the clear to the server.
+When a caller clears a field, send `null`. JSON drops keys set to `undefined`, so only `null` carries the clear to the server.
 
 ```ts
 changes.reviewer = null;
@@ -50,7 +50,7 @@ A PATCH changes only the fields it carries. Start the draft empty and add only w
 
 ```ts
 const draft: Partial<Task> = {};
-draft.title = input.value;
+draft.title = title;
 patch("/tasks/12", draft); // body: { "title": "Ship v2" }
 ```
 

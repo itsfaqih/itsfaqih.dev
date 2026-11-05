@@ -811,9 +811,6 @@ export const tree = {
   dir: style({
     color: palette["--dim"],
   }),
-  comp: style({
-    color: "var(--c-ink)",
-  }),
   more: style({
     color: palette["--mute"],
   }),

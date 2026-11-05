@@ -31,29 +31,29 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={inline.good.tree} />
   </RuleLesson>
   <RuleQuiz n={1} level={inline.levels[0]} board="tree"
-    >Only <Code tone="prompt">user-profile.ts</Code> calls <Code tone="prompt">formatDate()</Code>. Place it.</RuleQuiz
+    >Only <Code tone="prompt">refund.ts</Code> calls <Code tone="prompt">toCents()</Code>. Place it.</RuleQuiz
   >
 
   <RuleLesson lesson={fewer} rows={rows(fewer)}>
     <Fragment slot="body"
-      >Keep one component in one file. If you split its types, styles and helpers into a folder, reading it takes five tabs.</Fragment
+      >Keep one handler in one file. If you split its types, schema and helpers into a folder, reading it takes five tabs.</Fragment
     >
     <Tree slot="bad" rows={fewer.bad.tree} />
     <Tree slot="good" rows={fewer.good.tree} />
   </RuleLesson>
   <RuleQuiz n={2} level={fewer.levels[0]} board="tree"
-    ><Code tone="prompt">UserProfile</Code> has its own types, styles and a helper. Nothing else uses them. Place them.</RuleQuiz
+    ><Code tone="prompt">createOrder</Code> has its own types, schema and a helper. Nothing else uses them. Place them.</RuleQuiz
   >
 
   <RuleLesson lesson={constraint} rows={rows(constraint)}>
     <Fragment slot="body"
-      >Extract code used once when your stack demands a boundary. Many UI frameworks re-render the component that holds a piece of state. If a search box keeps its text in a child, a keystroke re-renders the child, not the page and its 500 rows.</Fragment
+      >Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a 2-second report build there and other requests stop waiting on it.</Fragment
     >
     <Tree slot="bad" rows={constraint.bad.tree} />
     <Tree slot="good" rows={constraint.good.tree} />
   </RuleLesson>
   <RuleQuiz n={3} level={constraint.levels[0]} board="tree"
-    >A search box keeps its text in state. Each keystroke re-renders whatever owns that state. Place the state.</RuleQuiz
+    ><Code tone="prompt">buildReport()</Code> blocks for 2 s of CPU, and only <Code tone="prompt">export.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
   >
 
   <RuleLesson lesson={ancestor} rows={rows(ancestor)}>
@@ -67,22 +67,22 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
     <Tree slot="good" rows={ancestor.good.tree} />
   </RuleLesson>
   <RuleQuiz n={4} level={ancestor.levels[0]} board="tree"
-    ><Code tone="prompt">cart/summary.ts</Code> and <Code tone="prompt">checkout/pay-button.ts</Code> now both call<Fragment set:html="<!-- -->" /> <Code tone="prompt">getCart()</Code>. Move it.</RuleQuiz
+    ><Code tone="prompt">cart/summary.ts</Code> and <Code tone="prompt">checkout/charge.ts</Code> now both call<Fragment set:html="<!-- -->" /> <Code tone="prompt">getCart()</Code>. Move it.</RuleQuiz
   >
 
   <RuleLesson lesson={global} rows={rows(global)}>
     <Fragment slot="body"
-      >Code used almost everywhere, like a button, belongs to no page. Give it a folder named for its type, and a suffix so <Kbd>⌘P</Kbd> finds it.</Fragment
+      >Code used almost everywhere, like auth middleware, belongs to no route. Give it a folder named for its type, and a suffix so <Kbd>⌘P</Kbd> finds it.</Fragment
     >
     <LessonText slot="extra" class={styles.suffixes}
       ><Code tone="chip" class={styles.suffix}>user.schema.ts</Code><Code tone="chip" class={styles.suffix}
         >auth.service.ts</Code
-      ><Code tone="chip" class={styles.suffix}>dashboard.page.ts</Code></LessonText
+      ><Code tone="chip" class={styles.suffix}>orders.controller.ts</Code></LessonText
     >
     <Tree slot="bad" rows={global.bad.tree} />
     <Tree slot="good" rows={global.good.tree} />
   </RuleLesson>
   <RuleQuiz n={5} level={global.levels[0]} board="tree"
-    >Twelve pages use <Code tone="prompt">button.ts</Code>. Place it.</RuleQuiz
+    >Twelve routes use <Code tone="prompt">require-auth.ts</Code>. Place it.</RuleQuiz
   >
 </RuleLanding>
