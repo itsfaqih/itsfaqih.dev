@@ -39,7 +39,7 @@ interface Admin extends User {
 
 ## Use unions, not enums
 
-Write a string union, which exists only as a type. A string enum is a runtime object: it rejects the plain string it stands for, adds JavaScript to the bundle, and fails under Node's type stripping. For the values at runtime too, derive the type from an `as const` array.
+Write a string union, which exists only as a type. A string enum is a runtime object. It rejects the plain string it stands for, adds JavaScript to the bundle, and fails under Node's type stripping. For the values at runtime too, derive the type from an `as const` array.
 
 ```ts
 type Role = "ADMIN" | "VIEWER"; // 0 lines of JS
@@ -53,7 +53,7 @@ type RoleFromList = (typeof ROLES)[number]; // "ADMIN" | "VIEWER"
 
 ## Infer inside, annotate the edges
 
-Let TypeScript infer locals, which keeps their narrow types. Annotate where a contract starts: a return type, a public API. A typo then fails where you wrote it.
+Let TypeScript infer locals, which keeps their narrow types. Annotate where a contract starts, such as a return type or a public API. A typo then fails where you wrote it.
 
 ```ts
 const role = "ADMIN"; // role: "ADMIN"

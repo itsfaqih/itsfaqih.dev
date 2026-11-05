@@ -134,7 +134,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "late",
             label: "Starts once the code loads",
-            note: "It waits for the page's code, which it doesn't need. Every millisecond it waits lands on the rows.",
+            note: "It waits for the page's code, which it doesn't need. Every millisecond it waits delays the rows.",
           },
         ],
       },

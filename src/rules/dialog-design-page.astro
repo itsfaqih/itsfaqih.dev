@@ -64,7 +64,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   </RuleQuiz>
 
   <RuleLesson lesson={escape}>
-    <Fragment slot="body">Close every dialog on <Kbd>Esc</Kbd>, every time, since keyboard users leave that way. Let a click outside close an info dialog too, as it has nothing to lose.</Fragment>
+    <Fragment slot="body">Close every dialog on <Kbd>Esc</Kbd>, every time, since keyboard users leave that way. Let a click outside close an info dialog too, since closing it loses nothing.</Fragment>
     <DialogEscapeDemo slot="bad" />
     <DialogEscapeDemo slot="good" sealed />
   </RuleLesson>

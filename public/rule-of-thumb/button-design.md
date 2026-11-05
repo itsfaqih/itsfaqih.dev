@@ -13,7 +13,7 @@ Make a button show what it does and what it's doing.
 
 ## Give every state a look
 
-Give hover, press and focus each a visible change, so a click lands where people can see it and a keyboard user can see where they are. Animate each change in 100 to 200ms. Draw the focus ring on `:focus-visible`, so it shows for the keyboard only.
+Give hover, press and focus each a visible change, so people see a click land and a keyboard user can see where they are. Animate each change in 100 to 200ms. Draw the focus ring on `:focus-visible`, so it shows for the keyboard only.
 
 ```css
 button {
@@ -42,7 +42,7 @@ button:focus-visible {
 
 ## Keep a disabled button still on hover
 
-A disabled button that lights up on hover says yes while its cursor says no, so people click and nothing happens. Keep its colour and its drop still on hover and press. Scope the hover and press looks to buttons that can act.
+A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Keep its colour and its drop still on hover and press. Scope the hover and press looks to buttons that can act.
 
 ```css
 button:hover:not(:disabled, [aria-disabled="true"]) {
@@ -67,7 +67,7 @@ A tint is the brand colour at low strength, such as `color-mix(in srgb, var(--br
 
 ## Optical alignment over mathematical alignment
 
-Take 4px off the icon's side. An icon carries white space inside its own box, so equal padding makes that side look wider.
+Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.
 
 ```css
 .icon-start {

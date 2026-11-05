@@ -54,7 +54,7 @@ skeleton.hidden = true;
 
 ## Errors where the data was
 
-Show the error where the data would go, with a Retry button. There it stays until someone acts on it, and the card explains its own gap. A toast fades before anyone reads it and leaves an empty card. Log every failure so you hear about it before your users do.
+Show the error where the data would go, with a Retry button. It stays there until someone acts on it, and it says why the card is empty. A toast fades before anyone reads it and leaves an empty card. Log every failure so you hear about it before your users do.
 
 ```html
 <section role="alert">Couldn't load the team. <button>Retry</button></section>
@@ -62,7 +62,7 @@ Show the error where the data would go, with a Retry button. There it stays unti
 
 ## Parse at the boundary
 
-Treat API data as a guess until you check it. Parse it as soon as it arrives and give optional fields a fallback, so the rest of your code gets real types and a missing field fails where it came in. When a required field is missing, show a plain message and log the details.
+Treat API data as a guess until you check it. Parse it as soon as it arrives and give optional fields a fallback. The rest of your code then gets real types, and a missing field fails where it came in. When a required field is missing, show a plain message and log the details.
 
 ```ts
 function parseUser(data: unknown): User {
