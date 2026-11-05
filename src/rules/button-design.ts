@@ -138,14 +138,14 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    title: "Pad an icon button the same on every side",
+    title: "Give an icon button less padding than a text button",
     bad: {
       label: "Text padding",
-      costs: ["16 | 11px", "48 × 38px"],
+      costs: ["16px every side", "48px, taller than Reply"],
     },
     good: {
-      label: "Square",
-      costs: ["11px every side", "38 × 38px"],
+      label: "From the height",
+      costs: ["11px every side", "38px, as tall as Reply"],
     },
     levels: [
       {
@@ -153,19 +153,19 @@ export const LESSONS: Lesson[] = [
         answer: "fit",
         choices: [
           {
-            id: "wide",
-            label: "16px sides, 11px top and bottom",
-            note: "Play stretches into a wide pill that looks like it lost its label.",
-          },
-          {
             id: "tall",
             label: "16px on every side",
-            note: "Play is square, but 48px tall beside a 38px Subtitles, so the bar no longer lines up.",
+            note: "16px is Subtitles' side padding, room for a label. Play comes out 48px tall beside a 38px Subtitles, so the bar stops lining up.",
           },
           {
             id: "fit",
             label: "11px on every side",
-            note: "A 16px icon with 11px all round makes a 38px square, as tall as Subtitles.",
+            note: "(38px height - 16px icon) / 2 is 11px, so Play is a 38px square, as tall as Subtitles.",
+          },
+          {
+            id: "short",
+            label: "8px on every side",
+            note: "Play shrinks to 32px, 6px shorter than Subtitles and a smaller target.",
           },
         ],
       },
@@ -178,5 +178,5 @@ export const TLDR = [
   ["Hovering a disabled button", "Keep its colour and drop still"],
   ["Picking a variant", "Fill one per screen, tint the secondary, make Cancel text"],
   ["An icon beside the label", "Take 4px off the icon's side"],
-  ["A button with only an icon", "Pad every side the same, so it's square"],
+  ["A button with only an icon", "Pad (height - icon) / 2, not the text's 16px"],
 ] as const satisfies Tldr;
