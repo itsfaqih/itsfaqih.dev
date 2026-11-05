@@ -47,7 +47,7 @@ export const LESSONS: Lesson[] = [
     },
     levels: [
       {
-        name: "Pay, before a card",
+        name: "Nothing to undo",
         answer: "still",
         choices: [
           {
