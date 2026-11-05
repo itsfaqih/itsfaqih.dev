@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -19,6 +20,11 @@ const SOURCES = {
   dive: "maximize-006",
   turn: "book-flip-2",
   fold: "book-flip-3",
+};
+
+/** Cues played as another cue's clip run backwards, made with ffmpeg once the sources are in. */
+const REVERSED = {
+  rise: "dive",
 };
 
 // The fields read from a registry item; the checks below reject anything else.
@@ -45,4 +51,11 @@ for (const [cue, item] of Object.entries(SOURCES)) {
   const bytes = Buffer.from(base64, "base64");
   writeFileSync(path.join(out, `${cue}.mp3`), bytes);
   console.log(`${cue}.mp3  ${item}  ${(bytes.length / 1024).toFixed(1)} KB`);
+}
+
+for (const [cue, source] of Object.entries(REVERSED)) {
+  const from = path.join(out, `${source}.mp3`);
+  const to = path.join(out, `${cue}.mp3`);
+  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", from, "-af", "areverse", "-b:a", "64k", to]);
+  console.log(`${cue}.mp3  ${source}.mp3 reversed`);
 }
