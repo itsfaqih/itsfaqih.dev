@@ -10,7 +10,7 @@ Keep code next to the code that uses it.
 | Code too long                 | Extract a function, same file         |
 | Reused in the same file       | Extract a function, same file         |
 | Reused across files           | Move it to the lowest common ancestor |
-| Used almost everywhere        | Use a type folder, like components/   |
+| Used almost everywhere        | Use a type folder, like middleware/   |
 | Your stack demands a boundary | Comply with the constraint            |
 
 ## Inline it first
@@ -18,33 +18,33 @@ Keep code next to the code that uses it.
 Keep code used once where it's used, in its caller's file. A one-caller helper in `utils/` adds a file and an import, and shares nothing.
 
 ```ts
-// src/routes/profile/user-profile.ts
-function formatDate(date: Date) {
-  return date.toLocaleDateString();
+// src/routes/orders/refund.ts
+function toCents(amount: number) {
+  return Math.round(amount * 100);
 }
 
-export function joinedLabel(user: User) {
-  return `Joined ${formatDate(user.joinedAt)}`;
+export function refund(order: Order) {
+  return payments.refund(order.chargeId, toCents(order.total));
 }
 ```
 
 ## Prefer fewer files
 
-Keep one component in one file, with its types, styles and helpers, so it reads in one tab. Split into a folder and reading it takes five tabs.
+Keep one handler in one file, with its types, schema and helpers, so it reads in one tab. Split into a folder and reading it takes five tabs.
 
 ```text
-routes/profile/
-  user-profile.ts         type Profile, const styles, function loadProfile(), UserProfile
+routes/orders/
+  create-order.ts         type OrderInput, const schema, function priceItems(), createOrder
 ```
 
 ## Comply with the constraint
 
-Extract code used once when your stack demands a boundary. Many UI frameworks re-render the component that holds a piece of state. If a search box keeps its text in a child of its own, a keystroke re-renders the child, not the page and its 500 rows.
+Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a 2-second report build there and other requests stop waiting on it.
 
-```text
-Order page
-  Search box            holds the query state, re-renders on each keystroke
-  Order list, 500 rows  re-renders only when a search runs
+```ts
+// src/routes/reports/export.ts
+const worker = new Worker(new URL("./build-report.worker.ts", import.meta.url));
+worker.postMessage({ month }); // buildReport() runs off the main thread
 ```
 
 ## Use the lowest common ancestor
@@ -56,17 +56,17 @@ src/
   routes/shop/
     cart.ts
     cart/summary.ts           calls getCart()
-    checkout/pay-button.ts    calls getCart()
+    checkout/charge.ts        calls getCart()
 ```
 
 ## Give global code a type folder
 
-Code used almost everywhere, like a button, belongs to no page. Give it a folder named for its type, and a type suffix so `⌘P` finds it: `user.schema.ts`, `auth.service.ts`, `dashboard.page.ts`.
+Code used almost everywhere, like auth middleware, belongs to no route. Give it a folder named for its type, and a type suffix so `⌘P` finds it: `user.schema.ts`, `auth.service.ts`, `orders.controller.ts`.
 
 ```text
 src/
-  components/
-    button.ts
+  middleware/
+    require-auth.ts
   routes/
-    settings/, checkout/, … 10 more pages    import components/button
+    settings/, checkout/, … 10 more routes    import middleware/require-auth
 ```

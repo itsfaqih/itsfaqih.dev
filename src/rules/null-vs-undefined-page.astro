@@ -57,7 +57,7 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullCodeBlock slot="good" lines={optional.good.lines!} />
   </RuleLesson>
   <RuleQuiz n={2} level={optional.levels[0]}
-    >The form calls <Code tone="prompt">signUp({"{"} email, password {"}"})</Code> when the nickname box is empty. Pick the<Fragment set:html="<!-- -->" /> <Code tone="prompt">nickname</Code> line that lets that call compile.
+    >A caller with no nickname runs <Code tone="prompt">signUp({"{"} email, password {"}"})</Code>. Pick the<Fragment set:html="<!-- -->" /> <Code tone="prompt">nickname</Code> line that lets that call compile.
     <div slot="board" class={styles.choiceStack}>
       {
         NICKNAMES.map((nickname) => (
@@ -71,7 +71,7 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
 
   <RuleLesson lesson={clear}>
     <Fragment slot="body"
-      >When the user empties a field, send <Code tone="chip">null</Code>. JSON drops keys set to<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>, so that clear never reaches the server.</Fragment
+      >When a caller clears a field, send <Code tone="chip">null</Code>. JSON drops keys set to<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>, so that clear never reaches the server.</Fragment
     >
     <NullFlow slot="bad" demo="clear" way="bad" />
     <NullFlow slot="good" demo="clear" way="good" />

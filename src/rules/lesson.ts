@@ -3,7 +3,7 @@
 export type TreeRow = {
   depth: number;
   text: string;
-  kind?: "dir" | "comp" | "more";
+  kind?: "dir" | "more";
   /** The row that changes place between the panes; `k` pairs it across them. */
   moved?: boolean;
   tag?: string;
