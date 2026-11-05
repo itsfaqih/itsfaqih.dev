@@ -1,6 +1,6 @@
 ---
 import type { Level } from "./lesson";
-import type { PickField } from "./null-vs-undefined";
+import { landed, type PickField } from "./null-vs-undefined";
 import { KINDS, paint, pickView } from "./null-vs-undefined.view";
 import { styles } from "./null-vs-undefined.css";
 
@@ -24,6 +24,13 @@ const painted = (source: string) =>
   paint(source, KINDS)
     .map((part) => (part.class ? `<span class="${part.class}">${escape(part.text)}</span>` : escape(part.text)))
     .join("");
+// Fields that know what they hold now get Now, Wanted and Result records; Check fills Result.
+const records = fields.every((field) => field.now !== undefined);
+const wanted = (field: PickField) => landed(field, field.options.find((option) => option.key === field.answer)!);
+const shown = [
+  { title: "Now", values: fields.map((field) => field.now) },
+  { title: "Wanted", values: fields.map(wanted) },
+];
 ---
 
 <null-pick-board
@@ -31,7 +38,29 @@ const painted = (source: string) =>
   data-notes={JSON.stringify(notes)}
   data-fields={JSON.stringify(fields)}
   data-noun={noun}
-  ><div class={styles.pickCode}
+  >{
+    records && (
+      <div class={styles.pickRecords}
+        >{
+          shown.map(({ title, values }) => (
+            <div class={styles.pickRecord}
+              ><h4 class={styles.pickRecordHead}>{title}</h4><code class={styles.pickRecordCode}
+                >{
+                  fields.map((field, index) => (
+                    <span class={styles.pickRecordLine} set:html={painted(`${field.name}: ${values[index]}`)} />
+                  ))
+                }</code
+              ></div
+            >
+          ))
+        }<div class={styles.pickRecord}
+          ><h4 class={styles.pickRecordHead}>Result</h4><code class={styles.pickRecordCode} data-part="result"
+            ><span class={pickView.result()}>Not sent yet.</span></code
+          ></div
+        ></div
+      >
+    )
+  }<div class={styles.pickCode}
     ><code class={styles.pickLine} set:html={painted(head)}
     />{fixed.map((line) => <code class:list={[styles.pickLine, styles.pickIn]} set:html={painted(line)} />)}{
       fields.map((field) => (

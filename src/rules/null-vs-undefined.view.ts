@@ -59,4 +59,7 @@ export const flowView = {
 export const pickView = {
   key: (on: boolean) => cx(styles.pickKey, on && styles.pickKeyOn),
   check: cx(button.base, buttonVariant["primary-brand"], button.sm, styles.pickCheck),
+  /** A Result line, tinted by whether it matches Wanted; unsent, it waits for Check. */
+  result: (hit?: boolean) =>
+    cx(styles.pickRecordLine, hit === undefined ? styles.pickUnsent : hit ? styles.pickHit : styles.pickMiss),
 };

@@ -85,6 +85,51 @@ export const NEW_TASK: readonly PickField[] = [
 const NEW_TASK_CLEAR =
   "Every caller has to pass an assignee, a user or null on purpose. The colour can be left out, and grey fills in.";
 
+/** What a field on a board with records holds after `option` is sent. */
+export const landed = (field: PickField, option: FieldOption) => option.lands ?? field.now;
+
+/** How a record shows a field that was cleared. */
+const NONE = "—";
+
+/** A field the "Make it match" patch sets to null or undefined, or to `value` when it offers one. */
+const patched = (
+  name: string,
+  now: string,
+  answer: string,
+  notes: { val?: string; nul?: string; und?: string },
+  value?: string,
+): PickField => ({
+  name,
+  line: `${name}:`,
+  answer,
+  now,
+  options: [
+    ...(value === undefined ? [] : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
+    { key: "nul", label: "null", line: `${name}: null,`, lands: NONE, note: notes.nul },
+    { key: "und", label: "undefined", line: `${name}: undefined,`, note: notes.und },
+  ],
+});
+
+export const MATCH: readonly PickField[] = [
+  patched(
+    "title",
+    '"Ship v1"',
+    "val",
+    {
+      nul: "null wipes the title instead of renaming it.",
+      und: "undefined drops out of the JSON, so the rename never arrives.",
+    },
+    '"Ship v2"',
+  ),
+  patched("assignee", '"Rina"', "und", { nul: "assignee: null unassigns Rina, which nobody asked for." }),
+  patched("due", '"Mar 3"', "nul", {
+    und: "undefined drops out of the JSON, so the server never hears about the clear and keeps Mar 3.",
+  }),
+  patched("notes", '"Check copy"', "und", { nul: "notes: null wipes notes nobody touched." }),
+];
+const MATCH_CLEAR =
+  "It matches. The new title went out, and null cleared the date. assignee and notes stayed undefined, so they dropped out of the JSON and the server left them alone.";
+
 export const LESSONS: Lesson<CodeSide>[] = [
   {
     title: "Tell missing from empty",
@@ -209,41 +254,9 @@ export const LESSONS: Lesson<CodeSide>[] = [
     good: { label: "= null", costs: ["1 field cleared"] },
     levels: [
       {
-        name: "The date picker",
-        piece: "null",
-        answer: "due",
-        rows: [
-          { depth: 0, text: 'patch("/tasks/12", {' },
-          { depth: 1, text: 'title: "Ship v2",' },
-          {
-            depth: 1,
-            lead: "assignee:",
-            slot: {
-              id: "assignee",
-              label: "assignee:",
-              note: "Sends assignee: null and unassigns Rina. Nobody asked for that.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "due:",
-            slot: {
-              id: "due",
-              label: "due:",
-              note: "Send null to clear it, since they cleared it on purpose.",
-            },
-          },
-          {
-            depth: 1,
-            lead: "notes:",
-            slot: {
-              id: "notes",
-              label: "notes:",
-              note: "Sends notes: null and wipes notes the user never opened.",
-            },
-          },
-          { depth: 0, text: "})" },
-        ],
+        name: "Make it match",
+        answer: pickChoice(MATCH.map((field) => field.answer)),
+        choices: pickChoices(MATCH, MATCH_CLEAR),
       },
     ],
   },

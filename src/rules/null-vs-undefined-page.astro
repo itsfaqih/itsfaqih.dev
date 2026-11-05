@@ -4,7 +4,7 @@ import NullBoardCell from "./null-board-cell.astro";
 import NullCodeBlock from "./null-code-block.astro";
 import NullFlow from "./null-flow.astro";
 import NullPickBoard from "./null-pick-board.astro";
-import { LESSONS, NEW_TASK, TLDR } from "./null-vs-undefined";
+import { LESSONS, MATCH, NEW_TASK, TLDR } from "./null-vs-undefined";
 import { styles } from "./null-vs-undefined.css";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
@@ -57,9 +57,17 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullFlow slot="bad" demo="clear" way="bad" />
     <NullFlow slot="good" demo="clear" way="good" />
   </RuleLesson>
-  <RuleQuiz n={3} level={clear.levels[0]} board="code" marks={marks}
-    >The user cleared the due date and never opened the assignee or notes. Place<Fragment set:html="<!-- -->" /> <Code tone="prompt">null</Code>.</RuleQuiz
-  >
+  <RuleQuiz n={3} level={clear.levels[0]} hint="Pick a value for each field, then press Check."
+    >Set each field of the patch so the server ends up with the Wanted task. Press Check to send it.
+    <NullPickBoard
+      slot="board"
+      level={clear.levels[0]}
+      head={'patch("/tasks/12", {'}
+      close="})"
+      fields={MATCH}
+      noun="value"
+    />
+  </RuleQuiz>
 
   <RuleLesson lesson={untouched}>
     <Fragment slot="body"

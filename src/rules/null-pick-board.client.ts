@@ -1,6 +1,8 @@
 import { play } from "../hooks/sound";
-import { pickChoice, type FieldOption, type PickField } from "./null-vs-undefined";
+import { landed, pickChoice, type FieldOption, type PickField } from "./null-vs-undefined";
 import { KINDS, paint, pickView } from "./null-vs-undefined.view";
+
+const LIST = new Intl.ListFormat("en", { type: "conjunction" });
 
 /**
  * A pick board (null-pick-board.astro). Each field's segments pick its option and rewrite its line;
@@ -18,6 +20,7 @@ class NullPickBoard extends HTMLElement {
     const noun = this.dataset.noun!;
     const check = this.querySelector<HTMLButtonElement>('[data-look="check"]')!;
     const left = this.querySelector<HTMLElement>('[data-part="left"]')!;
+    const result = this.querySelector<HTMLElement>('[data-part="result"]');
     const lines = [...this.querySelectorAll<HTMLElement>('[data-part="line"]')];
     const groups = [...this.querySelectorAll<HTMLElement>("[data-field]")];
     const picks: (FieldOption | undefined)[] = fields.map(() => undefined);
@@ -66,14 +69,29 @@ class NullPickBoard extends HTMLElement {
       ),
     );
 
+    // Each field lands what its pick sends, tinted by whether it matches what the answer lands.
+    const send = () => {
+      if (!result) return;
+      result.replaceChildren(
+        ...fields.map((field, index) => {
+          const answer = field.options.find((option) => option.key === field.answer)!;
+          const value = landed(field, picks[index]!);
+          const line = document.createElement("span");
+          line.className = pickView.result(value === landed(field, answer));
+          paintLine(line, `${field.name}: ${value}`);
+          return line;
+        }),
+      );
+    };
+
     // Until every field has a pick, Check has no answer to carry, so the quiz never hears it.
     check.addEventListener(
       "click",
       (event) => {
-        if (check.getAttribute("aria-disabled") !== "true") return;
+        if (check.getAttribute("aria-disabled") !== "true") return send();
         event.stopPropagation();
         play("error");
-        left.textContent = `Pick a ${noun} for ${fields.filter((_, index) => !picks[index]).map((field) => field.name).join(" and ")} first.`;
+        left.textContent = `Pick a ${noun} for ${LIST.format(fields.filter((_, index) => !picks[index]).map((field) => field.name))} first.`;
       },
       { signal },
     );

@@ -664,4 +664,51 @@ export const styles = {
       },
     },
   }),
+  // A board with records shows the task before, the task wanted, and what Check left.
+  pickRecords: style({
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "10px",
+    "@media": {
+      [PHONE]: {
+        gridTemplateColumns: "minmax(0, 1fr)",
+      },
+    },
+  }),
+  pickRecord: style({
+    display: "grid",
+    alignContent: "start",
+    gap: "4px",
+    minWidth: 0,
+  }),
+  pickRecordHead: style({
+    margin: 0,
+    fontWeight: 600,
+    fontSize: "12px",
+    fontFamily: fonts["--sans"],
+    color: palette["--dim"],
+  }),
+  pickRecordCode: style({
+    display: "grid",
+    fontSize: "12px",
+    lineHeight: 1.6,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  }),
+  pickRecordLine: style({
+    paddingInline: "4px",
+    marginInline: "-4px",
+    borderRadius: "4px",
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+  }),
+  pickHit: style({
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 22%, transparent)`,
+  }),
+  pickMiss: style({
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 24%, transparent)`,
+  }),
+  pickUnsent: style({
+    color: palette["--mute"],
+  }),
 };
