@@ -160,21 +160,21 @@ const key = [styles.key, styles.sm, styles.flat];
 
   <RuleLesson lesson={square}>
     <Fragment slot="body"
-      >Give a button with only an icon the same padding on every side, so it comes out square. Text padding stretches it into a wide pill that looks like it lost its label. Work the padding out from the height of the buttons beside it. A 38px button around a 16px icon gets 11px all round.</Fragment
+      >Making a button with only an icon square is the easy part. The padding is the trap. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.</Fragment
     >
     <ButtonToggle slot="extra" label="Show padding" name="ring" />
     <ButtonSquare slot="bad" />
     <ButtonSquare slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={5} level={square.levels[0]}
-    >A video player's bar has a <b>Subtitles</b> button, 38px tall with 16px sides. <b>Play</b> sits beside it with only an icon. Pick the Play that fits.
+    >A video player's bar has a <b>Subtitles</b> button, 38px tall, with 16px sides and 11px top and bottom. <b>Play</b> sits beside it with only a 16px icon. Pick the padding for Play.
     <div slot="board" class={quizKit.stack}>
       {
         (
           [
-            ["wide", "16 sides, 11 top", null],
             ["tall", "16 every side", styles.tall],
             ["fit", "11 every side", styles.square],
+            ["short", "8 every side", styles.short],
           ] as const
         ).map(([id, caption, look]) => (
           <QuizChoice level={square.levels[0]} id={id} caption={caption}

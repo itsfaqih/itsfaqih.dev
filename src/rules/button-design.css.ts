@@ -631,6 +631,13 @@ export const styles = {
       "--pv": "16px",
     },
   }),
+  short: style({
+    vars: {
+      "--pv": "8px",
+      "--pl": "8px",
+      "--pr": "8px",
+    },
+  }),
   // Hatches the padding on all four sides: a hatched layer with the content box cut out.
   ring: style({
     selectors: {

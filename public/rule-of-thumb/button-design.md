@@ -10,7 +10,7 @@ Make a button show what it does and what it's doing.
 | Hovering a disabled button | Keep its colour and drop still                               |
 | Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
 | An icon beside the label   | Take 4px off the icon's side                                 |
-| A button with only an icon | Pad every side the same, so it's square                      |
+| A button with only an icon | Pad (height - icon) / 2, not the text's 16px                 |
 
 ## Give every state a look
 
@@ -79,9 +79,9 @@ Take 4px off the icon's side. An icon has white space inside its own box, so equ
 }
 ```
 
-## Pad an icon button the same on every side
+## Give an icon button less padding than a text button
 
-Give a button with only an icon the same padding on every side, so it comes out square. Text padding stretches it into a wide pill that looks like it lost its label. Work the padding out from the height of the buttons beside it. A 38px button around a 16px icon gets 11px all round.
+Making a button with only an icon square is the easy part. The padding is the trap. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.
 
 ```css
 .icon-only {
