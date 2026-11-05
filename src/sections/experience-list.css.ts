@@ -300,6 +300,8 @@ export const styles = {
     alignContent: "start",
     overflowX: "hidden",
     overflowY: "auto",
+    // Its bottom is where the list ends, not where the page picks up.
+    overscrollBehavior: "contain",
     // Room for the scrollbar's thumb beside the badges.
     paddingInlineEnd: "14px",
     selectors: {
