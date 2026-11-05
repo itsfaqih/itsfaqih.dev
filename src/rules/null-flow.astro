@@ -23,9 +23,9 @@ const intent = DEMOS[demo].intent(TITLE);
       <div class={styles.form} data-part="form">
         {
           demo === "clear" ? (
-            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.none}>None</span><button type="button" class={flowView.again} data-part="again">Reset</button></Fragment>
+            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.none}>None</span></Fragment>
           ) : (
-            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input data-hint="true" spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button type="button" class={flowView.again} data-part="save">Reset</button></Fragment>
+            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input data-hint="true" spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button type="button" class={flowView.button} data-part="save">Save</button></Fragment>
           )
         }
       </div>
@@ -54,6 +54,9 @@ const intent = DEMOS[demo].intent(TITLE);
           })
         }
       </dl>
+      <div class={styles.ctl}
+        ><button type="button" class={flowView.button} data-part="reset">Reset</button></div
+      >
     </div>
   </div>
   {
