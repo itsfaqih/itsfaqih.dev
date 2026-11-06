@@ -217,11 +217,16 @@ export const styles = {
       },
     },
   }),
+  // Layered, so the slide quiz's plot can show its overflow.
   plot: style({
-    position: "relative",
-    paddingBottom: "30px",
-    borderRadius: "6px",
-    overflow: "hidden",
+    "@layer": {
+      [under1]: {
+        position: "relative",
+        paddingBottom: "30px",
+        borderRadius: "6px",
+        overflow: "hidden",
+      },
+    },
   }),
   lane: style({
     textWrap: "pretty",
