@@ -59,8 +59,13 @@ class NullPickBoard extends HTMLElement {
       group.addEventListener(
         "click",
         (event) => {
-          const key = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("[data-key]") : null;
-          const option = fields[index]!.options.find((candidate) => candidate.key === key?.dataset.key);
+          const key =
+            event.target instanceof Element
+              ? event.target.closest<HTMLButtonElement>("[data-key]")
+              : null;
+          const option = fields[index]!.options.find(
+            (candidate) => candidate.key === key?.dataset.key,
+          );
           if (!option || check.disabled || key?.getAttribute("aria-pressed") === "true") return;
           play("tap");
           set(index, option);

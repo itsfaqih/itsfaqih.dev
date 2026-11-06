@@ -117,15 +117,18 @@ try {
   await chip.click();
   await expectHeard(page, "a button click plays tap", ["tap"]);
   await tiles.nth(0).hover();
-  await expectHeard(page, "entering the rule grid plays move, then the lamp's two flicker crackles", [
-    "move",
-    "flicker",
-    "flicker",
-  ]);
+  await expectHeard(
+    page,
+    "entering the rule grid plays move, then the lamp's two flicker crackles",
+    ["move", "flicker", "flicker"],
+  );
   await tiles.nth(1).hover();
   await page.waitForTimeout(60);
   await tiles.nth(2).hover();
-  await expectHeard(page, "moving across lit tiles plays move per tile, no flicker", ["move", "move"]);
+  await expectHeard(page, "moving across lit tiles plays move per tile, no flicker", [
+    "move",
+    "move",
+  ]);
   await tiles.nth(2).hover({ position: { x: 4, y: 4 } });
   await expectHeard(page, "staying on one tile plays nothing", []);
 

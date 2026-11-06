@@ -67,7 +67,8 @@ class NullFlow extends HTMLElement {
         const shown = form.firstElementChild!.nextElementSibling!;
         const cleared = phase !== "idle";
         if (cleared === (shown.querySelector('[data-part="remove"]') !== null)) {
-          const fill = part<HTMLTemplateElement>(cleared ? "none" : "chip").content.firstElementChild!;
+          const fill = part<HTMLTemplateElement>(cleared ? "none" : "chip").content
+            .firstElementChild!;
           shown.replaceWith(document.importNode(fill, true));
         }
         return;

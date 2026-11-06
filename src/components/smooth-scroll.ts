@@ -12,7 +12,11 @@ let active: Lenis | null = null;
  */
 function ownsScroll(target: EventTarget | null) {
   const box = target instanceof Element ? target.closest("[data-own-scroll]") : null;
-  return box !== null && box.scrollHeight > box.clientHeight && getComputedStyle(box).overflowY !== "visible";
+  return (
+    box !== null &&
+    box.scrollHeight > box.clientHeight &&
+    getComputedStyle(box).overflowY !== "visible"
+  );
 }
 
 export function jumpTo(top: number) {

@@ -65,7 +65,8 @@ class DataLoadingSlide extends HTMLElement {
     // Grabbing the bar keeps the point under the finger; pressing the lane beside it moves the bar's
     // start there first.
     let grab: { x: number; from: number } | null = null;
-    const msAt = (x: number) => ((x - track.getBoundingClientRect().left) / track.clientWidth) * AXIS;
+    const msAt = (x: number) =>
+      ((x - track.getBoundingClientRect().left) / track.clientWidth) * AXIS;
     track.addEventListener(
       "pointerdown",
       (event) => {

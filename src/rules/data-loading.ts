@@ -43,8 +43,7 @@ export const EARLY: Waterfall = {
 export const SLIDE = { request: 400, render: 20, code: 250, max: 500, from: 280 } as const;
 
 /** When the rows show for a request that starts at `start`: once both the code and the data are in. */
-export const rowsAt = (start: number) =>
-  Math.max(start + SLIDE.request, SLIDE.code) + SLIDE.render;
+export const rowsAt = (start: number) => Math.max(start + SLIDE.request, SLIDE.code) + SLIDE.render;
 
 /** Which of the quiz's answers a start time is. */
 export const slideChoice = (start: number) =>

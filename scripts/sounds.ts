@@ -56,6 +56,17 @@ for (const [cue, item] of Object.entries(SOURCES)) {
 for (const [cue, source] of Object.entries(REVERSED)) {
   const from = path.join(out, `${source}.mp3`);
   const to = path.join(out, `${cue}.mp3`);
-  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", from, "-af", "areverse", "-b:a", "64k", to]);
+  execFileSync("ffmpeg", [
+    "-y",
+    "-loglevel",
+    "error",
+    "-i",
+    from,
+    "-af",
+    "areverse",
+    "-b:a",
+    "64k",
+    to,
+  ]);
   console.log(`${cue}.mp3  ${source}.mp3 reversed`);
 }

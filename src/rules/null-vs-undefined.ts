@@ -35,7 +35,10 @@ export const pickChoice = (keys: readonly string[]) => keys.join("-");
 
 /** Every way to fill `fields`; a wrong set's note is its first wrong field's. */
 type PickSet = { id: string; label: string; note: string };
-function pickChoices(fields: readonly PickField[], clear: string): [PickSet, PickSet, ...PickSet[]] {
+function pickChoices(
+  fields: readonly PickField[],
+  clear: string,
+): [PickSet, PickSet, ...PickSet[]] {
   const sets = fields.reduce<FieldOption[][]>(
     (all, field) => all.flatMap((set) => field.options.map((option) => [...set, option])),
     [[]],
@@ -60,7 +63,12 @@ const MARKS = [
 type Mark = (typeof MARKS)[number][0];
 
 /** A field the "A new invoice" board types with one of MARKS. */
-const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<Mark, string>>): PickField => ({
+const typed = (
+  name: string,
+  type: string,
+  answer: Mark,
+  notes: Partial<Record<Mark, string>>,
+): PickField => ({
   name,
   line: `${name}: ${type}`,
   answer,
@@ -75,7 +83,7 @@ const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<M
 export const NEW_INVOICE: readonly PickField[] = [
   typed("coupon", "Coupon", "nul", {
     opt: "?: lets a caller leave the coupon out and never decide. Make it required, so they pass a coupon or null on purpose.",
-    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no coupon\" is a null someone wrote.",
+    und: 'Callers must pass it now, but undefined reads as nobody gave a value. "There\'s no coupon" is a null someone wrote.',
   }),
   typed("memo", "string", "opt", {
     und: "Now every caller has to write memo: undefined just to leave it blank. ?: lets them leave it out.",
@@ -142,7 +150,9 @@ const patched = (
   answer,
   now,
   options: [
-    ...(value === undefined ? [] : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
+    ...(value === undefined
+      ? []
+      : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
     { key: "nul", label: "null", line: `${name}: null,`, lands: NONE, note: notes.nul },
     { key: "und", label: "undefined", line: `${name}: undefined,`, note: notes.und },
   ],
@@ -159,7 +169,9 @@ export const MATCH: readonly PickField[] = [
     },
     '"Ana Li"',
   ),
-  patched("email", '"ana@x.io"', "und", { nul: "email: null wipes the email, which nobody asked for." }),
+  patched("email", '"ana@x.io"', "und", {
+    nul: "email: null wipes the email, which nobody asked for.",
+  }),
   patched("phone", '"0812 555"', "nul", {
     und: "undefined drops out of the JSON, so the server never hears about the clear and keeps the number.",
   }),

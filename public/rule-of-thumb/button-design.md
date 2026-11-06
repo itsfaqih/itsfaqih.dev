@@ -4,13 +4,13 @@ Make a button show what it does and what it's doing.
 
 ## TL;DR
 
-| Situation                  | Do this                                                      |
-| -------------------------- | ------------------------------------------------------------ |
-| Any button                 | Give hover, press and focus a look, in 100 to 200ms          |
-| Hovering a disabled button | Keep its colour and drop still                               |
-| Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
-| An icon beside the label   | Take 4px off the icon's side                                 |
-| A button with only an icon | Pad (height - icon) / 2, not the text's 16px                 |
+| Situation                  | Do this                                                   |
+| -------------------------- | --------------------------------------------------------- |
+| Any button                 | Give hover, press and focus a look, in 100 to 200ms       |
+| Hovering a disabled button | Keep its colour and drop still                            |
+| Picking a variant          | Fill one per screen, tint the secondary, make Cancel text |
+| An icon beside the label   | Take 4px off the icon's side                              |
+| A button with only an icon | Pad (height - icon) / 2, not the text's 16px              |
 
 ## Give every state a look
 
