@@ -1,5 +1,8 @@
 export type Point = { x: number; y: number };
 
+/** The golden ratio. A hint's curve takes its proportions from it. */
+export const PHI = (1 + Math.sqrt(5)) / 2;
+
 /**
  * How every arrow on the site looks, by family. Lengths are px, angles degrees. The dev-only tuner
  * edits these in place and redraws, so read them at draw time, never into a module constant.
@@ -10,17 +13,19 @@ export const ARROWS = {
     stroke: 2.25,
     wing: 8,
     spread: (0.5 * 180) / Math.PI,
-    reach: 26,
-    bend: 40,
-    bow: 0.32,
-    tail: 0.2,
-    knee: 0.72,
+    reach: 40,
+    // The shortest curve a label may draw before its head, so every arrow reads as a curve.
+    length: 24,
+    // Each end turns off the line between the centres by the angle whose tangent is 1/φ², and each
+    // control point sits 1/φ² of the curve out from its end.
+    bow: 1 / PHI ** 2,
+    handle: 1 / PHI ** 2,
     labelGap: 6,
     targetGap: 6,
   },
   /** "Try it" arrows beside a toggle in a lesson's copy. They share the hint's stroke and head. */
   toggle: {
-    reach: 26,
+    reach: 41,
     labelGap: 4,
     targetGap: 5,
   },
