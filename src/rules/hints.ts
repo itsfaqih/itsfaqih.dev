@@ -1,6 +1,7 @@
 import {
   ARROWS_CHANGED,
   arrowsFor,
+  octant,
   pixels,
   walk,
   type HintLook,
@@ -114,7 +115,7 @@ function arc(label: Box, target: Box, bow: number, look: HintLook) {
   const heading = Math.atan2(to.y - from.y, to.x - from.x);
   const turn = Math.atan(bow);
   const out = { x: Math.cos(heading + turn), y: Math.sin(heading + turn) };
-  const snapped = Math.round((heading - turn) / (Math.PI / 4)) * (Math.PI / 4);
+  const snapped = octant(heading - turn);
   const into = { x: Math.cos(snapped), y: Math.sin(snapped) };
   const start = exit(label, out, look.labelGap);
   const end = exit(target, { x: -into.x, y: -into.y }, look.targetGap);

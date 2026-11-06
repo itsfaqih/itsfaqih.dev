@@ -139,10 +139,7 @@ class RuleLesson extends HTMLElement {
             svg.append(cell);
           });
           const label = document.createElement("span");
-          const caret = document.createElement("span");
-          caret.className = hintKit.caret;
-          caret.textContent = "▸";
-          label.append(caret, "Try it");
+          label.innerHTML = ruler.innerHTML;
           const blur = document.createElement("div");
           halo(blur, hint);
           layer.append(blur, svg, label);

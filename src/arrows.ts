@@ -13,7 +13,7 @@ const PHI = (1 + Math.sqrt(5)) / 2;
 export const ARROWS = {
   /** "Try it" arrows in a demo pane. */
   hint: {
-    grid: 3,
+    grid: 2,
     head: 3,
     // How long the curve runs before the head. A label steps out from its target until its curve
     // is this long. Where that lands on words or controls it tries shorter curves, then longer ones.
@@ -133,6 +133,9 @@ export function walk(points: Point[]) {
   return { s, total, at };
 }
 
+/** `angle` snapped to the nearest 45 degrees, the ways a pixel head can point. */
+export const octant = (angle: number) => Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+
 export const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
 
 /**
@@ -211,21 +214,22 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
   const steps = Math.ceil((stop / grid) * 4);
   const path: Point[] = [];
   for (let k = 0; stop > 0 && k <= steps; k++) {
-    const c = cell(at((stop * k) / steps).p);
+    const { p } = at((stop * k) / steps);
+    const c = cell(p);
     const last = path.at(-1);
-    if (!last || last.x !== c.x || last.y !== c.y) path.push(c);
+    if (last && last.x === c.x && last.y === c.y) continue;
+    if (last && last.x !== c.x && last.y !== c.y) {
+      // Cells that met only at a corner read as a dashed line, so a diagonal step fills the corner
+      // the curve passed nearer to.
+      const off = (q: Point) => Math.hypot((q.x + 0.5) * grid - p.x, (q.y + 0.5) * grid - p.y);
+      const across = { x: c.x, y: last.y };
+      const down = { x: last.x, y: c.y };
+      path.push(off(across) <= off(down) ? across : down);
+    }
+    path.push(c);
   }
-  // Where the line steps across and then up, the corner cell doubles it, so it goes and the two
-  // cells either side meet corner to corner.
-  const trail: Point[] = [];
-  path.forEach((c, i) => {
-    const prev = trail.at(-1);
-    const next = path[i + 1];
-    if (prev && next && Math.abs(prev.x - next.x) === 1 && Math.abs(prev.y - next.y) === 1) return;
-    trail.push(c);
-  });
   const { dir } = at(total);
-  const turn = (Math.round(Math.atan2(dir.y, dir.x) / (Math.PI / 4)) * Math.PI) / 4;
+  const turn = octant(Math.atan2(dir.y, dir.x));
   const d = { x: Math.round(Math.cos(turn)), y: Math.round(Math.sin(turn)) };
   const tip = cell(spine.at(-1) ?? { x: 0, y: 0 });
   const arrowhead: Point[] = [];
@@ -241,7 +245,7 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
   const taken = new Set(arrowhead.map((c) => `${c.x},${c.y}`));
   return {
     grid,
-    cells: [...trail.filter((c) => !taken.has(`${c.x},${c.y}`)), ...arrowhead].map((c) => ({
+    cells: [...path.filter((c) => !taken.has(`${c.x},${c.y}`)), ...arrowhead].map((c) => ({
       x: c.x * grid,
       y: c.y * grid,
     })),
