@@ -13,7 +13,7 @@ const PHI = (1 + Math.sqrt(5)) / 2;
 export const ARROWS = {
   /** "Try it" arrows in a demo pane. */
   hint: {
-    grid: 2,
+    grid: 3,
     head: 3,
     // How long the curve runs before the head. A label steps out from its target until its curve
     // is this long. Where that lands on words or controls it tries shorter curves, then longer ones.
