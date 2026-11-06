@@ -16,7 +16,7 @@ import HeroPrints from "./hero-prints.astro";
 const current = SLIDES[0]!;
 ---
 
-<home-hero class={styles.root}
+<home-hero class={styles.root} data-arrows="hero"
   ><div class={veil.soft}
     ><div class:list={[loadIn.veil, veil.dense, heroType.tag]} data-cut="true"
       ><span class:list={[loadIn.piece, loadIn.words]} data-cut="true"

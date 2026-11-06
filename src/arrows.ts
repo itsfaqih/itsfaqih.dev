@@ -39,6 +39,39 @@ export const ARROWS = {
 };
 
 export type ArrowFamily = keyof typeof ARROWS;
+export type HintLook = typeof ARROWS.hint;
+export type ToggleLook = typeof ARROWS.toggle;
+type SectionArrows = { hint?: Partial<HintLook>; toggle?: Partial<ToggleLook> };
+
+/**
+ * A lesson's own hint arrows, keyed by sectionKey(), over the values above. Squint and hero
+ * arrows each appear in one section, so their values above are already that section's.
+ */
+export const SECTIONS = new Map<string, SectionArrows>([]);
+
+/** The hint arrows of the lesson `section`, or the site's when it has none of its own. */
+export function arrowsFor(section: string | undefined) {
+  const own = section === undefined ? undefined : SECTIONS.get(section);
+  return {
+    hint: { ...ARROWS.hint, ...own?.hint },
+    toggle: { ...ARROWS.toggle, ...own?.toggle },
+  };
+}
+
+/** A lesson's key in SECTIONS: its page and title, as in "button-design/give-every-state-a-look". */
+export function sectionKey(path: string, title: string) {
+  const page =
+    path
+      .split("/")
+      .filter(Boolean)
+      .at(-1)
+      ?.replace(/\.html$/, "") ?? "";
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return `${page}/${slug}`;
+}
 
 /** The window event the tuner fires after it edits ARROWS, so drawn arrows redraw. */
 export const ARROWS_CHANGED = "arrows";
