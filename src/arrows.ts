@@ -21,8 +21,6 @@ export const ARROWS = {
     loop: 64,
     curl: 7,
     reach: 40,
-    // The shortest curve a label may draw before its head, so every arrow reads as a curve.
-    length: 24,
     // Each end turns off the line between the centres by the angle whose tangent is 1/φ², and each
     // control point sits 1/φ² of the curve out from its end.
     bow: 1 / PHI ** 2,
