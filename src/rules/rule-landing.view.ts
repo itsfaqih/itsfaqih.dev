@@ -25,6 +25,8 @@ export const lessonView = {
   pane: (on: boolean) => cx(lessonKit.well, lessonKit.pane, !on && lessonKit.behind, marker),
   hintSvg: (gone: boolean) => cx(hintKit.svg, gone && hintKit.gone),
   hintInk: hintKit.ink,
+  hintHalo: (onPanel: boolean, gone: boolean) =>
+    cx(hintKit.halo, onPanel && hintKit.haloOnPanel, gone && hintKit.gone),
   hintReveal: (drawn: boolean) => cx(hintKit.reveal, drawn && hintKit.drawn),
   hintLabel: (tilt: "up" | "down" | "level", onPanel: boolean, gone: boolean) =>
     cx(hintKit.label, hintKit[tilt], onPanel && hintKit.onPanel, gone && hintKit.gone),

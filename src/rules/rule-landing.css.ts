@@ -395,6 +395,31 @@ export const hintKit = {
     overflow: "visible",
     transition: `opacity 220ms ease`,
   }),
+  // Blurs and tints what sits under a hint's arrow and label, so the hint reads over a busy pane.
+  // Its mask, set per hint, feathers it to the arrow's shape.
+  halo: style({
+    "@layer": {
+      [under1]: {
+        position: "absolute",
+        backdropFilter: "blur(3px)",
+        WebkitBackdropFilter: "blur(3px)",
+        backgroundColor: `color-mix(in oklab, ${kit["--code-bg"]} 60%, transparent)`,
+        maskSize: "100% 100%",
+        maskRepeat: "no-repeat",
+        WebkitMaskSize: "100% 100%",
+        WebkitMaskRepeat: "no-repeat",
+        transition: `opacity 260ms ease`,
+        "@media": {
+          [REDUCE]: {
+            transition: "none",
+          },
+        },
+      },
+    },
+  }),
+  haloOnPanel: style({
+    backgroundColor: `color-mix(in oklab, ${palette["--panel"]} 60%, transparent)`,
+  }),
   // Outlined in its own colour so the brush's corners round off like marker.
   ink: style({
     "@layer": {
