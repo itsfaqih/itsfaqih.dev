@@ -1,7 +1,7 @@
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { chromium, type Browser, type ElementHandle, type Page } from "playwright";
-import { afterAll, beforeAll, describe, inject, it } from "vite-plus/test";
+import { afterAll, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import {
   fixedTime,
   mismatch,
@@ -336,10 +336,9 @@ describe.concurrent("demos behave as their baseline screenshots show", () => {
       const owned = (file: string) => file.startsWith(`${slug}--`) || file === `${slug}.json`;
       if (update) {
         mkdirSync(baselineDir, { recursive: true });
-        for (const file of readdirSync(baselineDir).filter(owned)) {
-          rmSync(path.join(baselineDir, file));
-        }
-        writeFileSync(path.join(baselineDir, `${slug}.json`), `${JSON.stringify(keys, null, 2)}\n`);
+        const manifest = `${JSON.stringify(keys, null, 2)}\n`;
+        if (JSON.stringify(readManifest(slug)) !== JSON.stringify(keys))
+          writeFileSync(path.join(baselineDir, `${slug}.json`), manifest);
       } else {
         expect(keys, "controls found differ from the manifest").toEqual(readManifest(slug));
       }
@@ -356,13 +355,17 @@ describe.concurrent("demos behave as their baseline screenshots show", () => {
               if (errors.length) failures.push(`${control.key}: page errors ${errors.join(" | ")}`);
               for (const { name, image } of shots) {
                 expectedFiles.push(name);
+                const file = path.join(baselineDir, name);
+                // An update writes a shot only when it is new or no longer matches, so an update
+                // commits only the shots that changed.
                 if (update) {
-                  writeFileSync(path.join(baselineDir, name), image);
+                  if (!existsSync(file) || mismatch(readFileSync(file), image))
+                    writeFileSync(file, image);
                   continue;
                 }
                 let baseline: Buffer;
                 try {
-                  baseline = readFileSync(path.join(baselineDir, name));
+                  baseline = readFileSync(file);
                 } catch {
                   writeDiff(diffDir, name, image);
                   failures.push(`${name}: no baseline`);
@@ -381,10 +384,27 @@ describe.concurrent("demos behave as their baseline screenshots show", () => {
         ),
       );
       expect(failures, `see ${diffDir}`).toEqual([]);
-      if (!update) {
-        const stored = readdirSync(baselineDir).filter(owned).sort();
+      const stored = readdirSync(baselineDir).filter(owned).sort();
+      if (update) {
+        // Every control ran, so a baseline no shot wrote belongs to a control that is gone.
+        for (const file of stored.filter((file) => !expectedFiles.includes(file)))
+          rmSync(path.join(baselineDir, file));
+      } else {
         expect(stored, "baselines without a control").toEqual(expectedFiles.sort());
       }
     },
   );
+});
+
+// The checks above cover each page's own files. An update also drops a removed page's baselines.
+const slugs = routes.map(routeSlug);
+const ownedByPage = (file: string) =>
+  slugs.some((slug) => file.startsWith(`${slug}--`) || file === `${slug}.json`);
+afterAll(() => {
+  if (!update) return;
+  for (const file of readdirSync(baselineDir).filter((file) => !ownedByPage(file)))
+    rmSync(path.join(baselineDir, file));
+});
+it.skipIf(update)("every baseline belongs to a page", () => {
+  expect(readdirSync(baselineDir).filter((file) => !ownedByPage(file))).toEqual([]);
 });

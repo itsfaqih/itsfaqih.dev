@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { chromium, type Browser } from "playwright";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vite-plus/test";
@@ -35,9 +35,16 @@ let browser: Browser;
 beforeAll(async () => {
   browser = await chromium.launch();
   rmSync(diffDir, { recursive: true, force: true });
-  if (update) rmSync(baselineDir, { recursive: true, force: true });
 });
-afterAll(() => browser?.close());
+afterAll(async () => {
+  await browser?.close();
+  // An update drops the baselines of pages that no longer exist. The others it rewrote one by one.
+  if (!update) return;
+  const expected = new Set(shots.map(shotName));
+  for (const file of readdirSync(baselineDir)) {
+    if (!expected.has(file)) rmSync(path.join(baselineDir, file));
+  }
+});
 
 async function capture(shot: Shot) {
   const { context, page, errors } = await openSettledPage(browser, shot);
@@ -56,12 +63,15 @@ describe.concurrent("pages match their baseline screenshots", () => {
   it.each(shots.map((shot) => [shotName(shot), shot] as const))("%s", async (name, shot) => {
     const { image: actual, errors } = await capture(shot);
     expect(errors, "errors logged while the page ran").toEqual([]);
+    const file = path.join(baselineDir, name);
     if (update) {
+      // A baseline that still matches stays as it is, so an update commits only the shots that changed.
+      if (existsSync(file) && !mismatch(readFileSync(file), actual)) return;
       mkdirSync(baselineDir, { recursive: true });
-      writeFileSync(path.join(baselineDir, name), actual);
+      writeFileSync(file, actual);
       return;
     }
-    const result = mismatch(readFileSync(path.join(baselineDir, name)), actual);
+    const result = mismatch(readFileSync(file), actual);
     if (result) writeDiff(diffDir, name, actual, result.diff);
     expect(result?.reason, `see ${diffDir}`).toBeUndefined();
   });
