@@ -1,3 +1,4 @@
+import { ARROWS, head, type Point } from "../../arrows";
 import { boxCentre, type Outline } from "./hero-morph";
 import {
   ABSORBED_SCALE,
@@ -54,21 +55,12 @@ function arcPoint(t: number) {
   return { x: at(0), y: at(1) };
 }
 
-type Point = { x: number; y: number };
-
-const ARROW_BARB = 6;
-
 function arrowed(line: Point[]) {
   const tip = line.at(-1)!;
-  const before = line.at(-2)!;
-  const heading = Math.atan2(tip.y - before.y, tip.x - before.x);
-  const barb = (turn: number) => ({
-    x: tip.x - ARROW_BARB * Math.cos(heading + turn),
-    y: tip.y - ARROW_BARB * Math.sin(heading + turn),
-  });
+  const [left, right] = head(line.at(-2)!, tip, ARROWS.hero.wing, ARROWS.hero.spread);
   const path = (pts: Point[]) =>
     `M${pts.map(({ x, y }) => `${+x.toFixed(1)} ${+y.toFixed(1)}`).join(" L")}`;
-  return `${path(line)} ${path([barb(-Math.PI / 4), tip, barb(Math.PI / 4)])}`;
+  return `${path(line)} ${path([right, tip, left])}`;
 }
 
 export function routeGhost(boxY: number) {
@@ -80,11 +72,13 @@ export function routeGhost(boxY: number) {
 }
 
 const RETRY_GHOST_SAMPLES = 24;
-export const RETRY_GHOST = arrowed(
-  Array.from({ length: RETRY_GHOST_SAMPLES }, (_, k) =>
-    arcPoint(0.16 + ((0.93 - 0.16) * k) / (RETRY_GHOST_SAMPLES - 1)),
-  ),
-);
+export function retryGhost() {
+  return arrowed(
+    Array.from({ length: RETRY_GHOST_SAMPLES }, (_, k) =>
+      arcPoint(0.16 + ((0.93 - 0.16) * k) / (RETRY_GHOST_SAMPLES - 1)),
+    ),
+  );
+}
 
 const REJECT_REACH = 7;
 export const REJECT_MARK = (() => {

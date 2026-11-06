@@ -1,9 +1,11 @@
 ---
+import { ARROWS, downArrow } from "../arrows";
 import { styles } from "./button-design.css";
 
 type Props = { careful?: boolean };
 
 const { careful = false } = Astro.props;
+const arrow = downArrow(ARROWS.squint);
 const key = [styles.key, styles.sm, styles.live, styles.cardRowKey, styles.squinted];
 // Each note names what squinting leaves of its button, and shows only while Squint is on.
 const KEYS = [
@@ -25,8 +27,14 @@ const say = careful
         KEYS.map(({ label, look, note }) => (
           <span class={styles.pin}
             ><button type="button" class:list={[key, look]}>{label}</button><span class={styles.squintNote}
-              >{note}<svg viewBox="0 0 10 14" class={styles.squintArrow} aria-hidden="true"
-                ><path pathLength="1" d="M5 1v12M2 9l3 4 3-4" /></svg
+              >{note}<svg
+                  viewBox={`0 0 ${arrow.width} ${arrow.height}`}
+                  width={arrow.width}
+                  height={arrow.height}
+                  class={styles.squintArrow}
+                  data-arrow="squint"
+                  aria-hidden="true"
+                  ><path pathLength="1" d={arrow.d} /></svg
               ></span
             ></span
           >

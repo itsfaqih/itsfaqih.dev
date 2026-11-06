@@ -2,6 +2,7 @@ import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
+import { ARROWS, strokeVar } from "../arrows";
 import { under1, under2, under3 } from "../layers.css";
 const TABLET = "(max-width: 820px)";
 const PHONE = "(max-width: 640px)";
@@ -390,11 +391,9 @@ export const styles = {
     },
   }),
   squintArrow: style({
-    width: "10px",
-    height: "14px",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 2,
+    strokeWidth: `var(${strokeVar("squint")}, ${ARROWS.squint.stroke})`,
     strokeLinecap: "round",
     strokeLinejoin: "round",
     strokeDasharray: 1,

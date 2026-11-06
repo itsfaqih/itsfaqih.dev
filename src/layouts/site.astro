@@ -68,6 +68,7 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
       import "../components/smooth-scroll";
       import { voiceControls } from "../hooks/sound";
       voiceControls();
+      if (import.meta.env.DEV) void import("../arrows-tuner");
     </script>
   </body>
 </html>
