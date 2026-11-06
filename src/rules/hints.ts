@@ -1,4 +1,12 @@
-import { ARROWS, ARROWS_CHANGED, head, type Point } from "../arrows";
+import {
+  ARROWS_CHANGED,
+  arrowsFor,
+  strokeVar,
+  head,
+  type HintLook,
+  type Point,
+  type ToggleLook,
+} from "../arrows";
 import { isTransitioning } from "../sections/rule-open";
 
 type Box = { left: number; top: number; right: number; bottom: number };
@@ -79,16 +87,8 @@ type Spot = { edge: Edge; dir: -1 | 0 | 1; gap: number; shift: number };
 // Further steps off an edge's middle for when a neighbour blocks every slot, so the label slides
 // past it along the same edge.
 const HINT_REACH = [30, 48, 72, 100, 130, 160];
-let spotsAt: { reach: number; spots: Spot[] } | undefined;
-
-/** Every place a label tries round its target, nearest first. */
-function spots(): Spot[] {
-  const reach = ARROWS.hint.reach;
-  if (spotsAt?.reach !== reach) spotsAt = { reach, spots: around(reach) };
-  return spotsAt.spots;
-}
-
-function around(reach: number): Spot[] {
+/** Every place a label tries round its target, nearest first, for labels `reach` off its edge. */
+function spots(reach: number): Spot[] {
   const rings = HINT_RINGS.map((ring) => reach + ring);
   return [
     ...rings.flatMap((gap) =>
@@ -109,10 +109,9 @@ function around(reach: number): Spot[] {
 type Way = { label: Box; way: ReturnType<typeof arc> };
 
 /** Where an arrow lands on its target: just off the middle of one edge, never a corner. */
-function landing(t: Box, edge: Edge): Point {
+function landing(t: Box, edge: Edge, gap: number): Point {
   const cx = (t.left + t.right) / 2;
   const cy = (t.top + t.bottom) / 2;
-  const gap = ARROWS.hint.targetGap;
   if (edge === "top") return { x: cx, y: t.top - gap };
   if (edge === "bottom") return { x: cx, y: t.bottom + gap };
   if (edge === "left") return { x: t.left - gap, y: cy };
@@ -148,8 +147,7 @@ const EDGES = ["top", "bottom", "left", "right"] as const;
  * with its head. An arc shorter than the hint's `bend` is straight whatever `bow` asks, as below it
  * the bend folds into a hook beside the word.
  */
-function arc(label: Box, end: Point, bow: number) {
-  const hint = ARROWS.hint;
+function arc(label: Box, end: Point, bow: number, hint: HintLook) {
   const start = exit(label, end, hint.labelGap);
   const dx = end.x - start.x;
   const dy = end.y - start.y;
@@ -171,19 +169,18 @@ function arc(label: Box, end: Point, bow: number) {
   // A short arc still turns under the wings, so a head set on the tangent at the tip lands one
   // wing on the line. Aim it along the stroke's last stretch instead.
   const tail = [...along].reverse().find((p) => Math.hypot(end.x - p.x, end.y - p.y) >= hint.wing);
-  return { start, c1, c2, end, wings: wings(tail ?? start, end), along, nx, ny };
+  return { start, c1, c2, end, wings: wings(tail ?? start, end, hint), along, nx, ny };
 }
 
 /** The two strokes of a hint's head at `end`, for a line arriving from `from`. */
-function wings(from: Point, end: Point) {
-  return head(from, end, ARROWS.hint.wing, ARROWS.hint.spread);
+function wings(from: Point, end: Point, hint: HintLook) {
+  return head(from, end, hint.wing, hint.spread);
 }
 
 /** Spots right beside a target, nearest side first, for a label with a short straight arrow. */
-function beside(t: Box, w: number, h: number): Box[] {
+function beside(t: Box, w: number, h: number, { reach }: ToggleLook): Box[] {
   const cx = (t.left + t.right) / 2;
   const cy = (t.top + t.bottom) / 2;
-  const reach = ARROWS.toggle.reach;
   return [
     {
       left: t.right + reach,
@@ -298,6 +295,8 @@ function survey(things: Element[]): Mark[] {
  */
 export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints: Hint[]) => void) {
   const place = () => {
+    const { hint, toggle } = arrowsFor(card.dataset.arrows);
+    card.style.setProperty(strokeVar("hint"), String(hint.stroke));
     const box = card.getBoundingClientRect();
     const w = ruler.offsetWidth;
     const h = ruler.offsetHeight;
@@ -349,17 +348,17 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       const covered = raster(box, [...solid, t]);
       const near = figure
         ? undefined
-        : beside(t, w, h).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
+        : beside(t, w, h, toggle).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
       if (near) {
         const mid = { x: (near.left + near.right) / 2, y: (near.top + near.bottom) / 2 };
-        const { labelGap, targetGap } = ARROWS.toggle;
+        const { labelGap, targetGap } = toggle;
         const start = exit(
           near,
           { x: (t.left + t.right) / 2, y: (t.top + t.bottom) / 2 },
           labelGap,
         );
         const end = exit(t, mid, targetGap);
-        const [a, b] = wings(start, end);
+        const [a, b] = wings(start, end, hint);
         next.push({
           zone: "copy",
           at: { x: mid.x - box.left, y: mid.y - box.top },
@@ -399,7 +398,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
             return o === 0 || o === area(label);
           });
         if (!sits) return undefined;
-        const end = landing(t, edge);
+        const end = landing(t, edge, hint.targetGap);
         // A full bend first, away from the target, then gentler ones when a neighbour sits close.
         const tiers =
           dir === 0
@@ -411,7 +410,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
               ];
         for (const bows of tiers) {
           const way = bows
-            .map((bow) => arc(label, end, bow))
+            .map((bow) => arc(label, end, bow, hint))
             .sort((a, b) => OUTWARD[edge](b) - OUTWARD[edge](a))
             .find((way) => !way.along.some(threaded.has));
           if (way) return { label, way };
@@ -462,7 +461,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           .flatMap(({ label, cost }) =>
             EDGES.flatMap((edge) =>
               ([1, -1] as const).map((bow) => {
-                const way = arc(label, landing(t, edge), bow);
+                const way = arc(label, landing(t, edge, hint.targetGap), bow, hint);
                 const hits = way.along.filter(
                   (p) =>
                     crossed.has(p) ||
@@ -480,7 +479,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       curved.push({ zone: figure?.dataset.side ?? "copy", t, fits, roam });
     }
     // Both panes of a demo take the same slot when one suits them all, so they read alike.
-    const round = spots();
+    const round = spots(hint.reach);
     const tries = [false, true].flatMap((snug) => round.map((spot) => [spot, snug] as const));
     const shared = tries.find((at) => curved.every((c) => c.fits(...at)));
     for (const { zone, t, fits, roam } of curved) {

@@ -1,4 +1,5 @@
 ---
+import { sectionKey } from "../arrows";
 import { type ClassValue } from "../cx";
 import { arcade } from "../components/arcade.css";
 import type { Lesson } from "./lesson";
@@ -16,12 +17,13 @@ type Props = {
 const { lesson, rows = 0, costsClass } = Astro.props;
 const SIDES: readonly SideKey[] = ["bad", "good"];
 const MARK = { bad: "✕", good: "✓" } as const;
+const section = sectionKey(Astro.url.pathname, lesson.title);
 // Slots: "body" (the lesson copy, its code in tone "chip"), "extra" (a block under it), and "bad"
 // and "good" (each pane's demo). The panes start on "good", as rule-lesson.client.ts expects.
 ---
 
 <rule-lesson class={host.contents}>
-  <article class={lessonView.article} data-rev="true">
+  <article class={lessonView.article} data-rev="true" data-arrows={section}>
     <div class={lessonKit.copy}>
       {lesson.exception && <span class={lessonKit.exception}>Exception</span>}
       <h3 class={lessonKit.title}>{lesson.title}</h3>
