@@ -1,6 +1,7 @@
 import {
   ARROWS_CHANGED,
   arrowsFor,
+  PHI,
   strokeVar,
   head,
   type HintLook,
@@ -22,8 +23,8 @@ const HINT_LEAN = 14 / 26;
 // The room a label keeps from words level with it, so it never reads as part of a line of text.
 const HINT_BERTH = 40;
 // How much further out than the hint's reach the wider rings sit, for when every slot in the first
-// ring is taken.
-const HINT_RINGS = [0, 18, 38];
+// ring is taken, then one nearer ring for a pane with no room further out.
+const HINT_RINGS = [0, 14, 34, -14];
 // The spots a label tries round its target, in order: above right, right, their mirror images,
 // level beside it, then below. `dir` is the side of the edge's middle it steps toward, and a
 // level label (dir 0) points straight across.
@@ -68,18 +69,17 @@ function apart(a: Box, b: Box) {
   );
 }
 
-/** Where a ray from the box's centre toward `to` leaves the box, pushed `gap` further out. */
-function exit(b: Box, to: Point, gap: number): Point {
-  const cx = (b.left + b.right) / 2;
-  const cy = (b.top + b.bottom) / 2;
-  const dx = to.x - cx;
-  const dy = to.y - cy;
-  const length = Math.hypot(dx, dy) || 1;
-  const reach = Math.min(
-    dx ? (b.right - b.left) / 2 / Math.abs(dx) : Infinity,
-    dy ? (b.bottom - b.top) / 2 / Math.abs(dy) : Infinity,
-  );
-  return { x: cx + dx * reach + (dx / length) * gap, y: cy + dy * reach + (dy / length) * gap };
+const centre = (b: Box): Point => ({ x: (b.left + b.right) / 2, y: (b.top + b.bottom) / 2 });
+
+/** Where a ray from the box's centre along the unit vector `dir` leaves the box, `gap` further out. */
+function exit(b: Box, dir: Point, gap: number): Point {
+  const c = centre(b);
+  const reach =
+    Math.min(
+      dir.x ? (b.right - b.left) / 2 / Math.abs(dir.x) : Infinity,
+      dir.y ? (b.bottom - b.top) / 2 / Math.abs(dir.y) : Infinity,
+    ) + gap;
+  return { x: c.x + dir.x * reach, y: c.y + dir.y * reach };
 }
 
 type Edge = (typeof HINT_SLOTS)[number]["edge"];
@@ -107,21 +107,12 @@ function spots(reach: number): Spot[] {
   ];
 }
 type Way = { label: Box; way: ReturnType<typeof arc> };
-
-/** Where an arrow lands on its target: just off the middle of one edge, never a corner. */
-function landing(t: Box, edge: Edge, gap: number): Point {
-  const cx = (t.left + t.right) / 2;
-  const cy = (t.top + t.bottom) / 2;
-  if (edge === "top") return { x: cx, y: t.top - gap };
-  if (edge === "bottom") return { x: cx, y: t.bottom + gap };
-  if (edge === "left") return { x: t.left - gap, y: cy };
-  return { x: t.right + gap, y: cy };
-}
+const SQUEEZES = [0, 1, 2] as const;
+type Squeeze = (typeof SQUEEZES)[number];
 
 /** A `w` by `h` label at one of the spots round `t`. */
 function slot(t: Box, { edge, dir, gap, shift }: Spot, w: number, h: number): Box {
-  const cx = (t.left + t.right) / 2;
-  const cy = (t.top + t.bottom) / 2;
+  const { x: cx, y: cy } = centre(t);
   if (edge === "top" || edge === "bottom") {
     const left = dir > 0 ? cx + shift : cx - shift - w;
     const top = edge === "top" ? t.top - gap - h : t.bottom + gap;
@@ -131,56 +122,58 @@ function slot(t: Box, { edge, dir, gap, shift }: Spot, w: number, h: number): Bo
   const top = dir === 0 ? cy - h / 2 : dir > 0 ? cy + shift : cy - shift - h;
   return { left, right: left + w, top, bottom: top + h };
 }
-
-/** How far an arc bows out past the edge it lands on, rather than back across the target. */
-const OUTWARD: Record<Edge, (way: ReturnType<typeof arc>) => number> = {
-  top: (way) => -way.ny,
-  bottom: (way) => way.ny,
-  left: (way) => -way.nx,
-  right: (way) => way.nx,
-};
-
-const EDGES = ["top", "bottom", "left", "right"] as const;
-
 /**
- * A hand-drawn arc from the label to `end`, bowed to one side by `bow` (-1 to 1, straight at 0),
- * with its head. An arc shorter than the hint's `bend` is straight whatever `bow` asks, as below it
- * the bend folds into a hook beside the word.
+ * A hand-drawn arc from the label to the target, with its head. It leaves the label on a ray from
+ * the label's centre and lands on a ray into the target's centre, so the nock points back at the
+ * word and the head at the target. Both rays turn off the line between the centres by the same
+ * angle, to the side `bow` picks, so even a label level with its target draws a curve.
  */
-function arc(label: Box, end: Point, bow: number, hint: HintLook) {
-  const start = exit(label, end, hint.labelGap);
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const bend = (Math.hypot(dx, dy) < hint.bend ? 0 : bow) * hint.bow;
-  const nx = -dy * bend;
-  const ny = dx * bend;
-  // The start lies on the line from the label's centre to `end`, so a first control point on that
-  // line makes the tail leave straight out of the word. The bow bends only the far half.
-  const c1 = { x: start.x + dx * hint.tail, y: start.y + dy * hint.tail };
-  const c2 = { x: start.x + dx * hint.knee + nx, y: start.y + dy * hint.knee + ny };
+function arc(label: Box, target: Box, bow: number, look: HintLook) {
+  const from = centre(label);
+  const to = centre(target);
+  const heading = Math.atan2(to.y - from.y, to.x - from.x);
+  const turn = Math.atan(bow * look.bow);
+  const out = { x: Math.cos(heading + turn), y: Math.sin(heading + turn) };
+  const into = { x: Math.cos(heading - turn), y: Math.sin(heading - turn) };
+  const start = exit(label, out, look.labelGap);
+  const end = exit(target, { x: -into.x, y: -into.y }, look.targetGap);
+  // The last wing's length runs straight along the ray, so both wings sit square on the line.
+  const neck = { x: end.x - into.x * look.wing, y: end.y - into.y * look.wing };
+  const handle = Math.hypot(neck.x - start.x, neck.y - start.y) * look.handle;
+  const c1 = { x: start.x + out.x * handle, y: start.y + out.y * handle };
+  const c2 = { x: neck.x - into.x * handle, y: neck.y - into.y * handle };
   const along = Array.from({ length: 29 }, (_, i) => {
     const t = (i + 1) / 30;
     const u = 1 - t;
     return {
-      x: u ** 3 * start.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * end.x,
-      y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * end.y,
+      x: u ** 3 * start.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * neck.x,
+      y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * neck.y,
     };
   });
-  // A short arc still turns under the wings, so a head set on the tangent at the tip lands one
-  // wing on the line. Aim it along the stroke's last stretch instead.
-  const tail = [...along].reverse().find((p) => Math.hypot(end.x - p.x, end.y - p.y) >= hint.wing);
-  return { start, c1, c2, end, wings: wings(tail ?? start, end, hint), along, nx, ny };
+  const line = [start, ...along, neck];
+  const length = line.slice(1).reduce((sum, p, i) => {
+    const q = line[i] ?? p;
+    return sum + Math.hypot(p.x - q.x, p.y - q.y);
+  }, 0);
+  const wings = head(neck, end, look.wing, look.spread);
+  // How far the head leans off square to the page, plus a hair for an arc that sags rather than
+  // arches, so a caller picking between the two sides takes the one that lands straighter.
+  const middle = along[14] ?? start;
+  const sags = middle.y > (start.y + end.y) / 2;
+  const skew = 1 - Math.max(Math.abs(into.x), Math.abs(into.y)) + (sags ? 1e-3 : 0);
+  return { start, c1, c2, neck, end, wings, along, length, skew };
 }
 
-/** The two strokes of a hint's head at `end`, for a line arriving from `from`. */
-function wings(from: Point, end: Point, hint: HintLook) {
-  return head(from, end, hint.wing, hint.spread);
+/** The arcs bending `bow` to either side, the one whose head lands squarer first. */
+function bowed(label: Box, target: Box, bow: number, look: HintLook) {
+  const a = arc(label, target, bow, look);
+  const b = arc(label, target, -bow, look);
+  return a.skew <= b.skew ? ([a, b] as const) : ([b, a] as const);
 }
 
 /** Spots right beside a target, nearest side first, for a label with a short straight arrow. */
 function beside(t: Box, w: number, h: number, { reach }: ToggleLook): Box[] {
-  const cx = (t.left + t.right) / 2;
-  const cy = (t.top + t.bottom) / 2;
+  const { x: cx, y: cy } = centre(t);
   return [
     {
       left: t.right + reach,
@@ -271,14 +264,15 @@ function survey(things: Element[]): Mark[] {
     );
     const cell = e.matches("td, th");
     if (words.length && surface && !cell) return [{ e, box, kind: "content" }];
-    // Bare text, and text in a table cell, counts only where its glyphs are, so a wide cell keeps
-    // its empty space.
+    // Bare text, and text in a table cell, counts only where its glyphs are, line by line, so a
+    // wide cell or a wrapped heading's short last line keeps its empty space.
     if (words.length) {
       const range = document.createRange();
       const glyphs = words.flatMap((n) => {
         range.selectNodeContents(n);
-        const r = range.getBoundingClientRect();
-        return r.width ? [{ e, box: r, kind: "content" as const, glyphs: true as const }] : [];
+        return [...range.getClientRects()]
+          .filter((r) => r.width)
+          .map((r) => ({ e, box: r, kind: "content" as const, glyphs: true as const }));
       });
       return surface ? [...glyphs, { e, box, kind: "surface" }] : glyphs;
     }
@@ -288,10 +282,9 @@ function survey(things: Element[]): Mark[] {
 
 /**
  * An arrow to every `[data-hint]` in the card, so readers know the demo takes input. A toggle in
- * the copy gets a short straight one from right beside it. Anything else gets an arrow from the
- * first clear spot round it, landing on the middle of an edge, so every pane reads the
- * same. Only when no spot is clear does the label search the pane for empty space. Each fades
- * once the reader touches the pane it points into.
+ * the copy gets a short one from right beside it. Anything else gets an arrow from the first
+ * clear spot round it, so every pane reads the same. Only when no spot is clear does the label
+ * search the pane for empty space. Each fades once the reader touches the pane it points into.
  */
 export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints: Hint[]) => void) {
   const place = () => {
@@ -309,6 +302,8 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
     );
     const next: Hint[] = [];
     const x = (p: Point) => `${(p.x - box.left).toFixed(1)} ${(p.y - box.top).toFixed(1)}`;
+    const draw = (way: ReturnType<typeof arc>) =>
+      `M${x(way.start)} C${x(way.c1)} ${x(way.c2)} ${x(way.neck)} L${x(way.end)} M${x(way.wings[0])} L${x(way.end)} L${x(way.wings[1])}`;
     const pad = (b: Box) => ({
       left: b.left - HINT_CLEAR,
       right: b.right + HINT_CLEAR,
@@ -318,7 +313,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
     const curved: {
       zone: string;
       t: Box;
-      fits: (spot: Spot, snug: boolean) => Way | undefined;
+      fits: (spot: Spot, squeeze: Squeeze) => Way | undefined;
       roam: () => Way | undefined;
     }[] = [];
     for (const target of card.querySelectorAll<HTMLElement>("[data-hint]")) {
@@ -350,20 +345,14 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         ? undefined
         : beside(t, w, h, toggle).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
       if (near) {
-        const mid = { x: (near.left + near.right) / 2, y: (near.top + near.bottom) / 2 };
-        const { labelGap, targetGap } = toggle;
-        const start = exit(
-          near,
-          { x: (t.left + t.right) / 2, y: (t.top + t.bottom) / 2 },
-          labelGap,
-        );
-        const end = exit(t, mid, targetGap);
-        const [a, b] = wings(start, end, hint);
+        const look = { ...hint, labelGap: toggle.labelGap, targetGap: toggle.targetGap };
+        const [way] = bowed(near, t, 1, look);
+        const mid = centre(near);
         next.push({
           zone: "copy",
           at: { x: mid.x - box.left, y: mid.y - box.top },
           tilt: "level",
-          path: `M${x(start)} L${x(end)} M${x(a)} L${x(end)} L${x(b)}`,
+          path: draw(way),
         });
         continue;
       }
@@ -377,10 +366,9 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       const cells = [...(figure ?? card).querySelectorAll("td, th")].map((e) =>
         e.getBoundingClientRect(),
       );
-      // A label in a slot may sit on a card or off it, never across its edge. It sits in a table's
-      // cells only when `snug`, as nothing else fits.
-      const fits = (spot: Spot, snug: boolean) => {
-        const { edge, dir } = spot;
+      // A label in a slot may sit on a card or off it, never across its edge. Squeezed, it may sit
+      // in a table's cells, then draw a curve shorter than the hint's length, as nothing else fits.
+      const fits = (spot: Spot, squeeze: Squeeze) => {
         const label = slot(t, spot, w, h);
         const clear = pad(label);
         const level = {
@@ -389,30 +377,21 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           right: label.right + HINT_BERTH,
         };
         const sits =
-          holds(zone, clear) &&
+          holds(zone, squeeze > 1 ? label : clear) &&
           blocked.covers(clear) === 0 &&
           words.covers(level) === 0 &&
-          (snug || cells.every((r) => overlap(label, r) === 0)) &&
+          (squeeze > 0 || cells.every((r) => overlap(label, r) === 0)) &&
           sheets.every((r) => {
             const o = overlap(label, r);
             return o === 0 || o === area(label);
           });
         if (!sits) return undefined;
-        const end = landing(t, edge, hint.targetGap);
-        // A full bend first, away from the target, then gentler ones when a neighbour sits close.
-        const tiers =
-          dir === 0
-            ? [[0]]
-            : [
-                [1, -1],
-                [0.5, -0.5],
-                [0.25, -0.25],
-              ];
-        for (const bows of tiers) {
-          const way = bows
-            .map((bow) => arc(label, end, bow, hint))
-            .sort((a, b) => OUTWARD[edge](b) - OUTWARD[edge](a))
-            .find((way) => !way.along.some(threaded.has));
+        // A full bend first, on the side whose head lands squarer, then ones a golden step gentler
+        // when a neighbour sits close.
+        for (const bow of [1, 1 / PHI, 1 / PHI ** 2]) {
+          const way = bowed(label, t, bow, hint).find(
+            (way) => (squeeze > 1 || way.length >= hint.length) && !way.along.some(threaded.has),
+          );
           if (way) return { label, way };
         }
         return undefined;
@@ -456,43 +435,40 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           }
         }
         spots.sort((a, b) => a.cost - b.cost);
-        return spots
-          .filter((spot, i, all) => i < 1500 && spot.cost < (all[0]?.cost ?? 0) + 600)
-          .flatMap(({ label, cost }) =>
-            EDGES.flatMap((edge) =>
-              ([1, -1] as const).map((bow) => {
-                const way = arc(label, landing(t, edge, hint.targetGap), bow, hint);
-                const hits = way.along.filter(
-                  (p) =>
-                    crossed.has(p) ||
-                    !holds(zone, { left: p.x, right: p.x, top: p.y, bottom: p.y }),
-                ).length;
-                return { label, way, cost: cost + hits * 500 + (way.ny > 0 ? 1 : 0) };
-              }),
-            ),
-          )
-          .reduce<(Way & { cost: number }) | undefined>(
-            (a, b) => (a && a.cost <= b.cost ? a : b),
-            undefined,
-          );
+        // An arc only adds to its spot's cost, so once a spot alone costs more than the best arc
+        // so far, no later spot can win.
+        let best: (Way & { cost: number }) | undefined;
+        for (const { label, cost } of spots.slice(0, 1500)) {
+          if (best && cost >= best.cost) break;
+          for (const way of bowed(label, t, 1, hint)) {
+            const hits = way.along.filter(
+              (p) =>
+                crossed.has(p) || !holds(zone, { left: p.x, right: p.x, top: p.y, bottom: p.y }),
+            ).length;
+            const short = way.length < hint.length ? 5000 : 0;
+            const total = cost + short + hits * 2000 + way.skew;
+            if (!best || total < best.cost) best = { label, way, cost: total };
+          }
+        }
+        return best;
       };
       curved.push({ zone: figure?.dataset.side ?? "copy", t, fits, roam });
     }
     // Both panes of a demo take the same slot when one suits them all, so they read alike.
     const round = spots(hint.reach);
-    const tries = [false, true].flatMap((snug) => round.map((spot) => [spot, snug] as const));
+    const tries = SQUEEZES.flatMap((squeeze) => round.map((spot) => [spot, squeeze] as const));
     const shared = tries.find((at) => curved.every((c) => c.fits(...at)));
     for (const { zone, t, fits, roam } of curved) {
       const pick =
         (shared && fits(...shared)) ?? tries.map((at) => fits(...at)).find(Boolean) ?? roam();
       if (!pick) continue;
       const { label, way } = pick;
-      const cx = (label.left + label.right) / 2;
+      const mid = centre(label);
       next.push({
         zone,
-        at: { x: cx - box.left, y: (label.top + label.bottom) / 2 - box.top },
-        tilt: cx < t.left + (t.right - t.left) / 2 ? "down" : "up",
-        path: `M${x(way.start)} C${x(way.c1)} ${x(way.c2)} ${x(way.end)} M${x(way.wings[0])} L${x(way.end)} L${x(way.wings[1])}`,
+        at: { x: mid.x - box.left, y: mid.y - box.top },
+        tilt: mid.x < centre(t).x ? "down" : "up",
+        path: draw(way),
       });
     }
     render(next);

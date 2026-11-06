@@ -49,10 +49,9 @@ const HINT: Spec<keyof typeof ARROWS.hint>[] = [
   ["wing", "Head length", 2, 20, 0.5],
   ["spread", "Head angle (deg)", 5, 80, 0.5],
   ["reach", "Label distance", 8, 80, 1],
-  ["bend", "Shortest curved", 0, 200, 1],
-  ["bow", "Curve depth", 0, 1, 0.01],
-  ["tail", "Tail straightness", 0, 1, 0.01],
-  ["knee", "Curve position", 0, 1, 0.01],
+  ["length", "Shortest line", 0, 80, 1],
+  ["bow", "Curve turn (tan)", 0.05, 1.5, 0.01],
+  ["handle", "Curve fullness", 0.1, 0.6, 0.01],
   ["labelGap", "Gap at label", 0, 24, 0.5],
   ["targetGap", "Gap at target", 0, 24, 0.5],
 ];
