@@ -209,6 +209,24 @@ Without suffixes, you'd see multiple `user.ts` files and have to guess which one
 
 ---
 
+## Arrows
+
+The site draws four kinds of arrow. **A request about "arrows" means all four** unless the user names one: a fix to the "Try it" arrows that leaves Squint or the hero arrows broken is not done. Check every kind on every page that draws it.
+
+| Kind   | What it is                                                                                      | Placed by                                                               | Drawn by                                                             | Look in `ARROWS`                |
+| ------ | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------- |
+| hint   | "Try it" arrow from a label to a `[data-hint]` control inside a demo pane (`figure[data-side]`) | `watchHints` in `src/rules/hints.ts`                                    | `src/rules/rule-lesson.client.ts`                                    | `hint`                          |
+| toggle | "Try it" arrow beside a `[data-hint]` toggle in a lesson's copy, outside any pane               | `watchHints`, the `!figure` branch                                      | `src/rules/rule-lesson.client.ts`                                    | `toggle`, with the `hint` brush |
+| Squint | Short arrows under Squint's notes, pointing down at each button                                 | `src/rules/button-hierarchy.astro` (Button Design)                      | `downArrow()` in `src/arrows.ts`                                     | `squint`                        |
+| hero   | Ghost arrows in the home hero's queue scene                                                     | `routeGhost()` and `retryGhost()` in `src/sections/hero/hero-scenes.ts` | `src/sections/hero/hero-scene.astro`, styled in `hero-prints.css.ts` | `hero`                          |
+
+- `src/arrows.ts` owns every arrow's geometry: the looks in `ARROWS`, `brush()` for the marker stroke and its notched head, `looped()` for a hint's curl, and `downArrow()`.
+- Hint targets are the `data-hint` attributes in the demo components (`src/rules/*-demo.astro`, `button-toggle.astro`, `table-segments.astro` and the rest). `src/rules/table-design.client.ts` moves `data-hint` to the first row's name as rows change, so its arrow follows. The "dead arrows" in `src/rules/table-design.ts` are pager copy, not drawn arrows.
+- **Arrow controls are per section.** In dev, `src/arrows-tuner.ts` (loaded by `src/layouts/site.astro`) tunes the arrows of one section at a time: each lesson card carries `data-arrows={sectionKey(...)}` (`rule-lesson.astro`) and the hero carries `data-arrows="hero"`. A section's own values go in `SECTIONS` in `src/arrows.ts`, over the site-wide `ARROWS`. A change the user asks for in one section stays in that section unless they say otherwise.
+- The rules every arrow keeps are tested in `tests/visual/arrows.test.ts`: the head points at its target and the nock at its word, every arrow is at least 24px long, no curve bends tighter than `ARROWS.hint.bend`, an arrow is straight where a straight one fits, arrows keep off each other and off the page's content where a free slot exists, and every head sits square on its stroke. Run it after any arrow change, and fix a rule it names rather than loosening it.
+
+---
+
 ## Summary
 
 | Scenario                          | Action                                         |
