@@ -17,7 +17,6 @@ export type Hint = {
   label: Box;
   // What the label and the line take up together.
   bounds: Box;
-  // Round the target, 4px out, its corners following the target's.
   ring: { box: Box; radius: number };
 } & PixelArrow;
 
@@ -155,6 +154,9 @@ function tightest(p0: Point, p1: Point, p2: Point, p3: Point) {
   return least;
 }
 
+/** How far a hint's ring sits out from its target. */
+const RING_GAP = 4;
+
 /** How far a bow eases off the golden turn, a step at a time, when it would bend too tight. */
 const EASES = [1, 3 / 4, 1 / 2, 1 / 4];
 
@@ -291,8 +293,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
     const w = ruler.offsetWidth;
     const h = ruler.offsetHeight;
     const marks = survey(card);
-    // The cells are wider than the centreline, so a line keeps off by half a cell and a hair.
-    const ink = hint.grid / 2 + 1;
+    const clearance = hint.grid / 2 + 1;
     const next: Hint[] = [];
     const local = (b: Box): Box => ({
       left: b.left - box.left,
@@ -309,8 +310,8 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         label: own,
         bounds: span(points, own),
         ring: {
-          box: grow(local(target.getBoundingClientRect()), 4),
-          radius: (parseFloat(getComputedStyle(target).borderRadius) || 0) + 4,
+          box: grow(local(target.getBoundingClientRect()), RING_GAP),
+          radius: (parseFloat(getComputedStyle(target).borderRadius) || 0) + RING_GAP,
         },
         ...pixels(points, hint),
       });
@@ -329,7 +330,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       const spine = [...way.curve, way.end];
       const keeps =
         way.gentle && holds(room, label)
-          ? (HINT_ROOMS.find((by) => clear(label, spine, others, ink, by)) ?? 0)
+          ? (HINT_ROOMS.find((by) => clear(label, spine, others, clearance, by)) ?? 0)
           : -1;
       return { label, spine, keeps };
     };

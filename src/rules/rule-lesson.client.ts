@@ -1,7 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { type Hint, watchHintReader, watchHints } from "./hints";
 import { lessonView, type SideKey } from "./rule-landing.view";
-import { hintKit, OUT, TABBED } from "./rule-landing.css";
+import { HINT_MOTION, hintKit, OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SVG = "http://www.w3.org/2000/svg";
@@ -135,7 +135,8 @@ class RuleLesson extends HTMLElement {
             const cell = document.createElementNS(SVG, "rect");
             attrs(cell, { x, y, width: hint.grid, height: hint.grid });
             cell.setAttribute("class", hintKit.cell);
-            cell.style.setProperty("--at", `${250 + (i / hint.cells.length) * 600}ms`);
+            const at = HINT_MOTION.trailAt + (i / hint.cells.length) * HINT_MOTION.trailFor;
+            cell.style.setProperty("--at", `${at}ms`);
             svg.append(cell);
           });
           const label = document.createElement("span");
@@ -150,9 +151,9 @@ class RuleLesson extends HTMLElement {
         const w = box.right - box.left;
         const h = box.bottom - box.top;
         attrs(mark.ring, { x: box.left, y: box.top, width: w, height: h, rx: radius });
-        // Each side grows the same 10px however long it is.
-        mark.ring.style.setProperty("--sx", String((w + 20) / w));
-        mark.ring.style.setProperty("--sy", String((h + 20) / h));
+        const out = 2 * HINT_MOTION.ringGrows;
+        mark.ring.style.setProperty("--sx", String((w + out) / w));
+        mark.ring.style.setProperty("--sy", String((h + out) / h));
         mark.label.style.left = `${hint.at.x}px`;
         mark.label.style.top = `${hint.at.y}px`;
         paint(mark);

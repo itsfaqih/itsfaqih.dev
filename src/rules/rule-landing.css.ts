@@ -380,7 +380,9 @@ export const text = {
 const HINT_BLUE = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
 const LIGHT = ":is(.light *)";
 
-// The ring grows about 10px out on every side as it fades, by a scale set per ring from its size.
+/** A hint's trail draws in from `trailAt` over `trailFor` ms. Then its ring pulses `ringGrows` px out. */
+export const HINT_MOTION = { trailAt: 250, trailFor: 600, ringGrows: 10 };
+
 const pulse = keyframes({
   from: { opacity: 0.55, transform: "scale(1)" },
   to: { opacity: 0, transform: "scale(var(--sx), var(--sy))" },
@@ -388,7 +390,6 @@ const pulse = keyframes({
 const blink = keyframes({ "50%": { opacity: 0 } });
 
 export const hintKit = {
-  // The hint's colour: the action yellow in the dark, the cyan's ink on paper.
   layer: style({
     position: "absolute",
     inset: 0,
@@ -430,8 +431,6 @@ export const hintKit = {
   haloOnPanel: style({
     backgroundColor: `color-mix(in oklab, ${palette["--panel"]} 60%, transparent)`,
   }),
-  // Once its arrow shows, a cell appears whole the moment its turn in --at comes, so the trail
-  // steps out square by square. One drawn after that shows at once.
   cell: style({
     fill: "var(--hint)",
     ["shapeRendering"]: "crispEdges",
@@ -452,9 +451,8 @@ export const hintKit = {
     transformBox: "fill-box",
     transformOrigin: "center",
   }),
-  // It starts once the trail has drawn.
   pulse: style({
-    animation: `${pulse} 1.6s ${OUT} 850ms infinite`,
+    animation: `${pulse} 1.6s ${OUT} ${HINT_MOTION.trailAt + HINT_MOTION.trailFor}ms infinite`,
     "@media": {
       [REDUCE]: {
         animation: "none",
@@ -462,8 +460,6 @@ export const hintKit = {
       },
     },
   }),
-  // A "press start" chip: ink on paper with a hard shadow in the hint's colour, the action yellow in
-  // the dark.
   label: style({
     "@layer": {
       [under1]: {

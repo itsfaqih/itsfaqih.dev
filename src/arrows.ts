@@ -27,7 +27,6 @@ export const ARROWS = {
     labelGap: 6,
     targetGap: 6,
   },
-  /** "Try it" arrows beside a toggle in a lesson's copy. They share the hint's pixels. */
   toggle: {
     reach: 41,
     labelGap: 4,
@@ -133,7 +132,6 @@ export function walk(points: Point[]) {
   return { s, total, at };
 }
 
-/** `angle` snapped to the nearest 45 degrees, the ways a pixel head can point. */
 export const octant = (angle: number) => Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
 
 export const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
@@ -201,11 +199,16 @@ export function brush(spine: Point[], look: Brush) {
 export type BrushArrow = ReturnType<typeof brush>;
 
 /**
- * A pixel arrow along `spine`, a centreline that ends at the tip and runs straight for its last
- * `head` cells. `cells` are the top-left corners of the `grid` px cells that draw it, in the order
- * they draw in: the trail from the label, then the head from its back row to the tip. `spine` is
- * the centreline as a path.
+ * The cell that joins two cells meeting only at a corner, which would read as a gap in the line:
+ * whichever of the two the curve, at `p`, passed nearer to.
  */
+function bridge(from: Point, to: Point, p: Point, grid: number) {
+  const off = (q: Point) => Math.hypot((q.x + 0.5) * grid - p.x, (q.y + 0.5) * grid - p.y);
+  const across = { x: to.x, y: from.y };
+  const down = { x: from.x, y: to.y };
+  return off(across) <= off(down) ? across : down;
+}
+
 export function pixels(spine: Point[], look: { grid: number; head: number }) {
   const { grid, head } = look;
   const { total, at } = walk(spine);
@@ -218,14 +221,7 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
     const c = cell(p);
     const last = path.at(-1);
     if (last && last.x === c.x && last.y === c.y) continue;
-    if (last && last.x !== c.x && last.y !== c.y) {
-      // Cells that met only at a corner read as a dashed line, so a diagonal step fills the corner
-      // the curve passed nearer to.
-      const off = (q: Point) => Math.hypot((q.x + 0.5) * grid - p.x, (q.y + 0.5) * grid - p.y);
-      const across = { x: c.x, y: last.y };
-      const down = { x: last.x, y: c.y };
-      path.push(off(across) <= off(down) ? across : down);
-    }
+    if (last && last.x !== c.x && last.y !== c.y) path.push(bridge(last, c, p, grid));
     path.push(c);
   }
   const { dir } = at(total);
@@ -235,7 +231,6 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
   const arrowhead: Point[] = [];
   for (let r = head; r >= 0; r--) {
     if (d.x && d.y) {
-      // A diagonal head is a right-angled triangle, its corner the tip, filled back row first.
       for (let i = 0; i <= r; i++) arrowhead.push({ x: tip.x - d.x * i, y: tip.y - d.y * (r - i) });
     } else if (r < head) {
       for (let w = -r; w <= r; w++)
