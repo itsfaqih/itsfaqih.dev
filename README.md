@@ -6,14 +6,10 @@ Personal website built with Astro and vanilla-extract. It includes a homepage, M
 
 ```bash
 vp install
-vp dev
+vp run dev
 ```
 
-`vp dev` runs `astro dev` at `http://127.0.0.1:5173`. If that port belongs to another project, use a separate port rather than stopping its server:
-
-```bash
-vp dev --port 5174 --strictPort
-```
+`vp run dev` starts `astro dev` on the LAN and prints a line like `LAN: http://192.168.1.20:5173/`. Open that URL on a phone on the same Wi-Fi; `127.0.0.1` and `localhost` reach only this Mac. It takes the first free port from 5173 up, so a server another checkout or project runs keeps its port. Astro runs one dev server per checkout: run `vp run dev` again and it prints the running server's URL instead of starting a second. Stop it with `vp run dev:stop` once you are done, and stop the servers of checkouts you no longer use the same way (`vp exec astro dev status` in a checkout shows whether it runs one). `vp dev` on its own starts Vite+'s plain Vite server, not Astro, so use `vp run dev`.
 
 The project uses [Vite+](https://viteplus.dev) with pnpm behind it. `package.json` pins pnpm in `packageManager` and `.node-version` pins Node; `vp` downloads both on first use. Cloudflare Pages reads `.node-version` but not `packageManager`, so its project settings set `PNPM_VERSION=12.16.1`. Add and remove dependencies with `vp add` and `vp remove`, and run other scripts with `vp run ...`. `pnpm-workspace.yaml` holds the Vite+ catalog and the packages allowed to run install scripts.
 

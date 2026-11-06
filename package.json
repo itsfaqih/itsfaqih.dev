@@ -6,7 +6,8 @@
     "#og/jsx-runtime": "./scripts/og/jsx-runtime.ts"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/dev.ts",
+    "dev:stop": "astro dev stop",
     "build": "astro build",
     "preview": "astro preview",
     "test": "vp test run --project unit",
