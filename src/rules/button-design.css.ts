@@ -1,8 +1,8 @@
+import { OUTLINE } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
-import { ARROWS, strokeVar } from "../arrows";
 import { under1, under2, under3 } from "../layers.css";
 const TABLET = "(max-width: 820px)";
 const PHONE = "(max-width: 640px)";
@@ -390,12 +390,18 @@ export const styles = {
       },
     },
   }),
-  squintArrow: style({
-    fill: "none",
+  // Outlined in its own colour so the brush's corners round off like marker.
+  squintInk: style({
+    fill: "currentColor",
     stroke: "currentColor",
-    strokeWidth: `var(${strokeVar("squint")}, ${ARROWS.squint.stroke})`,
-    strokeLinecap: "round",
+    strokeWidth: OUTLINE,
     strokeLinejoin: "round",
+  }),
+  // The arrow's mask: its centreline, stroked over the ink, draws the arrow in.
+  squintReveal: style({
+    fill: "none",
+    stroke: "white",
+    strokeLinecap: "round",
     strokeDasharray: 1,
     strokeDashoffset: 1,
     transition: "stroke-dashoffset 0s 200ms",

@@ -5,7 +5,9 @@ import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SVG = "http://www.w3.org/2000/svg";
-type Drawn = { svg: SVGSVGElement; path: SVGPathElement; label: HTMLElement; hint: Hint };
+type Drawn = { svg: SVGSVGElement; reveal: SVGPathElement; label: HTMLElement; hint: Hint };
+// Mask ids are document-wide, so every arrow on the page takes the next one.
+let masks = 0;
 
 /**
  * A lesson card (rule-lesson.astro). Its keys flip the demo between the ✕ and ✓ panes, which on
@@ -76,27 +78,35 @@ class RuleLesson extends HTMLElement {
     let drawn = new Map<string, Drawn>();
     let shown = false;
     const done = new Set<string>();
-    const paint = ({ svg, path, label, hint }: Drawn) => {
+    const paint = ({ svg, reveal, label, hint }: Drawn) => {
       const gone = !shown || done.has(hint.zone);
       svg.setAttribute("class", lessonView.hintSvg(gone));
-      path.setAttribute("class", lessonView.hintArrow(shown));
+      reveal.setAttribute("class", lessonView.hintReveal(shown));
       label.className = lessonView.hintLabel(hint.tilt, hint.zone === "copy", gone);
     };
     const draw = (hints: Hint[]) => {
       const next = new Map<string, Drawn>();
       for (const hint of hints) {
-        const key = `${hint.zone}-${hint.path}`;
+        const key = `${hint.zone}-${hint.ink}`;
         let mark = drawn.get(key);
         if (!mark) {
           const svg = document.createElementNS(SVG, "svg");
-          const path = document.createElementNS(SVG, "path");
-          path.setAttribute("d", hint.path);
-          path.setAttribute("pathLength", "1");
-          svg.append(path);
+          const mask = document.createElementNS(SVG, "mask");
+          mask.id = `hint-arrow-${++masks}`;
+          const reveal = document.createElementNS(SVG, "path");
+          reveal.setAttribute("d", hint.spine);
+          reveal.setAttribute("pathLength", "1");
+          reveal.setAttribute("stroke-width", String(hint.reveal));
+          mask.append(reveal);
+          const ink = document.createElementNS(SVG, "path");
+          ink.setAttribute("d", hint.ink);
+          ink.setAttribute("class", lessonView.hintInk);
+          ink.setAttribute("mask", `url(#${mask.id})`);
+          svg.append(mask, ink);
           const label = document.createElement("span");
           label.textContent = "Try it";
           layer.append(svg, label);
-          mark = { svg, path, label, hint };
+          mark = { svg, reveal, label, hint };
         }
         mark.hint = hint;
         mark.label.style.left = `${hint.at.x}px`;

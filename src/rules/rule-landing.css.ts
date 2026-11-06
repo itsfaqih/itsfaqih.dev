@@ -1,8 +1,8 @@
+import { OUTLINE } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
-import { ARROWS, strokeVar } from "../arrows";
 import { under1, under2, under3, under4, under5 } from "../layers.css";
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 
@@ -395,14 +395,24 @@ export const hintKit = {
     overflow: "visible",
     transition: `opacity 220ms ease`,
   }),
-  arrow: style({
+  // Outlined in its own colour so the brush's corners round off like marker.
+  ink: style({
+    "@layer": {
+      [under1]: {
+        fill: HINT_BLUE,
+        stroke: HINT_BLUE,
+        strokeWidth: OUTLINE,
+        strokeLinejoin: "round",
+      },
+    },
+  }),
+  // The arrow's mask: its centreline, stroked over the ink, draws the arrow in.
+  reveal: style({
     "@layer": {
       [under1]: {
         fill: "none",
-        stroke: HINT_BLUE,
-        strokeWidth: `var(${strokeVar("hint")}, ${ARROWS.hint.stroke})`,
+        stroke: "white",
         strokeLinecap: "round",
-        strokeLinejoin: "round",
         strokeDasharray: 1,
         strokeDashoffset: 1,
         transition: `stroke-dashoffset 700ms ${OUT} 250ms`,

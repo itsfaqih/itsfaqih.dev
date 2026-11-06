@@ -1,4 +1,12 @@
-import { ARROWS, ARROWS_CHANGED, downArrow, SECTIONS, strokeVar, type ArrowFamily } from "./arrows";
+import {
+  ARROWS,
+  ARROWS_CHANGED,
+  downArrow,
+  SECTIONS,
+  type ArrowFamily,
+  type Brush,
+  type BrushArrow,
+} from "./arrows";
 import { retryGhost, routeGhost } from "./sections/hero/hero-scenes";
 
 type Spec<K extends string> = [key: K, label: string, min: number, max: number, step: number];
@@ -44,10 +52,17 @@ const TITLES: Record<ArrowFamily, string> = {
   hero: "Hero queue arrows",
 };
 
+const BRUSH: Spec<keyof Brush>[] = [
+  ["tail", "Width at the nock", 0.1, 4, 0.05],
+  ["body", "Body width", 0.5, 8, 0.05],
+  ["head", "Head length", 2, 24, 0.5],
+  ["barb", "Head width", 2, 24, 0.5],
+  ["notch", "Notch depth", 0, 10, 0.1],
+];
 const HINT: Spec<keyof typeof ARROWS.hint>[] = [
-  ["stroke", "Stroke", 0.5, 5, 0.25],
-  ["wing", "Head length", 2, 20, 0.5],
-  ["spread", "Head angle (deg)", 5, 80, 0.5],
+  ...BRUSH,
+  ["loop", "Shortest curve to loop (0 off)", 0, 200, 1],
+  ["curl", "Loop radius", 2, 16, 0.5],
   ["reach", "Label distance", 8, 80, 1],
   ["length", "Shortest line", 0, 80, 1],
   ["bow", "Curve turn (tan)", 0.05, 1.5, 0.01],
@@ -60,16 +75,7 @@ const TOGGLE: Spec<keyof typeof ARROWS.toggle>[] = [
   ["labelGap", "Gap at label", 0, 24, 0.5],
   ["targetGap", "Gap at target", 0, 24, 0.5],
 ];
-const SQUINT: Spec<keyof typeof ARROWS.squint>[] = [
-  ["stroke", "Stroke", 0.5, 5, 0.25],
-  ["length", "Length", 4, 40, 0.5],
-  ["wing", "Head length", 1, 16, 0.5],
-  ["spread", "Head angle (deg)", 5, 80, 0.5],
-];
-const HERO: Spec<keyof typeof ARROWS.hero>[] = [
-  ["wing", "Head length", 1, 20, 0.5],
-  ["spread", "Head angle (deg)", 5, 80, 0.5],
-];
+const SQUINT: Spec<keyof typeof ARROWS.squint>[] = [...BRUSH, ["length", "Length", 4, 40, 0.5]];
 
 /** The knobs for the arrows a section draws. Squint and hero arrows live in one section each. */
 function knobsOf(key: string, el: HTMLElement): Knob[] {
@@ -84,7 +90,7 @@ function knobsOf(key: string, el: HTMLElement): Knob[] {
     ...(el.querySelector('[data-arrow="squint"]')
       ? bind("squint", ARROWS.squint, ARROWS.squint, SQUINT)
       : []),
-    ...(key === "hero" ? bind("hero", ARROWS.hero, ARROWS.hero, HERO) : []),
+    ...(key === "hero" ? bind("hero", ARROWS.hero, ARROWS.hero, BRUSH) : []),
   ];
 }
 
@@ -117,20 +123,32 @@ function survey() {
   }
 }
 
+/** Repaints a drawn arrow: its mask's centreline, the head a hero ghost keeps whole, and its ink. */
+function repaint(arrow: Element, { ink, spine, reveal }: BrushArrow, head?: string) {
+  const [line, cap] = arrow.querySelectorAll("mask path");
+  for (const path of [line, cap]) path?.setAttribute("stroke-width", String(reveal));
+  line?.setAttribute("d", spine);
+  if (head) cap?.setAttribute("d", head);
+  arrow.querySelector(":scope > path")?.setAttribute("d", ink);
+}
+
 /** Redraws every arrow on the page from the registry. */
 function apply() {
-  document.documentElement.style.setProperty(strokeVar("squint"), String(ARROWS.squint.stroke));
   const squint = downArrow(ARROWS.squint);
   for (const svg of document.querySelectorAll<SVGSVGElement>('svg[data-arrow="squint"]')) {
     svg.setAttribute("viewBox", `0 0 ${squint.width} ${squint.height}`);
     svg.setAttribute("width", String(squint.width));
     svg.setAttribute("height", String(squint.height));
-    svg.querySelector("path")?.setAttribute("d", squint.d);
+    repaint(svg, squint);
   }
-  for (const path of document.querySelectorAll<SVGPathElement>('path[data-arrow="route"]'))
-    path.setAttribute("d", routeGhost(Number(path.dataset.y)));
-  for (const path of document.querySelectorAll<SVGPathElement>('path[data-arrow="retry"]'))
-    path.setAttribute("d", retryGhost());
+  for (const g of document.querySelectorAll<SVGGElement>('g[data-arrow="route"]')) {
+    const arrow = routeGhost(Number(g.dataset.y));
+    repaint(g, arrow, arrow.head);
+  }
+  for (const g of document.querySelectorAll<SVGGElement>('g[data-arrow="retry"]')) {
+    const arrow = retryGhost();
+    repaint(g, arrow, arrow.head);
+  }
   window.dispatchEvent(new Event(ARROWS_CHANGED));
 }
 

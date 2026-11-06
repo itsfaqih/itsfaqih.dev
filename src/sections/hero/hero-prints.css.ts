@@ -1,3 +1,4 @@
+import { OUTLINE } from "../../arrows";
 import { palette } from "../../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../../when";
@@ -138,6 +139,34 @@ export const styles = {
     strokeDasharray: "3 4",
     strokeWidth: "1.4",
     opacity: 0.65,
+  }),
+  // A brush arrow's ink, outlined in its own colour so its corners round off like marker.
+  inkBrush: style({
+    fill: palette["--text"],
+    stroke: palette["--text"],
+  }),
+  hueBrush: style({
+    fill: "var(--hue)",
+    stroke: "var(--hue)",
+  }),
+  ghostBrush: style({
+    strokeWidth: OUTLINE,
+    strokeLinejoin: "round",
+    opacity: 0.65,
+  }),
+  // A ghost arrow's mask cuts its shaft into dashes. Square ends keep each gap open however wide the
+  // mask runs, and the layer's fade already reaches the ink, so the mask stays opaque.
+  ghostReveal: style({
+    fill: "none",
+    stroke: "white",
+    strokeOpacity: 1,
+    strokeDasharray: "3 4",
+  }),
+  // Dashes would chop the notched head to fragments, so the mask keeps it whole.
+  ghostHead: style({
+    fill: "none",
+    stroke: "white",
+    strokeOpacity: 1,
   }),
   // The prints' fades: a layer fades all its ink by --fade, and the shapes the morph picks up stay
   // whole, hidden while the morph carries them.
