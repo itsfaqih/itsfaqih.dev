@@ -14,6 +14,7 @@ const HINT_SHORT = 26;
 // every curved arrow has the same length and bend.
 const HINT_GAP = 26;
 const HINT_SHIFT = 14;
+const HINT_WING = 8;
 // The room a label keeps from words level with it, so it never reads as part of a line of text.
 const HINT_BERTH = 40;
 // Wider rings a label falls back to when every slot at HINT_GAP is taken.
@@ -150,7 +151,10 @@ function arc(label: Box, end: Point, bow: number) {
       y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * end.y,
     };
   });
-  return { start, c1, c2, end, wings: wings(c2, end), along, nx, ny };
+  // A short arc still turns under the wings, so a head set on the tangent at the tip lands one
+  // wing on the line. Aim it along the stroke's last stretch instead.
+  const tail = [...along].reverse().find((p) => Math.hypot(end.x - p.x, end.y - p.y) >= HINT_WING);
+  return { start, c1, c2, end, wings: wings(tail ?? start, end), along, nx, ny };
 }
 
 /** The two strokes of an arrowhead at `end`, for a line arriving from `from`. */
@@ -159,8 +163,8 @@ function wings(from: Point, end: Point) {
   const ux = (end.x - from.x) / length;
   const uy = (end.y - from.y) / length;
   const wing = (turn: number) => ({
-    x: end.x - (ux * Math.cos(turn) - uy * Math.sin(turn)) * 8,
-    y: end.y - (ux * Math.sin(turn) + uy * Math.cos(turn)) * 8,
+    x: end.x - (ux * Math.cos(turn) - uy * Math.sin(turn)) * HINT_WING,
+    y: end.y - (ux * Math.sin(turn) + uy * Math.cos(turn)) * HINT_WING,
   });
   return [wing(0.5), wing(-0.5)] as const;
 }
