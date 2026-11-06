@@ -76,7 +76,6 @@ const TOGGLE: Spec<keyof typeof ARROWS.toggle>[] = [
   ["targetGap", "Gap at target", 0, 24, 0.5],
 ];
 const SQUINT: Spec<keyof typeof ARROWS.squint>[] = [...BRUSH, ["length", "Length", 4, 40, 0.5]];
-const HERO: Spec<keyof typeof ARROWS.hero>[] = [...BRUSH];
 
 /** The knobs for the arrows a section draws. Squint and hero arrows live in one section each. */
 function knobsOf(key: string, el: HTMLElement): Knob[] {
@@ -91,7 +90,7 @@ function knobsOf(key: string, el: HTMLElement): Knob[] {
     ...(el.querySelector('[data-arrow="squint"]')
       ? bind("squint", ARROWS.squint, ARROWS.squint, SQUINT)
       : []),
-    ...(key === "hero" ? bind("hero", ARROWS.hero, ARROWS.hero, HERO) : []),
+    ...(key === "hero" ? bind("hero", ARROWS.hero, ARROWS.hero, BRUSH) : []),
   ];
 }
 

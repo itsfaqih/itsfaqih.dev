@@ -1,3 +1,4 @@
+import { OUTLINE } from "../../arrows";
 import { palette } from "../../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../../when";
@@ -149,7 +150,7 @@ export const styles = {
     stroke: "var(--hue)",
   }),
   ghostBrush: style({
-    strokeWidth: 0.6,
+    strokeWidth: OUTLINE,
     strokeLinejoin: "round",
     opacity: 0.65,
   }),

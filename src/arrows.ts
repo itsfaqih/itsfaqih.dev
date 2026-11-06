@@ -93,6 +93,9 @@ export function sectionKey(path: string, title: string) {
 /** The window event the tuner fires after it edits ARROWS, so drawn arrows redraw. */
 export const ARROWS_CHANGED = "arrows";
 
+/** The width of the outline that rounds a brush arrow's filled edges. */
+export const OUTLINE = 0.6;
+
 export type Brush = { tail: number; body: number; head: number; barb: number; notch: number };
 
 /** How far along its centreline the brush reaches full width. */
@@ -104,13 +107,13 @@ const lerp = (a: Point, b: Point, t: number): Point => ({
   x: a.x + (b.x - a.x) * t,
   y: a.y + (b.y - a.y) * t,
 });
-const unit = (x: number, y: number): Point => {
+export const unit = (x: number, y: number): Point => {
   const l = Math.hypot(x, y) || 1;
   return { x: x / l, y: y / l };
 };
 
 /** A polyline with the distance walked to each of its points, and the point at any distance. */
-function walk(points: Point[]) {
+export function walk(points: Point[]) {
   const s: number[] = [];
   points.reduce((sum, p, i) => {
     const q = points[i - 1] ?? p;
@@ -121,7 +124,7 @@ function walk(points: Point[]) {
   const total = s.at(-1) ?? 0;
   const at = (d: number) => {
     const found = s.findIndex((v) => v >= d);
-    const i = found < 1 ? (found === 0 ? 1 : points.length - 1) : found;
+    const i = found < 0 ? points.length - 1 : Math.max(1, found);
     const a = points[i - 1] ?? { x: 0, y: 0 };
     const b = points[i] ?? a;
     const span = (s[i] ?? 0) - (s[i - 1] ?? 0);
@@ -167,7 +170,7 @@ export function looped(points: Point[], loop: number, curl: number) {
   ];
 }
 
-const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
+export const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
 
 /**
  * A marker arrow along `spine`, a centreline that ends at the tip and runs straight for its last
@@ -188,15 +191,14 @@ export function brush(spine: Point[], look: Brush) {
   // The body runs on into the notch so the two overlap and no seam shows between them.
   const stop = total - look.head + look.notch;
   const body = [...fine.filter((_, i) => (s[i] ?? 0) < stop), at(stop).p];
-  const reach = walk(body).s;
-  const length = reach.at(-1) || 1;
+  const reach = [...s.filter((v) => v < stop), stop];
   const left: Point[] = [];
   const right: Point[] = [];
   body.forEach((p, i) => {
     const ahead = body[i + 1] ?? p;
     const behind = body[i - 1] ?? p;
     const t = unit(ahead.x - behind.x, ahead.y - behind.y);
-    const swell = Math.sin((Math.min((reach[i] ?? 0) / length / SWELL, 1) * Math.PI) / 2);
+    const swell = Math.sin((Math.min((reach[i] ?? 0) / Math.max(stop, 1) / SWELL, 1) * Math.PI) / 2);
     const half = (look.tail + (look.body - look.tail) * swell) / 2;
     left.push({ x: p.x - t.y * half, y: p.y + t.x * half });
     right.push({ x: p.x + t.y * half, y: p.y - t.x * half });

@@ -3,6 +3,7 @@ import {
   arrowsFor,
   brush,
   looped,
+  walk,
   PHI,
   type BrushArrow,
   type HintLook,
@@ -157,10 +158,7 @@ function arc(label: Box, target: Box, bow: number, look: HintLook) {
   });
   const line = looped(curve, look.loop, look.curl);
   const along = line.slice(1, -1);
-  const length = line.slice(1).reduce((sum, p, i) => {
-    const q = line[i] ?? p;
-    return sum + Math.hypot(p.x - q.x, p.y - q.y);
-  }, 0);
+  const length = walk(line).total;
   // How far the head leans off square to the page, plus a hair for an arc that sags rather than
   // arches, so a caller picking between the two sides takes the one that lands straighter.
   const middle = curve[15] ?? start;
@@ -315,12 +313,16 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         way.spine.map((p) => ({ x: p.x - box.left, y: p.y - box.top })),
         hint,
       );
-    const pad = (b: Box) => ({
-      left: b.left - HINT_CLEAR,
-      right: b.right + HINT_CLEAR,
-      top: b.top - HINT_CLEAR,
-      bottom: b.bottom + HINT_CLEAR,
+    const grow = (by: number) => (b: Box) => ({
+      left: b.left - by,
+      right: b.right + by,
+      top: b.top - by,
+      bottom: b.bottom + by,
     });
+    const pad = grow(HINT_CLEAR);
+    // The ink is wider than the centreline the rasters test, so what an arc must miss grows by half
+    // its width and a hair.
+    const inked = grow(hint.body / 2 + 1);
     const curved: {
       zone: string;
       t: Box;
@@ -357,7 +359,8 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         : beside(t, w, h, toggle).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
       if (near) {
         const look = { ...hint, labelGap: toggle.labelGap, targetGap: toggle.targetGap };
-        const way = bowed(near, t, 1, look).find((a) => !a.curled || !a.along.some(covered.has));
+        const struck = raster(box, [...solid.map(inked), t]);
+        const way = bowed(near, t, 1, look).find((a) => !a.curled || !a.along.some(struck.has));
         const mid = centre(near);
         if (way)
           next.push({
@@ -368,13 +371,13 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           });
         continue;
       }
-      const crossed = raster(box, [...solid.filter((r) => !holds(r, t)), t]);
+      const crossed = raster(box, [...solid.filter((r) => !holds(r, t)).map(inked), t]);
       const blocked = raster(box, [...firm, t]);
       const words = raster(
         box,
         marks.filter((m) => m.glyphs && !target.contains(m.e)).map((m) => m.box),
       );
-      const threaded = raster(box, [...firm.filter((r) => !holds(r, t)), t]);
+      const threaded = raster(box, [...firm.filter((r) => !holds(r, t)).map(inked), t]);
       const cells = [...(figure ?? card).querySelectorAll("td, th")].map((e) =>
         e.getBoundingClientRect(),
       );

@@ -1,4 +1,4 @@
-import { ARROWS, brush, type Point } from "../../arrows";
+import { ARROWS, brush, fmt, type Point, unit } from "../../arrows";
 import { boxCentre, type Outline } from "./hero-morph";
 import {
   ABSORBED_SCALE,
@@ -63,14 +63,12 @@ function arrowed(line: Point[]) {
   const { head, notch } = ARROWS.hero;
   const tip = line.at(-1)!;
   const from = line.at(-2)!;
-  const run = Math.hypot(tip.x - from.x, tip.y - from.y) || 1;
-  const dir = { x: (tip.x - from.x) / run, y: (tip.y - from.y) / run };
+  const dir = unit(tip.x - from.x, tip.y - from.y);
   const back = (by: number) => ({ x: tip.x - dir.x * by, y: tip.y - dir.y * by });
   const before = line.filter((p) => Math.hypot(tip.x - p.x, tip.y - p.y) > head);
-  const at = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
   return {
     ...brush([...before, back(head), tip], ARROWS.hero),
-    head: `M${at(back(head + notch))} L${at(back(-1))}`,
+    head: `M${fmt(back(head + notch))} L${fmt(back(-1))}`,
   };
 }
 

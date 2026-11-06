@@ -1,3 +1,4 @@
+import { OUTLINE } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -400,7 +401,7 @@ export const hintKit = {
       [under1]: {
         fill: HINT_BLUE,
         stroke: HINT_BLUE,
-        strokeWidth: 0.6,
+        strokeWidth: OUTLINE,
         strokeLinejoin: "round",
       },
     },

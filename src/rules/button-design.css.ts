@@ -1,3 +1,4 @@
+import { OUTLINE } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
@@ -393,7 +394,7 @@ export const styles = {
   squintInk: style({
     fill: "currentColor",
     stroke: "currentColor",
-    strokeWidth: 0.6,
+    strokeWidth: OUTLINE,
     strokeLinejoin: "round",
   }),
   // The arrow's mask: its centreline, stroked over the ink, draws the arrow in.
