@@ -11,10 +11,12 @@ const HINT_FAR = 130;
 // How far a toggle in the copy sits from its label, which points at it in a straight line.
 const HINT_SHORT = 26;
 // A label's gap from its target's edge, and how far it steps sideways off the edge's middle, so
-// every curved arrow has the same length and bend.
+// every arrow from the first ring has the same length.
 const HINT_GAP = 26;
 const HINT_SHIFT = 14;
 const HINT_WING = 8;
+// The shortest arrow that bends. Below it, the bend folds into a hook beside the word.
+const HINT_BEND = 40;
 // The room a label keeps from words level with it, so it never reads as part of a line of text.
 const HINT_BERTH = 40;
 // Wider rings a label falls back to when every slot at HINT_GAP is taken.
@@ -131,14 +133,15 @@ const EDGES = ["top", "bottom", "left", "right"] as const;
 
 /**
  * A hand-drawn arc from the label to `end`, bowed to one side by `bow` (-1 to 1, straight at 0),
- * with its head.
+ * with its head. An arc shorter than HINT_BEND is straight whatever `bow` asks.
  */
 function arc(label: Box, end: Point, bow: number) {
   const start = exit(label, end, 6);
   const dx = end.x - start.x;
   const dy = end.y - start.y;
-  const nx = -dy * 0.32 * bow;
-  const ny = dx * 0.32 * bow;
+  const bend = Math.hypot(dx, dy) < HINT_BEND ? 0 : bow;
+  const nx = -dy * 0.32 * bend;
+  const ny = dx * 0.32 * bend;
   // The start lies on the line from the label's centre to `end`, so a first control point on that
   // line makes the tail leave straight out of the word. The bow bends only the far half.
   const c1 = { x: start.x + dx * 0.2, y: start.y + dy * 0.2 };
@@ -280,8 +283,8 @@ function survey(things: Element[]): Mark[] {
 
 /**
  * An arrow to every `[data-hint]` in the card, so readers know the demo takes input. A toggle in
- * the copy gets a short straight one from right beside it. Anything else gets a short curve from
- * the first clear spot in HINT_SPOTS, landing on the middle of an edge, so every pane reads the
+ * the copy gets a short straight one from right beside it. Anything else gets an arrow from the
+ * first clear spot in HINT_SPOTS, landing on the middle of an edge, so every pane reads the
  * same. Only when no spot is clear does the label search the pane for empty space. Each fades
  * once the reader touches the pane it points into.
  */

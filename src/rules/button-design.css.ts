@@ -321,25 +321,9 @@ export const styles = {
   cardRow: style({
     marginTop: "16px",
     gap: "8px",
-    transition: "margin-top 200ms ease, row-gap 200ms ease",
-    selectors: {
-      // Room above each row for the notes Squint pins to the buttons.
-      [`&${SQUINT}`]: {
-        marginTop: "36px",
-        rowGap: "38px",
-      },
-    },
     "@media": {
       [PHONE]: {
         gap: "6px",
-        selectors: {
-          [`&${SQUINT}`]: {
-            rowGap: "38px",
-          },
-        },
-      },
-      [REDUCE]: {
-        transition: "none",
       },
     },
   }),
@@ -406,8 +390,8 @@ export const styles = {
     },
   }),
   squintArrow: style({
-    width: "14px",
-    height: "22px",
+    width: "10px",
+    height: "14px",
     fill: "none",
     stroke: "currentColor",
     strokeWidth: 2,
@@ -421,10 +405,6 @@ export const styles = {
         strokeDashoffset: 0,
         transition: "stroke-dashoffset 500ms ease 220ms",
       },
-      // The middle arrow bends the other way, so the three read as drawn by hand.
-      [`:nth-child(2) > * > &`]: {
-        scale: "-1 1",
-      },
     },
     "@media": {
       [REDUCE]: {
@@ -434,7 +414,6 @@ export const styles = {
     },
   }),
   squintSay: style({
-    display: "none",
     maxWidth: "min(100%, 380px)",
     margin: 0,
     fontSize: "13px",
@@ -442,9 +421,25 @@ export const styles = {
     textAlign: "center",
     textWrap: "pretty",
     color: palette["--mute"],
+    // Always in the layout, so turning Squint on moves nothing.
+    visibility: "hidden",
+    opacity: 0,
+    transition: "opacity 200ms ease, visibility 0s 200ms",
     selectors: {
       [`&${SQUINT}`]: {
-        display: "block",
+        visibility: "inherit",
+        opacity: 1,
+        transition: "opacity 220ms ease 120ms",
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        transition: "none",
+        selectors: {
+          [`&${SQUINT}`]: {
+            transition: "none",
+          },
+        },
       },
     },
   }),
