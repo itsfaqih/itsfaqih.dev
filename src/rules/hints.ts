@@ -105,13 +105,14 @@ function slot(t: Box, { edge, dir, lean }: Slot, gap: number, w: number, h: numb
  * A hand-drawn arc from the label to the target, its head still to add. It leaves the label on a
  * ray from the label's centre and lands on a ray into the target's centre, so the nock points back
  * at the word and the head at the target. Both rays turn off the line between the centres by the
- * same angle, to the `side` given, so even a label level with its target draws a curve.
+ * angle whose tangent is `bow`, its sign the side, so even a label level with its target draws a
+ * curve.
  */
-function arc(label: Box, target: Box, side: 1 | -1, look: HintLook) {
+function arc(label: Box, target: Box, bow: number, look: HintLook) {
   const from = centre(label);
   const to = centre(target);
   const heading = Math.atan2(to.y - from.y, to.x - from.x);
-  const turn = Math.atan(side * look.bow);
+  const turn = Math.atan(bow);
   const out = { x: Math.cos(heading + turn), y: Math.sin(heading + turn) };
   const into = { x: Math.cos(heading - turn), y: Math.sin(heading - turn) };
   const start = exit(label, out, look.labelGap);
@@ -128,10 +129,49 @@ function arc(label: Box, target: Box, side: 1 | -1, look: HintLook) {
   return { start, c1, c2, neck, end, skew };
 }
 
-/** The arc to whichever side lands its head squarer, as the centreline the brush paints. */
+/** The smallest radius a cubic Bézier bends through, sampled along it. */
+function tightest(p0: Point, p1: Point, p2: Point, p3: Point) {
+  const d = (a: Point, b: Point) => ({ x: b.x - a.x, y: b.y - a.y });
+  const [a, b, c] = [d(p0, p1), d(p1, p2), d(p2, p3)];
+  const [e, f] = [d(a, b), d(b, c)];
+  let least = Infinity;
+  for (let i = 0; i <= 16; i++) {
+    const t = i / 16;
+    const u = 1 - t;
+    const v = {
+      x: u * u * a.x + 2 * u * t * b.x + t * t * c.x,
+      y: u * u * a.y + 2 * u * t * b.y + t * t * c.y,
+    };
+    const w = { x: u * e.x + t * f.x, y: u * e.y + t * f.y };
+    const cross = Math.abs(v.x * w.y - v.y * w.x);
+    // The derivatives' factors of 3 and 6 leave the radius |B'|³/|B'×B''| a factor of 3/2.
+    if (cross) least = Math.min(least, (1.5 * Math.hypot(v.x, v.y) ** 3) / cross);
+  }
+  return least;
+}
+
+/** How far a bow eases off the golden turn, a step at a time, when it would bend too tight. */
+const EASES = [1, 3 / 4, 1 / 2, 1 / 4];
+
+/**
+ * The arc to whichever side lands its head squarer, as the centreline the brush paints. Where both
+ * sides bend tighter than the look allows, the bow eases until one does not. Where none does, as
+ * when a label sits too near its target to leave room for the head, the gentlest arc stands in and
+ * the way is not `gentle`.
+ */
 function bowed(label: Box, target: Box, look: HintLook) {
-  const [a, b] = [arc(label, target, 1, look), arc(label, target, -1, look)];
-  const { start, c1, c2, neck, end } = a.skew <= b.skew ? a : b;
+  let best: (ReturnType<typeof arc> & { bend: number }) | undefined;
+  search: for (const ease of EASES) {
+    const sides = [1, -1]
+      .map((side) => arc(label, target, side * ease * look.bow, look))
+      .sort((a, b) => a.skew - b.skew);
+    for (const a of sides) {
+      const bend = tightest(a.start, a.c1, a.c2, a.neck);
+      if (!best || bend > best.bend) best = { ...a, bend };
+      if (bend >= look.bend) break search;
+    }
+  }
+  const { start, c1, c2, neck, end, bend } = best!;
   const curve = Array.from({ length: 31 }, (_, i) => {
     const t = i / 30;
     const u = 1 - t;
@@ -140,7 +180,7 @@ function bowed(label: Box, target: Box, look: HintLook) {
       y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * neck.y,
     };
   });
-  return { curve, end, length: walk(curve).total };
+  return { curve, end, length: walk(curve).total, gentle: bend >= look.bend };
 }
 
 /** The line the brush paints along an arc, with its curl and its head. */
@@ -156,18 +196,14 @@ function reach(t: Box, s: Slot, w: number, h: number, look: HintLook, longest: n
     const label = slot(t, s, gap, w, h);
     const step = { label, way: bowed(label, t, look) };
     steps.push(step);
-    if (step.way.length >= longest || gap >= HINT_STRETCH) return { steps, last: step };
+    if ((step.way.gentle && step.way.length >= longest) || gap >= HINT_STRETCH)
+      return { steps, last: step };
   }
 }
 
-/**
- * The nearest label of a `reach` whose curve runs `length` before the head, with the line the brush
- * paints from it.
- */
-function pitch({ steps, last }: ReturnType<typeof reach>, length: number, look: HintLook) {
-  const { label, way } = steps.find((step) => step.way.length >= length) ?? last;
-  return { label, spine: spineOf(way, look) };
-}
+/** The nearest label of a `reach` whose curve runs `length` before the head without a hook. */
+const pitch = ({ steps, last }: ReturnType<typeof reach>, length: number) =>
+  steps.find(({ way }) => way.gentle && way.length >= length) ?? last;
 
 /** Whether an element paints a fill, as a skeleton bar standing in for a line of text does. */
 const painted = ({ backgroundColor, backgroundImage }: CSSStyleDeclaration) =>
@@ -285,23 +321,24 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       hint.length * 2,
     ];
     // A label and its line, with the widest room it keeps off the marks: 0 when it lands on one,
-    // and -1 when it leaves its pane.
+    // and -1 when it leaves its pane or its curve hooks.
     type Way = { label: Box; spine: Point[]; keeps: number };
-    const weigh = (label: Box, spine: Point[], room: Box, others: Box[]): Way => ({
-      label,
-      spine,
-      keeps: holds(room, label)
-        ? (HINT_ROOMS.find((by) => clear(label, spine, others, ink, by)) ?? 0)
-        : -1,
-    });
+    const weigh = (label: Box, way: ReturnType<typeof bowed>, room: Box, others: Box[]): Way => {
+      const spine = spineOf(way, hint);
+      const keeps =
+        way.gentle && holds(room, label)
+          ? (HINT_ROOMS.find((by) => clear(label, spine, others, ink, by)) ?? 0)
+          : -1;
+      return { label, spine, keeps };
+    };
     const keeps = (by: number) => (way: Way) => way.keeps >= by;
     // Every slot at every length round `t`.
     const tiers = (t: Box, room: Box, others: Box[]) => {
       const reaches = HINT_SLOTS.map((s) => reach(t, s, w, h, hint, Math.max(...lengths)));
       return lengths.map((length) =>
         reaches.map((r) => {
-          const { label, spine } = pitch(r, length, hint);
-          return weigh(label, spine, room, others);
+          const { label, way } = pitch(r, length);
+          return weigh(label, way, room, others);
         }),
       );
     };
@@ -321,7 +358,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         const look = { ...hint, labelGap: toggle.labelGap, targetGap: toggle.targetGap };
         const near = TOGGLE_SLOTS.map((s) => slot(t, s, toggle.reach, w, h))
           .filter((label) => holds(box, label))
-          .map((label) => weigh(label, spineOf(bowed(label, t, look), look), box, others));
+          .map((label) => weigh(label, bowed(label, t, look), box, others));
         let far: Way[] | undefined;
         const pick =
           HINT_ROOMS.map(

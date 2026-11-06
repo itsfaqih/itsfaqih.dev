@@ -27,6 +27,8 @@ export const ARROWS = {
     // control point sits 1/φ² of the curve out from its end.
     bow: 1 / PHI ** 2,
     handle: 1 / PHI ** 2,
+    // The tightest a curve may bend, as a radius. A bow that would bend tighter eases off.
+    bend: 20,
     labelGap: 6,
     targetGap: 6,
   },

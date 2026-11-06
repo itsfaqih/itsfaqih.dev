@@ -66,6 +66,7 @@ const HINT: Spec<keyof typeof ARROWS.hint>[] = [
   ["length", "Curve length", 12, 120, 1],
   ["bow", "Curve turn (tan)", 0.05, 1.5, 0.01],
   ["handle", "Curve fullness", 0.1, 0.6, 0.01],
+  ["bend", "Tightest bend (radius)", 0, 60, 1],
   ["labelGap", "Gap at label", 0, 24, 0.5],
   ["targetGap", "Gap at target", 0, 24, 0.5],
 ];
