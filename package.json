@@ -17,7 +17,10 @@
     "test:visual": "astro build && vp test run --project visual",
     "test:visual:update": "astro build && UPDATE_VISUAL=1 vp test run --project visual",
     "test:behavior": "astro build && vp test run --project behavior",
-    "test:behavior:update": "astro build && UPDATE_BEHAVIOR=1 vp test run --project behavior"
+    "test:behavior:update": "astro build && UPDATE_BEHAVIOR=1 vp test run --project behavior",
+    "test:sounds": "astro build && node scripts/verify-sounds.ts",
+    "verify": "vp run lint && vp fmt --check . && vp run typecheck && vp run test && astro build && vp test run --project visual && vp test run --project behavior && node scripts/verify-sounds.ts",
+    "prepare": "lefthook install && astro sync"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.5",
@@ -42,6 +45,7 @@
     "browserslist": "4.28.1",
     "fontkit": "^2.0.4",
     "jsdom": "^30.1.3",
+    "lefthook": "^2.2.2",
     "lightningcss": "1.33.0",
     "pixelmatch": "^8.0.0",
     "playwright": "^1.64.1",
