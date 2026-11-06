@@ -116,22 +116,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Less padding",
-        answer: "lead",
+        answer: "open",
         choices: [
           {
-            id: "text",
-            label: "Rename, text only",
-            note: "With no icon, there's no hidden white space. Even padding already looks even.",
+            id: "download",
+            label: "Download, 12 left and 16 right",
+            note: "Already trimmed on the icon's side.",
           },
           {
-            id: "lead",
-            label: "Download, with a download icon",
-            note: "Trim the icon's side. The icon's own white space makes up the rest.",
+            id: "open",
+            label: "Open, 16 left and 16 right",
+            note: "Its icon is on the right, and that side still has the full 16px.",
           },
           {
-            id: "only",
-            label: "Search, icon only",
-            note: "There's no text to balance against. Make it a square instead.",
+            id: "next",
+            label: "Next, 16 left and 12 right",
+            note: "Already trimmed on the icon's side.",
           },
         ],
       },
