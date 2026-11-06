@@ -1,7 +1,7 @@
 export type Point = { x: number; y: number };
 
 /** The golden ratio. A hint's curve takes its proportions from it. */
-export const PHI = (1 + Math.sqrt(5)) / 2;
+const PHI = (1 + Math.sqrt(5)) / 2;
 
 /**
  * How every arrow on the site looks, by family, in px. Each family's brush is a marker stroke:
@@ -20,7 +20,9 @@ export const ARROWS = {
     // A curve at least `loop` long before its neck curls once, `curl` in radius; 0 never curls.
     loop: 64,
     curl: 7,
-    reach: 40,
+    // How long the curve runs before the head. A label steps out from its target until its curve
+    // is this long. Where that lands on words or controls it tries shorter curves, then longer ones.
+    length: 48,
     // Each end turns off the line between the centres by the angle whose tangent is 1/φ², and each
     // control point sits 1/φ² of the curve out from its end.
     bow: 1 / PHI ** 2,
@@ -55,7 +57,7 @@ export const ARROWS = {
 
 export type ArrowFamily = keyof typeof ARROWS;
 export type HintLook = typeof ARROWS.hint;
-export type ToggleLook = typeof ARROWS.toggle;
+type ToggleLook = typeof ARROWS.toggle;
 type SectionArrows = { hint?: Partial<HintLook>; toggle?: Partial<ToggleLook> };
 
 /**
@@ -196,7 +198,9 @@ export function brush(spine: Point[], look: Brush) {
     const ahead = body[i + 1] ?? p;
     const behind = body[i - 1] ?? p;
     const t = unit(ahead.x - behind.x, ahead.y - behind.y);
-    const swell = Math.sin((Math.min((reach[i] ?? 0) / Math.max(stop, 1) / SWELL, 1) * Math.PI) / 2);
+    const swell = Math.sin(
+      (Math.min((reach[i] ?? 0) / Math.max(stop, 1) / SWELL, 1) * Math.PI) / 2,
+    );
     const half = (look.tail + (look.body - look.tail) * swell) / 2;
     left.push({ x: p.x - t.y * half, y: p.y + t.x * half });
     right.push({ x: p.x + t.y * half, y: p.y - t.x * half });

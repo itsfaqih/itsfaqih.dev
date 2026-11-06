@@ -5,9 +5,43 @@ import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SVG = "http://www.w3.org/2000/svg";
-type Drawn = { svg: SVGSVGElement; reveal: SVGPathElement; label: HTMLElement; hint: Hint };
+type Drawn = {
+  halo: HTMLElement;
+  svg: SVGSVGElement;
+  reveal: SVGPathElement;
+  label: HTMLElement;
+  hint: Hint;
+};
 // Mask ids are document-wide, so every arrow on the page takes the next one.
 let masks = 0;
+
+// How far the blur behind a hint reaches past its line and label, feather included.
+const HALO = 16;
+
+/**
+ * Fits the blur behind a hint to the hint, masked solid round the arrow's line and its label and
+ * feathered out past them, so it has no hard edge.
+ */
+function halo(e: HTMLElement, { spine, label, bounds }: Hint) {
+  const left = bounds.left - HALO;
+  const top = bounds.top - HALO;
+  const h = label.bottom - label.top;
+  const svg =
+    `<svg xmlns="${SVG}"><filter id="f" filterUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">` +
+    `<feGaussianBlur stdDeviation="3"/></filter><g filter="url(#f)"><g transform="translate(${-left} ${-top})">` +
+    `<path d="${spine}" fill="none" stroke="#000" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<rect x="${label.left - 6}" y="${label.top - 5}" width="${label.right - label.left + 12}" height="${h + 10}" rx="${h / 2 + 5}"/>` +
+    `</g></g></svg>`;
+  const mask = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  Object.assign(e.style, {
+    left: `${left}px`,
+    top: `${top}px`,
+    width: `${bounds.right + HALO - left}px`,
+    height: `${bounds.bottom + HALO - top}px`,
+    maskImage: mask,
+    webkitMaskImage: mask,
+  });
+}
 
 /**
  * A lesson card (rule-lesson.astro). Its keys flip the demo between the ✕ and ✓ panes, which on
@@ -78,8 +112,9 @@ class RuleLesson extends HTMLElement {
     let drawn = new Map<string, Drawn>();
     let shown = false;
     const done = new Set<string>();
-    const paint = ({ svg, reveal, label, hint }: Drawn) => {
+    const paint = ({ halo, svg, reveal, label, hint }: Drawn) => {
       const gone = !shown || done.has(hint.zone);
+      halo.className = lessonView.hintHalo(hint.zone === "copy", gone);
       svg.setAttribute("class", lessonView.hintSvg(gone));
       reveal.setAttribute("class", lessonView.hintReveal(shown));
       label.className = lessonView.hintLabel(hint.tilt, hint.zone === "copy", gone);
@@ -105,8 +140,10 @@ class RuleLesson extends HTMLElement {
           svg.append(mask, ink);
           const label = document.createElement("span");
           label.textContent = "Try it";
-          layer.append(svg, label);
-          mark = { svg, reveal, label, hint };
+          const blur = document.createElement("div");
+          halo(blur, hint);
+          layer.append(blur, svg, label);
+          mark = { halo: blur, svg, reveal, label, hint };
         }
         mark.hint = hint;
         mark.label.style.left = `${hint.at.x}px`;
@@ -114,8 +151,9 @@ class RuleLesson extends HTMLElement {
         paint(mark);
         next.set(key, mark);
       }
-      for (const [key, { svg, label }] of drawn) {
+      for (const [key, { halo, svg, label }] of drawn) {
         if (next.has(key)) continue;
+        halo.remove();
         svg.remove();
         label.remove();
       }
