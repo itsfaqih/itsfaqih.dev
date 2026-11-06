@@ -128,29 +128,27 @@ const key = [styles.key, styles.sm, styles.flat];
     <ButtonIcons slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={4} level={icons.levels[0]}
-    >Every button in this file toolbar has 16px of padding on both sides. Tap the one that will look lopsided.
+    >Someone trimmed the icon side on some of these buttons. Tap the one that still looks lopsided.
     <div slot="board" class={quiz.screen}>
       <span class={quiz.bar}>
-        <QuizChoice level={icons.levels[0]} id="text" look="spot"
+        <QuizChoice level={icons.levels[0]} id="download" look="spot"
           ><span class={quiz.ruled}
-            ><span class:list={[key, styles.plain, styles.even]}>Rename<Ruler pads={[16, 16]} /></span></span
-          ></QuizChoice
-        >
-        <QuizChoice level={icons.levels[0]} id="lead" look="spot"
-          ><span class={quiz.ruled}
-            ><span class:list={[key, styles.tint, styles.even]}
-              ><Icon name="DownloadSimple" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />Download<Ruler
-                pads={[16, 16]}
-              /></span
+            ><span class:list={[key, styles.plain, styles.lead]}
+              ><Icon name="DownloadSimple" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />Download<Ruler pads={[12, 16]} /></span
             ></span
           ></QuizChoice
         >
-        <QuizChoice level={icons.levels[0]} id="only" look="spot"
+        <QuizChoice level={icons.levels[0]} id="open" look="spot"
           ><span class={quiz.ruled}
             ><span class:list={[key, styles.plain, styles.even]}
-              ><Icon name="MagnifyingGlass" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler
-                pads={[16, 16]}
-              /></span
+              >Open<Icon name="ArrowSquareOut" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler pads={[16, 16]} /></span
+            ></span
+          ></QuizChoice
+        >
+        <QuizChoice level={icons.levels[0]} id="next" look="spot"
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.trail]}
+              >Next<Icon name="ArrowRight" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler pads={[16, 12]} /></span
             ></span
           ></QuizChoice
         >
