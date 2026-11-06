@@ -36,6 +36,9 @@ const snapshots = [
   { x0: 20, slip: false },
   { x0: 176, slip: true },
 ];
+// The queue scene's ghost arrows. Mask ids carry `p`, as each must be unique on the page.
+const routes = WORKER_Y.map((y) => ({ y, ...routeGhost(y) }));
+const retry = retryGhost();
 const OUT_SIZE = 8;
 const WORK_SIZE = 20;
 ---
@@ -150,16 +153,31 @@ const WORK_SIZE = 20;
         />
       ))}
       {
-        WORKER_Y.map((y) => (
-          <path
-            class={draw(styles.inkLine, styles.ghost)}
-            d={routeGhost(y)}
-            data-arrow="route"
-            data-y={y}
-          />
+        routes.map(({ y, ink, spine, head, reveal }, w) => (
+          <g data-arrow="route" data-y={y}>
+            <mask id={`${p}route${w}`}>
+              <path class={styles.ghostReveal} stroke-width={reveal} d={spine} />
+              <path class={styles.ghostHead} stroke-width={reveal} d={head} />
+            </mask>
+            <path
+              class={draw(styles.inkBrush, styles.ghostBrush)}
+              mask={`url(#${p}route${w})`}
+              d={ink}
+            />
+          </g>
         ))
       }
-      <path class={draw(styles.hueLine, styles.ghost)} d={retryGhost()} data-arrow="retry" />
+      <g data-arrow="retry">
+        <mask id={`${p}retry`}>
+          <path class={styles.ghostReveal} stroke-width={retry.reveal} d={retry.spine} />
+          <path class={styles.ghostHead} stroke-width={retry.reveal} d={retry.head} />
+        </mask>
+        <path
+          class={draw(styles.hueBrush, styles.ghostBrush)}
+          mask={`url(#${p}retry)`}
+          d={retry.ink}
+        />
+      </g>
       {WORKER_Y.map((y, w) => {
         const out = {
           x: WORKER_X + WORKER_SIZE / 2 + 4,

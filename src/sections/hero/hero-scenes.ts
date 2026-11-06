@@ -1,4 +1,4 @@
-import { ARROWS, head, type Point } from "../../arrows";
+import { ARROWS, brush, type Point } from "../../arrows";
 import { boxCentre, type Outline } from "./hero-morph";
 import {
   ABSORBED_SCALE,
@@ -55,12 +55,23 @@ function arcPoint(t: number) {
   return { x: at(0), y: at(1) };
 }
 
+/**
+ * A brush arrow along `line`, its last stretch straightened to seat the head on the last heading.
+ * `head` runs over the head and a hair past the tip, for a mask to keep it whole between dashes.
+ */
 function arrowed(line: Point[]) {
+  const { head, notch } = ARROWS.hero;
   const tip = line.at(-1)!;
-  const [left, right] = head(line.at(-2)!, tip, ARROWS.hero.wing, ARROWS.hero.spread);
-  const path = (pts: Point[]) =>
-    `M${pts.map(({ x, y }) => `${+x.toFixed(1)} ${+y.toFixed(1)}`).join(" L")}`;
-  return `${path(line)} ${path([right, tip, left])}`;
+  const from = line.at(-2)!;
+  const run = Math.hypot(tip.x - from.x, tip.y - from.y) || 1;
+  const dir = { x: (tip.x - from.x) / run, y: (tip.y - from.y) / run };
+  const back = (by: number) => ({ x: tip.x - dir.x * by, y: tip.y - dir.y * by });
+  const before = line.filter((p) => Math.hypot(tip.x - p.x, tip.y - p.y) > head);
+  const at = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
+  return {
+    ...brush([...before, back(head), tip], ARROWS.hero),
+    head: `M${at(back(head + notch))} L${at(back(-1))}`,
+  };
 }
 
 export function routeGhost(boxY: number) {

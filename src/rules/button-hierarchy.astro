@@ -6,6 +6,8 @@ type Props = { careful?: boolean };
 
 const { careful = false } = Astro.props;
 const arrow = downArrow(ARROWS.squint);
+// Both demos sit on one page, and a mask id must be unique in it.
+const mask = (i: number) => `squint-${careful ? "careful" : "flat"}-${i}`;
 const key = [styles.key, styles.sm, styles.live, styles.cardRowKey, styles.squinted];
 // Each note names what squinting leaves of its button, and shows only while Squint is on.
 const KEYS = [
@@ -24,17 +26,27 @@ const say = careful
     <span class:list={[styles.cardSub, styles.squinted]}>Draft · 1,240 words</span>
     <div class:list={[styles.row, styles.cardRow]}>
       {
-        KEYS.map(({ label, look, note }) => (
+        KEYS.map(({ label, look, note }, i) => (
           <span class={styles.pin}
             ><button type="button" class:list={[key, look]}>{label}</button><span class={styles.squintNote}
               >{note}<svg
                   viewBox={`0 0 ${arrow.width} ${arrow.height}`}
                   width={arrow.width}
                   height={arrow.height}
-                  class={styles.squintArrow}
                   data-arrow="squint"
                   aria-hidden="true"
-                  ><path pathLength="1" d={arrow.d} /></svg
+                  ><mask id={mask(i)}
+                    ><path
+                      class={styles.squintReveal}
+                      pathLength="1"
+                      stroke-width={arrow.reveal}
+                      d={arrow.spine}
+                    /></mask
+                  ><path
+                    class={styles.squintInk}
+                    mask={`url(#${mask(i)})`}
+                    d={arrow.ink}
+                  /></svg
               ></span
             ></span
           >

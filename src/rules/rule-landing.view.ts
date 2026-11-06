@@ -24,7 +24,8 @@ export const lessonView = {
   flipKey: (key: SideKey, on: boolean) => cx(lessonKit.flipKey, on && lessonKit[key]),
   pane: (on: boolean) => cx(lessonKit.well, lessonKit.pane, !on && lessonKit.behind, marker),
   hintSvg: (gone: boolean) => cx(hintKit.svg, gone && hintKit.gone),
-  hintArrow: (drawn: boolean) => cx(hintKit.arrow, drawn && hintKit.drawn),
+  hintInk: hintKit.ink,
+  hintReveal: (drawn: boolean) => cx(hintKit.reveal, drawn && hintKit.drawn),
   hintLabel: (tilt: "up" | "down" | "level", onPanel: boolean, gone: boolean) =>
     cx(hintKit.label, hintKit[tilt], onPanel && hintKit.onPanel, gone && hintKit.gone),
 };

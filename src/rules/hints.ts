@@ -1,9 +1,10 @@
 import {
   ARROWS_CHANGED,
   arrowsFor,
+  brush,
+  looped,
   PHI,
-  strokeVar,
-  head,
+  type BrushArrow,
   type HintLook,
   type Point,
   type ToggleLook,
@@ -11,7 +12,11 @@ import {
 import { isTransitioning } from "../sections/rule-open";
 
 type Box = { left: number; top: number; right: number; bottom: number };
-export type Hint = { zone: string; at: Point; tilt: "up" | "down" | "level"; path: string };
+export type Hint = {
+  zone: string;
+  at: Point;
+  tilt: "up" | "down" | "level";
+} & BrushArrow;
 
 const HINT_STEP = 10;
 const HINT_CLEAR = 8;
@@ -137,38 +142,43 @@ function arc(label: Box, target: Box, bow: number, look: HintLook) {
   const into = { x: Math.cos(heading - turn), y: Math.sin(heading - turn) };
   const start = exit(label, out, look.labelGap);
   const end = exit(target, { x: -into.x, y: -into.y }, look.targetGap);
-  // The last wing's length runs straight along the ray, so both wings sit square on the line.
-  const neck = { x: end.x - into.x * look.wing, y: end.y - into.y * look.wing };
+  // The head's length runs straight along the ray, so the head sits square on the line.
+  const neck = { x: end.x - into.x * look.head, y: end.y - into.y * look.head };
   const handle = Math.hypot(neck.x - start.x, neck.y - start.y) * look.handle;
   const c1 = { x: start.x + out.x * handle, y: start.y + out.y * handle };
   const c2 = { x: neck.x - into.x * handle, y: neck.y - into.y * handle };
-  const along = Array.from({ length: 29 }, (_, i) => {
-    const t = (i + 1) / 30;
+  const curve = Array.from({ length: 31 }, (_, i) => {
+    const t = i / 30;
     const u = 1 - t;
     return {
       x: u ** 3 * start.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * neck.x,
       y: u ** 3 * start.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * neck.y,
     };
   });
-  const line = [start, ...along, neck];
+  const line = looped(curve, look.loop, look.curl);
+  const along = line.slice(1, -1);
   const length = line.slice(1).reduce((sum, p, i) => {
     const q = line[i] ?? p;
     return sum + Math.hypot(p.x - q.x, p.y - q.y);
   }, 0);
-  const wings = head(neck, end, look.wing, look.spread);
   // How far the head leans off square to the page, plus a hair for an arc that sags rather than
   // arches, so a caller picking between the two sides takes the one that lands straighter.
-  const middle = along[14] ?? start;
+  const middle = curve[15] ?? start;
   const sags = middle.y > (start.y + end.y) / 2;
   const skew = 1 - Math.max(Math.abs(into.x), Math.abs(into.y)) + (sags ? 1e-3 : 0);
-  return { start, c1, c2, neck, end, wings, along, length, skew };
+  return { spine: [...line, end], along, length, skew, curled: line !== curve };
 }
 
-/** The arcs bending `bow` to either side, the one whose head lands squarer first. */
+/**
+ * The arcs bending `bow` to either side, the one whose head lands squarer first. A side long enough
+ * to curl comes curled, then plain, so a curl that hits something gives way without moving the label.
+ */
 function bowed(label: Box, target: Box, bow: number, look: HintLook) {
-  const a = arc(label, target, bow, look);
-  const b = arc(label, target, -bow, look);
-  return a.skew <= b.skew ? ([a, b] as const) : ([b, a] as const);
+  const sides = [bow, -bow].map((side) => ({ side, way: arc(label, target, side, look) }));
+  sides.sort((a, b) => a.way.skew - b.way.skew);
+  return sides.flatMap(({ side, way }) =>
+    way.curled ? [way, arc(label, target, side, { ...look, loop: 0 })] : [way],
+  );
 }
 
 /** Spots right beside a target, nearest side first, for a label with a short straight arrow. */
@@ -289,7 +299,6 @@ function survey(things: Element[]): Mark[] {
 export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints: Hint[]) => void) {
   const place = () => {
     const { hint, toggle } = arrowsFor(card.dataset.arrows);
-    card.style.setProperty(strokeVar("hint"), String(hint.stroke));
     const box = card.getBoundingClientRect();
     const w = ruler.offsetWidth;
     const h = ruler.offsetHeight;
@@ -301,9 +310,11 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
       ),
     );
     const next: Hint[] = [];
-    const x = (p: Point) => `${(p.x - box.left).toFixed(1)} ${(p.y - box.top).toFixed(1)}`;
     const draw = (way: ReturnType<typeof arc>) =>
-      `M${x(way.start)} C${x(way.c1)} ${x(way.c2)} ${x(way.neck)} L${x(way.end)} M${x(way.wings[0])} L${x(way.end)} L${x(way.wings[1])}`;
+      brush(
+        way.spine.map((p) => ({ x: p.x - box.left, y: p.y - box.top })),
+        hint,
+      );
     const pad = (b: Box) => ({
       left: b.left - HINT_CLEAR,
       right: b.right + HINT_CLEAR,
@@ -346,14 +357,15 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         : beside(t, w, h, toggle).find((b) => holds(box, pad(b)) && covered.covers(pad(b)) === 0);
       if (near) {
         const look = { ...hint, labelGap: toggle.labelGap, targetGap: toggle.targetGap };
-        const [way] = bowed(near, t, 1, look);
+        const way = bowed(near, t, 1, look).find((a) => !a.curled || !a.along.some(covered.has));
         const mid = centre(near);
-        next.push({
-          zone: "copy",
-          at: { x: mid.x - box.left, y: mid.y - box.top },
-          tilt: "level",
-          path: draw(way),
-        });
+        if (way)
+          next.push({
+            zone: "copy",
+            at: { x: mid.x - box.left, y: mid.y - box.top },
+            tilt: "level",
+            ...draw(way),
+          });
         continue;
       }
       const crossed = raster(box, [...solid.filter((r) => !holds(r, t)), t]);
@@ -468,7 +480,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         zone,
         at: { x: mid.x - box.left, y: mid.y - box.top },
         tilt: mid.x < centre(t).x ? "down" : "up",
-        path: draw(way),
+        ...draw(way),
       });
     }
     render(next);
