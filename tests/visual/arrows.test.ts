@@ -1,0 +1,431 @@
+import { chromium, type Browser, type Page } from "playwright";
+import { afterAll, beforeAll, describe, inject, it } from "vite-plus/test";
+import { ARROWS } from "../../src/arrows";
+import {
+  aimsAt,
+  type Box,
+  centre,
+  crosses,
+  grow,
+  intersects,
+  leaves,
+  longEnough,
+  outside,
+  type Point,
+  polyline,
+  SHORTEST,
+  spineOf,
+  squareHead,
+  squarePixelHead,
+  straightWhereItFits,
+  tightest,
+  touches,
+} from "../arrow-rules";
+import { openSettledPage, routeSlug, type Viewport } from "./page-setup";
+
+// Walks every hint, toggle and Squint arrow the rule pages draw, at both widths, and holds each to
+// the rules in tests/arrow-rules.ts. src/arrows.test.ts covers the hero's arrows. A rule a page
+// breaks today sits in KNOWN and runs as an expected failure, so fixing the arrow turns it red
+// until its line goes.
+
+/** Rules pages break on main, keyed `<route slug> <viewport> <rule>`, with what breaks them. */
+const BOWED =
+  "hints.ts bowed() bows every hint and toggle arrow, so none is straight where its label sits square to its target";
+const SQUINT_SHORT =
+  "Squint's downArrow draws ARROWS.squint.length = 12px, under 24px (e6e0c25 shortened it on purpose)";
+const KNOWN = new Map([
+  ["rule-of-thumb__button-design desktop straight", BOWED],
+  ["rule-of-thumb__button-design mobile straight", BOWED],
+  ["rule-of-thumb__button-design desktop length", SQUINT_SHORT],
+  ["rule-of-thumb__button-design mobile length", SQUINT_SHORT],
+  ["rule-of-thumb__data-loading mobile straight", BOWED],
+  ["rule-of-thumb__dialog-design desktop straight", BOWED],
+  ["rule-of-thumb__dialog-design mobile straight", BOWED],
+  ["rule-of-thumb__handling-timestamps desktop straight", BOWED],
+  ["rule-of-thumb__handling-timestamps mobile straight", BOWED],
+  ["rule-of-thumb__table-design desktop straight", BOWED],
+  ["rule-of-thumb__table-design mobile straight", BOWED],
+  [
+    "rule-of-thumb__table-design mobile overlap",
+    `the toggle arrow on "Give every state a next step" crosses the demo's content though a slot 48px out at 22.5° is clear`,
+  ],
+]);
+
+type Kind = "hint" | "toggle" | "squint";
+type Seen = {
+  card: string;
+  spine: string;
+  /** The brush outline, ending in the head. A pixel hint (feat/pixel-arrows) has `cells` instead. */
+  ink: string;
+  cells: Point[];
+  grid: number;
+  matrix: number[];
+  label: Box;
+  /** The index of the arrow's target in `targets`, matched by where the head lands. */
+  target?: number;
+};
+type Card = {
+  card: string;
+  arrows: Seen[];
+  targets: { box: Box; room: Box; inPane: boolean }[];
+  // The words, controls and pictures in the card, each with the targets it belongs to.
+  marks: { box: Box; of: number[] }[];
+};
+
+/** Runs in the page: every lesson card's hint and toggle arrows, their targets and its content. */
+function collectHints(): Card[] {
+  const box = (r: DOMRect): Box => ({
+    left: r.left + window.scrollX,
+    top: r.top + window.scrollY,
+    right: r.right + window.scrollX,
+    bottom: r.bottom + window.scrollY,
+  });
+  const matrix = (svg: SVGGraphicsElement) => {
+    const m = svg.getScreenCTM();
+    return m ? [m.a, m.b, m.c, m.d, m.e + window.scrollX, m.f + window.scrollY] : [];
+  };
+  const holds = (outer: DOMRect, inner: DOMRect) =>
+    inner.left >= outer.left &&
+    inner.right <= outer.right &&
+    inner.top >= outer.top &&
+    inner.bottom <= outer.bottom;
+  const cards: Card[] = [];
+  for (const card of document.querySelectorAll<HTMLElement>("article[data-arrows]")) {
+    const layer = card.querySelector('[data-part="hints"]');
+    if (!layer) continue;
+    const targets = [...card.querySelectorAll<HTMLElement>("[data-hint]")].filter((t) => {
+      const figure = t.closest<HTMLElement>("figure[data-side]");
+      if (figure && getComputedStyle(figure).visibility === "hidden") return false;
+      return t.getBoundingClientRect().width > 0;
+    });
+    const arrows: Seen[] = [];
+    for (const svg of layer.querySelectorAll("svg")) {
+      // A brush hint reveals its line through a mask; a pixel hint draws cells after its ring
+      // and keeps its line only in the mask of the blur behind it.
+      const halo = svg.previousElementSibling;
+      const blurred = decodeURIComponent(halo instanceof HTMLElement ? halo.style.maskImage : "");
+      const spine =
+        svg.querySelector("mask path")?.getAttribute("d") ??
+        /<path d="([^"]*)"/.exec(blurred)?.[1] ??
+        "";
+      const ink = svg.querySelector(":scope > path")?.getAttribute("d") ?? "";
+      const rects = [...svg.querySelectorAll(":scope > rect")].slice(1);
+      const label = svg.nextElementSibling;
+      if (!label) continue;
+      arrows.push({
+        card: card.dataset.arrows ?? "",
+        spine,
+        ink,
+        cells: rects.map((r) => ({
+          x: Number(r.getAttribute("x")),
+          y: Number(r.getAttribute("y")),
+        })),
+        grid: Number(rects[0]?.getAttribute("width") ?? 0),
+        matrix: matrix(svg),
+        label: box(label.getBoundingClientRect()),
+      });
+    }
+    // The same walk hints.ts survey() makes: text line by line, controls and pictures whole,
+    // and painted empty boxes such as skeleton bars.
+    const marks: Card["marks"] = [];
+    const range = document.createRange();
+    const rects = targets.map((t) => t.getBoundingClientRect());
+    const of = (e: Element, r: DOMRect) =>
+      targets.flatMap((t, i) => (t.contains(e) || holds(r, rects[i]!) ? [i] : []));
+    const visit = (parent: Element) => {
+      for (const e of parent.children) {
+        const style = getComputedStyle(e);
+        if (style.display === "none" || style.opacity === "0" || e === layer) continue;
+        const shown = e.checkVisibility({ visibilityProperty: true });
+        const painted =
+          style.backgroundImage !== "none" ||
+          !/^rgba\(.*,\s*0\)$|\/\s*0\)$/.test(style.backgroundColor);
+        if (e.matches("button, input, select, textarea, svg, img") || (!e.firstChild && painted)) {
+          const r = e.getBoundingClientRect();
+          if (shown && r.width > 1 && r.height > 1) marks.push({ box: box(r), of: of(e, r) });
+          continue;
+        }
+        for (const n of shown ? e.childNodes : []) {
+          if (n.nodeType !== Node.TEXT_NODE || !n.textContent?.trim()) continue;
+          range.selectNodeContents(n);
+          for (const r of range.getClientRects())
+            if (r.width > 1) marks.push({ box: box(r), of: of(e, r) });
+        }
+        visit(e);
+      }
+    };
+    visit(card);
+    cards.push({
+      card: card.dataset.arrows ?? "",
+      arrows,
+      targets: targets.map((t, i) => {
+        const figure = t.closest("figure[data-side]");
+        return {
+          box: box(rects[i]!),
+          room: box((figure ?? card).getBoundingClientRect()),
+          inPane: figure !== null,
+        };
+      }),
+      marks,
+    });
+  }
+  return cards;
+}
+
+/** Runs in the page: each Squint arrow, the note it hangs from and the button under it. */
+function collectSquint() {
+  const box = (r: DOMRect): Box => ({
+    left: r.left + window.scrollX,
+    top: r.top + window.scrollY,
+    right: r.right + window.scrollX,
+    bottom: r.bottom + window.scrollY,
+  });
+  const range = document.createRange();
+  return [...document.querySelectorAll<SVGSVGElement>('svg[data-arrow="squint"]')].map((svg) => {
+    const m = svg.getScreenCTM()!;
+    const note = svg.parentElement!;
+    range.selectNodeContents(note.firstChild!);
+    return {
+      spine: svg.querySelector("mask path")?.getAttribute("d") ?? "",
+      ink: svg.querySelector(":scope > path")?.getAttribute("d") ?? "",
+      matrix: [m.a, m.b, m.c, m.d, m.e + window.scrollX, m.f + window.scrollY],
+      label: box(range.getBoundingClientRect()),
+      target: box(note.parentElement!.querySelector("button")!.getBoundingClientRect()),
+    };
+  });
+}
+
+// The ink is wider than its centreline: a line keeps off by half its width and a hair, as hints.ts
+// does. A brush hint is `body` wide, a pixel hint (feat/pixel-arrows) one `grid` cell.
+const look: { body?: number; grid?: number; head: number } = ARROWS.hint;
+const INK = (look.body ?? look.grid ?? 0) / 2 + 1;
+const GAPS = {
+  hint: { label: ARROWS.hint.labelGap, target: ARROWS.hint.targetGap },
+  toggle: { label: ARROWS.toggle.labelGap, target: ARROWS.toggle.targetGap },
+  squint: { label: 6, target: 6 },
+};
+
+type Placed = { kind: Kind; where: string; points: Point[]; label: Box; target: Box; room: Box };
+
+/**
+ * A spot round the target where a label `w` by `h` and a straight arrow from it would keep off
+ * the content and every other arrow, inside the room. A label tries 16 directions at 16 to 48px.
+ */
+function freeSlot(a: Placed, w: number, h: number, marks: Box[], others: Placed[]) {
+  const t = a.target;
+  const tc = centre(t);
+  const half = (bw: number, bh: number, d: Point) =>
+    Math.min(d.x ? bw / 2 / Math.abs(d.x) : Infinity, d.y ? bh / 2 / Math.abs(d.y) : Infinity);
+  for (let k = 0; k < 16; k++) {
+    const d = { x: Math.cos((k * Math.PI) / 8), y: Math.sin((k * Math.PI) / 8) };
+    for (const off of [16, 24, 32, 48]) {
+      const reach = half(t.right - t.left, t.bottom - t.top, d) + half(w, h, d) + off;
+      const c = { x: tc.x + d.x * reach, y: tc.y + d.y * reach };
+      const label = {
+        left: c.x - w / 2,
+        top: c.y - h / 2,
+        right: c.x + w / 2,
+        bottom: c.y + h / 2,
+      };
+      if (label.left < a.room.left || label.right > a.room.right) continue;
+      if (label.top < a.room.top || label.bottom > a.room.bottom) continue;
+      const from = half(w, h, d) + 6;
+      const to = half(t.right - t.left, t.bottom - t.top, d) + 6;
+      const line = [
+        { x: c.x - d.x * from, y: c.y - d.y * from },
+        { x: tc.x + d.x * to, y: tc.y + d.y * to },
+      ];
+      if (reach - from - to < SHORTEST) continue;
+      const room = grow(label, 2);
+      if (marks.some((m) => intersects(room, m) || touches(line, undefined, m, INK))) continue;
+      if (
+        others.some(
+          (o) =>
+            intersects(room, o.label) ||
+            touches(line, undefined, o.label, INK) ||
+            touches(o.points, undefined, room, INK) ||
+            crosses(line, o.points, INK),
+        )
+      )
+        continue;
+      return `${k * 22.5}° ${off}px out`;
+    }
+  }
+  return undefined;
+}
+
+const RULES = ["aim", "length", "bend", "straight", "overlap", "head"] as const;
+type Rule = (typeof RULES)[number];
+
+function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
+  const broken = new Map<string, string[]>(RULES.map((rule) => [rule, []]));
+  const flag = (rule: Rule, where: string, what: string | undefined) => {
+    if (what) broken.get(rule)!.push(`${where}: ${what}`);
+  };
+  const rules = (a: Placed, seen: Seen) => {
+    const gaps = GAPS[a.kind];
+    flag("aim", a.where, aimsAt(a.points, a.target, gaps.target));
+    flag("aim", a.where, leaves(a.points, a.label, gaps.label));
+    flag("length", a.where, longEnough(a.points));
+    flag("bend", a.where, tightest(a.points, ARROWS.hint.bend));
+    flag("straight", a.where, straightWhereItFits(a.points, a.label, a.target));
+    const spine = polyline(seen.spine);
+    flag(
+      "head",
+      a.where,
+      seen.ink
+        ? squareHead({ spine, ink: seen.ink, matrix: seen.matrix })
+        : squarePixelHead(spine, seen.cells, seen.grid, look.head),
+    );
+  };
+  for (const card of cards) {
+    const placed: (Placed & { marks: Box[] })[] = [];
+    card.arrows.forEach((seen, i) => {
+      const points = spineOf({ spine: polyline(seen.spine), ink: seen.ink, matrix: seen.matrix });
+      const tip = points.at(-1)!;
+      const nearest = card.targets
+        .map((t, k) => ({ k, miss: outside(tip, t.box) }))
+        .sort((a, b) => a.miss - b.miss)[0];
+      const where = `${card.card} #${i}`;
+      if (!nearest) {
+        flag("aim", where, "points at no [data-hint] target");
+        return;
+      }
+      const t = card.targets[nearest.k]!;
+      const a: Placed = {
+        kind: t.inPane ? "hint" : "toggle",
+        where: `${where} (${t.inPane ? "hint" : "toggle"})`,
+        points,
+        label: seen.label,
+        target: t.box,
+        room: t.room,
+      };
+      rules(a, seen);
+      seen.target = nearest.k;
+      placed.push({
+        ...a,
+        marks: card.marks.filter((m) => !m.of.includes(nearest.k)).map((m) => m.box),
+      });
+    });
+    card.targets.forEach((_, k) => {
+      const n = card.arrows.filter((a) => a.target === k).length;
+      if (n !== 1) flag("aim", `${card.card} target ${k}`, `has ${n} arrows pointing at it`);
+    });
+    for (const a of placed) {
+      const others = placed.filter((o) => o !== a);
+      const onContent = a.marks.some((m) => touches(a.points, a.label, m, INK));
+      const onArrow = others.some(
+        (o) =>
+          intersects(a.label, o.label) ||
+          touches(a.points, undefined, o.label, INK) ||
+          crosses(a.points, o.points, INK),
+      );
+      if (!onContent && !onArrow) continue;
+      const slot = freeSlot(
+        a,
+        a.label.right - a.label.left,
+        a.label.bottom - a.label.top,
+        a.marks,
+        others,
+      );
+      if (slot)
+        flag(
+          "overlap",
+          a.where,
+          `covers ${onArrow ? "another arrow" : "content"} though a free slot exists (${slot})`,
+        );
+    }
+  }
+  squint.forEach((s, i) => {
+    const points = spineOf({ spine: polyline(s.spine), ink: s.ink, matrix: s.matrix });
+    const a: Placed = {
+      kind: "squint",
+      where: `squint #${i}`,
+      points,
+      label: s.label,
+      target: s.target,
+      room: s.target,
+    };
+    flag("aim", a.where, aimsAt(points, s.target, GAPS.squint.target));
+    flag("aim", a.where, leaves(points, s.label, GAPS.squint.label));
+    flag("length", a.where, longEnough(points));
+    flag("bend", a.where, tightest(points, ARROWS.hint.bend));
+    flag("head", a.where, squareHead({ spine: polyline(s.spine), ink: s.ink, matrix: s.matrix }));
+  });
+  return broken;
+}
+
+const routes = inject("routes").filter((route) => route.startsWith("/rule-of-thumb/"));
+const viewports: Viewport[] = ["desktop", "mobile"];
+
+let browser: Browser;
+beforeAll(async () => {
+  browser = await chromium.launch();
+});
+afterAll(() => browser?.close());
+
+/** Every card's arrows on the side it opens on, then again with every card flipped to ✕. */
+async function walk(page: Page) {
+  const frames = () =>
+    page.evaluate(
+      () =>
+        new Promise<void>((done) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(done, 50))),
+        ),
+    );
+  const first = await page.evaluate(collectHints);
+  // Flip each card as a reader does, one click at a time, then let the rows land and the hints
+  // re-place before measuring. Wide screens show both panes and hide the keys.
+  const keys = page.locator('article [data-part="bad"]');
+  let flips = 0;
+  for (let i = 0, n = await keys.count(); i < n; i++) {
+    if (!(await keys.nth(i).isVisible())) continue;
+    await keys.nth(i).click();
+    flips++;
+  }
+  await page.waitForTimeout(600);
+  await frames();
+  const flipped = flips
+    ? (await page.evaluate(collectHints)).map((c) => ({ ...c, card: `${c.card} ✕` }))
+    : [];
+  await page.evaluate(() => {
+    for (const key of document.querySelectorAll<HTMLElement>('[data-toggle="squint"]')) key.click();
+  });
+  await frames();
+  return { cards: [...first, ...flipped], squint: await page.evaluate(collectSquint) };
+}
+
+describe.concurrent("every drawn arrow keeps the arrow rules", () => {
+  it.for(routes.flatMap((route) => viewports.map((viewport) => [route, viewport] as const)))(
+    "%s %s",
+    { timeout: 120_000 },
+    async ([route, viewport], { expect: check }) => {
+      const { context, page } = await openSettledPage(browser, {
+        route,
+        viewport,
+        scheme: "light",
+      });
+      try {
+        const { cards, squint } = await walk(page);
+        const broken = judge(cards, squint);
+        const slug = routeSlug(route);
+        const unexpected = [...broken].flatMap(([rule, list]) =>
+          list.length && !KNOWN.has(`${slug} ${viewport} ${rule}`)
+            ? [`${rule}: ${list.join("; ")}`]
+            : [],
+        );
+        const healed = [...KNOWN.keys()].filter((key) => {
+          const [s, v, rule] = key.split(" ");
+          return s === slug && v === viewport && broken.get(rule ?? "")?.length === 0;
+        });
+        // Soft, so a page that breaks a new rule still reports the known ones it fixed.
+        check.soft(unexpected, "arrows break a rule").toEqual([]);
+        check
+          .soft(healed, "known breaks that no longer happen: delete them from KNOWN")
+          .toEqual([]);
+      } finally {
+        await context.close();
+      }
+    },
+  );
+});
