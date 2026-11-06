@@ -18,8 +18,8 @@ import {
   JOBS,
   MEANDER,
   REJECT_MARK,
-  RETRY_GHOST,
   RETRY_WORKER,
+  retryGhost,
   routeGhost,
   settleVars,
   TUMBLE_FLOAT_MS,
@@ -149,8 +149,17 @@ const WORK_SIZE = 20;
           height="28"
         />
       ))}
-      {WORKER_Y.map((y) => <path class={draw(styles.inkLine, styles.ghost)} d={routeGhost(y)} />)}
-      <path class={draw(styles.hueLine, styles.ghost)} d={RETRY_GHOST} />
+      {
+        WORKER_Y.map((y) => (
+          <path
+            class={draw(styles.inkLine, styles.ghost)}
+            d={routeGhost(y)}
+            data-arrow="route"
+            data-y={y}
+          />
+        ))
+      }
+      <path class={draw(styles.hueLine, styles.ghost)} d={retryGhost()} data-arrow="retry" />
       {WORKER_Y.map((y, w) => {
         const out = {
           x: WORKER_X + WORKER_SIZE / 2 + 4,

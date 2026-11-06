@@ -2,6 +2,7 @@ import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
+import { ARROWS, strokeVar } from "../arrows";
 import { under1, under2, under3, under4, under5 } from "../layers.css";
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 
@@ -399,7 +400,7 @@ export const hintKit = {
       [under1]: {
         fill: "none",
         stroke: HINT_BLUE,
-        strokeWidth: 2.25,
+        strokeWidth: `var(${strokeVar("hint")}, ${ARROWS.hint.stroke})`,
         strokeLinecap: "round",
         strokeLinejoin: "round",
         strokeDasharray: 1,
