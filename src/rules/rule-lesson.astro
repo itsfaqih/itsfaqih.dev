@@ -71,7 +71,9 @@ const section = sectionKey(Astro.url.pathname, lesson.title);
       }
     </div>
     <div data-hint-layer="true" aria-hidden="true" class={hintKit.layer} data-part="hints"
-      ><span class:list={[hintKit.label, hintKit.ruler]} data-part="ruler">Try it</span></div
+      ><span class:list={[hintKit.label, hintKit.ruler]} data-part="ruler"
+        ><span class={hintKit.caret}>▸</span>Try it</span
+      ></div
     >
   </article>
 </rule-lesson>

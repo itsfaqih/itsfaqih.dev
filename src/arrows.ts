@@ -4,22 +4,17 @@ export type Point = { x: number; y: number };
 const PHI = (1 + Math.sqrt(5)) / 2;
 
 /**
- * How every arrow on the site looks, by family, in px. Each family's brush is a marker stroke:
- * `tail` wide at the nock, swelling to `body`, under a solid head `head` long and `barb` wide whose
- * back is cut `notch` deep. The dev-only tuner edits these in place and redraws, so read them at
- * draw time, never into a module constant.
+ * How every arrow on the site looks, by family, in px. A hint is drawn in `grid` px cells and ends
+ * in a pixel head `head` rows deep. Squint and hero arrows are marker strokes: `tail` wide at the
+ * nock, swelling to `body`, under a solid head `head` long and `barb` wide whose back is cut `notch`
+ * deep. The dev-only tuner edits these in place and redraws, so read them at draw time, never into
+ * a module constant.
  */
 export const ARROWS = {
   /** "Try it" arrows in a demo pane. */
   hint: {
-    tail: 0.7,
-    body: 2.7,
-    head: 10,
-    barb: 10,
-    notch: 3,
-    // A curve at least `loop` long before its neck curls once, `curl` in radius; 0 never curls.
-    loop: 64,
-    curl: 7,
+    grid: 3,
+    head: 3,
     // How long the curve runs before the head. A label steps out from its target until its curve
     // is this long. Where that lands on words or controls it tries shorter curves, then longer ones.
     length: 48,
@@ -32,7 +27,7 @@ export const ARROWS = {
     labelGap: 6,
     targetGap: 6,
   },
-  /** "Try it" arrows beside a toggle in a lesson's copy. They share the hint's brush. */
+  /** "Try it" arrows beside a toggle in a lesson's copy. They share the hint's pixels. */
   toggle: {
     reach: 41,
     labelGap: 4,
@@ -138,40 +133,6 @@ export function walk(points: Point[]) {
   return { s, total, at };
 }
 
-/**
- * The centreline with one hand-drawn curl, a prolate cycloid `curl` in radius, centred 42% along
- * it on the outside of its bend. A line shorter than `loop`, or a `loop` of 0, comes back as it was.
- */
-export function looped(points: Point[], loop: number, curl: number) {
-  const { s, total, at } = walk(points);
-  if (!loop || total < loop) return points;
-  const span = Math.PI * curl;
-  const from = total * 0.42 - span / 2;
-  const { p: mid, dir } = at(from + span / 2);
-  const first = points[0] ?? mid;
-  const last = points.at(-1) ?? mid;
-  const chord = { x: last.x - first.x, y: last.y - first.y };
-  // Which side of the chord the curve bows to, then that side of the direction of travel.
-  const bulge = chord.x * (mid.y - first.y) - chord.y * (mid.x - first.x);
-  const out = bulge * (chord.x * dir.x + chord.y * dir.y) >= 0 ? 1 : -1;
-  const side = { x: -dir.y * out, y: dir.x * out };
-  // The cycloid's phase starts where it moves forward, so the curl leaves and rejoins the line along
-  // its tangent rather than doubling back on it.
-  const curled = Array.from({ length: 41 }, (_, k) => {
-    const u = k / 40;
-    const { p } = at(from + span * u);
-    const turn = 2 * Math.PI * u;
-    const ahead = curl * Math.sin(turn);
-    const off = curl * (1 - Math.cos(turn));
-    return { x: p.x + ahead * dir.x + off * side.x, y: p.y + ahead * dir.y + off * side.y };
-  });
-  return [
-    ...points.filter((_, i) => (s[i] ?? 0) < from),
-    ...curled,
-    ...points.filter((_, i) => (s[i] ?? 0) > from + span),
-  ];
-}
-
 export const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
 
 /**
@@ -235,6 +196,60 @@ export function brush(spine: Point[], look: Brush) {
 }
 
 export type BrushArrow = ReturnType<typeof brush>;
+
+/**
+ * A pixel arrow along `spine`, a centreline that ends at the tip and runs straight for its last
+ * `head` cells. `cells` are the top-left corners of the `grid` px cells that draw it, in the order
+ * they draw in: the trail from the label, then the head from its back row to the tip. `spine` is
+ * the centreline as a path.
+ */
+export function pixels(spine: Point[], look: { grid: number; head: number }) {
+  const { grid, head } = look;
+  const { total, at } = walk(spine);
+  const cell = (p: Point) => ({ x: Math.floor(p.x / grid), y: Math.floor(p.y / grid) });
+  const stop = total - head * grid;
+  const steps = Math.ceil((stop / grid) * 4);
+  const path: Point[] = [];
+  for (let k = 0; stop > 0 && k <= steps; k++) {
+    const c = cell(at((stop * k) / steps).p);
+    const last = path.at(-1);
+    if (!last || last.x !== c.x || last.y !== c.y) path.push(c);
+  }
+  // Where the line steps across and then up, the corner cell doubles it, so it goes and the two
+  // cells either side meet corner to corner.
+  const trail: Point[] = [];
+  path.forEach((c, i) => {
+    const prev = trail.at(-1);
+    const next = path[i + 1];
+    if (prev && next && Math.abs(prev.x - next.x) === 1 && Math.abs(prev.y - next.y) === 1) return;
+    trail.push(c);
+  });
+  const { dir } = at(total);
+  const turn = (Math.round(Math.atan2(dir.y, dir.x) / (Math.PI / 4)) * Math.PI) / 4;
+  const d = { x: Math.round(Math.cos(turn)), y: Math.round(Math.sin(turn)) };
+  const tip = cell(spine.at(-1) ?? { x: 0, y: 0 });
+  const arrowhead: Point[] = [];
+  for (let r = head; r >= 0; r--) {
+    if (d.x && d.y) {
+      // A diagonal head is a right-angled triangle, its corner the tip, filled back row first.
+      for (let i = 0; i <= r; i++) arrowhead.push({ x: tip.x - d.x * i, y: tip.y - d.y * (r - i) });
+    } else if (r < head) {
+      for (let w = -r; w <= r; w++)
+        arrowhead.push({ x: tip.x - d.x * r - d.y * w, y: tip.y - d.y * r + d.x * w });
+    }
+  }
+  const taken = new Set(arrowhead.map((c) => `${c.x},${c.y}`));
+  return {
+    grid,
+    cells: [...trail.filter((c) => !taken.has(`${c.x},${c.y}`)), ...arrowhead].map((c) => ({
+      x: c.x * grid,
+      y: c.y * grid,
+    })),
+    spine: `M${spine.map(fmt).join(" L")}`,
+  };
+}
+
+export type PixelArrow = ReturnType<typeof pixels>;
 
 /** A marker arrow `length` long pointing down, in a box that just fits it. */
 export function downArrow(look: typeof ARROWS.squint) {

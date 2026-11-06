@@ -1,19 +1,21 @@
 import { reducedMotion } from "../hooks/media-query";
 import { type Hint, watchHintReader, watchHints } from "./hints";
 import { lessonView, type SideKey } from "./rule-landing.view";
-import { OUT, TABBED } from "./rule-landing.css";
+import { hintKit, OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 const SVG = "http://www.w3.org/2000/svg";
 type Drawn = {
   halo: HTMLElement;
   svg: SVGSVGElement;
-  reveal: SVGPathElement;
+  ring: SVGRectElement;
   label: HTMLElement;
   hint: Hint;
 };
-// Mask ids are document-wide, so every arrow on the page takes the next one.
-let masks = 0;
+
+const attrs = (e: Element, values: Record<string, number>) => {
+  for (const [name, value] of Object.entries(values)) e.setAttribute(name, String(value));
+};
 
 // How far the blur behind a hint reaches past its line and label, feather included.
 const HALO = 16;
@@ -112,40 +114,48 @@ class RuleLesson extends HTMLElement {
     let drawn = new Map<string, Drawn>();
     let shown = false;
     const done = new Set<string>();
-    const paint = ({ halo, svg, reveal, label, hint }: Drawn) => {
+    const paint = ({ halo, svg, ring, label, hint }: Drawn) => {
       const gone = !shown || done.has(hint.zone);
       halo.className = lessonView.hintHalo(hint.zone === "copy", gone);
       svg.setAttribute("class", lessonView.hintSvg(gone));
-      reveal.setAttribute("class", lessonView.hintReveal(shown));
-      label.className = lessonView.hintLabel(hint.tilt, hint.zone === "copy", gone);
+      svg.toggleAttribute("data-drawn", shown);
+      ring.setAttribute("class", lessonView.hintRing(gone));
+      label.className = lessonView.hintLabel(gone);
     };
     const draw = (hints: Hint[]) => {
       const next = new Map<string, Drawn>();
       for (const hint of hints) {
-        const key = `${hint.zone}-${hint.ink}`;
+        const key = `${hint.zone}-${hint.spine}`;
         let mark = drawn.get(key);
         if (!mark) {
           const svg = document.createElementNS(SVG, "svg");
-          const mask = document.createElementNS(SVG, "mask");
-          mask.id = `hint-arrow-${++masks}`;
-          const reveal = document.createElementNS(SVG, "path");
-          reveal.setAttribute("d", hint.spine);
-          reveal.setAttribute("pathLength", "1");
-          reveal.setAttribute("stroke-width", String(hint.reveal));
-          mask.append(reveal);
-          const ink = document.createElementNS(SVG, "path");
-          ink.setAttribute("d", hint.ink);
-          ink.setAttribute("class", lessonView.hintInk);
-          ink.setAttribute("mask", `url(#${mask.id})`);
-          svg.append(mask, ink);
+          const ring = document.createElementNS(SVG, "rect");
+          svg.append(ring);
+          hint.cells.forEach(({ x, y }, i) => {
+            const cell = document.createElementNS(SVG, "rect");
+            attrs(cell, { x, y, width: hint.grid, height: hint.grid });
+            cell.setAttribute("class", hintKit.cell);
+            cell.style.setProperty("--at", `${250 + (i / hint.cells.length) * 600}ms`);
+            svg.append(cell);
+          });
           const label = document.createElement("span");
-          label.textContent = "Try it";
+          const caret = document.createElement("span");
+          caret.className = hintKit.caret;
+          caret.textContent = "▸";
+          label.append(caret, "Try it");
           const blur = document.createElement("div");
           halo(blur, hint);
           layer.append(blur, svg, label);
-          mark = { halo: blur, svg, reveal, label, hint };
+          mark = { halo: blur, svg, ring, label, hint };
         }
         mark.hint = hint;
+        const { box, radius } = hint.ring;
+        const w = box.right - box.left;
+        const h = box.bottom - box.top;
+        attrs(mark.ring, { x: box.left, y: box.top, width: w, height: h, rx: radius });
+        // Each side grows the same 10px however long it is.
+        mark.ring.style.setProperty("--sx", String((w + 20) / w));
+        mark.ring.style.setProperty("--sy", String((h + 20) / h));
         mark.label.style.left = `${hint.at.x}px`;
         mark.label.style.top = `${hint.at.y}px`;
         paint(mark);

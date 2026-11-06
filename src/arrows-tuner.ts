@@ -60,9 +60,8 @@ const BRUSH: Spec<keyof Brush>[] = [
   ["notch", "Notch depth", 0, 10, 0.1],
 ];
 const HINT: Spec<keyof typeof ARROWS.hint>[] = [
-  ...BRUSH,
-  ["loop", "Shortest curve to loop (0 off)", 0, 200, 1],
-  ["curl", "Loop radius", 2, 16, 0.5],
+  ["grid", "Pixel size", 2, 6, 1],
+  ["head", "Head depth (rows)", 2, 6, 1],
   ["length", "Curve length", 12, 120, 1],
   ["bow", "Curve turn (tan)", 0.05, 1.5, 0.01],
   ["handle", "Curve fullness", 0.1, 0.6, 0.01],

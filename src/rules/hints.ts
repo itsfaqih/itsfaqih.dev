@@ -1,11 +1,10 @@
 import {
   ARROWS_CHANGED,
   arrowsFor,
-  brush,
-  looped,
+  pixels,
   walk,
-  type BrushArrow,
   type HintLook,
+  type PixelArrow,
   type Point,
 } from "../arrows";
 import { isTransitioning } from "../sections/rule-open";
@@ -17,8 +16,9 @@ export type Hint = {
   label: Box;
   // What the label and the line take up together.
   bounds: Box;
-  tilt: "up" | "down" | "level";
-} & BrushArrow;
+  // Round the target, 4px out, its corners following the target's.
+  ring: { box: Box; radius: number };
+} & PixelArrow;
 
 type Slot = { edge: "top" | "right" | "bottom" | "left"; dir: -1 | 0 | 1; lean: number };
 // The furthest a label stands from its target looking for a curve `length` long.
@@ -106,7 +106,7 @@ function slot(t: Box, { edge, dir, lean }: Slot, gap: number, w: number, h: numb
  * ray from the label's centre and lands on a ray into the target's centre, so the nock points back
  * at the word and the head at the target. Both rays turn off the line between the centres by the
  * angle whose tangent is `bow`, its sign the side, so even a label level with its target draws a
- * curve.
+ * curve. The ray into the target snaps to the nearest 45 degrees, the ways a pixel head can point.
  */
 function arc(label: Box, target: Box, bow: number, look: HintLook) {
   const from = centre(label);
@@ -114,11 +114,15 @@ function arc(label: Box, target: Box, bow: number, look: HintLook) {
   const heading = Math.atan2(to.y - from.y, to.x - from.x);
   const turn = Math.atan(bow);
   const out = { x: Math.cos(heading + turn), y: Math.sin(heading + turn) };
-  const into = { x: Math.cos(heading - turn), y: Math.sin(heading - turn) };
+  const snapped = Math.round((heading - turn) / (Math.PI / 4)) * (Math.PI / 4);
+  const into = { x: Math.cos(snapped), y: Math.sin(snapped) };
   const start = exit(label, out, look.labelGap);
   const end = exit(target, { x: -into.x, y: -into.y }, look.targetGap);
   // The head's length runs straight along the ray, so the head sits square on the line.
-  const neck = { x: end.x - into.x * look.head, y: end.y - into.y * look.head };
+  const neck = {
+    x: end.x - into.x * look.head * look.grid,
+    y: end.y - into.y * look.head * look.grid,
+  };
   const handle = Math.hypot(neck.x - start.x, neck.y - start.y) * look.handle;
   const c1 = { x: start.x + out.x * handle, y: start.y + out.y * handle };
   const c2 = { x: neck.x - into.x * handle, y: neck.y - into.y * handle };
@@ -154,7 +158,7 @@ function tightest(p0: Point, p1: Point, p2: Point, p3: Point) {
 const EASES = [1, 3 / 4, 1 / 2, 1 / 4];
 
 /**
- * The arc to whichever side lands its head squarer, as the centreline the brush paints. Where both
+ * The arc to whichever side lands its head squarer, as the centreline the pixels follow. Where both
  * sides bend tighter than the look allows, the bow eases until one does not. Where none does, as
  * when a label sits too near its target to leave room for the head, the gentlest arc stands in and
  * the way is not `gentle`.
@@ -182,12 +186,6 @@ function bowed(label: Box, target: Box, look: HintLook) {
   });
   return { curve, end, length: walk(curve).total, gentle: bend >= look.bend };
 }
-
-/** The line the brush paints along an arc, with its curl and its head. */
-const spineOf = ({ curve, end }: { curve: Point[]; end: Point }, look: HintLook) => [
-  ...looped(curve, look.loop, look.curl),
-  end,
-];
 
 /** The label at slot `s` round `t` at each gap out from it, until its curve runs `longest`. */
 function reach(t: Box, s: Slot, w: number, h: number, look: HintLook, longest: number) {
@@ -292,27 +290,30 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
     const w = ruler.offsetWidth;
     const h = ruler.offsetHeight;
     const marks = survey(card);
-    // The ink is wider than the centreline, so a line keeps off by half its width and a hair.
-    const ink = hint.body / 2 + 1;
+    // The cells are wider than the centreline, so a line keeps off by half a cell and a hair.
+    const ink = hint.grid / 2 + 1;
     const next: Hint[] = [];
-    const push = (zone: string, label: Box, tilt: Hint["tilt"], spine: Point[]) => {
+    const local = (b: Box): Box => ({
+      left: b.left - box.left,
+      top: b.top - box.top,
+      right: b.right - box.left,
+      bottom: b.bottom - box.top,
+    });
+    const push = (zone: string, label: Box, spine: Point[], target: HTMLElement) => {
       const points = spine.map((p) => ({ x: p.x - box.left, y: p.y - box.top }));
-      const own = {
-        left: label.left - box.left,
-        top: label.top - box.top,
-        right: label.right - box.left,
-        bottom: label.bottom - box.top,
-      };
+      const own = local(label);
       next.push({
         zone,
         at: centre(own),
         label: own,
         bounds: span(points, own),
-        tilt,
-        ...brush(points, hint),
+        ring: {
+          box: grow(local(target.getBoundingClientRect()), 4),
+          radius: (parseFloat(getComputedStyle(target).borderRadius) || 0) + 4,
+        },
+        ...pixels(points, hint),
       });
     };
-    const tilt = (label: Box, t: Box) => (centre(label).x < centre(t).x ? "down" : "up");
     const lengths = [
       hint.length,
       (hint.length + HINT_SHORTEST) / 2,
@@ -324,7 +325,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
     // and -1 when it leaves its pane or its curve hooks.
     type Way = { label: Box; spine: Point[]; keeps: number };
     const weigh = (label: Box, way: ReturnType<typeof bowed>, room: Box, others: Box[]): Way => {
-      const spine = spineOf(way, hint);
+      const spine = [...way.curve, way.end];
       const keeps =
         way.gentle && holds(room, label)
           ? (HINT_ROOMS.find((by) => clear(label, spine, others, ink, by)) ?? 0)
@@ -342,7 +343,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
         }),
       );
     };
-    const curved: { zone: string; t: Box; tiers: ReturnType<typeof tiers> }[] = [];
+    const curved: { zone: string; target: HTMLElement; tiers: ReturnType<typeof tiers> }[] = [];
     for (const target of card.querySelectorAll<HTMLElement>("[data-hint]")) {
       const figure = target.closest<HTMLElement>("figure[data-side]");
       if (figure && getComputedStyle(figure).visibility === "hidden") continue;
@@ -365,12 +366,12 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
             (by) => near.find(keeps(by)) ?? (far ??= tiers(t, box, others).flat()).find(keeps(by)),
           ).find(Boolean) ?? near[0];
         if (pick) {
-          push("copy", pick.label, near.includes(pick) ? "level" : tilt(pick.label, t), pick.spine);
+          push("copy", pick.label, pick.spine, target);
           continue;
         }
       }
       const room = (figure ?? card).getBoundingClientRect();
-      curved.push({ zone: figure?.dataset.side ?? "copy", t, tiers: tiers(t, room, others) });
+      curved.push({ zone: figure?.dataset.side ?? "copy", target, tiers: tiers(t, room, others) });
     }
     // A clear slot at the full length first, then at each shorter length, then at each longer one,
     // first with the wider room and then the tighter, then any slot in the pane at the full length.
@@ -394,7 +395,7 @@ export function watchHints(card: HTMLElement, ruler: HTMLElement, render: (hints
           .map(({ i, ok, shared }) => c.tiers[i]?.[shared] ?? c.tiers[i]?.find(ok))
           .find(Boolean) ?? c.tiers[0]?.[0];
       if (!pick) continue;
-      push(c.zone, pick.label, tilt(pick.label, c.t), pick.spine);
+      push(c.zone, pick.label, pick.spine, c.target);
     }
     render(next);
   };

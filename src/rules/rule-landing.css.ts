@@ -1,4 +1,3 @@
-import { OUTLINE } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -379,13 +378,24 @@ export const text = {
 };
 
 const HINT_BLUE = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
+const LIGHT = ":is(.light *)";
+
+// The ring grows about 10px out on every side as it fades, by a scale set per ring from its size.
+const pulse = keyframes({
+  from: { opacity: 0.55, transform: "scale(1)" },
+  to: { opacity: 0, transform: "scale(var(--sx), var(--sy))" },
+});
+const blink = keyframes({ "50%": { opacity: 0 } });
 
 export const hintKit = {
+  // The hint's colour: the action yellow in the dark, the cyan's ink on paper.
   layer: style({
     position: "absolute",
     inset: 0,
     zIndex: 3,
     pointerEvents: "none",
+    vars: { "--hint": palette["--go"] },
+    selectors: { [`&${LIGHT}`]: { vars: { "--hint": HINT_BLUE } } },
   }),
   svg: style({
     position: "absolute",
@@ -420,73 +430,85 @@ export const hintKit = {
   haloOnPanel: style({
     backgroundColor: `color-mix(in oklab, ${palette["--panel"]} 60%, transparent)`,
   }),
-  // Outlined in its own colour so the brush's corners round off like marker.
-  ink: style({
-    "@layer": {
-      [under1]: {
-        fill: HINT_BLUE,
-        stroke: HINT_BLUE,
-        strokeWidth: OUTLINE,
-        strokeLinejoin: "round",
+  // Once its arrow shows, a cell appears whole the moment its turn in --at comes, so the trail
+  // steps out square by square. One drawn after that shows at once.
+  cell: style({
+    fill: "var(--hint)",
+    ["shapeRendering"]: "crispEdges",
+    opacity: 0,
+    transition: "opacity 0s linear var(--at)",
+    selectors: { [`&${when.ancestor("[data-drawn]")}`]: { opacity: 1 } },
+    "@media": {
+      [REDUCE]: {
+        transition: "none",
       },
     },
   }),
-  // The arrow's mask: its centreline, stroked over the ink, draws the arrow in.
-  reveal: style({
-    "@layer": {
-      [under1]: {
-        fill: "none",
-        stroke: "white",
-        strokeLinecap: "round",
-        strokeDasharray: 1,
-        strokeDashoffset: 1,
-        transition: `stroke-dashoffset 700ms ${OUT} 250ms`,
-        "@media": {
-          [REDUCE]: {
-            strokeDashoffset: 0,
-            transition: "none",
-          },
-        },
+  ring: style({
+    fill: "none",
+    stroke: "var(--hint)",
+    strokeWidth: 2,
+    opacity: 0,
+    transformBox: "fill-box",
+    transformOrigin: "center",
+  }),
+  // It starts once the trail has drawn.
+  pulse: style({
+    animation: `${pulse} 1.6s ${OUT} 850ms infinite`,
+    "@media": {
+      [REDUCE]: {
+        animation: "none",
+        opacity: 0.35,
       },
     },
   }),
-  drawn: style({
-    strokeDashoffset: 0,
-  }),
+  // A "press start" chip: ink on paper with a hard shadow in the hint's colour, the action yellow in
+  // the dark.
   label: style({
     "@layer": {
       [under1]: {
         position: "absolute",
-        fontWeight: 600,
-        fontSize: "13px",
-        lineHeight: 1,
+        transform: "translate(-50%, -50%)",
+        paddingBlock: "6px",
+        paddingInline: "7px 8px",
         fontFamily: fonts["--display"],
+        fontWeight: 700,
+        fontSize: "10px",
+        lineHeight: 1,
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
         whiteSpace: "nowrap",
-        color: HINT_BLUE,
-        textShadow: `0 0 3px ${kit["--code-bg"]}, 0 0 3px ${kit["--code-bg"]}`,
+        color: palette["--on-accent"],
+        backgroundColor: palette["--go"],
+        boxShadow: "3px 3px 0 #000",
         transition: `opacity 260ms ease 120ms`,
+        selectors: {
+          [`&${LIGHT}`]: {
+            color: palette["--bg"],
+            backgroundColor: palette["--text"],
+            boxShadow: `3px 3px 0 ${HINT_BLUE}`,
+          },
+        },
         "@media": {
           [REDUCE]: {
             transition: "none",
           },
         },
+      },
+    },
+  }),
+  caret: style({
+    display: "inline-block",
+    marginRight: "5px",
+    animation: `${blink} 1s steps(1) infinite`,
+    "@media": {
+      [REDUCE]: {
+        animation: "none",
       },
     },
   }),
   ruler: style({
     visibility: "hidden",
-  }),
-  up: style({
-    transform: "translate(-50%, -50%) rotate(-4deg)",
-  }),
-  down: style({
-    transform: "translate(-50%, -50%) rotate(4deg)",
-  }),
-  level: style({
-    transform: "translate(-50%, -50%)",
-  }),
-  onPanel: style({
-    textShadow: `0 0 3px ${palette["--panel"]}, 0 0 3px ${palette["--panel"]}`,
   }),
   gone: style({
     opacity: 0,
