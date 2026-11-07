@@ -2,7 +2,7 @@ import { chromium, type Browser, type BrowserContext, type Locator, type Page } 
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import { PUBLISHED_GUIDELINES, VISIBLE_GUIDELINES } from "../../src/data/guidelines";
 import { pageErrors, pathname } from "./page-setup";
-import { pageReady } from "./ready";
+import { pageReady } from "../ready";
 
 // Drives the built site the way a reader does, across page navigations.
 // Every test fails on any error the page logs.

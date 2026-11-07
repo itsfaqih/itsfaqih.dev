@@ -1,6 +1,6 @@
 import { globSync, readFileSync } from "node:fs";
 import { expect, test } from "vite-plus/test";
-import { SITE_ROOT } from "./serve-build";
+import { SITE_ROOT } from "../site";
 
 const STYLE = /<style[^>]*>(.*?)<\/style>/gs;
 const RULE = /([^{}]*)\{([^{}]*)\}/g;

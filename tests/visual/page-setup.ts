@@ -4,7 +4,7 @@ import pixelmatch from "pixelmatch";
 import type { Browser, Page } from "playwright";
 import { PNG } from "pngjs";
 import { inject } from "vite-plus/test";
-import { pageReady } from "./ready";
+import { pageReady } from "../ready";
 
 declare global {
   interface Window {

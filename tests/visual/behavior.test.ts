@@ -10,7 +10,7 @@ import {
   writeDiff,
   type Clip,
 } from "./page-setup";
-import { routeSlug } from "./serve-build";
+import { routeSlug } from "../site";
 
 declare global {
   interface Window {

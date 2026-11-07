@@ -11,7 +11,7 @@ import {
   type Scheme,
   type Viewport,
 } from "./page-setup";
-import { routeSlug } from "./serve-build";
+import { routeSlug } from "../site";
 
 type Shot = { route: string; viewport: Viewport; scheme: Scheme };
 

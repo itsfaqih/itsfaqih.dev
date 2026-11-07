@@ -1,6 +1,6 @@
 import { globSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vite-plus/test";
-import { SITE_ROOT } from "./serve-build";
+import { SITE_ROOT } from "../site";
 
 // `layer` decides order between layers; the conditions do not, so two rules under different
 // @media or @supports in one layer still fight by source order whenever both apply.

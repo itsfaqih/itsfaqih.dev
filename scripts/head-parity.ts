@@ -9,7 +9,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { builtRoutes } from "../tests/visual/serve-build.ts";
+import { builtRoutes } from "../tests/site.ts";
 import { decodeHtml } from "./decode-html.ts";
 
 const [other, site = "dist"] = process.argv.slice(2);

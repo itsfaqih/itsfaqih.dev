@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium } from "playwright";
-import { builtRoutes, routeSlug, serveSite } from "../tests/visual/serve-build.ts";
+import { builtRoutes, routeSlug, serveSite } from "../tests/site.ts";
 
 const { values } = parseArgs({
   options: {
