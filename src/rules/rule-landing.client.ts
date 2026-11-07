@@ -10,22 +10,25 @@ const LESSON_GLOW = 0.8;
 const TOP_RIGHT = [1, 0, 1, 0] as const;
 const BOTTOM_LEFT = [0, 1, 0, 1] as const;
 
-/** Shows `copied` on a button for 1600ms through `show`. */
-function flash(show: (copied: boolean) => void) {
+/** Shows `copied` on a button for 1600ms after its last press through `show`, until `signal` aborts. */
+function flash(show: (copied: boolean) => void, signal: AbortSignal) {
+  let timer: number | undefined;
+  signal.addEventListener("abort", () => clearTimeout(timer));
   return () => {
     show(true);
-    setTimeout(() => show(false), 1600);
+    clearTimeout(timer);
+    timer = window.setTimeout(() => show(false), 1600);
   };
 }
 
-function shareCopied(button: HTMLElement) {
+function shareCopied(button: HTMLElement, signal: AbortSignal) {
   const [share, check] = button.querySelectorAll('[data-part="glyph"]');
   const label = button.querySelector('[data-part="label"]')!;
   return flash((copied) => {
     share?.setAttribute("class", landingView.glyph(!copied));
     check?.setAttribute("class", landingView.glyph(copied));
     label.textContent = copied ? "Link copied" : "Share";
-  });
+  }, signal);
 }
 
 /**
@@ -88,7 +91,7 @@ class RuleLanding extends HTMLElement {
     };
     for (const root of [this, activity]) {
       for (const button of root.querySelectorAll<HTMLElement>('[data-part="share"]')) {
-        copiedShare.set(button, shareCopied(button));
+        copiedShare.set(button, shareCopied(button, signal));
         button.addEventListener("click", () => void share(button), { signal });
       }
     }
@@ -96,7 +99,7 @@ class RuleLanding extends HTMLElement {
     const copy = part("copy");
     const copiedMarkdown = flash((copied) => {
       copy.textContent = copied ? "Copied" : "Copy SKILL.md";
-    });
+    }, signal);
     copy.addEventListener(
       "click",
       async () => {
