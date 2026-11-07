@@ -16,7 +16,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
       <nav>
         <p class={styles.title}>On this page</p><ul class={cx(styles.list, marker)}>
           {headings.map(({ depth, slug, text }) => (
-            <li class={styles.item} style={`padding-left:${(depth - 2) * 12}px`}><a href={`#${slug}`} class={tocLink(false)}><span class={styles.label}><span class={styles.layer}>{text}</span><span aria-hidden="true" class={cx(styles.layer, styles.ghost)}>{text}</span></span></a></li>
+            <li class={cx(styles.item, depth === 3 && styles.depth3)}><a href={`#${slug}`} class={tocLink(false)}><span class={styles.label}><span class={styles.layer}>{text}</span><span aria-hidden="true" class={cx(styles.layer, styles.ghost)}>{text}</span></span></a></li>
           ))}
         </ul>
       </nav>
