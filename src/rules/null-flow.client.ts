@@ -71,7 +71,7 @@ class NullFlow extends HTMLElement {
         if (shown !== want) shown.replaceWith(want);
         return;
       }
-      part<HTMLButtonElement>("save").disabled = phase === "sent";
+      part("save").setAttribute("aria-disabled", String(phase === "sent"));
     };
 
     const syncWire = () => {
@@ -168,6 +168,7 @@ class NullFlow extends HTMLElement {
         const target = event.target instanceof Element ? event.target.closest("button") : null;
         const name = target?.dataset.part;
         if (name !== "remove" && name !== "save") return;
+        if (target!.getAttribute("aria-disabled") === "true") return;
         send();
       },
       { signal },
