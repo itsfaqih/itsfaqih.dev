@@ -35,16 +35,18 @@ const { jobs } = Astro.props;
           data-cut="true"
           data-on={isOpen ? "" : undefined}
         >
-          <button
-            type="button"
-            class={view.head}
-            aria-expanded={isOpen ? "true" : "false"}
-            aria-controls={`job-${index}`}
-          >
-            <span class={styles.years}>{job.years}</span>
-            <h3 class={view.company}><CompanyLogo name={job.company} class={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></h3>
-            <span class={view.chevron} aria-hidden="true" />
-          </button>
+          <h3 class={styles.heading}>
+            <button
+              type="button"
+              class={view.head}
+              aria-expanded={isOpen ? "true" : "false"}
+              aria-controls={`job-${index}`}
+            >
+              <span class={styles.years}>{job.years}</span>
+              <span class={view.company}><CompanyLogo name={job.company} class={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></span>
+              <span class={view.chevron} aria-hidden="true" />
+            </button>
+          </h3>
           <div data-stack="true" class={view.frame}>
             <ul data-own-scroll class={view.stack} aria-label={`${job.company} stack`}>
               {job.stack.map((tool) => (

@@ -121,9 +121,9 @@ class ExperienceList extends HTMLElement {
       const more = stack.querySelector<HTMLElement>(":scope > [data-more]")!;
       return {
         element,
-        head: element.querySelector(":scope > button")!,
-        company: element.querySelector("h3")!,
-        chevron: element.querySelector(":scope > button > span:last-child")!,
+        head: element.querySelector(":scope > h3 > button")!,
+        company: element.querySelector(":scope > h3 > button > :nth-child(2)")!,
+        chevron: element.querySelector(":scope > h3 > button > span:last-child")!,
         frame,
         stack,
         track: frame.querySelector(":scope > div[aria-hidden]")!,
