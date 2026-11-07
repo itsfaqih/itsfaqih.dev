@@ -213,7 +213,7 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: false,
     // The posts' fences are prerendered by rehypeHighlightCode; text stays as written, without
-    // GFM or SmartyPants, as the MDX compiler printed it before.
+    // GFM or SmartyPants.
     processor: unified({
       gfm: false,
       smartypants: false,

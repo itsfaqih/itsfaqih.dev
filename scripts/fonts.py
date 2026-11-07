@@ -151,7 +151,7 @@ for family, (path, weights, extended) in FAMILIES.items():
     original = TTFont(BytesIO(source), recalcTimestamp=False)
     limited = BytesIO()
     limit_weight(original, weights).save(limited)
-    # The extended file draws what the whole font used to, and the core what the inlined subset did.
+    # The extended file stands in for the whole font, and the core is the subset every page inlines.
     for part, unicodes, whole in (
         ("extended", [point for point in [*EXTENDED, *map(ord, extended)] if point not in CORE], original),
         ("core", CORE, None),
