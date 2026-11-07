@@ -14,16 +14,20 @@ class TableOfContents extends HTMLElement {
       for (const link of links) link.className = tocLink(idOf(link) === id);
     };
 
+    // The current section is the last whose heading has passed the band's bottom edge, 34% down.
+    // A heading leaving the band downward, as a reader scrolls back up, hands the mark to the one
+    // above it, which the band alone would not see until it scrolled back in.
+    const headings = links.flatMap((link) => document.getElementById(idOf(link)) ?? []);
     const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) if (entry.isIntersecting) activate(entry.target.id);
+      () => {
+        const line = innerHeight * 0.34;
+        const passed = headings.filter((heading) => heading.getBoundingClientRect().top < line);
+        const current = passed[passed.length - 1];
+        if (current) activate(current.id);
       },
       { rootMargin: "-100px 0px -66%" },
     );
-    for (const link of links) {
-      const heading = document.getElementById(idOf(link));
-      if (heading) observer.observe(heading);
-    }
+    for (const heading of headings) observer.observe(heading);
 
     const controller = new AbortController();
     this.addEventListener(
