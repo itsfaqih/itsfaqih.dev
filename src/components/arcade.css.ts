@@ -27,7 +27,7 @@ export const arcade = {
       },
     },
   }),
-  // Isolates so the veils' patches (section.ts) share one context above the backdrop, behind all
+  // Isolates so the veils' patches (section.css.ts) share one context above the backdrop, behind all
   // of the column's text.
   wrap: style({
     "@layer": {

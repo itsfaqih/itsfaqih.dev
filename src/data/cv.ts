@@ -7,7 +7,6 @@ export const CV_PDF = {
 };
 
 /** The CV shown at /cv. Its projects are off the page for now. */
-
 export const CV = {
   name: "Muhammad Faqih Muntashir",
   headline: "Full Stack Engineer",

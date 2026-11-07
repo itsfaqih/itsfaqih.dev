@@ -30,7 +30,7 @@ export const palette = {
   "--thumb-ts": "var(--ts)",
   "--thumb-ax": "var(--ax)",
   "--thumb-go": "var(--go)",
-  // The red of ✕ verdicts and destructive buttons, with its text ink.
+  // The red of ✕ verdicts, with its text ink.
   "--no": "#ff5468",
   "--no-ink": "color-mix(in oklab, var(--no) var(--ink-mix), #000)",
   // The green is the palette's lightest hue, so on a light ground its marks take a deeper shade.
@@ -55,7 +55,7 @@ export const palette = {
   "--soft-key-drop": "#202029",
   "--hair-hover": "#3a3a4c",
   "--scan": "rgb(0 0 0 / 0.18)",
-  // Text that sits straight on the dither gets a patch of page colour under it (see veil in sections/section.ts).
+  // Text that sits straight on the dither gets a patch of page colour under it (see veil in sections/section.css.ts).
   "--veil": "color-mix(in srgb, var(--bg) 72%, transparent)",
   // Small text has thin strokes the dither breaks up easily, so its veil is denser.
   "--veil-dense": "color-mix(in srgb, var(--bg) 90%, transparent)",
