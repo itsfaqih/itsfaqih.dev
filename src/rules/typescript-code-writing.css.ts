@@ -38,20 +38,25 @@ export const styles = {
       },
     },
   }),
+  // Layered, so `hot` squares the left corners of this radius.
   line: style({
-    position: "relative",
-    display: "flex",
-    flexWrap: "wrap",
-    rowGap: "2px",
-    columnGap: "12px",
-    alignItems: "center",
-    minHeight: "26px",
-    paddingBlock: "1px",
-    paddingInline: "8px",
-    borderRadius: "6px",
-    "@media": {
-      [PHONE]: {
-        paddingInline: "6px",
+    "@layer": {
+      [under1]: {
+        position: "relative",
+        display: "flex",
+        flexWrap: "wrap",
+        rowGap: "2px",
+        columnGap: "12px",
+        alignItems: "center",
+        minHeight: "26px",
+        paddingBlock: "1px",
+        paddingInline: "8px",
+        borderRadius: "6px",
+        "@media": {
+          [PHONE]: {
+            paddingInline: "6px",
+          },
+        },
       },
     },
   }),
