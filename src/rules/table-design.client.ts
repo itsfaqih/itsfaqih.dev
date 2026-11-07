@@ -106,14 +106,20 @@ function pageAsked(target: EventTarget | null, page: number) {
 
 function paintNav(nav: HTMLElement, page: number, pages: number) {
   texts(nav.firstElementChild!)[1]!.data = String(page);
-  nav.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = page <= 1;
-  nav.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = page >= pages;
+  const prev = nav.querySelector<HTMLButtonElement>('[data-step="-1"]')!;
+  const next = nav.querySelector<HTMLButtonElement>('[data-step="1"]')!;
+  prev.disabled = page <= 1;
+  next.disabled = page >= pages;
+  let current: HTMLButtonElement | undefined;
   for (const key of nav.querySelectorAll<HTMLButtonElement>("[data-page]")) {
     const on = Number(key.dataset.page) === page;
     if (on) key.setAttribute("aria-current", "page");
     else key.removeAttribute("aria-current");
     key.className = view.pageKey(on);
+    if (on) current = key;
   }
+  // Prev or Next disables at an end under the press that got there, which would drop focus.
+  if ([prev, next].some((key) => key.disabled && key === document.activeElement)) current?.focus();
 }
 
 /** The Live/Paused switch: ticks the revenue while playing and while its lesson is on screen. */
@@ -554,7 +560,9 @@ class TableUrl extends HTMLElement {
       } else {
         query?.remove();
       }
-      reload.disabled = now.reloading;
+      // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
+      if (now.reloading) reload.setAttribute("aria-disabled", "true");
+      else reload.removeAttribute("aria-disabled");
       caption.data = String(now.page);
       body.className = view.body(now.reloading);
       if (drawn !== now.page) {
@@ -578,6 +586,7 @@ class TableUrl extends HTMLElement {
     reload.addEventListener(
       "click",
       () => {
+        if (now.reloading) return;
         now = { ...now, reloading: true };
         paint();
         timer = window.setTimeout(() => {
