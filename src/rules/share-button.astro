@@ -16,39 +16,25 @@ const { inIsland = false } = Astro.props;
 // rule-landing.client.ts swaps the glyphs and the label while the link is copied.
 ---
 
-{
-  inIsland ? (
-    <button type="button" class={island.action} data-part="share"
-      ><span aria-hidden="true" class={glyphSwap.cell}
-        ><Icon name="ShareNetwork" size={16} weight="bold" class={landingView.glyph(true)} data-part="glyph" /><Icon
-          name="Check"
-          size={16}
-          weight="bold"
-          class={landingView.glyph(false)}
-          data-part="glyph"
-        /></span
-      ><span class={arcade.srOnly} aria-live="polite" data-part="label">Share</span></button
-    >
-  ) : (
-    <button
-      type="button"
-      class:list={[button.base,
-        buttonVariant["tertiary-neutral"],
-        button.sm,
-        veil.dense,
-        shell.share,
-        shell.in,
-        shell.first]}
-      data-part="share"
-      ><span aria-hidden="true" class={glyphSwap.cell}
-        ><Icon name="ShareNetwork" size={16} weight="bold" class={landingView.glyph(true)} data-part="glyph" /><Icon
-          name="Check"
-          size={16}
-          weight="bold"
-          class={landingView.glyph(false)}
-          data-part="glyph"
-        /></span
-      ><span aria-live="polite" class={shell.shareLabel} data-part="label">Share</span></button
-    >
-  )
-}
+<button
+  type="button"
+  class:list={inIsland
+    ? island.action
+    : [button.base,
+      buttonVariant["tertiary-neutral"],
+      button.sm,
+      veil.dense,
+      shell.share,
+      shell.in,
+      shell.first]}
+  data-part="share"
+  ><span aria-hidden="true" class={glyphSwap.cell}
+    ><Icon name="ShareNetwork" size={16} weight="bold" class={landingView.glyph(true)} data-part="glyph" /><Icon
+      name="Check"
+      size={16}
+      weight="bold"
+      class={landingView.glyph(false)}
+      data-part="glyph"
+    /></span
+  ><span aria-live="polite" class={inIsland ? arcade.srOnly : shell.shareLabel} data-part="label">Share</span></button
+>

@@ -22,7 +22,7 @@ type Props = {
 const { readings, utc } = Astro.props;
 ---
 
-<ts-readers
+<timestamps-readers
   class={host.contents}
   data-times={readings.map((reading) => reading.shown).join()}
   data-utc={utc}
@@ -32,7 +32,7 @@ const { readings, utc } = Astro.props;
       readings.map((reading) => {
         const off = offBy(reading);
         return (
-          <div class={`ts-reader ${styles.reader}`}
+          <div class={`timestamps-reader ${styles.reader}`}
             ><span aria-hidden="true" class={styles.clock}
               >{off && <i class={tsView.ghost} style={`--a:${hourAngle(reading.truth)}deg`} />}<i
                 class={tsView.minute}
@@ -60,8 +60,8 @@ const { readings, utc } = Astro.props;
       })
     }
   </div>
-</ts-readers>
+</timestamps-readers>
 
 <script>
-  import "./ts-readers.client";
+  import "./timestamps-readers.client";
 </script>

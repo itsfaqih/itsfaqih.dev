@@ -1,6 +1,6 @@
 import type { Lesson, Side, Tldr } from "./lesson";
 
-export type Note = { text: string; tone?: "no" | "yes"; error?: true };
+type Note = { text: string; tone?: "no" | "yes"; error?: true };
 /** A line of code in a pane, with what tsc says about it. */
 export type Line = { c: string; hot?: boolean; note?: Note };
 

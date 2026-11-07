@@ -12,14 +12,14 @@ import {
 } from "./handling-timestamps";
 import { tsView } from "./handling-timestamps.view";
 import { OUT, TABBED } from "./rule-landing.css";
-import { onceOnScreen } from "./rule-motion";
+import { belowFold, onceOnScreen } from "./rule-motion";
 
 function swing(root: Element, from: Wall[], to: Wall[], duration: number, step: number) {
-  return [...root.querySelectorAll<HTMLElement>(".ts-reader")].flatMap((card, index) => {
+  return [...root.querySelectorAll<HTMLElement>(".timestamps-reader")].flatMap((card, index) => {
     const start = from[index];
     const end = to[index];
-    const hour = card.querySelector<HTMLElement>(".ts-hour");
-    const minute = card.querySelector<HTMLElement>(".ts-min");
+    const hour = card.querySelector<HTMLElement>(".timestamps-hour");
+    const minute = card.querySelector<HTMLElement>(".timestamps-min");
     if (start === undefined || end === undefined || !hour || !minute || start === end) return [];
     const timing: KeyframeAnimationOptions = {
       duration,
@@ -60,12 +60,12 @@ const setText = (element: Element, text: string) => {
   if (element.textContent !== text) element.textContent = text;
 };
 
-/** Redraws one reader card (ts-readers.astro) for `reading`, keeping its nodes as React did. */
+/** Redraws one reader card (timestamps-readers.astro) for `reading`, patching its nodes in place. */
 function paint(card: Element, reading: Reading) {
   const off = offBy(reading);
   const clock = card.firstElementChild!;
   const read = card.lastElementChild!;
-  let ghost = clock.firstElementChild!.classList.contains("ts-min")
+  let ghost = clock.firstElementChild!.classList.contains("timestamps-min")
     ? null
     : clock.firstElementChild;
   if (off && !ghost) {
@@ -77,8 +77,8 @@ function paint(card: Element, reading: Reading) {
     ghost = null;
   }
   ghost?.setAttribute("style", `--a:${hourAngle(reading.truth)}deg`);
-  const minute = clock.querySelector(".ts-min")!;
-  const hour = clock.querySelector(".ts-hour")!;
+  const minute = clock.querySelector(".timestamps-min")!;
+  const hour = clock.querySelector(".timestamps-hour")!;
   minute.setAttribute("style", `--a:${minuteAngle(reading.shown)}deg`);
   hour.setAttribute("style", `--a:${hourAngle(reading.shown)}deg`);
   hour.className = tsView.hour(off !== null);
@@ -101,10 +101,11 @@ function paint(card: Element, reading: Reading) {
 }
 
 /**
- * Two readers' clocks (ts-readers.astro). Below the fold they swing from UTC to each reader's time
- * as they come on screen; a demo that changes the time calls `show`, and the hands swing there.
+ * Two readers' clocks (timestamps-readers.astro). Below the fold on a wide screen they swing from
+ * UTC to each reader's time as they come on screen; a demo that changes the time calls `show`, and
+ * the hands swing there.
  */
-export class TsReaders extends HTMLElement {
+export class TimestampsReaders extends HTMLElement {
   #stop?: () => void;
   #shown: Wall[] = [];
 
@@ -113,10 +114,9 @@ export class TsReaders extends HTMLElement {
     const shown = this.dataset.times!.split(",").map(Number);
     const utc = Number(this.dataset.utc);
     this.#shown = shown;
-    // React's phone branch looked for `.demo` and `.pane` ancestors that no page renders, so on a
-    // phone the clocks never swing in; that stays as shipped.
+    // Phones skip the swing in and show the clocks at their times.
     if (reducedMotion() || matchMedia(TABBED).matches) return;
-    if (root.getBoundingClientRect().top < innerHeight * 0.7) return;
+    if (!belowFold(root)) return;
     const held = swing(
       root,
       shown.map(() => utc),
@@ -125,15 +125,11 @@ export class TsReaders extends HTMLElement {
       120,
     );
     for (const animation of held) animation.pause();
-    let timer = 0;
-    const stop = onceOnScreen(root, () => {
-      timer = window.setTimeout(() => {
-        for (const animation of held) animation.play();
-      }, 240);
+    const stop = onceOnScreen(root, 240, () => {
+      for (const animation of held) animation.play();
     });
     this.#stop = () => {
       stop();
-      clearTimeout(timer);
       for (const animation of held) animation.cancel();
     };
   }
@@ -153,4 +149,4 @@ export class TsReaders extends HTMLElement {
   }
 }
 
-customElements.define("ts-readers", TsReaders);
+customElements.define("timestamps-readers", TimestampsReaders);

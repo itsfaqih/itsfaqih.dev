@@ -1,6 +1,6 @@
 import { reducedMotion } from "../browser/media-query";
 import { OUT, TABBED } from "./rule-landing.css";
-import { onceOnScreen } from "./rule-motion";
+import { belowFold, onceOnScreen } from "./rule-motion";
 import { LINE_HEIGHT, styles } from "./typescript-code-writing.css";
 
 /** How far apart, in ms, tsc reaches each line. */
@@ -25,7 +25,6 @@ class TsChecked extends HTMLElement {
     const run = this.querySelector("button")!;
     // As the server rendered it, tsc's verdict: "1 error", "3 errors".
     const verdict = summary.textContent;
-    let wait = 0;
     let timer = 0;
     let stopWatch = () => {};
 
@@ -89,27 +88,19 @@ class TsChecked extends HTMLElement {
       () => {
         if (run.hasAttribute("aria-disabled")) return;
         stopWatch();
-        clearTimeout(wait);
         check();
       },
       { signal: controller.signal },
     );
 
-    if (
-      !reducedMotion() &&
-      !matchMedia(TABBED).matches &&
-      this.getBoundingClientRect().top >= innerHeight * 0.7
-    ) {
+    if (!reducedMotion() && !matchMedia(TABBED).matches && belowFold(this)) {
       show("idle");
-      stopWatch = onceOnScreen(this, () => {
-        wait = window.setTimeout(check, 300);
-      });
+      stopWatch = onceOnScreen(this, 300, check);
     }
 
     this.#stop = () => {
       controller.abort();
       stopWatch();
-      clearTimeout(wait);
       clearTimeout(timer);
     };
   }

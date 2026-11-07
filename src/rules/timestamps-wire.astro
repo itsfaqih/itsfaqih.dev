@@ -6,8 +6,8 @@ import { tsView } from "./handling-timestamps.view";
 type Props = { lines: WireLine[] };
 
 const { lines } = Astro.props;
-// The empty comments split adjacent text the way React's server markup did, so the elements can
-// patch each piece in place (ts-wire.ts).
+// The empty comments keep each part its own text node, so the elements can patch each piece in
+// place (timestamps-wire.ts).
 ---
 
 <div class={styles.wire}>

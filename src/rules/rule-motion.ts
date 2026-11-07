@@ -38,15 +38,24 @@ export function watchTitleSwap(title: HTMLElement, label: HTMLElement) {
   };
 }
 
-export function onceOnScreen(element: Element, show: () => void) {
+/** Whether `element` starts low enough that it should play once scrolled to, not on load. */
+export const belowFold = (element: Element) =>
+  element.getBoundingClientRect().top >= innerHeight * 0.7;
+
+/** Calls `play` `delay` ms after `element` is mostly on screen, once. Returns the stop. */
+export function onceOnScreen(element: Element, delay: number, play: () => void) {
+  let timer = 0;
   const observer = new IntersectionObserver(
     ([entry]) => {
       if (!entry?.isIntersecting) return;
       observer.disconnect();
-      show();
+      timer = window.setTimeout(play, delay);
     },
     { threshold: 0.6 },
   );
   observer.observe(element);
-  return () => observer.disconnect();
+  return () => {
+    observer.disconnect();
+    clearTimeout(timer);
+  };
 }

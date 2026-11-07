@@ -10,7 +10,7 @@ import {
   type Row,
   type Way,
 } from "./null-vs-undefined";
-import { flowView, KINDS, paint } from "./null-vs-undefined.view";
+import { flowView, paintedNodes } from "./null-vs-undefined.view";
 
 const SEND_MS = 460;
 
@@ -21,16 +21,10 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, te
   return element;
 }
 
-function painted(source: string) {
-  return paint(source, KINDS).map((part) =>
-    part.class ? el("span", part.class, part.text) : document.createTextNode(part.text),
-  );
-}
-
 /**
  * A save demo (null-flow.astro): a form, the PATCH it sends, and the record it leaves. "clear"
- * removes the reviewer, "rename" edits the title. Each send replays the request and the record,
- * as React's keys remounted them.
+ * removes the reviewer, "rename" edits the title. Each send rebuilds the request and the record, so
+ * their animations replay.
  */
 class NullFlow extends HTMLElement {
   #stop?: () => void;
@@ -109,7 +103,7 @@ class NullFlow extends HTMLElement {
         code.className = flowView.body(phase === "sent");
         if (json !== body) {
           json = body;
-          code.replaceChildren(...painted(body));
+          code.replaceChildren(...paintedNodes(body));
         }
       }
       packet.className = flowView.packet(phase === "sent");

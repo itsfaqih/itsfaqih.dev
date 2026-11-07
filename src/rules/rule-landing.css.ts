@@ -2129,8 +2129,8 @@ export const island = {
   }),
 };
 
-// The custom elements of rule-landing.astro: the page root stands in for the block it was, and the
-// lesson and quiz hosts keep their native articles as the boxes.
+// Custom elements are inline by default. `block` lays a root out as a block; `contents` drops a
+// host's own box, so the article or view inside it is the box.
 export const host = {
   block: style({
     display: "block",

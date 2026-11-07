@@ -16,7 +16,7 @@ export const HINT = {
   each: "Pick each",
   hover: "Hover it",
 } as const;
-export type HintSay = (typeof HINT)[keyof typeof HINT];
+type HintSay = (typeof HINT)[keyof typeof HINT];
 
 export type Hint = {
   zone: string;

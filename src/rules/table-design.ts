@@ -29,7 +29,7 @@ export type Roster = {
   users: readonly Person[];
   query: string;
 };
-export type RosterView = "loading" | "empty" | "error" | "none" | "data";
+type RosterView = "loading" | "empty" | "error" | "none" | "data";
 
 export const TEAM: readonly Person[] = [
   { name: "Alice Johnson", role: "Admin" },

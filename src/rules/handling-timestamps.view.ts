@@ -9,8 +9,8 @@ export const tsView = {
   line: (note: boolean, hot: boolean) =>
     cx(styles.line, note && styles.note, hot && styles.hot, marker),
   ghost: cx(styles.hand, styles.ghost),
-  minute: `ts-min ${cx(styles.hand, styles.minuteHand)}`,
-  hour: (off: boolean) => `ts-hour ${cx(styles.hand, off && styles.hourOff)}`,
+  minute: `timestamps-min ${cx(styles.hand, styles.minuteHand)}`,
+  hour: (off: boolean) => `timestamps-hour ${cx(styles.hand, off && styles.hourOff)}`,
   time: (off: boolean) => cx(styles.time, off && styles.off),
   order: (fate: Fate) =>
     cx(

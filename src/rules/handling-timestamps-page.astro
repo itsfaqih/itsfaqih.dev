@@ -23,14 +23,14 @@ import QuizChoice from "./quiz-choice.astro";
 import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
-import TsBoardCell from "./ts-board-cell.astro";
-import TsFilter from "./ts-filter.astro";
-import TsOrders from "./ts-orders.astro";
-import TsReaders from "./ts-readers.astro";
-import TsReminder from "./ts-reminder.astro";
-import TsWire from "./ts-wire.astro";
+import TimestampsBoardCell from "./timestamps-board-cell.astro";
+import TimestampsFilter from "./timestamps-filter.astro";
+import TimestampsOrders from "./timestamps-orders.astro";
+import TimestampsReaders from "./timestamps-readers.astro";
+import TimestampsReminder from "./timestamps-reminder.astro";
+import TimestampsWire from "./timestamps-wire.astro";
 const [store, zulu, local, input, filter] = LESSONS;
-const marks = { lead: TsBoardCell, label: TsBoardCell, text: TsBoardCell };
+const marks = { lead: TimestampsBoardCell, label: TimestampsBoardCell, text: TimestampsBoardCell };
 
 // Quizzes use other people, zones and dates than the lessons, so they test the rule, not recall.
 const YUKI: Person = { who: "Yuki", city: "Tokyo", tz: "Asia/Tokyo" };
@@ -88,8 +88,8 @@ const lanes = [
     <LessonText slot="extra" tip
       >UTC never shifts for daylight saving or politics. It means the same moment everywhere.</LessonText
     >
-    <TsOrders slot="bad" way="bad" />
-    <TsOrders slot="good" way="good" />
+    <TimestampsOrders slot="bad" way="bad" />
+    <TimestampsOrders slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={1} level={store.levels[0]}
     >Yuki in Tokyo and Lena in Berlin post a comment in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">posted_at</Code> stores.
@@ -121,12 +121,12 @@ const lanes = [
       >An ISO string without a <Code tone="chip">Z</Code> has no zone, so each browser reads it as local time. Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code tone="chip">Z</Code> so each browser converts it to its own zone.</Fragment
     >
     <div slot="bad" class={styles.view}>
-      <TsWire lines={responseLines("bad")} />
-      <TsReaders readings={NO_Z} utc={MOMENT} />
+      <TimestampsWire lines={responseLines("bad")} />
+      <TimestampsReaders readings={NO_Z} utc={MOMENT} />
     </div>
     <div slot="good" class={styles.view}>
-      <TsWire lines={responseLines("good")} />
-      <TsReaders readings={RIGHT} utc={MOMENT} />
+      <TimestampsWire lines={responseLines("good")} />
+      <TimestampsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
   <RuleQuiz n={2} level={zulu.levels[0]}
@@ -152,12 +152,12 @@ const lanes = [
       >The server knows its own time zone, not the reader's, so a time it formats is right only where it runs. Send UTC and let each browser format it.</Fragment
     >
     <div slot="bad" class={styles.view}>
-      <TsWire lines={formatLines("bad")} />
-      <TsReaders readings={SERVER_TIME} utc={MOMENT} />
+      <TimestampsWire lines={formatLines("bad")} />
+      <TimestampsReaders readings={SERVER_TIME} utc={MOMENT} />
     </div>
     <div slot="good" class={styles.view}>
-      <TsWire lines={formatLines("good")} />
-      <TsReaders readings={RIGHT} utc={MOMENT} />
+      <TimestampsWire lines={formatLines("good")} />
+      <TimestampsReaders readings={RIGHT} utc={MOMENT} />
     </div>
   </RuleLesson>
   <RuleQuiz n={3} level={local.levels[0]} board="flow" marks={marks}
@@ -168,8 +168,8 @@ const lanes = [
     <Fragment slot="body"
       >Rina sets a reminder for 7:00 AM. From <Code tone="chip">2026-01-01T07:00:00</Code> the server can't tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code tone="chip">Z</Code>, or the local time with its offset. Both name one moment.</Fragment
     >
-    <TsReminder slot="bad" way="bad" />
-    <TsReminder slot="good" way="good" />
+    <TimestampsReminder slot="bad" way="bad" />
+    <TimestampsReminder slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={4} level={input.levels[0]} board="flow" marks={marks}
     >Lena in Berlin books a meeting for Mar 12, 9:30 AM. Place the conversion to UTC.</RuleQuiz
@@ -182,8 +182,8 @@ const lanes = [
     <Fragment slot="body"
       >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs from 07:00 to 07:00 her time. Orders before 07:00 go missing, and the next morning's show up.</Fragment
     >
-    <TsFilter slot="bad" way="bad" />
-    <TsFilter slot="good" way="good" />
+    <TimestampsFilter slot="bad" way="bad" />
+    <TimestampsFilter slot="good" way="good" />
   </RuleLesson>
   <RuleQuiz n={6} level={filter.levels[0]}
     >Three filters for Mar 4 each need a start. Tap the Mar 4 that starts at 15:00 UTC on Mar 3.

@@ -8,20 +8,18 @@ import {
   type Way,
 } from "./handling-timestamps";
 import { tsView } from "./handling-timestamps.view";
-import { patchLine } from "./ts-wire";
-
-const texts = (element: Element) =>
-  [...element.childNodes].filter((node): node is Text => node.nodeType === Node.TEXT_NODE);
+import { texts } from "./text-nodes";
+import { patchLine } from "./timestamps-wire";
 
 const setData = (node: Text, data: string) => {
   if (node.data !== data) node.data = data;
 };
 
 /**
- * The day filter demo (ts-filter.astro): Rina picks a day, and the range each way sends decides
- * which of her orders come back.
+ * The day filter demo (timestamps-filter.astro): Rina picks a day, and the range each way sends
+ * decides which of her orders come back.
  */
-class TsFilter extends HTMLElement {
+class TimestampsFilter extends HTMLElement {
   #stop?: () => void;
 
   connectedCallback() {
@@ -57,7 +55,7 @@ class TsFilter extends HTMLElement {
         if (fate.textContent !== FATE[order.fate]) fate.textContent = FATE[order.fate];
       });
     };
-    // React's onChange heard both events; sync is idempotent, so a pair costs nothing.
+    // Both input and change: sync is idempotent, so a picker that fires the pair costs nothing.
     for (const type of ["input", "change"]) {
       input.addEventListener(type, sync, { signal: controller.signal });
     }
@@ -69,4 +67,4 @@ class TsFilter extends HTMLElement {
   }
 }
 
-customElements.define("ts-filter", TsFilter);
+customElements.define("timestamps-filter", TimestampsFilter);

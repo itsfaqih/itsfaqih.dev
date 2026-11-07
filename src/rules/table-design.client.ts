@@ -25,6 +25,7 @@ import {
   viewOf,
 } from "./table-design";
 import { view } from "./table-design.view";
+import { texts } from "./text-nodes";
 
 type Store<T> = {
   get: () => T;
@@ -75,9 +76,6 @@ function cloneOf<T extends Element>(template: HTMLTemplateElement, kind: abstrac
     throw new Error(`template "${template.dataset.part}" holds no ${kind.name}`);
   return node;
 }
-
-const texts = (element: Element) =>
-  [...element.childNodes].filter((node): node is Text => node.nodeType === Node.TEXT_NODE);
 
 /** Makes `nodes` the children of `parent`, moving only what is out of place, as a keyed render does. */
 function place(parent: Element, nodes: readonly Node[]) {
@@ -266,7 +264,6 @@ class TableSegments extends HTMLElement {
     const controller = new AbortController();
     const keys = [...this.querySelectorAll<HTMLButtonElement>("[data-key]")];
     const ofRoster = this.dataset.of === "roster";
-    let settle = 0;
 
     const paint = (value: string) => {
       for (const key of keys) {
@@ -289,20 +286,13 @@ class TableSegments extends HTMLElement {
       },
       { signal: controller.signal },
     );
-    // A retried load settles after a beat; any change to the roster meanwhile restarts the wait.
     const unsubscribe = ofRoster
-      ? roster.subscribe((now) => {
-          paint(viewOf(now));
-          clearTimeout(settle);
-          if (now.phase === "loading" && now.settles)
-            settle = window.setTimeout(() => roster.update(() => READY), 1100);
-        })
+      ? roster.subscribe((now) => paint(viewOf(now)))
       : filter.subscribe(paint);
 
     this.#stop = () => {
       controller.abort();
       unsubscribe();
-      clearTimeout(settle);
     };
   }
 
@@ -409,12 +399,21 @@ class TableStates extends HTMLElement {
       },
       { signal: controller.signal },
     );
-    const unsubscribe = roster.subscribe(paint);
+    let settle = 0;
+    const unsubscribe = roster.subscribe((now) => {
+      paint(now);
+      if (!careful) return;
+      // Retry's load settles after a beat; any change to the roster meanwhile restarts the wait.
+      clearTimeout(settle);
+      if (now.phase === "loading" && now.settles)
+        settle = window.setTimeout(() => roster.update(() => READY), 1100);
+    });
     paint(roster.get());
 
     this.#stop = () => {
       controller.abort();
       unsubscribe();
+      clearTimeout(settle);
     };
   }
 

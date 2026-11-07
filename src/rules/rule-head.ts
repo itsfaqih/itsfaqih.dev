@@ -1,10 +1,14 @@
-import { PUBLISHED_GUIDELINES } from "../data/guidelines";
+import { PUBLISHED_GUIDELINES, type PublishedGuideline } from "../data/guidelines";
 import type { SharedPage } from "../seo";
 
-/** A rule page's sharing metadata. */
-export function ruleHead(id: string): SharedPage {
+export function publishedRule(id: string) {
   const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
   if (!rule) throw new Error(`No published rule "${id}"`);
+  return rule;
+}
+
+/** A rule page's sharing metadata. */
+export function ruleHead(rule: PublishedGuideline): SharedPage {
   return {
     path: rule.href,
     title: rule.headTitle,

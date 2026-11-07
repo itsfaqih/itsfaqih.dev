@@ -153,13 +153,13 @@ class RuleLanding extends HTMLElement {
       const thumb = card.querySelector(".thumb")!;
       // Chromium fires pointerleave between pageswap and the snapshot, which would stop the art
       // a dive morphs from.
-      const play = (on: boolean) => () => {
+      const playThumb = (on: boolean) => () => {
         if (!isTransitioning()) thumb.toggleAttribute("data-play", on);
       };
-      card.addEventListener("pointerenter", play(true), { signal });
-      card.addEventListener("pointerleave", play(false), { signal });
-      card.addEventListener("focus", play(true), { signal });
-      card.addEventListener("blur", play(false), { signal });
+      card.addEventListener("pointerenter", playThumb(true), { signal });
+      card.addEventListener("pointerleave", playThumb(false), { signal });
+      card.addEventListener("focus", playThumb(true), { signal });
+      card.addEventListener("blur", playThumb(false), { signal });
     }
     watchRuleOpen(this, signal);
 

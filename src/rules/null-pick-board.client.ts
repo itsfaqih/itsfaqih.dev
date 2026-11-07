@@ -1,6 +1,6 @@
 import { play } from "../browser/sound";
 import { landed, pickChoice, type FieldOption, type PickField } from "./null-vs-undefined";
-import { KINDS, paint, pickView } from "./null-vs-undefined.view";
+import { paintedNodes, pickView } from "./null-vs-undefined.view";
 
 const LIST = new Intl.ListFormat("en", { type: "conjunction" });
 
@@ -25,21 +25,9 @@ class NullPickBoard extends HTMLElement {
     const groups = [...this.querySelectorAll<HTMLElement>("[data-field]")];
     const picks: (FieldOption | undefined)[] = fields.map(() => undefined);
 
-    const paintLine = (line: HTMLElement, source: string) => {
-      line.replaceChildren(
-        ...paint(source, KINDS).map((part) => {
-          if (!part.class) return document.createTextNode(part.text);
-          const span = document.createElement("span");
-          span.className = part.class;
-          span.textContent = part.text;
-          return span;
-        }),
-      );
-    };
-
     const set = (index: number, option: FieldOption) => {
       picks[index] = option;
-      paintLine(lines[index]!, option.line);
+      lines[index]!.replaceChildren(...paintedNodes(option.line));
       groups[index]!.querySelectorAll<HTMLButtonElement>("[data-key]").forEach((key) => {
         const on = key.dataset.key === option.key;
         key.setAttribute("aria-pressed", String(on));
@@ -83,7 +71,7 @@ class NullPickBoard extends HTMLElement {
           const value = landed(field, picks[index]!);
           const line = document.createElement("span");
           line.className = pickView.result(value === landed(field, answer));
-          paintLine(line, `${field.name}: ${value}`);
+          line.append(...paintedNodes(`${field.name}: ${value}`));
           return line;
         }),
       );

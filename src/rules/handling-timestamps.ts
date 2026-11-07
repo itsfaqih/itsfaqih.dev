@@ -225,11 +225,11 @@ export function codeCell(value: string) {
 
 export type Way = "bad" | "good";
 export type Person = { who: string; city: string; tz: string };
-export const RINA: Person = { who: "Rina", city: "Jakarta", tz: "Asia/Jakarta" };
-export const SAM: Person = { who: "Sam", city: "New York", tz: "America/New_York" };
+const RINA: Person = { who: "Rina", city: "Jakarta", tz: "Asia/Jakarta" };
+const SAM: Person = { who: "Sam", city: "New York", tz: "America/New_York" };
 export const HOUR = 3_600_000;
 export const DAY = 24 * HOUR;
-export const JAKARTA = 7 * HOUR;
+const JAKARTA = 7 * HOUR;
 
 /** A wall-clock time in some zone, held as the UTC instant with the same digits. */
 export type Wall = number;
@@ -289,7 +289,7 @@ export const hhmm = (wall: Wall) => new Date(wall).toISOString().slice(11, 16);
 /** What a reader's clock shows, and what it should show. */
 export type Reading = { person: Person; shown: Wall; truth: Wall };
 
-export const readAt = (person: Person, shown: number, truth: number): Reading => ({
+const readAt = (person: Person, shown: number, truth: number): Reading => ({
   person,
   shown: wallOf(shown, person.tz),
   truth: wallOf(truth, person.tz),
@@ -319,7 +319,7 @@ export const SERVER_TIME: Reading[] = [RINA, SAM].map((person) => ({
   shown: SERVER_WALL,
   truth: wallOf(MOMENT, person.tz),
 }));
-export const serverString = (() => {
+const serverString = (() => {
   const at = new Date(SERVER_WALL);
   return `${at.getUTCMonth() + 1}/${at.getUTCDate()}/${at.getUTCFullYear()}, ${timeOf(SERVER_WALL, true)}`;
 })();
