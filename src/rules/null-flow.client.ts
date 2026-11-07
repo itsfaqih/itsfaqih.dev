@@ -68,7 +68,11 @@ class NullFlow extends HTMLElement {
       if (chip && none) {
         const want = phase === "idle" ? chip : none;
         const shown = form.children[1]!;
-        if (shown !== want) shown.replaceWith(want);
+        if (shown === want) return;
+        // The chip leaves with its focused ✕, so focus moves to Reset, the way back.
+        const focused = shown.contains(document.activeElement);
+        shown.replaceWith(want);
+        if (focused) reset.focus();
         return;
       }
       part("save").setAttribute("aria-disabled", String(phase === "sent"));
