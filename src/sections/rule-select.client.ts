@@ -127,6 +127,8 @@ class RuleSelect extends HTMLElement {
     let stopScramble = () => {};
     let stopAim = () => {};
     let tiles = new Map<string, HTMLElement>();
+    // The dealt hand's listeners, dropped with the hand when a new filter deals another.
+    let dealing = new AbortController();
 
     const matchesNow = () => {
       const normalized = query.trim().toLowerCase();
@@ -208,11 +210,19 @@ class RuleSelect extends HTMLElement {
       const key = `${category}|${query.trim().toLowerCase()}`;
       if (key !== dealt) {
         dealt = key;
+        dealing.abort();
+        dealing = new AbortController();
         tiles = new Map(
           matches.map((rule) => [rule.id, document.importNode(deck.get(rule.href)!, true)]),
         );
         tiles.forEach((tile, id) => watchTile(tile, id));
         grid.replaceChildren(...tiles.values());
+        // The lit tile was dealt anew, or out of the hand; the beam follows the new one or goes.
+        litTile = (litId && tiles.get(litId)) || null;
+        if (!litTile) litId = null;
+        aimed = null;
+        stopAim();
+        stopAim = () => {};
       }
       if (matches.length === 0) {
         // Separate text nodes, as each is shaped on its own: the closing quote takes no kerning.
@@ -286,6 +296,7 @@ class RuleSelect extends HTMLElement {
     );
 
     function watchTile(tile: HTMLElement, id: string) {
+      const { signal } = dealing;
       tile.addEventListener(
         "pointerenter",
         (event) => {
@@ -365,6 +376,7 @@ class RuleSelect extends HTMLElement {
 
     this.#stop = () => {
       controller.abort();
+      dealing.abort();
       stopAim();
       stopScramble();
       quiet();
