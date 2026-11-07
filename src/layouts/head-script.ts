@@ -21,11 +21,12 @@ export const HEAD_SCRIPT = String.raw`(function () {
   if (matchMedia("(hover: hover) and (pointer: fine)").matches) doc.classList.add("sb-own");
   // A saved choice wins; otherwise follow the system.
   var theme = "dark";
+  var saved = null;
   try {
-    var saved = localStorage.getItem("theme");
-    if (saved === "dark" || saved === "light") theme = saved;
-    else if (matchMedia("(prefers-color-scheme: light)").matches) theme = "light";
+    saved = localStorage.getItem("theme");
   } catch (e) {}
+  if (saved === "dark" || saved === "light") theme = saved;
+  else if (matchMedia("(prefers-color-scheme: light)").matches) theme = "light";
   doc.classList.remove("light", "dark");
   doc.classList.add(theme);
   // The metas' media queries follow the system, which a saved choice can contradict.

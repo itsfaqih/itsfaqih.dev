@@ -1,11 +1,11 @@
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
+import { palette } from "../theme.vars.css";
 const PHONE = "(max-width: 639px)";
 
 export const styles = {
   container: style({
     // On phones the text sits on a white sheet that fades out at the top and bottom.
-    // `background: none` minifies to a 0 0 position, which computes to 0px 0px.
     "@layer": {
       [under1]: {
         marginInline: "auto",
@@ -24,15 +24,13 @@ export const styles = {
                 inset: 0,
                 zIndex: -1,
                 pointerEvents: "none",
-                backgroundImage:
-                  "linear-gradient(90deg, transparent 0%, #FFFFFF 0%, #FFFFFF 100%, transparent 100%)",
+                backgroundColor: palette["--panel"],
                 maskImage:
                   "linear-gradient(to bottom, transparent 0%, black 1%, black 85%, transparent 100%)",
                 opacity: 0.9,
               },
               "&:is(.dark *)::before": {
-                backgroundImage: "none",
-                backgroundPosition: "0 0",
+                backgroundColor: "transparent",
               },
             },
           },

@@ -79,6 +79,7 @@ class CommandPalette extends HTMLElement {
     );
     const copyOption = this.querySelector<HTMLElement>("[data-copy]")!;
     const back = part("back");
+    const status = part("status");
     const [startGuard, endGuard] = this.querySelectorAll<HTMLElement>('[data-part="guard"]');
 
     let isOpen = false;
@@ -156,6 +157,8 @@ class CommandPalette extends HTMLElement {
       copyOption.querySelector('[data-part="mail"]')!.className = view.glyph(copied);
       copyOption.querySelector('[data-part="check"]')!.className = view.glyph(!copied);
       copyOption.querySelector<HTMLElement>('[data-part="copied"]')!.hidden = !copied;
+      const said = copied ? "Email address copied" : "";
+      if (status.textContent !== said) status.textContent = said;
 
       // One fill follows the highlighted option, whether the pointer or the arrow keys moved it, and
       // springs between options instead of blinking (fluid-hover.ts). A fresh fill fades in where it
@@ -256,6 +259,7 @@ class CommandPalette extends HTMLElement {
           copied = true;
           play("success");
           render();
+          clearTimeout(copiedTimer);
           copiedTimer = window.setTimeout(close, 1500);
         } catch (error) {
           console.warn("Could not copy the email address.", error);
@@ -492,4 +496,19 @@ class CommandPalette extends HTMLElement {
   }
 }
 
-whenIdle(() => customElements.define("command-palette", CommandPalette));
+const early = new AbortController();
+const define = () => {
+  early.abort();
+  if (!customElements.get("command-palette"))
+    customElements.define("command-palette", CommandPalette);
+};
+// A ⌘K, or the header search button's synthetic one, can come before the browser idles. Defining
+// here, in the capture phase at window, adds the palette's document listener in time to take it.
+addEventListener(
+  "keydown",
+  (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "k") define();
+  },
+  { capture: true, signal: early.signal },
+);
+whenIdle(define);

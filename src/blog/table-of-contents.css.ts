@@ -48,6 +48,9 @@ export const styles = {
       },
     },
   }),
+  depth3: style({
+    paddingLeft: "12px",
+  }),
   link: style({
     display: "block",
     paddingBlock: "0.75rem",

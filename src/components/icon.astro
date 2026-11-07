@@ -162,7 +162,9 @@ type Props = HTMLAttributes<"svg"> & {
   weight?: Weight;
 };
 
-const { name, size, weight = "regular", ...rest } = Astro.props;
+const { name, size, weight = "regular", "aria-hidden": hidden, ...rest } = Astro.props;
+// An icon is decorative unless its caller names it.
+const named = rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined;
 const weights: Partial<Record<Weight, string>> = PATHS[name];
 const d = weights[weight];
 if (!d) throw new Error(`icon.astro has no ${weight} ${name}`);
@@ -174,5 +176,6 @@ if (!d) throw new Error(`icon.astro has no ${weight} ${name}`);
   height={size}
   fill="currentColor"
   viewBox="0 0 256 256"
+  aria-hidden={hidden ?? (named ? undefined : "true")}
   {...rest}><path d={d}></path></svg
 >

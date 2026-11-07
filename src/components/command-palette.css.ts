@@ -138,6 +138,7 @@ export const styles = {
   backdrop: style({
     position: "fixed",
     inset: 0,
+    userSelect: "none",
     backgroundColor: `color-mix(in srgb, ${palette["--bg"]} 72%, transparent)`,
     backdropFilter: "blur(6px)",
     zIndex: 100,

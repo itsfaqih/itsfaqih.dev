@@ -16,6 +16,12 @@ export const styles = {
     display: "block",
     paddingTop: "20px",
     paddingBottom: "80px",
+    selectors: {
+      // The ATS version previews plain paper, which the scanlines (arcade.scan) would stripe.
+      "&:is([data-ats])::after": {
+        display: "none",
+      },
+    },
     "@media": {
       [PRINT]: {
         paddingTop: "10mm",

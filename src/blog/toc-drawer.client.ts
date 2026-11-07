@@ -1,5 +1,5 @@
 import { play } from "../hooks/sound";
-import { EASE, SLIDE, SLIDE_MS } from "./post.css";
+import { EASE, SLIDE, SLIDE_MS } from "./toc-drawer.view";
 import { TOC_NAVIGATE } from "./table-of-contents.client";
 
 const SLIDE_TRANSITION = `transform ${SLIDE} ${EASE}`;
