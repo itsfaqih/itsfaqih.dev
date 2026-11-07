@@ -274,16 +274,10 @@ export function trustJson(body: string): Outcome {
   }
 }
 
-type ProfileResponse = { id: number; name: string; city?: string };
-
-const parseProfile = (response: ProfileResponse): Profile => ({
-  ...response,
-  city: response.city ?? "Unknown",
-});
-
-export function parseJson(body: string): Outcome {
-  const user = parseProfile(JSON.parse(body));
-  return { ok: true, user: { ...user, city: user.city.toUpperCase() } };
+/** The ✓ side's `User.parse`, which gives a missing city its fallback. */
+export function withCityFallback(body: string): Outcome {
+  const { city = "Unknown", ...user }: Omit<Profile, "city"> & { city?: string } = JSON.parse(body);
+  return { ok: true, user: { ...user, city: city.toUpperCase() } };
 }
 
 export type Payment = { label: string; amount: number };
