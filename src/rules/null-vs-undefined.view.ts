@@ -32,6 +32,16 @@ export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
   return parts;
 }
 
+/** `paint` with KINDS, as DOM nodes for the elements that repaint a line. */
+export const paintedNodes = (source: string) =>
+  paint(source, KINDS).map((part) => {
+    if (!part.class) return document.createTextNode(part.text);
+    const span = document.createElement("span");
+    span.className = part.class;
+    span.textContent = part.text;
+    return span;
+  });
+
 /** Classes the save demo (null-flow.astro) and its element share. */
 export const flowView = {
   button: cx(button.base, buttonVariant["primary-neutral"], button.sm, styles.button),
