@@ -13,13 +13,18 @@ type Props = {
 const { level, id, look = "card", caption } = Astro.props;
 const choice = "choices" in level ? level.choices.find((candidate) => candidate.id === id) : undefined;
 if (!choice) throw new Error(`${level.name} has no choice "${id}"`);
+// A caption is the choice's visible label, so the accessible name holds it and a speech-input reader
+// who says the caption reaches the choice.
+const plain = (text: string) => text.replaceAll("\u2011", "-").toLowerCase();
+const label =
+  caption && !plain(choice.label).includes(plain(caption)) ? `${caption}. ${choice.label}` : choice.label;
 // A button holds phrasing content only, so the slot is drawn from spans.
 ---
 
 <button
   type="button"
   class={quizView.choice(look, { missed: false, cleared: false, seated: false })}
-  aria-label={choice.label}
+  aria-label={label}
   data-part="slot"
   data-slot={choice.id}
   data-note={choice.note}
