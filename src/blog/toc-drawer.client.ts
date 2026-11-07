@@ -15,7 +15,7 @@ const translateY = (element: Element) =>
 
 /**
  * The post's table of contents drawer (toc-drawer.astro). Open, its layer joins the end of the body
- * over an inert page, as Vaul's portal did, and leaves once its exit animation ends.
+ * over an inert page, and leaves once its exit animation ends.
  */
 class TocDrawer extends HTMLElement {
   #stop?: () => void;
@@ -205,7 +205,7 @@ class TocDrawer extends HTMLElement {
     content.addEventListener("pointerup", release, { signal });
     content.addEventListener("pointercancel", release, { signal });
     content.addEventListener(TOC_NAVIGATE, close, { signal });
-    // Radix closes on a mouse press outside, but on a tap only once it lands as a click.
+    // A mouse press outside closes it, but a tap only once it lands as a click.
     overlay.addEventListener(
       "pointerdown",
       (event) => {
