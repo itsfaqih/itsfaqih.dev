@@ -4,6 +4,7 @@ import { kit } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2 } from "../layers.css";
+import { hoverHold } from "../components/hover-hold.css";
 const PHONE = "(max-width: 640px)";
 const MOTION = "(prefers-reduced-motion: no-preference)";
 const HOVER = "(hover: hover) and (pointer: fine)";
@@ -266,43 +267,46 @@ export const styles = {
     fontFamily: fonts["--sans"],
     color: palette["--text"],
   }),
-  remove: style({
-    display: "grid",
-    alignItems: "center",
-    justifyItems: "center",
-    width: "26px",
-    height: "26px",
-    borderWidth: 0,
-    borderStyle: "none",
-    borderColor: "currentcolor",
-    borderRadius: "999px",
-    backgroundColor: "transparent",
-    fontSize: "12px",
-    color: palette["--dim"],
-    cursor: cursors["--cursor-point"],
-    transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
-    selectors: {
-      "&:focus-visible": {
-        outlineWidth: "3px",
-        outlineStyle: "solid",
-        outlineColor: palette["--focus"],
-        outlineOffset: "1px",
+  remove: style([
+    hoverHold.lift,
+    {
+      display: "grid",
+      alignItems: "center",
+      justifyItems: "center",
+      width: "26px",
+      height: "26px",
+      borderWidth: 0,
+      borderStyle: "none",
+      borderColor: "currentcolor",
+      borderRadius: "999px",
+      backgroundColor: "transparent",
+      fontSize: "12px",
+      color: palette["--dim"],
+      cursor: cursors["--cursor-point"],
+      transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease, transform ${kit["--t-fb"]} ${motion["--out"]}`,
+      selectors: {
+        "&:focus-visible": {
+          outlineWidth: "3px",
+          outlineStyle: "solid",
+          outlineColor: palette["--focus"],
+          outlineOffset: "1px",
+        },
+        "&:active": {
+          transform: "scale(0.92)",
+        },
       },
-      "&:active": {
-        transform: "scale(0.92)",
-      },
-    },
-    "@media": {
-      [HOVER]: {
-        selectors: {
-          "&:hover": {
-            backgroundColor: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
-            color: palette["--no-ink"],
+      "@media": {
+        [HOVER]: {
+          selectors: {
+            "&:hover": {
+              backgroundColor: `color-mix(in srgb, ${palette["--no"]} 18%, transparent)`,
+              color: palette["--no-ink"],
+            },
           },
         },
       },
     },
-  }),
+  ]),
   none: style({
     display: "inline-flex",
     alignItems: "center",

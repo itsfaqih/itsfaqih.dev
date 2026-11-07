@@ -1,7 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
-import { styles } from "./typescript-code-writing.css";
+import { LINE_HEIGHT, styles } from "./typescript-code-writing.css";
 
 /** How far apart, in ms, tsc reaches each line. */
 const STEP = 110;
@@ -33,7 +33,9 @@ class TsChecked extends HTMLElement {
       for (const mark of marks) mark.classList.toggle(styles.unrun, phase === "idle");
       summary.textContent =
         phase === "idle" ? "not run yet" : phase === "run" ? "checking…" : verdict;
-      run.disabled = phase === "run";
+      // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
+      if (phase === "run") run.setAttribute("aria-disabled", "true");
+      else run.removeAttribute("aria-disabled");
     };
 
     const check = () => {
@@ -52,7 +54,7 @@ class TsChecked extends HTMLElement {
           ...rows.map((row, index) => ({
             offset: index / rows.length,
             opacity: 1,
-            transform: `translateY(${row.offsetTop}px) scaleY(${row.offsetHeight / 26})`,
+            transform: `translateY(${row.offsetTop}px) scaleY(${row.offsetHeight / LINE_HEIGHT})`,
             easing: OUT,
           })),
           {
@@ -85,6 +87,7 @@ class TsChecked extends HTMLElement {
     run.addEventListener(
       "click",
       () => {
+        if (run.hasAttribute("aria-disabled")) return;
         stopWatch();
         clearTimeout(wait);
         check();

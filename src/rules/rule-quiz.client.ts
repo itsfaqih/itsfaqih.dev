@@ -76,7 +76,9 @@ class RuleQuiz extends HTMLElement {
           void slot.offsetWidth;
           slot.style.animation = "";
         }
-        slot.disabled = !open;
+        // The seated slot stays focusable, so a keyboard player keeps their place after a clear.
+        slot.disabled = !open && !seated;
+        if (seated) slot.setAttribute("aria-disabled", "true");
         if (cleared && !seated) slot.dataset.off = "true";
         else slot.removeAttribute("data-off");
         if (seated && !seat) {
@@ -141,6 +143,10 @@ class RuleQuiz extends HTMLElement {
 
     const drop = (slot: HTMLButtonElement) => {
       if (placed !== null) return;
+      // Disabling or removing the focused control drops focus to the page, so it is handed on.
+      const focused = document.activeElement;
+      const dropped = () =>
+        focused instanceof HTMLElement && (!focused.isConnected || focused.matches(":disabled"));
       picked = false;
       const chosen = { slot, id: slot.dataset.slot!, note: slot.dataset.note! };
       if (chosen.id === answer) {
@@ -150,6 +156,7 @@ class RuleQuiz extends HTMLElement {
         placed = chosen;
         miss = null;
         sync();
+        if (dropped()) slot.focus();
         if (!from || !seat || reducedMotion()) return;
         const to = seat.getBoundingClientRect();
         const dx = from.rect.left - to.left;
@@ -168,6 +175,7 @@ class RuleQuiz extends HTMLElement {
       miss = { ...chosen, at: performance.now() };
       if (piece) flyHome(piece);
       sync();
+      if (dropped()) piece?.focus();
     };
 
     article.addEventListener(

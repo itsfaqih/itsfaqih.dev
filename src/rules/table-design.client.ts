@@ -106,14 +106,20 @@ function pageAsked(target: EventTarget | null, page: number) {
 
 function paintNav(nav: HTMLElement, page: number, pages: number) {
   texts(nav.firstElementChild!)[1]!.data = String(page);
-  nav.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled = page <= 1;
-  nav.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled = page >= pages;
+  const prev = nav.querySelector<HTMLButtonElement>('[data-step="-1"]')!;
+  const next = nav.querySelector<HTMLButtonElement>('[data-step="1"]')!;
+  prev.disabled = page <= 1;
+  next.disabled = page >= pages;
+  let current: HTMLButtonElement | undefined;
   for (const key of nav.querySelectorAll<HTMLButtonElement>("[data-page]")) {
     const on = Number(key.dataset.page) === page;
     if (on) key.setAttribute("aria-current", "page");
     else key.removeAttribute("aria-current");
     key.className = view.pageKey(on);
+    if (on) current = key;
   }
+  // Prev or Next disables at an end under the press that got there, which would drop focus.
+  if ([prev, next].some((key) => key.disabled && key === document.activeElement)) current?.focus();
 }
 
 /** The Live/Paused switch: ticks the revenue while playing and while its lesson is on screen. */
@@ -139,7 +145,6 @@ class TableLive extends HTMLElement {
       if (playing && seen) timer = window.setInterval(() => ticker.update(tick), TICK_MS);
     };
     const paint = () => {
-      button.setAttribute("aria-pressed", String(!playing));
       dot.className = view.dot(playing);
       label.data = playing ? "Live" : "Paused";
       (playing ? icons.play : icons.pause).replaceWith(playing ? icons.pause : icons.play);
@@ -394,9 +399,13 @@ class TableStates extends HTMLElement {
     });
     act?.addEventListener(
       "click",
-      () => {
+      (event) => {
         const shown = viewOf(roster.get());
-        if (shown !== "loading" && shown !== "data") SAY[shown].run();
+        if (shown === "loading" || shown === "data") return;
+        SAY[shown].run();
+        // The run swaps out the row that holds this button. A key press moves focus to the search;
+        // a pointer press leaves it, since a focused input draws its ring.
+        if (event.detail === 0 && !act.isConnected) input.focus();
       },
       { signal: controller.signal },
     );
@@ -461,10 +470,24 @@ class TableActions extends HTMLElement {
           event.target instanceof Element ? event.target.closest<HTMLElement>("[data-act]") : null;
         if (!key) return;
         const name = nameOf.get(key.closest("tr")!) ?? "";
+        const at = present.indexOf(name);
         if (key.dataset.act === "restore") present = CREW.map((person) => person.name);
-        else if (key.dataset.act === "delete") present = present.filter((now) => now !== name);
-        else editing = editing === name ? null : name;
+        else if (key.dataset.act === "delete") {
+          present = present.filter((now) => now !== name);
+          if (editing === name) editing = null;
+        } else editing = editing === name ? null : name;
         paint();
+        if (event.detail !== 0 || key.isConnected) return;
+        // Delete and Restore take away the key just pressed, so a key press moves focus to the
+        // next row's Delete, else the one before, else Restore, and after Restore to the first Edit.
+        const row = (name: string | undefined) => (name ? rowOf.get(name) : undefined);
+        const then =
+          key.dataset.act === "delete"
+            ? (row(present[at] ?? present[at - 1])?.querySelector<HTMLElement>(
+                '[data-act="delete"]',
+              ) ?? restore)
+            : row(present[0])?.querySelector<HTMLElement>('[data-act="edit"]');
+        then?.focus();
       },
       { signal: controller.signal },
     );
@@ -555,7 +578,9 @@ class TableUrl extends HTMLElement {
       } else {
         query?.remove();
       }
-      reload.disabled = now.reloading;
+      // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
+      if (now.reloading) reload.setAttribute("aria-disabled", "true");
+      else reload.removeAttribute("aria-disabled");
       caption.data = String(now.page);
       body.className = view.body(now.reloading);
       if (drawn !== now.page) {
@@ -579,6 +604,7 @@ class TableUrl extends HTMLElement {
     reload.addEventListener(
       "click",
       () => {
+        if (now.reloading) return;
         now = { ...now, reloading: true };
         paint();
         timer = window.setTimeout(() => {

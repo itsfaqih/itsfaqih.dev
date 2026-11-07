@@ -4,6 +4,8 @@ import { style } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1 } from "../layers.css";
 const PHONE = "(max-width: 640px)";
+/** A code line's least height in px, which tsc's cursor matches and stretches from. */
+export const LINE_HEIGHT = 26;
 
 export const styles = {
   kw: style({
@@ -38,20 +40,25 @@ export const styles = {
       },
     },
   }),
+  // Layered, so `hot` squares the left corners of this radius.
   line: style({
-    position: "relative",
-    display: "flex",
-    flexWrap: "wrap",
-    rowGap: "2px",
-    columnGap: "12px",
-    alignItems: "center",
-    minHeight: "26px",
-    paddingBlock: "1px",
-    paddingInline: "8px",
-    borderRadius: "6px",
-    "@media": {
-      [PHONE]: {
-        paddingInline: "6px",
+    "@layer": {
+      [under1]: {
+        position: "relative",
+        display: "flex",
+        flexWrap: "wrap",
+        rowGap: "2px",
+        columnGap: "12px",
+        alignItems: "center",
+        minHeight: `${LINE_HEIGHT}px`,
+        paddingBlock: "1px",
+        paddingInline: "8px",
+        borderRadius: "6px",
+        "@media": {
+          [PHONE]: {
+            paddingInline: "6px",
+          },
+        },
       },
     },
   }),
@@ -139,7 +146,7 @@ export const styles = {
     top: 0,
     right: 0,
     left: 0,
-    height: "26px",
+    height: `${LINE_HEIGHT}px`,
     borderRadius: "6px",
     backgroundColor: "color-mix(in srgb, var(--c) 14%, transparent)",
     boxShadow: "inset 0 -2px 0 var(--c)",
@@ -174,7 +181,7 @@ export const styles = {
   run: style({
     marginLeft: "auto",
     selectors: {
-      "&:disabled": {
+      '&:disabled, &[aria-disabled="true"]': {
         opacity: 0.5,
       },
     },

@@ -450,7 +450,7 @@ export function watchHints(
       { i: 0, by: 0 },
     ].map(({ i, by }) => {
       const ok = keeps(by);
-      const shared = HINT_SLOTS.findIndex((_, k) =>
+      const shared = slots.findIndex((_, k) =>
         placed.every((c) => {
           const way = c.tiers[i]?.[k];
           return way !== undefined && ok(way);

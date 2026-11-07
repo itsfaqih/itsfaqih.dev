@@ -106,8 +106,8 @@ const hint = asked ?? (place
     ></template
   >
   <template data-part="clear"
-    ><span class={quizKit.stamp}>Clear</span><span class={quizKit.stars}
-      >{[1, 2, 3].map(() => <i class={quizView.star(false)}>★</i>)}</span
+    ><span class={quizKit.stamp}>Clear</span><span role="img" class={quizKit.stars}
+      >{[1, 2, 3].map(() => <i aria-hidden="true" class={quizView.star(false)}>★</i>)}</span
     ></template
   >
 </rule-quiz>
