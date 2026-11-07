@@ -82,9 +82,9 @@ const { class: className } = Astro.props;
 <div class={cx(styles.panel, className)}><slot /></div>
 ```
 
-### 3. Style on a Parent or Sibling State with Markers
+### 3. Style on a Parent State with Markers
 
-`when.ancestor` and `when.siblingBefore` in `src/when.ts` build zero-specificity selectors from a marker class. The parent carries `marker`, or a named marker for a nested state, and the descendant keys on it:
+`when.ancestor` in `src/when.ts` builds a zero-specificity selector from a marker class. The parent carries `marker`, or a named marker for a nested state, and the descendant keys on it:
 
 ```ts
 import { marker, when } from "../when";

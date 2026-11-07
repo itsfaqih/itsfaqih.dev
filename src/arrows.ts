@@ -140,8 +140,6 @@ export function brush(spine: Point[], look: Brush) {
   };
 }
 
-export type BrushArrow = ReturnType<typeof brush>;
-
 /**
  * The cell that joins two cells meeting only at a corner, which would read as a gap in the line:
  * whichever of the two the trail, at `p`, passed nearer to.
