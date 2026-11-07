@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-/** Each cue in src/hooks/sound.ts and the soundcn registry item it plays (https://soundcn.xyz). */
+/** Each cue in src/browser/sound.ts and the soundcn registry item it plays (https://soundcn.xyz). */
 const SOURCES = {
   tap: "click-004",
   move: "click-002",

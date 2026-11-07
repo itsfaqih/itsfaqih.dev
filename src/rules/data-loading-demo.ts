@@ -1,4 +1,4 @@
-import { play } from "../hooks/sound";
+import { play } from "../browser/sound";
 import { view } from "./data-loading.view";
 
 type Step = readonly [at: number, run: () => void];
