@@ -103,10 +103,18 @@ class RuleLanding extends HTMLElement {
     copy.addEventListener(
       "click",
       async () => {
+        const markdown = fetch(this.dataset.markdown!).then(async (response) => {
+          if (!response.ok) throw new Error(`${response.status} for ${response.url}`);
+          return new Blob([await response.text()], { type: "text/plain" });
+        });
         try {
-          const response = await fetch(this.dataset.markdown!);
-          if (!response.ok) return;
-          await navigator.clipboard.writeText(await response.text());
+          // Safari lets the clipboard write only inside the press, and an awaited fetch ends it, so
+          // the write starts now and takes the markdown as a promise.
+          try {
+            await navigator.clipboard.write([new ClipboardItem({ "text/plain": markdown })]);
+          } catch {
+            await navigator.clipboard.writeText(await (await markdown).text());
+          }
           copiedMarkdown();
         } catch (e) {
           console.error(e);
