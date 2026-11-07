@@ -34,9 +34,6 @@ const settleMs = 1000;
 // Pages open at once across every route; each is a headless Chromium tab on a shared machine.
 const pageSlots = 5;
 
-/** Controls that cannot be made deterministic, keyed `<route slug> <control key>`. */
-const excluded: Record<string, string> = {};
-
 const routes = inject("routes");
 
 let browser: Browser;
@@ -348,8 +345,6 @@ describe.concurrent("demos behave as their baseline screenshots show", () => {
       await Promise.all(
         controls.map((control, index) =>
           withSlot(async () => {
-            const reason = excluded[`${slug} ${control.key}`];
-            if (reason) return;
             try {
               const { shots, errors } = await exercise(route, index, control, stems[index]!);
               if (errors.length) failures.push(`${control.key}: page errors ${errors.join(" | ")}`);
