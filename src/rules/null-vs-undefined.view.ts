@@ -3,6 +3,7 @@ import { buttonVariant } from "../components/button";
 import { type Verdict, wentWrong } from "./null-vs-undefined";
 import { cx, type ClassValue } from "../cx";
 import { styles } from "./null-vs-undefined.css";
+import { tokenize } from "./paint";
 const TOKEN =
   /(\/\/.*)|("(?:[^"\\]|\\.)*"|`[^`]*`)|\b(null)\b|\b(undefined)\b|\b(const|let|function|return|type|await|new)\b/g;
 
@@ -19,18 +20,10 @@ export const OUT_KINDS = [
 type Painted = { text: string; class?: string };
 
 /** Colours a line of code: a match of TOKEN's nth capture group gets the class of `kinds[n]`. */
-export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
-  const parts: Painted[] = [];
-  let at = 0;
-  for (const match of source.matchAll(TOKEN)) {
-    if (match.index > at) parts.push({ text: source.slice(at, match.index) });
-    const kind = kinds[match.slice(1).findIndex((group) => group !== undefined)];
-    parts.push({ text: match[0], class: cx(kind) });
-    at = match.index + match[0].length;
-  }
-  if (at < source.length) parts.push({ text: source.slice(at) });
-  return parts;
-}
+export const paint = (source: string, kinds: readonly ClassValue[]): Painted[] =>
+  tokenize(source, TOKEN).map(({ text, kind }) =>
+    kind === undefined ? { text } : { text, class: cx(kinds[kind]) },
+  );
 
 /** `paint` with KINDS, as DOM nodes for the elements that repaint a line. */
 export const paintedNodes = (source: string) =>
