@@ -110,9 +110,8 @@ const footerVeil = cx(loadIn.veil, veil.dense);
           >Ready to bring the next level of care to your product?</span
         ></h2
       ><div
-        class:list={[loadIn.piece, heroType.acts]}
+        class:list={[loadIn.piece, heroType.acts, styles.contactActs]}
         data-cut="true"
-        style="margin-top:24px"
         ><a
           class:list={[button.base, buttonVariant["primary-purple"], button.lift]}
           href={`mailto:${LINKS.email}`}>{`Email ${LINKS.email}`}</a
@@ -124,7 +123,7 @@ const footerVeil = cx(loadIn.veil, veil.dense);
       ></div
     ><footer class={styles.footer}
       ><span class={footerVeil} data-cut="true"
-        ><span class={words} data-cut="true">© 2026 Faqih Muntashir</span></span
+        ><span class={words} data-cut="true">© {new Date().getFullYear()} Faqih Muntashir</span></span
       ><span class={footerVeil} data-cut="true"
         ><span class={words} data-cut="true"
           ><a class={styles.footerLink} href={LINKS.github} {...external}>GitHub</a> <Fragment

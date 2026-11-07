@@ -249,11 +249,6 @@ export const styles = {
         outlineColor: palette["--focus"],
         outlineOffset: "2px",
       },
-      "&:hover:not(:disabled)": {
-        borderColor: palette["--hair-hover"],
-        transitionDuration: `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}`,
-        transitionTimingFunction: `${motion["--exit"]}, ${motion["--exit"]}, ${motion["--fast"]}, ${motion["--exit"]}, ${motion["--exit"]}`,
-      },
       "&:disabled": {
         backgroundColor: palette["--panel-2"],
         color: palette["--mute"],
@@ -262,6 +257,15 @@ export const styles = {
       },
     },
     "@media": {
+      [HOVER]: {
+        selectors: {
+          "&:hover:not(:disabled)": {
+            borderColor: palette["--hair-hover"],
+            transitionDuration: `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast"]}, ${motion["--t-fast-exit"]}, ${motion["--t-fast-exit"]}`,
+            transitionTimingFunction: `${motion["--exit"]}, ${motion["--exit"]}, ${motion["--fast"]}, ${motion["--exit"]}, ${motion["--exit"]}`,
+          },
+        },
+      },
       [REDUCE]: {
         selectors: {
           "&:active:not(:disabled)": {

@@ -5,6 +5,7 @@ import { hoverHold } from "../components/hover-hold.css";
 import { loadIn } from "../components/load-in.css";
 import { veil } from "./section.css";
 import { number, styles } from "./rule-spread.css";
+import { PAGE_FILE_END } from "../page-path";
 import { pad } from "./rule-spread.view";
 import RuleThumb from "./rule-thumb.astro";
 
@@ -76,14 +77,14 @@ const rule = rules[initial]!;
       data-part="next">→</button
     ></div
   ></rule-spread
-><script is:inline>
+><script is:inline define:vars={{ pageFileEnd: PAGE_FILE_END.source }}>
   // Back from a rule's page (its "Back to home" link goes to /#rules), the deck opens on that
   // rule's card before first paint, so the zoom out lands on it. rule-spread.client.ts starts from
   // whichever card is current.
   (function () {
     var deck = document.currentScript.previousElementSibling;
     if (location.hash !== "#rules" || !document.referrer) return;
-    var from = new URL(document.referrer).pathname.replace(/(\.html|\/)$/, "");
+    var from = new URL(document.referrer).pathname.replace(new RegExp(pageFileEnd), "");
     var slots = Array.from(deck.querySelector('[data-part="stage"]').children);
     var at = slots.findIndex(function (slot) {
       return slot.firstElementChild.getAttribute("href") === from;

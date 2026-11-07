@@ -220,6 +220,7 @@ class RuleSpread extends HTMLElement {
         if (move === undefined) return;
         event.preventDefault();
         goTo(deck.target + move);
+        cards[deck.target]!.focus({ preventScroll: true });
       },
       { signal },
     );

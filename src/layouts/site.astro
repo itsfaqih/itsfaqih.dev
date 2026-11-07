@@ -7,6 +7,7 @@ import PageScrollbar from "../components/page-scrollbar.astro";
 import PrintCursor from "../components/print-cursor.astro";
 import { pageHead, type SharedPage } from "../seo";
 import { THEME_COLORS } from "../theme";
+import { PAGE_FILE_END } from "../page-path";
 import { HEAD_SCRIPT } from "./head-script";
 import { site } from "./site.css";
 
@@ -22,7 +23,7 @@ const head = page ? pageHead(page) : undefined;
 const title = head?.meta.find((meta) => "title" in meta)?.title ?? "Faqih Muntashir";
 const tags = head?.meta.filter((meta) => !("title" in meta)) ?? [];
 // The build names pages index.html and blog.html; the page's own path is / and /blog.
-const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
+const path = Astro.url.pathname.replace(PAGE_FILE_END, "") || "/";
 ---
 
 <!doctype html>

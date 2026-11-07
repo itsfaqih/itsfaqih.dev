@@ -1,3 +1,4 @@
+import { PAGE_FILE_END } from "../page-path";
 import { OPENING_KEY } from "../sections/rule-open";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
@@ -57,12 +58,16 @@ export const HEAD_SCRIPT = String.raw`(function () {
     // A rule page's back link returns home when the visit came from there.
     if (sameSite && new URL(document.referrer).pathname === "/") doc.classList.add("from-home");
   } catch (e) {}
+  function atRest() {
+    document.querySelectorAll("[data-cut]").forEach(function (piece) {
+      piece.style.animation = "none";
+      piece.classList.add("in");
+    });
+  }
   // Whatever plays the cut-ins cancels the fallback once it starts: an island once it hydrates, a
   // custom element once it watches them (cut-ins.ts).
   var rest = setTimeout(function () {
-    document.querySelectorAll("[data-cut]").forEach(function (piece) {
-      piece.setAttribute("data-rest", "");
-    });
+    atRest();
     doc.classList.add("no-intro");
   }, Math.max(0, ${REST_AFTER_MS} - performance.now()));
   function settle(event) {
@@ -75,7 +80,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
   var RULE_INDEX = /^\/rule-of-thumb$/;
   var HOME_DECK = "#rules";
   function pathOf(url) {
-    return new URL(url, location.href).pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
+    return new URL(url, location.href).pathname.replace(${PAGE_FILE_END}, "") || "/";
   }
   function dive() {
     try {
@@ -113,6 +118,11 @@ export const HEAD_SCRIPT = String.raw`(function () {
     else event.viewTransition.skipTransition();
   });
   addEventListener("pagereveal", function (event) {
+    // A page restored from the back-forward cache still names the card its dive left from, and two
+    // elements sharing a transition name would skip the morph.
+    document.querySelectorAll("[data-opening]").forEach(function (card) {
+      card.removeAttribute("data-opening");
+    });
     if (!event.viewTransition) return;
     var from = self.navigation && navigation.activation && navigation.activation.from;
     var type = from && from.url ? transitionType(from.url, location.href) : null;
@@ -132,10 +142,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
     if (type === "rule-close") {
       // The index or the home deck lands at rest, as the dive left it, with the rule's tile named
       // for the morph and the zoom centred on it.
-      document.querySelectorAll("[data-cut]").forEach(function (piece) {
-        piece.style.animation = "none";
-        piece.classList.add("in");
-      });
+      atRest();
       // The browser scrolls to the home deck after the first frame, too late for the morph.
       var mark = location.hash && document.getElementById(location.hash.slice(1));
       if (mark) mark.scrollIntoView({ behavior: "instant" });

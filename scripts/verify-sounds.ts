@@ -284,7 +284,7 @@ try {
 
   // The work history on the home page sounds a job opening and closing.
   await open(page, "/");
-  const jobs = page.locator("experience-list > * > button");
+  const jobs = page.locator("experience-list > * > h3 > button");
   await jobs.nth(1).scrollIntoViewIfNeeded();
   await jobs.nth(1).click();
   await expectHeard(page, "opening a job plays expand, no tap", ["expand"]);

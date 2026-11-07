@@ -52,7 +52,7 @@ export const styles = {
         transitionDuration: motion["--t-fast"],
         transitionTimingFunction: motion["--fast"],
       },
-      "&:has(> button:focus-visible)": {
+      "&:has(> h3 > button:focus-visible)": {
         outline: `2px solid ${palette["--focus"]}`,
         outlineOffset: "-2px",
       },
@@ -84,10 +84,20 @@ export const styles = {
       },
     },
   }),
+  // The job's heading holds its head, so the head keeps the row's first cell.
+  heading: style({
+    gridArea: "1 / 1",
+    margin: 0,
+    "@media": {
+      [STACKED]: {
+        gridArea: "auto",
+      },
+    },
+  }),
   // The dates sit over the company and role; the chevron stays at the right.
   head: style({
-    gridArea: "1 / 1",
     display: "grid",
+    width: "100%",
     gridTemplateColumns: "1fr 20px",
     gap: "6px 18px",
     alignItems: "center",
@@ -104,11 +114,6 @@ export const styles = {
     textAlign: "left",
     cursor: cursors["--cursor-point"],
     outline: "none",
-    "@media": {
-      [STACKED]: {
-        gridArea: "auto",
-      },
-    },
   }),
   // A closed row is one big target; an open row only toggles from its head, so its achievements
   // stay selectable.
@@ -378,17 +383,12 @@ export const styles = {
       },
     },
   }),
-  // The count pill: its words come from data-label, so measuring can try each count without a
-  // render.
+  // The count pill. Its first child holds the visible count, and a hidden " tools" finishes it
+  // for a screen reader.
   more: style({
     display: "inline-flex",
     borderStyle: "dashed",
     color: palette["--mute"],
-    selectors: {
-      "&::after": {
-        content: "attr(data-label)",
-      },
-    },
   }),
   markClosed: style({
     color: palette["--mute"],

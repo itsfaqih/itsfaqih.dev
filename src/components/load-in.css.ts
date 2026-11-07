@@ -81,10 +81,10 @@ const glitchInAlt = keyframes({
   "100%": { opacity: 1, clipPath: "none", translate: "none", filter: "none" },
 });
 
-// Reduced motion keeps only a short fade up.
+// Reduced motion keeps only a short fade, with nothing moving.
 const fadeIn = keyframes({
-  from: { opacity: 0, transform: "translateY(10px)" },
-  to: { opacity: 1, transform: "translateY(0)" },
+  from: { opacity: 0 },
+  to: { opacity: 1 },
 });
 
 // A veil only fades, so the patch of page colour under a piece's words never tears with them.
@@ -103,7 +103,7 @@ const deal = keyframes({
  * easing. Every [data-cut] composes `piece` first: it plays once, when watchCutIns gives it .in, and
  * pieces that arrive in the same frame stagger by --cut-order. A piece inside one still waiting
  * waits too. Siblings alternate two slice patterns so a row never tears in unison. Without JS
- * everything sits at rest; with reduced motion a piece only fades up. A piece under [data-loop]
+ * everything sits at rest; with reduced motion a piece only fades in. A piece under [data-loop]
  * pauses while watchCutIns marks it .paused, except for that fade.
  *
  * `deal` swaps the glitch for a dealt card, on the rule tiles. `veil` is for a [data-cut] that
