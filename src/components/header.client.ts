@@ -43,6 +43,7 @@ class SiteHeader extends HTMLElement {
     const part = (name: string) => this.querySelector<HTMLElement>(`[data-part="${name}"]`)!;
     const ground = part("ground");
     const toggle = part("menu");
+    const brand = this.querySelector<HTMLElement>('[data-seg="home"] a')!;
     const host = this.querySelector("[data-island-activity]")!;
     const segs = SEGS.map((name) => {
       const seg = this.querySelector<HTMLElement>(`[data-seg="${name}"]`)!;
@@ -91,12 +92,18 @@ class SiteHeader extends HTMLElement {
         return;
       this.toggleAttribute("data-scrolled", state.scrolled);
       this.toggleAttribute("data-open", state.open);
+      const focused = document.activeElement;
+      let foldedFocus = false;
       for (const { name, seg, row } of segs) {
         const view = segView(name, state);
         seg.className = view.seg;
         seg.inert = !view.on;
         row.className = view.row;
+        if (seg.inert && seg.contains(focused)) foldedFocus = true;
       }
+      // An inert segment would drop focus to the body. The menu shows whenever the page has
+      // scrolled, and the brand whenever it has not.
+      if (foldedFocus) (state.scrolled ? toggle : brand).focus();
       if (state.open !== was.open) {
         toggle.setAttribute("aria-expanded", String(state.open));
         toggle.setAttribute("aria-label", state.open ? "Close menu" : "Open menu");
