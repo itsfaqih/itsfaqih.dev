@@ -94,7 +94,7 @@ The preloads save 0.26 to 0.41 s on mobile and 0.9 to 1.5 s on slow 3G for the p
 
 ### Every page under 3 s on 3G (2026-11-08)
 
-Goal: every page loads in under 3 s on 3G. Chrome DevTools has renamed its presets. The `mobile-4g` profile (1.47 Mbit/s, 562.5 ms latency) is the preset it once called Fast 3G and now calls Slow 4G. `mobile-3g` (400 kbit/s, 2000 ms latency) is the preset it once called Slow 3G and now calls 3G. Both run on a 390×844 phone with touch and a 4× CPU slowdown, served over HTTP/2 as Cloudflare Pages does. "Base" is `main` before the pass and "final" is after it. Each page and build had 5 cold runs on `mobile-4g` and 3 on `mobile-3g`, with a load average under 3 on 10 cores. Medians in ms:
+Goal: every page loads in under 3 s on 3G. Chrome DevTools has renamed its presets. The `mobile-4g` profile (1.47 Mbit/s, 562.5 ms latency) is the preset it once called Fast 3G and now calls Slow 4G. `mobile-3g` (400 kbit/s, 2000 ms latency) is the preset it once called Slow 3G and now calls 3G. The owner set the target on `mobile-4g`, the old Fast 3G (2026-11-08). Both run on a 390×844 phone with touch and a 4× CPU slowdown, served over HTTP/2 as Cloudflare Pages does. "Base" is `main` before the pass and "final" is after it. Each page and build had 5 cold runs on `mobile-4g` and 3 on `mobile-3g`, with a load average under 3 on 10 cores. Medians in ms:
 
 | Page                                     | Slow 4G load base | Slow 4G load final | Slow 4G LCP final | 3G FCP final | 3G load final |
 | ---------------------------------------- | ----------------: | -----------------: | ----------------: | -----------: | ------------: |
@@ -129,7 +129,7 @@ These were found while porting and kept on purpose. None of them changes a scree
 - Ids are fixed strings derived from props instead of `useId` output.
 - Some hint arrows sit at a different place in the DOM, with the same rendering.
 - The home stack filter's view transition names every element it moves.
-- The phone reader’s clocks on the timestamps page do not swing in. They did not on the React build either.
+- The phone reader’s clocks on the timestamps page do not swing in. They did not on the React build either, and the owner kept it that way (2026-11-08).
 
 ## Rerun
 

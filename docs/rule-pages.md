@@ -145,7 +145,8 @@ against every one before showing it.
 - **Every choice looks alike.** The reader picks the answer by reading, never by spotting the odd
   one out. No choice may be the only one that moves, has an icon, is coloured or sized differently,
   or sits apart. Rejected: "too obvious that the answer is moving" and "too obvious because the only
-  button with icon is the middle one".
+  button with icon is the middle one". One exception stands: dialog design quiz 3's Discard is red
+  because the dialog it shows is red, as a real destructive button is (owner, 2026-11-08).
 - **The quiz has its own scenario.** It tests the rule on a case the lesson's explanation and demo
   did not show, so the reader applies the rule rather than recalling the example.
 - **Code is framework-agnostic.** Write examples in plain TypeScript, HTML or pseudo-markup. Use
