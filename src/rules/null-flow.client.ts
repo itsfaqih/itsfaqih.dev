@@ -50,6 +50,8 @@ class NullFlow extends HTMLElement {
     let phase: Phase = "idle";
     let runs = 0;
     let title = TITLE;
+    // The title as last sent: typing while a save is in flight changes neither it nor what lands.
+    let sentTitle = TITLE;
     let timer = 0;
     let wireKey = "w0";
     let recordKey = "before";
@@ -79,7 +81,7 @@ class NullFlow extends HTMLElement {
     };
 
     const syncWire = () => {
-      const body = JSON.stringify(demo.body(way, title));
+      const body = JSON.stringify(demo.body(way, sentTitle));
       if (wireKey !== `w${runs}`) {
         wireKey = `w${runs}`;
         const fresh = el("div", styles.wire);
@@ -117,14 +119,16 @@ class NullFlow extends HTMLElement {
       const key = phase === "done" ? `r${runs}` : "before";
       if (key === recordKey) return;
       recordKey = key;
-      const after = { ...demo.before, ...arrived(demo.body(way, title)) };
+      const after = { ...demo.before, ...arrived(demo.body(way, sentTitle)) };
       const row: Row = phase === "done" ? after : demo.before;
       const ran = runs > 0;
       const fresh = el("dl", styles.record);
       fresh.dataset.part = "record";
       demo.fields.forEach((field, index) => {
         const verdict =
-          phase === "done" ? verdictOf(field, demo.before, after, demo.intent(title)) : undefined;
+          phase === "done"
+            ? verdictOf(field, demo.before, after, demo.intent(sentTitle))
+            : undefined;
         const bad = verdict !== undefined && wentWrong(verdict);
         const value = row[field];
         const cell = el("div", flowView.cell(verdict, ran));
@@ -149,6 +153,7 @@ class NullFlow extends HTMLElement {
     const send = () => {
       clearTimeout(timer);
       runs += 1;
+      sentTitle = title;
       if (reducedMotion()) {
         phase = "done";
       } else {
