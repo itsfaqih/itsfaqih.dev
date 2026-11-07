@@ -59,5 +59,14 @@
     "vitest": "catalog:",
     "wrangler": "4.153.0"
   },
+  "browserslist": [
+    "chrome >= 109",
+    "edge >= 141",
+    "firefox >= 140",
+    "safari >= 26.1",
+    "ios_saf >= 18.5",
+    "opera >= 124",
+    "samsung >= 28"
+  ],
   "packageManager": "pnpm@12.16.1"
 }
