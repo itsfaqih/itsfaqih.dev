@@ -125,13 +125,10 @@ const lowerForBrowsers = (): Plugin => {
   };
 };
 
-async function inlineCoreAssets(css: string, outDir: string) {
-  for (const [url, , asset] of css.matchAll(
-    /url\((["']?)(\/(?:fonts\/[^)"']+-core\.woff2|cursors\/[^)#"']+\.svg))\1\)/g,
-  )) {
-    const data = (await readFile(path.join(outDir, asset!))).toString("base64");
-    const mime = asset!.endsWith(".svg") ? "image/svg+xml" : "font/woff2";
-    css = css.replace(url, `url(data:${mime};base64,${data})`);
+async function inlineCoreFonts(css: string, outDir: string) {
+  for (const [url, , font] of css.matchAll(/url\((["']?)(\/fonts\/[^)"']+-core\.woff2)\1\)/g)) {
+    const data = (await readFile(path.join(outDir, font!))).toString("base64");
+    css = css.replace(url, `url(data:font/woff2;base64,${data})`);
   }
   return css;
 }
@@ -175,7 +172,8 @@ function finishPages(): AstroIntegration {
           let html = await readFile(file, "utf8");
           const styles = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)];
           for (const [tag, css] of styles) {
-            html = html.replace(tag, `<style>${await inlineCoreAssets(css!, outDir)}</style>`);
+            const inlined = await inlineCoreFonts(css!, outDir);
+            html = html.replace(tag, () => `<style>${inlined}</style>`);
           }
           const preloads = await eagerModules(html, outDir);
           html = html.replace('<meta charset="utf-8">', (charset) => `${charset}${preloads}`);

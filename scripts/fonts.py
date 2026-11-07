@@ -167,7 +167,7 @@ for family, (path, weights, extended) in FAMILIES.items():
 used = {
     char
     for file in (ROOT / "src").rglob("*")
-    if file.suffix in {".ts", ".tsx", ".mdx"}
+    if file.suffix in {".ts", ".tsx", ".astro", ".md", ".mdx", ".css"}
     for char in file.read_text()
     if ord(char) > 0x7E
 }

@@ -26,11 +26,28 @@ import {
 import { openSettledPage, routeSlug, type Viewport } from "./page-setup";
 
 // Walks every hint, toggle and Squint arrow the rule pages draw, at both widths, and holds each to
-// the rules in tests/arrow-rules.ts. src/arrows.test.ts covers the hero's arrows. A rule a page
-// breaks today sits in KNOWN and runs as an expected failure, so fixing the arrow turns it red
-// until its line goes.
+// the rules in tests/arrow-rules.ts. src/arrows.test.ts covers the hero's arrows. An arrow that
+// breaks a rule today sits in PARKED and runs as an expected failure, so fixing that arrow turns
+// it red until its line goes, and a second arrow breaking the same rule still fails.
 
-/** Rules pages break on main, keyed `<route slug> <viewport> <rule>`, with what breaks them. */
+type Rule =
+  | "aim"
+  | "nock"
+  | "length"
+  | "bend"
+  | "straight"
+  | "overlap"
+  | "head"
+  | "no target"
+  | "one arrow";
+/** An arrow that aims at nothing, or a target with no arrow or two, is never parked. */
+type Parkable = Exclude<Rule, "no target" | "one arrow">;
+
+/**
+ * Each arrow that breaks a rule on main, by rule page, then reason, then `<viewport> <rule>
+ * <arrow>`, where the arrow is its card, the target it points at, and #n for a repeat.
+ */
+type Park = `${Viewport | "both"} ${Parkable} ${string}`;
 const SQUINT_SHORT =
   "button-hierarchy.astro draws Squint's arrow 18px long, under 24px (e6e0c25 shortened it on purpose)";
 const OFF_CENTRE =
@@ -39,24 +56,119 @@ const SQUINT_BOX =
   "button-hierarchy.astro draws Squint's pixel arrow in a fixed 5 by 7 cell box, which leaves 11px under the note and stops 9px over the button, past the 6px gaps";
 const SLOTS =
   "hints.ts places a hint only in its own slots, so it covers content where the rules' 16-direction search finds a free spot 48px out";
-const KNOWN = new Map([
-  ["rule-of-thumb__button-design desktop length", SQUINT_SHORT],
-  ["rule-of-thumb__button-design mobile length", SQUINT_SHORT],
-  ["rule-of-thumb__button-design desktop aim", SQUINT_BOX],
-  ["rule-of-thumb__button-design mobile aim", SQUINT_BOX],
-  ["rule-of-thumb__data-loading desktop aim", OFF_CENTRE],
-  ["rule-of-thumb__data-loading mobile aim", OFF_CENTRE],
-  ["rule-of-thumb__dialog-design desktop aim", OFF_CENTRE],
-  ["rule-of-thumb__dialog-design mobile aim", OFF_CENTRE],
-  ["rule-of-thumb__dialog-design desktop overlap", SLOTS],
-  ["rule-of-thumb__handling-timestamps desktop aim", OFF_CENTRE],
-  ["rule-of-thumb__handling-timestamps mobile aim", OFF_CENTRE],
-  ["rule-of-thumb__null-vs-undefined desktop aim", OFF_CENTRE],
-  ["rule-of-thumb__null-vs-undefined mobile aim", OFF_CENTRE],
-  ["rule-of-thumb__null-vs-undefined mobile overlap", SLOTS],
-  ["rule-of-thumb__table-design desktop aim", OFF_CENTRE],
-  ["rule-of-thumb__table-design mobile aim", OFF_CENTRE],
-]);
+// Checked in five runs: these breaks show up in some and not others, so their absence is not news.
+const SOMETIMES = `${OFF_CENTRE}. It breaks in some runs only, once the card has flipped`;
+const PARKED = {
+  "button-design": {
+    [SQUINT_BOX]: [
+      "both aim squint → Cancel",
+      "both aim squint → Publish",
+      "both aim squint → Save draft",
+      "both nock squint → Cancel",
+      "both nock squint → Publish",
+      "both nock squint → Save draft",
+    ],
+    [SQUINT_SHORT]: [
+      "both length squint → Cancel",
+      "both length squint → Publish",
+      "both length squint → Save draft",
+    ],
+  },
+  "data-loading": {
+    [SOMETIMES]: ["mobile aim Render public pages on the server ✕ → Load /lamp (hint)"],
+    [OFF_CENTRE]: [
+      "mobile aim Avoid skeleton flickers → 80ms (hint)",
+      "mobile aim Avoid skeleton flickers ✕ → 80ms (hint)",
+      "desktop aim Debounce search input → Type lamp (hint)",
+      "desktop aim Render public pages on the server → Load /lamp (hint)",
+      "mobile aim Start fetching early ✕ → Replay (hint)",
+      "mobile nock Avoid skeleton flickers → 80ms (hint)",
+      "mobile nock Avoid skeleton flickers ✕ → 80ms (hint)",
+      "desktop nock Debounce search input → Type lamp (hint)",
+      "desktop nock Render public pages on the server → Load /lamp (hint)",
+      "mobile nock Start fetching early ✕ → Replay (hint)",
+    ],
+  },
+  "dialog-design": {
+    [OFF_CENTRE]: [
+      "mobile aim Ask before you drop a draft → New issue (hint)",
+      "mobile aim Ask before you drop a draft ✕ → New issue (hint)",
+      "both aim Give it a name → Rename (hint)",
+      "mobile aim Give it a name ✕ → Rename (hint)",
+      "mobile aim Let Escape close it → What's new (hint)",
+      "mobile aim Let Escape close it ✕ → What's new (hint)",
+      "mobile aim Lock the page behind → Share (hint)",
+      "mobile aim Lock the page behind ✕ → Share (hint)",
+      "mobile nock Ask before you drop a draft → New issue (hint)",
+      "mobile nock Ask before you drop a draft ✕ → New issue (hint)",
+      "both nock Give it a name → Rename (hint)",
+      "mobile nock Give it a name ✕ → Rename (hint)",
+      "mobile nock Let Escape close it → What's new (hint)",
+      "mobile nock Let Escape close it ✕ → What's new (hint)",
+      "mobile nock Lock the page behind → Share (hint)",
+      "mobile nock Lock the page behind ✕ → Share (hint)",
+    ],
+    [SLOTS]: ["desktop overlap Focus the safe answer → Delete project (hint)"],
+  },
+  "handling-timestamps": {
+    [SOMETIMES]: [
+      "mobile aim Send the zone with the input ✕ → <input type=time> (hint)",
+      "mobile nock Send the zone with the input ✕ → <input type=time> (hint)",
+    ],
+    [OFF_CENTRE]: [
+      "both aim Filter by the user's day → <input type=date> (hint)",
+      "mobile aim Filter by the user's day ✕ → <input type=date> (hint)",
+      "mobile aim Send the zone with the input → <input type=time> (hint)",
+      "both nock Filter by the user's day → <input type=date> (hint)",
+      "mobile nock Filter by the user's day ✕ → <input type=date> (hint)",
+      "mobile nock Send the zone with the input → <input type=time> (hint)",
+    ],
+  },
+  "null-vs-undefined": {
+    [OFF_CENTRE]: [
+      "desktop aim Clear with null → Remove reviewer Rina (hint)",
+      "mobile aim Leave untouched fields out → Save (hint)",
+      "mobile aim Leave untouched fields out ✕ → Save (hint)",
+      "desktop nock Clear with null → Remove reviewer Rina (hint)",
+      "mobile nock Leave untouched fields out → Save (hint)",
+      "mobile nock Leave untouched fields out ✕ → Save (hint)",
+    ],
+    [SLOTS]: [
+      "mobile overlap Leave untouched fields out → Save (hint)",
+      "mobile overlap Leave untouched fields out ✕ → Save (hint)",
+    ],
+  },
+  "table-design": {
+    [OFF_CENTRE]: [
+      "both aim Keep the page in the URL → Reload (hint)",
+      "mobile aim Keep the page in the URL ✕ → Reload (hint)",
+      "desktop aim Put actions in a fixed last column → Ana Li (hint)",
+      "mobile aim Put actions in a fixed last column ✕ → Ana Li (hint)",
+      "both nock Keep the page in the URL → Reload (hint)",
+      "mobile nock Keep the page in the URL ✕ → Reload (hint)",
+      "both nock Put actions in a fixed last column → Ana Li (hint)",
+      "mobile nock Put actions in a fixed last column ✕ → Ana Li (hint)",
+    ],
+  },
+} satisfies Record<string, Record<string, Park[]>>;
+/** Each parked break as its full key, `both` spelled out as one entry per width. */
+function known(parked: Record<string, Record<string, Park[]>>) {
+  return new Map(
+    Object.entries(parked).flatMap(([page, whys]) =>
+      Object.entries(whys).flatMap(([why, breaks]) =>
+        breaks.flatMap((park) => {
+          const [size, ...rest] = park.split(" ");
+          const sizes = size === "both" ? ["desktop", "mobile"] : [size];
+          return sizes.map((viewport): [string, string] => [
+            `rule-of-thumb__${page} ${viewport} ${rest.join(" ")}`,
+            why,
+          ]);
+        }),
+      ),
+    ),
+  );
+}
+const KNOWN = known(PARKED);
 
 type Kind = "hint" | "toggle" | "squint";
 type Seen = {
@@ -74,7 +186,8 @@ type Seen = {
 type Card = {
   card: string;
   arrows: Seen[];
-  targets: { box: Box; room: Box; inPane: boolean }[];
+  /** `name` is what the target says, so a break names its arrow by the control it points at. */
+  targets: { name: string; box: Box; room: Box; inPane: boolean }[];
   // The words, controls and pictures in the card, each with the targets it belongs to.
   marks: { box: Box; of: number[] }[];
 };
@@ -163,6 +276,10 @@ function collectHints(): Card[] {
       targets: targets.map((t, i) => {
         const figure = t.closest("figure[data-side]");
         return {
+          name:
+            t.getAttribute("aria-label") ||
+            t.textContent!.replace(/\s+/g, " ").trim() ||
+            `<${t.localName}${t.hasAttribute("type") ? ` type=${t.getAttribute("type")}` : ""}>`,
           box: box(rects[i]!),
           room: box((figure ?? card).getBoundingClientRect()),
           inPane: figure !== null,
@@ -194,6 +311,7 @@ function collectSquint() {
       grid: Number(rects[0]?.getAttribute("width") ?? 0),
       matrix: [m.a, m.b, m.c, m.d, m.e + window.scrollX, m.f + window.scrollY],
       label: box(range.getBoundingClientRect()),
+      name: note.parentElement!.querySelector("button")!.textContent!.trim(),
       target: box(note.parentElement!.querySelector("button")!.getBoundingClientRect()),
     };
   });
@@ -259,18 +377,17 @@ function freeSlot(a: Placed, w: number, h: number, marks: Box[], others: Placed[
   return undefined;
 }
 
-const RULES = ["aim", "length", "bend", "straight", "overlap", "head"] as const;
-type Rule = (typeof RULES)[number];
+type Break = { rule: Rule; where: string; what: string };
 
 function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
-  const broken = new Map<string, string[]>(RULES.map((rule) => [rule, []]));
+  const broken: Break[] = [];
   const flag = (rule: Rule, where: string, what: string | undefined) => {
-    if (what) broken.get(rule)!.push(`${where}: ${what}`);
+    if (what) broken.push({ rule, where, what });
   };
   const rules = (a: Placed, seen: Seen) => {
     const gaps = GAPS[a.kind];
     flag("aim", a.where, aimsAt(a.points, a.target, gaps.target));
-    flag("aim", a.where, leaves(a.points, a.label, gaps.label));
+    flag("nock", a.where, leaves(a.points, a.label, gaps.label));
     flag("length", a.where, longEnough(a.points));
     flag("bend", a.where, tightest(a.points, BEND));
     flag("straight", a.where, straightWhereItFits(a.points, a.label, a.target));
@@ -291,15 +408,14 @@ function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
       const nearest = card.targets
         .map((t, k) => ({ k, miss: outside(tip, t.box) }))
         .sort((a, b) => a.miss - b.miss)[0];
-      const where = `${card.card} #${i}`;
       if (!nearest) {
-        flag("aim", where, "points at no [data-hint] target");
+        flag("no target", `${card.card} #${i}`, "points at no [data-hint] target");
         return;
       }
       const t = card.targets[nearest.k]!;
       const a: Placed = {
         kind: t.inPane ? "hint" : "toggle",
-        where: `${where} (${t.inPane ? "hint" : "toggle"})`,
+        where: `${card.card} → ${t.name} (${t.inPane ? "hint" : "toggle"})`,
         points,
         label: seen.label,
         target: t.box,
@@ -312,9 +428,9 @@ function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
         marks: card.marks.filter((m) => !m.of.includes(nearest.k)).map((m) => m.box),
       });
     });
-    card.targets.forEach((_, k) => {
+    card.targets.forEach((t, k) => {
       const n = card.arrows.filter((a) => a.target === k).length;
-      if (n !== 1) flag("aim", `${card.card} target ${k}`, `has ${n} arrows pointing at it`);
+      if (n !== 1) flag("one arrow", `${card.card} → ${t.name}`, `has ${n} arrows pointing at it`);
     });
     for (const a of placed) {
       const others = placed.filter((o) => o !== a);
@@ -341,18 +457,18 @@ function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
         );
     }
   }
-  squint.forEach((s, i) => {
+  squint.forEach((s) => {
     const points = spineOf({ spine: polyline(s.spine), ink: "", matrix: s.matrix });
     const a: Placed = {
       kind: "squint",
-      where: `squint #${i}`,
+      where: `squint → ${s.name}`,
       points,
       label: s.label,
       target: s.target,
       room: s.target,
     };
     flag("aim", a.where, aimsAt(points, s.target, GAPS.squint.target));
-    flag("aim", a.where, leaves(points, s.label, GAPS.squint.label));
+    flag("nock", a.where, leaves(points, s.label, GAPS.squint.label));
     flag("length", a.where, longEnough(points));
     flag("bend", a.where, tightest(points, BEND));
     flag("head", a.where, squarePixelHead(polyline(s.spine), s.cells, s.grid, look.head));
@@ -413,20 +529,19 @@ describe.concurrent("every drawn arrow keeps the arrow rules", () => {
       try {
         const { cards, squint } = await walk(page);
         const broken = judge(cards, squint);
-        const slug = routeSlug(route);
-        const unexpected = [...broken].flatMap(([rule, list]) =>
-          list.length && !KNOWN.has(`${slug} ${viewport} ${rule}`)
-            ? [`${rule}: ${list.join("; ")}`]
-            : [],
+        const here = `${routeSlug(route)} ${viewport} `;
+        const key = (b: Break) => `${here}${b.rule} ${b.where}`;
+        const unexpected = broken
+          .filter((b) => !KNOWN.has(key(b)))
+          .map((b) => `${b.rule}: ${b.where}: ${b.what}`);
+        const seen = new Set(broken.map(key));
+        const healed = [...KNOWN].flatMap(([k, why]) =>
+          k.startsWith(here) && why !== SOMETIMES && !seen.has(k) ? [k] : [],
         );
-        const healed = [...KNOWN.keys()].filter((key) => {
-          const [s, v, rule] = key.split(" ");
-          return s === slug && v === viewport && broken.get(rule ?? "")?.length === 0;
-        });
         // Soft, so a page that breaks a new rule still reports the known ones it fixed.
         check.soft(unexpected, "arrows break a rule").toEqual([]);
         check
-          .soft(healed, "known breaks that no longer happen: delete them from KNOWN")
+          .soft(healed, "parked breaks that no longer happen: delete them from PARKED")
           .toEqual([]);
       } finally {
         await context.close();

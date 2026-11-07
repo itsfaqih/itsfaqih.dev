@@ -6,12 +6,13 @@ pre-commit:
   parallel: true
   jobs:
     - name: format
-      glob: "*.{ts,mts,js,mjs,json,jsonc,md,css,yml,yaml,html}"
+      glob: "*.{ts,mts,tsx,js,mjs,json,jsonc,md,css,yml,yaml,html}"
       run: vp fmt --check {staged_files}
     - name: lint
-      glob: "*.{ts,mts,js,mjs,astro}"
+      glob: "*.{ts,mts,tsx,js,mjs,astro}"
       run: vp lint {staged_files}
-    # The checker runs over the whole project in a few seconds, so it runs whenever code changes.
+    # The checker runs over the whole project in a few seconds, so it runs whenever code or a
+    # config it reads (tsconfig.json, package.json) changes.
     - name: typecheck
-      glob: "*.{ts,mts,astro}"
+      glob: "*.{ts,mts,tsx,astro,json}"
       run: vp run typecheck

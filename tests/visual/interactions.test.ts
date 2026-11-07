@@ -19,16 +19,21 @@ afterEach(async () => {
   expect(errors, "errors logged while the page ran").toEqual([]);
 });
 
-async function open(route: string, viewport = { width: 1440, height: 900 }) {
-  context = await browser.newContext({ viewport, colorScheme: "light" });
-  // The home intro plays once a session; these tests start past it.
-  await context.addInitScript(() => sessionStorage.setItem("intro-seen", "1"));
+/** Collects every error the page throws or logs into `errors`, which afterEach checks. */
+function watch(page: Page) {
   errors = [];
-  const page = await context.newPage();
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
+  return page;
+}
+
+async function open(route: string, viewport = { width: 1440, height: 900 }) {
+  context = await browser.newContext({ viewport, colorScheme: "light" });
+  // The home intro plays once a session; these tests start past it.
+  await context.addInitScript(() => sessionStorage.setItem("intro-seen", "1"));
+  const page = watch(await context.newPage());
   await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
   await hydrated(page);
   return page;
@@ -283,7 +288,6 @@ describe("the built site responds to a reader", () => {
     const withScrollbars = await chromium.launch({ ignoreDefaultArgs: ["--hide-scrollbars"] });
     try {
       context = await withScrollbars.newContext({ viewport: { width: 1440, height: 900 } });
-      errors = [];
       await context.addInitScript(() => {
         sessionStorage.setItem("intro-seen", "1");
         const measure = () => {
@@ -294,7 +298,7 @@ describe("the built site responds to a reader", () => {
         };
         requestAnimationFrame(measure);
       });
-      const page = await context.newPage();
+      const page = watch(await context.newPage());
       await page.goto(new URL("/rule-of-thumb/button-design", inject("baseURL")).href, {
         waitUntil: "networkidle",
       });
@@ -310,9 +314,10 @@ describe("the built site responds to a reader", () => {
 
   it("fits every rule's title in its column before any script runs", async () => {
     context = await browser.newContext({ colorScheme: "light" });
-    errors = [];
-    await context.route("**/*.js", (route) => route.abort());
-    const page = await context.newPage();
+    await context.route("**/*.js", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "" }),
+    );
+    const page = watch(await context.newPage());
     const misfits: string[] = [];
     for (const rule of PUBLISHED_GUIDELINES) {
       for (const width of [320, 375, 768, 1024, 1280, 1366, 1440, 1920]) {

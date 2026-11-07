@@ -10,6 +10,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { builtRoutes } from "../tests/visual/serve-build.ts";
+import { decodeHtml } from "./decode-html.ts";
 
 const [other, site = "dist"] = process.argv.slice(2);
 if (!other) {
@@ -24,21 +25,11 @@ function pageFile(root: string, route: string) {
     .find((file) => existsSync(file));
 }
 
-function decode(value: string) {
-  return value
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(parseInt(hex, 16)))
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
-    .replaceAll("&quot;", '"')
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">")
-    .replaceAll("&amp;", "&");
-}
-
 function attributes(tag: string) {
   return Object.fromEntries(
     Array.from(tag.matchAll(/([\w:-]+)(?:=(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g))
       .slice(1)
-      .map(([, name, ...values]) => [name!.toLowerCase(), decode(values.find((v) => v) ?? "")]),
+      .map(([, name, ...values]) => [name!.toLowerCase(), decodeHtml(values.find((v) => v) ?? "")]),
   );
 }
 
@@ -47,7 +38,7 @@ function headTags(html: string) {
   const head = html.slice(0, html.indexOf("</head>"));
   const lines: string[] = [];
   const title = head.match(/<title[^>]*>([\s\S]*?)<\/title>/);
-  if (title) lines.push(`title = ${decode(title[1]!)}`);
+  if (title) lines.push(`title = ${decodeHtml(title[1]!)}`);
   for (const [tag] of head.matchAll(/<meta\s[^>]*>/g)) {
     const meta = attributes(tag);
     const key = meta.property ?? meta.name;

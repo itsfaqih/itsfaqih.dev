@@ -26,8 +26,10 @@ const contentTypes = new Map([
 const compressible = new Set([".html", ".js", ".css", ".svg", ".json", ".md", ".xml", ".txt"]);
 
 function resolveFile(root: string, urlPath: string) {
-  const file = path.join(root, decodeURIComponent(urlPath));
-  if (!file.startsWith(root)) return undefined;
+  const file = path.join(root, urlPath);
+  const inside = path.relative(root, file);
+  if (inside === ".." || inside.startsWith(`..${path.sep}`) || path.isAbsolute(inside))
+    return undefined;
   // Both page layouts a static host serves: `blog/index.html` and `blog.html` answer `/blog`.
   return [file, `${file.replace(/\/$/, "")}.html`, path.join(file, "index.html")].find(
     (candidate) => existsSync(candidate) && statSync(candidate).isFile(),
@@ -52,7 +54,14 @@ export function builtRoutes(root = SITE_ROOT) {
 export async function serveSite(root: string, { brotli = false } = {}) {
   const compressed = new Map<string, Buffer>();
   const server = createServer((req, res) => {
-    const file = resolveFile(root, new URL(req.url ?? "/", "http://localhost").pathname);
+    let urlPath: string;
+    try {
+      urlPath = decodeURIComponent(new URL(req.url ?? "/", "http://localhost").pathname);
+    } catch {
+      res.writeHead(400).end();
+      return;
+    }
+    const file = resolveFile(root, urlPath);
     if (!file) {
       res.writeHead(404).end();
       return;
