@@ -92,6 +92,30 @@ The preloads save 0.26 to 0.41 s on mobile and 0.9 to 1.5 s on slow 3G for the p
 - **Why the `load` event is not compared.** The React build injected its app script after `load` on purpose, so its `load` fired right after the HTML. Astro's module scripts load before `load`. The raw values are in the `--out` JSON files when you rerun.
 - **v1 → v2 of step one.** The first Astro build was slower than React (mobile interactive on home 4.69 s, on the blog post 4.50 s). It lacked the module preloads and still prefetched rule pages on idle. Those two fixes produced step one's numbers above.
 
+### Every page under 3 s on 3G (2026-11-08)
+
+Goal: every page loads in under 3 s on 3G. The `mobile-4g` profile is Chrome DevTools' Fast 3G preset (1.47 Mbit/s, 562.5 ms latency) on a 390×844 phone with a 4× CPU slowdown, served over HTTP/2 as Cloudflare Pages does. "Base" is `main` before the pass and "final" is after it. Each page and build had 7 cold runs, with a load average of 1.3 to 2.6 on 10 cores. Medians in ms:
+
+| Page                                     | Load base | Load final | LCP final | Interactive final |
+| ---------------------------------------- | --------: | ---------: | --------: | ----------------: |
+| `/`                                      |      1710 |       1720 |      1872 |              1701 |
+| `/blog`                                  |      1901 |       1342 |       932 |              1306 |
+| `/cv`                                    |      1937 |       1373 |       940 |              1308 |
+| `/rule-of-thumb`                         |      1464 |       1473 |      2180 |              1346 |
+| `/rule-of-thumb/button-design`           |      1530 |       1521 |      1072 |              1408 |
+| `/rule-of-thumb/data-loading`            |      1646 |       1657 |      1052 |              1506 |
+| `/rule-of-thumb/dialog-design`           |      1527 |       1550 |      1056 |              1409 |
+| `/rule-of-thumb/handling-timestamps`     |      1572 |       1581 |      1072 |              1446 |
+| `/rule-of-thumb/null-vs-undefined`       |      1559 |       1566 |      1076 |              1427 |
+| `/rule-of-thumb/proximity-principle`     |      1491 |       1496 |      1056 |              1387 |
+| `/rule-of-thumb/table-design`            |      1597 |       1610 |       996 |              1465 |
+| `/rule-of-thumb/typescript-code-writing` |      1508 |       1514 |      1088 |              1406 |
+
+- **What moved.** The print cursor's tokens pointed at `/cursors/none.svg`. On a desktop pointer that image is a CSS fetch the `load` event waits for, one more round trip after the CSS that names it. Inlining it as a data URI took `/cv` and `/blog` from 1.9 s to 1.35 s. Pages whose own scripts already held `load` past that fetch did not move.
+- **What did not.** Every byte of home has arrived by 1.7 s. A shared `<symbol>` sprite for the repeated tech logos cut home's raw HTML from 821 KB to 658 KB, but Brotli already sent the repeats once (129.9 KB against 130.0 KB), and the medians stayed within 8 ms, so it was dropped. The sound clips already start after `load`, so deferring them buys nothing.
+- **Shared chunks cost a request.** `texts()` in `src/rules/text-nodes.ts` is its own chunk, since three entry scripts import it. It adds one request to table design, dialog design and handling timestamps, and about 20 ms to their interactive time.
+- **Caveats.** The harness opens no new connection per run, so DNS, TCP and TLS on a cold 3G connection are missing. At about 3 round trips that is roughly 1.7 s more (inferred, not measured), which would put home near 3.4 s on a reader's first visit. Home's once-a-session intro hands its lede over at about 3.9 s, so a run whose LCP lands on the lede reads 3.9 s (2 of 18 runs). On `desktop-3g` (Slow 3G, 2 s round trips) no page can reach 3 s. The smallest page, `/blog`, sends 59 KB of HTML, which takes 1.2 s to arrive at 400 kbit/s after a 2 s round trip, before any of its scripts are requested.
+
 ## Known differences from the React build
 
 These were found while porting and kept on purpose. None of them changes a screenshot baseline.
