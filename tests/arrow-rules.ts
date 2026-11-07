@@ -17,7 +17,7 @@ export const BEND = 20;
 /** The shortest arrow, in px, nock to tip (hints.ts HINT_SHORTEST is its curve before the head). */
 export const SHORTEST = 24;
 /** How far a head may lean off the stroke it ends. a5a5128 fixed heads up to 34° off to 2.4°. */
-export const HEAD_LEAN = 2.4;
+const HEAD_LEAN = 2.4;
 // A head's ray passes through its target's middle, a nock's back through its word's: within a
 // quarter of the box's shorter side of its centre, so it hits the item and not its edge.
 const AIM = 1 / 4;
@@ -165,7 +165,7 @@ export function tightest(points: Point[], bend: number) {
 }
 
 /** How far the line strays from the straight line between its ends. */
-export function sag(points: Point[]) {
+function sag(points: Point[]) {
   const a = points[0]!;
   const b = points.at(-1)!;
   const d = sub(b, a);

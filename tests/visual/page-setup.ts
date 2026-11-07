@@ -23,7 +23,7 @@ export type Clip = { x: number; y: number; width: number; height: number };
 
 // Repeat captures match pixel for pixel, while a recoloured icon changes ~130 pixels and a hidden
 // one ~40. A flat budget holds a small change to the same bar on a tall page as on a short one.
-export const maxDiffPixels = 20;
+const maxDiffPixels = 20;
 
 // Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (cut-ins.ts), and
 // [data-rev] rule sections gain data-in (rule-motion.ts). A new reveal marker belongs here.

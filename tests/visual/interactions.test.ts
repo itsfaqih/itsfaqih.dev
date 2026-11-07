@@ -4,7 +4,7 @@ import { PUBLISHED_GUIDELINES, VISIBLE_GUIDELINES } from "../../src/data/guideli
 import { pageErrors, pathname } from "./page-setup";
 import { pageReady } from "./ready";
 
-// Drives the built site the way a reader does, across island hydration and page navigations.
+// Drives the built site the way a reader does, across page navigations.
 // Every test fails on any error the page logs.
 
 let browser: Browser;
@@ -32,12 +32,8 @@ async function open(route: string, viewport = { width: 1440, height: 900 }) {
   await context.addInitScript(() => sessionStorage.setItem("intro-seen", "1"));
   const page = watch(await context.newPage());
   await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
-  await hydrated(page);
+  await page.waitForFunction(pageReady);
   return page;
-}
-
-function hydrated(page: Page) {
-  return page.waitForFunction(pageReady);
 }
 
 // pagereveal can fire after load, so the transition's type is polled for.
@@ -116,7 +112,7 @@ describe("the built site responds to a reader", () => {
     const rule = VISIBLE_GUIDELINES[0]!;
     const tile = page.locator(`main a[href='${rule.href}']`).first();
     await Promise.all([page.waitForURL(new RegExp(`${rule.href}$`)), tile.click()]);
-    await hydrated(page);
+    await page.waitForFunction(pageReady);
     await expect.poll(() => transitionType(page)).toBe("rule-open");
     await expect.poll(() => heading(page)).toContain(rule.title);
 
@@ -132,7 +128,7 @@ describe("the built site responds to a reader", () => {
     const card = page.locator("[data-part=stage] a[aria-current]");
     const href = (await card.getAttribute("href"))!;
     await Promise.all([page.waitForURL(new RegExp(`${href}$`)), card.click()]);
-    await hydrated(page);
+    await page.waitForFunction(pageReady);
     await expect.poll(() => transitionType(page)).toBe("rule-open");
 
     const back = page.locator("main a[data-back]").first();
@@ -305,7 +301,7 @@ describe("the built site responds to a reader", () => {
       });
       await page.locator("a[href='/']").first().click();
       await page.waitForURL(new URL("/", inject("baseURL")).href);
-      await hydrated(page);
+      await page.waitForFunction(pageReady);
       expect(await page.locator("html").getAttribute("data-widths")).toBe("1440");
     } finally {
       await context.close();
