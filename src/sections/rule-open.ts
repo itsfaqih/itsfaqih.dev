@@ -15,14 +15,14 @@ export function isTransitioning(type?: string) {
 }
 
 /** A click that opens the link somewhere else (a new tab or window) is no dive. */
-export const opensElsewhere = (event: MouseEvent) =>
+const opensElsewhere = (event: MouseEvent) =>
   event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 
 /**
  * Leaves the dive into `href` for the rule page, zooming from `card`. The
  * transition's pictures live on the rule page, so the origin crosses in sessionStorage.
  */
-export function recordDive(href: string, card: Element) {
+function recordDive(href: string, card: Element) {
   const box = card.getBoundingClientRect();
   const art = card.querySelector(".thumb")?.getAnimations({ subtree: true })[0];
   const phase = art?.currentTime ?? null;

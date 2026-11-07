@@ -11,7 +11,7 @@ import {
   WORKER_Y,
   workerOf,
 } from "./hero-pieces";
-import { easeInOut, OUT, pct, SCENE_MS, SLIDE_MS, type TopInk, vars } from "./hero-prints.view";
+import { easeInOut, OUT, pct, SLIDE_MS, type TopInk, vars } from "./hero-prints.view";
 import { INOUT, SPRING } from "./hero-prints.css";
 
 export const MEANDER = [
@@ -290,7 +290,6 @@ export const settleVars = (
   step: number,
 ) => `${vars({ i, dx: `${dx}px`, dy: `${dy}px`, r: `${r}deg`, span, step })};${pivotOf(outline)}`;
 
-export const settledAt = (i: number, span: number, step: number) => (span + step * i) * SCENE_MS;
 export const TUMBLE_FLOAT_MS = [1500, 1800, 1600, 1700];
 export const WORKER_FLOAT_MS = [1500, 1800, 1700] as const;
 

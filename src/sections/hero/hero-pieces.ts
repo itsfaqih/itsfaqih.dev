@@ -45,7 +45,7 @@ export const QUARTER_TOKENS = [0, 2, 3, 1];
 
 // `frame` is what the scene draws the token's print in when it opens, unmoved unless stated.
 export type Token = { outline: Outline; top: TopInk; frame?: Frame };
-export type SceneTokens = { enter: Token[]; exit: Token[] };
+type SceneTokens = { enter: Token[]; exit: Token[] };
 
 const scattered = (pieces: Piece[]) =>
   pieces.map(({ outline, top, dx, dy, r }) => ({
