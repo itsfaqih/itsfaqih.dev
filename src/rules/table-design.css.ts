@@ -565,11 +565,11 @@ export const styles = {
         cursor: cursors["--cursor-point"],
         transition: `background-color ${kit["--t-fb"]} ease, color ${kit["--t-fb"]} ease`,
         selectors: {
-          "&:disabled": {
+          '&:disabled, &[aria-disabled="true"]': {
             opacity: 0.4,
             cursor: cursors["--cursor-forbid"],
           },
-          "&:active:enabled": {
+          '&:active:enabled:not([aria-disabled="true"])': {
             backgroundColor: "color-mix(in srgb, var(--c) 16%, transparent)",
             backgroundPosition: "initial",
             color: "var(--c-ink)",
@@ -578,7 +578,7 @@ export const styles = {
         "@media": {
           [HOVER]: {
             selectors: {
-              "&:hover:enabled": {
+              '&:hover:enabled:not([aria-disabled="true"])': {
                 backgroundColor: "color-mix(in srgb, var(--c) 16%, transparent)",
                 backgroundPosition: "initial",
                 color: "var(--c-ink)",

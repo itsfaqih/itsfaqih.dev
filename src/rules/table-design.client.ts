@@ -139,7 +139,6 @@ class TableLive extends HTMLElement {
       if (playing && seen) timer = window.setInterval(() => ticker.update(tick), TICK_MS);
     };
     const paint = () => {
-      button.setAttribute("aria-pressed", String(!playing));
       dot.className = view.dot(playing);
       label.data = playing ? "Live" : "Paused";
       (playing ? icons.play : icons.pause).replaceWith(playing ? icons.pause : icons.play);
