@@ -15,11 +15,11 @@ import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 
 function swing(root: Element, from: Wall[], to: Wall[], duration: number, step: number) {
-  return [...root.querySelectorAll<HTMLElement>(".ts-reader")].flatMap((card, index) => {
+  return [...root.querySelectorAll<HTMLElement>(".timestamps-reader")].flatMap((card, index) => {
     const start = from[index];
     const end = to[index];
-    const hour = card.querySelector<HTMLElement>(".ts-hour");
-    const minute = card.querySelector<HTMLElement>(".ts-min");
+    const hour = card.querySelector<HTMLElement>(".timestamps-hour");
+    const minute = card.querySelector<HTMLElement>(".timestamps-min");
     if (start === undefined || end === undefined || !hour || !minute || start === end) return [];
     const timing: KeyframeAnimationOptions = {
       duration,
@@ -60,12 +60,12 @@ const setText = (element: Element, text: string) => {
   if (element.textContent !== text) element.textContent = text;
 };
 
-/** Redraws one reader card (ts-readers.astro) for `reading`, keeping its nodes as React did. */
+/** Redraws one reader card (timestamps-readers.astro) for `reading`, keeping its nodes as React did. */
 function paint(card: Element, reading: Reading) {
   const off = offBy(reading);
   const clock = card.firstElementChild!;
   const read = card.lastElementChild!;
-  let ghost = clock.firstElementChild!.classList.contains("ts-min")
+  let ghost = clock.firstElementChild!.classList.contains("timestamps-min")
     ? null
     : clock.firstElementChild;
   if (off && !ghost) {
@@ -77,8 +77,8 @@ function paint(card: Element, reading: Reading) {
     ghost = null;
   }
   ghost?.setAttribute("style", `--a:${hourAngle(reading.truth)}deg`);
-  const minute = clock.querySelector(".ts-min")!;
-  const hour = clock.querySelector(".ts-hour")!;
+  const minute = clock.querySelector(".timestamps-min")!;
+  const hour = clock.querySelector(".timestamps-hour")!;
   minute.setAttribute("style", `--a:${minuteAngle(reading.shown)}deg`);
   hour.setAttribute("style", `--a:${hourAngle(reading.shown)}deg`);
   hour.className = tsView.hour(off !== null);
@@ -101,10 +101,10 @@ function paint(card: Element, reading: Reading) {
 }
 
 /**
- * Two readers' clocks (ts-readers.astro). Below the fold they swing from UTC to each reader's time
+ * Two readers' clocks (timestamps-readers.astro). Below the fold they swing from UTC to each reader's time
  * as they come on screen; a demo that changes the time calls `show`, and the hands swing there.
  */
-export class TsReaders extends HTMLElement {
+export class TimestampsReaders extends HTMLElement {
   #stop?: () => void;
   #shown: Wall[] = [];
 
@@ -153,4 +153,4 @@ export class TsReaders extends HTMLElement {
   }
 }
 
-customElements.define("ts-readers", TsReaders);
+customElements.define("timestamps-readers", TimestampsReaders);

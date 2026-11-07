@@ -1,12 +1,12 @@
 import { reminderLines, reminderOf, type Way } from "./handling-timestamps";
-import type { TsReaders } from "./ts-readers.client";
-import { patchLine } from "./ts-wire";
+import type { TimestampsReaders } from "./timestamps-readers.client";
+import { patchLine } from "./timestamps-wire";
 
 /**
- * The reminder demo (ts-reminder.astro): Rina picks a date and a time, and the request and both
+ * The reminder demo (timestamps-reminder.astro): Rina picks a date and a time, and the request and both
  * readers' clocks follow what the way sends.
  */
-class TsReminder extends HTMLElement {
+class TimestampsReminder extends HTMLElement {
   #stop?: () => void;
 
   connectedCallback() {
@@ -15,7 +15,7 @@ class TsReminder extends HTMLElement {
     const date = this.querySelector<HTMLInputElement>('[data-part="date"]')!;
     const time = this.querySelector<HTMLInputElement>('[data-part="time"]')!;
     const lines = this.querySelectorAll("code");
-    const readers = this.querySelector<TsReaders>("ts-readers")!;
+    const readers = this.querySelector<TimestampsReaders>("timestamps-readers")!;
     const sync = () => {
       const { wall, meant, readings } = reminderOf(way, date.value, time.value);
       reminderLines(way, wall, meant).forEach((line, index) => patchLine(lines[index]!, line.c));
@@ -35,4 +35,4 @@ class TsReminder extends HTMLElement {
   }
 }
 
-customElements.define("ts-reminder", TsReminder);
+customElements.define("timestamps-reminder", TimestampsReminder);

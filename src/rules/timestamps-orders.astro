@@ -1,7 +1,7 @@
 ---
 import { digits, HOUR, ordersLines, ordersOf, type Way } from "./handling-timestamps";
 import { styles } from "./handling-timestamps.css";
-import TsWire from "./ts-wire.astro";
+import TimestampsWire from "./timestamps-wire.astro";
 
 type Props = { way: Way };
 
@@ -12,7 +12,7 @@ const gap = ((rows[rows.length - 1]?.at ?? 0) - first) / HOUR;
 ---
 
 <div class={styles.view}>
-  <TsWire lines={ordersLines(way)} /><table class={styles.table}
+  <TimestampsWire lines={ordersLines(way)} /><table class={styles.table}
     ><thead
       ><tr
         ><th scope="col" class={styles.th}>id</th><th scope="col" class={styles.th}

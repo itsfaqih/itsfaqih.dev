@@ -8,7 +8,7 @@ import {
   type Way,
 } from "./handling-timestamps";
 import { tsView } from "./handling-timestamps.view";
-import { patchLine } from "./ts-wire";
+import { patchLine } from "./timestamps-wire";
 
 const texts = (element: Element) =>
   [...element.childNodes].filter((node): node is Text => node.nodeType === Node.TEXT_NODE);
@@ -18,10 +18,10 @@ const setData = (node: Text, data: string) => {
 };
 
 /**
- * The day filter demo (ts-filter.astro): Rina picks a day, and the range each way sends decides
+ * The day filter demo (timestamps-filter.astro): Rina picks a day, and the range each way sends decides
  * which of her orders come back.
  */
-class TsFilter extends HTMLElement {
+class TimestampsFilter extends HTMLElement {
   #stop?: () => void;
 
   connectedCallback() {
@@ -69,4 +69,4 @@ class TsFilter extends HTMLElement {
   }
 }
 
-customElements.define("ts-filter", TsFilter);
+customElements.define("timestamps-filter", TimestampsFilter);

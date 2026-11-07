@@ -13,7 +13,7 @@ import {
 import { styles } from "./handling-timestamps.css";
 import { tsView } from "./handling-timestamps.view";
 import { host } from "./rule-landing.css";
-import TsWire from "./ts-wire.astro";
+import TimestampsWire from "./timestamps-wire.astro";
 
 type Props = { way: Way };
 
@@ -21,7 +21,7 @@ const { way } = Astro.props;
 const { from, orders } = filterOf(way, FILTER_DATE);
 ---
 
-<ts-filter class={host.contents} data-way={way}>
+<timestamps-filter class={host.contents} data-way={way}>
   <div class={styles.view}>
     <label class={styles.form}
       ><span class={styles.formHead}>Rina's orders on</span><input
@@ -32,7 +32,7 @@ const { from, orders } = filterOf(way, FILTER_DATE);
         value={FILTER_DATE}
       /></label
     >
-    <TsWire lines={filterLines(way, from)} />
+    <TimestampsWire lines={filterLines(way, from)} />
     <ul class={styles.orders}>
       {
         orders.map((order) => (
@@ -52,8 +52,8 @@ const { from, orders } = filterOf(way, FILTER_DATE);
       }
     </ul>
   </div>
-</ts-filter>
+</timestamps-filter>
 
 <script>
-  import "./ts-filter.client";
+  import "./timestamps-filter.client";
 </script>
