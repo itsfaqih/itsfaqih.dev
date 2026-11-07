@@ -316,11 +316,6 @@ export const styles = {
   field: style({
     display: "grid",
     gap: "5px",
-    selectors: {
-      "&:focus-visible": {
-        outline: "none",
-      },
-    },
   }),
   label: style({
     fontWeight: 600,

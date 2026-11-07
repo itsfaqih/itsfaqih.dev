@@ -1,10 +1,10 @@
 ---
-import { HINT } from "./hints";
+import { hoverHold } from "../components/hover-hold.css";
 import { styles } from "./dialog-design.css";
 
-type Props = { part: string; hint?: boolean };
+type Props = { part: string };
 
-const { part, hint = false } = Astro.props;
+const { part } = Astro.props;
 ---
 
-<button type="button" data-hint={hint ? HINT.press : undefined} class={styles.key} data-part={part}><slot /></button>
+<button type="button" class:list={[hoverHold.lift, styles.key]} data-part={part}><slot /></button>

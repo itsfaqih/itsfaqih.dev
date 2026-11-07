@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import DialogBox from "./dialog-box.astro";
 import { styles } from "./dialog-design.css";
 import DialogField from "./dialog-field.astro";
@@ -17,14 +18,14 @@ const { sealed = false } = Astro.props;
       <div slot="page" class:list={[styles.page, styles.checkout]} data-part="page">
         <div class={styles.spread}><span class={styles.logo}></span><button type="button" data-stop="help" class:list={[styles.stop, styles.link]}>Help</button></div>
         <div class={styles.card}><div class={styles.spread}><b class={styles.strong}>Order #2041</b><span class={styles.price}>$86.00</span></div><span style="--w:70%" class={styles.ghost}></span><span style="--w:48%" class={styles.ghost}></span></div>
-        <div class:list={[styles.row, styles.pay]}><button type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>Edit profile</button><button type="button" data-stop="pay" class:list={[styles.stop, styles.btn]}>Pay now</button></div>
+        <div class:list={[styles.row, styles.pay]}><button data-hint={HINT.open} type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>Edit profile</button><button type="button" data-stop="pay" class:list={[styles.stop, styles.btn]}>Pay now</button></div>
       </div>
       <DialogBox id={`focus-${sealed ? "good" : "bad"}-`} title="Edit profile" part="dialog">
         <DialogField name="name" label="Name" value="Ada Lovelace" />
         <div class={styles.acts}><button type="button" data-stop="cancel" class:list={[styles.stop, styles.btn, styles.plain]}>Cancel</button><button type="button" data-stop="save" class:list={[styles.stop, styles.btn]}>Save</button></div>
       </DialogBox>
-      <Fragment slot="keys"><DialogKey part="tab" hint>Tab</DialogKey><DialogKey part="esc">Esc</DialogKey></Fragment>
-      <Fragment slot="read">Focus: <Fragment set:html="<!-- -->" />&lt;body&gt;</Fragment>
+      <Fragment slot="keys"><DialogKey part="tab">Tab</DialogKey><DialogKey part="esc">Esc</DialogKey></Fragment>
+      <Fragment slot="read">Open Edit profile, then press Tab</Fragment>
     </DialogWindow>
   </div>
 </dialog-focus>

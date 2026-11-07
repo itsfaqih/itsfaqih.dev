@@ -1,6 +1,6 @@
 ---
 import { HINT } from "./hints";
-import { FIXES, fateSays, QUERY, searches, shownSearch } from "./data-loading";
+import { QUERY } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -10,36 +10,22 @@ type Props = {
 };
 
 const { debounce = false } = Astro.props;
-// The still state is the end of the run: the word typed, every request's fate, the results shown.
-const fix = debounce ? FIXES.both : FIXES.none;
-const sent = searches(fix);
-const shown = shownSearch(fix)!;
-const stale = shown.q !== QUERY;
 ---
 
 <data-loading-search class={styles.view} data-debounce={debounce ? "" : undefined}
   ><div class={styles.card}
     ><div class={styles.head}
-      ><span>Search</span><span class={styles.status} data-part="count">{sent.length}<!-- --> sent</span
+      ><span>Search</span><span class={styles.status} data-part="count">0<!-- --> sent</span
       ></div
     ><div class={styles.box}
-      ><i aria-hidden="true" class={styles.boxGlass}></i><span data-part="typed">{QUERY}</span><i
+      ><i aria-hidden="true" class={styles.boxGlass}></i><span data-part="typed"></span><i
         aria-hidden="true"
         class={styles.caret}
         data-part="caret"></i
       ></div
-    ><div class={view.results(stale)} aria-live="polite" data-part="results"
-      ><span>{shown.matches.join(", ")}</span><span class={view.resultsFor(stale)}>for {shown.q}</span></div
-    ><ol class={styles.log} data-part="log"
-      >{
-        sent.map(({ q, fate }) => (
-          <li class={styles.logRow}
-            ><span class={view.logQuery(fate)}>GET ?q={q}</span><span
-              class={view.fate(fate, q !== QUERY)}>{fateSays(fate, q)}</span
-            ></li
-          >
-        ))
-      }</ol
+    ><div class={view.results(false)} aria-live="polite" data-part="results"
+      ><span class={styles.status}>No results yet</span></div
+    ><ol class={styles.log} data-part="log"></ol
     ></div
   ><div class={styles.ctl}
     ><span class={styles.note}>Types {QUERY}, with a pause after la</span><button

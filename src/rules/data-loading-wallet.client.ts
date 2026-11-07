@@ -1,6 +1,6 @@
 import { styles } from "./data-loading.css";
 import { HISTORY, money, type Payment, SPENT } from "./data-loading";
-import { Demo, el, spinner, write } from "./data-loading-demo";
+import { busy, Demo, el, spinner, write } from "./data-loading-demo";
 import { type Signal, view } from "./data-loading.view";
 
 /**
@@ -60,12 +60,12 @@ class DataLoadingWallet extends Demo {
         });
       }
       write(stamp?.firstChild ?? null, online ? "Updated just now" : "Updated 2 days ago");
-      button.disabled = next === "connecting";
+      busy(button, next === "connecting");
       write(button.firstChild, online ? "Reopen offline" : "Get signal");
     };
 
-    button.addEventListener(
-      "click",
+    this.onPress(
+      button,
       () => {
         if (this.#signal === "online") {
           show("offline");
@@ -74,7 +74,7 @@ class DataLoadingWallet extends Demo {
         show("connecting");
         this.play([[700, () => show("online")]]);
       },
-      { signal },
+      signal,
     );
   }
 }

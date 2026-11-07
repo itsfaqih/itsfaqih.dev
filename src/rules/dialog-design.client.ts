@@ -10,7 +10,6 @@ import {
   ringView,
   scrimView,
 } from "./dialog-design.view";
-import { onceOnScreen } from "./rule-motion";
 
 /**
  * A demo's window (dialog-window.astro) and the parts every demo has: the page under the dialog,
@@ -53,9 +52,8 @@ function windowOf(host: HTMLElement, signal: AbortSignal) {
 type Window = ReturnType<typeof windowOf>;
 
 /**
- * Which `[data-stop]` in the window holds the ring the demo draws, and whether real focus follows
- * it. The demo's own ring lets a scripted walk show focus moving without taking the reader's.
- * `changed` runs when the reader moves focus themselves.
+ * Which `[data-stop]` in the window holds the ring the demo draws. `move` sends real focus there on
+ * the next `flush`. `changed` runs when the reader moves focus themselves.
  */
 function windowFocus({ screen, page }: Window, signal: AbortSignal, changed: () => void) {
   let at: string | null = null;
@@ -86,9 +84,9 @@ function windowFocus({ screen, page }: Window, signal: AbortSignal, changed: () 
       return at;
     },
     find,
-    move(stop: string | null, real: boolean) {
+    move(stop: string | null) {
       at = stop;
-      pending = real;
+      pending = true;
     },
     next(within: HTMLElement | null, back: boolean) {
       const stops = [...screen.querySelectorAll<HTMLElement>("[data-stop]")].filter(
@@ -125,10 +123,6 @@ function setDialog(dialog: HTMLElement, open: boolean, held = false, top = false
   dialog.className = dialogView(top, open);
 }
 
-function stopButton(w: Window, stop: string) {
-  return w.screen.querySelector<HTMLElement>(`[data-stop="${stop}"]`)!;
-}
-
 /** A demo element: `run` wires it up once connected and gets whether it is the ✓ side. */
 function defineDemo(
   name: string,
@@ -163,24 +157,20 @@ const PROFILE_STOPS = new Map([
   ["cancel", "Cancel"],
   ["save", "Save"],
 ]);
-const IN_PROFILE = ["name", "cancel", "save"];
-const WALK_START = 500;
-const WALK_STEP = 600;
-const WALK_PRESSES = 7;
 
-/** "Keep focus inside": Tab through a checkout with Edit profile open. Once on screen it walks. */
+/** "Keep focus inside": Tab through a checkout with Edit profile open. */
 defineDemo("dialog-focus", (host, sealed, signal) => {
   const w = windowOf(host, signal);
   const dialog = w.part("dialog");
   let open = false;
-  let touched = false;
   const focus = windowFocus(w, signal, () => render());
+  const outside = (stop: string | null) => stop !== null && !dialog.contains(focus.find(stop));
 
   const render = () => {
     w.page.inert = sealed && open;
     w.scrim.className = scrimView(false, open);
     setDialog(dialog, open);
-    const behind = open && focus.at !== null && !IN_PROFILE.includes(focus.at);
+    const behind = open && outside(focus.at);
     const where = (focus.at && PROFILE_STOPS.get(focus.at)) ?? "<body>";
     w.say(
       ["Focus: ", where, ...(behind ? [", behind"] : [])],
@@ -188,30 +178,27 @@ defineDemo("dialog-focus", (host, sealed, signal) => {
     );
     focus.flush(open);
   };
-  const show = (real: boolean) => {
+  const show = () => {
     open = true;
-    focus.move(sealed ? "name" : "trigger", real);
+    focus.move(sealed ? "name" : "trigger");
     render();
   };
   const hide = () => {
     open = false;
-    const stays = focus.at !== null && !IN_PROFILE.includes(focus.at) ? focus.at : null;
-    focus.move(sealed ? "trigger" : stays, true);
+    const stays = outside(focus.at) ? focus.at : null;
+    focus.move(sealed ? "trigger" : stays);
     render();
   };
-  const tab = (real: boolean, back = false) => {
-    focus.move(focus.next(sealed && open ? dialog : null, back), real);
+  const tab = (back = false) => {
+    focus.move(focus.next(sealed && open ? dialog : null, back));
     render();
   };
 
-  for (const kind of ["pointerdown", "keydown"] as const) {
-    host.addEventListener(kind, () => (touched = true), { capture: true, signal });
-  }
-  w.part("tab").addEventListener("click", () => tab(true), { signal });
+  w.part("tab").addEventListener("click", () => tab(), { signal });
   w.part("esc").addEventListener("click", () => open && hide(), { signal });
-  stopButton(w, "trigger").addEventListener("click", () => show(true), { signal });
+  focus.find("trigger")!.addEventListener("click", show, { signal });
   for (const stop of ["cancel", "save"]) {
-    stopButton(w, stop).addEventListener("click", hide, { signal });
+    focus.find(stop)!.addEventListener("click", hide, { signal });
   }
   w.screen.addEventListener(
     "keydown",
@@ -220,30 +207,11 @@ defineDemo("dialog-focus", (host, sealed, signal) => {
       if (event.key === "Escape") hide();
       if (event.key === "Tab" && sealed) {
         event.preventDefault();
-        tab(true, event.shiftKey);
+        tab(event.shiftKey);
       }
     },
     { signal },
   );
-
-  if (reducedMotion()) return;
-  const timers: number[] = [];
-  const later = (at: number, step: () => void) =>
-    timers.push(
-      window.setTimeout(() => {
-        if (!touched) step();
-      }, at),
-    );
-  const stop = onceOnScreen(w.stage, () => {
-    later(WALK_START, () => show(false));
-    for (let press = 1; press <= WALK_PRESSES; press++) {
-      later(WALK_START + press * WALK_STEP, () => tab(false));
-    }
-  });
-  return () => {
-    stop();
-    for (const timer of timers) clearTimeout(timer);
-  };
 });
 
 /** "Let Escape close it": What's new, closed by Esc and a click outside only on the ✓ side. */
@@ -265,7 +233,7 @@ defineDemo("dialog-escape", (host, sealed, signal) => {
   const close = (how: string) => {
     open = false;
     said = `Closed by ${how}`;
-    focus.move("trigger", true);
+    focus.move("trigger");
     render();
   };
   const refuse = (what: string) => {
@@ -279,17 +247,19 @@ defineDemo("dialog-escape", (host, sealed, signal) => {
     else refuse("Esc");
   };
 
-  stopButton(w, "trigger").addEventListener(
+  focus.find("trigger")!.addEventListener(
     "click",
     () => {
       open = true;
-      focus.move("ok", true);
+      said = "Press Esc";
+      ignored = 0;
+      focus.move("ok");
       render();
     },
     { signal },
   );
-  stopButton(w, "x").addEventListener("click", () => close("×"), { signal });
-  stopButton(w, "ok").addEventListener("click", () => close("Got it"), { signal });
+  focus.find("x")!.addEventListener("click", () => close("×"), { signal });
+  focus.find("ok")!.addEventListener("click", () => close("Got it"), { signal });
   w.part("esc").addEventListener("click", escape, { signal });
   w.screen.addEventListener("keydown", (event) => event.key === "Escape" && escape(), { signal });
   w.scrim.addEventListener(
@@ -340,7 +310,7 @@ defineDemo("dialog-confirm", (host, sealed, signal) => {
   };
   const go = (next: ConfirmPhase, stop: string) => {
     phase = next;
-    focus.move(stop, true);
+    focus.move(stop);
     render();
   };
 
@@ -353,8 +323,8 @@ defineDemo("dialog-confirm", (host, sealed, signal) => {
   };
   on("trigger", idle, () => go("open", sealed ? "cancel" : "delete"));
   on("reset", gone, () => go("idle", "trigger"));
-  stopButton(w, "cancel").addEventListener("click", () => go("idle", "trigger"), { signal });
-  stopButton(w, "delete").addEventListener("click", () => go("deleted", "reset"), { signal });
+  focus.find("cancel")!.addEventListener("click", () => go("idle", "trigger"), { signal });
+  focus.find("delete")!.addEventListener("click", () => go("deleted", "reset"), { signal });
   w.part("enter").addEventListener("click", () => focus.at && focus.find(focus.at)?.click(), {
     signal,
   });
@@ -382,6 +352,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
   let phase: DraftPhase = "closed";
   let draft = DRAFT;
   let said = `Draft: ${DRAFT.length} chars`;
+  let tone: ReadTone;
   const dirty = () => draft.trim() !== "";
   const focus = windowFocus(w, signal, () => render());
 
@@ -396,33 +367,31 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
       setDialog(top.dialog, phase === "confirm", false, true);
       top.body.textContent = `You'll lose ${draft.length} characters.`;
     }
-    w.say(
-      [said],
-      said.endsWith("gone")
-        ? "no"
-        : said.startsWith("Asked") || said.endsWith("open")
-          ? "yes"
-          : undefined,
-    );
+    w.say([said], tone);
     focus.flush(open);
+  };
+  const tell = (text: string, next?: ReadTone) => {
+    said = text;
+    tone = next;
   };
   const drop = (how: string) => {
     phase = "closed";
-    focus.move("trigger", true);
-    said = dirty() ? `${how}: ${draft.length} chars gone` : `Closed by ${how}`;
+    focus.move("trigger");
+    if (dirty()) tell(`${how}: ${draft.length} chars gone`, "no");
+    else tell(`Closed by ${how}`);
     draft = "";
     render();
   };
   const leave = (how: string) => {
     if (!sealed || !dirty()) return drop(how);
     phase = "confirm";
-    focus.move("keep", true);
-    said = "Asked first";
+    focus.move("keep");
+    tell("Asked first", "yes");
     render();
   };
   const strayClick = () => {
     if (!sealed || !dirty()) return drop("A click outside");
-    said = "Click outside: still open";
+    tell("Click outside: still open", "yes");
     render();
     if (reducedMotion()) {
       dialog.animate(
@@ -445,8 +414,8 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
   };
   const keepEditing = () => {
     phase = "open";
-    focus.move("title", true);
-    said = `Draft: ${draft.length} chars`;
+    focus.move("title");
+    tell(`Draft: ${draft.length} chars`);
     render();
   };
   const escape = () => {
@@ -454,23 +423,23 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     else if (phase === "confirm") keepEditing();
   };
 
-  stopButton(w, "trigger").addEventListener(
+  focus.find("trigger")!.addEventListener(
     "click",
     () => {
       phase = "open";
-      focus.move("title", true);
-      said = dirty() ? `Draft: ${draft.length} chars` : "Draft: empty";
+      focus.move("title");
+      tell(dirty() ? `Draft: ${draft.length} chars` : "Draft: empty");
       render();
     },
     { signal },
   );
-  stopButton(w, "x").addEventListener("click", () => leave("×"), { signal });
-  stopButton(w, "create").addEventListener(
+  focus.find("x")!.addEventListener("click", () => leave("×"), { signal });
+  focus.find("create")!.addEventListener(
     "click",
     () => {
       phase = "closed";
-      focus.move("trigger", true);
-      said = "Issue created";
+      focus.move("trigger");
+      tell("Issue created");
       draft = DRAFT;
       render();
     },
@@ -485,15 +454,15 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     { signal },
   );
   if (top) {
-    stopButton(w, "keep").addEventListener("click", keepEditing, { signal });
-    stopButton(w, "discard").addEventListener("click", () => drop("Discarded"), { signal });
+    focus.find("keep")!.addEventListener("click", keepEditing, { signal });
+    focus.find("discard")!.addEventListener("click", () => drop("Discarded"), { signal });
   }
   w.part("esc").addEventListener("click", escape, { signal });
   w.part("retype").addEventListener(
     "click",
     () => {
       draft = DRAFT;
-      said = `Draft: ${DRAFT.length} chars`;
+      tell(`Draft: ${DRAFT.length} chars`);
       render();
     },
     { signal },
@@ -538,11 +507,11 @@ defineDemo("dialog-scroll", (host, sealed, signal) => {
   const hide = () => {
     open = false;
     wheel?.abort();
-    focus.move("trigger", true);
+    focus.move("trigger");
     render();
   };
 
-  stopButton(w, "trigger").addEventListener(
+  focus.find("trigger")!.addEventListener(
     "click",
     () => {
       base = w.page.scrollTop;
@@ -551,13 +520,13 @@ defineDemo("dialog-scroll", (host, sealed, signal) => {
       wheel?.abort();
       wheel = new AbortController();
       w.screen.addEventListener("wheel", onWheel, { passive: false, signal: wheel.signal });
-      focus.move("copy", true);
+      focus.move("copy");
       render();
     },
     { signal },
   );
-  stopButton(w, "x").addEventListener("click", hide, { signal });
-  stopButton(w, "copy").addEventListener("click", hide, { signal });
+  focus.find("x")!.addEventListener("click", hide, { signal });
+  focus.find("copy")!.addEventListener("click", hide, { signal });
   w.part("scroll").addEventListener("click", () => nudge(60), { signal });
   w.screen.addEventListener("keydown", (event) => event.key === "Escape" && open && hide(), {
     signal,
@@ -617,26 +586,26 @@ defineDemo("dialog-name", (host, sealed, signal) => {
   };
   const hide = () => {
     open = false;
-    focus.move("trigger", true);
+    focus.move("trigger");
     render();
   };
 
-  stopButton(w, "trigger").addEventListener(
+  focus.find("trigger")!.addEventListener(
     "click",
     () => {
       open = true;
-      focus.move("name", true);
+      focus.move("name");
       render();
     },
     { signal },
   );
   for (const stop of ["cancel", "save"]) {
-    stopButton(w, stop).addEventListener("click", hide, { signal });
+    focus.find(stop)!.addEventListener("click", hide, { signal });
   }
   w.part("tab").addEventListener(
     "click",
     () => {
-      focus.move(focus.next(open ? dialog : null, false), true);
+      focus.move(focus.next(open ? dialog : null, false));
       render();
     },
     { signal },
