@@ -149,7 +149,7 @@ class StackShowcase extends HTMLElement {
     };
 
     // Names each badge and group in the transition: the ones that stay glide (stack-move), the
-    // ones that come back slide in, and the dropped ones fade, as React's <ViewTransition> did.
+    // ones that come back slide in, and the dropped ones fade.
     // `named` is the latest run's; an earlier run that ends late leaves the latest run's names be.
     let named: HTMLElement[] = [];
     const nameAs = (run: HTMLElement[], element: HTMLElement, kind: string) => {

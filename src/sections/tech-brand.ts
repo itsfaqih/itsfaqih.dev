@@ -220,5 +220,5 @@ export const styleOf = (properties: Record<string, string | number>) =>
     .join(";");
 
 let instances = 0;
-/** Keeps the gradient ids of each TechIcon on a page apart, as React's useId did. */
+/** Keeps the gradient ids of each TechIcon on a page apart. */
 export const instanceSuffix = () => `t${++instances}`;
