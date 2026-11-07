@@ -1,5 +1,5 @@
-import { whenIdle } from "../hooks/idle";
-import { play } from "../hooks/sound";
+import { whenIdle } from "../browser/idle";
+import { play } from "../browser/sound";
 import { watchBoxScrollbar } from "./box-scrollbar";
 import { ISLAND_HOME_MS, LIST_PADDING, view, type Step } from "./command-palette.view";
 import { placeHighlight } from "./fluid-hover";

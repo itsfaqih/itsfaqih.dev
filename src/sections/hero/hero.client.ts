@@ -1,6 +1,6 @@
 import "./hero-prints.client";
 import { SLIDES } from "../../data/home";
-import { reducedMotion, watchMedia } from "../../hooks/media-query";
+import { reducedMotion, watchMedia } from "../../browser/media-query";
 import { glowDots } from "../backdrop-dots";
 import { whenIntroDone } from "../intro.client";
 import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.view";

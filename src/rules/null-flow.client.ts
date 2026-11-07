@@ -1,5 +1,5 @@
 import { styles } from "./null-vs-undefined.css";
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import {
   arrived,
   DEMOS,

@@ -1,6 +1,6 @@
-import { reducedMotion } from "../hooks/media-query";
-import { play, soundOn, toggleSound, watchSound } from "../hooks/sound";
-import { followTheme, readTheme, toggleTheme } from "../hooks/theme-store";
+import { reducedMotion } from "../browser/media-query";
+import { play, soundOn, toggleSound, watchSound } from "../browser/sound";
+import { followTheme, readTheme, toggleTheme } from "../browser/theme-store";
 import { watchFluidHover } from "./fluid-hover";
 import { menuGlyphs, SEGS, segView, type HeaderState } from "./header.view";
 

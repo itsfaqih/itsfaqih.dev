@@ -1,8 +1,8 @@
 import Fuse from "fuse.js";
 import { colorOf, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
 import type { PublishedGuideline } from "../data/guidelines";
-import { reducedMotion } from "../hooks/media-query";
-import { play } from "../hooks/sound";
+import { reducedMotion } from "../browser/media-query";
+import { play } from "../browser/sound";
 import { isTransitioning, watchRuleOpen } from "./rule-open";
 import { countClass } from "./chips.view";
 import { beamClass } from "./rule-select.view";

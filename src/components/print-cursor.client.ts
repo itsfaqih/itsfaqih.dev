@@ -1,4 +1,4 @@
-import { whenIdle } from "../hooks/idle";
+import { whenIdle } from "../browser/idle";
 
 // Pixel art on CELL px squares: K is the ink outline, F the fill. hot is the hotspot in cells.
 const PIXEL_ART = {

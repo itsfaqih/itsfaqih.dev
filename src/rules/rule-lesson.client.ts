@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import { mountHints } from "./hint-layer";
 import { lessonView, type SideKey } from "./rule-landing.view";
 import { OUT, TABBED } from "./rule-landing.css";

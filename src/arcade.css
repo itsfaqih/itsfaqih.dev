@@ -105,9 +105,9 @@
 
   /* Opening a rule from a card dives into it: the home deck's card, or on the index the panel the
      tile projects onto. The page zooms toward the card (the head script sets --open-x and --open-y
-     to the centre useRuleOpen measured) while the card's frame swells past the screen edges, and its thumbnail and title fly
-     on into the rule page's cover and heading. The names exist only during that transition, so the
-     theme switch still reveals the page as one picture. */
+     to its centre) while the card's frame swells past the screen edges, and its thumbnail and title
+     fly on into the rule page's cover and heading. The names exist only during that transition, so
+     the theme switch still reveals the page as one picture. */
   /* Global: the dive's one curve and length, set on html so its view-transition pseudo-elements
      inherit them. */
   html {

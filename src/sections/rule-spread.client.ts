@@ -1,4 +1,4 @@
-import { reducedMotion, watchMedia } from "../hooks/media-query";
+import { reducedMotion, watchMedia } from "../browser/media-query";
 import { glowDots } from "./backdrop-dots";
 import { watchRuleOpen } from "./rule-open";
 import { number } from "./rule-spread.css";

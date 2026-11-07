@@ -1,5 +1,5 @@
-import { reducedMotion } from "../hooks/media-query";
-import { play } from "../hooks/sound";
+import { reducedMotion } from "../browser/media-query";
+import { play } from "../browser/sound";
 import { glowDots } from "../sections/backdrop-dots";
 import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
 import { landingView } from "./rule-landing.view";

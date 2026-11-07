@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 
 const REVEAL_PX = 24;
 const LINGER_MS = 900;

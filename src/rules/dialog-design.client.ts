@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import { palette } from "../theme.vars.css";
 import { DRAFT } from "./dialog-design";
 import {

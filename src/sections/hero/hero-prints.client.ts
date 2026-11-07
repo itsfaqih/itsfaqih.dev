@@ -22,7 +22,7 @@ import {
   type TopInk,
   TOPS,
 } from "./hero-prints.view";
-import { reducedMotion } from "../../hooks/media-query";
+import { reducedMotion } from "../../browser/media-query";
 
 const HALFTONE_OFFSET = "translate(5 4)";
 const LANDING_T = 0.845;

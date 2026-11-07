@@ -1,6 +1,6 @@
 import { HINT } from "./hints";
 import { styles } from "./table-design.css";
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import {
   CREW,
   DIGITS,

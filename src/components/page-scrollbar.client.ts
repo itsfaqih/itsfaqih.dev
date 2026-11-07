@@ -1,5 +1,5 @@
-import { whenIdle } from "../hooks/idle";
-import { reducedMotion } from "../hooks/media-query";
+import { whenIdle } from "../browser/idle";
+import { reducedMotion } from "../browser/media-query";
 import { jumpTo } from "./smooth-scroll";
 
 const REVEAL_PX = 32;

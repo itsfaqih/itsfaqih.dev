@@ -69,7 +69,7 @@ const path = Astro.url.pathname.replace(PAGE_FILE_END, "") || "/";
     <script>
       import "../components/favicon-cycle";
       import "../components/smooth-scroll";
-      import { voiceControls } from "../hooks/sound";
+      import { voiceControls } from "../browser/sound";
       voiceControls();
     </script>
   </body>

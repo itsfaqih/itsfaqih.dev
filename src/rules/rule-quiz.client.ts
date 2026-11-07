@@ -1,5 +1,5 @@
-import { reducedMotion } from "../hooks/media-query";
-import { play } from "../hooks/sound";
+import { reducedMotion } from "../browser/media-query";
+import { play } from "../browser/sound";
 import { mountHints } from "./hint-layer";
 import { HINT } from "./hints";
 import { OUT } from "./rule-landing.css";

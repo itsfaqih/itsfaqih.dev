@@ -1,4 +1,4 @@
-import { play } from "../hooks/sound";
+import { play } from "../browser/sound";
 import { EASE, SLIDE, SLIDE_MS } from "./toc-drawer.view";
 import { TOC_NAVIGATE } from "./table-of-contents.client";
 

@@ -1,6 +1,6 @@
 import Lenis from "lenis";
-import { whenIdle } from "../hooks/idle";
-import { reducedMotion } from "../hooks/media-query";
+import { whenIdle } from "../browser/idle";
+import { reducedMotion } from "../browser/media-query";
 
 const GLIDE = 0.07;
 

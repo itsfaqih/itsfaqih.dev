@@ -1,6 +1,6 @@
 import { arcade } from "../components/arcade.css";
 import { styles } from "./handling-timestamps.css";
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import {
   dayOf,
   hourAngle,
