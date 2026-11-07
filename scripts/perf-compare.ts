@@ -208,13 +208,21 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     status?: number;
     protocol?: string;
     bytes?: number;
+    /** CDP's monotonic clock, in seconds. */
+    sent: number;
+    finished?: number;
     done: boolean;
     failed?: string;
   };
   const requests = new Map<string, Request>();
   cdp.on("Network.requestWillBeSent", (event) => {
     if (event.request.url.startsWith("data:")) return;
-    requests.set(event.requestId, { url: event.request.url, type: event.type, done: false });
+    requests.set(event.requestId, {
+      url: event.request.url,
+      type: event.type,
+      sent: event.timestamp,
+      done: false,
+    });
   });
   cdp.on("Network.responseReceived", (event) => {
     const request = requests.get(event.requestId);
@@ -227,6 +235,7 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     if (!request) return;
     request.done = true;
     request.bytes = event.encodedDataLength;
+    request.finished = event.timestamp;
   });
   cdp.on("Network.loadingFailed", (event) => {
     const request = requests.get(event.requestId);
@@ -260,6 +269,9 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
   await context.close();
 
   const list = [...requests.values()];
+  // Milliseconds from the document's request, near enough to navigation start to set beside `load`.
+  const zero = list[0]?.sent ?? 0;
+  const ms = (at?: number) => (at === undefined ? undefined : Math.round((at - zero) * 1000));
   const sum = (filter: (request: Request) => boolean) =>
     list.filter(filter).reduce((total, request) => total + (request.bytes ?? 0), 0);
   errors.push(
@@ -282,12 +294,14 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     requests: list.length,
     errors,
     lcpElement: timings.lcp?.element ?? "none",
-    requestLog: list.map(({ url, type, status, protocol, bytes }) => ({
+    requestLog: list.map(({ url, type, status, protocol, bytes, sent, finished }) => ({
       url,
       type,
       status,
       protocol,
       bytes,
+      start: ms(sent),
+      end: ms(finished),
     })),
   };
 }
