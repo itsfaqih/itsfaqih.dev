@@ -23,9 +23,9 @@ const typo = [
   ["local", "function formatPrice(cents:\u00a0number)\u00a0{…}"],
 ] as const;
 const clash = [
-  ["and", ["type Invoice = Order & { total: string }"]],
-  ["extends", ["interface Invoice extends Order {", "  total: string", "}"]],
-  ["value", ['const Invoice = { total: "0" }']],
+  ["and", ["type Trial = Plan & {", "  price(): string", "}"]],
+  ["extends", ["interface Trial extends Plan {", "  price(): string", "}"]],
+  ["value", ["const Trial = {", '  price: () => "free"', "}"]],
 ] as const;
 ---
 
@@ -63,10 +63,10 @@ const clash = [
     <TsChecked slot="good" lines={extend.good.lines} />
   </RuleLesson>
   <RuleQuiz n={2} level={extend.levels[0]}
-    ><Code tone="prompt">Invoice</Code> builds on <Code tone="prompt">Order</Code>, but gives <Code tone="prompt">total</Code> a string where Order has a number. Pick the Invoice that fails where it's declared.
+    ><Code tone="prompt">Trial</Code> builds on <Code tone="prompt">Plan</Code>, but its <Code tone="prompt">price()</Code> returns a string where Plan's returns a number. Pick the Trial that fails where it's declared.
     <div slot="board" class={quizKit.stack}>
       <div class:list={[styles.code, quiz.given]}>
-        <code class={styles.source}><TsPaint text={"type Order = {\u00a0id:\u00a0string;\u00a0total:\u00a0number\u00a0}"} /></code>
+        <code class={styles.source}><TsPaint text={"type Plan = {\u00a0id:\u00a0string;\u00a0price():\u00a0number\u00a0}"} /></code>
       </div>
       {
         clash.map(([id, lines]) => (
@@ -91,7 +91,7 @@ const clash = [
     <TsChecked slot="good" lines={unions.good.lines} />
   </RuleLesson>
   <RuleQuiz n={3} level={unions.levels[0]} board="code" marks={blanks}
-    >You loop over the invoice statuses at runtime and want a <Code tone="prompt">Status</Code> type that matches the list. Place <Code tone="prompt">as const</Code>.</RuleQuiz
+    >You want <Code tone="prompt">SIZES.s</Code> to read like an enum member, and a <Code tone="prompt">Size</Code> type that takes only the values. Place <Code tone="prompt">as const</Code>.</RuleQuiz
   >
 
   <RuleLesson lesson={edges}>
@@ -113,7 +113,7 @@ const clash = [
     <TsChecked slot="good" lines={options.good.lines} />
   </RuleLesson>
   <RuleQuiz n={5} level={options.levels[0]} board="code" marks={{ lead: TsCode, label: TsHolds }}
-    >Strings in a row can swap with no error. Place the options object.</RuleQuiz
+    >Dozens of files call each of these. Place the options object.</RuleQuiz
   >
 
   <RuleLesson lesson={flags}>
@@ -127,6 +127,6 @@ const clash = [
     <TsChecked slot="good" lines={flags.good.lines} />
   </RuleLesson>
   <RuleQuiz n={6} level={flags.levels[0]} board="code" marks={blanks}
-    ><Code tone="prompt">cells[1].trim()</Code> crashed in production on a CSV row with no comma. <Code tone="prompt">strict</Code> <Fragment set:html="<!-- -->" />is already on. Set the flag that fails the build.</RuleQuiz
+    ><Code tone="prompt">prices[sku].toFixed(2)</Code> crashed in production on a SKU with no price. <Code tone="prompt">prices</Code> is a <Code tone="prompt">{"Record<string, number>"}</Code>, and <Code tone="prompt">strict</Code> is already on. Set the flag that fails the build.</RuleQuiz
   >
 </RuleLanding>

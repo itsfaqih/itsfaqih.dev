@@ -23,7 +23,7 @@ import RuleQuiz from "./rule-quiz.astro";
 const [seo, early, stale, flicker, debounce, errors, boundary, persist] = LESSONS;
 const PAGES = [
   ["settings", "Settings, signed in", "Settings", "Signed in", [["Email alerts", "On"], ["Theme", "Dark"]]],
-  ["product", "Public product page", "shop.test/lamp", "Public", [["Desk lamp", "$48"], ["In stock", "12"]]],
+  ["help", "Public help page", "shop.test/help", "Public", [["Return window", "30 days"], ["Refund in", "5 days"]]],
   ["admin", "Staff dashboard", "Admin", "Staff only", [["Orders", "1,284"], ["Refunds", "12"]]],
 ] as const;
 const PRICES = [
@@ -37,9 +37,14 @@ const TILES = [
   ["Signups", "342"],
 ] as const;
 const PATH = [
-  ["fetch", "loadOrder()", "Receives the order and hands it to the app", false],
-  ["page", "<CheckoutPage>", "Renders the order", false],
-  ["receipt", "<Receipt>", "Reads order.coupon.code", true],
+  ["fetch", "loadOrder()", "Receives the order and hands it to the app"],
+  ["page", "renderCheckout()", "Renders the order"],
+  ["receipt", "printReceipt(order)", "Reads order.coupon.code and throws"],
+] as const;
+const CACHED = [
+  ["stock", "Fan stock", [["Floor fan", "3 left"], ["Desk fan", "8 left"]]],
+  ["orders", "Your orders", ORDERS.slice(0, 2).map(({ item, total }) => [item, total])],
+  ["price", "Fan sale prices", [["Floor fan", "$39"], ["Desk fan", "$24"]]],
 ] as const;
 ---
 
@@ -154,7 +159,7 @@ const PATH = [
     <DataLoadingSearch slot="good" debounce />
   </RuleLesson>
   <RuleQuiz n={5} level={debounce.levels[0]} hint="Tap a fix."
-    >You type la, pause, then finish lamp. This box sends 4 requests and shows results for la. Pick the change that fixes both.
+    >You type ch, pause, add ai, pause, then finish chair. This box sends 5 requests and shows results for chai. Pick the setup that sends fewer and shows chair's results.
     <DataLoadingFix slot="board" level={debounce.levels[0]} />
   </RuleQuiz>
 
@@ -216,13 +221,11 @@ const PATH = [
         ></span
       >
       {
-        PATH.map(([id, name, does, crashed]) => (
+        PATH.map(([id, name, does]) => (
           <Fragment
             ><i aria-hidden="true" class={quiz.link}></i><QuizChoice level={boundary.levels[0]} id={id} look="spot"
               ><span class={quiz.node}
-                ><b class={quiz.nodeName}>{name}</b><span class={quiz.nodeDoes}>{does}</span>{
-                  crashed && <span class:list={[styles.fate, styles.fateStale, quiz.crashed]}>TypeError, crashed here</span>
-                }</span
+                ><b class={quiz.nodeName}>{name}</b><span class={quiz.nodeDoes}>{does}</span></span
               ></QuizChoice
             ></Fragment
           >
@@ -239,38 +242,30 @@ const PATH = [
     <DataLoadingWallet slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={8} level={persist.levels[0]}
-    >A shop app persists its cache. On day 2 the desk lamp sells out and its sale ends. On day 3 you open the app with no signal. Tap what it may show from the cache.
+    >A shop app persists its cache. On day 2 both fans sell out and their sale ends. On day 3 you open the app with no signal. Tap what it may show from the cache.
     <div slot="board" class:list={[styles.card, quiz.wallet]}>
       <span class={styles.head}
         ><span>Shop</span><span class={view.signal("offline")}>No signal, day 3</span></span
       >
-      <QuizChoice level={persist.levels[0]} id="stock" look="spot"
-        ><span class:list={[styles.balance, quiz.inset]}
-          ><span class={styles.balanceLabel}>Desk lamp in stock</span><b class:list={[styles.balanceValue, quiz.still]}
-            >3</b
-          ></span
-        ></QuizChoice
-      >
-      <QuizChoice level={persist.levels[0]} id="orders" look="spot"
-        ><span class:list={[styles.hist, quiz.inset]}
-          ><span class={styles.histHead}
-            ><span>Your orders</span><span class={styles.stamp}>Updated 2 days ago</span></span
-          ><span class={styles.histList}
-            >{
-              ORDERS.map(({ item, total }) => (
-                <span class={quiz.row}
-                  ><span>{item}</span><b class={styles.histAmount}>{total}</b></span
-                >
-              ))
-            }</span
-          ></span
-        ></QuizChoice
-      >
-      <QuizChoice level={persist.levels[0]} id="price" look="spot"
-        ><span class:list={[quiz.rate, quiz.inset]}
-          ><span>Desk lamp, on sale</span><b class={styles.histAmount}>$48</b></span
-        ></QuizChoice
-      >
+      {
+        CACHED.map(([id, head, rows]) => (
+          <QuizChoice level={persist.levels[0]} id={id} look="spot"
+            ><span class:list={[styles.hist, quiz.inset]}
+              ><span class={styles.histHead}
+                ><span>{head}</span><span class={styles.stamp}>Updated 2 days ago</span></span
+              ><span class={styles.histList}
+                >{
+                  rows.map(([name, value]) => (
+                    <span class={quiz.row}
+                      ><span>{name}</span><b class={styles.histAmount}>{value}</b></span
+                    >
+                  ))
+                }</span
+              ></span
+            ></QuizChoice
+          >
+        ))
+      }
     </div>
   </RuleQuiz>
 </RuleLanding>

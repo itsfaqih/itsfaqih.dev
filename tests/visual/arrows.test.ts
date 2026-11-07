@@ -83,14 +83,14 @@ const PARKED = {
     [OFF_CENTRE]: [
       "mobile aim Avoid skeleton flickers → 80ms (hint)",
       "mobile aim Avoid skeleton flickers ✕ → 80ms (hint)",
-      "desktop aim Debounce search input → Type lamp (hint)",
       "desktop aim Render public pages on the server → Load /lamp (hint)",
-      "mobile aim Start fetching early ✕ → Replay (hint)",
+      "mobile aim Start fetching early → Play (hint)",
+      "mobile aim Start fetching early ✕ → Play (hint)",
       "mobile nock Avoid skeleton flickers → 80ms (hint)",
       "mobile nock Avoid skeleton flickers ✕ → 80ms (hint)",
-      "desktop nock Debounce search input → Type lamp (hint)",
       "desktop nock Render public pages on the server → Load /lamp (hint)",
-      "mobile nock Start fetching early ✕ → Replay (hint)",
+      "mobile nock Start fetching early → Play (hint)",
+      "mobile nock Start fetching early ✕ → Play (hint)",
     ],
   },
   "dialog-design": {

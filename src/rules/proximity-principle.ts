@@ -283,16 +283,18 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     levels: [
       {
         name: "Twelve callers",
-        piece: "user.schema.ts",
-        answer: "schemas",
+        piece: "cart.repository.ts",
+        answer: "repositories",
         rows: [
           { depth: 0, text: "src/", kind: "dir" },
+          { depth: 1, text: "repositories/", kind: "dir" },
+          { depth: 2, text: "user.repository.ts" },
           {
-            depth: 1,
+            depth: 2,
             slot: {
-              id: "schemas",
-              label: "+ schemas/user.schema.ts",
-              note: "Give it a type folder. schemas/ says what it is, and ⌘P finds it.",
+              id: "repositories",
+              label: "+ cart.repository.ts",
+              note: "Give it its type folder. repositories/ says what it is, and ⌘P finds it.",
             },
           },
           { depth: 1, text: "routes/", kind: "dir" },
@@ -300,17 +302,17 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             depth: 2,
             slot: {
               id: "routes",
-              label: "+ user.schema.ts",
-              note: "routes/ is the lowest common ancestor, but a schema is not a route.",
+              label: "+ cart.repository.ts",
+              note: "routes/ is the lowest common ancestor, but a repository is not a route.",
             },
           },
-          { depth: 2, text: "signup/", kind: "dir", tag: "uses it" },
+          { depth: 2, text: "cart/", kind: "dir", tag: "uses it" },
           {
             depth: 3,
             slot: {
-              id: "signup",
-              label: "+ user.schema.ts",
-              note: "Its first caller doesn't own it. Eleven other routes would import from signup/.",
+              id: "cart",
+              label: "+ cart.repository.ts",
+              note: "Sharing a name doesn't make cart/ its owner. Eleven other routes would import from it.",
             },
           },
           { depth: 2, text: "… 11 more routes", kind: "more", tag: "uses it" },

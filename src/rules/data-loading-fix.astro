@@ -1,20 +1,21 @@
 ---
 import type { Level } from "./lesson";
-import { FIXES, fateSays, QUERY, searches } from "./data-loading";
+import { CHAIR, FIXES, fateSays, queryOf, searches } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
 import { fixView, view } from "./data-loading.view";
 import QuizChoice from "./quiz-choice.astro";
 import { quizKit } from "./rule-landing.css";
 
-// Quiz 5's board (data-loading-fix.client.ts): the search box after typing lamp, once for each fix,
+// Quiz 5's board (data-loading-fix.client.ts): the search box after typing chair, once for each fix,
 // all read off the model. The box with no fix shows first; picking a fix shows the box it leaves.
 type Props = { level: Level };
 
 const { level } = Astro.props;
 if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
 const labels = new Map(level.choices.map((choice) => [choice.id, choice.label]));
+const query = queryOf(CHAIR);
 const boxes = Object.entries(FIXES).map(([id, fix]) => {
-  const sent = searches(fix);
+  const sent = searches(fix, CHAIR);
   const shown = sent.find((s) => s.fate === "shown")!;
   const canceled = sent.filter((s) => s.fate === "canceled").length;
   return {
@@ -22,8 +23,8 @@ const boxes = Object.entries(FIXES).map(([id, fix]) => {
     says: id === "none" ? "Sends on every letter" : labels.get(id),
     sent,
     shown,
-    stale: shown.q !== QUERY,
-    floods: sent.length === QUERY.length,
+    stale: shown.q !== query,
+    floods: sent.length === query.length,
     count: `${sent.length} sent${canceled ? `, ${canceled} canceled` : ""}`,
   };
 });
@@ -36,15 +37,15 @@ const boxes = Object.entries(FIXES).map(([id, fix]) => {
         ><div class={styles.head}
           ><span>Search</span><span class:list={[styles.status, quiz.fixSays]}>{says}</span></div
         ><div class={styles.box}
-          ><i aria-hidden="true" class={styles.boxGlass}></i><span>{QUERY}</span><i aria-hidden="true" class={styles.caret}></i></div
+          ><i aria-hidden="true" class={styles.boxGlass}></i><span>{query}</span><i aria-hidden="true" class={styles.caret}></i></div
         ><div class={view.results(stale)}
           ><span>{shown.matches.join(", ")}</span><span class={view.resultsFor(stale)}>for {shown.q}</span></div
         ><ol class={styles.log}
           >{
             sent.map(({ q, fate }) => (
               <li class={styles.logRow}
-                ><span class={view.logQuery(fate)}>GET ?q={q}</span><span class={view.fate(fate, q !== QUERY)}
-                  >{fateSays(fate, q)}</span
+                ><span class={view.logQuery(fate)}>GET ?q={q}</span><span class={view.fate(fate, q !== query)}
+                  >{fateSays(fate, q, query)}</span
                 ></li
               >
             ))

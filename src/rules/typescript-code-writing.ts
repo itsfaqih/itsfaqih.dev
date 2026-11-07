@@ -110,18 +110,18 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
         choices: [
           {
             id: "and",
-            label: "type Invoice = Order & { total: string }",
-            note: "It compiles. total becomes never, and the error shows up at the first Invoice you write.",
+            label: "type Trial = Plan & { price(): string }",
+            note: "It compiles. price() keeps both signatures, calls read it as a number, and the error waits for the first Trial you write.",
           },
           {
             id: "extends",
-            label: "interface Invoice extends Order { total: string }",
-            note: "Extend it. The clash fails right here, and the message names both types of total.",
+            label: "interface Trial extends Plan { price(): string }",
+            note: "Extend it. The clash fails right here, and the message names both return types.",
           },
           {
             id: "value",
-            label: 'const Invoice = { total: "0" }',
-            note: "That's a value, not a type. Nothing checks it against Order at all.",
+            label: 'const Trial = { price: () => "free" }',
+            note: "That's a value, not a type. Nothing checks it against Plan at all.",
           },
         ],
       },
@@ -165,38 +165,41 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     },
     levels: [
       {
-        name: "The status list",
+        name: "The size map",
         piece: "as const",
-        answer: "roles",
+        answer: "sizes",
         rows: [
           {
             depth: 0,
-            lead: 'const STATUSES = ["draft", "paid"]',
+            lead: 'const VERSION = "v2"',
             slot: {
-              id: "roles",
-              label: 'const STATUSES = ["draft", "paid"]',
-              note: "Freeze the list. STATUSES becomes a readonly tuple, so Status is the union, with no enum and no extra JavaScript.",
+              id: "version",
+              label: 'const VERSION = "v2"',
+              note: 'A const string is already the literal "v2". SIZES stays { s: string; l: string }, so Size is any string.',
             },
           },
+          { depth: 0, text: "const SIZES = {" },
+          { depth: 1, text: 's: "small",' },
+          { depth: 1, text: 'l: "large",' },
           {
             depth: 0,
-            lead: 'let status = "draft"',
+            lead: "}",
             slot: {
-              id: "role",
-              label: 'let status = "draft"',
-              note: 'status is a let you mean to change. Frozen to "draft", the next assignment fails.',
+              id: "sizes",
+              label: 'const SIZES = { s: "small", l: "large" }',
+              note: 'Freeze the object. Its values become "small" and "large", so Size is their union, with no enum and no extra JavaScript.',
             },
           },
+          { depth: 0, text: "type Size = (typeof SIZES)[keyof typeof SIZES]" },
           {
             depth: 0,
-            lead: "const retries = 3",
+            lead: "let size = SIZES.s",
             slot: {
-              id: "limit",
-              label: "const retries = 3",
-              note: "A const 3 is already the literal 3. STATUSES stays string[], so Status is any string.",
+              id: "size",
+              label: "let size = SIZES.s",
+              note: "as const goes on a literal. On SIZES.s it fails with TS1355, and SIZES still holds plain strings.",
             },
           },
-          { depth: 0, text: "type Status = (typeof STATUSES)[number]" },
         ],
       },
     ],
@@ -311,9 +314,9 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
     },
     levels: [
       {
-        name: "Send an email",
+        name: "Many callers",
         piece: "options",
-        answer: "send",
+        answer: "bill",
         rows: [
           {
             depth: 0,
@@ -335,11 +338,11 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
           },
           {
             depth: 0,
-            lead: "function sendEmail(",
+            lead: "function bill(",
             slot: {
-              id: "send",
-              label: "to, subject, body",
-              note: "Take one options object. Three strings in a row swap without an error, and named keys can't.",
+              id: "bill",
+              label: "user, cents, due",
+              note: "Take one options object. Past two parameters, a call stops saying which value is which, and named keys label each one.",
             },
           },
         ],
@@ -385,11 +388,11 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
           { depth: 1, text: '"strict": true,' },
           {
             depth: 1,
-            lead: '"noImplicitAny":',
+            lead: '"strictNullChecks":',
             slot: {
-              id: "any",
-              label: '"noImplicitAny":',
-              note: "strict already turns it on. cells[1] still reads as string, so the crash ships.",
+              id: "nulls",
+              label: '"strictNullChecks":',
+              note: "strict already turns it on, and it still trusts index reads. prices[sku] reads as number, so the crash ships.",
             },
           },
           {
@@ -398,16 +401,16 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
             slot: {
               id: "index",
               label: '"noUncheckedIndexedAccess":',
-              note: "Turn it on. cells[1] becomes string | undefined, and .trim() fails with TS18048 before it ships.",
+              note: "Turn it on. prices[sku] becomes number | undefined, and .toFixed() fails with TS2532 before it ships.",
             },
           },
           {
             depth: 1,
-            lead: '"verbatimModuleSyntax":',
+            lead: '"exactOptionalPropertyTypes":',
             slot: {
-              id: "verbatim",
-              label: '"verbatimModuleSyntax":',
-              note: "It makes type imports say import type. Keep it, but cells[1] still reads as string.",
+              id: "exact",
+              label: '"exactOptionalPropertyTypes":',
+              note: "It stops an optional field taking an explicit undefined. prices[sku] still reads as number.",
             },
           },
           { depth: 0, text: "}" },

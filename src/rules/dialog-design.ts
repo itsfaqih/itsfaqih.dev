@@ -4,6 +4,11 @@ export const DRAFT = "Checkout fails on Safari 17 when a coupon is set";
 /** What the quizzes' typed-in dialogs hold. */
 export const REPLY = "Thanks, I'll look at it tonight";
 export const REVIEW = "Bright and warm, but the cable is short";
+export const RENAMED = "budget-2027-final.xlsx";
+export const SIGN_OUT = {
+  title: "Sign out everywhere?",
+  body: "You'll need to sign in again on 3 devices.",
+};
 
 export const LESSONS: Lesson[] = [
   {
@@ -66,9 +71,9 @@ export const LESSONS: Lesson[] = [
             note: "Close it on a click outside, since there is nothing to lose.",
           },
           {
-            id: "profile",
-            label: "Edit address, nothing changed yet",
-            note: "Let Esc and Cancel close it. It's a form, and one keystroke would give it input to lose.",
+            id: "rename",
+            label: "Rename file, name edited",
+            note: "One stray click throws away the new name they typed.",
           },
         ],
       },
@@ -86,23 +91,23 @@ export const LESSONS: Lesson[] = [
     },
     levels: [
       {
-        name: "Delete forever",
-        answer: "cancel",
+        name: "Unsaved post",
+        answer: "keep",
         choices: [
           {
             id: "trigger",
-            label: "Delete account, on the page behind",
+            label: "Close editor, on the page behind",
             note: "Focus stays behind the dim layer. Tab moves through the page, and Enter reopens the dialog.",
           },
           {
-            id: "cancel",
-            label: "Cancel",
-            note: "Focus the safe answer. A stray Enter backs out, and deleting takes a deliberate move.",
+            id: "keep",
+            label: "Keep editing",
+            note: "Focus the safe answer, even when it isn't called Cancel. A stray Enter keeps the post.",
           },
           {
-            id: "delete",
-            label: "Delete",
-            note: "One Enter deletes the account and its 38 invoices before anyone has read the title.",
+            id: "discard",
+            label: "Discard",
+            note: "One Enter throws away 3 paragraphs before anyone has read the title.",
           },
         ],
       },
@@ -119,6 +124,11 @@ export const LESSONS: Lesson[] = [
             id: "name",
             label: "Name field",
             note: "Focus the first field so they start typing at once, with no click or Tab.",
+          },
+          {
+            id: "email",
+            label: "Email field",
+            note: "Email comes second. They start there, then Shift+Tab back up to fill in the name.",
           },
           {
             id: "save",
@@ -141,23 +151,23 @@ export const LESSONS: Lesson[] = [
     },
     levels: [
       {
-        name: "A slip",
+        name: "Esc pressed",
         answer: "issue",
         choices: [
           {
-            id: "news",
-            label: "About, nothing to fill in",
-            note: "With nothing typed, a click outside loses nothing. Shaking it blocks a safe way out.",
+            id: "blank",
+            label: "Write a review, nothing typed yet",
+            note: "Nothing is typed, so Esc loses nothing. Asking only slows the way out.",
           },
           {
             id: "issue",
             label: "Write a review, text typed in",
-            note: `Shake it and keep the ${REVIEW.length} characters. Esc or × asks before it drops them.`,
+            note: `Ask before Esc drops the ${REVIEW.length} characters they typed.`,
           },
           {
-            id: "preview",
-            label: "Image preview, nothing to fill in",
-            note: "It holds no input, so a click outside should close it.",
+            id: "news",
+            label: "About, nothing to fill in",
+            note: "It holds no input, so Esc should close it at once.",
           },
         ],
       },
@@ -213,19 +223,19 @@ export const LESSONS: Lesson[] = [
         answer: "named",
         choices: [
           {
-            id: "plain",
-            label: "A plain box",
-            note: "Focus moves, but nothing says a dialog opened or what it asks.",
+            id: "loose",
+            label: "Its title, Cancel, then the page behind",
+            note: "It isn't marked modal, so the swipe runs out of the dialog into the page behind.",
           },
           {
             id: "role",
-            label: "Marked as a dialog",
-            note: "They hear dialog, but not which one or what it asks.",
+            label: "dialog, its text, then Cancel",
+            note: "They hear what it says, but not which dialog opened. Name it by its title.",
           },
           {
             id: "named",
-            label: "A dialog with a name and a description",
-            note: "They hear Delete Moonbase?, dialog, then that 214 files go for good. That's enough to answer.",
+            label: "Its title, its text, then Cancel",
+            note: "They hear which dialog opened and what it does, and the swipe stays inside it.",
           },
         ],
       },

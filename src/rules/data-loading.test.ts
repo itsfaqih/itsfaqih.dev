@@ -1,15 +1,17 @@
 import { expect, it } from "vite-plus/test";
 import {
+  CHAIR,
   FIXES,
   LESSONS,
   type Load,
-  QUERY,
+  queryOf,
   SKELETON,
   searches,
   shownAt,
   shownSearch,
   skeletonChoice,
   skeletonSays,
+  TYPING,
 } from "./data-loading";
 
 // The playhead's path across quiz 4's track, and the marker's spots along it.
@@ -45,21 +47,29 @@ it("offers one choice per zone, and waits for the answer", () => {
   expect(level?.answer).toBe("wait");
 });
 
-// What quiz 5's box shows after typing lamp, for each fix: a request per letter, and stale results.
-it.each([
-  ["none", FIXES.none, { floods: true, stale: true }],
-  ["pause", FIXES.pause, { floods: false, stale: true }],
-  ["cancel", FIXES.cancel, { floods: true, stale: false }],
-  ["both", FIXES.both, { floods: false, stale: false }],
-] as const)("the box with fix %s leaves what quiz 5 says", (_, fix, leaves) => {
+// What the demo's box (typing lamp) and quiz 5's (typing chair) show for each fix: a request per
+// letter, and stale results.
+it.each(
+  (
+    [
+      ["none", FIXES.none, { floods: true, stale: true }],
+      ["pause", FIXES.pause, { floods: false, stale: true }],
+      ["cancel", FIXES.cancel, { floods: true, stale: false }],
+      ["both", FIXES.both, { floods: false, stale: false }],
+    ] as const
+  ).flatMap(([id, fix, leaves]) => [
+    [id, "lamp", TYPING, fix, leaves] as const,
+    [id, "chair", CHAIR, fix, leaves] as const,
+  ]),
+)("the box with fix %s, typing %s, leaves what its notes say", (_, __, typing, fix, leaves) => {
   expect({
-    floods: searches(fix).length === QUERY.length,
-    stale: shownSearch(fix)?.q !== QUERY,
+    floods: searches(fix, typing).length === queryOf(typing).length,
+    stale: shownSearch(fix, typing)?.q !== queryOf(typing),
   }).toEqual(leaves);
 });
 
 it("offers each fix, and waits for the one that fixes both", () => {
-  const level = LESSONS.flatMap((lesson) => lesson.levels).find((l) => l.name === "Typing lamp");
+  const level = LESSONS.flatMap((lesson) => lesson.levels).find((l) => l.name === "Typing chair");
   expect(level && "choices" in level && level.choices.map((choice) => choice.id)).toEqual(
     Object.keys(FIXES).filter((id) => id !== "none"),
   );

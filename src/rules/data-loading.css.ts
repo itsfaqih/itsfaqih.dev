@@ -1549,9 +1549,6 @@ export const quiz = {
     fontSize: "13px",
     color: palette["--dim"],
   }),
-  still: style({
-    animationName: "none",
-  }),
   bigSpin: style({
     alignSelf: "center",
     justifySelf: "center",
@@ -1636,15 +1633,6 @@ export const quiz = {
     paddingBottom: "6px",
     paddingLeft: "9px",
     borderTopWidth: 0,
-  }),
-  rate: style({
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: "8px",
-    alignItems: "center",
-    fontSize: "12px",
-    color: palette["--dim"],
   }),
   // Quiz 5's board: the search box as a fix leaves it, above the fixes. A long fix's name wraps
   // under the box's title.
@@ -1739,10 +1727,5 @@ export const quiz = {
         borderColor: `${palette["--hair"]} transparent transparent`,
       },
     },
-  }),
-  crashed: style({
-    marginTop: "2px",
-    paddingBlock: "3px",
-    fontFamily: fonts["--mono"],
   }),
 };

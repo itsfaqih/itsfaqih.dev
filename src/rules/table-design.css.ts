@@ -1007,9 +1007,6 @@ export const quiz = {
     fontSize: "11px",
     whiteSpace: "nowrap",
   }),
-  typed: style({
-    color: palette["--text"],
-  }),
   glyph: style({
     flexShrink: 0,
     width: "12px",
@@ -1034,9 +1031,6 @@ export const quiz = {
     fontSize: "11px",
     lineHeight: "15px",
     color: palette["--dim"],
-  }),
-  error: style({
-    color: palette["--no-ink"],
   }),
   key: style({
     display: "inline-flex",
