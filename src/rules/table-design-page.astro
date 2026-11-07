@@ -23,9 +23,9 @@ const sizes = [
   ["notes.txt", "9"],
 ] as const;
 const blanks = [
-  { id: "error", caption: "Error", title: "Couldn't load invoices", hint: "The server didn't answer.", query: "" },
-  { id: "empty", caption: "Empty", title: "No invoices yet", hint: "Create your first invoice.", query: "" },
-  { id: "search", caption: "No results", title: 'No results for "zed"', hint: "Check the spelling, or clear the search.", query: "zed" },
+  { id: "create", title: "No invoices yet", hint: "Create your first invoice.", act: "New invoice" },
+  { id: "ask", title: "No invoices yet", hint: "Only admins can create them.", act: "Ask an admin" },
+  { id: "refresh", title: "Nothing to show", hint: "Check back later.", act: "Refresh" },
 ] as const;
 const filters = [
   { id: "25", caption: "Shipped, 25 orders", orders: ["#1042", "#1039", "#1031"], total: 25 },
@@ -59,9 +59,9 @@ const cells = [
       {
         (
           [
-            ["left", "Left-aligned", quiz.left],
-            ["center", "Centred", quiz.center],
-            ["right", "Right-aligned, tabular", quiz.right],
+            ["left", "Left", quiz.left],
+            ["center", "Centre", quiz.center],
+            ["right", "Right", quiz.right],
           ] as const
         ).map(([id, caption, align]) => (
           <QuizChoice level={numbers.levels[0]} id={id} caption={caption}
@@ -91,11 +91,11 @@ const cells = [
     <TableStates slot="good" careful />
   </RuleLesson>
   <RuleQuiz n={2} level={states.levels[0]}
-    >The invoices table can show no rows for three reasons. Pick the one where <b>New invoice</b> belongs.
+    >A viewer, who can read invoices but not create them, opens the invoices table. There are none yet. Pick what they should see.
     <div slot="board" class={quizKit.trio}>
       {
-        blanks.map(({ id, caption, title, hint, query }) => (
-          <QuizChoice level={states.levels[0]} id={id} caption={caption}
+        blanks.map(({ id, title, hint, act }) => (
+          <QuizChoice level={states.levels[0]} id={id}
             ><span class={quiz.sheet}
               ><span class={quiz.bar}
                 ><span class={quiz.search}
@@ -105,14 +105,13 @@ const cells = [
                     weight="bold"
                     aria-hidden="true"
                     class={quiz.glyph}
-                  />{query ? <span class={quiz.typed}>{query}</span> : "Search invoices"}</span
+                  />Search invoices</span
                 ></span
               ><span class={quiz.people}
                 ><span class={quiz.th}>Customer</span><span class={quiz.th}>Total</span></span
               ><span class={quiz.said}
-                ><span class:list={[quiz.saidTitle, id === "error" && quiz.error]}>{title}</span><span
-                  class={quiz.saidHint}>{hint}</span
-                ><span class={quiz.key}>New invoice</span></span
+                ><span class={quiz.saidTitle}>{title}</span><span class={quiz.saidHint}>{hint}</span
+                ><span class={quiz.key}>{act}</span></span
               ></span
             ></QuizChoice
           >

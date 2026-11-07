@@ -124,7 +124,7 @@ export const LESSONS: Lesson[] = [
           },
           {
             id: "right",
-            label: "Size right-aligned, with even-width digits",
+            label: "Size right-aligned",
             note: "Ones sit under ones and thousands under thousands, so the longest number reads as the biggest.",
           },
         ],
@@ -138,22 +138,22 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Fill the blank",
-        answer: "empty",
+        answer: "ask",
         choices: [
           {
-            id: "error",
-            label: "Couldn't load invoices, with New invoice",
-            note: "The list failed to load, so it isn't empty. Offer Retry, since New invoice hides the failure.",
-          },
-          {
-            id: "empty",
+            id: "create",
             label: "No invoices yet, with New invoice",
-            note: "There are no invoices yet, so offer to create the first one.",
+            note: "A viewer can't create invoices, so New invoice fails when they press it.",
           },
           {
-            id: "search",
-            label: "No results for zed, with New invoice",
-            note: "The invoices exist and the search hid them. Offer Clear search to bring them back.",
+            id: "ask",
+            label: "No invoices yet, with Ask an admin",
+            note: "Say why it's empty, and give the one step this viewer can take.",
+          },
+          {
+            id: "refresh",
+            label: "Nothing to show, with Refresh",
+            note: "It never says why the table is empty, and Refresh brings back the same blank.",
           },
         ],
       },
