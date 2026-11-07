@@ -68,14 +68,33 @@
 
   /* Global: keys on a class a script sets on html.
      print-cursor.client.ts sets html.cur-on and draws the shape itself, so every element's cursor token
-     becomes a blank image whose fragment names that shape, for the cursor to read back. */
+     becomes a blank image whose fragment names that shape, for the cursor to read back. The image is
+     inline: a file would be one more round trip that holds up the load event. */
   html.cur-on {
-    --cursor: url("/cursors/none.svg#arrow") 0 0, none;
-    --cursor-point: url("/cursors/none.svg#point") 0 0, none;
-    --cursor-grab: url("/cursors/none.svg#grab") 0 0, none;
-    --cursor-grabbing: url("/cursors/none.svg#grabbing") 0 0, none;
-    --cursor-text: url("/cursors/none.svg#text") 0 0, none;
-    --cursor-forbid: url("/cursors/none.svg#forbid") 0 0, none;
+    --cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#arrow")
+        0 0,
+      none;
+    --cursor-point:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#point")
+        0 0,
+      none;
+    --cursor-grab:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#grab")
+        0 0,
+      none;
+    --cursor-grabbing:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#grabbing")
+        0 0,
+      none;
+    --cursor-text:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#text")
+        0 0,
+      none;
+    --cursor-forbid:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#forbid")
+        0 0,
+      none;
   }
   /* Global: keys on a class a script sets on html.
      the head script sets html.sb-own where page-scrollbar.client.ts draws its own bar; the native one

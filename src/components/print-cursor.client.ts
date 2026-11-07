@@ -141,10 +141,10 @@ const isGlyph = (name: string | undefined): name is Glyph => !!name && name in P
 const PLATE_REST = [3, 2.5] as const;
 const PLATE_SLIP = 9;
 
-// arcade.css points the --cursor tokens at /cursors/none.svg#<glyph> while this cursor is on,
+// arcade.css points the --cursor tokens at a blank image ending #<glyph> while this cursor is on,
 // so the cursor an element already asks for says which glyph to draw.
 function modeOf(cursor: string): Mode {
-  const marker = /none\.svg#(\w+)/.exec(cursor)?.[1];
+  const marker = /#(\w+)"?\)/.exec(cursor)?.[1];
   if (isGlyph(marker)) return marker;
   if (cursor === "pointer") return "point";
   if (cursor === "text") return "text";
