@@ -1,4 +1,9 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { request } from "node:http";
+import { createSecureServer, constants, type ServerHttp2Stream } from "node:http2";
+import type { AddressInfo } from "node:net";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium } from "playwright";
@@ -11,8 +16,13 @@ const { values } = parseArgs({
     profile: { type: "string", default: "mobile-4g" },
     out: { type: "string" },
     route: { type: "string", multiple: true },
+    protocol: { type: "string", default: "h2" },
   },
 });
+if (values.protocol !== "h1" && values.protocol !== "h2")
+  throw new Error("--protocol takes h1 or h2");
+// The names Chrome reports in a response's `protocol` field.
+const wire = values.protocol === "h2" ? "h2" : "http/1.1";
 
 // Network numbers are DevTools' own presets as Lighthouse applies them with its "devtools"
 // throttling method: request latency already scaled for packet-level loss.
@@ -79,13 +89,67 @@ type Run = {
   lcpElement: string;
 };
 
-const servers = await Promise.all(sites.map((site) => serveSite(site.dir, { brotli: true })));
+/**
+ * Puts an HTTP/2 front on a build's HTTP/1.1 server, because the production host speaks HTTP/2.
+ * Over HTTP/1.1 Chrome opens six connections per host, so a page's 50 small requests queue
+ * behind each other at the profile's latency, which the deployed site never does.
+ */
+async function serveHttp2(upstream: string) {
+  const dir = mkdtempSync(path.join(tmpdir(), "perf-tls-"));
+  execFileSync(
+    "openssl",
+    `req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=127.0.0.1 -keyout ${path.join(dir, "key.pem")} -out ${path.join(dir, "cert.pem")}`.split(
+      " ",
+    ),
+    { stdio: "ignore" },
+  );
+  const server = createSecureServer({
+    key: readFileSync(path.join(dir, "key.pem")),
+    cert: readFileSync(path.join(dir, "cert.pem")),
+  });
+  server.on("stream", (stream: ServerHttp2Stream, headers) => {
+    const forward = request(
+      new URL(String(headers[constants.HTTP2_HEADER_PATH]), upstream),
+      (res) => {
+        // HTTP/2 forbids the hop-by-hop headers an HTTP/1.1 response carries.
+        const kept = Object.fromEntries(
+          Object.entries(res.headers).filter(
+            ([name]) => !["connection", "keep-alive", "transfer-encoding"].includes(name),
+          ),
+        );
+        stream.respond({ ":status": res.statusCode ?? 502, ...kept });
+        res.pipe(stream);
+      },
+    );
+    forward.on("error", () => stream.close(constants.NGHTTP2_INTERNAL_ERROR));
+    forward.end();
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  // SAFETY: a server listening on a TCP host and port reports AddressInfo, never a pipe name.
+  const { port } = server.address() as AddressInfo;
+  return {
+    url: `https://127.0.0.1:${port}`,
+    close: () => new Promise<void>((resolve) => server.close(() => resolve())),
+  };
+}
+
+const servers = await Promise.all(
+  sites.map(async (site) => {
+    const plain = await serveSite(site.dir, { brotli: true });
+    if (values.protocol === "h1") return plain;
+    const secure = await serveHttp2(plain.url);
+    return { url: secure.url, close: () => Promise.all([secure.close(), plain.close()]) };
+  }),
+);
 const browser = await chromium.launch({ channel: "chrome" });
 const results = new Map<string, Run[]>();
 if (values.out) mkdirSync(values.out, { recursive: true });
 
 async function measure(base: string, route: string): Promise<Run & { requestLog: object[] }> {
-  const context = await browser.newContext({ viewport: profile.viewport });
+  const context = await browser.newContext({
+    viewport: profile.viewport,
+    ignoreHTTPSErrors: true,
+  });
   const page = await context.newPage();
   const errors: string[] = [];
   page.on("console", (message) => {
@@ -142,6 +206,7 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     url: string;
     type?: string;
     status?: number;
+    protocol?: string;
     bytes?: number;
     done: boolean;
     failed?: string;
@@ -153,7 +218,9 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
   });
   cdp.on("Network.responseReceived", (event) => {
     const request = requests.get(event.requestId);
-    if (request) request.status = event.response.status;
+    if (!request) return;
+    request.status = event.response.status;
+    request.protocol = event.response.protocol;
   });
   cdp.on("Network.loadingFinished", (event) => {
     const request = requests.get(event.requestId);
@@ -199,6 +266,9 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     ...list
       .filter((request) => request.failed || (request.status ?? 200) >= 400)
       .map((request) => `${request.status ?? request.failed} ${request.url}`),
+    ...list
+      .filter((request) => request.protocol && request.protocol !== wire)
+      .map((request) => `served over ${request.protocol}, not ${wire}: ${request.url}`),
   );
   return {
     fcp: timings.fcp,
@@ -212,7 +282,13 @@ async function measure(base: string, route: string): Promise<Run & { requestLog:
     requests: list.length,
     errors,
     lcpElement: timings.lcp?.element ?? "none",
-    requestLog: list.map(({ url, type, status, bytes }) => ({ url, type, status, bytes })),
+    requestLog: list.map(({ url, type, status, protocol, bytes }) => ({
+      url,
+      type,
+      status,
+      protocol,
+      bytes,
+    })),
   };
 }
 
@@ -231,7 +307,10 @@ for (let run = 0; run < Number(values.runs); run++) {
       if (values.out) {
         const slug = route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
         writeFileSync(
-          path.join(values.out, `${values.profile}--${site.label}--${slug}--run${run + 1}.json`),
+          path.join(
+            values.out,
+            `${values.profile}--${values.protocol}--${site.label}--${slug}--run${run + 1}.json`,
+          ),
           JSON.stringify({ site: site.label, route, ...result, requestLog }, null, 2),
         );
       }
@@ -247,7 +326,7 @@ const ms = (xs: number[]) =>
 const kb = (xs: number[]) => (median(xs) / 1024).toFixed(1);
 
 const summary = [
-  `Profile ${values.profile}: ${profile.viewport.width}x${profile.viewport.height}, ${((profile.download * 8) / 1000).toFixed(0)} kbit/s down, ${profile.latency} ms latency, ${profile.cpu}x CPU slowdown. ${values.runs} cold runs per page and build, alternating order. Brotli, no browser cache. Median (min–max), times in ms.`,
+  `Profile ${values.profile} over ${values.protocol === "h2" ? "HTTP/2" : "HTTP/1.1"}: ${profile.viewport.width}x${profile.viewport.height}, ${((profile.download * 8) / 1000).toFixed(0)} kbit/s down, ${profile.latency} ms latency, ${profile.cpu}x CPU slowdown. ${values.runs} cold runs per page and build, alternating order. Brotli, no browser cache. Median (min–max), times in ms.`,
   "",
   "| Page | Build | FCP | LCP | Interactive | Load | TBT | Transferred KB | JS KB | HTML KB | Requests | Errors |",
   "|---|---|---|---|---|---|---|---|---|---|---|---|",
@@ -260,4 +339,8 @@ const summary = [
   ),
 ].join("\n");
 console.log(summary);
-if (values.out) writeFileSync(path.join(values.out, `${values.profile}--summary.md`), summary);
+if (values.out)
+  writeFileSync(
+    path.join(values.out, `${values.profile}--${values.protocol}--summary.md`),
+    summary,
+  );

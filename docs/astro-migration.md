@@ -32,7 +32,7 @@ Every page and component is an `.astro` file, prerendered to HTML. An interactiv
 
 One run measured all three builds side by side on 2026-11-02. "React" is the TanStack Start build (`.output/public` from `main` at 53ec8bb). "Step one" is the React-islands build (51e75b8). "Step two" is the current build.
 
-Method: `scripts/perf-compare.ts` serves every build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating the order of the builds, and reports the median with the range in parentheses. "Interactive" is when the header answers input, which is when its React root mounts or its `<site-header>` element is defined. It does not time the page's demos or the palette, which is defined when the browser is idle. All 240 runs finished with zero failed requests and zero console errors. The load average was 4 to 10 on 10 cores, and the alternating order spread that noise across the builds.
+Method: `scripts/perf-compare.ts` serves every build from one local server with Brotli and no browser cache. It runs 5 cold runs per page and build, alternating the order of the builds, and reports the median with the range in parentheses. "Interactive" is when the header answers input, which is when its React root mounts or its `<site-header>` element is defined. It does not time the page's demos or the palette, which is defined when the browser is idle. These runs used HTTP/1.1. The script now serves HTTP/2 by default, as Cloudflare Pages does, so new numbers do not compare with these. All 240 runs finished with zero failed requests and zero console errors. The load average was 4 to 10 on 10 cores, and the alternating order spread that noise across the builds.
 
 ### Mobile 4G (390×844, 1.47 Mbit/s, 562 ms RTT, 4× CPU slowdown)
 
@@ -115,7 +115,7 @@ vp node scripts/perf-compare.ts --site react=../itsfaqih-react/.output/public \
   --site step1=../itsfaqih-step1/dist --site astro=dist --profile mobile-4g --runs 5 --out /tmp/perf
 ```
 
-`--profile desktop-3g` selects the second profile, and `--route /blog` (repeatable) limits the pages.
+`--profile desktop-3g` selects the second profile, `--route /blog` (repeatable) limits the pages, and `--protocol h1` serves HTTP/1.1 instead of HTTP/2.
 
 ## Next lever
 
