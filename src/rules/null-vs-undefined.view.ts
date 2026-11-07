@@ -1,5 +1,5 @@
 import { button } from "../components/button.css";
-import { buttonVariant } from "../components/button";
+import { buttonVariant } from "../components/button.view";
 import { type Verdict, wentWrong } from "./null-vs-undefined";
 import { cx, type ClassValue } from "../cx";
 import { styles } from "./null-vs-undefined.css";
