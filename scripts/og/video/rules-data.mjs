@@ -1,5 +1,5 @@
 // Writes films/rules-data.js from src/data/guidelines.ts, so every word in the rule films comes
-// from the site's own data. Run: vp node --experimental-strip-types rules-data.mjs
+// from the site's own data. Run: vp node rules-data.mjs
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";

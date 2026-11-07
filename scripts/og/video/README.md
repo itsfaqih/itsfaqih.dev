@@ -16,7 +16,7 @@ From the repository root:
 
 ```sh
 cd scripts/og/video
-vp node --experimental-strip-types rules-data.mjs   # films/rules-data.js from src/data/guidelines.ts
+vp node rules-data.mjs                              # films/rules-data.js from src/data/guidelines.ts
 vp node render.mjs headline
 vp node render.mjs rule-index --poster-at 1.9
 vp node render.mjs rule --q id=button-design --name rule-button-design --poster-at 2.3   # once per rule
