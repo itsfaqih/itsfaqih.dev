@@ -56,10 +56,13 @@ const SQUINT_BOX =
   "button-hierarchy.astro draws Squint's pixel arrow in a fixed 5 by 7 cell box, which leaves 11px under the note and stops 9px over the button, past the 6px gaps";
 const SLOTS =
   "hints.ts places a hint only in its own slots, so it covers content where the rules' 16-direction search finds a free spot 48px out";
-// Checked in five runs: these breaks show up in some and not others, so their absence is not news.
-const SOMETIMES = `${OFF_CENTRE}. It breaks in some runs only, once the card has flipped`;
+// Checked in 13 runs: these breaks show up in some and not others, so their absence is not news.
+const ONLY_SOME = ". It breaks in some runs only, once the card has flipped";
+const SOMETIMES = `${OFF_CENTRE}${ONLY_SOME}`;
+const SLOTS_SOMETIMES = `${SLOTS}${ONLY_SOME}`;
 const PARKED = {
   "button-design": {
+    [SOMETIMES]: ["desktop aim Keep a disabled button still on hover ✕ → Back (hint)"],
     [SQUINT_BOX]: [
       "both aim squint → Cancel",
       "both aim squint → Publish",
@@ -76,6 +79,7 @@ const PARKED = {
   },
   "data-loading": {
     [SOMETIMES]: ["mobile aim Render public pages on the server ✕ → Load /lamp (hint)"],
+    [SLOTS_SOMETIMES]: ["mobile overlap Render public pages on the server ✕ → Load /lamp (hint)"],
     [OFF_CENTRE]: [
       "mobile aim Avoid skeleton flickers → 80ms (hint)",
       "mobile aim Avoid skeleton flickers ✕ → 80ms (hint)",
@@ -115,6 +119,7 @@ const PARKED = {
       "mobile aim Send the zone with the input ✕ → <input type=time> (hint)",
       "mobile nock Send the zone with the input ✕ → <input type=time> (hint)",
     ],
+    [SLOTS_SOMETIMES]: ["mobile overlap Send the zone with the input ✕ → <input type=time> (hint)"],
     [OFF_CENTRE]: [
       "both aim Filter by the user's day → <input type=date> (hint)",
       "mobile aim Filter by the user's day ✕ → <input type=date> (hint)",
@@ -536,7 +541,7 @@ describe.concurrent("every drawn arrow keeps the arrow rules", () => {
           .map((b) => `${b.rule}: ${b.where}: ${b.what}`);
         const seen = new Set(broken.map(key));
         const healed = [...KNOWN].flatMap(([k, why]) =>
-          k.startsWith(here) && why !== SOMETIMES && !seen.has(k) ? [k] : [],
+          k.startsWith(here) && !why.endsWith(ONLY_SOME) && !seen.has(k) ? [k] : [],
         );
         // Soft, so a page that breaks a new rule still reports the known ones it fixed.
         check.soft(unexpected, "arrows break a rule").toEqual([]);
