@@ -11,7 +11,7 @@ import {
   WORKER_X,
   WORKER_Y,
 } from "./hero-pieces";
-import { draw, SLIDE_MS as BACKENDS_MS } from "./hero-prints.view";
+import { draw, SLIDE_MS } from "./hero-prints.view";
 import { styles } from "./hero-prints.css";
 import {
   jobRest,
@@ -142,7 +142,7 @@ const WORK_SIZE = 20;
 }
 {
   index === 3 && (
-    <g class={draw()} style={`--scene-duration:${BACKENDS_MS}ms`}>
+    <g class={draw()} style={`--scene-duration:${SLIDE_MS}ms`}>
       {SLOT_X.map((x) => (
         <rect
           class={draw(styles.inkLine, styles.ghost)}

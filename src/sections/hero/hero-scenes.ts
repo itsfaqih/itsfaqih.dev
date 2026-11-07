@@ -95,7 +95,6 @@ export const REJECT_MARK = (() => {
   return `M${x - r} ${y - r} L${x + r} ${y + r} M${x + r} ${y - r} L${x - r} ${y + r}`;
 })();
 
-const BACKENDS_MS = SLIDE_MS;
 const MOVE_MS = 192;
 const ROUTE_MS = 240;
 const WORK_MS = 800;
@@ -105,7 +104,7 @@ const PULSE_MS = 64;
 const SETTLE_MS = 256;
 const ADVANCE_EVERY_MS = 484;
 // The queue keeps its pace until the scene hands off, so the last jobs are still working then.
-const ADVANCE_COUNT = Math.floor((BACKENDS_MS - ROUTE_MS) / ADVANCE_EVERY_MS) + 1;
+const ADVANCE_COUNT = Math.floor((SLIDE_MS - ROUTE_MS) / ADVANCE_EVERY_MS) + 1;
 const ADVANCES = Array.from({ length: ADVANCE_COUNT }, (_, k) => k * ADVANCE_EVERY_MS);
 const HUE_REJECTED = 1;
 const HUE_RETURNS = 2;
@@ -115,7 +114,7 @@ const advancesFrom = (from: number, to?: number) =>
   ADVANCES.map((_, advance) => advance).slice(from, to);
 const intoWorkerAt = (advance: number) => ADVANCES[advance]! + ROUTE_MS;
 const boxOffset = (advance: number) => WORKER_Y[workerOf(advance)] - QUEUE_Y;
-const backendsPct = (ms: number) => pct((ms / BACKENDS_MS) * 100);
+const backendsPct = (ms: number) => pct((ms / SLIDE_MS) * 100);
 
 type JobStop = {
   at: number;
@@ -152,7 +151,7 @@ function joining(advances: number[]): JobStop[] {
 }
 
 const absorbed = (advance: number): JobStop[] =>
-  [intoWorkerAt(advance) + ABSORB_MS, BACKENDS_MS].map((at) => ({
+  [intoWorkerAt(advance) + ABSORB_MS, SLIDE_MS].map((at) => ({
     at,
     x: WORKER_X,
     y: boxOffset(advance),
@@ -216,9 +215,9 @@ type Key = { at: number; css: string; ease?: string };
 
 // Work still under way when the scene hands off stops where it is.
 const keyframes = (name: string, keys: Key[]) => {
-  const kept = keys.filter(({ at }) => at <= BACKENDS_MS);
+  const kept = keys.filter(({ at }) => at <= SLIDE_MS);
   const last = kept.at(-1)!;
-  if (last.at < BACKENDS_MS) kept.push({ at: BACKENDS_MS, css: last.css });
+  if (last.at < SLIDE_MS) kept.push({ at: SLIDE_MS, css: last.css });
   const frame = ({ at, css, ease }: Key) =>
     `${backendsPct(at)} { ${css}${ease ? ` animation-timing-function: ${ease};` : ""} }`;
   return `@keyframes ${name} { ${kept.map(frame).join(" ")} }`;
