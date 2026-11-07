@@ -2,7 +2,7 @@ import { reducedMotion } from "../hooks/media-query";
 import { mountHints } from "./hint-layer";
 import { lessonView, type SideKey } from "./rule-landing.view";
 import { OUT, TABBED } from "./rule-landing.css";
-import { onceOnScreen } from "./rule-motion";
+import { belowFold, onceOnScreen } from "./rule-motion";
 
 /**
  * A lesson card (rule-lesson.astro). Its keys flip the demo between the ✕ and ✓ panes, which on
@@ -95,23 +95,12 @@ class RuleLesson extends HTMLElement {
 
     glide();
     let stopRewind = () => {};
-    if (
-      !reducedMotion() &&
-      matchMedia(TABBED).matches &&
-      card.getBoundingClientRect().top >= innerHeight * 0.7
-    ) {
+    if (!reducedMotion() && matchMedia(TABBED).matches && belowFold(card)) {
       rewound = true;
       show("bad");
-      let timer = 0;
-      const stop = onceOnScreen(card, () => {
-        timer = window.setTimeout(() => {
-          if (!touched) show("good");
-        }, 700);
+      stopRewind = onceOnScreen(card, 700, () => {
+        if (!touched) show("good");
       });
-      stopRewind = () => {
-        stop();
-        clearTimeout(timer);
-      };
     }
 
     this.#stop = () => {

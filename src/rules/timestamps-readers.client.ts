@@ -12,7 +12,7 @@ import {
 } from "./handling-timestamps";
 import { tsView } from "./handling-timestamps.view";
 import { OUT, TABBED } from "./rule-landing.css";
-import { onceOnScreen } from "./rule-motion";
+import { belowFold, onceOnScreen } from "./rule-motion";
 
 function swing(root: Element, from: Wall[], to: Wall[], duration: number, step: number) {
   return [...root.querySelectorAll<HTMLElement>(".timestamps-reader")].flatMap((card, index) => {
@@ -115,7 +115,7 @@ export class TimestampsReaders extends HTMLElement {
     this.#shown = shown;
     // Phones skip the swing in and show the clocks at their times.
     if (reducedMotion() || matchMedia(TABBED).matches) return;
-    if (root.getBoundingClientRect().top < innerHeight * 0.7) return;
+    if (!belowFold(root)) return;
     const held = swing(
       root,
       shown.map(() => utc),
@@ -124,15 +124,11 @@ export class TimestampsReaders extends HTMLElement {
       120,
     );
     for (const animation of held) animation.pause();
-    let timer = 0;
-    const stop = onceOnScreen(root, () => {
-      timer = window.setTimeout(() => {
-        for (const animation of held) animation.play();
-      }, 240);
+    const stop = onceOnScreen(root, 240, () => {
+      for (const animation of held) animation.play();
     });
     this.#stop = () => {
       stop();
-      clearTimeout(timer);
       for (const animation of held) animation.cancel();
     };
   }
