@@ -1,5 +1,5 @@
 ---
-import { draw, type TopInk } from "./hero-prints.view";
+import { topInk, type TopInk } from "./hero-prints.view";
 import { styles } from "./hero-prints.css";
 
 // A figure printed in two passes: the halftone screen offset beneath it, then its top ink.
@@ -15,22 +15,4 @@ const { p, top = "solid", tag: Figure, figure } = Astro.props;
 
 <g transform="translate(5 4)" fill={`url(#${p}ht)`} class:list={[styles.part, styles.screen]}
   ><Figure {...figure} /></g
->{
-  top === "solid" && (
-    <g class={draw(styles.ink)}>
-      <Figure {...figure} />
-    </g>
-  )
-}{
-  top === "hue" && (
-    <g class={draw(styles.hue, styles.screen)}>
-      <Figure {...figure} />
-    </g>
-  )
-}{
-  top === "outline" && (
-    <g class={draw(styles.inkLine)} stroke-width="3">
-      <Figure {...figure} />
-    </g>
-  )
-}
+><g {...topInk(top)}><Figure {...figure} /></g>

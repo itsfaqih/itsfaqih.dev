@@ -24,3 +24,11 @@ export const REST_TRANSFORM = `rotateX(${REST_DEG.x}deg) rotateY(${REST_DEG.y}de
 // on the way out, and turns about its own box. The halftone copies carry a transform attribute
 // instead, so they take the hold alone.
 export const draw = (...more: (ClassValue | false)[]) => cx(styles.part, styles.box, ...more);
+
+/** A top ink's attributes, for a figure's print (hero-ink.astro) and the morph's tokens. */
+export const topInk = (top: TopInk): { class: string; "stroke-width"?: string } =>
+  ({
+    solid: { class: draw(styles.ink) },
+    hue: { class: draw(styles.hue, styles.screen) },
+    outline: { class: draw(styles.inkLine), "stroke-width": "3" },
+  })[top];
