@@ -1,3 +1,5 @@
+import { LINKS, SITE_ORIGIN } from "../seo";
+
 /** The PDFs /cv offers, which the build prints from the page itself (scripts/cv/export-pdf.ts). */
 export const CV_PDF = {
   design: { href: "/faqih-muntashir-cv.pdf", fileName: "CV - Faqih Muntashir.pdf" },
@@ -10,28 +12,13 @@ export const CV = {
   name: "Muhammad Faqih Muntashir",
   headline: "Full Stack Engineer",
   location: "Yogyakarta, Indonesia",
-  email: "itsfaqih@gmail.com",
+  email: LINKS.email,
   links: [
-    {
-      label: "Portfolio",
-      href: "https://itsfaqih.dev/",
-    },
-    {
-      label: "Medium",
-      href: "https://medium.com/@itsfaqih",
-    },
-    {
-      label: "Dribbble",
-      href: "https://dribbble.com/itsfaqih",
-    },
-    {
-      label: "GitHub",
-      href: "https://github.com/itsfaqih",
-    },
-    {
-      label: "LinkedIn",
-      href: "https://www.linkedin.com/in/itsfaqih",
-    },
+    { label: "Portfolio", href: `${SITE_ORIGIN}/` },
+    { label: "Medium", href: LINKS.medium },
+    { label: "Dribbble", href: LINKS.dribbble },
+    { label: "GitHub", href: LINKS.github },
+    { label: "LinkedIn", href: LINKS.linkedin },
   ],
   summary: [
     "Full-stack engineer based in Yogyakarta, Indonesia with 5+ years of professional experience building web products across healthcare, SaaS, and internal tooling. Currently building healthcare software at EvidenceCare for the US market.",
