@@ -412,9 +412,9 @@ export const TLDR = [
 ] as const satisfies Tldr;
 
 export type Way = "bad" | "good";
-export type Field = "title" | "assignee" | "due" | "reviewer";
+type Field = "title" | "assignee" | "due" | "reviewer";
 export type Row = Partial<Record<Field, string | null>>;
-export type Body = Partial<Record<Field, string | null | undefined>>;
+type Body = Partial<Record<Field, string | null | undefined>>;
 export type Phase = "idle" | "sent" | "done";
 export type Verdict = "saved" | "kept" | "wiped" | "not cleared" | "not saved";
 

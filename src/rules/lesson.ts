@@ -14,7 +14,7 @@ export type Side = { label: string; costs: string[] };
 
 export type Slot = { id: string; label: string; note: string };
 
-export type BoardRow =
+type BoardRow =
   | { depth: number; text: string; kind?: TreeRow["kind"]; tag?: string }
   | { depth: number; slot: Slot; lead?: string };
 
