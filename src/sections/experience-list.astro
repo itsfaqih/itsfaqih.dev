@@ -1,5 +1,6 @@
 ---
 import type { Job } from "./home-content";
+import { arcade } from "../components/arcade.css";
 import { boxScrollbar } from "../components/box-scrollbar.css";
 import { marker as barMarker } from "../when";
 import { loadIn } from "../components/load-in.css";
@@ -52,7 +53,7 @@ const { jobs } = Astro.props;
               {job.stack.map((tool) => (
                 <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} class={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
               ))}
-              <li data-more="true" style="display:none"><span data-label={moreLabel(0)} class={view.more} aria-label="0 more tools" /></li>
+              <li data-more="true" hidden><span class={view.more}><span>{moreLabel(0)}</span><span class={arcade.srOnly}> tools</span></span></li>
             </ul>
             <span aria-hidden="true" class={view.hint}>Scroll down</span>
             <div hidden aria-hidden="true" class:list={[boxScrollbar.track, styles.stackBar, barMarker]}>

@@ -130,7 +130,7 @@ class ExperienceList extends HTMLElement {
         hint: frame.querySelector(":scope > span[aria-hidden]")!,
         pills,
         more,
-        moreLabel: more.querySelector(":scope > *")!,
+        moreLabel: more.querySelector(":scope > * > :first-child")!,
         body: element.querySelector(":scope > [data-body]")!,
         achievements: element.querySelector(":scope > template")!,
         shown: pills.length,
@@ -143,9 +143,8 @@ class ExperienceList extends HTMLElement {
 
     const renderMore = (row: Row) => {
       const hidden = row.pills.length - row.shown;
-      row.moreLabel.dataset.label = moreLabel(hidden);
-      row.moreLabel.setAttribute("aria-label", `${hidden} more tools`);
-      row.more.style.display = hidden > 0 ? "" : "none";
+      row.moreLabel.textContent = moreLabel(hidden);
+      row.more.hidden = hidden === 0;
     };
 
     // Each fade grows with the distance left to scroll, so it's gone by the time that end is reached.
@@ -163,16 +162,16 @@ class ExperienceList extends HTMLElement {
       const show = (count: number) =>
         pills.forEach((pill, at) => (pill.style.display = at < count ? "" : "none"));
       show(pills.length);
-      more.style.display = "none";
+      more.hidden = true;
       const lines = [...new Set(pills.map((pill) => pill.offsetTop))];
       row.shown = pills.length;
       if (!isOpen && lines.length > MAX_ROWS) {
         const lastLine = lines[MAX_ROWS - 1]!;
         let count = pills.findIndex((pill) => pill.offsetTop > lastLine);
-        more.style.display = "";
+        more.hidden = false;
         for (; count > 0; count--) {
           show(count);
-          row.moreLabel.dataset.label = moreLabel(pills.length - count);
+          row.moreLabel.textContent = moreLabel(pills.length - count);
           if (more.offsetTop <= lastLine) break;
         }
         row.shown = count;

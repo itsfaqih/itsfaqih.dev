@@ -383,17 +383,12 @@ export const styles = {
       },
     },
   }),
-  // The count pill: its words come from data-label, so measuring can try each count without a
-  // render.
+  // The count pill. Its first child holds the visible count, and a hidden " tools" finishes it
+  // for a screen reader.
   more: style({
     display: "inline-flex",
     borderStyle: "dashed",
     color: palette["--mute"],
-    selectors: {
-      "&::after": {
-        content: "attr(data-label)",
-      },
-    },
   }),
   markClosed: style({
     color: palette["--mute"],
