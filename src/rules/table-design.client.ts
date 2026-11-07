@@ -470,10 +470,24 @@ class TableActions extends HTMLElement {
           event.target instanceof Element ? event.target.closest<HTMLElement>("[data-act]") : null;
         if (!key) return;
         const name = nameOf.get(key.closest("tr")!) ?? "";
+        const at = present.indexOf(name);
         if (key.dataset.act === "restore") present = CREW.map((person) => person.name);
-        else if (key.dataset.act === "delete") present = present.filter((now) => now !== name);
-        else editing = editing === name ? null : name;
+        else if (key.dataset.act === "delete") {
+          present = present.filter((now) => now !== name);
+          if (editing === name) editing = null;
+        } else editing = editing === name ? null : name;
         paint();
+        if (event.detail !== 0 || key.isConnected) return;
+        // Delete and Restore take away the key just pressed, so a key press moves focus to the
+        // next row's Delete, else the one before, else Restore, and after Restore to the first Edit.
+        const row = (name: string | undefined) => (name ? rowOf.get(name) : undefined);
+        const then =
+          key.dataset.act === "delete"
+            ? (row(present[at] ?? present[at - 1])?.querySelector<HTMLElement>(
+                '[data-act="delete"]',
+              ) ?? restore)
+            : row(present[0])?.querySelector<HTMLElement>('[data-act="edit"]');
+        then?.focus();
       },
       { signal: controller.signal },
     );
