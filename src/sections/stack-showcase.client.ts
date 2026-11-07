@@ -150,11 +150,12 @@ class StackShowcase extends HTMLElement {
 
     // Names each badge and group in the transition: the ones that stay glide (stack-move), the
     // ones that come back slide in, and the dropped ones fade, as React's <ViewTransition> did.
+    // `named` is the latest run's; an earlier run that ends late leaves the latest run's names be.
     let named: HTMLElement[] = [];
-    const nameAs = (element: HTMLElement, kind: string) => {
-      element.style.setProperty("view-transition-name", `stack-${named.length}`);
+    const nameAs = (run: HTMLElement[], element: HTMLElement, kind: string) => {
+      element.style.setProperty("view-transition-name", `stack-${run.length}`);
       element.style.setProperty("view-transition-class", kind);
-      named.push(element);
+      run.push(element);
     };
     const unname = () => {
       for (const element of named) {
@@ -175,17 +176,23 @@ class StackShowcase extends HTMLElement {
         return;
       }
       unname();
+      const run = named;
       const was = new Set(before.flatMap(({ group, tools }) => [group, ...tools]));
       const stays = new Set(after.flatMap(({ group, tools }) => [group, ...tools]));
-      for (const element of was) nameAs(element, stays.has(element) ? "stack-move" : "stack-out");
+      for (const element of was) {
+        nameAs(run, element, stays.has(element) ? "stack-move" : "stack-out");
+      }
       const transition = document.startViewTransition({
         update: () => {
           apply(after);
-          for (const element of stays) if (!was.has(element)) nameAs(element, "stack-in");
+          if (named !== run) return;
+          for (const element of stays) if (!was.has(element)) nameAs(run, element, "stack-in");
         },
         types: [STACK_FILTER],
       });
-      transition.finished.finally(unname);
+      transition.finished.finally(() => {
+        if (named === run) unname();
+      });
     };
 
     chipButtons.forEach((chip) =>
