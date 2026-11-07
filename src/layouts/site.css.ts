@@ -2,6 +2,9 @@ import { palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 const HOVER = "(hover: hover) and (pointer: fine)";
 
+/** The room the fixed header bar takes at the top of the page, in px. */
+export const HEADER_HEIGHT = 72;
+
 export const site = {
   html: style({
     scrollBehavior: "smooth",
@@ -13,8 +16,7 @@ export const site = {
   body: style({
     position: "relative",
     minHeight: "100svh",
-    // Room for the fixed header bar.
-    paddingTop: "calc(72px + env(safe-area-inset-top, 0px))",
+    paddingTop: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
     // viewport-fit=cover lays the page under a landscape notch; the background still bleeds there.
     paddingLeft: "env(safe-area-inset-left, 0px)",
     paddingRight: "env(safe-area-inset-right, 0px)",

@@ -1,7 +1,7 @@
+import { HEADER_HEIGHT } from "../layouts/site.css";
 import { countClass } from "./chips.view";
 import { groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.view";
 
-const HEADER_HEIGHT = 72;
 const CARD_GAP = 10;
 const CARD_TOP_MARGIN = 16;
 const CARD_HIDE_DELAY_MS = 80;
