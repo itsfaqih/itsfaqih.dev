@@ -70,7 +70,8 @@ class RuleLanding extends HTMLElement {
     const copiedShare = new Map<Element, () => void>();
     const share = async (button: HTMLElement) => {
       const data = { ...shared, url: location.href };
-      if ("share" in navigator && navigator.canShare(data)) {
+      // Safari before 14 and Chrome before 89 have share but no canShare.
+      if ("share" in navigator && (navigator.canShare?.(data) ?? true)) {
         try {
           await navigator.share(data);
         } catch (e) {
