@@ -26,7 +26,6 @@
     "@astrojs/markdown-remark": "7.3.5",
     "@astrojs/mdx": "8.1.2",
     "@pierre/diffs": "^1.6.2",
-    "@types/mdx": "^2.0.14",
     "@vanilla-extract/css": "^1.21.3",
     "astro": "7.4.4",
     "fuse.js": "^7.5.0",
@@ -53,11 +52,9 @@
     "satori": "^0.63.2",
     "svgo": "^4.1.0",
     "tsrs": "0.20.1-ts7.1.0-beta",
-    "unplugin": "^2.3.11",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
-    "wrangler": "4.153.0"
+    "vitest": "catalog:"
   },
   "browserslist": [
     "chrome >= 109",
