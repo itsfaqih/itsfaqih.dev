@@ -129,7 +129,7 @@ All five were fixed (see Build notes; the dots dropped to 12% and 22% alpha).
 
 ## Critique, round 2
 
-Captures in `shots/hero-dioramas/` at the repo root: `dark-0..4.png` and `light-0..3.png` at 1440, `mobile-390-light-0.png`, and the motion sheets and clips `motion-1440.*` and `motion-390.*`.
+Captures in `docs/hero-dioramas/`: `dark-0..4.png` and `light-0..3.png` at 1440, `mobile-390-light-0.png`, and the motion sheets and clips `motion-1440.*` and `motion-390.*`.
 
 - **Squint.** Unchanged and correct. The diorama now has real depth: skirts and shadows separate every block from the plate in both themes.
 - **Color, light and dark.** Light uses white tops, `#c5c5d1` skirts and a soft `rgb(30 30 60/.14)` shadow. The hue-tinted plate matches the light thumbnails, and no text falls below its dark-mode legibility.
