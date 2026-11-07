@@ -492,4 +492,19 @@ class CommandPalette extends HTMLElement {
   }
 }
 
-whenIdle(() => customElements.define("command-palette", CommandPalette));
+const early = new AbortController();
+const define = () => {
+  early.abort();
+  if (!customElements.get("command-palette"))
+    customElements.define("command-palette", CommandPalette);
+};
+// A ⌘K, or the header search button's synthetic one, can come before the browser idles. Defining
+// here, in the capture phase at window, adds the palette's document listener in time to take it.
+addEventListener(
+  "keydown",
+  (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "k") define();
+  },
+  { capture: true, signal: early.signal },
+);
+whenIdle(define);
