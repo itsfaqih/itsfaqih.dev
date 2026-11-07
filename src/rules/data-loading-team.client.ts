@@ -1,4 +1,4 @@
-import { Demo, spinner } from "./data-loading-demo";
+import { busy, Demo, spinner } from "./data-loading-demo";
 
 type TeamLoad = "ok" | "loading" | "failed";
 
@@ -30,11 +30,11 @@ class DataLoadingTeam extends Demo {
             ? people.cloneNode(true)
             : clone("failed"),
       );
-      fail.disabled = team === "loading";
+      busy(fail, team === "loading");
     };
 
-    fail.addEventListener(
-      "click",
+    this.onPress(
+      fail,
       () => {
         show("loading");
         this.play([
@@ -49,13 +49,15 @@ class DataLoadingTeam extends Demo {
           ],
         ]);
       },
-      { signal },
+      signal,
     );
     body.addEventListener(
       "click",
       (event) => {
         if (!(event.target instanceof Element) || !event.target.closest('[data-part="retry"]'))
           return;
+        // Retry leaves with the error, so its focus moves to the key that stays.
+        if (body.contains(document.activeElement)) fail.focus();
         show("loading");
         this.play([[600, () => show("ok")]]);
       },

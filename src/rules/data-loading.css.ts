@@ -92,7 +92,7 @@ export const styles = {
   }),
   ctlButton: style({
     selectors: {
-      "&:disabled": {
+      '&:disabled, &[aria-disabled="true"]': {
         opacity: 0.55,
         cursor: cursors["--cursor-forbid"],
       },

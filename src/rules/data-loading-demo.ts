@@ -16,6 +16,20 @@ export abstract class Demo extends HTMLElement {
     return this.querySelector<T>(`[data-part="${name}"]`)!;
   }
 
+  /**
+   * Runs `run` on each press of `key` that lands while it is not busy. A busy key stays enabled,
+   * since disabling the key a reader just pressed drops their focus to the page.
+   */
+  protected onPress(key: HTMLButtonElement, run: () => void, signal: AbortSignal) {
+    key.addEventListener(
+      "click",
+      () => {
+        if (key.getAttribute("aria-disabled") !== "true") run();
+      },
+      { signal },
+    );
+  }
+
   protected play(steps: readonly Step[]) {
     this.#clear();
     for (const [at, run] of steps) this.#timers.push(window.setTimeout(run, at));
@@ -35,6 +49,11 @@ export abstract class Demo extends HTMLElement {
     for (const timer of this.#timers) clearTimeout(timer);
     this.#timers = [];
   }
+}
+
+/** Greys out a demo key while its run plays. `onPress` ignores it meanwhile. */
+export function busy(key: HTMLButtonElement, on: boolean) {
+  key.setAttribute("aria-disabled", String(on));
 }
 
 export function spinner(small: boolean, inFigure = false) {

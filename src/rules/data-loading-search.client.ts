@@ -1,5 +1,5 @@
 import { type Fate, FIXES, fateSays, QUERY, type Search, searches, TYPING } from "./data-loading";
-import { Demo, el, spinner, write } from "./data-loading-demo";
+import { busy, Demo, el, spinner, write } from "./data-loading-demo";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -57,10 +57,10 @@ class DataLoadingSearch extends Demo {
       render();
     };
 
-    button.addEventListener(
-      "click",
+    this.onPress(
+      button,
       () => {
-        button.disabled = true;
+        busy(button, true);
         fates.clear();
         log.replaceChildren();
         typed.textContent = "";
@@ -80,12 +80,12 @@ class DataLoadingSearch extends Demo {
           [
             end,
             () => {
-              button.disabled = false;
+              busy(button, false);
             },
           ],
         ]);
       },
-      { signal },
+      signal,
     );
   }
 }

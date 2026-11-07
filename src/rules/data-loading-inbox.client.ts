@@ -1,6 +1,6 @@
 import { styles } from "./data-loading.css";
 import { inboxRows, SPIN_DELAY } from "./data-loading";
-import { Demo, el, write } from "./data-loading-demo";
+import { busy, Demo, el, write } from "./data-loading-demo";
 import { view } from "./data-loading.view";
 
 /**
@@ -52,7 +52,7 @@ class DataLoadingInbox extends Demo {
         }
       }
       write(said.firstChild, this.#said ?? "Pick how fast the server replies.");
-      for (const button of buttons) button.disabled = this.#waiting;
+      for (const button of buttons) busy(button, this.#waiting);
     };
 
     const load = (ms: number) => {
@@ -93,8 +93,8 @@ class DataLoadingInbox extends Demo {
       ]);
     };
 
-    buttons[0]!.addEventListener("click", () => load(80), { signal });
-    buttons[1]!.addEventListener("click", () => load(1200), { signal });
+    this.onPress(buttons[0]!, () => load(80), signal);
+    this.onPress(buttons[1]!, () => load(1200), signal);
   }
 }
 

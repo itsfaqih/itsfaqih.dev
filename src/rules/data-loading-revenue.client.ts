@@ -1,5 +1,5 @@
 import { money, REVENUE } from "./data-loading";
-import { Demo, el, spinner } from "./data-loading-demo";
+import { busy, Demo, el, spinner } from "./data-loading-demo";
 import { view } from "./data-loading.view";
 
 /**
@@ -40,11 +40,11 @@ class DataLoadingRevenue extends Demo {
         this.#shownAt = this.#at;
       }
       sub.className = view.sub(blank);
-      button.disabled = this.#fetching;
+      busy(button, this.#fetching);
     };
 
-    button.addEventListener(
-      "click",
+    this.onPress(
+      button,
       () => {
         this.#fetching = true;
         render();
@@ -60,7 +60,7 @@ class DataLoadingRevenue extends Demo {
           ],
         ]);
       },
-      { signal },
+      signal,
     );
   }
 }

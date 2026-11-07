@@ -1,4 +1,4 @@
-import { Demo, spinner } from "./data-loading-demo";
+import { busy, Demo, spinner } from "./data-loading-demo";
 
 /**
  * A fetch of /users/1 (data-loading-parse.astro) that takes 450ms, then shows what the code above
@@ -10,22 +10,22 @@ class DataLoadingParse extends Demo {
     const button = this.query<HTMLButtonElement>("fetch");
     const outcome = result.firstElementChild!.cloneNode(true);
 
-    button.addEventListener(
-      "click",
+    this.onPress(
+      button,
       () => {
-        button.disabled = true;
+        busy(button, true);
         result.replaceChildren(spinner(false));
         this.play([
           [
             450,
             () => {
-              button.disabled = false;
+              busy(button, false);
               result.replaceChildren(outcome.cloneNode(true));
             },
           ],
         ]);
       },
-      { signal },
+      signal,
     );
   }
 }

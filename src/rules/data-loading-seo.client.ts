@@ -1,5 +1,5 @@
 import { RENDERS } from "./data-loading";
-import { Demo, spinner } from "./data-loading-demo";
+import { busy, Demo, spinner } from "./data-loading-demo";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -21,10 +21,10 @@ class DataLoadingSeo extends Demo {
       status.replaceChildren(...(waiting ? [spinner(true), ` ${text}`] : [text]));
     };
 
-    button.addEventListener(
-      "click",
+    this.onPress(
+      button,
       () => {
-        button.disabled = true;
+        busy(button, true);
         frame.className = view.frame(true);
         frame.replaceChildren();
         this.play([
@@ -35,12 +35,12 @@ class DataLoadingSeo extends Demo {
               frame.className = view.frame(false);
               frame.replaceChildren(product.cloneNode(true));
               say(painted, false);
-              button.disabled = false;
+              busy(button, false);
             },
           ],
         ]);
       },
-      { signal },
+      signal,
     );
   }
 }
