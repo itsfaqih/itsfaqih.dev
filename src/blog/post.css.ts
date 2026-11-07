@@ -317,6 +317,17 @@ export const styles = {
       [HOVER]: {
         userSelect: "none",
       },
+      // Reduced motion fades the drawer in and out where it rests instead of sliding it.
+      [REDUCE]: {
+        selectors: {
+          [`&&${CLOSED}`]: {
+            animationName: fadeOut,
+          },
+          [`&${OPEN}`]: {
+            animationName: fadeIn,
+          },
+        },
+      },
     },
   }),
   drawerPanel: style({
