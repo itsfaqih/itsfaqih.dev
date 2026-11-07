@@ -251,6 +251,8 @@ defineDemo("dialog-escape", (host, sealed, signal) => {
     "click",
     () => {
       open = true;
+      said = "Press Esc";
+      ignored = 0;
       focus.move("ok");
       render();
     },
@@ -350,6 +352,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
   let phase: DraftPhase = "closed";
   let draft = DRAFT;
   let said = `Draft: ${DRAFT.length} chars`;
+  let tone: ReadTone;
   const dirty = () => draft.trim() !== "";
   const focus = windowFocus(w, signal, () => render());
 
@@ -364,20 +367,18 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
       setDialog(top.dialog, phase === "confirm", false, true);
       top.body.textContent = `You'll lose ${draft.length} characters.`;
     }
-    w.say(
-      [said],
-      said.endsWith("gone")
-        ? "no"
-        : said.startsWith("Asked") || said.endsWith("open")
-          ? "yes"
-          : undefined,
-    );
+    w.say([said], tone);
     focus.flush(open);
+  };
+  const tell = (text: string, next?: ReadTone) => {
+    said = text;
+    tone = next;
   };
   const drop = (how: string) => {
     phase = "closed";
     focus.move("trigger");
-    said = dirty() ? `${how}: ${draft.length} chars gone` : `Closed by ${how}`;
+    if (dirty()) tell(`${how}: ${draft.length} chars gone`, "no");
+    else tell(`Closed by ${how}`);
     draft = "";
     render();
   };
@@ -385,12 +386,12 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     if (!sealed || !dirty()) return drop(how);
     phase = "confirm";
     focus.move("keep");
-    said = "Asked first";
+    tell("Asked first", "yes");
     render();
   };
   const strayClick = () => {
     if (!sealed || !dirty()) return drop("A click outside");
-    said = "Click outside: still open";
+    tell("Click outside: still open", "yes");
     render();
     if (reducedMotion()) {
       dialog.animate(
@@ -414,7 +415,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
   const keepEditing = () => {
     phase = "open";
     focus.move("title");
-    said = `Draft: ${draft.length} chars`;
+    tell(`Draft: ${draft.length} chars`);
     render();
   };
   const escape = () => {
@@ -427,7 +428,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     () => {
       phase = "open";
       focus.move("title");
-      said = dirty() ? `Draft: ${draft.length} chars` : "Draft: empty";
+      tell(dirty() ? `Draft: ${draft.length} chars` : "Draft: empty");
       render();
     },
     { signal },
@@ -438,7 +439,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     () => {
       phase = "closed";
       focus.move("trigger");
-      said = "Issue created";
+      tell("Issue created");
       draft = DRAFT;
       render();
     },
@@ -461,7 +462,7 @@ defineDemo("dialog-draft", (host, sealed, signal) => {
     "click",
     () => {
       draft = DRAFT;
-      said = `Draft: ${DRAFT.length} chars`;
+      tell(`Draft: ${DRAFT.length} chars`);
       render();
     },
     { signal },
