@@ -8,6 +8,7 @@ import {
   VISIBLE_GUIDELINES,
 } from "../../src/data/guidelines";
 import { OG_DIR, SITE_ORIGIN } from "../../src/seo";
+import { decodeHtml } from "../decode-html";
 import { renderCard, type OgCard } from "./card";
 
 type BuiltPage = {
@@ -109,24 +110,7 @@ function readPage(file: string, html: string): BuiltPage {
 }
 
 function attributes(tag: string) {
-  return new Map(
-    [...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, unescapeAttribute(v!)]),
-  );
-}
-
-const ENTITIES = new Map([
-  ["amp", "&"],
-  ["lt", "<"],
-  ["gt", ">"],
-  ["quot", '"'],
-]);
-
-function unescapeAttribute(text: string) {
-  return text.replace(/&(amp|lt|gt|quot|#\d+|#x[\da-f]+);/gi, (_, name: string) =>
-    name.startsWith("#")
-      ? String.fromCodePoint(Number(name[1] === "x" ? `0${name.slice(1)}` : name.slice(1)))
-      : ENTITIES.get(name)!,
-  );
+  return new Map([...tag.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k!, decodeHtml(v!)]));
 }
 
 function cardFor(page: BuiltPage): OgCard {
