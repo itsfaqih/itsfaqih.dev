@@ -1,6 +1,7 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import { VISIBLE_GUIDELINES } from "../../src/data/guidelines";
+import { pageErrors, pathname } from "./page-setup";
 import { pageReady } from "./ready";
 
 // Drives the ⌘K palette on the built site. Every test fails on any error the page logs.
@@ -20,12 +21,8 @@ afterEach(async () => {
 
 async function openPalette(route = "/blog") {
   context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  errors = [];
   const page = await context.newPage();
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
+  errors = pageErrors(page);
   await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
   await summon(page);
   return page;
@@ -62,7 +59,6 @@ const listedOptions = (page: Page) =>
     .evaluateAll((options) =>
       options.map((option) => option.querySelector(".cmdk-name")?.textContent),
     );
-const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
 
 describe("the command palette", () => {
   it("groups the root commands by category", async () => {

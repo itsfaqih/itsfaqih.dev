@@ -47,6 +47,11 @@ export function builtRoutes(root = SITE_ROOT) {
   return [...new Set(routes)].sort();
 }
 
+/** A route as a file name: `home`, or its path with `__` for each slash. */
+export function routeSlug(route: string) {
+  return route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
+}
+
 /**
  * Serves a build the way a CDN would: Brotli for text, nothing cached by the browser. The
  * compressed bodies are kept in memory so compression time never lands inside a measurement.

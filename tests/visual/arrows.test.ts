@@ -22,7 +22,8 @@ import {
   tightest,
   touches,
 } from "../arrow-rules";
-import { openSettledPage, routeSlug, type Viewport } from "./page-setup";
+import { openSettledPage, type Viewport } from "./page-setup";
+import { routeSlug } from "./serve-build";
 
 // Walks every hint, toggle and Squint arrow the rule pages draw, at both widths, and holds each to
 // the rules in tests/arrow-rules.ts. src/arrows.test.ts covers the hero's arrows. An arrow that

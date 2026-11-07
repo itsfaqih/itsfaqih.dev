@@ -5,13 +5,13 @@ import { afterAll, beforeAll, describe, expect, inject, it } from "vite-plus/tes
 import {
   mismatch,
   openSettledPage,
-  routeSlug,
   stableScreenshot,
   viewports,
   writeDiff,
   type Scheme,
   type Viewport,
 } from "./page-setup";
+import { routeSlug } from "./serve-build";
 
 type Shot = { route: string; viewport: Viewport; scheme: Scheme };
 

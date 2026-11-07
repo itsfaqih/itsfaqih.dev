@@ -6,11 +6,11 @@ import {
   fixedTime,
   mismatch,
   openSettledPage,
-  routeSlug,
   stableScreenshot,
   writeDiff,
   type Clip,
 } from "./page-setup";
+import { routeSlug } from "./serve-build";
 
 declare global {
   interface Window {

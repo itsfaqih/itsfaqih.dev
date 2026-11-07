@@ -1,6 +1,7 @@
 import { chromium, type Browser, type BrowserContext, type Locator, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import { PUBLISHED_GUIDELINES, VISIBLE_GUIDELINES } from "../../src/data/guidelines";
+import { pageErrors, pathname } from "./page-setup";
 import { pageReady } from "./ready";
 
 // Drives the built site the way a reader does, across island hydration and page navigations.
@@ -21,11 +22,7 @@ afterEach(async () => {
 
 /** Collects every error the page throws or logs into `errors`, which afterEach checks. */
 function watch(page: Page) {
-  errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
+  errors = pageErrors(page);
   return page;
 }
 
@@ -46,7 +43,6 @@ function hydrated(page: Page) {
 // pagereveal can fire after load, so the transition's type is polled for.
 const transitionType = (page: Page) => page.evaluate(() => document.documentElement.dataset.vt);
 
-const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
 const heading = (page: Page) =>
   page
     .locator("h1")

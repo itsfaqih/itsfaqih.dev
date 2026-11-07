@@ -31,9 +31,17 @@ const unrevealedSelector = "[data-cut]:not(.in), [data-rev]:not([data-in])";
 
 export const fixedTime = new Date("2026-01-15T09:30:00Z");
 
-export function routeSlug(route: string) {
-  return route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
+/** Every error the page throws or logs, gathered as it runs. */
+export function pageErrors(page: Page) {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  return errors;
 }
+
+export const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
 
 /**
  * Opens a route frozen for screenshots: seeded randomness, a fixed clock, no motion, the intro
@@ -70,11 +78,7 @@ export async function openSettledPage(
     document.addEventListener("DOMContentLoaded", () => document.head.append(style));
   }, scheme);
   const page = await context.newPage();
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
+  const errors = pageErrors(page);
   await page.clock.setFixedTime(fixedTime);
   try {
     await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
