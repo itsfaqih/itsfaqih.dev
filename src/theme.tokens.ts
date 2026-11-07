@@ -78,8 +78,6 @@ export const fonts = {
   "--display": '"Unbounded", system-ui, sans-serif',
   "--sans": '"Geist", system-ui, sans-serif',
   "--mono": '"Geist Mono", ui-monospace, monospace',
-  "--font-sans": '"Geist", ui-sans-serif, system-ui, sans-serif',
-  "--font-mono": '"Geist Mono", ui-monospace, monospace',
 };
 
 export const motion = {
