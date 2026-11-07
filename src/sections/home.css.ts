@@ -176,6 +176,9 @@ export const styles = {
       },
     },
   }),
+  contactActs: style({
+    marginTop: "24px",
+  }),
   footer: style({
     fontSize: "13px",
     color: palette["--mute"],
