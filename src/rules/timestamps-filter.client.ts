@@ -16,8 +16,8 @@ const setData = (node: Text, data: string) => {
 };
 
 /**
- * The day filter demo (timestamps-filter.astro): Rina picks a day, and the range each way sends decides
- * which of her orders come back.
+ * The day filter demo (timestamps-filter.astro): Rina picks a day, and the range each way sends
+ * decides which of her orders come back.
  */
 class TimestampsFilter extends HTMLElement {
   #stop?: () => void;

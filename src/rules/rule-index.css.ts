@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 export const styles = {
-  // The custom element stands in for the block the root used to be.
+  // A custom element is inline by default; the index root lays out as a block.
   root: style({
     display: "block",
   }),

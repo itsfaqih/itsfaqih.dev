@@ -3,8 +3,8 @@ import type { TimestampsReaders } from "./timestamps-readers.client";
 import { patchLine } from "./timestamps-wire";
 
 /**
- * The reminder demo (timestamps-reminder.astro): Rina picks a date and a time, and the request and both
- * readers' clocks follow what the way sends.
+ * The reminder demo (timestamps-reminder.astro): Rina picks a date and a time, and the request and
+ * both readers' clocks follow what the way sends.
  */
 class TimestampsReminder extends HTMLElement {
   #stop?: () => void;

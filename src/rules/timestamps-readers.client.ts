@@ -101,8 +101,9 @@ function paint(card: Element, reading: Reading) {
 }
 
 /**
- * Two readers' clocks (timestamps-readers.astro). Below the fold on a wide screen they swing from UTC
- * to each reader's time as they come on screen; a demo that changes the time calls `show`, and the hands swing there.
+ * Two readers' clocks (timestamps-readers.astro). Below the fold on a wide screen they swing from
+ * UTC to each reader's time as they come on screen; a demo that changes the time calls `show`, and
+ * the hands swing there.
  */
 export class TimestampsReaders extends HTMLElement {
   #stop?: () => void;
