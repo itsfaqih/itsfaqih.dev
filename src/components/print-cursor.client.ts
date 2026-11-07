@@ -274,10 +274,11 @@ class PrintCursor extends HTMLElement {
     const onLeave = () => this.classList.remove("on");
     // Hover and drag states change classes and attributes without a pointer move. The cursor,
     // user-select and --c that sync reads are set on the target or inherited from an ancestor, so
-    // a change off that line, such as an animation's per-frame style, can't change the glyph.
+    // a change off that line, such as an animation's per-frame style, can't change the glyph. A
+    // target the page has removed (a deleted row) has no line left, and reading it hides the glyph.
     const observer = new MutationObserver((records) => {
       const at = target;
-      if (at && records.some((r) => r.target.contains(at))) sync();
+      if (at && (!at.isConnected || records.some((r) => r.target.contains(at)))) sync();
     });
 
     html.classList.add("cur-on");
