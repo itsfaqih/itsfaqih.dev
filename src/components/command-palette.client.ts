@@ -256,6 +256,7 @@ class CommandPalette extends HTMLElement {
           copied = true;
           play("success");
           render();
+          clearTimeout(copiedTimer);
           copiedTimer = window.setTimeout(close, 1500);
         } catch (error) {
           console.warn("Could not copy the email address.", error);
