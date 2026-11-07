@@ -41,6 +41,12 @@ globalStyle(":root.light", {
         "--ink-mix": "62%",
         "--eyebrow-mix": "90%",
         "--ts-deep": "color-mix(in oklab, var(--ts) 82%, #000)",
+        "--thumb-cw": "#0a9cd4",
+        "--thumb-ux": "#e0389f",
+        "--thumb-ar": "#e38a00",
+        "--thumb-ts": "#2aa816",
+        "--thumb-ax": "#815efc",
+        "--thumb-go": "#c99a00",
         // The purple's light lavender washes out on paper, so light mode takes a deeper one.
         "--ax": "#a084ff",
         // Yellow darkened toward black turns olive; light mode takes a gold of its own, 4:1 on white.

@@ -22,6 +22,14 @@ export const palette = {
   "--ts": "#7dff6a",
   "--ax": "#bca2ff",
   "--go": "#ffe14d",
+  // A rule thumbnail's screen takes these hues (rule-thumb.css.ts): the palette's own in dark, and
+  // deeper ones on paper, where thin strokes and 9px labels need the contrast.
+  "--thumb-cw": "var(--cw)",
+  "--thumb-ux": "var(--ux)",
+  "--thumb-ar": "var(--ar)",
+  "--thumb-ts": "var(--ts)",
+  "--thumb-ax": "var(--ax)",
+  "--thumb-go": "var(--go)",
   // The red of ✕ verdicts and destructive buttons, with its text ink.
   "--no": "#ff5468",
   "--no-ink": "color-mix(in oklab, var(--no) var(--ink-mix), #000)",
