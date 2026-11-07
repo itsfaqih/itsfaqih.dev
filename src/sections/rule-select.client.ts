@@ -75,6 +75,8 @@ class RuleSelect extends HTMLElement {
     const beam = part("beam");
     const search = part<HTMLInputElement>("search");
     const topicText = part("topic");
+    // The panel's picked rule is announced by name, not by the whole panel it redraws.
+    const status = part("status");
     const empty = document.importNode(
       part<HTMLTemplateElement>("empty").content.firstElementChild!,
       true,
@@ -189,6 +191,7 @@ class RuleSelect extends HTMLElement {
       shown = id;
       stopScramble();
       stopScramble = () => {};
+      status.textContent = rule?.title ?? "";
       if (!rule) {
         panel.replaceChildren(...standby);
         return;

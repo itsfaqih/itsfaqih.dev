@@ -22,7 +22,6 @@ const count = (topic: string) =>
     class:list={[loadIn.piece, styles.panel]}
     data-cut="true"
     data-empty=""
-    aria-live="polite"
     data-part="panel"
   >
     <div class:list={[styles.plate, styles.standby]}><span>No.—</span><span>STANDBY</span></div>
@@ -75,6 +74,7 @@ const count = (topic: string) =>
     </div>
   </div>
   <div class={beamClass(false)} aria-hidden="true" data-part="beam"></div>
+  <p class={arcade.srOnly} aria-live="polite" data-part="status"></p>
   <template data-part="deck">{RULES.map((rule) => <RuleTile rule={rule} />)}</template>
   {
     RULES.map((rule) => (
