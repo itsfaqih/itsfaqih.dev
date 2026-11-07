@@ -25,17 +25,29 @@ if (values.protocol !== "h1" && values.protocol !== "h2")
 const wire = values.protocol === "h2" ? "h2" : "http/1.1";
 
 // Network numbers are DevTools' own presets as Lighthouse applies them with its "devtools"
-// throttling method: request latency already scaled for packet-level loss.
+// throttling method: request latency already scaled for packet-level loss. DevTools names them
+// Slow 4G (mobile-4g, once Fast 3G) and 3G (mobile-3g and desktop-3g, once Slow 3G). A phone
+// profile emulates touch, so scripts that run only for a mouse stay off as on a real phone.
 const PROFILES = {
   "mobile-4g": {
     viewport: { width: 390, height: 844 },
+    touch: true,
     latency: 562.5,
     download: (1474.6 * 1000) / 8,
     upload: (675 * 1000) / 8,
     cpu: 4,
   },
+  "mobile-3g": {
+    viewport: { width: 390, height: 844 },
+    touch: true,
+    latency: 400 * 5,
+    download: ((500 * 1000) / 8) * 0.8,
+    upload: ((500 * 1000) / 8) * 0.8,
+    cpu: 4,
+  },
   "desktop-3g": {
     viewport: { width: 1440, height: 900 },
+    touch: false,
     latency: 400 * 5,
     download: ((500 * 1000) / 8) * 0.8,
     upload: ((500 * 1000) / 8) * 0.8,
@@ -148,6 +160,8 @@ if (values.out) mkdirSync(values.out, { recursive: true });
 async function measure(base: string, route: string): Promise<Run & { requestLog: object[] }> {
   const context = await browser.newContext({
     viewport: profile.viewport,
+    isMobile: profile.touch,
+    hasTouch: profile.touch,
     ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();

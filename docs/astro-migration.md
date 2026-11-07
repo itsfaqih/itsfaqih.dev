@@ -94,27 +94,29 @@ The preloads save 0.26 to 0.41 s on mobile and 0.9 to 1.5 s on slow 3G for the p
 
 ### Every page under 3 s on 3G (2026-11-08)
 
-Goal: every page loads in under 3 s on 3G. The `mobile-4g` profile is Chrome DevTools' Fast 3G preset (1.47 Mbit/s, 562.5 ms latency) on a 390×844 phone with a 4× CPU slowdown, served over HTTP/2 as Cloudflare Pages does. "Base" is `main` before the pass and "final" is after it. Each page and build had 7 cold runs, with a load average of 1.3 to 2.6 on 10 cores. Medians in ms:
+Goal: every page loads in under 3 s on 3G. Chrome DevTools has renamed its presets. The `mobile-4g` profile (1.47 Mbit/s, 562.5 ms latency) is the preset it once called Fast 3G and now calls Slow 4G. `mobile-3g` (400 kbit/s, 2000 ms latency) is the preset it once called Slow 3G and now calls 3G. Both run on a 390×844 phone with touch and a 4× CPU slowdown, served over HTTP/2 as Cloudflare Pages does. "Base" is `main` before the pass and "final" is after it. Each page and build had 5 cold runs on `mobile-4g` and 3 on `mobile-3g`, with a load average under 3 on 10 cores. Medians in ms:
 
-| Page                                     | Load base | Load final | LCP final | Interactive final |
-| ---------------------------------------- | --------: | ---------: | --------: | ----------------: |
-| `/`                                      |      1710 |       1720 |      1872 |              1701 |
-| `/blog`                                  |      1901 |       1342 |       932 |              1306 |
-| `/cv`                                    |      1937 |       1373 |       940 |              1308 |
-| `/rule-of-thumb`                         |      1464 |       1473 |      2180 |              1346 |
-| `/rule-of-thumb/button-design`           |      1530 |       1521 |      1072 |              1408 |
-| `/rule-of-thumb/data-loading`            |      1646 |       1657 |      1052 |              1506 |
-| `/rule-of-thumb/dialog-design`           |      1527 |       1550 |      1056 |              1409 |
-| `/rule-of-thumb/handling-timestamps`     |      1572 |       1581 |      1072 |              1446 |
-| `/rule-of-thumb/null-vs-undefined`       |      1559 |       1566 |      1076 |              1427 |
-| `/rule-of-thumb/proximity-principle`     |      1491 |       1496 |      1056 |              1387 |
-| `/rule-of-thumb/table-design`            |      1597 |       1610 |       996 |              1465 |
-| `/rule-of-thumb/typescript-code-writing` |      1508 |       1514 |      1088 |              1406 |
+| Page                                     | Slow 4G load base | Slow 4G load final | Slow 4G LCP final | 3G FCP final | 3G load final |
+| ---------------------------------------- | ----------------: | -----------------: | ----------------: | -----------: | ------------: |
+| `/`                                      |              1706 |               1716 |              1872 |         3524 |          6051 |
+| `/blog`                                  |              1331 |               1339 |               940 |         3272 |          4751 |
+| `/cv`                                    |              1363 |               1371 |               944 |         3300 |          4869 |
+| `/rule-of-thumb`                         |              1465 |               1473 |              2172 |         3340 |          5231 |
+| `/rule-of-thumb/button-design`           |              1528 |               1552 |              1052 |         3420 |          5327 |
+| `/rule-of-thumb/data-loading`            |              1651 |               1648 |              1060 |         3556 |          5721 |
+| `/rule-of-thumb/dialog-design`           |              1526 |               1547 |              1048 |         3508 |          5412 |
+| `/rule-of-thumb/handling-timestamps`     |              1565 |               1581 |              1052 |         3416 |          5444 |
+| `/rule-of-thumb/null-vs-undefined`       |              1557 |               1570 |              1068 |         3424 |          5415 |
+| `/rule-of-thumb/proximity-principle`     |              1490 |               1496 |              1060 |         3392 |          5260 |
+| `/rule-of-thumb/table-design`            |              1590 |               1606 |              1072 |         3464 |          5589 |
+| `/rule-of-thumb/typescript-code-writing` |              1506 |               1516 |              1080 |         3440 |          5293 |
 
-- **What moved.** The print cursor's tokens pointed at `/cursors/none.svg`. On a desktop pointer that image is a CSS fetch the `load` event waits for, one more round trip after the CSS that names it. Inlining it as a data URI took `/cv` and `/blog` from 1.9 s to 1.35 s. Pages whose own scripts already held `load` past that fetch did not move.
-- **What did not.** Every byte of home has arrived by 1.7 s. A shared `<symbol>` sprite for the repeated tech logos cut home's raw HTML from 821 KB to 658 KB, but Brotli already sent the repeats once (129.9 KB against 130.0 KB), and the medians stayed within 8 ms, so it was dropped. The sound clips already start after `load`, so deferring them buys nothing.
+- **Slow 4G.** Every page loads in under 1.75 s and paints its largest content by 2.2 s. Base already did on a phone, and the pass moved no page by more than 25 ms.
+- **3G.** No page reaches 3 s, and none can. A 2 s round trip for the HTML and a second one for any script or image put `load` at 4 s or later. First paint waits for the whole `<head>`, and the inlined core fonts are 43 of the 60 KB of Brotli HTML on `/blog`. At 400 kbit/s they take about 1.1 s. Moving them to files would bring first paint near 2.5 s on 3G (inferred, not measured), but text would paint in the fallback font and swap about 2 s later.
+- **What moved on a desktop pointer.** The print cursor's tokens pointed at `/cursors/none.svg`, an image the `load` event waits for. Inlining it as a data URI took `/cv` and `/blog` from 1.9 s to 1.35 s on a 390×844 viewport with a mouse (an earlier run of this harness, before it emulated touch). A phone never draws that cursor, so the phone numbers above do not move.
+- **What did not.** Every byte of home has arrived by 1.7 s on Slow 4G. A shared `<symbol>` sprite for the repeated tech logos cut home's raw HTML from 821 KB to 658 KB, but Brotli already sent the repeats once (129.9 KB against 130.0 KB), and the medians stayed within 8 ms, so it was dropped. The sound clips already start after `load`, so deferring them buys nothing.
 - **Shared chunks cost a request.** `texts()` in `src/rules/text-nodes.ts` is its own chunk, since three entry scripts import it. It adds one request to table design, dialog design and handling timestamps, and about 20 ms to their interactive time.
-- **Caveats.** The harness opens no new connection per run, so DNS, TCP and TLS on a cold 3G connection are missing. At about 3 round trips that is roughly 1.7 s more (inferred, not measured), which would put home near 3.4 s on a reader's first visit. Home's once-a-session intro hands its lede over at about 3.9 s, so a run whose LCP lands on the lede reads 3.9 s (2 of 18 runs). On `desktop-3g` (Slow 3G, 2 s round trips) no page can reach 3 s. The smallest page, `/blog`, sends 59 KB of HTML, which takes 1.2 s to arrive at 400 kbit/s after a 2 s round trip, before any of its scripts are requested.
+- **Caveats.** The harness opens no new connection per run, so DNS, TCP and TLS on a cold connection are missing from every page. At about 3 round trips that is roughly 1.7 s more on Slow 4G (inferred, not measured). That would put home's LCP near 3.6 s and the rule index's near 3.9 s on a reader's first visit, and the other pages under 3.1 s. Home's once-a-session intro hands its lede over at about 3.9 s after navigation on every first visit, whatever the network.
 
 ## Known differences from the React build
 
@@ -139,7 +141,7 @@ vp node scripts/perf-compare.ts --site react=../itsfaqih-react/.output/public \
   --site step1=../itsfaqih-step1/dist --site astro=dist --profile mobile-4g --runs 5 --out /tmp/perf
 ```
 
-`--profile desktop-3g` selects the second profile, `--route /blog` (repeatable) limits the pages, and `--protocol h1` serves HTTP/1.1 instead of HTTP/2.
+`--profile mobile-3g` selects DevTools' 3G preset on a phone, `--profile desktop-3g` the same network at 1440×900 with a mouse, `--route /blog` (repeatable) limits the pages, and `--protocol h1` serves HTTP/1.1 instead of HTTP/2.
 
 ## Next lever
 
