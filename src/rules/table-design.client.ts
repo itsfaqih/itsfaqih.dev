@@ -399,9 +399,13 @@ class TableStates extends HTMLElement {
     });
     act?.addEventListener(
       "click",
-      () => {
+      (event) => {
         const shown = viewOf(roster.get());
-        if (shown !== "loading" && shown !== "data") SAY[shown].run();
+        if (shown === "loading" || shown === "data") return;
+        SAY[shown].run();
+        // The run swaps out the row that holds this button. A key press moves focus to the search;
+        // a pointer press leaves it, since a focused input draws its ring.
+        if (event.detail === 0 && !act.isConnected) input.focus();
       },
       { signal: controller.signal },
     );
