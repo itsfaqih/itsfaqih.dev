@@ -25,7 +25,7 @@ export const styles = {
   }),
   // While any link is hovered, the other entries dim.
   item: style({
-    // -webkit-box with no -webkit-line-clamp, so it clamps nothing.
+    // A box with no line clamp still sizes its block link to the text, so only the words take hover.
     display: "-webkit-box",
     overflow: "hidden",
     transitionProperty: "opacity",

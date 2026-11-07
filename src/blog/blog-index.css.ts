@@ -143,8 +143,6 @@ export const styles = {
     },
   }),
   summary: style({
-    // -webkit-box with no -webkit-line-clamp, so it clamps nothing.
-    display: "-webkit-box",
     overflow: "hidden",
     lineHeight: 1.625,
     color: palette["--muted-foreground"],
