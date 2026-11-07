@@ -57,7 +57,7 @@ class TimestampsFilter extends HTMLElement {
         if (fate.textContent !== FATE[order.fate]) fate.textContent = FATE[order.fate];
       });
     };
-    // React's onChange heard both events; sync is idempotent, so a pair costs nothing.
+    // Both input and change: sync is idempotent, so a picker that fires the pair costs nothing.
     for (const type of ["input", "change"]) {
       input.addEventListener(type, sync, { signal: controller.signal });
     }

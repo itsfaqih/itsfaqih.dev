@@ -60,7 +60,7 @@ const setText = (element: Element, text: string) => {
   if (element.textContent !== text) element.textContent = text;
 };
 
-/** Redraws one reader card (timestamps-readers.astro) for `reading`, keeping its nodes as React did. */
+/** Redraws one reader card (timestamps-readers.astro) for `reading`, patching its nodes in place. */
 function paint(card: Element, reading: Reading) {
   const off = offBy(reading);
   const clock = card.firstElementChild!;
@@ -101,8 +101,8 @@ function paint(card: Element, reading: Reading) {
 }
 
 /**
- * Two readers' clocks (timestamps-readers.astro). Below the fold they swing from UTC to each reader's time
- * as they come on screen; a demo that changes the time calls `show`, and the hands swing there.
+ * Two readers' clocks (timestamps-readers.astro). Below the fold on a wide screen they swing from UTC
+ * to each reader's time as they come on screen; a demo that changes the time calls `show`, and the hands swing there.
  */
 export class TimestampsReaders extends HTMLElement {
   #stop?: () => void;
@@ -113,8 +113,7 @@ export class TimestampsReaders extends HTMLElement {
     const shown = this.dataset.times!.split(",").map(Number);
     const utc = Number(this.dataset.utc);
     this.#shown = shown;
-    // React's phone branch looked for `.demo` and `.pane` ancestors that no page renders, so on a
-    // phone the clocks never swing in; that stays as shipped.
+    // Phones skip the swing in and show the clocks at their times.
     if (reducedMotion() || matchMedia(TABBED).matches) return;
     if (root.getBoundingClientRect().top < innerHeight * 0.7) return;
     const held = swing(

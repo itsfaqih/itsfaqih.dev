@@ -29,8 +29,8 @@ function painted(source: string) {
 
 /**
  * A save demo (null-flow.astro): a form, the PATCH it sends, and the record it leaves. "clear"
- * removes the reviewer, "rename" edits the title. Each send replays the request and the record,
- * as React's keys remounted them.
+ * removes the reviewer, "rename" edits the title. Each send rebuilds the request and the record, so
+ * their animations replay.
  */
 class NullFlow extends HTMLElement {
   #stop?: () => void;

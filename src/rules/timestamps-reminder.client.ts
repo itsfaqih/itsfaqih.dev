@@ -21,7 +21,7 @@ class TimestampsReminder extends HTMLElement {
       reminderLines(way, wall, meant).forEach((line, index) => patchLine(lines[index]!, line.c));
       readers.show(readings);
     };
-    // React's onChange heard both events; sync is idempotent, so a pair costs nothing.
+    // Both input and change: sync is idempotent, so a picker that fires the pair costs nothing.
     for (const input of [date, time]) {
       for (const type of ["input", "change"]) {
         input.addEventListener(type, sync, { signal: controller.signal });

@@ -6,7 +6,7 @@ type Props = { text: string; tone: "plain" | "wrap" };
 
 const { text, tone } = Astro.props;
 const code = codeCell(text);
-// React's Code took tone "wrap" inside a slot button and no tone on the board around it.
+// A slot's label takes the wrap tone; on the board the code stays bare.
 ---
 
 {code === undefined ? text : tone === "wrap" ? <Code tone="wrap">{code}</Code> : <code>{code}</code>}
