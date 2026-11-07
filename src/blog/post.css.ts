@@ -1,15 +1,11 @@
 import { motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
+import { EASE, SLIDE } from "./toc-drawer.view";
 const HOVER = "(hover: hover) and (pointer: fine)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const OPEN = ":is([data-state=open])";
 const CLOSED = ":is([data-state=closed])";
-
-// Vaul's timing. It plays under reduced motion too, as Vaul did.
-export const SLIDE_MS = 500;
-export const SLIDE = `${SLIDE_MS}ms`;
-export const EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
