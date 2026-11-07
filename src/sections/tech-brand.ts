@@ -177,17 +177,23 @@ export function brandFor(
   return toHex(mixed);
 }
 
-// The outline a badge lights up in: the logo's colours around a conic gradient, each where it sits
-// in the logo, or the one brand colour of a single-colour mark. light-dark() follows the theme.
+/**
+ * An outline in a mark's colours: a conic gradient with each colour where it sits in the mark, in
+ * degrees clockwise from the top, or the one colour of a single-colour mark.
+ */
+export function ringGradient(stops: [tone: string, at: number][]) {
+  const [first, from] = stops[0]!;
+  if (stops.length === 1) return `linear-gradient(${first}, ${first})`;
+  const around = stops.map(([tone, at]) => `${tone} ${at - from}deg`);
+  return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${first} 360deg)`;
+}
+
+// The outline a badge lights up in: the logo's ring, or its brand colour, which light-dark() turns
+// with the theme.
 function ringOf(name: string, brand: { "--brand-dark": string; "--brand-light": string }) {
   const stops = TECH_LOGOS.get(name)?.ring ?? [];
-  if (stops.length < 2) {
-    const tone = stops[0]?.[0] ?? `light-dark(${brand["--brand-light"]}, ${brand["--brand-dark"]})`;
-    return `linear-gradient(${tone}, ${tone})`;
-  }
-  const from = stops[0]?.[1] ?? 0;
-  const around = stops.map(([tone, at]) => `${tone} ${at - from}deg`);
-  return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${stops[0]?.[0]} 360deg)`;
+  const tone = `light-dark(${brand["--brand-light"]}, ${brand["--brand-dark"]})`;
+  return ringGradient(stops.length ? stops : [[tone, 0]]);
 }
 
 const BRANDS = new Map<string, Record<string, string>>(
