@@ -181,7 +181,7 @@ export const styles = {
   run: style({
     marginLeft: "auto",
     selectors: {
-      "&:disabled": {
+      '&:disabled, &[aria-disabled="true"]': {
         opacity: 0.5,
       },
     },

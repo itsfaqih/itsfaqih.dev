@@ -33,7 +33,9 @@ class TsChecked extends HTMLElement {
       for (const mark of marks) mark.classList.toggle(styles.unrun, phase === "idle");
       summary.textContent =
         phase === "idle" ? "not run yet" : phase === "run" ? "checking…" : verdict;
-      run.disabled = phase === "run";
+      // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
+      if (phase === "run") run.setAttribute("aria-disabled", "true");
+      else run.removeAttribute("aria-disabled");
     };
 
     const check = () => {
@@ -85,6 +87,7 @@ class TsChecked extends HTMLElement {
     run.addEventListener(
       "click",
       () => {
+        if (run.hasAttribute("aria-disabled")) return;
         stopWatch();
         clearTimeout(wait);
         check();
