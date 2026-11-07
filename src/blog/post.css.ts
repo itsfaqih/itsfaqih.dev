@@ -2,8 +2,7 @@ import { motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { EASE, SLIDE } from "./toc-drawer.view";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
+import { HOVER, REDUCE } from "../browser/media-query";
 const OPEN = ":is([data-state=open])";
 const CLOSED = ":is([data-state=closed])";
 

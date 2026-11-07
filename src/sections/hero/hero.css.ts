@@ -2,9 +2,8 @@ import { cursors, fonts, motion, palette } from "../../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../../when";
 import { under1 } from "../../layers.css";
+import { HOVER, REDUCE } from "../../browser/media-query";
 const STACKED = "(max-width: 960px)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
 const FOCUS_RING = `3px solid ${palette["--focus"]}`;
 // The leaving phrase stays visible until its fade ends.
 const PHRASE_OUT = "160ms";

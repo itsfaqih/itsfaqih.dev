@@ -1,4 +1,4 @@
-import { reducedMotion, watchMedia } from "../browser/media-query";
+import { REDUCE, reducedMotion, watchMedia } from "../browser/media-query";
 import { glowDots } from "./backdrop-dots";
 import { watchRuleOpen } from "./rule-open";
 import { number } from "./rule-spread.css";
@@ -252,7 +252,7 @@ class RuleSpread extends HTMLElement {
     previous.addEventListener("click", () => goTo(active - 1), { signal });
     next.addEventListener("click", () => goTo(active + 1), { signal });
     watchRuleOpen(this, signal);
-    const unwatch = watchMedia("(prefers-reduced-motion: reduce)", () => {
+    const unwatch = watchMedia(REDUCE, () => {
       reduced = reducedMotion();
     });
 

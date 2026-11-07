@@ -1,6 +1,7 @@
 import { whenIdle } from "../browser/idle";
 import { watchScrollbar } from "./scrollbar";
 import { jumpTo } from "./smooth-scroll";
+import { HOVER } from "../browser/media-query";
 
 const REVEAL_PX = 32;
 const MIN_THUMB_PX = 40;
@@ -12,7 +13,7 @@ class PageScrollbar extends HTMLElement {
 
   connectedCallback() {
     const thumb = this.querySelector<HTMLElement>("[data-part='thumb']")!;
-    if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!matchMedia(HOVER).matches) return;
     const html = document.documentElement;
 
     // A page with section eyebrows takes the hue of the section being read: the last eyebrow above

@@ -2,8 +2,7 @@ import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER, REDUCE } from "../browser/media-query";
 // A press or hover counts only while the deck is not being dragged.
 const STILL = ":not([data-dragging] *)";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;

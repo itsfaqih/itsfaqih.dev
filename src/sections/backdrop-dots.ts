@@ -1,4 +1,5 @@
 import { TILE, U } from "./backdrop-dots.css";
+import { REDUCE } from "../browser/media-query";
 const PALETTE = ["--cw", "--ux", "--ar", "--ts", "--ax", "--go"];
 // A press draws the dots around it in and colours them, and lets go once the button comes up.
 const PRESS_RADIUS = 200;
@@ -192,7 +193,7 @@ export function animateDots(element: Element, withTide: boolean) {
     draw();
   };
   addEventListener("resize", onResize);
-  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  const still = matchMedia(REDUCE);
 
   let presses: {
     x: number;

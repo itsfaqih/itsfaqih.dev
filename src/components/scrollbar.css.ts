@@ -1,7 +1,7 @@
 import { cursors, motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
-const REDUCE = "(prefers-reduced-motion: reduce)";
+import { REDUCE } from "../browser/media-query";
 
 // The thumb of both scrollbars. Its track sets --sb-hue, and its size as --sb-width, --sb-wide
 // (while hovered or dragged) and --sb-right.

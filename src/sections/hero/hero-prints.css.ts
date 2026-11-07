@@ -3,11 +3,11 @@ import { palette } from "../../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../../when";
 import { under1 } from "../../layers.css";
+import { REDUCE } from "../../browser/media-query";
 export const INOUT = "cubic-bezier(0.65, 0, 0.35, 1)";
 export const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 const SCENE = "var(--scene-duration)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
 
 const settle = keyframes({
   "0%": { transform: "translate(var(--dx), var(--dy)) rotate(var(--r,0deg))" },

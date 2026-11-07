@@ -1,8 +1,7 @@
 import { motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER, REDUCE } from "../browser/media-query";
 const HUE = `var(--c, ${palette["--go"]})`;
 const INK = `color-mix(in oklab, ${HUE} ${palette["--ink-mix"]}, #000)`;
 const LEG = "12px";

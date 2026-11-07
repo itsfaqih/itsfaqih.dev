@@ -1,7 +1,7 @@
 import { motion } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-const REDUCE = "(prefers-reduced-motion: reduce)";
+import { REDUCE } from "../browser/media-query";
 
 export const fluidHover = {
   group: style({

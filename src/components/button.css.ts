@@ -3,8 +3,7 @@ import { hoverHold } from "./hover-hold.css";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1, under2 } from "../layers.css";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
+import { HOVER, REDUCE } from "../browser/media-query";
 // A key that is unavailable, natively or through aria-disabled, neither lights up nor presses down.
 // Chrome still matches :hover and :active on a disabled button.
 const LIVE_HOVER = ':hover:not(:disabled, [aria-disabled="true"])';

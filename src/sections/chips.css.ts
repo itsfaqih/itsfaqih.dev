@@ -1,8 +1,8 @@
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
+import { REDUCE } from "../browser/media-query";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
-const REDUCE = "(prefers-reduced-motion: reduce)";
 const FAST = motion["--t-fast"];
 const FAST_EXIT = motion["--t-fast-exit"];
 const EXIT = motion["--exit"];

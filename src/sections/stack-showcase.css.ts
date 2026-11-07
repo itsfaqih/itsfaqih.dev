@@ -2,9 +2,8 @@ import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 
 import { style, keyframes } from "@vanilla-extract/css";
+import { HOVER, REDUCE } from "../browser/media-query";
 const STACKED = "(max-width: 960px)";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
 const LIGHT = ":is(.light *)";
 
 const LIFT_TIME = `${motion["--t-fast"]}, ${motion["--t-moderate"]}`;

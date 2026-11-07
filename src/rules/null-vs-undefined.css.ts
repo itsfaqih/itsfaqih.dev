@@ -5,10 +5,9 @@ import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2 } from "../layers.css";
 import { hoverHold } from "../components/hover-hold.css";
+import { HOVER, TOUCH } from "../browser/media-query";
 const PHONE = "(max-width: 640px)";
 const MOTION = "(prefers-reduced-motion: no-preference)";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const TOUCH = "(pointer: coarse)";
 
 const flash = keyframes({
   from: { opacity: 1 },

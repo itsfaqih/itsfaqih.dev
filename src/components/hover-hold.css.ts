@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 import { under2 } from "../layers.css";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER } from "../browser/media-query";
 
 /**
  * For an element that moves on hover or press. Lifted, it slides out from under a pointer resting

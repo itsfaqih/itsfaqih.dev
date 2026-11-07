@@ -1,7 +1,7 @@
 import { motion } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-const REDUCE = "(prefers-reduced-motion: reduce)";
+import { REDUCE } from "../browser/media-query";
 // watchCutIns (cut-ins.ts) adds .in to each [data-cut] piece once it is on screen.
 const IN = ":is(.in)";
 // With JS on, a piece waits hidden until it gets .in, and so does every piece inside one still waiting.

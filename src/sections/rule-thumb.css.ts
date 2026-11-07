@@ -2,6 +2,7 @@ import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
+import { REDUCE } from "../browser/media-query";
 // The art plays while its screen carries data-play, so starting and stopping it is one attribute
 // and the class lists never change.
 const PLAY = ":is([data-play] *)";
@@ -105,7 +106,6 @@ export const screen = {
 // The cover sets --px and --py, the pointer's offset from its centre from -0.5 to 0.5. Inside the
 // SVG a px is a viewBox unit, about three screen pixels at cover size. Translate composes with the
 // beats' transform, so the layers shift while the art plays.
-const REDUCE = "(prefers-reduced-motion: reduce)";
 export const depth = {
   dots: style({
     backgroundPositionX: "calc(var(--px, 0) * -12px), 0%",

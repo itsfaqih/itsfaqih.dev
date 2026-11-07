@@ -1,8 +1,7 @@
 import { motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER } from "../browser/media-query";
 
 /**
  * `badge` lays a tool's mark and name in a row, and `brand` sets --brand, a single-colour mark's

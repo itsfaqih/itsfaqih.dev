@@ -5,6 +5,7 @@ import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2, under3, under4, under5 } from "../layers.css";
+import { HOVER, REDUCE } from "../browser/media-query";
 export const OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 export const TABBED = "(max-width: 820px)";
@@ -43,8 +44,6 @@ const DIVED = ":is(html[data-vt='rule-open'] *)";
 const RULE_OPEN =
   ":is(html:active-view-transition-type(rule-open, rule-close):not(:has([data-opening])) *)";
 const NARROW = "(max-width: 480px)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
 export const TITLE_TRACKING = -0.05;
 export const TITLE_MARK_INSET = 0.06;
 

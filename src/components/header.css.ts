@@ -1,8 +1,7 @@
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER, REDUCE } from "../browser/media-query";
 const TABLET = "(max-width: 960px)";
 
 const NARROW = "(max-width: 480px)";

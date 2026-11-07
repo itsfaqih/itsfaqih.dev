@@ -4,8 +4,8 @@ import { kit } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2 } from "../layers.css";
+import { REDUCE } from "../browser/media-query";
 const PHONE = "(max-width: 640px)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
 
 const turn = keyframes({
   to: { transform: "rotate(1turn)" },

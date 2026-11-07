@@ -4,9 +4,8 @@ import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1 } from "../layers.css";
+import { HOVER, TOUCH } from "../browser/media-query";
 const PHONE = "(max-width: 640px)";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const TOUCH = "(pointer: coarse)";
 const LIGHT = ":is(.light *)";
 
 export const styles = {

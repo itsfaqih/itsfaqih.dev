@@ -1,9 +1,8 @@
 import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
+import { HOVER, REDUCE } from "../browser/media-query";
 const STACKED = "(max-width: 960px)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
 const LIFT = "translateY(-4px) rotate(-1deg)";
 // The lift and press ride the moderate spring and the rim the fast one; they leave on the exits.
 const LIFT_TIME = `${motion["--t-moderate"]}, ${motion["--t-moderate"]}, ${motion["--t-fast"]}`;

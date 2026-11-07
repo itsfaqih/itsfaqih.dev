@@ -1,4 +1,5 @@
 import { whenIdle } from "../browser/idle";
+import { HOVER, REDUCE } from "../browser/media-query";
 
 // Pixel art on CELL px squares: K is the ink outline, F the fill. hot is the hotspot in cells.
 const PIXEL_ART = {
@@ -172,8 +173,8 @@ class PrintCursor extends HTMLElement {
   #stop = () => {};
 
   connectedCallback() {
-    if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    if (!matchMedia(HOVER).matches) return;
+    const reduce = matchMedia(REDUCE);
     const html = document.documentElement;
     const part = (name: string) => this.querySelector(`[data-part="${name}"]`)!;
     const plate = part("plate");

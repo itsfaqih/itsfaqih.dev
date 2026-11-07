@@ -2,10 +2,8 @@ import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
+import { HOVER, REDUCE, TOUCH } from "../browser/media-query";
 const STACKED = "(max-width: 960px)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const TOUCH = "(pointer: coarse)";
 const LIGHT = ":is(.light *)";
 // A tile waiting for its cut-in, or inside a piece still waiting, stays hidden (loadIn.piece).
 const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";

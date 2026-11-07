@@ -1,7 +1,7 @@
 import { motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER } from "../browser/media-query";
 
 export const styles = {
   page: style({

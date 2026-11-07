@@ -1,6 +1,6 @@
 import "./hero-prints.client";
 import { SLIDES } from "../../data/home";
-import { reducedMotion, watchMedia } from "../../browser/media-query";
+import { REDUCE, reducedMotion, watchMedia } from "../../browser/media-query";
 import { glowDots } from "../backdrop-dots";
 import { whenIntroDone } from "../intro.client";
 import { SCENE_LEAD_MS, SLIDE_MS } from "./hero-prints.view";
@@ -117,9 +117,7 @@ class HomeHero extends HTMLElement {
     pause.addEventListener("click", () => setHeld(() => (pausedByUser = !userPaused())), {
       signal,
     });
-    const unwatch = watchMedia("(prefers-reduced-motion: reduce)", () =>
-      setHeld(() => (reduced = reducedMotion())),
-    );
+    const unwatch = watchMedia(REDUCE, () => setHeld(() => (reduced = reducedMotion())));
     const sight = new IntersectionObserver(([entry]) =>
       setHeld(() => (offScreen = !entry!.isIntersecting)),
     );

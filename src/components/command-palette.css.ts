@@ -1,13 +1,11 @@
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
+import { HOVER, REDUCE, TOUCH } from "../browser/media-query";
 // command-palette.client.ts sets these on the backdrop and the stage while they enter and leave.
 const STARTING = ":is([data-starting-style])";
 const LEAVING = ":is([data-ending-style])";
 const IN_STARTING = ":is([data-starting-style] *)";
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const HOVER = "(hover: hover) and (pointer: fine)";
-const TOUCH = "(pointer: coarse)";
 const DARK = ":is(.dark *)";
 // The island's ground, black over the light theme and white over the dark one.
 const ISLAND = "#0a0a0c";

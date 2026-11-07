@@ -13,9 +13,8 @@ Put styles in a module beside the component (`card.css.ts` for `card.astro`) and
 ```ts
 // card.css.ts
 import { style } from "@vanilla-extract/css";
+import { HOVER } from "../browser/media-query";
 import { palette } from "../theme.vars.css";
-
-const HOVER = "(hover: hover) and (pointer: fine)";
 
 export const styles = {
   card: style({
@@ -134,7 +133,7 @@ Do not add a new global utility class when a local rule can express the same sty
 
 ### 6. Preserve Interactive and Responsive States
 
-Hover styles sit inside `@media (hover: hover) and (pointer: fine)` so touch screens do not keep them after a tap. vanilla-extract does not nest `@media`, so join two conditions in one query string:
+Hover styles sit inside `@media (hover: hover) and (pointer: fine)` so touch screens do not keep them after a tap. `HOVER`, `REDUCE` and `TOUCH` come from `src/browser/media-query.ts`, so styles and scripts read one string each. vanilla-extract does not nest `@media`, so join two conditions in one query string:
 
 ```ts
 const styles = {

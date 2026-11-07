@@ -1,4 +1,5 @@
 import { watchScrollbar } from "./scrollbar";
+import { HOVER } from "../browser/media-query";
 
 const REVEAL_PX = 24;
 const MIN_THUMB_PX = 32;
@@ -14,7 +15,7 @@ const INSET_PX = 6;
 export function watchBoxScrollbar(box: HTMLElement, track: HTMLElement) {
   const thumb = track.firstElementChild;
   if (!(thumb instanceof HTMLElement)) return () => {};
-  if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return () => {};
+  if (!matchMedia(HOVER).matches) return () => {};
 
   const bar = watchScrollbar(track, thumb, {
     target: box,

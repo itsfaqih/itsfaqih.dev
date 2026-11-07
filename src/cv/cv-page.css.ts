@@ -1,8 +1,8 @@
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
+import { REDUCE } from "../browser/media-query";
 const PHONE = "(max-width: 639px)";
 const PRINT = "print";
-const REDUCE = "(prefers-reduced-motion: reduce)";
 
 // The switch's mode, which the page's script sets on <cv-page>. Its rules nest inside the media
 // queries they share a property with, because a style's media queries come after its selectors.

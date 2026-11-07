@@ -2,13 +2,13 @@ import { palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
 import { scrollbarThumb } from "./scrollbar.css";
-const FINE = "(hover: hover) and (pointer: fine)";
+import { HOVER } from "../browser/media-query";
 
 /** Goes on the scrolling box: hides its native bar where the box scrollbar takes over, a fine pointer. */
 export const boxScrollbarHost = {
   box: style({
     "@media": {
-      [FINE]: {
+      [HOVER]: {
         scrollbarWidth: "none",
         selectors: {
           "&::-webkit-scrollbar": {

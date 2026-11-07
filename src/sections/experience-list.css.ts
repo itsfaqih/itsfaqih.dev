@@ -3,8 +3,8 @@ import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1 } from "../layers.css";
+import { HOVER } from "../browser/media-query";
 const STACKED = "(max-width: 960px)";
-const HOVER = "(hover: hover) and (pointer: fine)";
 const LIGHT = ":is(.light *)";
 
 const listIn = keyframes({

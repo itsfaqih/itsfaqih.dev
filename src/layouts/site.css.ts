@@ -1,6 +1,6 @@
 import { palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
-const HOVER = "(hover: hover) and (pointer: fine)";
+import { HOVER } from "../browser/media-query";
 
 /** The room the fixed header bar takes at the top of the page, in px. */
 export const HEADER_HEIGHT = 72;
