@@ -54,6 +54,6 @@
   "button \"A plain box\" #0",
   "button \"Marked as a dialog\" #0",
   "button \"A dialog with a name and a description\" #0",
-  "button \"Copy as Markdown\" #0",
+  "button \"Copy SKILL.md\" #0",
   "link \"View .md\" #0"
 ]

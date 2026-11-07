@@ -110,7 +110,7 @@ function slot(t: Box, { edge, dir, lean }: Slot, gap: number, w: number, h: numb
 }
 
 /** How far a hint's ring sits out from its target. */
-const RING_GAP = 4;
+export const RING_GAP = 4;
 
 // How far inside a label's and a target's edges a line passes, so it never just grazes a corner.
 const LABEL_INSET = 4;

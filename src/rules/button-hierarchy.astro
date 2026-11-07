@@ -46,6 +46,8 @@ const say = careful
                   width={width}
                   height={height}
                   aria-hidden="true"
+                  data-arrow="squint"
+                  data-spine={arrow.spine}
                   >{
                     arrow.cells.map(({ x, y }, c) => (
                       <rect class={styles.squintCell} x={x} y={y} width={grid} height={grid} style={times(c)} />

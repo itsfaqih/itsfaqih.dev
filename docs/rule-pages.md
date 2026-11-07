@@ -133,6 +133,25 @@ pass nothing and get `--rows:0`.
   and presses each moving control on home 1px inside its top and bottom edges.
 - **`costsStyle`** (handling-timestamps) is a `RuleLesson` prop, applied last to the cost row.
 
+## Quiz rules
+
+The user rejected quizzes and demos for each of these, more than once. Check a new or changed quiz
+against every one before showing it.
+
+- **Every choice looks alike.** The reader picks the answer by reading, never by spotting the odd
+  one out. No choice may be the only one that moves, has an icon, is coloured or sized differently,
+  or sits apart. Rejected: "too obvious that the answer is moving" and "too obvious because the only
+  button with icon is the middle one".
+- **The quiz has its own scenario.** It tests the rule on a case the lesson's explanation and demo
+  did not show, so the reader applies the rule rather than recalling the example.
+- **Code is framework-agnostic.** Write examples in plain TypeScript, HTML or pseudo-markup. Use
+  React or another framework only when the rule is about that framework.
+- **Never disable a submit button because the form is invalid.** Keep it enabled and say what is
+  wrong on submit. A demo or quiz that shows the right way follows this too.
+- **Show variants before changing a quiz's format.** When a quiz needs a new interaction (drag,
+  tap, slide, pick), build a few variants as a local artifact and let the user pick before
+  replacing the current one.
+
 ## Driving the page
 
 The visual and behavior suites catch layout and the basics. Before calling a page done, drive it at

@@ -248,11 +248,16 @@ export const styles = {
       },
     },
   }),
+  // Layered, so the slide quiz's plot can show its overflow.
   plot: style({
-    position: "relative",
-    paddingBottom: "30px",
-    borderRadius: "6px",
-    overflow: "hidden",
+    "@layer": {
+      [under1]: {
+        position: "relative",
+        paddingBottom: "30px",
+        borderRadius: "6px",
+        overflow: "hidden",
+      },
+    },
   }),
   lane: style({
     textWrap: "pretty",
@@ -1288,12 +1293,13 @@ export const quiz = {
       },
     },
   }),
+  // Layered, so the skeleton quiz's foot can sit at the end.
   slideFoot: style({
     display: "flex",
     flexWrap: "wrap",
     alignItems: "center",
-    justifyContent: "space-between",
     gap: "10px",
+    "@layer": { [under1]: { justifyContent: "space-between" } },
   }),
   readout: style({
     fontWeight: 600,
@@ -1339,10 +1345,11 @@ export const quiz = {
     color: palette["--mute"],
     whiteSpace: "nowrap",
   }),
+  // Layered, so a label before its mark can move to the right.
   skelMarkLabel: style({
     position: "absolute",
     top: 0,
-    left: "8px",
+    "@layer": { [under1]: { left: "8px" } },
   }),
   skelMarkLabelBefore: style({
     right: "8px",
@@ -1427,19 +1434,19 @@ export const quiz = {
     borderRadius: "12px",
     backgroundColor: palette["--panel-2"],
   }),
+  // Layered, so the picked key's colours win.
   segKey: style({
+    "@layer": { [under1]: { backgroundColor: "transparent", color: palette["--dim"] } },
     minHeight: "30px",
     paddingBlock: 0,
     paddingInline: "10px",
     borderWidth: 0,
     borderStyle: "none",
     borderRadius: "9px",
-    backgroundColor: "transparent",
     fontWeight: 700,
     fontSize: "13px",
     lineHeight: "normal",
     fontFamily: fonts["--display"],
-    color: palette["--dim"],
     whiteSpace: "nowrap",
     cursor: cursors["--cursor-point"],
     selectors: {

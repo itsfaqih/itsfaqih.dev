@@ -242,28 +242,33 @@ export const styles = {
     },
   }),
   // Lavender with dark ink on the black island; the deeper purple with white ink on the white one.
+  // The colours are layered, so a rule page's hue wins.
   connect: style({
-    color: CONNECT_CHIP,
-    backgroundColor: AX_ON_BLACK,
     flex: "none",
     height: "32px",
     paddingInline: "12px",
     whiteSpace: "nowrap",
     borderRadius: "999px",
-    selectors: {
-      [`&${DARK}`]: {
-        color: "#fff",
-        backgroundColor: AX_ON_WHITE,
-      },
-    },
-    "@media": {
-      [HOVER]: {
+    "@layer": {
+      [under1]: {
+        color: CONNECT_CHIP,
+        backgroundColor: AX_ON_BLACK,
         selectors: {
-          "&:hover": {
-            backgroundColor: `color-mix(in oklab, ${AX_ON_BLACK} 82%, #fff)`,
+          [`&${DARK}`]: {
+            color: "#fff",
+            backgroundColor: AX_ON_WHITE,
           },
-          [`&${DARK}:hover`]: {
-            backgroundColor: `color-mix(in oklab, ${AX_ON_WHITE} 88%, #000)`,
+        },
+        "@media": {
+          [HOVER]: {
+            selectors: {
+              "&:hover": {
+                backgroundColor: `color-mix(in oklab, ${AX_ON_BLACK} 82%, #fff)`,
+              },
+              [`&${DARK}:hover`]: {
+                backgroundColor: `color-mix(in oklab, ${AX_ON_WHITE} 88%, #000)`,
+              },
+            },
           },
         },
       },

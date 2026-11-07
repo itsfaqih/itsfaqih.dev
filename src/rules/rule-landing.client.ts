@@ -61,7 +61,8 @@ class RuleLanding extends HTMLElement {
     stops.push(watchTitleSwap(title, part("label", activity)));
     if (document.documentElement.classList.contains("from-home")) {
       for (const root of [this, activity]) {
-        for (const back of root.querySelectorAll<HTMLAnchorElement>("[data-back]")) back.href = "/#rules";
+        for (const back of root.querySelectorAll<HTMLAnchorElement>("[data-back]"))
+          back.href = "/#rules";
       }
     }
 

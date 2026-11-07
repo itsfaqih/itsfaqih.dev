@@ -227,7 +227,6 @@
     }
   }
 
-
   /* Global: a pseudo-element keyed on the attribute the CV page's switch sets. The ATS version previews
      plain paper, which the scanlines would stripe. */
   cv-page[data-ats]::after {

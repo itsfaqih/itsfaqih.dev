@@ -179,32 +179,45 @@ describe("the built site responds to a reader", () => {
       };
       for (const type of ["click", "dragstart"]) addEventListener(type, swallow, true);
     });
-    const holds = (target: Locator, state: string) =>
+    // Samples every frame for a span of time rather than a count of frames, so a loaded machine
+    // checks just as long.
+    const holds = (target: Locator, state: string, span = 200) =>
       target.evaluate(
-        (node, state) =>
+        (node, { state, span }) =>
           new Promise<boolean>((done) => {
+            const start = performance.now();
             let frames = 0;
             let held = true;
-            const tick = () => {
+            const tick = (now: number) => {
               held &&= node.matches(state);
-              if (++frames < 12) requestAnimationFrame(tick);
+              if (++frames < 2 || now - start < span) requestAnimationFrame(tick);
               else done(held);
             };
             requestAnimationFrame(tick);
           }),
-        state,
+        { state, span },
       );
     const owns = (target: Locator, x: number, y: number) =>
       target.evaluate((node, { x, y }) => node.contains(document.elementFromPoint(x, y)), { x, y });
+    // A cut-in waits out its stagger standing still, then glitches sideways, so a still box is not
+    // yet at rest. Rest is once the one-shot animations on the control and its ancestors end.
     const settled = async (target: Locator) => {
-      let box = await target.boundingBox();
-      for (let i = 0; i < 20; i++) {
-        await page.waitForTimeout(100);
-        const next = await target.boundingBox();
-        if (next && box && next.x === box.x && next.y === box.y) return next;
-        box = next;
-      }
-      return box;
+      await target.evaluate(async (node) => {
+        await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+        await Promise.all(
+          document
+            .getAnimations()
+            .filter(
+              (animation) =>
+                animation.playState === "running" &&
+                animation.effect?.getComputedTiming().iterations !== Infinity &&
+                animation.effect instanceof KeyframeEffect &&
+                (animation.effect.target?.contains(node) ?? false),
+            )
+            .map((animation) => animation.finished.catch(() => undefined)),
+        );
+      });
+      return target.boundingBox();
     };
 
     const slips: string[] = [];
@@ -218,10 +231,10 @@ describe("the built site responds to a reader", () => {
       const x = rest.x + rest.width / 2;
       if (!(await owns(target, x, rest.y + rest.height / 2))) continue;
       await page.mouse.move(x, rest.y + rest.height / 2);
-      await holds(target, "*");
+      await holds(target, "*", 0);
       const hovered = (await target.boundingBox())!;
       await page.mouse.down();
-      await holds(target, "*");
+      await holds(target, "*", 0);
       const pressed = (await target.boundingBox())!;
       await page.mouse.up();
       if (Math.abs(hovered.y - rest.y) < 1 && Math.abs(pressed.y - rest.y) < 1) continue;

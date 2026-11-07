@@ -243,8 +243,9 @@ export const styles = {
   }),
   // Sits on the bottom fade of the open row's tools while more lie below, and leaves with the fade
   // as the list reaches its end. A closed row's tools never scroll, so it has none.
+  // Layered, so the open row's chip can show.
   hint: style({
-    display: "none",
+    "@layer": { [under1]: { display: "none" } },
   }),
   // A chip in the row's own tone, so the badges sliding under it don't break up its words.
   hintOpen: style({

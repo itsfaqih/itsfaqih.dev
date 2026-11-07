@@ -98,6 +98,7 @@ export function mountHints(card: HTMLElement, middle = false) {
         mark = { halo: blur, group, svg, ring, label, hint };
       }
       mark.hint = hint;
+      mark.svg.dataset.spine = hint.spine;
       const { box, radius } = hint.ring;
       const w = box.right - box.left;
       const h = box.bottom - box.top;

@@ -1,6 +1,13 @@
 import { reducedMotion } from "../hooks/media-query";
 import { play } from "../hooks/sound";
-import { type Load, type Shown, SKELETON, shownAt, skeletonChoice, skeletonSays } from "./data-loading";
+import {
+  type Load,
+  type Shown,
+  SKELETON,
+  shownAt,
+  skeletonChoice,
+  skeletonSays,
+} from "./data-loading";
 import { skeletonView } from "./data-loading.view";
 
 type Choice = ReturnType<typeof skeletonChoice>;
@@ -42,7 +49,6 @@ class DataLoadingSkeleton extends HTMLElement {
     const track = part("track");
     const handle = part("handle");
     const head = part("head");
-    const preview = part("preview");
     const said = part("said");
     const matches = [...this.querySelectorAll<HTMLElement>('[data-part="match"]')];
     const keys = [...this.querySelectorAll<HTMLButtonElement>("[data-load]")];
@@ -59,7 +65,6 @@ class DataLoadingSkeleton extends HTMLElement {
     const show = (next: Shown) => {
       if (next === shown) return;
       shown = next;
-      preview.dataset.shown = next;
       for (const match of matches) match.className = skeletonView.match(next, true);
     };
 
@@ -120,7 +125,8 @@ class DataLoadingSkeleton extends HTMLElement {
         handle.focus({ preventScroll: true });
         halt();
         play("lift");
-        if (!(event.target instanceof Node && handle.contains(event.target))) set(atX(event.clientX));
+        if (!(event.target instanceof Node && handle.contains(event.target)))
+          set(atX(event.clientX));
         grab = { x: event.clientX, from: at };
         this.toggleAttribute("data-dragging", true);
       },

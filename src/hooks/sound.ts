@@ -141,7 +141,8 @@ export function play(cue: Cue) {
     // while its audio service starts, and that once-a-session wait shouldn't drop the sound.
     const askedAt = performance.now();
     void decode(ctx, cue).then((ready) => {
-      if (ready && performance.now() - askedAt <= (CUES[cue].late ?? LATE_MS)) start(ctx, cue, ready);
+      if (ready && performance.now() - askedAt <= (CUES[cue].late ?? LATE_MS))
+        start(ctx, cue, ready);
     });
   }
 }

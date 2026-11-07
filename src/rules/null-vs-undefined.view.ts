@@ -48,11 +48,7 @@ export const flowView = {
   value: (bad: boolean, landing: boolean) =>
     cx(styles.value, bad && styles.valueLost, landing && styles.landing),
   nul: (bad: boolean) => cx(styles.nul, bad && styles.nulLost),
-  tag: (verdict: Verdict) =>
-    cx(
-      styles.tag,
-      wentWrong(verdict) ? styles.tagLost : styles.tagKept,
-    ),
+  tag: (verdict: Verdict) => cx(styles.tag, wentWrong(verdict) ? styles.tagLost : styles.tagKept),
 };
 
 /** Classes a pick board (null-pick-board.astro) and its element share. */

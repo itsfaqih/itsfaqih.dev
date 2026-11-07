@@ -117,15 +117,18 @@ try {
   await chip.click();
   await expectHeard(page, "a button click plays tap", ["tap"]);
   await tiles.nth(0).hover();
-  await expectHeard(page, "entering the rule grid plays move, then the lamp's two flicker crackles", [
-    "move",
-    "flicker",
-    "flicker",
-  ]);
+  await expectHeard(
+    page,
+    "entering the rule grid plays move, then the lamp's two flicker crackles",
+    ["move", "flicker", "flicker"],
+  );
   await tiles.nth(1).hover();
   await page.waitForTimeout(60);
   await tiles.nth(2).hover();
-  await expectHeard(page, "moving across lit tiles plays move per tile, no flicker", ["move", "move"]);
+  await expectHeard(page, "moving across lit tiles plays move per tile, no flicker", [
+    "move",
+    "move",
+  ]);
   await tiles.nth(2).hover({ position: { x: 4, y: 4 } });
   await expectHeard(page, "staying on one tile plays nothing", []);
 
@@ -338,8 +341,12 @@ try {
     if (message.type() === "warning" || message.type() === "error")
       logs.push(`${message.type()}: ${message.text()}`);
   });
-  await open(small, "/blog");
+  // The menu button shows only once the header folds, which needs a page long enough to scroll.
+  await open(small, "/rule-of-thumb");
+  await small.mouse.wheel(0, 600);
   const menu = small.locator('site-header [data-part="menu"]');
+  await menu.waitFor({ state: "visible" });
+  await small.waitForTimeout(700);
   await menu.click();
   await expectHeard(small, "the header menu opens with open, no tap", ["open"]);
   await small.waitForTimeout(700);
