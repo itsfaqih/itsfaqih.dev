@@ -75,15 +75,7 @@ class DataLoadingSearch extends Demo {
             .map((search) => [search.lands, () => land(search)] as const),
         ];
         const end = Math.max(...steps.map(([at]) => at));
-        this.play([
-          ...steps,
-          [
-            end,
-            () => {
-              busy(button, false);
-            },
-          ],
-        ]);
+        this.play([...steps, [end, () => busy(button, false)]]);
       },
       signal,
     );

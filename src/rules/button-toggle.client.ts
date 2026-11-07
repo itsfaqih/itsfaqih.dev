@@ -2,10 +2,10 @@ import { view } from "./button-design.view";
 
 /** A lesson's on/off switch (button-toggle.astro); the demo's styles read its aria-pressed. */
 class ButtonToggle extends HTMLElement {
-  #stop?: () => void;
+  #controller?: AbortController;
 
   connectedCallback() {
-    const controller = new AbortController();
+    this.#controller = new AbortController();
     const toggle = this.querySelector("button")!;
     const dot = toggle.querySelector("span")!;
     let on = false;
@@ -16,13 +16,12 @@ class ButtonToggle extends HTMLElement {
         toggle.setAttribute("aria-pressed", String(on));
         dot.className = view.dot(on);
       },
-      { signal: controller.signal },
+      { signal: this.#controller.signal },
     );
-    this.#stop = () => controller.abort();
   }
 
   disconnectedCallback() {
-    this.#stop?.();
+    this.#controller?.abort();
   }
 }
 
