@@ -70,7 +70,7 @@ const setFade = (layer: SVGGElement, fade: number) =>
 const REACH_DEG = { x: 6, y: 10 };
 const EASE_PER_FRAME = 0.12;
 
-/** Tilts the card toward a mouse pointer and back to rest when it leaves. Returns the stop. */
+/** Tilts the card toward a mouse pointer and back to rest when it leaves, until `signal` aborts. */
 function tiltToCursor(stage: HTMLElement, card: HTMLElement, signal: AbortSignal) {
   if (reducedMotion()) return;
   const clamp = (value: number) => Math.min(1, Math.max(-1, value));
