@@ -339,10 +339,6 @@ export const styles = {
         backgroundColor: palette["--panel-2"],
         color: palette["--text"],
       },
-      "&:hover": {
-        transitionDuration: motion["--t-fast"],
-        transitionTimingFunction: motion["--fast"],
-      },
       "&:active": {
         color: palette["--text"],
       },
@@ -355,6 +351,8 @@ export const styles = {
         selectors: {
           "&:hover": {
             color: palette["--text"],
+            transitionDuration: motion["--t-fast"],
+            transitionTimingFunction: motion["--fast"],
           },
         },
       },
