@@ -117,6 +117,11 @@ export const HEAD_SCRIPT = String.raw`(function () {
     else event.viewTransition.skipTransition();
   });
   addEventListener("pagereveal", function (event) {
+    // A page restored from the back-forward cache still names the card its dive left from, and two
+    // elements sharing a transition name would skip the morph.
+    document.querySelectorAll("[data-opening]").forEach(function (card) {
+      card.removeAttribute("data-opening");
+    });
     if (!event.viewTransition) return;
     var from = self.navigation && navigation.activation && navigation.activation.from;
     var type = from && from.url ? transitionType(from.url, location.href) : null;
