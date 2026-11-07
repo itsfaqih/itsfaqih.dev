@@ -3,9 +3,15 @@ import { reducedMotion } from "./media-query";
 
 const THEME_CHANGE_EVENT = "theme-change";
 
+// Stands in for localStorage when the browser refuses it.
+let unsaved: string | null = null;
+
 /** The saved theme, else the system's. */
 export function readTheme(): Theme {
-  const saved = localStorage.getItem("theme");
+  let saved = unsaved;
+  try {
+    saved = localStorage.getItem("theme");
+  } catch {}
   if (saved === "dark" || saved === "light") return saved;
   return matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
@@ -47,7 +53,10 @@ export function toggleTheme(origin?: { x: number; y: number }) {
   const next: Theme = readTheme() === "light" ? "dark" : "light";
   const commit = () => {
     applyThemeClass(next);
-    localStorage.setItem("theme", next);
+    unsaved = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
     dispatchEvent(new Event(THEME_CHANGE_EVENT));
   };
 
