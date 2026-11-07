@@ -1,11 +1,11 @@
 ---
 import { HINT } from "./hints";
-import { inboxRows } from "./data-loading";
+import { INBOX, inboxRows, replyIn } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
 type Props = {
-  /** Hold the skeleton back until the reply has taken 200ms. */
+  /** Hold the skeleton back until the reply has taken `SPIN_DELAY`. */
   delay?: boolean;
 };
 
@@ -37,8 +37,8 @@ const { delay = false } = Astro.props;
   ><div class={styles.ctl}
     ><span class={styles.note}>Server replies in</span><span
       class={styles.pair}
-      ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="fast">80ms</button
-      ><button type="button" class={view.ctlButton} data-part="slow">1.2s</button></span
+      ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="fast">{replyIn(INBOX.fast)}</button
+      ><button type="button" class={view.ctlButton} data-part="slow">{replyIn(INBOX.slow)}</button></span
     ></div
   ></data-loading-inbox
 >
