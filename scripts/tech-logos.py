@@ -448,7 +448,7 @@ def minify(logos: list[tuple[str, str]]) -> list[str]:
             svg = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view_box}">{body}</svg>'
             Path(folder, f"{index}.svg").write_text(svg)
         subprocess.run(
-            ["vp", "dlx", "svgo@3.3.2", "-q", "-f", folder, "-o", folder, "-p", "1"], check=True
+            ["vp", "exec", "svgo", "-q", "-f", folder, "-o", folder, "-p", "1"], check=True
         )
         return [
             re.sub(r"^<svg[^>]*>|</svg>$", "", Path(folder, f"{index}.svg").read_text().strip())
