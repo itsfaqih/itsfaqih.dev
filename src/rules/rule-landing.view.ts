@@ -51,7 +51,7 @@ export const quizView = {
   slot: ({ lead, open, near, missed, cleared, seated }: SlotState) =>
     cx(
       quizKit.slot,
-      lead ? quizKit.slotAfterLead : null,
+      lead && quizKit.slotAfterLead,
       open && quizKit.slotOpen,
       near && quizKit.slotNear,
       missed && (open ? quizKit.slotMissOpen : quizKit.slotMiss),
