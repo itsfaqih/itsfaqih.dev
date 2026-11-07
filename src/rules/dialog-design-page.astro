@@ -1,7 +1,7 @@
 ---
 import Icon from "../components/icon.astro";
 import DialogConfirmDemo from "./dialog-confirm-demo.astro";
-import { LESSONS, REPLY, REVIEW, TLDR } from "./dialog-design";
+import { LESSONS, RENAMED, REPLY, REVIEW, SIGN_OUT, TLDR } from "./dialog-design";
 import { quiz, styles } from "./dialog-design.css";
 import { quizKit } from "./rule-landing.css";
 import DialogDraftDemo from "./dialog-draft-demo.astro";
@@ -93,13 +93,13 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
       >
-      <QuizChoice level={escape.levels[0]} id="profile" caption="Nothing changed yet"
+      <QuizChoice level={escape.levels[0]} id="rename" caption="Name edited"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
-            ><span class={quiz.miniHead}><span class={quiz.miniTitle}>Edit address</span></span><span
-              class={quiz.miniField}>12 Baker St</span
-            ><span class={quiz.miniActs}
-              ><span class:list={[quiz.miniBtn, quiz.miniPlain]}>Cancel</span><span class={quiz.miniBtn}>Save</span></span
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Rename file</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{RENAMED}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Save</span></span
             ></span
           ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
         ></QuizChoice
@@ -114,28 +114,28 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogConfirmDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={3} level={safe.levels[0]}
-    ><b>Delete your account?</b> erases it and its 38 invoices for good. Tap where focus starts.
+    >You close a half-written post, and <b>Discard changes?</b> opens. Tap where focus starts.
     <div slot="board" class:list={[quiz.screen, quiz.tall]}>
       <span class:list={[quiz.layer, styles.page, quiz.page]}>
         <span class={styles.spread}><span class={styles.logo}></span><span style="--w:30%" class={styles.ghost}></span></span>
         <span class:list={[styles.card, styles.spread, quiz.wrap]}
           ><span class={styles.project}
-            ><b class={styles.strong}>Your account</b><small class={styles.meta}>Member since 2021</small></span
+            ><b class={styles.strong}>Draft post</b><small class={styles.meta}>3 paragraphs, not saved</small></span
           ><QuizChoice level={safe.levels[0]} id="trigger" look="spot"
-            ><span class:list={[btn, styles.red, styles.redTint]}>Delete account</span></QuizChoice
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Close editor</span></QuizChoice
           ></span
         >
         <span style="--w:62%" class={styles.ghost}></span>
       </span>
       <span aria-hidden="true" class:list={[quiz.layer, quiz.scrim]}></span>
       <span class:list={[quiz.layer, quiz.panel, quiz.low]}>
-        <span class={styles.head}><span class={styles.title}>Delete your account?</span></span>
-        <span class={styles.body}>Its 38 invoices go too. This can't be undone.</span>
+        <span class={styles.head}><span class={styles.title}>Discard changes?</span></span>
+        <span class={styles.body}>Your 3 unsaved paragraphs will be lost.</span>
         <span class={styles.acts}
-          ><QuizChoice level={safe.levels[0]} id="cancel" look="spot"
-            ><span class:list={[btn, styles.plain, quiz.plain]}>Cancel</span></QuizChoice
-          ><QuizChoice level={safe.levels[0]} id="delete" look="spot"
-            ><span class:list={[btn, styles.red]}>Delete</span></QuizChoice
+          ><QuizChoice level={safe.levels[0]} id="keep" look="spot"
+            ><span class:list={[btn, styles.plain, quiz.plain]}>Keep editing</span></QuizChoice
+          ><QuizChoice level={safe.levels[0]} id="discard" look="spot"
+            ><span class:list={[btn, styles.red]}>Discard</span></QuizChoice
           ></span
         >
       </span>
@@ -153,14 +153,16 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
         <QuizChoice level={safe.levels[1]!} id="name" look="spot"
           ><span class={styles.field}
             ><span class={styles.label}>Name</span><span class:list={[styles.input, quiz.input, quiz.placeholder]}
-              >Ada Lovelace</span
+              >Ravi Shah</span
             ></span
           ></QuizChoice
         >
-        <span class={styles.field}
-          ><span class={styles.label}>Email</span><span class:list={[styles.input, quiz.input, quiz.placeholder]}
-            >ada@example.com</span
-          ></span
+        <QuizChoice level={safe.levels[1]!} id="email" look="spot"
+          ><span class={styles.field}
+            ><span class={styles.label}>Email</span><span class:list={[styles.input, quiz.input, quiz.placeholder]}
+              >ravi@example.com</span
+            ></span
+          ></QuizChoice
         >
         <span class={styles.acts}
           ><QuizChoice level={safe.levels[1]!} id="save" look="spot"><span class:list={[btn]}>Save</span></QuizChoice></span
@@ -175,17 +177,17 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogDraftDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={5} level={draft.levels[0]}
-    >Three dialogs, and a click lands on the dim area by mistake. Pick the one that should shake and stay open.
+    >Three dialogs, and someone presses <Kbd>Esc</Kbd> in each. Pick the one that should ask before it closes.
     <div slot="board" class={quizKit.trio}>
-      <QuizChoice level={draft.levels[0]} id="news" caption="Nothing to fill in"
+      <QuizChoice level={draft.levels[0]} id="blank" caption="Nothing typed yet"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>About</span><Icon {...x} class={quiz.miniX} /></span
-            ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
-              class={quiz.miniActs}><span class={quiz.miniBtn}>Close</span></span
+              ><span class={quiz.miniTitle}>Write a review</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class:list={[quiz.miniField, quiz.placeholder]}>What did you think?</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Post</span></span
             ></span
-          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
         ></QuizChoice
       >
       <QuizChoice level={draft.levels[0]} id="issue" caption="Text typed in"
@@ -196,16 +198,18 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
             ><span class={quiz.miniField}>{REVIEW}</span><span class={quiz.miniActs}
               ><span class={quiz.miniBtn}>Post</span></span
             ></span
-          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
         ></QuizChoice
       >
-      <QuizChoice level={draft.levels[0]} id="preview" caption="Image preview"
+      <QuizChoice level={draft.levels[0]} id="news" caption="Nothing to fill in"
         ><span class={quiz.mini}
           ><span class={quiz.miniPanel}
             ><span class={quiz.miniHead}
-              ><span class={quiz.miniTitle}>photo.jpg</span><Icon {...x} class={quiz.miniX} /></span
-            ><span class={quiz.miniFigure}></span></span
-          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+              ><span class={quiz.miniTitle}>About</span><Icon {...x} class={quiz.miniX} /></span
+            ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
+              class={quiz.miniActs}><span class={quiz.miniBtn}>Close</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
         ></QuizChoice
       >
     </div>
@@ -258,17 +262,17 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
     <DialogNameDemo slot="good" sealed />
   </RuleLesson>
   <RuleQuiz n={7} level={name.levels[0]}
-    >A screen reader user presses Delete and <b>Delete Moonbase?</b> opens. Pick what they should hear.
+    >A screen reader user presses <b>Sign out everywhere</b>, and its dialog opens. They swipe through it. Pick what they should hear.
     <div slot="board" class={quizKit.stack}>
       {
         (
           [
-            ["plain", "A plain box", ["Cancel, button"]],
-            ["role", "Marked as a dialog", ["dialog", "Cancel, button"]],
-            ["named", "Named and described", ["Delete Moonbase?, dialog", "Its 214 files go too. This can't be undone.", "Cancel, button"]],
+            ["loose", [SIGN_OUT.title + ", dialog", "Cancel, button", "Account settings, signed in on 3 devices"]],
+            ["role", ["dialog", SIGN_OUT.body, "Cancel, button"]],
+            ["named", [SIGN_OUT.title + ", dialog", SIGN_OUT.body, "Cancel, button"]],
           ] as const
-        ).map(([id, caption, lines]) => (
-          <QuizChoice level={name.levels[0]} id={id} caption={caption}
+        ).map(([id, lines]) => (
+          <QuizChoice level={name.levels[0]} id={id}
             ><span class={quiz.transcript}
               >{
                 lines.map((line) => (

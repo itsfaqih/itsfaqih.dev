@@ -927,6 +927,15 @@ export const quiz = {
     backgroundColor: "rgb(255 255 255 / 0.9)",
     boxShadow: "0 0 0 4px rgb(255 255 255 / 0.25)",
   }),
+  escKey: style({
+    paddingInline: "4px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "rgb(255 255 255 / 0.85)",
+    borderRadius: "4px",
+    fontSize: "10px",
+    lineHeight: "14px",
+  }),
   layers: style({
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
