@@ -1,6 +1,6 @@
 import { play } from "../hooks/sound";
 import { AXIS, rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
-import { slideView } from "./data-loading.view";
+import { pct, slideView } from "./data-loading.view";
 
 type Choice = ReturnType<typeof slideChoice>;
 
@@ -41,7 +41,6 @@ class DataLoadingSlide extends HTMLElement {
     const check = this.querySelector<HTMLButtonElement>('[data-look="check"]')!;
     const notes: Record<Choice, string> = JSON.parse(this.dataset.notes!);
     const labels: Record<Choice, string> = JSON.parse(this.dataset.labels!);
-    const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 
     let start: number = SLIDE.from;
     const locked = () => check.disabled;
