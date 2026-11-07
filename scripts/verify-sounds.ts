@@ -77,6 +77,16 @@ async function heard(page: Page) {
   return page.evaluate(() => window.played.splice(0));
 }
 
+/** Logs every warning and error the page writes or throws, for the check at the end. */
+function watch(page: Page) {
+  page.on("console", (message) => {
+    if (message.type() === "warning" || message.type() === "error")
+      logs.push(`${message.type()}: ${message.text()}`);
+  });
+  page.on("pageerror", (error) => logs.push(`pageerror: ${error.message}`));
+  return page;
+}
+
 async function expectHeard(page: Page, label: string, want: string[]) {
   const got = await heard(page);
   check(JSON.stringify(got) === JSON.stringify(want), label, `heard ${JSON.stringify(got)}`);
@@ -89,12 +99,7 @@ try {
   });
   await context.addInitScript(() => sessionStorage.setItem("intro-seen", "1"));
   await context.addInitScript(recordPlays);
-  const page = await context.newPage();
-  page.on("console", (message) => {
-    if (message.type() === "warning" || message.type() === "error")
-      logs.push(`${message.type()}: ${message.text()}`);
-  });
-  page.on("pageerror", (error) => logs.push(`pageerror: ${error.message}`));
+  const page = watch(await context.newPage());
 
   // Playwright's evaluate and locators count as a user gesture, so this first look at the page
   // waits and moves the mouse by hand.
@@ -336,11 +341,7 @@ try {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await phone.addInitScript(() => sessionStorage.setItem("intro-seen", "1"));
   await phone.addInitScript(recordPlays);
-  const small = await phone.newPage();
-  small.on("console", (message) => {
-    if (message.type() === "warning" || message.type() === "error")
-      logs.push(`${message.type()}: ${message.text()}`);
-  });
+  const small = watch(await phone.newPage());
   // The menu button shows only once the header folds, which needs a page long enough to scroll.
   await open(small, "/rule-of-thumb");
   await small.mouse.wheel(0, 600);
