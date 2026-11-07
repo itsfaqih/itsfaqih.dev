@@ -1,11 +1,6 @@
 ---
 import { cx } from "../cx";
-import {
-  colorOf,
-  PUBLISHED_GUIDELINES,
-  ruleNumber,
-  VISIBLE_GUIDELINES,
-} from "../data/guidelines";
+import { colorOf, ruleNumber, VISIBLE_GUIDELINES } from "../data/guidelines";
 import Icon from "../components/icon.astro";
 import { arcade } from "../components/arcade.css";
 import { button } from "../components/button.css";
@@ -23,6 +18,7 @@ import { backTo, cover, host, island, lessonKit, pager, shell, takeKit } from ".
 import { landingView } from "./rule-landing.view";
 import { titleWordEm } from "./title-fit";
 import ShareButton from "./share-button.astro";
+import { publishedRule } from "./rule-head";
 
 type Props = {
   /** The published rule this page teaches. */
@@ -35,8 +31,7 @@ type Props = {
 };
 
 const { id, learn, tldr, take } = Astro.props;
-const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
-if (!rule) throw new Error(`No published rule "${id}"`);
+const rule = publishedRule(id);
 
 const hue = `--c:${colorOf(rule.label)}`;
 const number = ruleNumber(rule);
