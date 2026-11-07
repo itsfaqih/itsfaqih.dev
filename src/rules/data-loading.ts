@@ -2,7 +2,7 @@ import type { Lesson, Tldr } from "./lesson";
 
 export const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
-export type Bar = {
+type Bar = {
   label: string;
   from: number;
   to: number;
@@ -101,7 +101,7 @@ export function skeletonSays(load: Load, at: number) {
 }
 
 /** Where a page renders: on the server, or in the browser after its code loads. */
-export type RenderAt = "server" | "browser";
+type RenderAt = "server" | "browser";
 
 export const LAMP = { path: "/lamp", title: "Desk lamp", price: "$48", stock: "In stock" } as const;
 
@@ -145,7 +145,7 @@ export const RENDERS: Record<
 
 export const REVENUE = [48210, 49875, 47930, 51402];
 
-export const MAIL = [
+const MAIL = [
   ["Rina", "Invoice #2041 is paid"],
   ["Deploy bot", "main is green again"],
   ["Sam", "Notes from Tuesday"],
@@ -194,7 +194,7 @@ export const CHAIR = [
 export const queryOf = (typing: Typing) => typing.map(({ key }) => key).join("");
 export const QUERY = queryOf(TYPING);
 
-export const DEBOUNCE = 300;
+const DEBOUNCE = 300;
 
 /** What became of a search request: still out, canceled, shown last, or shown and then replaced. */
 export type Fate = "flight" | "canceled" | "shown" | "replaced";
@@ -259,7 +259,7 @@ export const TEAM = [
 export const RESPONSE = '{ "id": 1, "name": "Alice" }';
 
 type Profile = { id: number; name: string; city: string };
-export type Outcome = { ok: true; user: Profile } | { ok: false; error: string };
+type Outcome = { ok: true; user: Profile } | { ok: false; error: string };
 
 const describe = (cause: unknown) =>
   cause instanceof Error ? `${cause.name}: ${cause.message}` : "Error: unknown";

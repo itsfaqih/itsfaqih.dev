@@ -10,10 +10,10 @@ const REDUCE = "(prefers-reduced-motion: reduce)";
 const turn = keyframes({
   to: { transform: "rotate(1turn)" },
 });
-export const fresh = keyframes({
+const fresh = keyframes({
   from: { opacity: 0.25, transform: "translateY(4px)" },
 });
-export const sweep = keyframes({
+const sweep = keyframes({
   to: { transform: "translate(calc(100% + 12px))" },
 });
 const mark = keyframes({
