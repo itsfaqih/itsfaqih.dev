@@ -163,13 +163,31 @@ export const SPIN_DELAY = 200;
  * What the debounce demo types into search, key by key: when each key lands, how long the server
  * takes to answer the query it makes, so the replies land out of order, and what that query finds.
  */
+export type Typing = readonly {
+  key: string;
+  at: number;
+  reply: number;
+  matches: readonly string[];
+}[];
+
 export const TYPING = [
   { key: "l", at: 0, reply: 500, matches: ["Laptop stand", "Lunch box"] },
   { key: "a", at: 120, reply: 1100, matches: ["Laptop stand", "Ladder"] },
   { key: "m", at: 600, reply: 300, matches: ["Lamb rug", "Laminator"] },
   { key: "p", at: 720, reply: 300, matches: ["Desk lamp", "Floor lamp"] },
-] as const;
-export const QUERY = TYPING.map(({ key }) => key).join("");
+] as const satisfies Typing;
+
+/** What quiz 5 types: chair, with a pause after ch and another after chai. */
+export const CHAIR = [
+  { key: "c", at: 0, reply: 400, matches: ["Cable tray", "Coat hook"] },
+  { key: "h", at: 120, reply: 1300, matches: ["Chest", "Chalk board"] },
+  { key: "a", at: 700, reply: 300, matches: ["Chair", "Chalk board"] },
+  { key: "i", at: 820, reply: 900, matches: ["Chai mug", "Chai tea set"] },
+  { key: "r", at: 1300, reply: 300, matches: ["Desk chair", "Armchair"] },
+] as const satisfies Typing;
+
+export const queryOf = (typing: Typing) => typing.map(({ key }) => key).join("");
+export const QUERY = queryOf(TYPING);
 
 export const DEBOUNCE = 300;
 
@@ -199,10 +217,11 @@ export const FIXES = {
  * sends one; with it a request waits for a pause in the typing. With `cancel` sending a request
  * cancels any still in flight. Of the requests that land, the last to land shows.
  */
-export function searches({ pause, cancel }: Fix): Search[] {
-  const sent = TYPING.flatMap(({ at, reply, matches }, i) => {
-    const next = TYPING[i + 1]?.at ?? Infinity;
-    const q = QUERY.slice(0, i + 1);
+export function searches({ pause, cancel }: Fix, typing: Typing = TYPING): Search[] {
+  const query = queryOf(typing);
+  const sent = typing.flatMap(({ at, reply, matches }, i) => {
+    const next = typing[i + 1]?.at ?? Infinity;
+    const q = query.slice(0, i + 1);
     if (!pause) return [{ q, sent: at, reply, matches }];
     return next - at > DEBOUNCE ? [{ q, sent: at + DEBOUNCE, reply, matches }] : [];
   });
@@ -219,11 +238,12 @@ export function searches({ pause, cancel }: Fix): Search[] {
 }
 
 /** What the request log says of a request with this fate. */
-export const fateSays = (fate: Fate, q: string) =>
-  fate === "flight" ? "in flight" : fate === "shown" && q !== QUERY ? "shown, stale" : fate;
+export const fateSays = (fate: Fate, q: string, query = QUERY) =>
+  fate === "flight" ? "in flight" : fate === "shown" && q !== query ? "shown, stale" : fate;
 
 /** The request whose results show once every request has landed. */
-export const shownSearch = (fix: Fix) => searches(fix).find((s) => s.fate === "shown");
+export const shownSearch = (fix: Fix, typing: Typing = TYPING) =>
+  searches(fix, typing).find((s) => s.fate === "shown");
 
 export const TEAM = [
   ["Ana", "Design"],
@@ -281,7 +301,7 @@ export const LESSONS: Lesson[] = [
     levels: [
       {
         name: "Three pages",
-        answer: "product",
+        answer: "help",
         choices: [
           {
             id: "settings",
@@ -289,9 +309,9 @@ export const LESSONS: Lesson[] = [
             note: "No crawler gets past the login, and the person already has the app open. The browser is fine.",
           },
           {
-            id: "product",
-            label: "A public product page",
-            note: "Search has to read its name and price, and a shopper from a search result wants them in the first frame. Render it on the server.",
+            id: "help",
+            label: "A public help page",
+            note: "Search has to read its answers, and a shopper from a search result wants them in the first frame. Render it on the server.",
           },
           {
             id: "admin",
@@ -352,7 +372,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "keep",
             label: "Prices kept until the next page load",
-            note: "The fresh prices arrive and nobody sees them. The cache never revalidates.",
+            note: "The refetch lands, but the screen keeps the 5-minute-old prices until a reload.",
           },
         ],
       },
@@ -392,23 +412,23 @@ export const LESSONS: Lesson[] = [
     good: { label: "Wait 300ms", costs: ["2 sent, 1 canceled", "right results"] },
     levels: [
       {
-        name: "Typing lamp",
+        name: "Typing chair",
         answer: "both",
         choices: [
           {
             id: "pause",
-            label: "Wait for a pause before sending",
-            note: "It sends 2 requests now, but la's slow reply still lands last and shows.",
+            label: "Wait for a pause, keep old ones",
+            note: "It sends 3 requests now, but chai's slow reply still lands last and shows.",
           },
           {
             id: "cancel",
-            label: "Cancel the request still out",
+            label: "Send every letter, cancel old ones",
             note: "The results are right now, but it still sends a request on every letter.",
           },
           {
             id: "both",
-            label: "Wait for a pause, and cancel the one still out",
-            note: "It sends la after the pause, cancels it when lamp goes, and shows lamp's results.",
+            label: "Wait for a pause, cancel old ones",
+            note: "It sends ch and chai after their pauses, cancels each when the next one goes, and shows chair's results.",
           },
         ],
       },
@@ -458,12 +478,12 @@ export const LESSONS: Lesson[] = [
           },
           {
             id: "page",
-            label: "<CheckoutPage>",
+            label: "renderCheckout()",
             note: "The data got this far unchecked, and every other screen that loads an order skips the check.",
           },
           {
             id: "receipt",
-            label: "<Receipt>, where it crashed",
+            label: "printReceipt(order), where it crashed",
             note: "It crashed here, but the bad data came in two steps earlier. Patch it here and order history crashes next.",
           },
         ],
@@ -481,8 +501,8 @@ export const LESSONS: Lesson[] = [
         choices: [
           {
             id: "stock",
-            label: "Desk lamp, 3 in stock",
-            note: "They sold out on day 2. You'd order a lamp nobody can ship.",
+            label: "Fan stock, updated 2 days ago",
+            note: "Both fans sold out on day 2. You'd order a fan nobody can ship.",
           },
           {
             id: "orders",
@@ -491,7 +511,7 @@ export const LESSONS: Lesson[] = [
           },
           {
             id: "price",
-            label: "Desk lamp sale price, $48",
+            label: "Fan sale prices, updated 2 days ago",
             note: "The sale ended on day 2. A two-day-old price shows a total checkout won't charge.",
           },
         ],
@@ -507,6 +527,6 @@ export const TLDR = [
   ["A reply that may be quick", "Show loading UI only after 200ms"],
   ["Search as you type", "Send it 300ms after the last key. Cancel the old one"],
   ["A request that fails", "Show the error in place, with Retry. Log it"],
-  ["Updates within a second", "Push them over a live connection. At 30s or slower, poll"],
   ["Anything from an API", "Parse it where it arrives"],
+  ["Caching to disk", "Persist history with its date. Fetch balances, prices and stock live"],
 ] as const satisfies Tldr;

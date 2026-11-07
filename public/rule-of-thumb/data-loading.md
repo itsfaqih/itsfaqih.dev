@@ -11,16 +11,16 @@ People judge loading by what they see while it lasts, so design the wait.
 
 ## TL;DR
 
-| Situation                  | Do this                                                      |
-| -------------------------- | ------------------------------------------------------------ |
-| SEO or first paint matters | Render it on the server. Behind a login, the browser is fine |
-| Data a page needs          | Start it on navigation, batch it, stream the rest            |
-| Refetching data you have   | Keep it on screen with a small spinner                       |
-| A reply that may be quick  | Show loading UI only after 200ms                             |
-| Search as you type         | Send it 300ms after the last key. Cancel the old one         |
-| A request that fails       | Show the error in place, with Retry. Log it                  |
-| Updates within a second    | Push them over a live connection. At 30s or slower, poll     |
-| Anything from an API       | Parse it where it arrives                                    |
+| Situation                  | Do this                                                              |
+| -------------------------- | -------------------------------------------------------------------- |
+| SEO or first paint matters | Render it on the server. Behind a login, the browser is fine         |
+| Data a page needs          | Start it on navigation, batch it, stream the rest                    |
+| Refetching data you have   | Keep it on screen with a small spinner                               |
+| A reply that may be quick  | Show loading UI only after 200ms                                     |
+| Search as you type         | Send it 300ms after the last key. Cancel the old one                 |
+| A request that fails       | Show the error in place, with Retry. Log it                          |
+| Anything from an API       | Parse it where it arrives                                            |
+| Caching to disk            | Persist history with its date. Fetch balances, prices and stock live |
 
 ## Render public pages on the server
 
