@@ -6,7 +6,7 @@ export type Point = { x: number; y: number };
  * swelling to `body`, under a solid head `head` long and `barb` wide whose back is cut `notch` deep.
  */
 export const ARROWS = {
-  /** Hint arrows in a demo pane. */
+  /** Hint arrows in a demo pane. Toggle and quiz arrows draw with the same cells. */
   hint: {
     grid: 3,
     head: 3,

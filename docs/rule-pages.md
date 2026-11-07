@@ -10,7 +10,7 @@ composes it by hand from the pieces below, with proximity as the worked example.
 | ----------------------------------------- | ------------------------------------------------------------------------------------- |
 | `<RuleLanding id learn tldr take>`        | `rule-landing.astro`, with slots `lead`, `intro` and the default slot for the lessons |
 | `<RuleLesson lesson rows? costsClass?>`   | `rule-lesson.astro`, slots `body`, `extra`, `bad`, `good`                             |
-| `<RuleQuiz n level board marks?>`         | `rule-quiz.astro`, the prompt as its default slot                                     |
+| `<RuleQuiz n level board? hint? marks?>`  | `rule-quiz.astro`, the prompt as its default slot                                     |
 | `<Code tone?>`                            | `code.astro`, tone `"chip"`, `"prompt"`, `"wrap"` or `"take"` (default `"plain"`)     |
 | `<LessonText style?>`, `<LessonText tip>` | `lesson-text.astro`                                                                   |
 | `<Kbd>`                                   | `kbd.astro`                                                                           |
@@ -25,7 +25,7 @@ The frame's behavior lives in three custom elements. `<rule-landing>` runs the r
 fit and swap, the compact header's way back, tags and Share, Copy SKILL.md, the cover's lean, and
 the pager's art and dive. `<rule-lesson>` runs the ✕/✓ flip, the rows gliding between panes, the
 phone rewind and the hint arrows ("Tap it", "Drag it" and the rest). `<rule-quiz>` runs drag, tap and keyboard play, misses, the
-seat and the stars. A page adds no script for any of that.
+seat, the stars and its own hint arrow. A page adds no script for any of that.
 
 ## Files for one page
 
@@ -118,7 +118,9 @@ pass nothing and get `--rows:0`.
 - **Reveals.** A block that rises in on scroll carries `data-rev="true"`. The visual suite fails if
   one is still unrevealed when it captures.
 - **Hints.** A demo control marked `data-hint` gets a hint arrow labelled from `HINT` ("Tap it", "Drag it"), placed by `watchHints` in
-  `hints.ts` and drawn by `rule-lesson.client.ts`.
+  `hints.ts` and drawn by `mountHints` in `hint-layer.ts`, which `rule-lesson.client.ts` and
+  `rule-quiz.client.ts` call. A quiz board with no `data-hint` of its own gets one from
+  `rule-quiz.client.ts`: "Drag it" on the piece, or "Pick one" on the box round every choice.
 - **The reader starts a demo.** A demo whose control carries a hint waits for the press.
   It renders unsent and never plays on scroll, so the reader sees the cause before the effect.
   null-vs-undefined's save demos start at "not sent yet" with Rina still assigned.
