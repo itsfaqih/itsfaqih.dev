@@ -105,7 +105,15 @@ class StackShowcase extends HTMLElement {
         });
         li.addEventListener("focus", () => show(li), { signal });
         li.addEventListener("blur", hide, { signal });
-        li.addEventListener("keydown", (event) => event.key === "Escape" && li.blur(), { signal });
+        li.addEventListener(
+          "keydown",
+          (event) => {
+            if (event.key !== "Escape" || peekedTool !== li) return;
+            clearTimeout(hideTimer);
+            setPeek(null);
+          },
+          { signal },
+        );
       }
     }
 
