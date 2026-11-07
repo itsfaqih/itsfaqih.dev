@@ -37,10 +37,10 @@ const ROW_IN = `opacity ${motion["--t-slow"]} ${motion["--slow"]} 40ms, filter $
 const ROW_OUT = `opacity ${motion["--t-moderate-exit"]} ${motion["--exit"]}, filter ${motion["--t-moderate-exit"]} ${motion["--exit"]}`;
 
 // A black capsule that floats over every page. At the top it holds the whole nav; once the page
-// scrolls it folds to the brand, or to the live activity a page lends it (IslandActivity), beside
-// search and the theme switch, and a menu button unfolds it again. Each part folds its own column
-// from 1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the parts
-// blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
+// scrolls it folds to the brand, or to the live activity a page lends it ([data-island-activity]),
+// beside search and the theme switch, and a menu button unfolds it again. Each part folds its own
+// column from 1fr to 0fr on one spring, so the capsule resizes around whatever it holds while the
+// parts blur out quickly and resolve in a beat later. The capsule is black over the light theme and white
 // over the dark one, so it is always the one shape that stands apart from the page.
 export const styles = {
   // A clear strip at the top of every page that only centres the island; presses pass through it

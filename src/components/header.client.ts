@@ -1,6 +1,6 @@
-import { reducedMotion } from "../hooks/media-query";
-import { play, soundOn, toggleSound, watchSound } from "../hooks/sound";
-import { followTheme, readTheme, toggleTheme } from "../hooks/theme-store";
+import { reducedMotion } from "../browser/media-query";
+import { play, soundOn, toggleSound, watchSound } from "../browser/sound";
+import { followTheme, readTheme, toggleTheme } from "../browser/theme-store";
 import { watchFluidHover } from "./fluid-hover";
 import { menuGlyphs, SEGS, segView, type HeaderState } from "./header.view";
 
@@ -26,8 +26,8 @@ function bounce(ground: HTMLElement, width: number, speed: number, since = 0) {
   }
   frames.push({ transform: "none" });
   for (const running of ground.getAnimations()) running.cancel();
-  const play = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
-  play.currentTime = since;
+  const animation = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
+  animation.currentTime = since;
 }
 
 /**

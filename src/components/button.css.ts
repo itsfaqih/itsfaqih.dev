@@ -204,15 +204,6 @@ export const tone = {
       "--lit": "color-mix(in oklab, var(--hue) 82%, #fff)",
     },
   }),
-  destructive: style({
-    vars: {
-      "--c": palette["--no"],
-      "--on-c": palette["--on-accent"],
-      "--key": `color-mix(in oklab, ${palette["--no"]} 60%, #000)`,
-      "--ink": palette["--no-ink"],
-      "--lit": `color-mix(in oklab, ${palette["--no"]} 82%, #fff)`,
-    },
-  }),
   neutral: style({
     vars: {
       "--c": palette["--soft-key"],

@@ -1,4 +1,4 @@
-import { play } from "../hooks/sound";
+import { play } from "../browser/sound";
 import { landed, pickChoice, type FieldOption, type PickField } from "./null-vs-undefined";
 import { KINDS, paint, pickView } from "./null-vs-undefined.view";
 

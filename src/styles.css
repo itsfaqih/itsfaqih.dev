@@ -86,7 +86,7 @@
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
     line-height: 1.5;
-    font-family: var(--font-sans);
+    font-family: var(--sans);
     font-feature-settings: normal;
     font-variation-settings: normal;
     -webkit-tap-highlight-color: transparent;
@@ -126,7 +126,7 @@
   kbd,
   samp,
   pre {
-    font-family: var(--font-mono);
+    font-family: var(--mono);
     font-feature-settings: normal;
     font-variation-settings: normal;
     font-size: 1em;

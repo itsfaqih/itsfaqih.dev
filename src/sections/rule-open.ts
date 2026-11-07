@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 
 /** Where a tile's click leaves the dive for the head script on the rule page (head-script.ts). */
 export const OPENING_KEY = "rule-open";

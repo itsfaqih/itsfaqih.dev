@@ -1,7 +1,7 @@
-import { cursors, motion, palette } from "../theme.vars.css";
+import { palette } from "../theme.vars.css";
 import { style } from "@vanilla-extract/css";
-import { when } from "../when";
 import { under1 } from "../layers.css";
+import { scrollbarThumb } from "./scrollbar.css";
 const FINE = "(hover: hover) and (pointer: fine)";
 
 /** Goes on the scrolling box: hides its native bar where the box scrollbar takes over, a fine pointer. */
@@ -20,8 +20,6 @@ export const boxScrollbarHost = {
   }),
 };
 
-const REDUCE = "(prefers-reduced-motion: reduce)";
-
 // watchBoxScrollbar sets data-shown, data-gold and data-dragging on the track.
 export const boxScrollbar = {
   track: style({
@@ -36,6 +34,9 @@ export const boxScrollbar = {
         pointerEvents: "none",
         vars: {
           "--sb-hue": palette["--go"],
+          "--sb-width": "5px",
+          "--sb-wide": "8px",
+          "--sb-right": "4px",
         },
         selectors: {
           "&:is([data-shown])": {
@@ -45,47 +46,5 @@ export const boxScrollbar = {
       },
     },
   }),
-  thumb: style({
-    position: "absolute",
-    top: 0,
-    right: "4px",
-    width: "5px",
-    borderRadius: "2.5px",
-    backgroundColor: `color-mix(in oklab, var(--sb-hue) ${palette["--eyebrow-mix"]}, #000)`,
-    opacity: 0,
-    cursor: cursors["--cursor-grab"],
-    transitionProperty: "opacity, width, background-color",
-    transitionDuration: motion["--t-fast-exit"],
-    transitionTimingFunction: motion["--exit"],
-    selectors: {
-      [`&${when.ancestor(":is([data-shown]:hover, [data-dragging])")}`]: {
-        width: "8px",
-        borderRadius: "4px",
-      },
-      [`&${when.ancestor("[data-dragging]")}`]: {
-        cursor: cursors["--cursor-grabbing"],
-      },
-      [`&${when.ancestor("[data-gold]")}`]: {
-        backgroundColor: palette["--go-ink"],
-      },
-      [`&${when.ancestor("[data-shown]")}`]: {
-        opacity: 1,
-        transitionDuration: motion["--t-fast"],
-        transitionTimingFunction: motion["--fast"],
-      },
-    },
-    "@media": {
-      "(forced-colors: active)": {
-        backgroundColor: "CanvasText",
-        selectors: {
-          [`&${when.ancestor("[data-gold]")}`]: {
-            backgroundColor: palette["--go-ink"],
-          },
-        },
-      },
-      [REDUCE]: {
-        transitionProperty: "opacity, background-color",
-      },
-    },
-  }),
+  thumb: scrollbarThumb,
 };

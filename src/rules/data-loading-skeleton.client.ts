@@ -1,5 +1,5 @@
-import { reducedMotion } from "../hooks/media-query";
-import { play } from "../hooks/sound";
+import { reducedMotion } from "../browser/media-query";
+import { play } from "../browser/sound";
 import {
   type Load,
   type Shown,

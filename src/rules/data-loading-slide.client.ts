@@ -1,4 +1,4 @@
-import { play } from "../hooks/sound";
+import { play } from "../browser/sound";
 import { AXIS, rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
 import { Demo, slider } from "./data-loading-demo";
 import { pct, slideView } from "./data-loading.view";

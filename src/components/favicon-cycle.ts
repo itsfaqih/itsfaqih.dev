@@ -1,5 +1,5 @@
-import { whenIdle } from "../hooks/idle";
-import { reducedMotion } from "../hooks/media-query";
+import { whenIdle } from "../browser/idle";
+import { reducedMotion } from "../browser/media-query";
 
 const HUES = [
   ["#0a9cd4", "#4dd4ff"],

@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import { Demo, write } from "./data-loading-demo";
 import { type Sweep, view } from "./data-loading.view";
 

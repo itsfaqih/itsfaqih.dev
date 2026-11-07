@@ -1,4 +1,4 @@
-import { reducedMotion } from "../hooks/media-query";
+import { reducedMotion } from "../browser/media-query";
 import { OUT, TABBED } from "./rule-landing.css";
 import { onceOnScreen } from "./rule-motion";
 import { LINE_HEIGHT, styles } from "./typescript-code-writing.css";

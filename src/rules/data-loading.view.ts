@@ -1,5 +1,5 @@
 import { button } from "../components/button.css";
-import { buttonVariant } from "../components/button";
+import { buttonVariant } from "../components/button.view";
 import { cx } from "../cx";
 import { AXIS, type Fate, type Shown } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";

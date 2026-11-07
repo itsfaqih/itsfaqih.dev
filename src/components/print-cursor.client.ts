@@ -1,4 +1,4 @@
-import { whenIdle } from "../hooks/idle";
+import { whenIdle } from "../browser/idle";
 
 // Pixel art on CELL px squares: K is the ink outline, F the fill. hot is the hotspot in cells.
 const PIXEL_ART = {
@@ -282,11 +282,13 @@ class PrintCursor extends HTMLElement {
     });
 
     html.classList.add("cur-on");
-    addEventListener("pointermove", onMove, { passive: true });
-    addEventListener("pointerdown", onDown);
-    addEventListener("pointerup", onUp);
-    document.addEventListener("pointerleave", onLeave);
-    addEventListener("blur", onLeave);
+    const abort = new AbortController();
+    const { signal } = abort;
+    addEventListener("pointermove", onMove, { passive: true, signal });
+    addEventListener("pointerdown", onDown, { signal });
+    addEventListener("pointerup", onUp, { signal });
+    document.addEventListener("pointerleave", onLeave, { signal });
+    addEventListener("blur", onLeave, { signal });
     observer.observe(document.body, {
       subtree: true,
       attributes: true,
@@ -294,11 +296,7 @@ class PrintCursor extends HTMLElement {
     });
     this.#stop = () => {
       html.classList.remove("cur-on");
-      removeEventListener("pointermove", onMove);
-      removeEventListener("pointerdown", onDown);
-      removeEventListener("pointerup", onUp);
-      document.removeEventListener("pointerleave", onLeave);
-      removeEventListener("blur", onLeave);
+      abort.abort();
       observer.disconnect();
       cancelAnimationFrame(frame);
     };

@@ -107,7 +107,7 @@ const deal = keyframes({
  * pauses while watchCutIns marks it .paused, except for that fade.
  *
  * `deal` swaps the glitch for a dealt card, on the rule tiles. `veil` is for a [data-cut] that
- * wears a veil (see section.ts): it fades up while its words, a `piece` composed with `words`
+ * wears a veil (see section.css.ts): it fades up while its words, a `piece` composed with `words`
  * inside it, glitch in. `islandPart` plays the glitch on the header island's parts once the page
  * is ready, staggered across the island, on the visit's first page only.
  */

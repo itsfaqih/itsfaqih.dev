@@ -196,7 +196,7 @@ export const styles = {
     display: "contents",
   }),
   // Focus lands on one only when Tab runs off either end of the open drawer; the client sends it
-  // back around, as Radix's focus scope did.
+  // back around, as a modal would.
   guard: style({
     position: "fixed",
     width: 1,
@@ -264,7 +264,7 @@ export const styles = {
       },
     },
   }),
-  // Vaul's drawer, which the native dialog's own box has to give way to.
+  // The drawer, over the native dialog's own box.
   drawer: style({
     // Fills the gap below the drawer while a drag pulls it past its resting place.
     position: "fixed",

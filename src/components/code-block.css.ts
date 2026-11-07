@@ -23,7 +23,7 @@ export const styles = {
       "--diffs-gap-block": "0.5rem",
       "--diffs-line-height": "1.625rem",
       "--diffs-font-family": fonts["--mono"],
-      "--diffs-header-font-family": fonts["--font-sans"],
+      "--diffs-header-font-family": fonts["--sans"],
       "--diffs-light-bg": palette["--card"],
       "--diffs-dark-bg": palette["--card"],
       "--diffs-foreground": palette["--text"],
