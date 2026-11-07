@@ -12,7 +12,8 @@ const HERO_GLOW_STRENGTH = 0.6;
 /**
  * The home hero (hero.astro). The slides advance on a timer once the intro hands off; the pips
  * jump, the button pauses. Each slide gets its full time again when picked, and a pause keeps
- * what was left of it.
+ * what was left of it. The hero also holds while it is off screen or the tab is hidden, without
+ * touching the button.
  */
 class HomeHero extends HTMLElement {
   #stop?: () => void;
@@ -35,6 +36,7 @@ class HomeHero extends HTMLElement {
     let lead = 0;
     let introDone = false;
     let pausedByUser: boolean | null = null;
+    let offScreen = false;
     let reduced = reducedMotion();
     let remaining = SLIDE_MS;
     let timer = 0;
@@ -44,9 +46,11 @@ class HomeHero extends HTMLElement {
     const barKeys = pips.map((_, at): string => (at === 0 ? "0" : "idle"));
 
     const userPaused = () => pausedByUser ?? reduced;
+    const held = () => userPaused() || offScreen || document.hidden;
 
     const render = () => {
-      const held = userPaused();
+      const paused = userPaused();
+      const still = held();
       const current = SLIDES[index]!;
       phrases.forEach((phrase, at) => {
         const on = at === index;
@@ -63,17 +67,17 @@ class HomeHero extends HTMLElement {
           barKeys[at] = key;
           pip.replaceChildren(document.createElement("i"));
         }
-        pip.firstElementChild!.className = barClass(on, held);
+        pip.firstElementChild!.className = barClass(on, still);
       });
-      pause.setAttribute("aria-label", held ? "Play" : "Pause");
-      playGlyph.className = glyphClass(!held);
-      pauseGlyph.className = glyphClass(held);
+      pause.setAttribute("aria-label", paused ? "Play" : "Pause");
+      playGlyph.className = glyphClass(!paused);
+      pauseGlyph.className = glyphClass(paused);
       bench.style.setProperty("--c", current.color);
       go.style.setProperty("--c", current.color);
       // Held until the intro hands off, so the light turns on where it's seen.
       if (introDone)
         glowDots("hero", prints, current.color, [0.3, 0.3, 0.7, 0.7], HERO_GLOW_STRENGTH);
-      prints.toggleAttribute("data-paused", !introDone || held);
+      prints.toggleAttribute("data-paused", !introDone || still);
       prints.show(index, run);
     };
 
@@ -84,7 +88,7 @@ class HomeHero extends HTMLElement {
         timer = 0;
         if (armedRun === run) remaining -= performance.now() - armedAt;
       }
-      if (!introDone || userPaused()) return;
+      if (!introDone || held()) return;
       armedRun = run;
       armedAt = performance.now();
       timer = window.setTimeout(() => {
@@ -103,10 +107,10 @@ class HomeHero extends HTMLElement {
     };
 
     const setHeld = (change: () => void) => {
-      const was = userPaused();
+      const was = held();
       change();
       render();
-      if (userPaused() !== was) sync();
+      if (held() !== was) sync();
     };
 
     pips.forEach((pip, at) => pip.addEventListener("click", () => pick(at), { signal }));
@@ -116,6 +120,11 @@ class HomeHero extends HTMLElement {
     const unwatch = watchMedia("(prefers-reduced-motion: reduce)", () =>
       setHeld(() => (reduced = reducedMotion())),
     );
+    const sight = new IntersectionObserver(([entry]) =>
+      setHeld(() => (offScreen = !entry!.isIntersecting)),
+    );
+    sight.observe(this);
+    document.addEventListener("visibilitychange", () => setHeld(() => {}), { signal });
 
     render();
     const requested = Number(new URLSearchParams(location.search).get("slide"));
@@ -130,6 +139,7 @@ class HomeHero extends HTMLElement {
       glowDots("hero", null);
       controller.abort();
       unwatch();
+      sight.disconnect();
       clearTimeout(timer);
     };
   }
