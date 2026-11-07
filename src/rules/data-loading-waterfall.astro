@@ -3,12 +3,11 @@ import { HINT } from "./hints";
 import { arcade } from "../components/arcade.css";
 import { AXIS, ORDERS, screenOf, SWEEP, type Waterfall } from "./data-loading";
 import { styles } from "./data-loading.css";
-import { view } from "./data-loading.view";
+import { pct, view } from "./data-loading.view";
 
 type Props = Waterfall;
 
 const { bars, paint } = Astro.props;
-const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 const clock = (ms: number) => `${(ms / AXIS) * SWEEP}ms`;
 const screen = screenOf(Astro.props);
 const deferred = bars.some((bar) => bar.kind === "defer");
@@ -38,7 +37,7 @@ const deferred = bars.some((bar) => bar.kind === "defer");
         class={view.paint("still")}
         style={`left:${pct(paint)};--at:${(paint / AXIS) * SWEEP}ms`}
         data-part="paint"
-        ><b class:list={[styles.paintTag, paint > AXIS * 0.6 && styles.paintTagEnd]}
+        ><b class={view.paintTag(paint)}
           ><span class={styles.long}>on screen </span>{paint}<!-- -->ms</b
         ></span
       ><span class={view.cover("still")} aria-hidden="true" data-part="cover"></span><span

@@ -1,12 +1,12 @@
 import { styles } from "./data-loading.css";
-import { HISTORY, money, type Payment, SPENT } from "./data-loading";
+import { CACHED, HISTORY, money, type Payment, SPENT } from "./data-loading";
 import { busy, Demo, el, spinner, write } from "./data-loading-demo";
 import { type Signal, view } from "./data-loading.view";
 
 /**
  * A wallet opened from its disk cache with no signal (data-loading-wallet.astro). Getting signal
  * takes 700ms and brings the laptop bought since. Without `data-careful` the cached balance jumps
- * from $2,140 to $310; with it the balance waits for the connection and the history is dated.
+ * to the live one; with it the balance waits for the connection and the history is dated.
  */
 class DataLoadingWallet extends Demo {
   #signal: Signal = "offline";
@@ -43,7 +43,7 @@ class DataLoadingWallet extends Demo {
           el(
             "b",
             view.balance(online, careful),
-            online ? money(310) : careful ? "Needs a connection" : money(2140),
+            online ? money(CACHED + SPENT.amount) : careful ? "Needs a connection" : money(CACHED),
           ),
         );
         const shown = online ? [SPENT, ...HISTORY].slice(0, 3) : HISTORY;

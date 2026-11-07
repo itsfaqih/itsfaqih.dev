@@ -3,9 +3,9 @@ import { HINT } from "./hints";
 import { arcade } from "../components/arcade.css";
 import type { Level } from "./lesson";
 import { marker } from "../when";
-import { AXIS, rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
+import { rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
-import { slideView } from "./data-loading.view";
+import { pct, slideView } from "./data-loading.view";
 
 // Quiz 2's board (data-loading-slide.client.ts): GET /invoices slides along a track with no clock
 // on it, marked where the code loads, and the rows' paint line follows it. Check sends the zone it's
@@ -16,7 +16,6 @@ const { level } = Astro.props;
 if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
 const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
 const labels = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.label]));
-const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 const start = SLIDE.from;
 const shown = rowsAt(start);
 const id = slideChoice(start);

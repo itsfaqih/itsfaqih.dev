@@ -1,11 +1,12 @@
 import { styles } from "./data-loading.css";
-import { inboxRows, SPIN_DELAY } from "./data-loading";
+import { INBOX, inboxRows, replyIn, SPIN_DELAY } from "./data-loading";
 import { busy, Demo, el, write } from "./data-loading-demo";
 import { view } from "./data-loading.view";
 
 /**
- * An inbox (data-loading-inbox.astro) whose server replies in 80ms or 1.2s. The skeleton shows at
- * once, or with `data-delay` only once the reply has taken 200ms; each reply brings a new message.
+ * An inbox (data-loading-inbox.astro) whose server replies fast or slow. The skeleton shows at
+ * once, or with `data-delay` only once the reply has taken `SPIN_DELAY`; each reply brings a new
+ * message.
  */
 class DataLoadingInbox extends Demo {
   #waiting = false;
@@ -57,12 +58,12 @@ class DataLoadingInbox extends Demo {
 
     const load = (ms: number) => {
       const shownFor = delay ? Math.max(0, ms - SPIN_DELAY) : ms;
-      const reply = ms < 1000 ? `${ms}ms` : `${ms / 1000}s`;
+      const reply = replyIn(ms);
       const next =
         shownFor === 0
           ? `Reply in ${reply}. No skeleton.`
           : delay
-            ? `Reply in ${reply}. Skeleton from 200ms, for ${shownFor}ms.`
+            ? `Reply in ${reply}. Skeleton from ${SPIN_DELAY}ms, for ${shownFor}ms.`
             : `Reply in ${reply}. Skeleton flashed for ${shownFor}ms.`;
       this.#waiting = true;
       this.#skeleton = !delay;
@@ -93,8 +94,8 @@ class DataLoadingInbox extends Demo {
       ]);
     };
 
-    this.onPress(buttons[0]!, () => load(80), signal);
-    this.onPress(buttons[1]!, () => load(1200), signal);
+    this.onPress(buttons[0]!, () => load(INBOX.fast), signal);
+    this.onPress(buttons[1]!, () => load(INBOX.slow), signal);
   }
 }
 

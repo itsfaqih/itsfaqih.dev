@@ -873,11 +873,6 @@ export const quiz = {
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
   }),
-  miniFigure: style({
-    height: "46px",
-    borderRadius: "6px",
-    backgroundColor: `color-mix(in srgb, var(--c) 22%, ${palette["--panel-2"]})`,
-  }),
   miniActs: style({
     display: "flex",
     gap: "6px",
@@ -897,10 +892,6 @@ export const quiz = {
         color: "var(--on-c)",
       },
     },
-  }),
-  miniPlain: style({
-    backgroundColor: "transparent",
-    color: palette["--text"],
   }),
   click: style({
     position: "absolute",

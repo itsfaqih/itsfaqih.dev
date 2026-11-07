@@ -2,7 +2,7 @@ import type { Lesson, Tldr } from "./lesson";
 
 export const money = (value: number) => `$${value.toLocaleString("en-US")}`;
 
-export type Bar = {
+type Bar = {
   label: string;
   from: number;
   to: number;
@@ -101,7 +101,7 @@ export function skeletonSays(load: Load, at: number) {
 }
 
 /** Where a page renders: on the server, or in the browser after its code loads. */
-export type RenderAt = "server" | "browser";
+type RenderAt = "server" | "browser";
 
 export const LAMP = { path: "/lamp", title: "Desk lamp", price: "$48", stock: "In stock" } as const;
 
@@ -145,7 +145,7 @@ export const RENDERS: Record<
 
 export const REVENUE = [48210, 49875, 47930, 51402];
 
-export const MAIL = [
+const MAIL = [
   ["Rina", "Invoice #2041 is paid"],
   ["Deploy bot", "main is green again"],
   ["Sam", "Notes from Tuesday"],
@@ -158,6 +158,11 @@ export const inboxRows = (top: number) =>
   [0, 1, 2].map((offset) => MAIL[(top + offset) % MAIL.length] ?? MAIL[0]);
 
 export const SPIN_DELAY = 200;
+
+/** How fast the inbox demo's server replies: once before `SPIN_DELAY`, once after it. */
+export const INBOX = { fast: 80, slow: 1200 } as const;
+
+export const replyIn = (ms: number) => (ms < 1000 ? `${ms}ms` : `${ms / 1000}s`);
 
 /**
  * What the debounce demo types into search, key by key: when each key lands, how long the server
@@ -189,7 +194,7 @@ export const CHAIR = [
 export const queryOf = (typing: Typing) => typing.map(({ key }) => key).join("");
 export const QUERY = queryOf(TYPING);
 
-export const DEBOUNCE = 300;
+const DEBOUNCE = 300;
 
 /** What became of a search request: still out, canceled, shown last, or shown and then replaced. */
 export type Fate = "flight" | "canceled" | "shown" | "replaced";
@@ -254,7 +259,7 @@ export const TEAM = [
 export const RESPONSE = '{ "id": 1, "name": "Alice" }';
 
 type Profile = { id: number; name: string; city: string };
-export type Outcome = { ok: true; user: Profile } | { ok: false; error: string };
+type Outcome = { ok: true; user: Profile } | { ok: false; error: string };
 
 const describe = (cause: unknown) =>
   cause instanceof Error ? `${cause.name}: ${cause.message}` : "Error: unknown";
@@ -269,21 +274,17 @@ export function trustJson(body: string): Outcome {
   }
 }
 
-type ProfileResponse = { id: number; name: string; city?: string };
-
-const parseProfile = (response: ProfileResponse): Profile => ({
-  ...response,
-  city: response.city ?? "Unknown",
-});
-
-export function parseJson(body: string): Outcome {
-  const user = parseProfile(JSON.parse(body));
-  return { ok: true, user: { ...user, city: user.city.toUpperCase() } };
+/** The ✓ side's `User.parse`, which gives a missing city its fallback. */
+export function withCityFallback(body: string): Outcome {
+  const { city = "Unknown", ...user }: Omit<Profile, "city"> & { city?: string } = JSON.parse(body);
+  return { ok: true, user: { ...user, city: city.toUpperCase() } };
 }
 
 export type Payment = { label: string; amount: number };
 
 export const SPENT: Payment = { label: "Laptop", amount: -1830 };
+/** The wallet's balance as the disk cache kept it, from before the laptop. */
+export const CACHED = 2140;
 export const HISTORY: Payment[] = [
   { label: "Salary", amount: 2400 },
   { label: "Groceries", amount: -62 },
@@ -324,8 +325,8 @@ export const LESSONS: Lesson[] = [
   },
   {
     title: "Start fetching early",
-    bad: { label: "Fetch on render", costs: ["data at 840ms", "1 waterfall"] },
-    good: { label: "Fetch on navigation", costs: ["data at 520ms", "0 waterfalls"] },
+    bad: { label: "Fetch on render", costs: [`data at ${LATE.paint}ms`, "1 waterfall"] },
+    good: { label: "Fetch on navigation", costs: [`data at ${EARLY.paint}ms`, "0 waterfalls"] },
     levels: [
       {
         name: "Twelve invoices",
@@ -380,8 +381,8 @@ export const LESSONS: Lesson[] = [
   },
   {
     title: "Avoid skeleton flickers",
-    bad: { label: "At once", costs: ["flashes 80ms"] },
-    good: { label: "Wait 200ms", costs: ["0 flashes"] },
+    bad: { label: "At once", costs: [`flashes ${INBOX.fast}ms`] },
+    good: { label: `Wait ${SPIN_DELAY}ms`, costs: ["0 flashes"] },
     levels: [
       {
         name: "As you type",
@@ -409,7 +410,7 @@ export const LESSONS: Lesson[] = [
   {
     title: "Debounce search input",
     bad: { label: "Every keystroke", costs: ["4 requests", "stale results win"] },
-    good: { label: "Wait 300ms", costs: ["2 sent, 1 canceled", "right results"] },
+    good: { label: `Wait ${DEBOUNCE}ms`, costs: ["2 sent, 1 canceled", "right results"] },
     levels: [
       {
         name: "Typing chair",
@@ -492,7 +493,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     title: "Persist what can't mislead",
-    bad: { label: "Persist all", costs: ["$1,830 off", "no date"] },
+    bad: { label: "Persist all", costs: [`${money(-SPENT.amount)} off`, "no date"] },
     good: { label: "Persist history only", costs: ["balance always live", "history dated"] },
     levels: [
       {

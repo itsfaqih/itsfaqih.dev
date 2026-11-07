@@ -1,6 +1,6 @@
 ---
 import { HINT } from "./hints";
-import { HISTORY, money } from "./data-loading";
+import { CACHED, HISTORY, money } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -20,7 +20,7 @@ const { careful = false } = Astro.props;
       ></div
     ><div class={styles.balance} data-part="balance"
       ><span class={styles.balanceLabel}>Balance</span><b
-        class={view.balance(false, careful)}>{careful ? "Needs a connection" : money(2140)}</b
+        class={view.balance(false, careful)}>{careful ? "Needs a connection" : money(CACHED)}</b
       ></div
     ><div class={styles.hist}
       ><div class={styles.histHead}

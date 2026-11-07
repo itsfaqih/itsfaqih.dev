@@ -1,6 +1,6 @@
 ---
 import { HINT } from "./hints";
-import { parseJson, RESPONSE, trustJson } from "./data-loading";
+import { RESPONSE, trustJson, withCityFallback } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -10,7 +10,7 @@ type Props = {
 };
 
 const { parse = false } = Astro.props;
-const outcome = parse ? parseJson(RESPONSE) : trustJson(RESPONSE);
+const outcome = parse ? withCityFallback(RESPONSE) : trustJson(RESPONSE);
 ---
 
 <data-loading-parse class={styles.view}

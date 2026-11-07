@@ -8,6 +8,7 @@ import {
   skeletonChoice,
   skeletonSays,
 } from "./data-loading";
+import { Demo, slider } from "./data-loading-demo";
 import { skeletonView } from "./data-loading.view";
 
 type Choice = ReturnType<typeof skeletonChoice>;
@@ -22,34 +23,17 @@ const TRACK_MS = 3000;
 
 const isLoad = (value: string | undefined): value is Load => value === "fast" || value === "slow";
 
-const KEY_STEPS = new Map([
-  ["ArrowLeft", -STEP],
-  ["ArrowDown", -STEP],
-  ["ArrowRight", STEP],
-  ["ArrowUp", STEP],
-  ["PageDown", -BIG_STEP],
-  ["PageUp", BIG_STEP],
-  ["Home", -1],
-  ["End", 1],
-]);
-
 /**
  * Quiz 4's board (data-loading-skeleton.astro). Dragging the skeleton marker, or its arrow keys,
  * moves when the skeleton shows; letting go, switching the load, or Replay plays that load past the
- * preview. Check carries the answer the marker's zone is. The quiz locks Check once cleared, and the
- * marker locks with it.
+ * preview. Check carries the answer the marker's zone is.
  */
-class DataLoadingSkeleton extends HTMLElement {
-  #stop?: () => void;
-
-  connectedCallback() {
-    const controller = new AbortController();
-    const { signal } = controller;
-    const part = (name: string) => this.querySelector<HTMLElement>(`[data-part="${name}"]`)!;
-    const track = part("track");
-    const handle = part("handle");
-    const head = part("head");
-    const said = part("said");
+class DataLoadingSkeleton extends Demo {
+  protected setup(signal: AbortSignal) {
+    const track = this.query("track");
+    const handle = this.query("handle");
+    const head = this.query("head");
+    const said = this.query("said");
     const matches = [...this.querySelectorAll<HTMLElement>('[data-part="match"]')];
     const keys = [...this.querySelectorAll<HTMLButtonElement>("[data-load]")];
     const check = this.querySelector<HTMLButtonElement>('[data-look="check"]')!;
@@ -60,7 +44,6 @@ class DataLoadingSkeleton extends HTMLElement {
     let load: Load = "fast";
     let shown: Shown = "data";
     let frame = 0;
-    const locked = () => check.disabled;
 
     const show = (next: Shown) => {
       if (next === shown) return;
@@ -111,61 +94,21 @@ class DataLoadingSkeleton extends HTMLElement {
       check.dataset.note = notes[id];
     };
 
-    // Grabbing the marker keeps the point under the finger; pressing the lane beside it moves the
-    // marker's edge there first. Its reach is the lane less the marker, as the styles place it.
-    let grab: { x: number; from: number } | null = null;
-    const reach = () => track.clientWidth - handle.offsetWidth;
-    const atX = (x: number) => (x - track.getBoundingClientRect().left) / reach();
-    track.addEventListener(
-      "pointerdown",
-      (event) => {
-        if (locked() || event.button !== 0) return;
-        event.preventDefault();
-        track.setPointerCapture(event.pointerId);
-        handle.focus({ preventScroll: true });
-        halt();
-        play("lift");
-        if (!(event.target instanceof Node && handle.contains(event.target)))
-          set(atX(event.clientX));
-        grab = { x: event.clientX, from: at };
-        this.toggleAttribute("data-dragging", true);
+    // The marker's reach is the lane less the marker, as the styles place it.
+    slider(
+      {
+        board: this,
+        track,
+        handle,
+        check,
+        at: () => at,
+        set,
+        scale: (px) => px / (track.clientWidth - handle.offsetWidth),
+        keys: [STEP, BIG_STEP, 1],
+        hold: halt,
+        settle: run,
       },
-      { signal },
-    );
-    track.addEventListener(
-      "pointermove",
-      (event) => {
-        if (grab) set(grab.from + (event.clientX - grab.x) / reach());
-      },
-      { signal },
-    );
-    const release = (event: PointerEvent) => {
-      if (!grab) return;
-      grab = null;
-      this.removeAttribute("data-dragging");
-      play("place");
-      if (event.type === "pointerup") run();
-    };
-    track.addEventListener("pointerup", release, { signal });
-    track.addEventListener("pointercancel", release, { signal });
-
-    handle.addEventListener(
-      "keydown",
-      (event) => {
-        const step = KEY_STEPS.get(event.key);
-        if (step === undefined || locked()) return;
-        event.preventDefault();
-        halt();
-        set(at + step);
-      },
-      { signal },
-    );
-    handle.addEventListener(
-      "keyup",
-      (event) => {
-        if (KEY_STEPS.has(event.key) && !locked()) run();
-      },
-      { signal },
+      signal,
     );
 
     for (const key of keys)
@@ -185,25 +128,8 @@ class DataLoadingSkeleton extends HTMLElement {
         },
         { signal },
       );
-    part("replay").addEventListener("click", run, { signal });
-
-    // The quiz disables Check once it's cleared; the marker takes the same lock.
-    const lock = new MutationObserver(() => {
-      if (!locked()) return;
-      handle.setAttribute("aria-disabled", "true");
-      this.toggleAttribute("data-locked", true);
-    });
-    lock.observe(check, { attributes: true, attributeFilter: ["disabled"] });
-
-    this.#stop = () => {
-      controller.abort();
-      lock.disconnect();
-      halt();
-    };
-  }
-
-  disconnectedCallback() {
-    this.#stop?.();
+    this.query("replay").addEventListener("click", run, { signal });
+    signal.addEventListener("abort", halt);
   }
 }
 
