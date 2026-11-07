@@ -36,6 +36,97 @@ async function open(route: string, viewport = { width: 1440, height: 900 }) {
   return page;
 }
 
+/**
+ * Hovers and presses each control `selector` finds that moves on hover or press, 1px inside its top
+ * and bottom edges. Returns how many moved and each edge where the pointer slipped off.
+ */
+async function edgeSlips(page: Page, selector: string) {
+  // Instant moves make a slip show within a frame, and a press never follows a link.
+  await page.addStyleTag({ content: "*, *::before, *::after { transition: none !important; }" });
+  await page.evaluate(() => {
+    const swallow = (event: Event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    };
+    for (const type of ["click", "dragstart"]) addEventListener(type, swallow, true);
+  });
+  // Samples every frame for a span of time rather than a count of frames, so a loaded machine
+  // checks just as long.
+  const holds = (target: Locator, state: string, span = 200) =>
+    target.evaluate(
+      (node, { state, span }) =>
+        new Promise<boolean>((done) => {
+          const start = performance.now();
+          let frames = 0;
+          let held = true;
+          const tick = (now: number) => {
+            held &&= node.matches(state);
+            if (++frames < 2 || now - start < span) requestAnimationFrame(tick);
+            else done(held);
+          };
+          requestAnimationFrame(tick);
+        }),
+      { state, span },
+    );
+  const owns = (target: Locator, x: number, y: number) =>
+    target.evaluate((node, { x, y }) => node.contains(document.elementFromPoint(x, y)), { x, y });
+  // A cut-in waits out its stagger standing still, then glitches sideways, so a still box is not
+  // yet at rest. Rest is once the one-shot animations on the control and its ancestors end.
+  const settled = async (target: Locator) => {
+    await target.evaluate(async (node) => {
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+      await Promise.all(
+        document
+          .getAnimations()
+          .filter(
+            (animation) =>
+              animation.playState === "running" &&
+              animation.effect?.getComputedTiming().iterations !== Infinity &&
+              animation.effect instanceof KeyframeEffect &&
+              (animation.effect.target?.contains(node) ?? false),
+          )
+          .map((animation) => animation.finished.catch(() => undefined)),
+      );
+    });
+    return target.boundingBox();
+  };
+
+  const slips: string[] = [];
+  let movers = 0;
+  for (const target of await page.locator(selector).all()) {
+    if (!(await target.isVisible())) continue;
+    await target.scrollIntoViewIfNeeded();
+    await page.mouse.move(1, 1);
+    const rest = await settled(target);
+    if (!rest || rest.height < 12) continue;
+    const x = rest.x + rest.width / 2;
+    if (!(await owns(target, x, rest.y + rest.height / 2))) continue;
+    await page.mouse.move(x, rest.y + rest.height / 2);
+    await holds(target, "*", 0);
+    const hovered = (await target.boundingBox())!;
+    await page.mouse.down();
+    await holds(target, "*", 0);
+    const pressed = (await target.boundingBox())!;
+    await page.mouse.up();
+    if (Math.abs(hovered.y - rest.y) < 1 && Math.abs(pressed.y - rest.y) < 1) continue;
+    movers++;
+    const name = (await target.innerText()).trim().split("\n")[0];
+    for (const [edge, y] of [
+      ["top", rest.y + 1],
+      ["bottom", rest.y + rest.height - 1],
+    ] as const) {
+      await page.mouse.move(1, 1);
+      if (!(await owns(target, x, y))) continue;
+      await page.mouse.move(x, y);
+      if (!(await holds(target, ":hover"))) slips.push(`"${name}" hovered at its ${edge}`);
+      await page.mouse.down();
+      if (!(await holds(target, ":hover:active"))) slips.push(`"${name}" pressed at its ${edge}`);
+      await page.mouse.up();
+    }
+  }
+  return { movers, slips };
+}
+
 // pagereveal can fire after load, so the transition's type is polled for.
 const transitionType = (page: Page) => page.evaluate(() => document.documentElement.dataset.vt);
 
@@ -171,93 +262,26 @@ describe("the built site responds to a reader", () => {
   });
 
   it("keeps a control that moves on hover or press under a pointer at its edge", async () => {
-    const page = await open("/");
-    // Instant moves make a slip show within a frame, and a press never follows a link.
-    await page.addStyleTag({ content: "*, *::before, *::after { transition: none !important; }" });
-    await page.evaluate(() => {
-      const swallow = (event: Event) => {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      };
-      for (const type of ["click", "dragstart"]) addEventListener(type, swallow, true);
-    });
-    // Samples every frame for a span of time rather than a count of frames, so a loaded machine
-    // checks just as long.
-    const holds = (target: Locator, state: string, span = 200) =>
-      target.evaluate(
-        (node, { state, span }) =>
-          new Promise<boolean>((done) => {
-            const start = performance.now();
-            let frames = 0;
-            let held = true;
-            const tick = (now: number) => {
-              held &&= node.matches(state);
-              if (++frames < 2 || now - start < span) requestAnimationFrame(tick);
-              else done(held);
-            };
-            requestAnimationFrame(tick);
-          }),
-        { state, span },
-      );
-    const owns = (target: Locator, x: number, y: number) =>
-      target.evaluate((node, { x, y }) => node.contains(document.elementFromPoint(x, y)), { x, y });
-    // A cut-in waits out its stagger standing still, then glitches sideways, so a still box is not
-    // yet at rest. Rest is once the one-shot animations on the control and its ancestors end.
-    const settled = async (target: Locator) => {
-      await target.evaluate(async (node) => {
-        await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
-        await Promise.all(
-          document
-            .getAnimations()
-            .filter(
-              (animation) =>
-                animation.playState === "running" &&
-                animation.effect?.getComputedTiming().iterations !== Infinity &&
-                animation.effect instanceof KeyframeEffect &&
-                (animation.effect.target?.contains(node) ?? false),
-            )
-            .map((animation) => animation.finished.catch(() => undefined)),
-        );
-      });
-      return target.boundingBox();
-    };
-
-    const slips: string[] = [];
-    let movers = 0;
-    for (const target of await page.locator("header a, header button, main a, main button").all()) {
-      if (!(await target.isVisible())) continue;
-      await target.scrollIntoViewIfNeeded();
-      await page.mouse.move(1, 1);
-      const rest = await settled(target);
-      if (!rest || rest.height < 12) continue;
-      const x = rest.x + rest.width / 2;
-      if (!(await owns(target, x, rest.y + rest.height / 2))) continue;
-      await page.mouse.move(x, rest.y + rest.height / 2);
-      await holds(target, "*", 0);
-      const hovered = (await target.boundingBox())!;
-      await page.mouse.down();
-      await holds(target, "*", 0);
-      const pressed = (await target.boundingBox())!;
-      await page.mouse.up();
-      if (Math.abs(hovered.y - rest.y) < 1 && Math.abs(pressed.y - rest.y) < 1) continue;
-      movers++;
-      const name = (await target.innerText()).trim().split("\n")[0];
-      for (const [edge, y] of [
-        ["top", rest.y + 1],
-        ["bottom", rest.y + rest.height - 1],
-      ] as const) {
-        await page.mouse.move(1, 1);
-        if (!(await owns(target, x, y))) continue;
-        await page.mouse.move(x, y);
-        if (!(await holds(target, ":hover"))) slips.push(`"${name}" hovered at its ${edge}`);
-        await page.mouse.down();
-        if (!(await holds(target, ":hover:active"))) slips.push(`"${name}" pressed at its ${edge}`);
-        await page.mouse.up();
-      }
-    }
+    const { movers, slips } = await edgeSlips(
+      await open("/"),
+      "header a, header button, main a, main button",
+    );
     expect(movers, "controls that move on hover or press").toBeGreaterThan(0);
     expect(slips).toEqual([]);
   }, 120_000);
+
+  // Rule-page demos animate on their own, so only their moving keys are driven here.
+  it.each([
+    ["/rule-of-thumb/table-design", 'table-states [data-part="act"]'],
+    [
+      "/rule-of-thumb/null-vs-undefined",
+      'null-flow [data-part="remove"], null-flow [data-part="save"]',
+    ],
+  ])("keeps the moving demo keys on %s under a pointer at their edge", async (route, selector) => {
+    const { movers, slips } = await edgeSlips(await open(route), selector);
+    expect(movers, "controls that move on hover or press").toBeGreaterThan(0);
+    expect(slips).toEqual([]);
+  });
 
   it("filters the home stack and opens an experience entry", async () => {
     const page = await open("/");

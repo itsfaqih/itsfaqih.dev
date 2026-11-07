@@ -132,7 +132,9 @@ pass nothing and get `--rows:0`.
   dip) takes `hoverHold.lift`, whose `::before` reaches 8px past it above and below while it is
   hovered. Without it, a pointer resting on an edge slips off as the control moves, so the hover
   flickers or the click misses. Every `button.base` key has it already. The visual suite hovers
-  and presses each moving control on home 1px inside its top and bottom edges.
+  and presses each moving control on home 1px inside its top and bottom edges, and on a rule page
+  the demo keys `interactions.test.ts` names. A demo that animates on its own cannot be swept, so a
+  new moving demo key joins that list.
 - **`costsClass`** is a `RuleLesson` prop, applied last to the cost row.
 
 ## Quiz rules
