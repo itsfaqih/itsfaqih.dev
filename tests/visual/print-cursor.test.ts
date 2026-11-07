@@ -1,6 +1,6 @@
 import { chromium, type Browser } from "playwright";
 import { afterAll, beforeAll, expect, inject, it } from "vite-plus/test";
-import { pageReady } from "./ready";
+import { pageReady } from "../ready";
 
 // The print cursor draws the glyph each element's own cursor token names, read from that token's
 // url fragment (arcade.css), with no image file to fetch.
