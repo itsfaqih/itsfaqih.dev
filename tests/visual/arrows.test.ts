@@ -62,7 +62,7 @@ const SOMETIMES = `${OFF_CENTRE}${ONLY_SOME}`;
 const SLOTS_SOMETIMES = `${SLOTS}${ONLY_SOME}`;
 const PARKED = {
   "button-design": {
-    [SOMETIMES]: ["desktop aim Keep a disabled button still on hover ✕ → Back (hint)"],
+    [SOMETIMES]: ["both aim Keep a disabled button still on hover ✕ → Back (hint)"],
     [SQUINT_BOX]: [
       "both aim squint → Cancel",
       "both aim squint → Publish",
