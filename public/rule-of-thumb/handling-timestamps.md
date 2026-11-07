@@ -1,3 +1,8 @@
+---
+name: handling-timestamps
+description: Store and send UTC. Turn it local only on the reader's screen. Use when you store, send, show or filter by a date and time.
+---
+
 # Handling Timestamps
 
 Store and send UTC. Turn it local only on the reader's screen.
@@ -60,7 +65,7 @@ const body = { at }; // POST /reminders
 
 ## Filter by the user's day
 
-Send the user's day as a UTC range that starts at their local midnight. Rina's Jan 10 starts at 17:00 UTC on Jan 9. A bare midnight runs the query from 07:00 to 07:00 her time, so orders before 07:00 go missing and the next morning's show up.
+Send the user's day as a UTC range that starts at their local midnight. Rina's Jan 10 starts at 17:00 UTC on Jan 9. A bare midnight runs the query from 07:00 to 07:00 her time. Orders before 07:00 go missing, and the next morning's show up.
 
 ```ts
 // in Rina's browser (UTC+7)

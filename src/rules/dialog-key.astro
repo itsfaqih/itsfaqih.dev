@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { styles } from "./dialog-design.css";
 
 type Props = { part: string; hint?: boolean };
@@ -6,4 +7,4 @@ type Props = { part: string; hint?: boolean };
 const { part, hint = false } = Astro.props;
 ---
 
-<button type="button" data-hint={hint ? "true" : undefined} class={styles.key} data-part={part}><slot /></button>
+<button type="button" data-hint={hint ? HINT.press : undefined} class={styles.key} data-part={part}><slot /></button>

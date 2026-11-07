@@ -1,3 +1,8 @@
+---
+name: dialog-design
+description: Hold focus in a dialog, let Escape close it, and keep what people typed. Use when you build or review a modal dialog or a confirm prompt.
+---
+
 # Dialog Design
 
 Hold focus in a dialog, let Escape close it, and keep what people typed.
@@ -64,7 +69,7 @@ function requestClose(reason: "outside" | "escape" | "close-button") {
 
 ## Lock the page behind
 
-Stop the page under the dialog from scrolling, so it stays still. Keep the scrollbar's space so nothing shifts when the scrollbar hides.
+Stop the page under the dialog from scrolling, so people keep their place. Keep the scrollbar's space so nothing shifts when the scrollbar hides.
 
 ```css
 html {

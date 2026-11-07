@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import DialogBox from "./dialog-box.astro";
 import DialogClose from "./dialog-close.astro";
 import { articleView } from "./dialog-design.view";
@@ -15,7 +16,7 @@ const { sealed = false } = Astro.props;
 <dialog-scroll class={host.contents} data-sealed={sealed ? "" : undefined}>
   <DialogWindow>
     <div slot="page" class={articleView(false)} data-part="page">
-      <div class={styles.spread}><b class={styles.strong}>Why we moved to Postgres</b><button data-hint="true" type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>Share</button></div>
+      <div class={styles.spread}><b class={styles.strong}>Why we moved to Postgres</b><button data-hint={HINT.open} type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>Share</button></div>
       {
         [0, 1, 2, 3, 4, 5].map((block) => (
           <div class={styles.para}>{block % 3 === 1 && <span class={styles.figure}></span>}{[96, 88, 92, 60].map((width) => <span style={`--w:${width - (block % 3) * 4}%`} class={styles.ghost}></span>)}</div>

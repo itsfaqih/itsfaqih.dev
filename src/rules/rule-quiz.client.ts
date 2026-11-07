@@ -1,5 +1,7 @@
 import { reducedMotion } from "../hooks/media-query";
 import { play } from "../hooks/sound";
+import { mountHints } from "./hint-layer";
+import { HINT } from "./hints";
 import { OUT } from "./rule-landing.css";
 import { quizView, SNAP } from "./rule-landing.view";
 
@@ -19,7 +21,7 @@ class RuleQuiz extends HTMLElement {
     const answer = this.dataset.answer!;
     const name = this.dataset.piece;
     const board = this.dataset.board;
-    const hint = this.dataset.hint!;
+    const hint = this.dataset.ask!;
     const piece = this.querySelector<HTMLButtonElement>('[data-part="piece"]');
     const say = part("say");
     const note = this.querySelector('[data-part="note"]');
@@ -122,6 +124,7 @@ class RuleQuiz extends HTMLElement {
           `${name}. ${picked ? `Picked up. Choose a spot in the ${board}.` : "Pick up"}`,
         );
       }
+      // The note starts empty, so the arrow's label has room beside the piece until the first touch.
       note!.textContent = cleared
         ? "In its place."
         : picked
@@ -295,7 +298,25 @@ class RuleQuiz extends HTMLElement {
       );
     }
 
-    this.#stop = () => controller.abort();
+    // The arrow points at what the reader acts on first: a board's own pick, else the piece to
+    // drag, else every choice together, ringed from the box that holds them all.
+    if (!article.querySelector("[data-hint]")) {
+      if (piece) piece.dataset.hint = HINT.drag;
+      else {
+        const choices = [...slots.values()];
+        const holdsAll = (box: Element) => choices.every((choice) => box.contains(choice));
+        let all = choices[0]?.parentElement;
+        while (all && !holdsAll(all)) all = all.parentElement;
+        for (const choice of choices) choice.toggleAttribute("data-hint-cover", true);
+        if (all) all.dataset.hint = HINT.pick;
+      }
+    }
+    const hints = mountHints(article, true);
+
+    this.#stop = () => {
+      controller.abort();
+      hints.stop();
+    };
   }
 
   disconnectedCallback() {

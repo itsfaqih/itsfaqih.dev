@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -15,7 +16,7 @@ const flash = keyframes({
 const typeIn = keyframes({
   from: { opacity: 0, transform: "translate(-8px)" },
 });
-const drop = keyframes({
+const fall = keyframes({
   from: { opacity: 1, transform: "translateY(-14px)" },
   "70%": { opacity: 1 },
   to: { opacity: 0, transform: "translateY(16px)" },
@@ -120,6 +121,8 @@ export const styles = {
     },
   }),
   hot: style({
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     selectors: {
       [`&${when.ancestor('[data-side="bad"]')}`]: {
         backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
@@ -256,7 +259,7 @@ export const styles = {
     paddingLeft: "12px",
     borderRadius: "999px",
     backgroundColor: palette["--soft-key"],
-    boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
+    boxShadow: drop(2, palette["--soft-key-drop"]),
     fontWeight: 600,
     fontSize: "14px",
     lineHeight: "normal",
@@ -380,7 +383,7 @@ export const styles = {
   dropping: style({
     "@media": {
       [MOTION]: {
-        animationName: drop,
+        animationName: fall,
         animationDuration: "260ms",
         animationTimingFunction: motion["--out"],
         animationDelay: "180ms",
@@ -638,7 +641,7 @@ export const styles = {
   pickKeyOn: style({
     backgroundColor: "var(--c)",
     backgroundPosition: "initial",
-    boxShadow: "0 3px 0 var(--key-c)",
+    boxShadow: drop(3, "var(--key-c)"),
     color: "var(--on-c)",
   }),
   pickFoot: style({
@@ -653,16 +656,16 @@ export const styles = {
     fontSize: "12px",
     fontFamily: fonts["--mono"],
     color: palette["--dim"],
+    selectors: {
+      "&[data-missed]": {
+        color: palette["--no-ink"],
+      },
+    },
   }),
   // The quiz sets data-state on Check: missed shakes it, seated wears the tick.
   pickCheck: style({
     position: "relative",
     marginLeft: "auto",
-    selectors: {
-      '&[aria-disabled="true"]': {
-        opacity: 0.55,
-      },
-    },
     "@media": {
       [MOTION]: {
         selectors: {

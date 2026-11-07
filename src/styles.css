@@ -58,6 +58,15 @@
   }
 }
 
+/* Global: no class reaches every control. A disabled key lies flat. Every hard drop is drawn by
+   drop() (src/bevel.ts) as a multiple of --bevel, which a disabled control sets to 0. Layered so a
+   component can keep a disabled key raised on purpose. */
+@layer base {
+  :is(:disabled, [aria-disabled="true"]) {
+    --bevel: 0;
+  }
+}
+
 /* Global: Tailwind's preflight, the element defaults every page was laid out against, which no
    class can reach. Layered so that any unlayered rule wins. */
 @layer base {

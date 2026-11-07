@@ -5,13 +5,12 @@ import {
   DEMOS,
   TITLE,
   verdictOf,
+  wentWrong,
   type Phase,
   type Row,
   type Way,
 } from "./null-vs-undefined";
 import { flowView, KINDS, paint } from "./null-vs-undefined.view";
-import { TABBED } from "./rule-landing.css";
-import { onceOnScreen } from "./rule-motion";
 
 const SEND_MS = 460;
 
@@ -44,32 +43,32 @@ class NullFlow extends HTMLElement {
     const clear = this.dataset.demo === "clear";
     const demo = clear ? DEMOS.clear : DEMOS.rename;
     const way: Way = this.dataset.way === "bad" ? "bad" : "good";
-    const flow = part("flow");
     const form = part("form");
     let wire = part("wire");
     let record = part("record");
 
-    let phase: Phase = "done";
+    let phase: Phase = "idle";
     let runs = 0;
     let title = TITLE;
-    let touched = false;
     let timer = 0;
     let wireKey = "w0";
-    let recordKey = "r0";
+    let recordKey = "before";
     let json = "";
+    // The clear demo swaps the reviewer chip for "None" once sent, and puts the same chip back on Reset.
+    const chip = clear ? form.children[1]! : null;
+    const none = clear
+      ? document.importNode(part<HTMLTemplateElement>("none").content.firstElementChild!, true)
+      : null;
 
     const syncForm = () => {
       const reset = part<HTMLButtonElement>("reset");
       // aria-disabled, not disabled: pressing it disables it, and a disabled button drops focus.
       const fresh = phase === "idle" && (clear || title === TITLE);
       reset.setAttribute("aria-disabled", String(phase === "sent" || fresh));
-      if (clear) {
-        const shown = form.firstElementChild!.nextElementSibling!;
-        const cleared = phase !== "idle";
-        if (cleared === (shown.querySelector('[data-part="remove"]') !== null)) {
-          const fill = part<HTMLTemplateElement>(cleared ? "none" : "chip").content.firstElementChild!;
-          shown.replaceWith(document.importNode(fill, true));
-        }
+      if (chip && none) {
+        const want = phase === "idle" ? chip : none;
+        const shown = form.children[1]!;
+        if (shown !== want) shown.replaceWith(want);
         return;
       }
       part<HTMLButtonElement>("save").disabled = phase === "sent";
@@ -122,7 +121,7 @@ class NullFlow extends HTMLElement {
       demo.fields.forEach((field, index) => {
         const verdict =
           phase === "done" ? verdictOf(field, demo.before, after, demo.intent(title)) : undefined;
-        const bad = verdict === "wiped" || verdict === "lost";
+        const bad = verdict !== undefined && wentWrong(verdict);
         const value = row[field];
         const cell = el("div", flowView.cell(verdict, ran));
         cell.style.setProperty("--i", String(index));
@@ -158,7 +157,6 @@ class NullFlow extends HTMLElement {
       sync();
     };
     const rewind = () => {
-      touched = true;
       clearTimeout(timer);
       phase = "idle";
       sync();
@@ -170,7 +168,6 @@ class NullFlow extends HTMLElement {
         const target = event.target instanceof Element ? event.target.closest("button") : null;
         const name = target?.dataset.part;
         if (name !== "remove" && name !== "save") return;
-        touched = true;
         send();
       },
       { signal },
@@ -200,29 +197,8 @@ class NullFlow extends HTMLElement {
       { signal },
     );
 
-    let stopRewind = () => {};
-    if (
-      !reducedMotion() &&
-      !matchMedia(TABBED).matches &&
-      flow.getBoundingClientRect().top >= innerHeight * 0.7
-    ) {
-      phase = "idle";
-      sync();
-      let wait = 0;
-      const stop = onceOnScreen(flow, () => {
-        wait = window.setTimeout(() => {
-          if (!touched) send();
-        }, 500);
-      });
-      stopRewind = () => {
-        stop();
-        clearTimeout(wait);
-      };
-    }
-
     this.#stop = () => {
       controller.abort();
-      stopRewind();
       clearTimeout(timer);
     };
   }

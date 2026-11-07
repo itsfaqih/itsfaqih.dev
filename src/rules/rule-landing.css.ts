@@ -1,3 +1,5 @@
+import { HINT_LEAVE, HINT_MOTION } from "../arrows";
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit, reveal } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -45,6 +47,25 @@ const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
 export const TITLE_TRACKING = -0.05;
 export const TITLE_MARK_INSET = 0.06;
+
+// A rule page's back link names where it leads, set by the head script's .from-home.
+export const backTo = {
+  rules: style({
+    selectors: {
+      ".from-home &": {
+        display: "none",
+      },
+    },
+  }),
+  home: style({
+    display: "none",
+    selectors: {
+      ".from-home &": {
+        display: "inline",
+      },
+    },
+  }),
+};
 
 export const shell = {
   root: style({
@@ -337,7 +358,7 @@ export const text = {
         paddingInline: "6px",
         borderRadius: "6px",
         backgroundColor: palette["--soft-key"],
-        boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
+        boxShadow: drop(2, palette["--soft-key-drop"]),
         fontWeight: 600,
         fontSize: "0.86em",
         lineHeight: "normal",
@@ -377,11 +398,24 @@ export const text = {
   }),
 };
 
-const HINT_BLUE = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
-const LIGHT = ":is(.light *)";
+/** A hint label's chip, also worn by the notes that point at a demo without asking for a touch. */
+export const HINT_CHIP = {
+  paddingBlock: "6px",
+  paddingInline: "7px 8px",
+  fontFamily: fonts["--display"],
+  fontWeight: 700,
+  fontSize: "10px",
+  lineHeight: 1,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  whiteSpace: "nowrap",
+  color: palette["--on-accent"],
+  backgroundColor: "var(--hint)",
+  boxShadow: "3px 3px 0 #000",
+} as const;
 
-/** A hint's trail draws in from `trailAt` over `trailFor` ms. Then its ring pulses `ringGrows` px out. */
-export const HINT_MOTION = { trailAt: 250, trailFor: 600, ringGrows: 10 };
+/** A trail cell, one `grid` px square of the hint's colour. */
+export const HINT_CELL = { fill: "var(--hint)", ["shapeRendering"]: "crispEdges" } as const;
 
 const pulse = keyframes({
   from: { opacity: 0.55, transform: "scale(1)" },
@@ -395,8 +429,18 @@ export const hintKit = {
     inset: 0,
     zIndex: 3,
     pointerEvents: "none",
-    vars: { "--hint": palette["--go"] },
-    selectors: { [`&${LIGHT}`]: { vars: { "--hint": HINT_BLUE } } },
+    vars: { "--hint": palette["--cw"] },
+  }),
+  group: style({
+    position: "absolute",
+    inset: 0,
+    "@media": {
+      [REDUCE]: {
+        selectors: {
+          "&[data-left]": { opacity: 0, transition: `opacity ${HINT_LEAVE}ms ease-out` },
+        },
+      },
+    },
   }),
   svg: style({
     position: "absolute",
@@ -404,7 +448,6 @@ export const hintKit = {
     width: "100%",
     height: "100%",
     overflow: "visible",
-    transition: `opacity 220ms ease`,
   }),
   // Blurs and tints what sits under a hint's arrow and label, so the hint reads over a busy pane.
   // Its mask, set per hint, feathers it to the arrow's shape.
@@ -419,7 +462,7 @@ export const hintKit = {
         maskRepeat: "no-repeat",
         WebkitMaskSize: "100% 100%",
         WebkitMaskRepeat: "no-repeat",
-        transition: `opacity 260ms ease`,
+        transition: `opacity ${HINT_MOTION.popFor}ms ${OUT}`,
         "@media": {
           [REDUCE]: {
             transition: "none",
@@ -432,14 +475,23 @@ export const hintKit = {
     backgroundColor: `color-mix(in oklab, ${palette["--panel"]} 60%, transparent)`,
   }),
   cell: style({
-    fill: "var(--hint)",
-    ["shapeRendering"]: "crispEdges",
+    ...HINT_CELL,
     opacity: 0,
     transition: "opacity 0s linear var(--at)",
-    selectors: { [`&${when.ancestor("[data-drawn]")}`]: { opacity: 1 } },
+    selectors: {
+      [`&${when.ancestor("[data-drawn]")}`]: { opacity: 1 },
+      [`&${when.ancestor("[data-left]")}`]: {
+        opacity: 0,
+        transition: "opacity 0s linear var(--out)",
+      },
+    },
     "@media": {
       [REDUCE]: {
         transition: "none",
+        selectors: {
+          // The whole hint fades as one instead (see group).
+          [`&${when.ancestor("[data-left]")}`]: { transition: `opacity 0s linear ${HINT_LEAVE}ms` },
+        },
       },
     },
   }),
@@ -450,6 +502,9 @@ export const hintKit = {
     opacity: 0,
     transformBox: "fill-box",
     transformOrigin: "center",
+    // Its pulse drives opacity, so it fades out on its stroke as the trail pulls back from it.
+    transition: `stroke-opacity ${HINT_MOTION.retractFor / 2}ms ease-out`,
+    selectors: { [`&${when.ancestor("[data-left]")}`]: { strokeOpacity: 0 } },
   }),
   pulse: style({
     animation: `${pulse} 1.6s ${OUT} ${HINT_MOTION.trailAt + HINT_MOTION.trailFor}ms infinite`,
@@ -465,29 +520,11 @@ export const hintKit = {
       [under1]: {
         position: "absolute",
         transform: "translate(-50%, -50%)",
-        paddingBlock: "6px",
-        paddingInline: "7px 8px",
-        fontFamily: fonts["--display"],
-        fontWeight: 700,
-        fontSize: "10px",
-        lineHeight: 1,
-        letterSpacing: "0.08em",
-        textTransform: "uppercase",
-        whiteSpace: "nowrap",
-        color: palette["--on-accent"],
-        backgroundColor: palette["--go"],
-        boxShadow: "3px 3px 0 #000",
-        transition: `opacity 260ms ease 120ms`,
-        selectors: {
-          [`&${LIGHT}`]: {
-            color: palette["--bg"],
-            backgroundColor: palette["--text"],
-            boxShadow: `3px 3px 0 ${HINT_BLUE}`,
-          },
-        },
+        ...HINT_CHIP,
+        transition: `opacity ${HINT_MOTION.popFor}ms ${OUT}, scale ${HINT_MOTION.popFor}ms ${OUT}`,
         "@media": {
           [REDUCE]: {
-            transition: "none",
+            transition: `opacity ${HINT_MOTION.popFor}ms ${OUT}`,
           },
         },
       },
@@ -506,8 +543,35 @@ export const hintKit = {
   ruler: style({
     visibility: "hidden",
   }),
+  // Before the card is on screen: each part waits hidden, to come in on its own transition.
+  waiting: style({
+    opacity: 0,
+  }),
+  labelWaiting: style({
+    scale: "0.92",
+    "@media": {
+      [REDUCE]: {
+        scale: "none",
+      },
+    },
+  }),
+  // Unlayered, so on the way out these transitions stand in for each part's own.
   gone: style({
     opacity: 0,
+    transition: `opacity ${HINT_LEAVE}ms ease-out`,
+  }),
+  // The label goes once the trail has all but pulled back into it.
+  labelLeaves: style({
+    selectors: {
+      [`&${when.ancestor("[data-left]")}`]: {
+        opacity: 0,
+        transition: `opacity ${HINT_MOTION.labelLeavesFor}ms ease-out ${HINT_MOTION.labelLeavesAt}ms`,
+      },
+    },
+  }),
+  // A ring freezes mid-pulse while it fades out, rather than vanishing the moment it stops.
+  still: style({
+    animationPlayState: "paused",
   }),
 };
 
@@ -553,7 +617,7 @@ export const lessonKit = {
     paddingLeft: "36px",
     borderRadius: "20px",
     backgroundColor: palette["--panel"],
-    boxShadow: `${palette["--raise"]}, 0 6px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(6, palette["--drop-ink"])}`,
     "@media": {
       [PHONE]: {
         paddingTop: "20px",
@@ -787,7 +851,7 @@ export const lessonKit = {
   panel: style({
     borderRadius: "20px",
     backgroundColor: palette["--panel"],
-    boxShadow: `${palette["--raise"]}, 0 6px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(6, palette["--drop-ink"])}`,
   }),
   sheet: style({
     display: "grid",
@@ -873,13 +937,13 @@ export const tree = {
     paddingInline: "10px",
     borderRadius: "8px",
     backgroundColor: "var(--c)",
-    boxShadow: "0 3px 0 var(--key-c)",
+    boxShadow: drop(3, "var(--key-c)"),
     fontWeight: 600,
     color: "var(--on-c)",
     selectors: {
       [`&${when.ancestor(BAD_PANE)}`]: {
         backgroundColor: `color-mix(in srgb, ${palette["--no"]} 22%, ${palette["--panel-2"]})`,
-        boxShadow: `0 3px 0 color-mix(in srgb, ${palette["--no"]} 40%, ${palette["--drop-ink"]})`,
+        boxShadow: drop(3, `color-mix(in srgb, ${palette["--no"]} 40%, ${palette["--drop-ink"]})`),
         color: palette["--no-ink"],
       },
     },
@@ -1291,7 +1355,7 @@ export const quizKit = {
         borderColor: "currentcolor",
         borderRadius: "10px",
         backgroundColor: ON,
-        boxShadow: "0 4px 0 var(--key-c)",
+        boxShadow: drop(4, "var(--key-c)"),
         fontWeight: 600,
         fontSize: "14px",
         lineHeight: "normal",
@@ -1319,7 +1383,7 @@ export const quizKit = {
     "@layer": {
       [under1]: {
         translate: "0 -4px",
-        boxShadow: `0 8px 0 var(--key-c), 0 14px 28px ${palette["--lift"]}`,
+        boxShadow: `${drop(8, "var(--key-c)")}, 0 14px 28px ${palette["--lift"]}`,
         transitionDuration: motion["--t-moderate"],
         transitionTimingFunction: motion["--moderate"],
       },
@@ -1327,7 +1391,7 @@ export const quizKit = {
   }),
   dragging: style({
     zIndex: 30,
-    boxShadow: `0 10px 0 var(--key-c), 0 20px 36px ${palette["--lift"]}`,
+    boxShadow: `${drop(10, "var(--key-c)")}, 0 20px 36px ${palette["--lift"]}`,
     cursor: cursors["--cursor-grabbing"],
     transitionDuration: motion["--t-moderate"],
     transitionTimingFunction: motion["--moderate"],
@@ -1336,7 +1400,7 @@ export const quizKit = {
     height: "30px",
     paddingInline: "12px",
     fontSize: "13px",
-    boxShadow: "0 3px 0 var(--key-c)",
+    boxShadow: drop(3, "var(--key-c)"),
     cursor: "inherit",
   }),
   burst: style({
@@ -1643,7 +1707,7 @@ export const pager = {
         borderBottomLeftRadius: "16px",
         borderBottomRightRadius: "16px",
         backgroundColor: palette["--panel"],
-        boxShadow: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+        boxShadow: `${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`,
         transitionProperty: "transform, box-shadow, border-color",
         transitionDuration: motion["--t-moderate-exit"],
         transitionDelay: "0s, 0s, 0s",
@@ -1652,7 +1716,7 @@ export const pager = {
         selectors: {
           "&:focus-visible": {
             borderColor: ACCENT,
-            boxShadow: `${palette["--raise"]}, 0 8px 0 var(--key)`,
+            boxShadow: `${palette["--raise"]}, ${drop(8, "var(--key)")}`,
             transform: LIFTED,
             outlineWidth: "3px",
             outlineStyle: "solid",
@@ -1664,7 +1728,7 @@ export const pager = {
           "&:active": {
             borderColor: ACCENT,
             // Repeated under the media query, which would otherwise let hovering outrank pressing.
-            boxShadow: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+            boxShadow: `${palette["--raise"]}, ${drop(1, "var(--key)")}`,
             transform: PRESSED,
             transitionDuration: motion["--t-moderate"],
             transitionTimingFunction: motion["--moderate"],
@@ -1699,13 +1763,13 @@ export const pager = {
             selectors: {
               "&:hover": {
                 borderColor: ACCENT,
-                boxShadow: `${palette["--raise"]}, 0 8px 0 var(--key)`,
+                boxShadow: `${palette["--raise"]}, ${drop(8, "var(--key)")}`,
                 transform: LIFTED,
                 transitionDuration: motion["--t-moderate"],
                 transitionTimingFunction: motion["--moderate"],
               },
               "&:active": {
-                boxShadow: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+                boxShadow: `${palette["--raise"]}, ${drop(1, "var(--key)")}`,
               },
               "&&:active": {
                 transform: PRESSED,

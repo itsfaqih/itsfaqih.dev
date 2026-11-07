@@ -1,0 +1,70 @@
+---
+import type { Level } from "./lesson";
+import { FIXES, fateSays, QUERY, searches } from "./data-loading";
+import { quiz, styles } from "./data-loading.css";
+import { fixView, view } from "./data-loading.view";
+import QuizChoice from "./quiz-choice.astro";
+import { quizKit } from "./rule-landing.css";
+
+// Quiz 5's board (data-loading-fix.client.ts): the search box after typing lamp, once for each fix,
+// all read off the model. The box with no fix shows first; picking a fix shows the box it leaves.
+type Props = { level: Level };
+
+const { level } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const labels = new Map(level.choices.map((choice) => [choice.id, choice.label]));
+const boxes = Object.entries(FIXES).map(([id, fix]) => {
+  const sent = searches(fix);
+  const shown = sent.find((s) => s.fate === "shown")!;
+  const canceled = sent.filter((s) => s.fate === "canceled").length;
+  return {
+    id,
+    says: id === "none" ? "Sends on every letter" : labels.get(id),
+    sent,
+    shown,
+    stale: shown.q !== QUERY,
+    floods: sent.length === QUERY.length,
+    count: `${sent.length} sent${canceled ? `, ${canceled} canceled` : ""}`,
+  };
+});
+---
+
+<data-loading-fix class={quiz.fix}
+  >{
+    boxes.map(({ id, says, sent, shown, stale, floods, count }) => (
+      <div class={styles.card} hidden={id !== "none"} data-fix={id}
+        ><div class={styles.head}
+          ><span>Search</span><span class:list={[styles.status, quiz.fixSays]}>{says}</span></div
+        ><div class={styles.box}
+          ><i aria-hidden="true" class={styles.boxGlass}></i><span>{QUERY}</span><i aria-hidden="true" class={styles.caret}></i></div
+        ><div class={view.results(stale)}
+          ><span>{shown.matches.join(", ")}</span><span class={view.resultsFor(stale)}>for {shown.q}</span></div
+        ><ol class={styles.log}
+          >{
+            sent.map(({ q, fate }) => (
+              <li class={styles.logRow}
+                ><span class={view.logQuery(fate)}>GET ?q={q}</span><span class={view.fate(fate, q !== QUERY)}
+                  >{fateSays(fate, q)}</span
+                ></li
+              >
+            ))
+          }</ol
+        ><div class={quiz.fixChips}
+          ><span class={fixView.chip(floods)}>{count}</span><span class={fixView.chip(stale)}
+            >results for {shown.q}</span
+          ></div
+        ></div
+      >
+    ))
+  }<div class={quizKit.stack}
+    >{
+      level.choices.map(({ id, label }) => (
+        <QuizChoice level={level} id={id}><span class={quiz.fixLabel}>{label}</span></QuizChoice>
+      ))
+    }</div
+  ></data-loading-fix
+>
+
+<script>
+  import "./data-loading-fix.client";
+</script>

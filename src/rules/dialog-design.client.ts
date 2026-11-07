@@ -609,7 +609,7 @@ defineDemo("dialog-name", (host, sealed, signal) => {
     let line: string | Node = "Open Rename to hear it";
     if (speech) {
       const span = document.importNode(speaker.content.firstElementChild!, true);
-      span.append("“", speech, "”");
+      span.append('"', speech, '"');
       line = span;
     }
     w.say([line], speech ? (sealed ? "yes" : "no") : undefined);

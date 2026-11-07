@@ -269,6 +269,27 @@ export const styles = {
       },
     },
   }),
+  // A rule page's own colour with dark ink. Its hues are bright, so white ink fails on both islands.
+  connectHue: style({
+    selectors: {
+      [`&, &${DARK}`]: {
+        color: "color-mix(in srgb, var(--hue) 18%, #0a0a0c)",
+        backgroundColor: "var(--hue)",
+      },
+    },
+    "@media": {
+      [HOVER]: {
+        selectors: {
+          "&:hover": {
+            backgroundColor: "color-mix(in oklab, var(--hue) 82%, #fff)",
+          },
+          [`&${DARK}:hover`]: {
+            backgroundColor: "color-mix(in oklab, var(--hue) 88%, #000)",
+          },
+        },
+      },
+    },
+  }),
   ring: style({
     selectors: {
       "&:focus-visible": {

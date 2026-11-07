@@ -1,10 +1,14 @@
 ---
+import { colorOf, PUBLISHED_GUIDELINES } from "../data/guidelines";
 import Site from "../layouts/site.astro";
 import { ruleHead } from "./rule-head";
 
 type Props = { id: string };
+
+const { id } = Astro.props;
+const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
 ---
 
-<Site page={ruleHead(Astro.props.id)}>
+<Site page={ruleHead(id)} hue={rule && colorOf(rule.label)}>
   <slot />
 </Site>

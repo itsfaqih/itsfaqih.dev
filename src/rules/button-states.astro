@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { styles } from "./button-design.css";
 
 type Props = { careful?: boolean };
@@ -13,7 +14,7 @@ const FORCED = {
 ---
 
 <div class={styles.stage}>
-  <button data-hint="true" type="button" class:list={[styles.key, careful ? styles.live : styles.flat]}
+  <button data-hint={HINT.press} type="button" class:list={[styles.key, careful ? styles.live : styles.flat]}
     >Save changes</button
   >
   <div class={styles.specimens} aria-hidden="true">

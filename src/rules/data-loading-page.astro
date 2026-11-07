@@ -1,13 +1,16 @@
 ---
-import { EARLY, LATE, LESSONS, TLDR } from "./data-loading";
+import { EARLY, LATE, LESSONS, ORDERS, TLDR } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 import { quizKit } from "./rule-landing.css";
+import DataLoadingFix from "./data-loading-fix.astro";
 import DataLoadingInbox from "./data-loading-inbox.astro";
 import DataLoadingParse from "./data-loading-parse.astro";
-import DataLoadingQuiz from "./data-loading-quiz.astro";
 import DataLoadingSlide from "./data-loading-slide.astro";
 import DataLoadingRevenue from "./data-loading-revenue.astro";
+import DataLoadingSearch from "./data-loading-search.astro";
+import DataLoadingSeo from "./data-loading-seo.astro";
+import DataLoadingSkeleton from "./data-loading-skeleton.astro";
 import DataLoadingTeam from "./data-loading-team.astro";
 import DataLoadingWallet from "./data-loading-wallet.astro";
 import DataLoadingWaterfall from "./data-loading-waterfall.astro";
@@ -17,7 +20,12 @@ import RuleLanding from "./rule-landing.astro";
 import RuleLesson from "./rule-lesson.astro";
 import RuleQuiz from "./rule-quiz.astro";
 
-const [early, stale, flicker, errors, boundary, persist] = LESSONS;
+const [seo, early, stale, flicker, debounce, errors, boundary, persist] = LESSONS;
+const PAGES = [
+  ["settings", "Settings, signed in", "Settings", "Signed in", [["Email alerts", "On"], ["Theme", "Dark"]]],
+  ["product", "Public product page", "shop.test/lamp", "Public", [["Desk lamp", "$48"], ["In stock", "12"]]],
+  ["admin", "Staff dashboard", "Admin", "Staff only", [["Orders", "1,284"], ["Refunds", "12"]]],
+] as const;
 const PRICES = [
   ["Gold", "$2,384"],
   ["Silver", "$28.40"],
@@ -28,16 +36,46 @@ const TILES = [
   ["Refunds", "12"],
   ["Signups", "342"],
 ] as const;
-const ORDERS = [
-  ["#1042 Notebook", "$12"],
-  ["#1038 Pens", "$6"],
-  ["#1031 Desk mat", "$24"],
+const PATH = [
+  ["fetch", "loadOrder()", "Receives the order and hands it to the app", false],
+  ["page", "<CheckoutPage>", "Renders the order", false],
+  ["receipt", "<Receipt>", "Reads order.coupon.code", true],
 ] as const;
 ---
 
 <RuleLanding id="data-loading" learn="Fast first paint, smooth updates" tldr={TLDR} take="load data the same way">
   <Fragment slot="lead">Start requests on navigation and keep stale data on screen. Show a skeleton only after 200ms.</Fragment>
   <Fragment slot="intro">Design the wait, because people judge loading by what they see while it lasts.</Fragment>
+
+  <RuleLesson lesson={seo}>
+    <Fragment slot="body"
+      >Render a page that needs search traffic or a fast first paint on the server, so the first HTML response carries the content. A page rendered in the browser sends an empty shell and paints nothing until its code loads and fetches. Many crawlers and link previews read only that first response. A page behind a login never shows up in search, so the browser is fine there.</Fragment
+    >
+    <DataLoadingSeo slot="bad" />
+    <DataLoadingSeo slot="good" server />
+  </RuleLesson>
+  <RuleQuiz n={1} level={seo.levels[0]}
+    >A shop has three pages. Which of these pages must render on the server?
+    <div slot="board" class={quizKit.trio}>
+      {
+        PAGES.map(([id, caption, head, tag, rows]) => (
+          <QuizChoice level={seo.levels[0]} id={id} caption={caption}
+            ><span class={quiz.prices}
+              ><span class={styles.head}>{head}</span><span class={quiz.rows}
+                >{
+                  rows.map(([name, value]) => (
+                    <span class={quiz.row}
+                      ><span>{name}</span><b class={styles.histAmount}>{value}</b></span
+                    >
+                  ))
+                }</span
+              ><span class={styles.status}>{tag}</span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={early}>
     <Fragment slot="body"
@@ -46,7 +84,7 @@ const ORDERS = [
     <DataLoadingWaterfall slot="bad" {...LATE} />
     <DataLoadingWaterfall slot="good" {...EARLY} />
   </RuleLesson>
-  <RuleQuiz n={1} level={early.levels[0]} hint="Drag the amber bar, then press Check. Arrow keys work too."
+  <RuleQuiz n={2} level={early.levels[0]} hint="Drag the amber bar, then press Check. Arrow keys work too."
     >The invoices page lists 12 invoices. Drag <b>GET /invoices</b> to when it should start. The rows render once both the code and the data are in.
     <DataLoadingSlide slot="board" level={early.levels[0]} />
   </RuleQuiz>
@@ -58,12 +96,12 @@ const ORDERS = [
     <DataLoadingRevenue slot="bad" />
     <DataLoadingRevenue slot="good" swr />
   </RuleLesson>
-  <RuleQuiz n={2} level={stale.levels[0]}
-    >You return to a tab of prices loaded 5 minutes ago. They refetch on focus, which takes 600ms. Pick what the tab shows meanwhile.
+  <RuleQuiz n={3} level={stale.levels[0]}
+    >You return to a tab of prices loaded 5 minutes ago. They refetch on focus, which takes a few seconds. Pick what the tab shows meanwhile.
     <div slot="board" class={quizKit.trio}>
       <QuizChoice level={stale.levels[0]} id="blank" caption="A full spinner"
         ><span class={quiz.prices}
-          ><span class={styles.head}>Prices</span><span class:list={[styles.spin, quiz.still, quiz.bigSpin]}
+          ><span class={styles.head}>Prices</span><span class:list={[styles.spin, quiz.bigSpin]}
           ></span><span class={styles.status}>Updating</span></span
         ></QuizChoice
       >
@@ -85,7 +123,7 @@ const ORDERS = [
                   ))
                 }</span
               ><span class={styles.status}
-                >{spin && <span class:list={[styles.spin, styles.spinSmall, quiz.still]} />}{
+                >{spin && <span class:list={[styles.spin, styles.spinSmall]} />}{
                   spin ? "Updating" : "Updated 5 min ago"
                 }</span
               ></span
@@ -103,18 +141,31 @@ const ORDERS = [
     <DataLoadingInbox slot="bad" />
     <DataLoadingInbox slot="good" delay />
   </RuleLesson>
-  <DataLoadingQuiz n={3} level={flicker.levels[0]}
-    >Search suggestions update as you type. Most land in 60ms, and a few take 1.5s. Place the spinner.</DataLoadingQuiz
-  >
+  <RuleQuiz n={4} level={flicker.levels[0]} hint="Drag the skeleton, then press Check. Arrow keys work too."
+    >Search suggestions load as you type. Most replies are fast and a few are slow. Drag the skeleton to when it should appear.
+    <DataLoadingSkeleton slot="board" level={flicker.levels[0]} />
+  </RuleQuiz>
+
+  <RuleLesson lesson={debounce}>
+    <Fragment slot="body"
+      >A search box that sends a request on every keystroke floods the server, and a slow reply for an old query can land after the newest one. Wait for a pause in typing, then send one request, and cancel the one in flight when a new one starts. This is debouncing. Press Type lamp on both.</Fragment
+    >
+    <DataLoadingSearch slot="bad" />
+    <DataLoadingSearch slot="good" debounce />
+  </RuleLesson>
+  <RuleQuiz n={5} level={debounce.levels[0]} hint="Tap a fix."
+    >You type la, pause, then finish lamp. This box sends 4 requests and shows results for la. Pick the change that fixes both.
+    <DataLoadingFix slot="board" level={debounce.levels[0]} />
+  </RuleQuiz>
 
   <RuleLesson lesson={errors}>
     <Fragment slot="body"
-      >Show the error where the data would go, with a Retry button. A toast fades before anyone reads it and leaves an empty card. Log every failure so you hear about it before your users do.</Fragment
+      >Show the error where the data would go, with a Retry button. A toast fades before anyone reads it and leaves an empty card. Log every failure so you learn about it before a user reports it.</Fragment
     >
     <DataLoadingTeam slot="bad" />
     <DataLoadingTeam slot="good" inline />
   </RuleLesson>
-  <RuleQuiz n={4} level={errors.levels[0]}
+  <RuleQuiz n={6} level={errors.levels[0]}
     >A dashboard loads five cards, and the revenue card fails to load. Tap where its error and Retry should go.
     <div slot="board" class={quiz.screen}>
       <span class={quiz.backdrop}><QuizChoice level={errors.levels[0]} id="page" look="spot" /></span>
@@ -156,9 +207,29 @@ const ORDERS = [
     <DataLoadingParse slot="bad" />
     <DataLoadingParse slot="good" parse />
   </RuleLesson>
-  <DataLoadingQuiz n={5} level={boundary.levels[0]}
-    >The server sometimes leaves out an order's coupon, and the receipt reads it two screens deep. Place the check.</DataLoadingQuiz
-  >
+  <RuleQuiz n={7} level={boundary.levels[0]} hint="Tap a step."
+    >An order arrives without its coupon, and the receipt crashes. Tap where the fix goes.
+    <div slot="board" class={quiz.path}>
+      <span class={quiz.response}
+        ><b class={quiz.nodeName}>GET /orders/1042</b><span class={quiz.json}
+          >{'{ "id": 1042, "total": 24, '}<span class={quiz.hole}>coupon?</span>{" }"}</span
+        ></span
+      >
+      {
+        PATH.map(([id, name, does, crashed]) => (
+          <Fragment
+            ><i aria-hidden="true" class={quiz.link}></i><QuizChoice level={boundary.levels[0]} id={id} look="spot"
+              ><span class={quiz.node}
+                ><b class={quiz.nodeName}>{name}</b><span class={quiz.nodeDoes}>{does}</span>{
+                  crashed && <span class:list={[styles.fate, styles.fateStale, quiz.crashed]}>TypeError, crashed here</span>
+                }</span
+              ></QuizChoice
+            ></Fragment
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
 
   <RuleLesson lesson={persist}>
     <Fragment slot="body"
@@ -167,7 +238,7 @@ const ORDERS = [
     <DataLoadingWallet slot="bad" />
     <DataLoadingWallet slot="good" careful />
   </RuleLesson>
-  <RuleQuiz n={6} level={persist.levels[0]}
+  <RuleQuiz n={8} level={persist.levels[0]}
     >A shop app persists its cache. On day 2 the desk lamp sells out and its sale ends. On day 3 you open the app with no signal. Tap what it may show from the cache.
     <div slot="board" class:list={[styles.card, quiz.wallet]}>
       <span class={styles.head}
@@ -186,9 +257,9 @@ const ORDERS = [
             ><span>Your orders</span><span class={styles.stamp}>Updated 2 days ago</span></span
           ><span class={styles.histList}
             >{
-              ORDERS.map(([label, total]) => (
+              ORDERS.map(({ item, total }) => (
                 <span class={quiz.row}
-                  ><span>{label}</span><b class={styles.histAmount}>{total}</b></span
+                  ><span>{item}</span><b class={styles.histAmount}>{total}</b></span
                 >
               ))
             }</span

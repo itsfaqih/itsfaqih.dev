@@ -52,7 +52,8 @@ class RuleSpread extends HTMLElement {
     const slideNumber = part("number");
 
     const last = slots.length - 1;
-    const initial = Math.floor(last / 2);
+    // The middle card, or the one a return from its rule opened the deck on (rule-spread.astro).
+    const initial = cards.findIndex((card) => card.hasAttribute("aria-current"));
     let active = initial;
     let shownNumber = initial + 1;
     let reduced = reducedMotion();

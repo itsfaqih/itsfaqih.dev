@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -29,6 +30,7 @@ const toast = keyframes({
 const fade = keyframes({
   from: { opacity: 0 },
 });
+const blink = keyframes({ "50%": { opacity: 0 } });
 const jump = keyframes({
   "from, 40%": { color: palette["--no-ink"] },
 });
@@ -41,6 +43,33 @@ const toastFade = keyframes({
   "0%, 100%": { opacity: 0 },
   "8%, 86%": { opacity: 1 },
 });
+const gone = keyframes({
+  "from, to": { visibility: "hidden" },
+});
+
+const MOVES = "(prefers-reduced-motion: no-preference)";
+const screenArmed = style({});
+const screenRun = style({});
+const armed = `${screenArmed} &`;
+const run = `${screenRun} &`;
+/** Shows a part from the moment in `at` on: its first frame is blank until then. */
+const arrives = (at: string) =>
+  ({
+    animationName: fade,
+    animationDuration: "220ms",
+    animationTimingFunction: "ease-out",
+    animationDelay: at,
+    animationFillMode: "backwards",
+  }) as const;
+/** Shows a part until the moment in `at`. */
+const leaves = (at: string) =>
+  ({
+    visibility: "visible",
+    animationName: gone,
+    animationDuration: "1ms",
+    animationDelay: at,
+    animationFillMode: "forwards",
+  }) as const;
 
 export const styles = {
   view: style({
@@ -94,7 +123,7 @@ export const styles = {
         paddingBottom: "16px",
         borderRadius: "12px",
         backgroundColor: palette["--panel"],
-        boxShadow: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+        boxShadow: `${palette["--raise"]}, ${drop(3, palette["--drop-ink"])}`,
         overflow: "hidden",
         "@media": {
           [PHONE]: {
@@ -108,7 +137,9 @@ export const styles = {
   }),
   head: style({
     display: "flex",
-    gap: "12px",
+    flexWrap: "wrap",
+    rowGap: "4px",
+    columnGap: "12px",
     alignItems: "center",
     justifyContent: "space-between",
     minHeight: "22px",
@@ -246,11 +277,11 @@ export const styles = {
   }),
   req: style({
     backgroundColor: "var(--c)",
-    boxShadow: "0 2px 0 var(--key-c)",
+    boxShadow: drop(2, "var(--key-c)"),
     selectors: {
       [`&${when.ancestor('[data-side="bad"]')}`]: {
         backgroundColor: palette["--no"],
-        boxShadow: `0 2px 0 ${palette["--no-shadow"]}`,
+        boxShadow: drop(2, palette["--no-shadow"]),
       },
     },
   }),
@@ -528,6 +559,12 @@ export const styles = {
     borderRadius: "6px",
     backgroundColor: palette["--panel-2"],
     color: "transparent",
+    // Dark --panel-2 sits one step above the card, and the pulse dims it to almost nothing.
+    selectors: {
+      "&:is(.dark *)": {
+        backgroundColor: "#3d3d54",
+      },
+    },
     animationName: pulse,
     animationDuration: "900ms",
     animationTimingFunction: "ease-in-out",
@@ -629,15 +666,35 @@ export const styles = {
         position: "absolute",
         bottom: "12px",
         left: "50%",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
         paddingBlock: "8px",
-        paddingInline: "14px",
+        paddingLeft: "10px",
+        paddingRight: "14px",
         borderRadius: "10px",
-        backgroundColor: palette["--text"],
-        boxShadow: `0 8px 20px ${palette["--lift"]}`,
+        backgroundColor: palette["--panel-2"],
+        boxShadow: `inset 0 0 0 1px ${palette["--hair"]}, 0 8px 20px ${palette["--lift"]}`,
         fontSize: "13px",
-        fontWeight: 600,
-        color: palette["--bg"],
+        fontWeight: 500,
+        color: palette["--text"],
         whiteSpace: "nowrap",
+        selectors: {
+          "&::before": {
+            content: '"!"',
+            display: "grid",
+            placeItems: "center",
+            flexShrink: 0,
+            width: "16px",
+            height: "16px",
+            borderRadius: "50%",
+            backgroundColor: palette["--no"],
+            fontSize: "11px",
+            fontWeight: 800,
+            lineHeight: 1,
+            color: palette["--on-accent"],
+          },
+        },
         translate: "-50% 0",
         opacity: 0,
         animationName: toast,
@@ -730,6 +787,8 @@ export const styles = {
     borderRadius: "10px",
     backgroundColor: `color-mix(in srgb, ${palette["--no"]} 12%, transparent)`,
     boxShadow: `inset 3px 0 0 ${palette["--no"]}`,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     animationName: fade,
     animationDuration: "200ms",
     animationTimingFunction: "ease-out",
@@ -873,29 +932,313 @@ export const styles = {
     fontFamily: fonts["--mono"],
     color: palette["--text"],
   }),
-  time: style({
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: "auto",
-    minWidth: "54px",
-    fontWeight: 700,
-    color: "var(--c-ink)",
+  screen: style({
+    gridColumn: "1 / -1",
+    marginTop: "10px",
+  }),
+  screenArmed,
+  screenRun,
+  wait: style({
+    gridArea: "1 / 1",
+    placeSelf: "center",
+    visibility: "hidden",
     "@media": {
-      [PHONE]: {
-        minWidth: "46px",
+      [MOVES]: {
+        selectors: {
+          [armed]: { visibility: "visible" },
+          [run]: leaves("var(--shell)"),
+        },
       },
     },
   }),
+  page: style({
+    gridArea: "1 / 1",
+    display: "grid",
+    gap: "8px",
+    "@media": {
+      [MOVES]: {
+        selectors: {
+          [armed]: { visibility: "hidden" },
+          [run]: arrives("var(--shell)"),
+        },
+      },
+    },
+  }),
+  order: style({
+    display: "grid",
+  }),
+  orderBones: style({
+    gridArea: "1 / 1",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    visibility: "hidden",
+    "@media": {
+      [MOVES]: {
+        selectors: {
+          [run]: leaves("var(--rows)"),
+        },
+      },
+    },
+  }),
+  boneItem: style({
+    width: "46%",
+    height: "11px",
+  }),
+  boneTotal: style({
+    width: "28px",
+    height: "11px",
+  }),
+  orderRow: style({
+    gridArea: "1 / 1",
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    fontSize: "13px",
+    lineHeight: 1.45,
+    color: palette["--dim"],
+    "@media": {
+      [MOVES]: {
+        selectors: {
+          [run]: arrives("var(--rows)"),
+        },
+      },
+    },
+  }),
+  orderItem: style({
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  }),
+  review: style({
+    display: "grid",
+    flexShrink: 0,
+  }),
+  orderTotal: style({
+    marginLeft: "auto",
+  }),
+  reviewBone: style({
+    gridArea: "1 / 1",
+    display: "grid",
+    visibility: "hidden",
+    "@media": {
+      [MOVES]: {
+        selectors: {
+          [run]: leaves("var(--reviews)"),
+        },
+      },
+    },
+  }),
+  reviewStars: style({
+    gridArea: "1 / 1",
+    "@media": {
+      [MOVES]: {
+        selectors: {
+          [run]: arrives("var(--reviews)"),
+        },
+      },
+    },
+  }),
+  frame: style({
+    display: "grid",
+    gap: "4px",
+    alignContent: "center",
+    minHeight: "76px",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderRadius: "9px",
+    backgroundColor: palette["--panel-2"],
+  }),
+  frameBlank: style({
+    backgroundImage: `repeating-linear-gradient(135deg, ${palette["--hair"]} 0 1px, transparent 1px 9px)`,
+  }),
+  lampTitle: style({
+    fontWeight: 800,
+    fontSize: "18px",
+    lineHeight: 1.2,
+    fontFamily: fonts["--display"],
+    color: palette["--text"],
+  }),
+  lampPrice: style({
+    fontSize: "13px",
+    color: palette["--dim"],
+  }),
+  lampShown: style({
+    animationName: fresh,
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+    "@media": {
+      [REDUCE]: {
+        animationName: fade,
+      },
+    },
+  }),
+  box: style({
+    "@layer": {
+      [under1]: {
+        display: "flex",
+        gap: "8px",
+        alignItems: "center",
+        minHeight: "36px",
+        paddingInline: "12px",
+        borderRadius: "9px",
+        backgroundColor: palette["--panel-2"],
+        boxShadow: `inset 0 0 0 1px ${palette["--hair"]}`,
+        fontSize: "14px",
+        color: palette["--text"],
+      },
+    },
+  }),
+  boxGlass: style({
+    flexShrink: 0,
+    width: "10px",
+    height: "10px",
+    borderWidth: "2px",
+    borderStyle: "solid",
+    borderColor: palette["--mute"],
+    borderRadius: "50%",
+  }),
+  caret: style({
+    "@layer": {
+      [under1]: {
+        width: "2px",
+        height: "16px",
+        marginLeft: "-6px",
+        backgroundColor: "var(--c)",
+      },
+    },
+    "@media": {
+      [MOVES]: {
+        animation: `${blink} 1s steps(1) infinite`,
+      },
+    },
+  }),
+  results: style({
+    "@layer": {
+      [under1]: {
+        display: "grid",
+        gridTemplateColumns: "minmax(0, 1fr) auto",
+        gap: "8px",
+        alignItems: "center",
+        minHeight: "22px",
+        fontSize: "13px",
+        color: palette["--dim"],
+      },
+    },
+  }),
+  resultsWrong: style({
+    color: palette["--no-ink"],
+  }),
+  log: style({
+    "@layer": {
+      [under1]: {
+        display: "grid",
+        gridTemplateRows: "repeat(4, 20px)",
+        gap: "4px",
+        marginBlock: 0,
+        marginInline: 0,
+        paddingTop: "10px",
+        paddingInline: 0,
+        paddingBottom: 0,
+        borderTopWidth: "1px",
+        borderTopStyle: "solid",
+        borderTopColor: palette["--hair"],
+        listStyle: "none",
+      },
+    },
+  }),
+  logRow: style({
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    fontWeight: 500,
+    fontSize: "12px",
+    lineHeight: "normal",
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    whiteSpace: "nowrap",
+    animationName: fresh,
+    animationDuration: "220ms",
+    animationTimingFunction: motion["--out"],
+    "@media": {
+      [REDUCE]: {
+        animationName: fade,
+      },
+    },
+  }),
+  logCanceled: style({
+    color: palette["--mute"],
+    textDecorationLine: "line-through",
+  }),
+  fate: style({
+    "@layer": {
+      [under1]: {
+        display: "inline-flex",
+        gap: "6px",
+        alignItems: "center",
+        paddingBlock: "1px",
+        paddingInline: "7px",
+        borderRadius: "6px",
+        backgroundColor: palette["--panel-2"],
+        fontWeight: 600,
+        fontSize: "11px",
+        color: palette["--mute"],
+        textDecorationLine: "none",
+      },
+    },
+  }),
+  fateShown: style({
+    backgroundColor: `color-mix(in srgb, ${kit["--yes"]} 18%, transparent)`,
+    color: kit["--yes-ink"],
+  }),
+  fateStale: style({
+    backgroundColor: `color-mix(in srgb, ${palette["--no"]} 16%, transparent)`,
+    color: palette["--no-ink"],
+  }),
 };
+
+const PILL = "76px";
+const ALONG = `calc(var(--at) * (100% - ${PILL}))`;
 
 export const quiz = {
   slide: style({
     display: "grid",
     gap: "14px",
   }),
+  // Room above the lanes for the "Code loaded" label.
+  slideWf: style({
+    paddingTop: "22px",
+  }),
   // Room under the paint tag; the lanes stay the waterfall's.
   slidePlot: style({
     overflow: "visible",
+  }),
+  // Where app.js finishes: a line down the lanes, drawn under the bars, and its label above them.
+  slideMark: style({
+    position: "absolute",
+    top: "-22px",
+    bottom: "30px",
+    width: "2px",
+    marginLeft: "-1px",
+    borderRadius: "1px",
+    backgroundColor: palette["--mute"],
+  }),
+  slideMarkLabel: style({
+    position: "absolute",
+    top: "-22px",
+    marginLeft: "8px",
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "16px",
+    fontFamily: fonts["--mono"],
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+  }),
+  // Mono, as the marks are, and narrow enough to fit beside the line at either end of a phone's track.
+  slideTag: style({
+    fontFamily: fonts["--mono"],
   }),
   track: style({
     cursor: cursors["--cursor-point"],
@@ -957,6 +1300,210 @@ export const quiz = {
     fontSize: "12px",
     fontFamily: fonts["--mono"],
     color: palette["--dim"],
+  }),
+  // Quiz 4's skeleton board. Everything on its track sits `--at` along a run that stops one marker
+  // short of the lane's end, so the marker's left edge, the moment it stands for, reaches 1.
+  skel: style({
+    display: "grid",
+    gap: "14px",
+  }),
+  // The lane from the top: the slow reply's label, the fast reply's, the rail, and the marker hanging
+  // under it, so neither the marker nor the playhead ever covers a mark.
+  skelLane: style({
+    position: "relative",
+    height: "80px",
+  }),
+  skelRail: style({
+    position: "absolute",
+    top: "42px",
+    right: 0,
+    left: 0,
+    height: "2px",
+    borderRadius: "1px",
+    backgroundColor: palette["--hair"],
+  }),
+  skelMark: style({
+    position: "absolute",
+    top: "var(--top)",
+    left: ALONG,
+    width: "2px",
+    height: "calc(50px - var(--top))",
+    marginLeft: "-1px",
+    borderRadius: "1px",
+    backgroundColor: palette["--mute"],
+    fontWeight: 600,
+    fontSize: "11px",
+    lineHeight: "16px",
+    fontFamily: fonts["--mono"],
+    fontStyle: "normal",
+    color: palette["--mute"],
+    whiteSpace: "nowrap",
+  }),
+  skelMarkLabel: style({
+    position: "absolute",
+    top: 0,
+    left: "8px",
+  }),
+  skelMarkLabelBefore: style({
+    right: "8px",
+    left: "auto",
+  }),
+  // No display of its own, so the `hidden` it starts with keeps it out until the first play.
+  skelHead: style({
+    position: "absolute",
+    top: "34px",
+    bottom: 0,
+    left: ALONG,
+    zIndex: 2,
+    width: "2px",
+    marginLeft: "-1px",
+    borderRadius: "1px",
+    backgroundColor: palette["--text"],
+  }),
+  // The marker's square left edge, and the stem up from it to the rail, are its moment; the rest of
+  // it is grip and label.
+  skelHandle: style({
+    position: "absolute",
+    top: "52px",
+    left: ALONG,
+    zIndex: 1,
+    display: "grid",
+    placeItems: "center",
+    width: PILL,
+    height: "24px",
+    borderRadius: "2px 7px 7px 7px",
+    backgroundColor: "var(--c)",
+    boxShadow: drop(2, "var(--key-c)"),
+    fontWeight: 700,
+    fontSize: "11px",
+    lineHeight: 1,
+    fontFamily: fonts["--mono"],
+    color: "var(--on-c, #111)",
+    cursor: cursors["--cursor-grab"],
+    outline: "none",
+    transitionProperty: "left",
+    transitionDuration: "90ms",
+    transitionTimingFunction: "linear",
+    selectors: {
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: "-12px -4px -8px",
+      },
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        bottom: "100%",
+        left: 0,
+        width: "2px",
+        height: "8px",
+        backgroundColor: "var(--c)",
+      },
+      "&:focus-visible": {
+        outline: `3px solid ${palette["--focus"]}`,
+        outlineOffset: "2px",
+      },
+      [`&${when.ancestor("[data-dragging]")}`]: {
+        cursor: cursors["--cursor-grabbing"],
+        transitionDuration: "0s",
+      },
+      [`&${when.ancestor("[data-locked]")}`]: {
+        cursor: "default",
+      },
+    },
+  }),
+  skelBar: style({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    alignItems: "center",
+    justifyContent: "space-between",
+  }),
+  seg: style({
+    display: "inline-flex",
+    gap: "4px",
+    paddingBlock: "4px",
+    paddingInline: "4px",
+    borderRadius: "12px",
+    backgroundColor: palette["--panel-2"],
+  }),
+  segKey: style({
+    minHeight: "30px",
+    paddingBlock: 0,
+    paddingInline: "10px",
+    borderWidth: 0,
+    borderStyle: "none",
+    borderRadius: "9px",
+    backgroundColor: "transparent",
+    fontWeight: 700,
+    fontSize: "13px",
+    lineHeight: "normal",
+    fontFamily: fonts["--display"],
+    color: palette["--dim"],
+    whiteSpace: "nowrap",
+    cursor: cursors["--cursor-point"],
+    selectors: {
+      "&:focus-visible": {
+        outline: `3px solid ${palette["--focus"]}`,
+        outlineOffset: "2px",
+      },
+    },
+    "@media": {
+      [PHONE]: {
+        paddingInline: "7px",
+      },
+    },
+  }),
+  segOn: style({
+    backgroundColor: "var(--c)",
+    boxShadow: drop(3, "var(--key-c)"),
+    color: "var(--on-c)",
+  }),
+  skelPreview: style({
+    gap: "10px",
+  }),
+  // The rows' colour sits here, so a bone's transparent text wins on the row itself.
+  skelFound: style({
+    display: "grid",
+    gap: "6px",
+    justifyItems: "start",
+    color: palette["--dim"],
+  }),
+  skelMatch: style({
+    fontSize: "13px",
+    lineHeight: 1.4,
+  }),
+  skelFresh: style({
+    animationName: fresh,
+    animationDuration: "260ms",
+    animationTimingFunction: motion["--out"],
+    "@media": {
+      [REDUCE]: {
+        animationName: fade,
+      },
+    },
+  }),
+  skelFoot: style({
+    justifyContent: "flex-end",
+  }),
+  // The swept preview shows what played, so with motion this line is only for screen readers.
+  skelSaid: style({
+    marginBlock: 0,
+    marginRight: "auto",
+    fontWeight: 600,
+    fontSize: "12px",
+    fontFamily: fonts["--mono"],
+    color: palette["--dim"],
+    "@media": {
+      [MOVES]: {
+        position: "absolute",
+        width: "1px",
+        height: "1px",
+        overflow: "hidden",
+        clipPath: "inset(50%)",
+        whiteSpace: "nowrap",
+      },
+    },
   }),
   // The quiz sets data-state on Check: missed shakes it, seated wears the tick.
   check: style({
@@ -1045,7 +1592,7 @@ export const quiz = {
     paddingInline: "12px",
     borderRadius: "10px",
     backgroundColor: palette["--panel"],
-    boxShadow: `${palette["--raise"]}, 0 2px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(2, palette["--drop-ink"])}`,
     pointerEvents: "none",
   }),
   tileLabel: style({
@@ -1091,5 +1638,104 @@ export const quiz = {
     alignItems: "center",
     fontSize: "12px",
     color: palette["--dim"],
+  }),
+  // Quiz 5's board: the search box as a fix leaves it, above the fixes. A long fix's name wraps
+  // under the box's title.
+  fix: style({
+    display: "grid",
+    gap: "12px",
+  }),
+  fixSays: style({
+    whiteSpace: "normal",
+    textWrap: "balance",
+  }),
+  fixChips: style({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "6px",
+  }),
+  fixChip: style({
+    paddingBlock: "3px",
+    paddingInline: "8px",
+    fontSize: "12px",
+    fontFamily: fonts["--mono"],
+    boxShadow: "inset 0 0 0 1px color-mix(in srgb, currentColor 40%, transparent)",
+  }),
+  fixLabel: style({
+    fontWeight: 600,
+    fontSize: "14px",
+    lineHeight: 1.35,
+  }),
+  // Quiz 7's path from the response to the crash. A spot's border and padding add up to the
+  // response's own, so the text of every step lines up.
+  path: style({
+    display: "grid",
+  }),
+  response: style({
+    display: "grid",
+    gap: "4px",
+    paddingBlock: "10px",
+    paddingInline: "12px",
+    borderWidth: "1.5px",
+    borderStyle: "dotted",
+    borderColor: palette["--hair"],
+    borderRadius: "12px",
+  }),
+  node: style({
+    display: "grid",
+    gap: "4px",
+    justifyItems: "start",
+    paddingBlock: "7px",
+    paddingInline: "9px",
+  }),
+  nodeName: style({
+    fontWeight: 600,
+    fontSize: "13px",
+    lineHeight: 1.3,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+  }),
+  nodeDoes: style({
+    fontSize: "12px",
+    lineHeight: 1.4,
+    color: palette["--dim"],
+  }),
+  json: style({
+    fontSize: "12px",
+    lineHeight: 1.5,
+    fontFamily: fonts["--mono"],
+    color: palette["--text"],
+    overflowWrap: "anywhere",
+  }),
+  hole: style({
+    paddingInline: "4px",
+    borderWidth: "1px",
+    borderStyle: "dashed",
+    borderColor: palette["--no"],
+    borderRadius: "4px",
+    color: palette["--no-ink"],
+  }),
+  link: style({
+    position: "relative",
+    justifySelf: "center",
+    width: "2px",
+    height: "18px",
+    backgroundColor: palette["--hair"],
+    selectors: {
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        bottom: "-1px",
+        left: "-4px",
+        borderWidth: "5px 5px 0",
+        borderStyle: "solid",
+        borderColor: `${palette["--hair"]} transparent transparent`,
+      },
+    },
+  }),
+  crashed: style({
+    marginTop: "2px",
+    paddingBlock: "3px",
+    fontFamily: fonts["--mono"],
   }),
 };

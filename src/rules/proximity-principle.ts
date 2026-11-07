@@ -119,7 +119,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             slot: {
               id: "kinds",
               label: "+ types/, templates/, helpers/",
-              note: "Sorted by kind, one handler now spans four folders.",
+              note: "Sort by kind, and one handler spans four folders.",
             },
           },
         ],
@@ -131,7 +131,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
     exception: true,
     bad: {
       label: "In the handler",
-      costs: ["every request waits 2 s"],
+      costs: ["every request waits"],
       tree: [
         { depth: 0, text: "routes/reports/", kind: "dir" },
         { depth: 1, text: "export.ts" },
@@ -161,7 +161,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             slot: {
               id: "service",
               label: "+ imports.service.ts",
-              note: "A new file, but it still runs on the main thread. Every request still waits 3 s.",
+              note: "A new file, but it still runs on the main thread. Every request still waits for it.",
             },
           },
           { depth: 1, text: "routes/imports/", kind: "dir" },
@@ -171,7 +171,7 @@ export const LESSONS: Lesson<Side & { tree: TreeRow[] }>[] = [
             slot: {
               id: "inline",
               label: "↳ inline, in upload.ts",
-              note: "It runs on the main thread, so every other request waits 3 s for it.",
+              note: "It runs on the main thread, so every other request waits for it.",
             },
           },
           {

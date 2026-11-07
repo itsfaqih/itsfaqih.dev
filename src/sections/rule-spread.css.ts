@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
@@ -7,6 +8,7 @@ const HOVER = "(hover: hover) and (pointer: fine)";
 const STILL = ":not([data-dragging] *)";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
 const PRESSED = `:active${STILL}`;
+const RISEN = `:hover:not(:active)${STILL}`;
 const NUDGED = `:is(:hover > * > *)${STILL}`;
 
 /*
@@ -68,7 +70,7 @@ export const styles = {
     borderWidth: "2px",
     borderStyle: "solid",
     borderColor: "var(--c)",
-    boxShadow: `${palette["--raise"]}, 0 6px 0 var(--key)`,
+    boxShadow: `${palette["--raise"]}, ${drop(6, "var(--key)")}`,
     color: palette["--text"],
     textDecoration: "none",
     ...undraggable,
@@ -89,7 +91,7 @@ export const styles = {
         pointerEvents: "none",
       },
       [`&${PRESSED}`]: {
-        boxShadow: `${palette["--raise"]}, 0 3px 0 var(--key)`,
+        boxShadow: `${palette["--raise"]}, ${drop(3, "var(--key)")}`,
         translate: "0 3px",
         transitionDuration: motion["--t-moderate"],
         transitionTimingFunction: motion["--moderate"],
@@ -102,6 +104,16 @@ export const styles = {
       },
     },
     "@media": {
+      [`${HOVER} and (prefers-reduced-motion: no-preference)`]: {
+        selectors: {
+          [`&${RISEN}`]: {
+            boxShadow: `${palette["--raise"]}, ${drop(10, "var(--key)")}`,
+            translate: "0 -4px",
+            transitionDuration: motion["--t-moderate"],
+            transitionTimingFunction: motion["--moderate"],
+          },
+        },
+      },
       [REDUCE]: {
         selectors: {
           "&::after": {
@@ -216,7 +228,7 @@ export const styles = {
     fontFamily: fonts["--display"],
     // The nav's tabular figures are for the count, not the arrows.
     fontVariantNumeric: "normal",
-    boxShadow: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(3, palette["--drop-ink"])}`,
     cursor: cursors["--cursor-point"],
     // The press rides the moderate spring and the rim lights on the fast one.
     transitionProperty: "transform, box-shadow, border-color, background-color, color",
@@ -224,7 +236,7 @@ export const styles = {
     transitionTimingFunction: motion["--exit"],
     selectors: {
       "&:active:not(:disabled)": {
-        boxShadow: `${palette["--raise"]}, 0 1px 0 ${palette["--drop-ink"]}`,
+        boxShadow: `${palette["--raise"]}, ${drop(1, palette["--drop-ink"])}`,
         transform: "translateY(2px)",
       },
       "&&:active:not(:disabled)": {
@@ -245,7 +257,7 @@ export const styles = {
       "&:disabled": {
         backgroundColor: palette["--panel-2"],
         color: palette["--mute"],
-        boxShadow: `0 3px 0 ${palette["--drop-ink"]}`,
+        boxShadow: "none",
         cursor: cursors["--cursor-forbid"],
       },
     },

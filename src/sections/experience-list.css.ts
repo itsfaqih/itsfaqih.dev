@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
@@ -18,7 +19,7 @@ export const styles = {
     borderStyle: "solid",
     borderColor: palette["--hair"],
     borderRadius: "22px",
-    boxShadow: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`,
     overflow: "hidden",
   }),
   // A [data-cut] piece: the open state keys on data-on, so its class list never changes and the

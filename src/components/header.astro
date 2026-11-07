@@ -12,9 +12,11 @@ import Icon from "./icon.astro";
 type Props = {
   /** The page's pathname, which marks the current section's link. */
   path: string;
+  /** Whether the page sets a --hue for Connect to take on. */
+  hued?: boolean;
 };
 
-const { path } = Astro.props;
+const { path, hued = false } = Astro.props;
 const current = (active: boolean) => (active ? "page" : undefined);
 // The server can't see the hash; header.client.ts marks these once it can.
 const hashOnHome = (hash: string) => (path === "/" ? hash : undefined);
@@ -110,7 +112,9 @@ const glyphs = menuGlyphs(false);
       >
     </Seg>
     <Seg name="connect">
-      <a href="/#contact" class:list={[button.base, button.sm, styles.connect]}>Connect</a>
+      <a href="/#contact" class:list={[button.base, button.sm, styles.connect, hued && styles.connectHue]}
+        >Connect</a
+      >
     </Seg>
     <Seg name="menu">
       <button

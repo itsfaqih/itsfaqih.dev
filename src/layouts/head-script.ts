@@ -8,7 +8,8 @@ export const REST_AFTER_MS = 3500;
  * across pages, the rest fallback that settles the cut-ins when the islands that play them are slow
  * to arrive, and the cross-document view transitions' types. Opening a rule from its tile dives
  * into it (rule-open); leaving a rule for the index zooms back out onto its tile (rule-close); every
- * other page change fades through (page-fade).
+ * other page change fades through (page-fade). A rule's "Back to home" link zooms out the same way,
+ * onto the rule's card in the home deck.
  * The transition's pictures live on the new page, so the dive's origin crosses in sessionStorage.
  */
 export const HEAD_SCRIPT = String.raw`(function () {
@@ -53,6 +54,8 @@ export const HEAD_SCRIPT = String.raw`(function () {
     if (sameSite && !(entry && entry.type === "reload")) {
       doc.classList.add("from-site");
     }
+    // A rule page's back link returns home when the visit came from there.
+    if (sameSite && new URL(document.referrer).pathname === "/") doc.classList.add("from-home");
   } catch (e) {}
   // Whatever plays the cut-ins cancels the fallback once it starts: an island once it hydrates, a
   // custom element once it watches them (cut-ins.ts).
@@ -70,6 +73,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
 
   var RULE_PAGE = /^\/rule-of-thumb\/[^/]+$/;
   var RULE_INDEX = /^\/rule-of-thumb$/;
+  var HOME_DECK = "#rules";
   function pathOf(url) {
     return new URL(url, location.href).pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
   }
@@ -80,10 +84,13 @@ export const HEAD_SCRIPT = String.raw`(function () {
       return null;
     }
   }
-  function transitionType(from, to) {
+  function transitionType(fromUrl, toUrl) {
+    var from = pathOf(fromUrl);
+    var to = pathOf(toUrl);
     if (from === to) return null;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return "page-fade";
-    if (RULE_PAGE.test(from) && RULE_INDEX.test(to)) return "rule-close";
+    var toDeck = to === "/" && new URL(toUrl, location.href).hash === HOME_DECK;
+    if (RULE_PAGE.test(from) && (RULE_INDEX.test(to) || toDeck)) return "rule-close";
     var opening = dive();
     return opening && opening.href === to ? "rule-open" : "page-fade";
   }
@@ -101,14 +108,14 @@ export const HEAD_SCRIPT = String.raw`(function () {
   }
   addEventListener("pageswap", function (event) {
     if (!event.viewTransition || !event.activation) return;
-    var type = transitionType(pathOf(location.href), pathOf(event.activation.entry.url));
+    var type = transitionType(location.href, event.activation.entry.url);
     if (type) event.viewTransition.types.add(type);
     else event.viewTransition.skipTransition();
   });
   addEventListener("pagereveal", function (event) {
     if (!event.viewTransition) return;
     var from = self.navigation && navigation.activation && navigation.activation.from;
-    var type = from && from.url ? transitionType(pathOf(from.url), pathOf(location.href)) : null;
+    var type = from && from.url ? transitionType(from.url, location.href) : null;
     if (!type) return event.viewTransition.skipTransition();
     event.viewTransition.types.add(type);
     doc.dataset.vt = type;
@@ -123,12 +130,15 @@ export const HEAD_SCRIPT = String.raw`(function () {
       }
     }
     if (type === "rule-close") {
-      // The index lands at rest, as the dive left it, with the rule's tile named for the morph
-      // and the zoom centred on it.
+      // The index or the home deck lands at rest, as the dive left it, with the rule's tile named
+      // for the morph and the zoom centred on it.
       document.querySelectorAll("[data-cut]").forEach(function (piece) {
         piece.style.animation = "none";
         piece.classList.add("in");
       });
+      // The browser scrolls to the home deck after the first frame, too late for the morph.
+      var mark = location.hash && document.getElementById(location.hash.slice(1));
+      if (mark) mark.scrollIntoView({ behavior: "instant" });
       var tile = document.querySelector('[data-cut][href="' + pathOf(from.url) + '"]');
       if (tile) {
         tile.setAttribute("data-opening", "");

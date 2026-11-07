@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
@@ -607,7 +608,7 @@ export const styles = {
     borderColor: "currentcolor",
     borderRadius: "8px",
     backgroundColor: palette["--soft-key"],
-    boxShadow: `0 3px 0 ${palette["--soft-key-drop"]}`,
+    boxShadow: drop(3, palette["--soft-key-drop"]),
     fontWeight: 700,
     fontSize: "12px",
     lineHeight: "normal",
@@ -623,7 +624,7 @@ export const styles = {
         outlineOffset: "2px",
       },
       "&:active": {
-        boxShadow: `0 1px 0 ${palette["--soft-key-drop"]}`,
+        boxShadow: drop(1, palette["--soft-key-drop"]),
         transform: "translateY(2px)",
       },
     },

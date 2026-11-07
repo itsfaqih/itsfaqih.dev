@@ -1,3 +1,8 @@
+---
+name: proximity-principle
+description: Keep code next to the code that uses it. Use when you decide where a new file, component, helper or test goes, or whether to split code into its own file.
+---
+
 # Proximity Principle
 
 Keep code next to the code that uses it.
@@ -39,7 +44,7 @@ routes/orders/
 
 ## Comply with the constraint
 
-Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a 2-second report build there and other requests stop waiting on it.
+Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a slow report build there and other requests stop waiting on it.
 
 ```ts
 // src/routes/reports/export.ts

@@ -338,21 +338,7 @@ try {
     if (message.type() === "warning" || message.type() === "error")
       logs.push(`${message.type()}: ${message.text()}`);
   });
-  await open(small, "/blog/hello-world");
-  await small.evaluate(() => scrollTo(0, 600));
-  await small.waitForTimeout(600);
-  await small.locator('toc-drawer [data-part="trigger"]').click();
-  await expectHeard(small, "the TOC button opens the drawer with open, no tap", ["open"]);
-  await small.waitForTimeout(500);
-  await small.keyboard.press("Escape");
-  await expectHeard(small, "Escape closes the drawer with close", ["close"]);
-  await small.waitForTimeout(500);
-  await small.locator('toc-drawer [data-part="trigger"]').click();
-  await small.waitForTimeout(500);
-  await heard(small);
-  await small.locator("#toc-drawer a").first().click();
-  await expectHeard(small, "a TOC link closes the drawer with close, no tap", ["close"]);
-  await small.waitForTimeout(500);
+  await open(small, "/blog");
   const menu = small.locator('site-header [data-part="menu"]');
   await menu.click();
   await expectHeard(small, "the header menu opens with open, no tap", ["open"]);

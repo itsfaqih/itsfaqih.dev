@@ -1,6 +1,7 @@
 ---
+import { HINT } from "./hints";
 import { arcade } from "../components/arcade.css";
-import { AXIS, SWEEP, type Waterfall } from "./data-loading";
+import { AXIS, ORDERS, screenOf, SWEEP, type Waterfall } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
 
@@ -8,6 +9,8 @@ type Props = Waterfall;
 
 const { bars, paint } = Astro.props;
 const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
+const clock = (ms: number) => `${(ms / AXIS) * SWEEP}ms`;
+const screen = screenOf(Astro.props);
 const deferred = bars.some((bar) => bar.kind === "defer");
 ---
 
@@ -48,6 +51,36 @@ const deferred = bars.some((bar) => bar.kind === "defer");
           <i class={styles.tick} style={`left:${pct(ms)}`}>{ms}</i>
         ))
       }</span
+    ><div
+      class={view.screen("still")}
+      style={`--shell:${clock(screen.shell)};--rows:${clock(screen.rows)}${screen.reviews === undefined ? "" : `;--reviews:${clock(screen.reviews)}`}`}
+      aria-hidden="true"
+      data-part="screen"
+      data-hint-solid
+      ><span class={styles.wait}><span class={view.spin(false)}></span></span><div class={styles.page}
+        ><span class={styles.head}>Your orders</span><ul class={styles.histList}
+          >{
+            ORDERS.map(({ item, total, stars }) => (
+              <li class={styles.order}
+                ><span class={styles.orderBones}
+                  ><i class:list={[styles.bone, styles.boneItem]}></i><i
+                    class:list={[styles.bone, styles.boneTotal]}></i></span
+                ><span class={styles.orderRow}
+                  ><span class={styles.orderItem}>{item}</span>{
+                    screen.reviews !== undefined && (
+                      <span class={styles.review}
+                        ><span class={styles.reviewBone}><i class={styles.bone}></i></span><span
+                          class:list={[styles.stamp, styles.reviewStars]}>★ {stars}</span
+                        ></span
+                      >
+                    )
+                  }<b class:list={[styles.histAmount, styles.orderTotal]}>{total}</b></span
+                ></li
+              >
+            ))
+          }</ul
+        ></div
+      ></div
     ></div
   ><div class={styles.ctl}
     ><span class={styles.note}
@@ -57,7 +90,7 @@ const deferred = bars.some((bar) => bar.kind === "defer");
           <Fragment><i class:list={[styles.key, styles.keyDefer]}></i> deferred</Fragment>
         )
       }</span
-    ><button data-hint="true" type="button" class={view.ctlButton} data-part="replay">Replay</button
+    ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="replay">Replay</button
     ></div
   ></data-loading-waterfall
 >

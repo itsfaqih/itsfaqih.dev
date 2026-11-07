@@ -1,5 +1,7 @@
-import { OUTLINE } from "../arrows";
+import { drop } from "../bevel";
+import { ARROWS, HINT_LEAVE, HINT_MOTION } from "../arrows";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
+import { HINT_CELL, HINT_CHIP, OUT } from "./rule-landing.css";
 import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
 import { when } from "../when";
@@ -9,9 +11,12 @@ const PHONE = "(max-width: 640px)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
 const SQUINT = when.ancestor(':has([data-toggle="squint"][aria-pressed="true"])');
+const FOCUS_INSET = 6;
 const RING = when.ancestor(':has([data-toggle="ring"][aria-pressed="true"])');
 const HATCH = `repeating-linear-gradient(-45deg, color-mix(in srgb, ${palette["--focus"]} 55%, transparent) 0 2px, transparent 2px 5px)`;
-const NOTE_INK = `color-mix(in oklab, ${palette["--cw"]} ${palette["--ink-mix"]}, #000)`;
+// Dark mode's yellow, darkened halfway to light mode's gold so it reads on paper. In dark the gold
+// is the yellow itself, so the mix stays put.
+const FOCUS = `color-mix(in oklab, ${palette["--go"]} 50%, ${palette["--go-ink"]})`;
 
 export const styles = {
   stage: style({
@@ -48,9 +53,9 @@ export const styles = {
         borderWidth: 0,
         borderStyle: "none",
         borderColor: "currentcolor",
-        borderRadius: "12px",
+        borderRadius: "var(--key-r)",
         backgroundColor: "var(--face)",
-        boxShadow: "0 4px 0 var(--key)",
+        boxShadow: drop(4, "var(--key)"),
         fontWeight: 700,
         fontSize: "14px",
         lineHeight: "normal",
@@ -65,11 +70,12 @@ export const styles = {
           "--key": "color-mix(in oklab, var(--c) 60%, #000)",
           "--ink": `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`,
           "--face": "var(--c)",
+          "--key-r": "12px",
           "--lit": "color-mix(in oklab, var(--c) 82%, #fff)",
         },
         selectors: {
           "&:focus-visible": {
-            outline: `3px solid ${palette["--focus"]}`,
+            outline: `3px solid ${FOCUS}`,
             outlineOffset: "3px",
           },
         },
@@ -80,11 +86,11 @@ export const styles = {
     "@layer": {
       [under2]: {
         backgroundColor: "var(--face)",
-        boxShadow: "0 4px 0 var(--key)",
+        boxShadow: drop(4, "var(--key)"),
         selectors: {
           "&:active": {
             transform: "translateY(2px) scale(0.97)",
-            boxShadow: "0 2px 0 var(--key)",
+            boxShadow: drop(2, "var(--key)"),
           },
         },
         "@media": {
@@ -117,9 +123,9 @@ export const styles = {
     "@layer": {
       [under2]: {
         height: "38px",
-        borderRadius: "10px",
         fontSize: "12px",
         vars: {
+          "--key-r": "10px",
           "--pl": "16px",
           "--pr": "16px",
         },
@@ -150,7 +156,7 @@ export const styles = {
   plain: style({
     "@layer": {
       [under1]: {
-        boxShadow: `0 4px 0 ${palette["--soft-key-drop"]}`,
+        boxShadow: drop(4, palette["--soft-key-drop"]),
         color: palette["--text"],
         vars: {
           "--face": palette["--soft-key"],
@@ -158,7 +164,7 @@ export const styles = {
         },
         selectors: {
           "&:active": {
-            boxShadow: `0 2px 0 ${palette["--soft-key-drop"]}`,
+            boxShadow: drop(2, palette["--soft-key-drop"]),
           },
         },
       },
@@ -186,7 +192,7 @@ export const styles = {
     "@layer": {
       [under1]: {
         transform: "translateY(2px) scale(0.97)",
-        boxShadow: "0 2px 0 var(--key)",
+        boxShadow: drop(2, "var(--key)"),
         "@media": {
           [REDUCE]: {
             transform: "none",
@@ -195,11 +201,21 @@ export const styles = {
       },
     },
   }),
+  // Drawn round the key's 4px drop as well as its face, which an outline can't do, so the ring
+  // keeps the same 3px gap all round. Its corners follow the key's, 6px further out.
   focus: style({
     "@layer": {
       [under1]: {
-        outline: `3px solid ${palette["--focus"]}`,
-        outlineOffset: "3px",
+        selectors: {
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            inset: `-${FOCUS_INSET}px -${FOCUS_INSET}px -${FOCUS_INSET + 4}px`,
+            border: `3px solid ${FOCUS}`,
+            borderRadius: `calc(var(--key-r) + ${FOCUS_INSET}px)`,
+            pointerEvents: "none",
+          },
+        },
       },
     },
   }),
@@ -223,7 +239,7 @@ export const styles = {
   }),
   flatForced: style({
     backgroundColor: "var(--face)",
-    boxShadow: "0 4px 0 var(--key)",
+    boxShadow: drop(4, "var(--key)"),
     transform: "none",
     outline: "none",
   }),
@@ -254,10 +270,10 @@ export const styles = {
   }),
   specimenKey: style({
     height: "32px",
-    borderRadius: "8px",
     fontSize: "11px",
     transition: "none",
     vars: {
+      "--key-r": "8px",
       "--pl": "12px",
       "--pr": "12px",
     },
@@ -274,11 +290,11 @@ export const styles = {
     gap: "10px",
   }),
   off: style({
-    boxShadow: `0 4px 0 ${palette["--soft-key-drop"]}`,
     color: palette["--dim"],
     cursor: cursors["--cursor-forbid"],
     vars: {
       "--face": palette["--soft-key"],
+      "--bevel": "0",
     },
   }),
   card: style({
@@ -351,70 +367,77 @@ export const styles = {
       },
     },
   }),
+  // A pixel arrow under a chip, drawn like the demos' hints, while Squint is on. It leaves like
+  // them too: the arrow pulls back into the chip, then the chip fades.
   squintNote: style({
     position: "absolute",
-    bottom: "calc(100% + 2px)",
+    bottom: `calc(100% + ${ARROWS.hint.targetGap}px)`,
     left: "50%",
+    translate: "-50% 0",
     display: "grid",
     justifyItems: "center",
-    gap: "2px",
-    fontWeight: 600,
-    fontSize: "13px",
-    lineHeight: 1,
-    fontFamily: fonts["--display"],
-    whiteSpace: "nowrap",
-    color: NOTE_INK,
-    textShadow: `0 0 3px ${palette["--panel"]}, 0 0 3px ${palette["--panel"]}`,
+    gap: `${ARROWS.hint.labelGap}px`,
+    vars: { "--hint": palette["--cw"] },
     pointerEvents: "none",
     visibility: "hidden",
-    opacity: 0,
-    transform: "translate(-50%, 4px)",
-    transition: "opacity 200ms ease, transform 200ms ease, visibility 0s 200ms",
+    transition: `visibility 0s ${HINT_LEAVE}ms`,
     selectors: {
       [`&${SQUINT}`]: {
         // Inherit, so a note in the hidden pane stays hidden with it.
         visibility: "inherit",
-        opacity: 1,
-        transform: "translate(-50%, 0)",
-        transition: "opacity 220ms ease 120ms, transform 220ms ease 120ms",
+        transition: "none",
       },
     },
     "@media": {
       [REDUCE]: {
-        transition: "none",
+        opacity: 0,
+        transition: `opacity ${HINT_LEAVE}ms ease-out, visibility 0s ${HINT_LEAVE}ms`,
         selectors: {
           [`&${SQUINT}`]: {
-            transition: "none",
+            opacity: 1,
           },
         },
       },
     },
   }),
-  // Outlined in its own colour so the brush's corners round off like marker.
-  squintInk: style({
-    fill: "currentColor",
-    stroke: "currentColor",
-    strokeWidth: OUTLINE,
-    strokeLinejoin: "round",
-  }),
-  // The arrow's mask: its centreline, stroked over the ink, draws the arrow in.
-  squintReveal: style({
-    fill: "none",
-    stroke: "white",
-    strokeLinecap: "round",
-    strokeDasharray: 1,
-    strokeDashoffset: 1,
-    transition: "stroke-dashoffset 0s 200ms",
+  squintLabel: style({
+    ...HINT_CHIP,
+    opacity: 0,
+    scale: "0.92",
+    transition: `opacity ${HINT_MOTION.labelLeavesFor}ms ease-out ${HINT_MOTION.labelLeavesAt}ms, scale 0s ${HINT_LEAVE}ms`,
     selectors: {
       [`&${SQUINT}`]: {
-        strokeDashoffset: 0,
-        transition: "stroke-dashoffset 500ms ease 220ms",
+        opacity: 1,
+        scale: "1",
+        transition: `opacity ${HINT_MOTION.popFor}ms ${OUT}, scale ${HINT_MOTION.popFor}ms ${OUT}`,
       },
     },
     "@media": {
       [REDUCE]: {
-        strokeDashoffset: 0,
-        transition: "none",
+        scale: "none",
+      },
+    },
+  }),
+  // Each cell shows at its own --at and hides at its own --out.
+  squintCell: style({
+    ...HINT_CELL,
+    opacity: 0,
+    transition: "opacity 0s linear var(--out)",
+    selectors: {
+      [`&${SQUINT}`]: {
+        opacity: 1,
+        transition: "opacity 0s linear var(--at)",
+      },
+    },
+    "@media": {
+      [REDUCE]: {
+        // The note fades as one instead.
+        transition: `opacity 0s linear ${HINT_LEAVE}ms`,
+        selectors: {
+          [`&${SQUINT}`]: {
+            transition: "none",
+          },
+        },
       },
     },
   }),

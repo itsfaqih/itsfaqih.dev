@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import DialogBox from "./dialog-box.astro";
 import { cardView } from "./dialog-design.view";
 import { styles } from "./dialog-design.css";
@@ -16,7 +17,7 @@ const { sealed = false } = Astro.props;
   <DialogWindow>
     <div slot="page" class={styles.page} data-part="page">
       <div class={styles.spread}><span class={styles.logo}></span><span style="--w:30%" class={styles.ghost}></span></div>
-      <div class={cardView(false)} data-part="card"><span class={styles.project}><b class={styles.strong}>Moonbase</b><small class={styles.meta}>214 files · edited 2h ago</small></span><button data-hint="true" type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.red, styles.redTint]}>Delete project</button></div>
+      <div class={cardView(false)} data-part="card"><span class={styles.project}><b class={styles.strong}>Moonbase</b><small class={styles.meta}>214 files · edited 2h ago</small></span><button data-hint={HINT.open} type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.red, styles.redTint]}>Delete project</button></div>
       <span style="--w:62%" class={styles.ghost}></span>
       <span style="--w:48%" class={styles.ghost}></span>
     </div>

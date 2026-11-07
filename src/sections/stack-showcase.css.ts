@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 
 import { style, keyframes } from "@vanilla-extract/css";
@@ -224,7 +225,7 @@ export const styles = {
     backgroundImage: TOOL_RING,
     backgroundClip: "padding-box, border-box",
     backgroundOrigin: "border-box",
-    boxShadow: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`,
     pointerEvents: "none",
     animationName: peekIn,
     animationDuration: motion["--t-moderate"],

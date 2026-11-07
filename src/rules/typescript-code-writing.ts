@@ -55,7 +55,7 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
           {
             id: "named",
             label: "export function formatPrice",
-            note: "Export it by name. Every import must spell formatPrice, so the typo fails where it's written.",
+            note: "Export it by name. Every import must spell formatPrice, so the typo fails where you wrote it.",
           },
           {
             id: "local",
@@ -248,7 +248,7 @@ export const LESSONS: Lesson<Side & { lines: Line[] }>[] = [
             slot: {
               id: "ret",
               label: "export function findOrder(id: string)",
-              note: "Annotate the return type, the contract. find can miss, so the build fails at the return, inside findOrder.",
+              note: "Annotate the return type, since it is the contract. find can miss, so the build fails at the return, inside findOrder.",
             },
           },
           { depth: 1, text: "return orders.find((o) => o.id === id)" },

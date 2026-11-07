@@ -47,13 +47,13 @@ const rows = (lesson: (typeof LESSONS)[number]) =>
 
   <RuleLesson lesson={constraint} rows={rows(constraint)}>
     <Fragment slot="body"
-      >Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a 2-second report build there and other requests stop waiting on it.</Fragment
+      >Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a slow report build there and other requests stop waiting on it.</Fragment
     >
     <Tree slot="bad" rows={constraint.bad.tree} />
     <Tree slot="good" rows={constraint.good.tree} />
   </RuleLesson>
   <RuleQuiz n={3} level={constraint.levels[0]} board="tree"
-    ><Code tone="prompt">parseCsv()</Code> takes 3 s of CPU on a large upload, and only <Code tone="prompt">upload.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
+    ><Code tone="prompt">parseCsv()</Code> takes seconds of CPU on a large upload, and only <Code tone="prompt">upload.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
   >
 
   <RuleLesson lesson={ancestor} rows={rows(ancestor)}>

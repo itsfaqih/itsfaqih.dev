@@ -1,6 +1,6 @@
 import { button } from "../components/button.css";
 import { buttonVariant } from "../components/button";
-import type { Verdict } from "./null-vs-undefined";
+import { type Verdict, wentWrong } from "./null-vs-undefined";
 import { cx, type ClassValue } from "../cx";
 import { styles } from "./null-vs-undefined.css";
 const TOKEN =
@@ -35,13 +35,14 @@ export function paint(source: string, kinds: readonly ClassValue[]): Painted[] {
 /** Classes the save demo (null-flow.astro) and its element share. */
 export const flowView = {
   button: cx(button.base, buttonVariant["primary-neutral"], button.sm, styles.button),
+  save: cx(button.base, buttonVariant["secondary-hue"], button.sm, styles.button),
   body: (typing: boolean) => cx(styles.body, typing && styles.typing),
   packet: (dropping: boolean) => cx(styles.packet, dropping && styles.dropping),
   cell: (verdict: Verdict | undefined, ran: boolean) =>
     cx(
       styles.cell,
       verdict === "saved" && styles.cellSaved,
-      (verdict === "wiped" || verdict === "lost") && styles.cellLost,
+      verdict !== undefined && wentWrong(verdict) && styles.cellLost,
       ran && verdict !== undefined && styles.flashing,
     ),
   value: (bad: boolean, landing: boolean) =>
@@ -50,16 +51,18 @@ export const flowView = {
   tag: (verdict: Verdict) =>
     cx(
       styles.tag,
-      (verdict === "saved" || verdict === "kept") && styles.tagKept,
-      (verdict === "wiped" || verdict === "lost") && styles.tagLost,
+      wentWrong(verdict) ? styles.tagLost : styles.tagKept,
     ),
 };
 
 /** Classes a pick board (null-pick-board.astro) and its element share. */
 export const pickView = {
   key: (on: boolean) => cx(styles.pickKey, on && styles.pickKeyOn),
-  check: cx(button.base, buttonVariant["primary-brand"], button.sm, styles.pickCheck),
+  check: cx(button.base, buttonVariant["primary-hue"], button.sm, styles.pickCheck),
   /** A Result line, tinted by whether it matches Wanted; unsent, it waits for Check. */
   result: (hit?: boolean) =>
-    cx(styles.pickRecordLine, hit === undefined ? styles.pickUnsent : hit ? styles.pickHit : styles.pickMiss),
+    cx(
+      styles.pickRecordLine,
+      hit === undefined ? styles.pickUnsent : hit ? styles.pickHit : styles.pickMiss,
+    ),
 };

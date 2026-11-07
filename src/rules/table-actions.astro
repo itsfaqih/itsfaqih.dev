@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { row } from "./table-design.markers";
 import Icon from "../components/icon.astro";
 import { arcade } from "../components/arcade.css";
@@ -35,7 +36,7 @@ const { careful } = Astro.props;
         CREW.map(({ name, role }, at) => (
           <tr class={row} data-name={name}
             ><td class={view.nameCell(false)}
-              ><span data-hint={at === 0 ? "true" : undefined} data-part="name">{name}</span>{
+              ><span data-hint={at === 0 ? HINT.hover : undefined} data-part="name">{name}</span>{
                 !careful && (
                   <span class={styles.inline}
                     ><button

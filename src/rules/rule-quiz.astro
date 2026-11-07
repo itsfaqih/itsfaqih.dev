@@ -1,12 +1,13 @@
 ---
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { Level } from "./lesson";
+import HintLayer from "./hint-layer.astro";
 import { host, lessonKit, quizKit, shell, tree } from "./rule-landing.css";
 import { quizView } from "./rule-landing.view";
 
 /**
  * Draws a row's string as markup, from props `text` and `tone` (how code reads where it lands: "wrap"
- * inside a slot button, "plain" elsewhere). A text row's mark also gets the whole `row`.
+ * inside a slot button, "plain" elsewhere).
  */
 type Mark = AstroComponentFactory;
 
@@ -35,7 +36,7 @@ const hint = asked ?? (place
   data-answer={level.answer}
   data-piece={place?.piece}
   data-board={board}
-  data-hint={hint}
+  data-ask={hint}
   data-sound="none"
 >
   <article id={`lv-${n}`} class:list={[lessonKit.panel, quizKit.level, shell.rev]} data-rev="true">
@@ -50,7 +51,7 @@ const hint = asked ?? (place
       </div>
     </div>
 
-    <div class:list={[lessonKit.well, quizKit.board, !place && quizKit.chooseBoard]}>
+    <div class:list={[lessonKit.well, quizKit.board, !place && quizKit.chooseBoard]} data-hint-zone="true">
       {
         place ? (
           <Fragment>
@@ -70,7 +71,7 @@ const hint = asked ?? (place
                   >
                 ) : (
                   <li style={`--d:${row.depth}`} class:list={[tree.row, row.kind && tree[row.kind]]}
-                    >{Text ? <Text text={row.text} tone="plain" row={row} /> : row.text}{row.tag && <span class={tree.calls}>{row.tag}</span>}</li
+                    >{Text ? <Text text={row.text} tone="plain" /> : row.text}{row.tag && <span class={tree.calls}>{row.tag}</span>}</li
                   >
                 ),
               )
@@ -83,7 +84,7 @@ const hint = asked ?? (place
               aria-pressed="false"
               aria-label={`${place.piece}. Pick up`}
               data-part="piece">{place.piece}</button
-            ><span class={quizKit.trayNote} data-part="note">Your piece</span>
+            ><span class={quizKit.trayNote} data-part="note"></span>
           </div>
           </Fragment>
         ) : (
@@ -91,6 +92,7 @@ const hint = asked ?? (place
         )
       }
     </div>
+    <HintLayer />
   </article>
   <template data-part="seat"
     ><span class:list={[place ? [quizKit.piece, quizKit.seated] : quizKit.tick]}

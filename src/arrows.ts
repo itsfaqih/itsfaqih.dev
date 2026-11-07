@@ -1,29 +1,18 @@
 export type Point = { x: number; y: number };
 
-/** The golden ratio. A hint's curve takes its proportions from it. */
-const PHI = (1 + Math.sqrt(5)) / 2;
-
 /**
  * How every arrow on the site looks, by family, in px. A hint is drawn in `grid` px cells and ends
- * in a pixel head `head` rows deep. Squint and hero arrows are marker strokes: `tail` wide at the
- * nock, swelling to `body`, under a solid head `head` long and `barb` wide whose back is cut `notch`
- * deep. The dev-only tuner edits these in place and redraws, so read them at draw time, never into
- * a module constant.
+ * in a pixel head `head` rows deep. Hero arrows are marker strokes: `tail` wide at the nock,
+ * swelling to `body`, under a solid head `head` long and `barb` wide whose back is cut `notch` deep.
  */
 export const ARROWS = {
-  /** "Try it" arrows in a demo pane. */
+  /** Hint arrows in a demo pane. */
   hint: {
     grid: 3,
     head: 3,
-    // How long the curve runs before the head. A label steps out from its target until its curve
-    // is this long. Where that lands on words or controls it tries shorter curves, then longer ones.
-    length: 48,
-    // Each end turns off the line between the centres by the angle whose tangent is 1/φ², and each
-    // control point sits 1/φ² of the curve out from its end.
-    bow: 1 / PHI ** 2,
-    handle: 1 / PHI ** 2,
-    // The tightest a curve may bend, as a radius. A bow that would bend tighter eases off.
-    bend: 20,
+    // How long the line runs before the head. A label steps out from its target until its line is
+    // this long. Where that lands on words or controls it tries shorter lines, then longer ones.
+    length: 22,
     labelGap: 6,
     targetGap: 6,
   },
@@ -31,15 +20,6 @@ export const ARROWS = {
     reach: 41,
     labelGap: 4,
     targetGap: 5,
-  },
-  /** The arrows under Squint's notes. */
-  squint: {
-    tail: 0.6,
-    body: 2.2,
-    head: 5.5,
-    barb: 6.5,
-    notch: 1.6,
-    length: 12,
   },
   /** The ghost arrows in the hero's queue scene. */
   hero: {
@@ -51,43 +31,7 @@ export const ARROWS = {
   },
 };
 
-export type ArrowFamily = keyof typeof ARROWS;
 export type HintLook = typeof ARROWS.hint;
-type ToggleLook = typeof ARROWS.toggle;
-type SectionArrows = { hint?: Partial<HintLook>; toggle?: Partial<ToggleLook> };
-
-/**
- * A lesson's own hint arrows, keyed by sectionKey(), over the values above. Squint and hero
- * arrows each appear in one section, so their values above are already that section's.
- */
-export const SECTIONS = new Map<string, SectionArrows>([]);
-
-/** The hint arrows of the lesson `section`, or the site's when it has none of its own. */
-export function arrowsFor(section: string | undefined) {
-  const own = section === undefined ? undefined : SECTIONS.get(section);
-  return {
-    hint: { ...ARROWS.hint, ...own?.hint },
-    toggle: { ...ARROWS.toggle, ...own?.toggle },
-  };
-}
-
-/** A lesson's key in SECTIONS: its page and title, as in "button-design/give-every-state-a-look". */
-export function sectionKey(path: string, title: string) {
-  const page =
-    path
-      .split("/")
-      .filter(Boolean)
-      .at(-1)
-      ?.replace(/\.html$/, "") ?? "";
-  const slug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-  return `${page}/${slug}`;
-}
-
-/** The window event the tuner fires after it edits ARROWS, so drawn arrows redraw. */
-export const ARROWS_CHANGED = "arrows";
 
 /** The width of the outline that rounds a brush arrow's filled edges. */
 export const OUTLINE = 0.6;
@@ -132,7 +76,7 @@ export function walk(points: Point[]) {
   return { s, total, at };
 }
 
-export const octant = (angle: number) => Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+const octant = (angle: number) => Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
 
 export const fmt = (p: Point) => `${+p.x.toFixed(2)} ${+p.y.toFixed(2)}`;
 
@@ -200,7 +144,7 @@ export type BrushArrow = ReturnType<typeof brush>;
 
 /**
  * The cell that joins two cells meeting only at a corner, which would read as a gap in the line:
- * whichever of the two the curve, at `p`, passed nearer to.
+ * whichever of the two the trail, at `p`, passed nearer to.
  */
 function bridge(from: Point, to: Point, p: Point, grid: number) {
   const off = (q: Point) => Math.hypot((q.x + 0.5) * grid - p.x, (q.y + 0.5) * grid - p.y);
@@ -227,7 +171,7 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
   const { dir } = at(total);
   const turn = octant(Math.atan2(dir.y, dir.x));
   const d = { x: Math.round(Math.cos(turn)), y: Math.round(Math.sin(turn)) };
-  const tip = cell(spine.at(-1) ?? { x: 0, y: 0 });
+  const tip = cell(spine.at(-1)!);
   const arrowhead: Point[] = [];
   for (let r = head; r >= 0; r--) {
     if (d.x && d.y) {
@@ -250,16 +194,33 @@ export function pixels(spine: Point[], look: { grid: number; head: number }) {
 
 export type PixelArrow = ReturnType<typeof pixels>;
 
-/** A marker arrow `length` long pointing down, in a box that just fits it. */
-export function downArrow(look: typeof ARROWS.squint) {
-  const pad = 1;
-  const x = look.barb / 2 + pad;
-  const arrow = brush(
-    [
-      { x, y: pad },
-      { x, y: pad + look.length },
-    ],
-    look,
-  );
-  return { ...arrow, width: +(2 * x).toFixed(2), height: +(look.length + 2 * pad).toFixed(2) };
-}
+/**
+ * How a hint moves, in ms. Its label pops in over `popFor`. Its trail shoots out from `trailAt` over
+ * `trailFor`, fast off the label and slowing into the target, then its ring pulses `ringGrows` px
+ * out. It leaves the way it came: the trail pulls back from the tip into the label over
+ * `retractFor`, and the label fades from `labelLeavesAt` over `labelLeavesFor`.
+ */
+export const HINT_MOTION = {
+  popFor: 260,
+  trailAt: 140,
+  trailFor: 420,
+  ringGrows: 10,
+  retractFor: 200,
+  labelLeavesAt: 140,
+  labelLeavesFor: 180,
+};
+
+/** How long a hint takes to leave, label and all. */
+export const HINT_LEAVE = HINT_MOTION.labelLeavesAt + HINT_MOTION.labelLeavesFor;
+
+// Where an ease-out has a run of `count` steps by step `i`, from 0 to 1, so it starts fast and settles.
+const eased = (i: number, count: number) => 1 - Math.sqrt(1 - i / Math.max(1, count - 1));
+
+/**
+ * When trail cell `i` of `count` shows on the way in (`at`), the label end first, and hides on the
+ * way out (`out`), the tip first.
+ */
+export const cellTimes = (i: number, count: number) => ({
+  at: HINT_MOTION.trailAt + eased(i, count) * HINT_MOTION.trailFor,
+  out: eased(count - 1 - i, count) * HINT_MOTION.retractFor,
+});

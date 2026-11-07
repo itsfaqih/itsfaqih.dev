@@ -28,7 +28,7 @@ const key = [styles.key, styles.sm, styles.flat];
   take="build buttons the same way"
 >
   <Fragment slot="lead">Style every state, weigh each variant, and line up the icon.</Fragment>
-  <Fragment slot="intro">Give each state a visible change, so no press feels lost.</Fragment>
+  <Fragment slot="intro">Give each state a visible change, so people can tell each press worked.</Fragment>
 
   <RuleLesson lesson={states}>
     <Fragment slot="body"
@@ -54,7 +54,7 @@ const key = [styles.key, styles.sm, styles.flat];
 
   <RuleLesson lesson={still}>
     <Fragment slot="body"
-      >A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Keep its colour and its drop still on hover and press. Hover Back in both.</Fragment
+      >A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Lay it flat, then keep it still on hover and press. Hover Back in both.</Fragment
     >
     <ButtonStill slot="bad" />
     <ButtonStill slot="good" careful />
@@ -158,7 +158,7 @@ const key = [styles.key, styles.sm, styles.flat];
 
   <RuleLesson lesson={square}>
     <Fragment slot="body"
-      >Making a button with only an icon square is the easy part. The padding is the trap. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.</Fragment
+      >Keep a button with only an icon square, and don't copy a text button's padding. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.</Fragment
     >
     <ButtonToggle slot="extra" label="Show padding" name="ring" />
     <ButtonSquare slot="bad" />

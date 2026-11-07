@@ -62,10 +62,10 @@ const footerVeil = cx(loadIn.veil, veil.dense);
             ><span class={words} data-cut="true">Experience</span></small
           ><span class={titleText} data-cut="true">Where I've worked</span></h2
         ><a
-          class:list={[loadIn.piece, button.base, buttonVariant["secondary-pink"], button.iconEnd, styles.overDots]}
+          class:list={[loadIn.piece, button.base, buttonVariant["secondary-pink"], button.iconEnd, button.lift, styles.overDots]}
           href="/cv"
           data-cut="true"
-          >View CV<Icon name="ArrowRight" size={18} weight="bold" /></a
+          >View CV<Icon name="ArrowRight" size={18} weight="bold" class={button.nudge} /></a
         ></div
       ><ExperienceList jobs={EXPERIENCE} /></section
     ><StackShowcase groups={STACK_GROUPS} sources={STACK_SOURCES} />{
@@ -114,10 +114,10 @@ const footerVeil = cx(loadIn.veil, veil.dense);
         data-cut="true"
         style="margin-top:24px"
         ><a
-          class:list={[button.base, buttonVariant["primary-purple"]]}
+          class:list={[button.base, buttonVariant["primary-purple"], button.lift]}
           href={`mailto:${LINKS.email}`}>{`Email ${LINKS.email}`}</a
         ><a
-          class:list={[button.base, buttonVariant["secondary-purple"]]}
+          class:list={[button.base, buttonVariant["secondary-purple"], button.lift]}
           href={LINKS.linkedin}
           {...external}>LinkedIn</a
         ></div

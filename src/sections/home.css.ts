@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 const STACKED = "(max-width: 960px)";
@@ -72,14 +73,14 @@ export const styles = {
     borderWidth: "2px",
     borderStyle: "solid",
     borderColor: palette["--hair"],
-    boxShadow: `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`,
     transitionProperty: "transform, box-shadow, border-color",
     transitionDuration: `${motion["--t-moderate-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}`,
     transitionTimingFunction: motion["--exit"],
     selectors: {
       "&:focus-visible": {
         borderColor: "var(--c)",
-        boxShadow: `${palette["--raise"]}, 0 8px 0 var(--key)`,
+        boxShadow: `${palette["--raise"]}, ${drop(8, "var(--key)")}`,
         transform: LIFT,
         outline: `3px solid ${palette["--focus"]}`,
         outlineOffset: "3px",
@@ -89,7 +90,7 @@ export const styles = {
       "&:active": {
         borderColor: "var(--c)",
         // Repeated under the media query, which would otherwise let hovering outrank pressing.
-        boxShadow: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+        boxShadow: `${palette["--raise"]}, ${drop(1, "var(--key)")}`,
         transform: "translateY(3px)",
         transitionDuration: LIFT_TIME,
         transitionTimingFunction: LIFT_EASE,
@@ -124,13 +125,13 @@ export const styles = {
         selectors: {
           "&:hover": {
             borderColor: "var(--c)",
-            boxShadow: `${palette["--raise"]}, 0 8px 0 var(--key)`,
+            boxShadow: `${palette["--raise"]}, ${drop(8, "var(--key)")}`,
             transform: LIFT,
             transitionDuration: LIFT_TIME,
             transitionTimingFunction: LIFT_EASE,
           },
           "&:active": {
-            boxShadow: `${palette["--raise"]}, 0 1px 0 var(--key)`,
+            boxShadow: `${palette["--raise"]}, ${drop(1, "var(--key)")}`,
           },
           "&&:active": {
             transform: "translateY(3px)",
@@ -165,7 +166,7 @@ export const styles = {
     borderWidth: "2px",
     borderStyle: "solid",
     borderColor: "var(--c)",
-    boxShadow: `${palette["--raise"]}, 0 5px 0 color-mix(in oklab, var(--c) 62%, #000)`,
+    boxShadow: `${palette["--raise"]}, ${drop(5, "color-mix(in oklab, var(--c) 62%, #000)")}`,
     vars: {
       "--c": palette["--ax"],
     },

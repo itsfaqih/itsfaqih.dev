@@ -1,3 +1,8 @@
+---
+name: null-vs-undefined
+description: Use undefined for a value nobody gave, and null for one emptied on purpose. Use when a field, parameter or API value can be missing or cleared, or a lookup can find nothing.
+---
+
 # Null vs Undefined
 
 Use undefined for a value nobody gave, and null for one emptied on purpose.
@@ -41,7 +46,7 @@ When a caller clears a field, send `null`. JSON drops keys set to `undefined`, s
 
 ```ts
 changes.reviewer = null;
-patch("/tasks/12", changes); // body: { "reviewer": null }, the reviewer is removed
+patch("/tasks/12", changes); // body: { "reviewer": null }, so the server removes the reviewer
 ```
 
 ## Leave untouched fields out
@@ -69,11 +74,23 @@ save({ title, assignee: null }); // 0 errors
 
 ## Return null for not found
 
-Return `null` from a lookup that finds nothing. `Map.get` returns `undefined`, which `JSON.stringify` turns into an empty body the client fails to parse.
+Return `null` from a lookup that finds nothing. A forgotten return gives `undefined` too, and the caller reads it as "not found". Type the lookup to return `User | null` and the slip fails the build.
 
 ```ts
-const user = users.get(email); // undefined
-JSON.stringify(user); // undefined, 0 bytes: JSON.parse throws a SyntaxError
-const body = JSON.stringify(user ?? null); // "null", 4 bytes
-JSON.parse(body); // null, so show "No such user"
+function findUser(email: string): User | null {
+  const cached = cache.get(email);
+  if (cached) return cached;
+  users.find((u) => u.email === email); // TS2366: the return is missing
+}
+// Typed User | undefined, this compiles, and findUser("ana@x.io") gives undefined though Ana exists.
+```
+
+The fix returns the miss as `null`:
+
+```ts
+function findUser(email: string): User | null {
+  const cached = cache.get(email);
+  if (cached) return cached;
+  return users.find((u) => u.email === email) ?? null;
+}
 ```

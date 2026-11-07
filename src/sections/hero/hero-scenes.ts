@@ -103,8 +103,9 @@ const ABSORB_MS = 128;
 const ARC_MS = 448;
 const PULSE_MS = 64;
 const SETTLE_MS = 256;
-const ADVANCE_COUNT = 7;
-const ADVANCE_EVERY_MS = (BACKENDS_MS - ROUTE_MS - WORK_MS - SETTLE_MS) / (ADVANCE_COUNT - 1);
+const ADVANCE_EVERY_MS = 484;
+// The queue keeps its pace until the scene hands off, so the last jobs are still working then.
+const ADVANCE_COUNT = Math.floor((BACKENDS_MS - ROUTE_MS) / ADVANCE_EVERY_MS) + 1;
 const ADVANCES = Array.from({ length: ADVANCE_COUNT }, (_, k) => k * ADVANCE_EVERY_MS);
 const HUE_REJECTED = 1;
 const HUE_RETURNS = 2;
@@ -124,9 +125,6 @@ type JobStop = {
   opacity?: number;
   ease?: string;
 };
-
-const jobFrame = ({ at, x, y = 0, scale = 1, opacity = 1, ease }: JobStop) =>
-  `${backendsPct(at)} { opacity: ${opacity}; transform: translate(${+x.toFixed(1)}px, ${+y.toFixed(1)}px) scale(${scale});${ease ? ` animation-timing-function: ${ease};` : ""} }`;
 
 function queued(fromSlot: number, advances: number[], since = 0): JobStop[] {
   const stops: JobStop[] = [{ at: since, x: SLOT_X[fromSlot]! }];
@@ -214,42 +212,53 @@ export const jobRest = ({ stops }: (typeof JOBS)[number]) => {
 export const RETRY_WORKER = workerOf(HUE_PASSES);
 const REJECTED_AT = intoWorkerAt(HUE_REJECTED);
 
+type Key = { at: number; css: string; ease?: string };
+
+// Work still under way when the scene hands off stops where it is.
+const keyframes = (name: string, keys: Key[]) => {
+  const kept = keys.filter(({ at }) => at <= BACKENDS_MS);
+  const last = kept.at(-1)!;
+  if (last.at < BACKENDS_MS) kept.push({ at: BACKENDS_MS, css: last.css });
+  const frame = ({ at, css, ease }: Key) =>
+    `${backendsPct(at)} { ${css}${ease ? ` animation-timing-function: ${ease};` : ""} }`;
+  return `@keyframes ${name} { ${kept.map(frame).join(" ")} }`;
+};
+
+const jobKey = ({ at, x, y = 0, scale = 1, opacity = 1, ease }: JobStop): Key => ({
+  at,
+  css: `opacity: ${opacity}; transform: translate(${+x.toFixed(1)}px, ${+y.toFixed(1)}px) scale(${scale});`,
+  ease,
+});
+
 function queueKeyframes() {
-  const heldToEnd = (stops: JobStop[]) =>
-    stops.at(-1)!.at < BACKENDS_MS
-      ? [...stops, { ...stops.at(-1)!, at: BACKENDS_MS, ease: undefined }]
-      : stops;
-  const jobs = JOBS.map(
-    ({ stops }, k) => `@keyframes hp-job-${k} { ${heldToEnd(stops).map(jobFrame).join(" ")} }`,
-  );
-  const work = (advance: number) => {
+  const jobs = JOBS.map(({ stops }, k) => keyframes(`hp-job-${k}`, stops.map(jobKey)));
+  const rest = "transform: scale(0.72);";
+  const busy = "transform: scale(1);";
+  const work = (advance: number): Key[] => {
     const at = intoWorkerAt(advance);
     const release = advance === HUE_REJECTED ? at : at + WORK_MS;
     return [
-      `${backendsPct(at)} { transform: scale(0.72); animation-timing-function: ${SPRING}; }`,
-      `${backendsPct(at + PULSE_MS)} { transform: scale(1); animation-timing-function: ${INOUT}; }`,
-      ...(advance === HUE_REJECTED
-        ? []
-        : [
-            `${backendsPct(release)} { transform: scale(1); animation-timing-function: ${INOUT}; }`,
-          ]),
-      `${backendsPct(release + SETTLE_MS)} { transform: scale(0.72); }`,
+      { at, css: rest, ease: SPRING },
+      { at: at + PULSE_MS, css: busy, ease: INOUT },
+      ...(advance === HUE_REJECTED ? [] : [{ at: release, css: busy, ease: INOUT }]),
+      { at: release + SETTLE_MS, css: rest },
     ];
   };
-  const emit = (advance: number) => {
+  const hidden = "opacity: 0;";
+  const emit = (advance: number): Key[] => {
     const at = intoWorkerAt(advance) + WORK_MS;
     return [
-      `${backendsPct(at)} { opacity: 0; transform: none; animation-timing-function: ${OUT}; }`,
-      `${backendsPct(at + PULSE_MS / 2)} { opacity: 1; }`,
-      `${backendsPct(at + SETTLE_MS)} { opacity: 0; transform: translateX(28px); }`,
+      { at, css: `${hidden} transform: none;`, ease: OUT },
+      { at: at + PULSE_MS / 2, css: "opacity: 1;" },
+      { at: at + SETTLE_MS, css: `${hidden} transform: translateX(28px);` },
     ];
   };
   const workers = WORKER_Y.flatMap((_, worker) => {
     const takes = advancesFrom(0).filter((advance) => workerOf(advance) === worker);
     const inkDone = takes.filter((advance) => advance !== HUE_REJECTED && advance !== HUE_PASSES);
     return [
-      `@keyframes hp-work-${worker} { 0% { transform: scale(0.72); } ${takes.flatMap(work).join(" ")} 100% { transform: scale(0.72); } }`,
-      `@keyframes hp-out-${worker} { 0% { opacity: 0; } ${inkDone.flatMap(emit).join(" ")} 100% { opacity: 0; } }`,
+      keyframes(`hp-work-${worker}`, [{ at: 0, css: rest }, ...takes.flatMap(work)]),
+      keyframes(`hp-out-${worker}`, [{ at: 0, css: hidden }, ...inkDone.flatMap(emit)]),
     ];
   });
   const x = [
@@ -260,7 +269,7 @@ function queueKeyframes() {
   return [
     ...jobs,
     ...workers,
-    `@keyframes hp-out-retry { 0% { opacity: 0; } ${emit(HUE_PASSES).join(" ")} 100% { opacity: 0; } }`,
+    keyframes("hp-out-retry", [{ at: 0, css: hidden }, ...emit(HUE_PASSES)]),
     `@keyframes hp-x { ${x.join(" ")} }`,
   ].join("\n");
 }

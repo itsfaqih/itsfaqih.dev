@@ -1,6 +1,8 @@
 import { play } from "../hooks/sound";
-import { AXIS, rowsAt, SLIDE, slideChoice } from "./data-loading";
+import { AXIS, rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
 import { slideView } from "./data-loading.view";
+
+type Choice = ReturnType<typeof slideChoice>;
 
 const STEP = 10;
 const BIG_STEP = 50;
@@ -8,8 +10,8 @@ const BIG_STEP = 50;
 const TICK = 50;
 
 /**
- * The first quiz's board (data-loading-slide.astro). Dragging GET /invoices, or its arrow keys, moves
- * its start in 10ms steps; the rows' bar and paint line follow, and Check carries the answer that
+ * Quiz 2's board (data-loading-slide.astro). Dragging GET /invoices, or its arrow keys, moves
+ * its start a step at a time; the rows' bar and paint line follow, and Check carries the answer that
  * start is. The quiz locks Check once cleared, and the bar locks with it.
  */
 const KEY_STEPS = new Map([
@@ -37,7 +39,8 @@ class DataLoadingSlide extends HTMLElement {
     const tag = part("tag");
     const readout = part("start");
     const check = this.querySelector<HTMLButtonElement>('[data-look="check"]')!;
-    const notes: Record<string, string> = JSON.parse(this.dataset.notes!);
+    const notes: Record<Choice, string> = JSON.parse(this.dataset.notes!);
+    const labels: Record<Choice, string> = JSON.parse(this.dataset.labels!);
     const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 
     let start: number = SLIDE.from;
@@ -54,10 +57,9 @@ class DataLoadingSlide extends HTMLElement {
       rows.style.left = pct(shown - SLIDE.render);
       paint.style.left = pct(shown);
       tag.className = slideView.tag(shown);
-      tag.textContent = `${shown}ms`;
-      readout.textContent = `${start}ms`;
+      readout.textContent = labels[id];
       handle.setAttribute("aria-valuenow", String(start));
-      handle.setAttribute("aria-valuetext", `${start}ms, rows show at ${shown}ms`);
+      handle.setAttribute("aria-valuetext", slideSays(labels[id], start));
       check.dataset.slot = id;
       check.dataset.note = notes[id];
     };
@@ -65,7 +67,8 @@ class DataLoadingSlide extends HTMLElement {
     // Grabbing the bar keeps the point under the finger; pressing the lane beside it moves the bar's
     // start there first.
     let grab: { x: number; from: number } | null = null;
-    const msAt = (x: number) => ((x - track.getBoundingClientRect().left) / track.clientWidth) * AXIS;
+    const msAt = (x: number) =>
+      ((x - track.getBoundingClientRect().left) / track.clientWidth) * AXIS;
     track.addEventListener(
       "pointerdown",
       (event) => {

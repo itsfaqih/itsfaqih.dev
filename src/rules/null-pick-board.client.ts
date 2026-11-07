@@ -47,7 +47,7 @@ class NullPickBoard extends HTMLElement {
       });
       const picked = picks.filter((pick) => pick !== undefined);
       const unpicked = fields.length - picked.length;
-      check.setAttribute("aria-disabled", String(unpicked > 0));
+      left.removeAttribute("data-missed");
       left.textContent = unpicked > 0 ? `${unpicked} left to pick.` : "Press Check to try it.";
       if (unpicked > 0) return;
       const id = pickChoice(picked.map((pick) => pick.key));
@@ -59,8 +59,13 @@ class NullPickBoard extends HTMLElement {
       group.addEventListener(
         "click",
         (event) => {
-          const key = event.target instanceof Element ? event.target.closest<HTMLButtonElement>("[data-key]") : null;
-          const option = fields[index]!.options.find((candidate) => candidate.key === key?.dataset.key);
+          const key =
+            event.target instanceof Element
+              ? event.target.closest<HTMLButtonElement>("[data-key]")
+              : null;
+          const option = fields[index]!.options.find(
+            (candidate) => candidate.key === key?.dataset.key,
+          );
           if (!option || check.disabled || key?.getAttribute("aria-pressed") === "true") return;
           play("tap");
           set(index, option);
@@ -88,9 +93,10 @@ class NullPickBoard extends HTMLElement {
     check.addEventListener(
       "click",
       (event) => {
-        if (check.getAttribute("aria-disabled") !== "true") return send();
+        if (picks.every((pick) => pick !== undefined)) return send();
         event.stopPropagation();
         play("error");
+        left.toggleAttribute("data-missed", true);
         left.textContent = `Pick a ${noun} for ${LIST.format(fields.filter((_, index) => !picks[index]).map((field) => field.name))} first.`;
       },
       { signal },

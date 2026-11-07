@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import DialogBox from "./dialog-box.astro";
 import DialogClose from "./dialog-close.astro";
 import { DRAFT } from "./dialog-design";
@@ -18,7 +19,7 @@ const id = `draft-${sealed ? "good" : "bad"}-`;
 <dialog-draft class={host.contents} data-sealed={sealed ? "" : undefined}>
   <DialogWindow>
     <div slot="page" class={styles.page} data-part="page">
-      <div class={styles.spread}><span class={styles.logo}></span><button data-hint="true" type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>New issue</button></div>
+      <div class={styles.spread}><span class={styles.logo}></span><button data-hint={HINT.open} type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.soft]}>New issue</button></div>
       {
         [66, 52, 74].map((width) => (
           <div class={styles.mail}><span class={styles.tag}></span><span style={`--w:${width}%`} class={styles.ghost}></span></div>

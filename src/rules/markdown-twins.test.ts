@@ -11,8 +11,9 @@ import * as proximityPrinciple from "./proximity-principle";
 import * as tableDesign from "./table-design";
 import * as typescriptCodeWriting from "./typescript-code-writing";
 
-// "View .md" serves public/rule-of-thumb/<id>.md, which readers paste into their AGENTS.md. It is
-// written by hand, so it carries code the page shows as demos; this keeps its rule in step with the page.
+// "Copy SKILL.md" and "View .md" serve public/rule-of-thumb/<id>.md, which readers save as an agent
+// skill. It is written by hand, so it carries code the page shows as demos; this keeps its rule in
+// step with the page.
 const PAGES = {
   "button-design": buttonDesign,
   "data-loading": dataLoading,
@@ -43,7 +44,17 @@ it("has a page for every published rule", () => {
 
 describe.each(Object.entries(PAGES))("%s.md", (id, page) => {
   const rule = PUBLISHED_GUIDELINES.find((guideline) => guideline.id === id);
-  const markdown = readFileSync(`public/rule-of-thumb/${id}.md`, "utf8");
+  const file = readFileSync(`public/rule-of-thumb/${id}.md`, "utf8");
+  const [, name, description, markdown = ""] =
+    /^---\nname: (.+)\ndescription: (.+)\n---\n\n([\s\S]*)$/.exec(file) ?? [];
+
+  it("is an agent skill named after the rule", () => {
+    expect(name).toBe(id);
+    expect(name).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+    expect(description?.startsWith(`${rule?.claim} Use when `)).toBe(true);
+    expect(description?.length).toBeLessThanOrEqual(1024);
+    expect(description).not.toMatch(/: | #|[<>]/);
+  });
 
   it("opens with the page's title and claim", () => {
     expect(markdown.startsWith(`# ${rule?.title}\n\n${rule?.claim}\n`)).toBe(true);

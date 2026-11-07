@@ -1,3 +1,8 @@
+---
+name: table-design
+description: Line up what people compare, and never leave a table blank. Use when you build or review a data table, its loading and empty states, row actions or pagination.
+---
+
 # Table Design
 
 Line up what people compare, and never leave a table blank.
@@ -39,9 +44,9 @@ cell.textContent = row.revenue.toLocaleString("en-US", { minimumFractionDigits: 
 A table is often loading, empty, failed or showing no matches. Draw each one, and in every blank state say why and what to do next:
 
 - **Loading.** Skeleton rows at the real row height keep the table's shape.
-- **Empty.** "No users yet" and an Add user button.
-- **Error.** "Couldn't load users" and a Retry button alone, so the failure stays in view.
-- **No results.** `No results for "xyz"` and a Clear search button.
+- **Empty.** Show "No users yet" and an Add user button.
+- **Error.** Show "Couldn't load users" and only a Retry button, so the failure stays in view.
+- **No results.** Show `No results for "xyz"` and a Clear search button.
 
 ```tsx
 const blank = {

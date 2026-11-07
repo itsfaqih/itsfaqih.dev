@@ -1,3 +1,8 @@
+---
+name: data-loading
+description: Fetch early, show what you have, and never blank the screen. Use when a page or component fetches data, shows a loading state, refreshes stale data or shows a fetch error.
+---
+
 # Data Loading
 
 Fetch early, show what you have, and never blank the screen.
@@ -12,9 +17,25 @@ People judge loading by what they see while it lasts, so design the wait.
 | Data a page needs          | Start it on navigation, batch it, stream the rest            |
 | Refetching data you have   | Keep it on screen with a small spinner                       |
 | A reply that may be quick  | Show loading UI only after 200ms                             |
+| Search as you type         | Send it 300ms after the last key. Cancel the old one         |
 | A request that fails       | Show the error in place, with Retry. Log it                  |
 | Updates within a second    | Push them over a live connection. At 30s or slower, poll     |
 | Anything from an API       | Parse it where it arrives                                    |
+
+## Render public pages on the server
+
+Render a page that needs search traffic or a fast first paint on the server, so the first HTML response carries the content. A page rendered in the browser sends an empty shell and paints nothing until its code loads and fetches. Many crawlers and link previews read only that first response. A page behind a login never shows up in search, so the browser is fine there.
+
+```html
+<!-- Rendered in the browser. The first response has nothing to paint or index -->
+<div id="root"></div>
+<script src="/app.js"></script>
+
+<!-- Rendered on the server. The first response carries the content -->
+<h1>Desk lamp</h1>
+<p>$48 · In stock</p>
+<script src="/app.js"></script>
+```
 
 ## Start fetching early
 
@@ -24,7 +45,7 @@ Fetch on navigation, not on render. A fetch that starts when the page renders wa
 // runs when the user navigates to /invoices/:id, before the page renders
 function onNavigate(id: string) {
   const invoice = fetchInvoice(id); // the page waits for this
-  const activity = fetchActivity(id); // streamed: the page shows it when it lands
+  const activity = fetchActivity(id); // streamed, so the page shows it when it lands
   return { invoice, activity };
 }
 ```
@@ -52,9 +73,34 @@ clearTimeout(timer);
 skeleton.hidden = true;
 ```
 
+## Debounce search input
+
+A search box that sends a request on every keystroke floods the server, and a slow reply for an old query can land after the newest one. Wait for a pause in typing, then send one request, and cancel the one in flight when a new one starts.
+
+```ts
+let timer: ReturnType<typeof setTimeout> | undefined;
+let inFlight: AbortController | undefined;
+
+input.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    inFlight?.abort(); // an older reply can no longer land after this one
+    const current = (inFlight = new AbortController());
+    try {
+      const response = await fetch(`/search?q=${encodeURIComponent(input.value)}`, {
+        signal: current.signal,
+      });
+      showResults(await response.json());
+    } catch (error) {
+      if (!current.signal.aborted) throw error;
+    }
+  }, 300);
+});
+```
+
 ## Errors where the data was
 
-Show the error where the data would go, with a Retry button. It stays there until someone acts on it, and it says why the card is empty. A toast fades before anyone reads it and leaves an empty card. Log every failure so you hear about it before your users do.
+Show the error where the data would go, with a Retry button. It stays there until someone acts on it, and it says why the card is empty. A toast fades before anyone reads it and leaves an empty card. Log every failure so you learn about it before a user reports it.
 
 ```html
 <section role="alert">Couldn't load the team. <button>Retry</button></section>

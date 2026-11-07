@@ -147,7 +147,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "news",
             label: "About, nothing to fill in",
-            note: "Nothing typed, nothing lost. Shaking it blocks a safe way out.",
+            note: "With nothing typed, a click outside loses nothing. Shaking it blocks a safe way out.",
           },
           {
             id: "issue",

@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { inboxRows } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
@@ -36,7 +37,7 @@ const { delay = false } = Astro.props;
   ><div class={styles.ctl}
     ><span class={styles.note}>Server replies in</span><span
       class={styles.pair}
-      ><button data-hint="true" type="button" class={view.ctlButton} data-part="fast">80ms</button
+      ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="fast">80ms</button
       ><button type="button" class={view.ctlButton} data-part="slow">1.2s</button></span
     ></div
   ></data-loading-inbox

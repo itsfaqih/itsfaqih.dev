@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { button } from "../components/button.css";
 import { buttonVariant } from "../components/button";
 import { TEAM } from "./data-loading";
@@ -33,7 +34,7 @@ const { inline = false } = Astro.props;
     ></div
   ><div class={styles.ctl}
     ><span class={styles.note}>The next request fails</span><button
-      data-hint="true"
+      data-hint={HINT.tap}
       type="button"
       class={view.ctlButton}
       data-part="fail">Fail a request</button
@@ -46,7 +47,7 @@ const { inline = false } = Astro.props;
             class={styles.errorText}>The server didn't answer. Your other cards are fine.</span
           ><button
             type="button"
-            class:list={[button.base, buttonVariant["primary-brand"], button.sm, styles.errorButton]}
+            class:list={[button.base, buttonVariant["secondary-hue"], button.sm, styles.errorButton]}
             data-part="retry">Retry</button
           ><code class={styles.errorCode}>logged · req 7f3a</code></div
         >

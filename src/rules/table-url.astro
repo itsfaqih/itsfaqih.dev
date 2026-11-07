@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { row } from "./table-design.markers";
 import Icon from "../components/icon.astro";
 import { arcade } from "../components/arcade.css";
@@ -17,7 +18,7 @@ const shown = STAFF.slice((page - 1) * URL_PER_PAGE, page * URL_PER_PAGE);
 
 <table-url class={styles.card} data-careful={careful ? "true" : undefined}>
   <div class={styles.bar}>
-    <button type="button" class:list={[styles.icon, styles.ring]} aria-label="Reload" data-hint="true" data-part="reload"
+    <button type="button" class:list={[styles.icon, styles.ring]} aria-label="Reload" data-hint={HINT.tap} data-part="reload"
       ><Icon
         name="ArrowClockwise"
         size="1em"

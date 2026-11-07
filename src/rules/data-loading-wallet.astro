@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { HISTORY, money } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
@@ -42,7 +43,7 @@ const { careful = false } = Astro.props;
     ></div
   ><div class={styles.ctl}
     ><span class={styles.note}>Opened from cache</span><button
-      data-hint="true"
+      data-hint={HINT.tap}
       type="button"
       class={view.ctlButton}
       data-part="go">Get signal</button

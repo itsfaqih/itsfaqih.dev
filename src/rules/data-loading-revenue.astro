@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { money, REVENUE } from "./data-loading";
 import { styles } from "./data-loading.css";
 import { view } from "./data-loading.view";
@@ -26,8 +27,8 @@ const { swr = false } = Astro.props;
       ></div
     ></div
   ><div class={styles.ctl}
-    ><span class={styles.note}>Refetch takes 900ms</span><button
-      data-hint="true"
+    ><span class={styles.note}>Refetch takes a second</span><button
+      data-hint={HINT.tap}
       type="button"
       class={view.ctlButton}
       data-part="refetch">Refetch</button

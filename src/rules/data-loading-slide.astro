@@ -1,32 +1,41 @@
 ---
+import { HINT } from "./hints";
 import { arcade } from "../components/arcade.css";
 import type { Level } from "./lesson";
-import { AXIS, rowsAt, SLIDE, slideChoice } from "./data-loading";
+import { marker } from "../when";
+import { AXIS, rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
 import { quiz, styles } from "./data-loading.css";
 import { slideView } from "./data-loading.view";
 
-// The first quiz's board (data-loading-slide.client.ts): GET /invoices slides along the axis, and the
-// rows' paint line follows it. Check sends the spot it's in to the quiz as that spot's answer.
+// Quiz 2's board (data-loading-slide.client.ts): GET /invoices slides along a track with no clock
+// on it, marked where the code loads, and the rows' paint line follows it. Check sends the zone it's
+// in to the quiz as that zone's answer.
 type Props = { level: Level };
 
 const { level } = Astro.props;
 if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
 const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const labels = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.label]));
 const pct = (ms: number) => `${(ms / AXIS) * 100}%`;
 const start = SLIDE.from;
 const shown = rowsAt(start);
 const id = slideChoice(start);
 ---
 
-<data-loading-slide class={quiz.slide} data-notes={JSON.stringify(notes)}
-  ><div class={styles.wf}
+<data-loading-slide
+  class:list={[quiz.slide, marker]}
+  data-notes={JSON.stringify(notes)}
+  data-labels={JSON.stringify(labels)}
+  ><div class:list={[styles.wf, quiz.slideWf]}
     ><ul class={styles.lanes} aria-hidden="true"
       ><li class={styles.label}>app.js</li><li class={styles.label}>GET /invoices</li><li class={styles.label}>render rows</li></ul
     ><div class:list={[styles.plot, quiz.slidePlot]}
+      ><i class={quiz.slideMark} style={`left:${pct(SLIDE.code)}`} aria-hidden="true"></i
+      ><span class={quiz.slideMarkLabel} style={`left:${pct(SLIDE.code)}`} aria-hidden="true">Code loaded</span
       ><ul class={styles.lanes}
         ><li class={styles.lane}
           ><span class:list={[styles.bar, styles.code]} style={`left:0;width:${pct(SLIDE.code)}`}></span
-          ><span class={arcade.srOnly}>app.js: 0 to {SLIDE.code}ms</span></li
+          ><span class={arcade.srOnly}>app.js loads first, from the navigation until the code is loaded</span></li
         ><li class:list={[styles.lane, quiz.track]} data-part="track"
           ><span
             role="slider"
@@ -37,8 +46,9 @@ const id = slideChoice(start);
             aria-valuemin="0"
             aria-valuemax={SLIDE.max}
             aria-valuenow={start}
-            aria-valuetext={`${start}ms, rows show at ${shown}ms`}
-            data-part="handle"></span
+            aria-valuetext={slideSays(labels[id], start)}
+            data-part="handle"
+            data-hint={HINT.drag}></span
           ></li
         ><li class={styles.lane}
           ><span
@@ -48,18 +58,11 @@ const id = slideChoice(start);
           ></li
         ></ul
       ><span class={styles.paint} style={`left:${pct(shown)}`} data-part="paint"
-        ><b class={slideView.tag(shown)} data-part="tag">{shown}ms</b></span
+        ><b class={slideView.tag(shown)} data-part="tag">Rows show</b></span
       ><span class={styles.grid} aria-hidden="true"></span></div
-    ><span class={styles.axis} aria-hidden="true"
-      >{
-        [0, 250, 500, 750, 1000].map((ms) => (
-          <i class={styles.tick} style={`left:${pct(ms)}`}>{ms}</i>
-        ))
-      }</span
     ></div
   ><div class={quiz.slideFoot}
-    ><span class={quiz.readout} aria-hidden="true"
-      >starts at <b data-part="start">{start}ms</b></span
+    ><span class={quiz.readout} aria-hidden="true" data-part="start">{labels[id]}</span
     ><button
       type="button"
       class={slideView.check}

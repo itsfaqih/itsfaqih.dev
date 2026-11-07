@@ -23,11 +23,17 @@ export const lessonView = {
   article: `lesson ${cx(lessonKit.lesson, shell.rev, marker)}`,
   flipKey: (key: SideKey, on: boolean) => cx(lessonKit.flipKey, on && lessonKit[key]),
   pane: (on: boolean) => cx(lessonKit.well, lessonKit.pane, !on && lessonKit.behind, marker),
-  hintSvg: (gone: boolean) => cx(hintKit.svg, gone && hintKit.gone, marker),
+  hintSvg: (waiting: boolean) => cx(hintKit.svg, waiting && hintKit.waiting, marker),
   hintHalo: (onPanel: boolean, gone: boolean) =>
     cx(hintKit.halo, onPanel && hintKit.haloOnPanel, gone && hintKit.gone),
-  hintRing: (gone: boolean) => cx(hintKit.ring, !gone && hintKit.pulse),
-  hintLabel: (gone: boolean) => cx(hintKit.label, gone && hintKit.gone),
+  hintRing: (left: boolean) => cx(hintKit.ring, hintKit.pulse, left && hintKit.still),
+  hintLabel: (waiting: boolean) =>
+    cx(
+      hintKit.label,
+      hintKit.labelLeaves,
+      waiting && hintKit.waiting,
+      waiting && hintKit.labelWaiting,
+    ),
 };
 
 type SlotState = {

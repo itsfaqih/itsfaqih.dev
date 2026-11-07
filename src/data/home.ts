@@ -31,10 +31,10 @@ export const SLIDES: {
     highlight: "save hours",
   },
   {
-    tab: "Backends",
-    ticker: "APIS",
+    tab: "Systems",
+    ticker: "SYSTEM DESIGN",
     color: "var(--ts)",
-    phrase: "backends that ",
+    phrase: "systems that ",
     highlight: "run reliably",
   },
   {

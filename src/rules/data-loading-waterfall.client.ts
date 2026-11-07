@@ -5,7 +5,8 @@ import { onceOnScreen } from "./rule-motion";
 
 /**
  * A request waterfall (data-loading-waterfall.astro). Once it is on screen a cover sweeps off the
- * plot and the "on screen" mark lands when the sweep reaches it. Replay runs it again.
+ * plot and the "on screen" mark lands when the sweep reaches it, while the orders page below draws
+ * on the same clock. Replay runs it again.
  */
 class DataLoadingWaterfall extends Demo {
   #run = 0;
@@ -22,13 +23,16 @@ class DataLoadingWaterfall extends Demo {
     );
   }
 
-  /** `run` numbers each sweep; a new number restarts the plot's animations on a fresh copy. */
+  /** `run` numbers each sweep; a new number restarts the animations on fresh copies. */
   #show(sweep: Sweep, run: number) {
-    if (run !== this.#run) this.query("plot").replaceWith(this.query("plot").cloneNode(true));
+    if (run !== this.#run)
+      for (const part of ["plot", "screen"])
+        this.query(part).replaceWith(this.query(part).cloneNode(true));
     this.#run = run;
     const plot = this.query("plot");
     plot.querySelector('[data-part="paint"]')!.className = view.paint(sweep);
     plot.querySelector('[data-part="cover"]')!.className = view.cover(sweep);
+    this.query("screen").className = view.screen(sweep);
   }
 }
 

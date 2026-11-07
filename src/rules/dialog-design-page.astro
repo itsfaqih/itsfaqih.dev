@@ -23,7 +23,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
 
 <RuleLanding id="dialog-design" learn="Hold focus, let go cleanly" tldr={TLDR} take="build dialogs the same way">
   <Fragment slot="lead">Trap Tab inside the dialog, lock the page behind it, and name it for screen readers.</Fragment>
-  <Fragment slot="intro">Give a dialog a way through and a way out, since it takes over the screen.</Fragment>
+  <Fragment slot="intro">A dialog takes over the screen, so give people a way to finish it and a way to leave.</Fragment>
 
   <RuleLesson lesson={focus}>
     <Fragment slot="body">Move focus into the dialog when it opens. Let <Kbd>Tab</Kbd> cycle its controls and never reach the inert page behind. On close, return focus to the button that opened it. Press Tab in both.</Fragment>
@@ -212,7 +212,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
   </RuleQuiz>
 
   <RuleLesson lesson={scroll}>
-    <Fragment slot="body">Stop the page under the dialog from scrolling, so it stays still. Keep the scrollbar's space so nothing shifts when the scrollbar hides. Open Share, then scroll.</Fragment>
+    <Fragment slot="body">Stop the page under the dialog from scrolling, so people keep their place. Keep the scrollbar's space so nothing shifts when the scrollbar hides. Open Share, then scroll.</Fragment>
     <DialogScrollDemo slot="bad" />
     <DialogScrollDemo slot="good" sealed />
   </RuleLesson>
@@ -265,7 +265,7 @@ const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as c
           [
             ["plain", "A plain box", ["Cancel, button"]],
             ["role", "Marked as a dialog", ["dialog", "Cancel, button"]],
-            ["named", "Named and described", ["Delete Moonbase?, dialog", "Its 38 invoices go too. This can't be undone.", "Cancel, button"]],
+            ["named", "Named and described", ["Delete Moonbase?, dialog", "Its 214 files go too. This can't be undone.", "Cancel, button"]],
           ] as const
         ).map(([id, caption, lines]) => (
           <QuizChoice level={name.levels[0]} id={id} caption={caption}

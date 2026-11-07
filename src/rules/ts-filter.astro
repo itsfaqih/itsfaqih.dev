@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import {
   FATE,
   FILTER_DATE,
@@ -24,7 +25,7 @@ const { from, orders } = filterOf(way, FILTER_DATE);
   <div class={styles.view}>
     <label class={styles.form}
       ><span class={styles.formHead}>Rina's orders on</span><input
-        data-hint="true"
+        data-hint={HINT.edit}
         type="date"
         required
         class={styles.input}

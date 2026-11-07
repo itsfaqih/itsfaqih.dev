@@ -1,9 +1,9 @@
 ---
-import { sectionKey } from "../arrows";
 import { type ClassValue } from "../cx";
 import { arcade } from "../components/arcade.css";
 import type { Lesson } from "./lesson";
-import { hintKit, host, lessonKit, text } from "./rule-landing.css";
+import HintLayer from "./hint-layer.astro";
+import { host, lessonKit, text } from "./rule-landing.css";
 import { lessonView, type SideKey } from "./rule-landing.view";
 
 type Props = {
@@ -17,13 +17,12 @@ type Props = {
 const { lesson, rows = 0, costsClass } = Astro.props;
 const SIDES: readonly SideKey[] = ["bad", "good"];
 const MARK = { bad: "✕", good: "✓" } as const;
-const section = sectionKey(Astro.url.pathname, lesson.title);
 // Slots: "body" (the lesson copy, its code in tone "chip"), "extra" (a block under it), and "bad"
 // and "good" (each pane's demo). The panes start on "good", as rule-lesson.client.ts expects.
 ---
 
 <rule-lesson class={host.contents}>
-  <article class={lessonView.article} data-rev="true" data-arrows={section}>
+  <article class={lessonView.article} data-rev="true">
     <div class={lessonKit.copy}>
       {lesson.exception && <span class={lessonKit.exception}>Exception</span>}
       <h3 class={lessonKit.title}>{lesson.title}</h3>
@@ -70,11 +69,7 @@ const section = sectionKey(Astro.url.pathname, lesson.title);
         ))
       }
     </div>
-    <div data-hint-layer="true" aria-hidden="true" class={hintKit.layer} data-part="hints"
-      ><span class:list={[hintKit.label, hintKit.ruler]} data-part="ruler"
-        ><span class={hintKit.caret}>▸</span>Try it</span
-      ></div
-    >
+    <HintLayer />
   </article>
 </rule-lesson>
 

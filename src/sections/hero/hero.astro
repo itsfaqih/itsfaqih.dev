@@ -16,7 +16,7 @@ import HeroPrints from "./hero-prints.astro";
 const current = SLIDES[0]!;
 ---
 
-<home-hero class={styles.root} data-arrows="hero"
+<home-hero class={styles.root}
   ><div class={veil.soft}
     ><div class:list={[loadIn.veil, veil.dense, heroType.tag]} data-cut="true"
       ><span class:list={[loadIn.piece, loadIn.words]} data-cut="true"
@@ -48,7 +48,7 @@ const current = SLIDES[0]!;
       >.</p
     ><div class={heroType.acts}
       ><a
-        class:list={[loadIn.piece, button.base, buttonVariant["primary-brand"], styles.go]}
+        class:list={[loadIn.piece, button.base, buttonVariant["primary-brand"], button.lift, styles.go]}
         href="#contact"
         data-cut="true"
         style={`--c:${current.color}`}

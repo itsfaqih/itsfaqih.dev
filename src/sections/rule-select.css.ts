@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
@@ -13,7 +14,7 @@ const WAITING = ":is(:is(.js *):not(.in), .js [data-cut]:not(.in) *)";
 const DIMMED_HOVER = ":not([data-on]):is(:hover > *):not(:is(.js *):not(.in))";
 const DIMMED_FOCUS = ":not([data-on]):is(:focus-within > *):not(:is(.js *):not(.in))";
 const INK = `color-mix(in oklab, var(--c) ${palette["--ink-mix"]}, #000)`;
-const PANEL_SHADOW = `${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`;
+const PANEL_SHADOW = `${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`;
 const TILE_TOP = "inset 0 4px 0 var(--c)";
 // Per tile: opacity (the dim), transform, border-color, box-shadow (the lift onto its key).
 const TILE_LEAVE = `${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}, ${motion["--t-fast-exit"]}, ${motion["--t-moderate-exit"]}`;
@@ -276,7 +277,7 @@ export const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "10px",
-    boxShadow: `${TILE_TOP}, ${palette["--raise"]}, 0 4px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${TILE_TOP}, ${palette["--raise"]}, ${drop(4, palette["--drop-ink"])}`,
     transitionProperty: "opacity, transform, border-color, box-shadow",
     transitionDuration: TILE_LEAVE,
     transitionTimingFunction: motion["--exit"],
@@ -316,7 +317,7 @@ export const styles = {
         zIndex: 2,
         borderColor: "var(--c)",
         transform: "translateY(-4px)",
-        boxShadow: `${TILE_TOP}, ${palette["--raise"]}, 0 8px 0 var(--key)`,
+        boxShadow: `${TILE_TOP}, ${palette["--raise"]}, ${drop(8, "var(--key)")}`,
         transitionDuration: TILE_PICK,
         transitionTimingFunction: TILE_PICK_EASE,
       },
@@ -327,7 +328,7 @@ export const styles = {
       },
       "&:is([data-on]):active": {
         transform: "translateY(3px)",
-        boxShadow: `${TILE_TOP}, ${palette["--raise"]}, 0 1px 0 var(--key)`,
+        boxShadow: `${TILE_TOP}, ${palette["--raise"]}, ${drop(1, "var(--key)")}`,
       },
     },
     "@media": {

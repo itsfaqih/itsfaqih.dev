@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { fonts, motion, palette } from "../theme.vars.css";
 import { style, keyframes } from "@vanilla-extract/css";
 import { under1 } from "../layers.css";
@@ -545,7 +546,7 @@ export const dataLoading = {
     padding: "14px 16px 16px",
     borderRadius: "12px",
     backgroundColor: palette["--panel"],
-    boxShadow: `${palette["--raise"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `${palette["--raise"]}, ${drop(3, palette["--drop-ink"])}`,
     overflow: "hidden",
     "@media": {
       [PHONE]: {

@@ -1,7 +1,8 @@
 ---
+import { HINT } from "./hints";
 import NullCodeBlock from "./null-code-block.astro";
-import { arrived, DEMOS, TITLE, verdictOf, type Demo, type Way } from "./null-vs-undefined";
-import { flowView, KINDS, paint } from "./null-vs-undefined.view";
+import { DEMOS, TITLE, type Demo, type Way } from "./null-vs-undefined";
+import { flowView } from "./null-vs-undefined.view";
 import { styles } from "./null-vs-undefined.css";
 import { host } from "./rule-landing.css";
 
@@ -9,11 +10,7 @@ type Props = { demo: Demo; way: Way };
 
 const { demo, way } = Astro.props;
 const { fields, before, lines } = DEMOS[demo];
-const body = DEMOS[demo].body(way, TITLE);
-const after = { ...before, ...arrived(body) };
-const intent = DEMOS[demo].intent(TITLE);
-// The first frame is the save already done, as React rendered it; null-flow.client.ts rewinds it to
-// "not sent yet" when the demo starts below the fold, and plays the save once it is on screen.
+// It starts unsent, and the save runs only when the reader presses ✕ or Save (null-flow.client.ts).
 ---
 
 <null-flow class={host.contents} data-demo={demo} data-way={way}>
@@ -23,58 +20,41 @@ const intent = DEMOS[demo].intent(TITLE);
       <div class={styles.form} data-part="form">
         {
           demo === "clear" ? (
-            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.none}>None</span></Fragment>
+            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.chip}
+              >Rina<button
+                data-hint={HINT.tap}
+                type="button"
+                aria-label="Remove reviewer Rina"
+                class={styles.remove}
+                data-part="remove">✕</button
+              ></span
+            ></Fragment>
           ) : (
-            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input data-hint="true" spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button type="button" class={flowView.button} data-part="save">Save</button></Fragment>
+            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button data-hint={HINT.tap} type="button" class={flowView.save} data-part="save">Save</button></Fragment>
           )
         }
       </div>
       <div class={styles.wire} data-part="wire"
-        ><span class={styles.verb}>PATCH /tasks/12</span><code class={flowView.body(false)}
-          >{
-            paint(JSON.stringify(body), KINDS).map((p) =>
-              p.class ? <span class={p.class}>{p.text}</span> : p.text,
-            )
-          }</code
+        ><span class={styles.verb}>PATCH /tasks/12</span><span class={styles.idle}>not sent yet</span
         ><i aria-hidden="true" class={flowView.packet(false)}></i></div
       >
       <dl class={styles.record} data-part="record">
         {
-          fields.map((field, index) => {
-            const verdict = verdictOf(field, before, after, intent);
-            const bad = verdict === "wiped" || verdict === "lost";
-            const value = after[field];
-            return (
-              <div style={`--i:${index}`} class={flowView.cell(verdict, false)}
-                ><dt class={styles.name}>{field}</dt><dd class={flowView.value(bad, false)}
-                  >{value === null ? <span class={flowView.nul(bad)}>null</span> : value}</dd
-                ><span class={flowView.tag(verdict)}>{verdict}</span></div
-              >
-            );
-          })
+          fields.map((field, index) => (
+            <div style={`--i:${index}`} class={flowView.cell(undefined, false)}
+              ><dt class={styles.name}>{field}</dt><dd class={flowView.value(false, false)}>{before[field]}</dd></div
+            >
+          ))
         }
       </dl>
       <div class={styles.ctl}
-        ><button type="button" class={flowView.button} data-part="reset">Reset</button></div
+        ><button type="button" class={flowView.button} data-part="reset" aria-disabled="true">Reset</button></div
       >
     </div>
   </div>
   {
     demo === "clear" && (
-      <Fragment>
-        <template data-part="chip"
-          ><span class={styles.chip}
-            >Rina<button
-              data-hint="true"
-              type="button"
-              aria-label="Remove reviewer Rina"
-              class={styles.remove}
-              data-part="remove">✕</button
-            ></span
-          ></template
-        >
-        <template data-part="none"><span class={styles.none}>None</span></template>
-      </Fragment>
+      <template data-part="none"><span class={styles.none}>None</span></template>
     )
   }
 </null-flow>

@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { button } from "../components/button.css";
 import { buttonVariant } from "../components/button";
 import { styles } from "./button-design.css";
@@ -16,7 +17,7 @@ const { label, name } = Astro.props;
 
 <button-toggle class={host.contents}
   ><button
-    data-hint="true"
+    data-hint={HINT.tap}
     type="button"
     class:list={[button.base, buttonVariant["primary-neutral"], button.sm, styles.toggle]}
     data-toggle={name}

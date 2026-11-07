@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { cursors, fonts, motion, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { row, tipped } from "./table-design.markers";
@@ -32,7 +33,7 @@ export const styles = {
     alignContent: "start",
     borderRadius: "12px",
     backgroundColor: palette["--panel"],
-    boxShadow: `0 0 0 1px ${palette["--hair"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `0 0 0 1px ${palette["--hair"]}, ${drop(3, palette["--drop-ink"])}`,
     overflow: "hidden",
   }),
   table: style({
@@ -323,7 +324,7 @@ export const styles = {
   segOn: style({
     backgroundColor: "var(--c)",
     backgroundPosition: "initial",
-    boxShadow: "0 3px 0 var(--key-c)",
+    boxShadow: drop(3, "var(--key-c)"),
     color: "var(--on-c)",
   }),
   bar: style({
@@ -489,7 +490,7 @@ export const styles = {
         borderColor: "currentcolor",
         borderRadius: "8px",
         backgroundColor: palette["--soft-key"],
-        boxShadow: `0 3px 0 ${palette["--soft-key-drop"]}`,
+        boxShadow: drop(3, palette["--soft-key-drop"]),
         fontWeight: 700,
         fontSize: "12px",
         lineHeight: "normal",
@@ -499,7 +500,7 @@ export const styles = {
         transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color ${kit["--t-fb"]} ease`,
         selectors: {
           "&:active": {
-            boxShadow: `0 1px 0 ${palette["--soft-key-drop"]}`,
+            boxShadow: drop(1, palette["--soft-key-drop"]),
             transform: "translateY(2px)",
           },
         },
@@ -517,11 +518,11 @@ export const styles = {
   }),
   go: style({
     backgroundColor: "var(--c)",
-    boxShadow: "0 3px 0 var(--key-c)",
+    boxShadow: drop(3, "var(--key-c)"),
     color: "var(--on-c)",
     selectors: {
       "&:active": {
-        boxShadow: "0 1px 0 var(--key-c)",
+        boxShadow: drop(1, "var(--key-c)"),
       },
     },
     "@media": {
@@ -1041,7 +1042,7 @@ export const quiz = {
     paddingInline: "10px",
     borderRadius: "7px",
     backgroundColor: "var(--c)",
-    boxShadow: "0 2px 0 var(--key-c)",
+    boxShadow: drop(2, "var(--key-c)"),
     fontWeight: 700,
     fontSize: "11px",
     fontFamily: fonts["--display"],
@@ -1075,7 +1076,7 @@ export const quiz = {
     overflow: "hidden",
     borderRadius: "12px",
     backgroundColor: palette["--panel"],
-    boxShadow: `0 0 0 1px ${palette["--hair"]}, 0 3px 0 ${palette["--drop-ink"]}`,
+    boxShadow: `0 0 0 1px ${palette["--hair"]}, ${drop(3, palette["--drop-ink"])}`,
     fontSize: "13px",
     lineHeight: "18px",
     fontFamily: fonts["--sans"],

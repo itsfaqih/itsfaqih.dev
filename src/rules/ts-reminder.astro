@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { arcade } from "../components/arcade.css";
 import { REMINDER, reminderLines, reminderOf, type Way } from "./handling-timestamps";
 import { styles } from "./handling-timestamps.css";
@@ -27,7 +28,7 @@ const id = `ts-${way}`;
         value={REMINDER.date}
         data-part="date"
       /><label for={`${id}-time`} class={arcade.srOnly}>Time</label><input
-        data-hint="true"
+        data-hint={HINT.edit}
         id={`${id}-time`}
         type="time"
         required

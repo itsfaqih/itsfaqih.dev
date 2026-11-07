@@ -13,9 +13,11 @@ import { site } from "./site.css";
 type Props = {
   /** The page's sharing metadata. Without it the page gets the site title and no sharing tags. */
   page?: SharedPage;
+  /** The page's own colour, which the navbar's Connect and the page's hue buttons take on. */
+  hue?: `var(--${string})`;
 };
 
-const { page } = Astro.props;
+const { page, hue } = Astro.props;
 const head = page ? pageHead(page) : undefined;
 const title = head?.meta.find((meta) => "title" in meta)?.title ?? "Faqih Muntashir";
 const tags = head?.meta.filter((meta) => !("title" in meta)) ?? [];
@@ -57,8 +59,8 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
     }
     <script is:inline set:html={HEAD_SCRIPT} />
   </head>
-  <body class={site.body}>
-    <Header path={path} />
+  <body class={site.body} style={hue && `--hue: ${hue}`}>
+    <Header path={path} hued={hue !== undefined} />
     <CommandPalette />
     <main class={site.main}><slot /></main>
     <PrintCursor />
@@ -68,7 +70,6 @@ const path = Astro.url.pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
       import "../components/smooth-scroll";
       import { voiceControls } from "../hooks/sound";
       voiceControls();
-      if (import.meta.env.DEV) void import("../arrows-tuner");
     </script>
   </body>
 </html>

@@ -180,7 +180,7 @@ const lanes = [
 
   <RuleLesson lesson={filter} costsClass={styles.costs}>
     <Fragment slot="body"
-      >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs 07:00 to 07:00 her time, so orders before 07:00 go missing and the next morning's show up.</Fragment
+      >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs from 07:00 to 07:00 her time. Orders before 07:00 go missing, and the next morning's show up.</Fragment
     >
     <TsFilter slot="bad" way="bad" />
     <TsFilter slot="good" way="good" />

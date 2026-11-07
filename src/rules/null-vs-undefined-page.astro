@@ -107,7 +107,7 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
     <NullCodeBlock slot="good" lines={force.good.lines!} />
   </RuleLesson>
   <RuleQuiz n={5} level={force.levels[0]} hint="Pick a mark for each field, then press Check."
-    >Every new invoice must name a coupon or say there's none. The memo is optional, and most invoices have none. How should each field be typed?
+    >Every new invoice must name a coupon or say there's none. The memo is optional, and most invoices have none. Type each field.
     <NullPickBoard
       slot="board"
       level={force.levels[0]}
@@ -121,7 +121,7 @@ const marks = { lead: NullBoardCell, label: NullBoardCell, text: NullBoardCell }
 
   <RuleLesson lesson={lookup}>
     <Fragment slot="body"
-      >Return <Code tone="chip">null</Code> from a lookup that finds nothing. <Code tone="chip">Map.get</Code> returns<Fragment set:html="<!-- -->" /> <Code tone="chip">undefined</Code>, and <Code tone="chip">JSON.stringify</Code> turns that into no body.</Fragment
+      >Return <Code tone="chip">null</Code> from a lookup that finds nothing. A forgotten return gives <Code tone="chip">undefined</Code> too, and the caller reads it as "not found". Type the lookup to return <Code tone="chip">User | null</Code> and the slip fails the build.</Fragment
     >
     <NullCodeBlock slot="bad" lines={lookup.bad.lines!} />
     <NullCodeBlock slot="good" lines={lookup.good.lines!} />

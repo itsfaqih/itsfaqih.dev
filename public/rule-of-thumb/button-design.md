@@ -1,3 +1,8 @@
+---
+name: button-design
+description: Make a button show what it does and what it's doing. Use when you build, style or review a button, pick its variant, or place an icon beside its label.
+---
+
 # Button Design
 
 Make a button show what it does and what it's doing.
@@ -7,7 +12,7 @@ Make a button show what it does and what it's doing.
 | Situation                  | Do this                                                      |
 | -------------------------- | ------------------------------------------------------------ |
 | Any button                 | Give hover, press and focus a look, in 100 to 200ms          |
-| Hovering a disabled button | Keep its colour and drop still                               |
+| Hovering a disabled button | Lay it flat and keep it still                                |
 | Picking a variant          | Fill one per screen, tint the secondary, make Cancel text    |
 | An icon beside the label   | Take 4px off the icon's side                                 |
 | A button with only an icon | Pad (height - icon) / 2, not the text's 16px                 |
@@ -43,9 +48,12 @@ button:focus-visible {
 
 ## Keep a disabled button still on hover
 
-A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Keep its colour and its drop still on hover and press. Scope the hover and press looks to buttons that can act.
+A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Lay it flat, then keep it still on hover and press. Scope the hover and press looks to buttons that can act.
 
 ```css
+button:is(:disabled, [aria-disabled="true"]) {
+  box-shadow: none;
+}
 button:hover:not(:disabled, [aria-disabled="true"]) {
   background-color: var(--button-hover);
 }
@@ -81,7 +89,7 @@ Take 4px off the icon's side. An icon has white space inside its own box, so equ
 
 ## Give an icon button less padding than a text button
 
-Making a button with only an icon square is the easy part. The padding is the trap. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.
+Keep a button with only an icon square, and don't copy a text button's padding. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.
 
 ```css
 .icon-only {

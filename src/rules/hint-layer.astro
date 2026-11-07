@@ -1,0 +1,11 @@
+---
+import { hintKit } from "./rule-landing.css";
+
+// Where a card's hint arrows draw (hint-layer.ts). The ruler sizes each label before it lands.
+---
+
+<div data-hint-layer="true" aria-hidden="true" class={hintKit.layer} data-part="hints"
+  ><span class:list={[hintKit.label, hintKit.ruler]} data-part="ruler"
+    ><span class={hintKit.caret}>▸</span>Try it</span
+  ></div
+>

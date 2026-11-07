@@ -1,3 +1,8 @@
+---
+name: typescript-code-writing
+description: Write types precise enough that the compiler catches a mistake where you made it. Use when you write or review TypeScript types, function signatures or tsconfig flags.
+---
+
 # TypeScript Guidelines
 
 Write types precise enough that the compiler catches a mistake where you made it.
@@ -27,7 +32,7 @@ import { calculateTotl } from "./cart"; // TS2724: did you mean 'calculateTotal'
 
 ## Extend with interface
 
-Use `type` for shapes, unions and aliases. To build one shape on another, use `interface … extends`, so a clash fails at the declaration, in plain words. An `&` intersection compiles the clash into `never` and reports it at the first object of that type.
+Use `type` for shapes, unions and aliases. To build one shape on another, use `interface … extends`, so a clash fails at the declaration and the error names both types. An `&` intersection compiles the clash into `never` and reports it at the first object of that type.
 
 ```ts
 type User = { id: string; name: string };
@@ -75,7 +80,7 @@ createUser({ name, email, role: "admn" }); // TS2820: did you mean '"admin"'?
 
 ## Turn the flags on
 
-Enable `strict`, `noUncheckedIndexedAccess` and `verbatimModuleSyntax`. `noUncheckedIndexedAccess` types every index read as possibly `undefined`, which catches `users[0]` on an empty list. `verbatimModuleSyntax` makes a type import say `import type`. Write ESM: `import` and `export`.
+Enable `strict`, `noUncheckedIndexedAccess` and `verbatimModuleSyntax`. `noUncheckedIndexedAccess` types every index read as possibly `undefined`, which catches `users[0]` on an empty list. `verbatimModuleSyntax` makes a type import say `import type`. Write ESM, with `import` and `export`.
 
 ```json
 {

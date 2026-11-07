@@ -120,7 +120,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "center",
             label: "Size centred",
-            note: "Each value sits by its own width, so no column of digits lines up at all.",
+            note: "Each value moves with its own width, so no column of digits lines up at all.",
           },
           {
             id: "right",
@@ -148,7 +148,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "empty",
             label: "No invoices yet, with New invoice",
-            note: "Nothing here yet, so offer creating the first invoice.",
+            note: "There are no invoices yet, so offer to create the first one.",
           },
           {
             id: "search",
@@ -209,7 +209,7 @@ export const LESSONS: Lesson[] = [
           {
             id: "0",
             label: "Refunded, 0 orders",
-            note: "Nothing to page through. Under the empty state it would say Page 1 of 0.",
+            note: "There is nothing to page through. Under the empty state it would say Page 1 of 0.",
           },
         ],
       },
@@ -217,7 +217,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     title: "Keep the page in the URL",
-    bad: { label: "In state", costs: ["reload → page 1", "link says /users"] },
+    bad: { label: "In state", costs: ["reload resets it", "link says /users"] },
     good: { label: "Keep in the URL", costs: ["?page=2", "reload keeps it"] },
     levels: [
       {

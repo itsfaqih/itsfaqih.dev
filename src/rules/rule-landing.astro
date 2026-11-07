@@ -19,7 +19,7 @@ import Code from "./code.astro";
 import type { Tldr } from "./lesson";
 import PagerCard from "./pager-card.astro";
 import { reveal } from "./rule-landing.vars.css";
-import { cover, host, island, lessonKit, pager, shell, takeKit } from "./rule-landing.css";
+import { backTo, cover, host, island, lessonKit, pager, shell, takeKit } from "./rule-landing.css";
 import { landingView } from "./rule-landing.view";
 import { titleWordEm } from "./title-fit";
 import ShareButton from "./share-button.astro";
@@ -30,7 +30,7 @@ type Props = {
   /** The heading over the lessons; its intro goes in the "intro" slot. */
   learn: string;
   tldr: Tldr;
-  /** What agents do with the rule in their `AGENTS.md`, as in "build buttons the same way". */
+  /** What agents do with the rule as a skill, as in "build buttons the same way". */
   take: string;
 };
 
@@ -57,14 +57,16 @@ const [was, now] = rule.coverTag.split(" → ");
   data-claim={rule.claim}
   data-markdown={markdownUrl}
 >
-  <Backdrop tide />
+  <Backdrop />
   <header class:list={[arcade.wrap, shell.titleScreen]}>
     {/* Spans both columns, so Share sits over the cover's right edge. */}
     <div class={shell.crumbRow} data-header-fold>
       <nav
         class:list={[heroType.tag, veil.dense, shell.crumb, shell.in, shell.first]}
         aria-label="Breadcrumb"
-        ><a href="/rule-of-thumb" class={shell.crumbLink}>← All rules</a>{
+        ><a href="/rule-of-thumb" class={shell.crumbLink} data-back
+          >← <span class={backTo.rules}>All rules</span><span class={backTo.home}>Back to home</span></a
+        >{
           number && <span class={shell.crumbTag}>No.<!-- -->{number}</span>
         }<span class={shell.crumbTag}>{rule.label}</span></nav
       >
@@ -143,18 +145,18 @@ const [was, now] = rule.coverTag.split(" → ");
       <div class:list={[veil.soft, takeKit.copy, shell.rev]} data-rev="true">
         <h2 class:list={[section.title, takeKit.title]}>Take the rule with you</h2>
         <p class={takeKit.text}
-          >The whole rule in Markdown. Paste it into your <Code tone="take">AGENTS.md</Code>{
-            ` and your agents will ${take}.`
-          }</p
+          >Copy the whole rule as an agent skill. Save it as <Code tone="take"
+            >{`${rule.id}/SKILL.md`}</Code
+          >{` in your agent's skills folder, and your agents will ${take}.`}</p
         >
         <div class:list={[heroType.acts, takeKit.acts]}>
           <button
             type="button"
-            class:list={[button.base, buttonVariant["primary-brand"]]}
-            data-part="copy">Copy as Markdown</button
+            class:list={[button.base, buttonVariant["primary-hue"]]}
+            data-part="copy">Copy SKILL.md</button
           >
           <a
-            class:list={[button.base, buttonVariant["secondary-brand"]]}
+            class:list={[button.base, buttonVariant["secondary-hue"]]}
             href={markdownUrl}
             target="_blank"
             rel="noopener noreferrer">View .md</a
@@ -190,9 +192,10 @@ const [was, now] = rule.coverTag.split(" → ");
   {/* The compact header island's live activity, moved into its [data-island-activity] on load. */}
   <template data-part="activity"
     ><span class={island.activity} style={hue}
-      ><a href="/rule-of-thumb" class:list={[island.action, island.back]}
+      ><a href="/rule-of-thumb" class:list={[island.action, island.back]} data-back
         ><Icon name="ArrowLeft" size={16} weight="bold" aria-hidden="true" /><span
-          class={island.backText}>All rules</span
+          class={island.backText}
+          ><span class={backTo.rules}>All rules</span><span class={backTo.home}>Back to home</span></span
         ></a
       ><span class={landingView.label} data-part="label"
         ><span class:list={[island.labelPart, island.tags]}

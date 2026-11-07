@@ -1,3 +1,4 @@
+import { HINT } from "./hints";
 import { styles } from "./table-design.css";
 import { reducedMotion } from "../hooks/media-query";
 import {
@@ -438,7 +439,7 @@ class TableActions extends HTMLElement {
         const on = editing === name;
         const [nameCell, roleCell, actsCell] = row.cells;
         const label = part(nameCell!, "name");
-        if (at === 0) label.setAttribute("data-hint", "true");
+        if (at === 0) label.setAttribute("data-hint", HINT.hover);
         else label.removeAttribute("data-hint");
         nameCell!.className = view.nameCell(on);
         roleCell!.className = view.roleCell(on);

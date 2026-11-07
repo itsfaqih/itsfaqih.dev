@@ -1,3 +1,4 @@
+import { drop } from "../bevel";
 import { fonts, palette } from "../theme.vars.css";
 import { kit } from "./rule-landing.vars.css";
 import { style } from "@vanilla-extract/css";
@@ -46,6 +47,8 @@ export const styles = {
     color: palette["--mute"],
   }),
   hot: style({
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     selectors: {
       [`&${when.ancestor('[data-side="bad"]')}`]: {
         backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,
@@ -87,7 +90,7 @@ export const styles = {
     paddingInline: "12px",
     borderRadius: "12px",
     backgroundColor: palette["--panel"],
-    boxShadow: `0 2px 0 ${palette["--drop-ink"]}`,
+    boxShadow: drop(2, palette["--drop-ink"]),
   }),
   read: style({
     display: "grid",
@@ -338,6 +341,8 @@ export const styles = {
   orderWrong: style({
     backgroundColor: `color-mix(in srgb, ${palette["--no"]} 8%, transparent)`,
     boxShadow: `inset 2px 0 0 ${palette["--no"]}`,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
   }),
   orderId: style({
     color: palette["--mute"],

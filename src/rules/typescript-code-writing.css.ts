@@ -56,6 +56,8 @@ export const styles = {
     },
   }),
   hot: style({
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
     selectors: {
       [`&${when.ancestor('[data-side="bad"]')}`]: {
         backgroundColor: `color-mix(in srgb, ${palette["--no"]} 10%, transparent)`,

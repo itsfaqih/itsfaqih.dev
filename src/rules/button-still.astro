@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import { styles } from "./button-design.css";
 import { marker } from "../when";
 
@@ -10,7 +11,7 @@ const { careful = false } = Astro.props;
 <div class={styles.stage}>
   <div class={styles.steps}>
     <button
-      data-hint="true"
+      data-hint={HINT.hover}
       type="button"
       class:list={[styles.key,
         styles.sm,

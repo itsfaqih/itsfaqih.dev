@@ -1,4 +1,5 @@
 ---
+import { HINT } from "./hints";
 import type { Level } from "./lesson";
 import { landed, type PickField } from "./null-vs-undefined";
 import { KINDS, paint, pickView } from "./null-vs-undefined.view";
@@ -60,13 +61,13 @@ const shown = [
         ></div
       >
     )
-  }<div class={styles.pickCode}
+  }<div class={styles.pickCode} data-hint={HINT.each}
     ><code class={styles.pickLine} set:html={painted(head)}
     />{fixed.map((line) => <code class:list={[styles.pickLine, styles.pickIn]} set:html={painted(line)} />)}{
       fields.map((field) => (
         <div class={styles.pickRow}
           ><code class:list={[styles.pickLine, styles.pickIn]} data-part="line" set:html={painted(field.line)}
-          /><span class={styles.pickSeg} role="group" aria-label={field.name} data-field={field.name}
+          /><span class={styles.pickSeg} role="group" aria-label={field.name} data-field={field.name} data-hint-cover
             >{
               field.options.map((option) => (
                 <button type="button" class={pickView.key(false)} aria-pressed="false" data-key={option.key}>{option.label}</button>
@@ -77,10 +78,9 @@ const shown = [
       ))
     }<code class={styles.pickLine} set:html={painted(close)} /></div
   ><div class={styles.pickFoot}
-    ><span class={styles.pickLeft} data-part="left">{fields.length} left to pick.</span><button
+    ><span class={styles.pickLeft} data-part="left" aria-live="polite">{fields.length} left to pick.</span><button
       type="button"
       class={pickView.check}
-      aria-disabled="true"
       data-part="slot"
       data-look="check"
       data-slot=""

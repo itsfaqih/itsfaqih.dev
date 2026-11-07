@@ -1,8 +1,14 @@
 import { reducedMotion } from "../hooks/media-query";
 import { play } from "../hooks/sound";
+import { glowDots } from "../sections/backdrop-dots";
 import { isTransitioning, watchRuleOpen } from "../sections/rule-open";
 import { landingView } from "./rule-landing.view";
 import { watchReveal, watchTitleSwap } from "./rule-motion";
+
+// Each lesson card lights one corner, so the whole column stays mostly grey.
+const LESSON_GLOW = 0.8;
+const TOP_RIGHT = [1, 0, 1, 0] as const;
+const BOTTOM_LEFT = [0, 1, 0, 1] as const;
 
 /** Shows `copied` on a button for 1600ms through `show`. */
 function flash(show: (copied: boolean) => void) {
@@ -25,7 +31,8 @@ function shareCopied(button: HTMLElement) {
 /**
  * A rule page (rule-landing.astro): its blocks rise in as they scroll into view, the title fits its
  * column, the header island carries the way back, the tags and Share while the header is compact,
- * the cover leans toward the mouse, and the pager cards play their art and dive into the next rule.
+ * the cover leans toward the mouse, the lesson cards light the dots behind a corner, and the pager
+ * cards play their art and dive into the next rule.
  */
 class RuleLanding extends HTMLElement {
   #stop?: () => void;
@@ -52,6 +59,11 @@ class RuleLanding extends HTMLElement {
     );
     document.querySelector("[data-island-activity]")?.append(activity);
     stops.push(watchTitleSwap(title, part("label", activity)));
+    if (document.documentElement.classList.contains("from-home")) {
+      for (const root of [this, activity]) {
+        for (const back of root.querySelectorAll<HTMLAnchorElement>("[data-back]")) back.href = "/#rules";
+      }
+    }
 
     const shared = { title: this.dataset.title!, text: this.dataset.claim! };
     const copiedShare = new Map<Element, () => void>();
@@ -81,7 +93,7 @@ class RuleLanding extends HTMLElement {
 
     const copy = part("copy");
     const copiedMarkdown = flash((copied) => {
-      copy.textContent = copied ? "Copied" : "Copy as Markdown";
+      copy.textContent = copied ? "Copied" : "Copy SKILL.md";
     });
     copy.addEventListener(
       "click",
@@ -138,10 +150,24 @@ class RuleLanding extends HTMLElement {
     }
     watchRuleOpen(this, signal);
 
+    // The page's hue blips on behind each lesson card's corner as it scrolls in, alternating sides.
+    const lessons = [...this.querySelectorAll("rule-lesson")].map((lesson) =>
+      lesson.querySelector("article")!,
+    );
+    const light = () =>
+      lessons.forEach((card, i) =>
+        glowDots(`lesson-${i}`, card, "var(--hue)", i % 2 ? BOTTOM_LEFT : TOP_RIGHT, LESSON_GLOW),
+      );
+    light();
+    const reflow = new ResizeObserver(light);
+    reflow.observe(this);
+
     this.#stop = () => {
       controller.abort();
       for (const stop of stops) stop();
       activity.remove();
+      reflow.disconnect();
+      lessons.forEach((_, i) => glowDots(`lesson-${i}`, null));
     };
   }
 

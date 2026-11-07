@@ -35,7 +35,10 @@ export const pickChoice = (keys: readonly string[]) => keys.join("-");
 
 /** Every way to fill `fields`; a wrong set's note is its first wrong field's. */
 type PickSet = { id: string; label: string; note: string };
-function pickChoices(fields: readonly PickField[], clear: string): [PickSet, PickSet, ...PickSet[]] {
+function pickChoices(
+  fields: readonly PickField[],
+  clear: string,
+): [PickSet, PickSet, ...PickSet[]] {
   const sets = fields.reduce<FieldOption[][]>(
     (all, field) => all.flatMap((set) => field.options.map((option) => [...set, option])),
     [[]],
@@ -60,7 +63,12 @@ const MARKS = [
 type Mark = (typeof MARKS)[number][0];
 
 /** A field the "A new invoice" board types with one of MARKS. */
-const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<Mark, string>>): PickField => ({
+const typed = (
+  name: string,
+  type: string,
+  answer: Mark,
+  notes: Partial<Record<Mark, string>>,
+): PickField => ({
   name,
   line: `${name}: ${type}`,
   answer,
@@ -75,7 +83,7 @@ const typed = (name: string, type: string, answer: Mark, notes: Partial<Record<M
 export const NEW_INVOICE: readonly PickField[] = [
   typed("coupon", "Coupon", "nul", {
     opt: "?: lets a caller leave the coupon out and never decide. Make it required, so they pass a coupon or null on purpose.",
-    und: "Callers must pass it now, but undefined reads as nobody gave a value. \"There's no coupon\" is a null someone wrote.",
+    und: 'Callers must pass it now, but undefined reads as nobody gave a value. "There\'s no coupon" is a null someone wrote.',
   }),
   typed("memo", "string", "opt", {
     und: "Now every caller has to write memo: undefined just to leave it blank. ?: lets them leave it out.",
@@ -127,7 +135,7 @@ export const NICKNAMES: [Choice, Choice, ...Choice[]] = [
 export const landed = (field: PickField, option: FieldOption) => option.lands ?? field.now;
 
 /** How a record shows a field that was cleared. */
-const NONE = "—";
+const NONE = "null";
 
 /** A field the "Make it match" patch sets to null or undefined, or to `value` when it offers one. */
 const patched = (
@@ -142,7 +150,9 @@ const patched = (
   answer,
   now,
   options: [
-    ...(value === undefined ? [] : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
+    ...(value === undefined
+      ? []
+      : [{ key: "val", label: value, line: `${name}: ${value},`, lands: value, note: notes.val }]),
     { key: "nul", label: "null", line: `${name}: null,`, lands: NONE, note: notes.nul },
     { key: "und", label: "undefined", line: `${name}: undefined,`, note: notes.und },
   ],
@@ -159,7 +169,9 @@ export const MATCH: readonly PickField[] = [
     },
     '"Ana Li"',
   ),
-  patched("email", '"ana@x.io"', "und", { nul: "email: null wipes the email, which nobody asked for." }),
+  patched("email", '"ana@x.io"', "und", {
+    nul: "email: null wipes the email, which nobody asked for.",
+  }),
   patched("phone", '"0812 555"', "nul", {
     und: "undefined drops out of the JSON, so the server never hears about the clear and keeps the number.",
   }),
@@ -233,7 +245,7 @@ export const LESSONS: Lesson<CodeSide>[] = [
   },
   {
     title: "Clear with null",
-    bad: { label: "= undefined", costs: ["{} sent", "clear lost"] },
+    bad: { label: "= undefined", costs: ["{} sent", "not cleared"] },
     good: { label: "= null", costs: ["1 field cleared"] },
     levels: [
       {
@@ -324,33 +336,27 @@ export const LESSONS: Lesson<CodeSide>[] = [
   {
     title: "Return null for not found",
     bad: {
-      label: "Send undefined",
-      costs: ["0-byte body", "1 SyntaxError"],
+      label: "Return undefined",
+      costs: ["0 build errors", "Ana: not found"],
       lines: [
-        { c: "const user = users.get(email)", out: "undefined" },
-        {
-          c: "const body = JSON.stringify(user)",
-          out: "undefined, 0 bytes",
-          tone: "no",
-          hot: true,
-        },
-        { c: "// on the client" },
-        { c: "JSON.parse(body)", out: "SyntaxError: Unexpected end of JSON input", tone: "no" },
+        { c: "function findUser(email: string): User | undefined {" },
+        { c: "  const cached = cache.get(email)" },
+        { c: "  if (cached) return cached" },
+        { c: "  users.find((u) => u.email === email)", out: "forgot return, 0 errors", tone: "no", hot: true },
+        { c: "}" },
+        { c: 'findUser("ana@x.io")', out: "undefined, though Ana exists", tone: "no" },
       ],
     },
     good: {
-      label: "Send null",
-      costs: ["4-byte body", "0 errors"],
+      label: "Return null",
+      costs: ["1 build error", "caught before it runs"],
       lines: [
-        { c: "const user = users.get(email)", out: "undefined" },
-        {
-          c: "const body = JSON.stringify(user ?? null)",
-          out: '"null", 4 bytes',
-          tone: "yes",
-          hot: true,
-        },
-        { c: "// on the client" },
-        { c: "JSON.parse(body)", out: 'null: "No such user"', tone: "yes" },
+        { c: "function findUser(email: string): User | null {" },
+        { c: "  const cached = cache.get(email)" },
+        { c: "  if (cached) return cached" },
+        { c: "  users.find((u) => u.email === email)", out: "TS2366: no ending return", tone: "yes", hot: true },
+        { c: "}" },
+        { c: "// fix: return users.find(…) ?? null" },
       ],
     },
     levels: [
@@ -376,7 +382,7 @@ export const LESSONS: Lesson<CodeSide>[] = [
             slot: {
               id: "unchecked",
               label: '["sku-3",',
-              note: "Says no product has sku-3 before anyone checked. It can't be sold until the cache clears.",
+              note: "It says no product has sku-3 before anyone checked. It can't be sold until the cache clears.",
             },
           },
           { depth: 0, text: "])" },
@@ -400,7 +406,10 @@ export type Field = "title" | "assignee" | "due" | "reviewer";
 export type Row = Partial<Record<Field, string | null>>;
 export type Body = Partial<Record<Field, string | null | undefined>>;
 export type Phase = "idle" | "sent" | "done";
-export type Verdict = "saved" | "kept" | "wiped" | "lost";
+export type Verdict = "saved" | "kept" | "wiped" | "not cleared" | "not saved";
+
+/** Whether the record ended up other than the user meant: a field wiped, or a change that didn't land. */
+export const wentWrong = (verdict: Verdict) => verdict !== "saved" && verdict !== "kept";
 
 const FIELDS: readonly Field[] = ["title", "assignee", "due", "reviewer"];
 
@@ -415,7 +424,10 @@ export function arrived(body: Body): Row {
 }
 
 export function verdictOf(field: Field, before: Row, after: Row, intent: Row): Verdict {
-  if (field in intent) return after[field] === intent[field] ? "saved" : "lost";
+  if (field in intent) {
+    if (after[field] === intent[field]) return "saved";
+    return intent[field] === null ? "not cleared" : "not saved";
+  }
   return after[field] === before[field] ? "kept" : "wiped";
 }
 
