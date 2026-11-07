@@ -26,8 +26,8 @@ function bounce(ground: HTMLElement, width: number, speed: number, since = 0) {
   }
   frames.push({ transform: "none" });
   for (const running of ground.getAnimations()) running.cancel();
-  const play = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
-  play.currentTime = since;
+  const animation = ground.animate(frames, { duration: (frames.length - 1) * FRAME_MS });
+  animation.currentTime = since;
 }
 
 /**
