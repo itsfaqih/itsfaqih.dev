@@ -49,7 +49,7 @@ const { title, summary, publishedAt } = post.data;
             <header class={styles.header}>
               <div class={styles.meta}>
                 <div class={cx(styles.metaItem, styles.small, styles.muted)}>
-                  <Icon name="CalendarBlank" size={14} /><time>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
+                  <Icon name="CalendarBlank" size={14} /><time datetime={publishedAt.toISOString().slice(0, 10)}>{BLOG_DATE_FORMATTER.format(publishedAt)}</time>
                 </div>
                 <div class={cx(styles.metaItem, styles.small, styles.muted)}>
                   <Icon name="Clock" size={14} /><span>5 min read</span>
