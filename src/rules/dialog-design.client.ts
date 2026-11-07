@@ -1,6 +1,7 @@
 import { reducedMotion } from "../browser/media-query";
 import { palette } from "../theme.vars.css";
 import { DRAFT } from "./dialog-design";
+import { texts } from "./text-nodes";
 import {
   articleView,
   cardView,
@@ -27,8 +28,7 @@ function windowOf(host: HTMLElement, signal: AbortSignal) {
     },
     { signal },
   );
-  let said = [...read.childNodes]
-    .filter((node) => node.nodeType === Node.TEXT_NODE)
+  let said = texts(read)
     .map((node) => node.textContent)
     .join("|");
   /** Shows `parts` in the read line, one text node per string, rewriting it only on a change. */
