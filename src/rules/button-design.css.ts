@@ -119,6 +119,13 @@ export const styles = {
     width: "16px",
     height: "16px",
   }),
+  bigIcon: style({
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: "20px",
+    height: "20px",
+  }),
   sm: style({
     "@layer": {
       [under2]: {
@@ -660,6 +667,16 @@ export const styles = {
       "--pl": "8px",
       "--pr": "8px",
     },
+  }),
+  snug: style({
+    vars: {
+      "--pv": "6px",
+      "--pl": "6px",
+      "--pr": "6px",
+    },
+  }),
+  low: style({
+    height: "32px",
   }),
   // Hatches the padding on all four sides: a hatched layer with the content box cut out.
   ring: style({

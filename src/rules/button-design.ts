@@ -125,8 +125,8 @@ export const LESSONS: Lesson[] = [
           },
           {
             id: "open",
-            label: "Open, 16 left and 16 right",
-            note: "Its icon is on the right, and that side still has the full 16px.",
+            label: "Open, 12 left and 16 right",
+            note: "Its icon is on the right, but the 4px came off the left. The icon's side still has the full 16px.",
           },
           {
             id: "next",
@@ -153,19 +153,19 @@ export const LESSONS: Lesson[] = [
         answer: "fit",
         choices: [
           {
-            id: "tall",
+            id: "sides",
             label: "16px on every side",
-            note: "16px is Subtitles' side padding, room for a label. Play comes out 48px tall beside a 38px Subtitles, so the bar stops lining up.",
+            note: "16px is Subtitles' side padding, room for a label. Play comes out 52px tall beside a 32px Subtitles, so the bar stops lining up.",
           },
           {
             id: "fit",
-            label: "11px on every side",
-            note: "(38px height - 16px icon) / 2 is 11px, so Play is a 38px square, as tall as Subtitles.",
+            label: "6px on every side",
+            note: "(32px height - 20px icon) / 2 is 6px, so Play is a 32px square, as tall as Subtitles.",
           },
           {
-            id: "short",
+            id: "usual",
             label: "8px on every side",
-            note: "Play shrinks to 32px, 6px shorter than Subtitles and a smaller target.",
+            note: "8px fits a 16px icon. This one is 20px, so Play comes out 36px tall, 4px taller than Subtitles.",
           },
         ],
       },
