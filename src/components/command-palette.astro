@@ -2,6 +2,7 @@
 import { colorOf, VISIBLE_GUIDELINES, type Guideline, type RuleId } from "../data/guidelines";
 import { SHOW_PROJECTS } from "../data/home";
 import { LINKS } from "../seo";
+import { arcade } from "./arcade.css";
 import { boxScrollbar, boxScrollbarHost } from "./box-scrollbar.css";
 import { marker } from "../when";
 import { styles } from "./command-palette.css";
@@ -225,7 +226,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
     class={styles.backdrop}
   >
   </div>
-  <dialog data-pour tabindex="-1" aria-modal="true" class:list={[styles.dialog, styles.stage]}>
+  <dialog data-pour tabindex="-1" aria-modal="true" aria-label="Command palette" class:list={[styles.dialog, styles.stage]}>
     <div aria-hidden="true" class={styles.drop}></div>
     <div data-cmd-panel class={styles.panel}>
       <div class={styles.surface}>
@@ -333,7 +334,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
                                 </span>
                               </span>
                               {"copy" in item && (
-                                <span data-part="copied" hidden class={styles.done}>
+                                <span data-part="copied" hidden aria-hidden="true" class={styles.done}>
                                   Copied!
                                 </span>
                               )}
@@ -368,6 +369,7 @@ const isPhosphor = (icon: Command["icon"]): icon is (typeof PHOSPHOR)[number] =>
               ><kbd class:list={[styles.kbd, styles.lastKey]}>←</kbd>Back</span
             >
           </div>
+          <span data-part="status" role="status" class={arcade.srOnly}></span>
         </div>
       </div>
     </div>

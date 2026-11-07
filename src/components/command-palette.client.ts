@@ -79,6 +79,7 @@ class CommandPalette extends HTMLElement {
     );
     const copyOption = this.querySelector<HTMLElement>("[data-copy]")!;
     const back = part("back");
+    const status = part("status");
     const [startGuard, endGuard] = this.querySelectorAll<HTMLElement>('[data-part="guard"]');
 
     let isOpen = false;
@@ -156,6 +157,8 @@ class CommandPalette extends HTMLElement {
       copyOption.querySelector('[data-part="mail"]')!.className = view.glyph(copied);
       copyOption.querySelector('[data-part="check"]')!.className = view.glyph(!copied);
       copyOption.querySelector<HTMLElement>('[data-part="copied"]')!.hidden = !copied;
+      const said = copied ? "Email address copied" : "";
+      if (status.textContent !== said) status.textContent = said;
 
       // One fill follows the highlighted option, whether the pointer or the arrow keys moved it, and
       // springs between options instead of blinking (fluid-hover.ts). A fresh fill fades in where it
