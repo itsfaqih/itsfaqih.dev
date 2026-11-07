@@ -8,10 +8,8 @@ import {
   type Way,
 } from "./handling-timestamps";
 import { tsView } from "./handling-timestamps.view";
+import { texts } from "./text-nodes";
 import { patchLine } from "./timestamps-wire";
-
-const texts = (element: Element) =>
-  [...element.childNodes].filter((node): node is Text => node.nodeType === Node.TEXT_NODE);
 
 const setData = (node: Text, data: string) => {
   if (node.data !== data) node.data = data;

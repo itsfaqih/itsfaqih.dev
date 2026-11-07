@@ -25,6 +25,7 @@ import {
   viewOf,
 } from "./table-design";
 import { view } from "./table-design.view";
+import { texts } from "./text-nodes";
 
 type Store<T> = {
   get: () => T;
@@ -75,9 +76,6 @@ function cloneOf<T extends Element>(template: HTMLTemplateElement, kind: abstrac
     throw new Error(`template "${template.dataset.part}" holds no ${kind.name}`);
   return node;
 }
-
-const texts = (element: Element) =>
-  [...element.childNodes].filter((node): node is Text => node.nodeType === Node.TEXT_NODE);
 
 /** Makes `nodes` the children of `parent`, moving only what is out of place, as a keyed render does. */
 function place(parent: Element, nodes: readonly Node[]) {
