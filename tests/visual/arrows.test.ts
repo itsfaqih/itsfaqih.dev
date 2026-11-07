@@ -17,7 +17,6 @@ import {
   polyline,
   SHORTEST,
   spineOf,
-  squareHead,
   squarePixelHead,
   straightWhereItFits,
   tightest,
@@ -179,8 +178,6 @@ type Kind = "hint" | "toggle" | "squint";
 type Seen = {
   card: string;
   spine: string;
-  /** The brush outline, ending in the head. A pixel hint (feat/pixel-arrows) has `cells` instead. */
-  ink: string;
   cells: Point[];
   grid: number;
   matrix: number[];
@@ -225,17 +222,14 @@ function collectHints(): Card[] {
     });
     const arrows: Seen[] = [];
     for (const svg of layer.querySelectorAll("svg")) {
-      // A brush hint reveals its line through a mask; a pixel hint carries its line as data-spine
-      // and draws cells after its ring.
-      const spine = svg.querySelector("mask path")?.getAttribute("d") ?? svg.dataset.spine ?? "";
-      const ink = svg.querySelector(":scope > path")?.getAttribute("d") ?? "";
+      // A pixel hint carries its line as data-spine and draws its cells after its ring.
+      const spine = svg.dataset.spine ?? "";
       const rects = [...svg.querySelectorAll(":scope > rect")].slice(1);
       const label = svg.nextElementSibling;
       if (!label) continue;
       arrows.push({
         card: card.querySelector("h2, h3")?.textContent?.trim() ?? "",
         spine,
-        ink,
         cells: rects.map((r) => ({
           x: Number(r.getAttribute("x")),
           y: Number(r.getAttribute("y")),
@@ -322,10 +316,9 @@ function collectSquint() {
   });
 }
 
-// The ink is wider than its centreline: a line keeps off by half its width and a hair, as hints.ts
-// does. A brush hint is `body` wide, a pixel hint (feat/pixel-arrows) one `grid` cell.
-const look: { body?: number; grid?: number; head: number } = ARROWS.hint;
-const INK = (look.body ?? look.grid ?? 0) / 2 + 1;
+// The ink is one `grid` cell wide: a line keeps off by half its width and a hair, as hints.ts does.
+const look = ARROWS.hint;
+const INK = look.grid / 2 + 1;
 // A hint's line stops short of the ring round its target, which sits RING_GAP out.
 const GAPS = {
   hint: { label: ARROWS.hint.labelGap, target: ARROWS.hint.targetGap + RING_GAP },
@@ -396,19 +389,12 @@ function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
     flag("length", a.where, longEnough(a.points));
     flag("bend", a.where, tightest(a.points, BEND));
     flag("straight", a.where, straightWhereItFits(a.points, a.label, a.target));
-    const spine = polyline(seen.spine);
-    flag(
-      "head",
-      a.where,
-      seen.ink
-        ? squareHead({ spine, ink: seen.ink, matrix: seen.matrix })
-        : squarePixelHead(spine, seen.cells, seen.grid, look.head),
-    );
+    flag("head", a.where, squarePixelHead(polyline(seen.spine), seen.cells, seen.grid, look.head));
   };
   for (const card of cards) {
     const placed: (Placed & { marks: Box[] })[] = [];
     card.arrows.forEach((seen, i) => {
-      const points = spineOf({ spine: polyline(seen.spine), ink: seen.ink, matrix: seen.matrix });
+      const points = spineOf({ spine: polyline(seen.spine), matrix: seen.matrix });
       const tip = points.at(-1)!;
       const nearest = card.targets
         .map((t, k) => ({ k, miss: outside(tip, t.box) }))
@@ -463,7 +449,7 @@ function judge(cards: Card[], squint: ReturnType<typeof collectSquint>) {
     }
   }
   squint.forEach((s) => {
-    const points = spineOf({ spine: polyline(s.spine), ink: "", matrix: s.matrix });
+    const points = spineOf({ spine: polyline(s.spine), matrix: s.matrix });
     const a: Placed = {
       kind: "squint",
       where: `squint → ${s.name}`,

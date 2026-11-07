@@ -45,7 +45,8 @@ export function head({ ink, matrix }: Drawn) {
   return { tip, r, notch, l };
 }
 
-export const spineOf = ({ spine, matrix }: Drawn) => spine.map((p) => transform(p, matrix));
+export const spineOf = ({ spine, matrix }: Omit<Drawn, "ink">) =>
+  spine.map((p) => transform(p, matrix));
 
 const sub = (a: Point, b: Point) => ({ x: a.x - b.x, y: a.y - b.y });
 const len = (v: Point) => Math.hypot(v.x, v.y);
@@ -207,7 +208,7 @@ export function squareHead(drawn: Drawn) {
 }
 
 /**
- * The same rule for a head built of `grid` px cells (the pixel hints on feat/pixel-arrows): the
+ * The same rule for a head built of `grid` px cells (the pixel hints and Squint's): the
  * line's last stretch runs along one of the eight ways a pixel head can point, and the head's cells
  * mirror each other across it. `cells` are the cells' top-left corners, in the spine's units, and
  * `head` how many rows deep the head is.
