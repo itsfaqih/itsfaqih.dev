@@ -2,7 +2,7 @@ import { PAGE_FILE_END } from "../page-path";
 import { OPENING_KEY } from "../sections/rule-open";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
-export const REST_AFTER_MS = 3500;
+const REST_AFTER_MS = 3500;
 
 /**
  * Runs before first paint: the theme, the sound toggle's glyph, the intro gate, the header carried

@@ -61,7 +61,7 @@ const TINT_STEPS = 24;
 
 type Box = { left: number; right: number; top: number; bottom: number };
 /** Part of a box, as fractions of its width and height: [left, top, right, bottom]. */
-export type GlowArea = readonly [left: number, top: number, right: number, bottom: number];
+type GlowArea = readonly [left: number, top: number, right: number, bottom: number];
 type Glow = { box: Element; hue: string; from?: GlowArea; strength: number; since: number };
 
 // Each source's glows, newest last. A glow stays until a newer one has fully faded in over it.

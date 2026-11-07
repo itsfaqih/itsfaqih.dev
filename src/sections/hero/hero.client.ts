@@ -42,7 +42,7 @@ class HomeHero extends HTMLElement {
     let timer = 0;
     let armedRun = 0;
     let armedAt = 0;
-    // A pip's bar restarts whenever the run it shows changes, as React remounted it by key.
+    // A pip's bar is a new element, so its fill restarts, whenever the run it shows changes.
     const barKeys = pips.map((_, at): string => (at === 0 ? "0" : "idle"));
 
     const userPaused = () => pausedByUser ?? reduced;

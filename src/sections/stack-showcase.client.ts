@@ -1,7 +1,7 @@
+import { HEADER_HEIGHT } from "../layouts/site.css";
 import { countClass } from "./chips.view";
 import { groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.view";
 
-const HEADER_HEIGHT = 72;
 const CARD_GAP = 10;
 const CARD_TOP_MARGIN = 16;
 const CARD_HIDE_DELAY_MS = 80;
@@ -149,7 +149,7 @@ class StackShowcase extends HTMLElement {
     };
 
     // Names each badge and group in the transition: the ones that stay glide (stack-move), the
-    // ones that come back slide in, and the dropped ones fade, as React's <ViewTransition> did.
+    // ones that come back slide in, and the dropped ones fade.
     // `named` is the latest run's; an earlier run that ends late leaves the latest run's names be.
     let named: HTMLElement[] = [];
     const nameAs = (run: HTMLElement[], element: HTMLElement, kind: string) => {

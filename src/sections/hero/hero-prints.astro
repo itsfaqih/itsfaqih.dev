@@ -1,5 +1,5 @@
 ---
-import { draw, REST_TRANSFORM, SCENE_MS, TOKEN_COUNT, TOPS } from "./hero-prints.view";
+import { draw, REST_TRANSFORM, SCENE_MS, TOKEN_COUNT, topInk, TOPS } from "./hero-prints.view";
 import { marker } from "../../when";
 import { styles } from "./hero-prints.css";
 import { KEYFRAMES, SCENE_LABELS } from "./hero-scenes";
@@ -8,7 +8,6 @@ import HeroScene from "./hero-scene.astro";
 // The bench's prints (hero-prints.client.ts). Scene 0 is drawn; every scene and the morph's tokens
 // wait in templates for the element to swap in.
 const p = "hp";
-const topInk = { solid: [styles.ink], hue: [styles.hue, styles.screen], outline: [styles.inkLine] };
 ---
 
 <hero-prints class:list={[styles.root, marker]} data-paused=""
@@ -54,11 +53,7 @@ const topInk = { solid: [styles.ink], hue: [styles.hue, styles.screen], outline:
                 class:list={[styles.part, styles.screen]}
               />
               {TOPS.map((top) => (
-                <path
-                  data-top={top}
-                  class={draw(...topInk[top])}
-                  stroke-width={top === "outline" ? "3" : undefined}
-                />
+                <path data-top={top} {...topInk(top)} />
               ))}
             </g>
           ))

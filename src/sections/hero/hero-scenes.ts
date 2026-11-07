@@ -1,5 +1,5 @@
 import { ARROWS, brush, fmt, type Point, unit } from "../../arrows";
-import { boxCentre, type Outline } from "./hero-morph";
+import { boxCentre } from "./hero-morph";
 import {
   ABSORBED_SCALE,
   type Piece,
@@ -11,8 +11,9 @@ import {
   WORKER_Y,
   workerOf,
 } from "./hero-pieces";
-import { easeInOut, OUT, pct, SCENE_MS, SLIDE_MS, type TopInk, vars } from "./hero-prints.view";
+import { easeInOut, OUT, pct, SLIDE_MS, type TopInk } from "./hero-prints.view";
 import { INOUT, SPRING } from "./hero-prints.css";
+import { styleOf } from "../tech-brand";
 
 export const MEANDER = [
   [40, 160],
@@ -95,7 +96,6 @@ export const REJECT_MARK = (() => {
   return `M${x - r} ${y - r} L${x + r} ${y + r} M${x + r} ${y - r} L${x - r} ${y + r}`;
 })();
 
-const BACKENDS_MS = SLIDE_MS;
 const MOVE_MS = 192;
 const ROUTE_MS = 240;
 const WORK_MS = 800;
@@ -105,7 +105,7 @@ const PULSE_MS = 64;
 const SETTLE_MS = 256;
 const ADVANCE_EVERY_MS = 484;
 // The queue keeps its pace until the scene hands off, so the last jobs are still working then.
-const ADVANCE_COUNT = Math.floor((BACKENDS_MS - ROUTE_MS) / ADVANCE_EVERY_MS) + 1;
+const ADVANCE_COUNT = Math.floor((SLIDE_MS - ROUTE_MS) / ADVANCE_EVERY_MS) + 1;
 const ADVANCES = Array.from({ length: ADVANCE_COUNT }, (_, k) => k * ADVANCE_EVERY_MS);
 const HUE_REJECTED = 1;
 const HUE_RETURNS = 2;
@@ -115,7 +115,7 @@ const advancesFrom = (from: number, to?: number) =>
   ADVANCES.map((_, advance) => advance).slice(from, to);
 const intoWorkerAt = (advance: number) => ADVANCES[advance]! + ROUTE_MS;
 const boxOffset = (advance: number) => WORKER_Y[workerOf(advance)] - QUEUE_Y;
-const backendsPct = (ms: number) => pct((ms / BACKENDS_MS) * 100);
+const backendsPct = (ms: number) => pct((ms / SLIDE_MS) * 100);
 
 type JobStop = {
   at: number;
@@ -152,7 +152,7 @@ function joining(advances: number[]): JobStop[] {
 }
 
 const absorbed = (advance: number): JobStop[] =>
-  [intoWorkerAt(advance) + ABSORB_MS, BACKENDS_MS].map((at) => ({
+  [intoWorkerAt(advance) + ABSORB_MS, SLIDE_MS].map((at) => ({
     at,
     x: WORKER_X,
     y: boxOffset(advance),
@@ -206,7 +206,7 @@ export const JOBS: { top: TopInk; stops: JobStop[] }[] = [
 // With animation off a job stays where it opens the scene, so the queue still holds work.
 export const jobRest = ({ stops }: (typeof JOBS)[number]) => {
   const { x, opacity = 1 } = stops[0]!;
-  return vars({ "rest-x": `${x}px`, "rest-opacity": opacity });
+  return styleOf({ "--rest-x": `${x}px`, "--rest-opacity": opacity });
 };
 
 export const RETRY_WORKER = workerOf(HUE_PASSES);
@@ -216,9 +216,9 @@ type Key = { at: number; css: string; ease?: string };
 
 // Work still under way when the scene hands off stops where it is.
 const keyframes = (name: string, keys: Key[]) => {
-  const kept = keys.filter(({ at }) => at <= BACKENDS_MS);
+  const kept = keys.filter(({ at }) => at <= SLIDE_MS);
   const last = kept.at(-1)!;
-  if (last.at < BACKENDS_MS) kept.push({ at: BACKENDS_MS, css: last.css });
+  if (last.at < SLIDE_MS) kept.push({ at: SLIDE_MS, css: last.css });
   const frame = ({ at, css, ease }: Key) =>
     `${backendsPct(at)} { ${css}${ease ? ` animation-timing-function: ${ease};` : ""} }`;
   return `@keyframes ${name} { ${kept.map(frame).join(" ")} }`;
@@ -278,19 +278,24 @@ export const KEYFRAMES = [meanderKeyframes(), queueKeyframes()].join("\n");
 
 // A piece turns about its outline's box centre, as moved() does for the shape the morph hands over,
 // so it doesn't shift when the scene takes over from the morph.
-const pivotOf = (outline: Outline) => {
-  const [x, y] = boxCentre(outline);
-  return `transform-origin:${x}px ${y}px`;
-};
-
 export const settleVars = (
   { outline, dx, dy, r = 0 }: Piece,
   i: number,
   span: number,
   step: number,
-) => `${vars({ i, dx: `${dx}px`, dy: `${dy}px`, r: `${r}deg`, span, step })};${pivotOf(outline)}`;
+) => {
+  const [x, y] = boxCentre(outline);
+  return styleOf({
+    "--i": i,
+    "--dx": `${dx}px`,
+    "--dy": `${dy}px`,
+    "--r": `${r}deg`,
+    "--span": span,
+    "--step": step,
+    "transform-origin": `${x}px ${y}px`,
+  });
+};
 
-export const settledAt = (i: number, span: number, step: number) => (span + step * i) * SCENE_MS;
 export const TUMBLE_FLOAT_MS = [1500, 1800, 1600, 1700];
 export const WORKER_FLOAT_MS = [1500, 1800, 1700] as const;
 

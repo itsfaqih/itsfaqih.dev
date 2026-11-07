@@ -36,12 +36,18 @@ const GLYPHS = new Map<string, Stroke[]>([
 
 const glyphOf = (label: string) => GLYPHS.get(label) ?? GLYPHS.get("Best Practices")!;
 
-/** The rules with art of their own; every other rule shows its topic's glyph. */
-const ART_IDS = new Set([
-  "proximity-principle",
-  "button-design",
-  "data-loading",
-  "null-vs-undefined",
+/** The chip's beats for each rule with art of its own; every other rule shows its topic's glyph. */
+const CHIPS = new Map([
+  ["proximity-principle", { beats: ["FAR", "NEAR"], moves: [beat.away, beat.rest] }],
+  [
+    "button-design",
+    {
+      beats: ["IDLE", "HOVER", "PRESS", "LOAD", "DONE"],
+      moves: [beat.idle, beat.hover, beat.press, beat.load, beat.done],
+    },
+  ],
+  ["data-loading", { beats: ["STALE", "FRESH"], moves: [beat.away, beat.rest] }],
+  ["null-vs-undefined", { beats: ["MISSING", "EMPTY"], moves: [beat.missing, beat.empty] }],
 ]);
 
 // The progress pips fill one by one; the first is lit throughout.
@@ -58,22 +64,12 @@ type Props = {
 };
 
 const { rule, play = false, at = "card", class: className } = Astro.props;
-const art = rule && ART_IDS.has(rule.id) ? rule.id : undefined;
+const art = rule && CHIPS.has(rule.id) ? rule.id : undefined;
 // On a rule's cover the art sits in layers (depth), and the data-loading screen takes that page's
 // demo card styles, and its slide in place of the sweep.
 const z = at === "cover";
 const playing = art === "button-design" ? draw.playSlow : draw.play;
-const chip = art
-  ? {
-      "proximity-principle": { beats: ["FAR", "NEAR"], moves: [beat.away, beat.rest] },
-      "button-design": {
-        beats: ["IDLE", "HOVER", "PRESS", "LOAD", "DONE"],
-        moves: [beat.idle, beat.hover, beat.press, beat.load, beat.done],
-      },
-      "data-loading": { beats: ["STALE", "FRESH"], moves: [beat.away, beat.rest] },
-      "null-vs-undefined": { beats: ["MISSING", "EMPTY"], moves: [beat.missing, beat.empty] },
-    }[art]
-  : undefined;
+const chip = art && CHIPS.get(art);
 const rows = [
   { y: 34, width: 50, value: "$12" },
   { y: 52, width: 38, value: "$14" },

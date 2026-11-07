@@ -45,7 +45,7 @@ export const QUARTER_TOKENS = [0, 2, 3, 1];
 
 // `frame` is what the scene draws the token's print in when it opens, unmoved unless stated.
 export type Token = { outline: Outline; top: TopInk; frame?: Frame };
-export type SceneTokens = { enter: Token[]; exit: Token[] };
+type SceneTokens = { enter: Token[]; exit: Token[] };
 
 const scattered = (pieces: Piece[]) =>
   pieces.map(({ outline, top, dx, dy, r }) => ({
@@ -59,7 +59,7 @@ const settling = (pieces: Piece[]): SceneTokens => ({
   exit: settled(pieces),
 });
 
-const DEV_TOOLS_TOKENS = (ball: Outline, ballFrame: Frame): Token[] => [
+const devToolsTokens = (ball: Outline, ballFrame: Frame): Token[] => [
   { outline: ball, top: "solid", frame: ballFrame },
   { outline: polygon([37.8, 155.5], [277.8, 35.5], [282.2, 44.5], [42.2, 164.5]), top: "hue" },
   { outline: rect(264, 24, 32, 32), top: "outline" },
@@ -71,7 +71,7 @@ const workerBox = (y: number): Token => ({
   top: "outline",
 });
 // In this order the morph travels least, from the scene before and into the one after.
-const QUEUE_TOKENS = (job: Token): Token[] => [
+const queueTokens = (job: Token): Token[] => [
   workerBox(WORKER_Y[0]),
   workerBox(WORKER_Y[1]),
   job,
@@ -89,16 +89,16 @@ export const SCENE_TOKENS: SceneTokens[] = [
   settling(TUMBLE),
   settling(QUARTER_TOKENS.map((q) => QUARTERS[q]!)),
   {
-    enter: DEV_TOOLS_TOKENS(dot(40, 160), shifted(40, 160)),
-    exit: DEV_TOOLS_TOKENS(circle(280, 40, 10), shifted(280, 40)),
+    enter: devToolsTokens(dot(40, 160), shifted(40, 160)),
+    exit: devToolsTokens(circle(280, 40, 10), shifted(280, 40)),
   },
   {
-    enter: QUEUE_TOKENS({
+    enter: queueTokens({
       outline: circle(SLOT_X[3], QUEUE_Y, 11),
       top: "solid",
       frame: shifted(SLOT_X[3]),
     }),
-    exit: QUEUE_TOKENS({ outline: dot(WORKER_X, QUEUE_Y), top: "solid" }),
+    exit: queueTokens({ outline: dot(WORKER_X, QUEUE_Y), top: "solid" }),
   },
   {
     enter: [

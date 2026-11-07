@@ -1,4 +1,4 @@
-import { brandFor, styleOf } from "./tech-brand";
+import { brandFor, ringGradient, styleOf } from "./tech-brand";
 /* Each employer's icon mark, one path per brand colour. EvidenceCare's is redrawn from its site's
    mark with the navy outline thickened to stay visible at chip size, and its navy turns to the text
    colour on dark as in its own reversed logo. Jatis Mobile's and Mitra Integrasi Informatika's are
@@ -107,10 +107,7 @@ export const toneOf = ({ hex, dark }: Part) => ({
   "--brand-dark": dark ?? brandFor(hex, "dark"),
 });
 
-/**
- * The logo's colours for an outline, as --ring-dark and --ring-light: a conic gradient with each
- * colour where it sits in the mark, or the one colour of a single-colour mark.
- */
+/** The logo's colours for an outline, as --ring-dark and --ring-light (ringGradient). */
 export function ringOf(name: string) {
   const logo = LOGOS.get(name);
   if (!logo) return undefined;
@@ -118,12 +115,7 @@ export function ringOf(name: string) {
   const stops = (placed.length ? placed : logo.parts.slice(0, 1)).sort(
     (a, b) => (a.at ?? 0) - (b.at ?? 0),
   );
-  const ring = (theme: "--brand-dark" | "--brand-light") => {
-    const tones = stops.map((part) => toneOf(part)[theme]);
-    if (stops.length === 1) return `linear-gradient(${tones[0]}, ${tones[0]})`;
-    const from = stops[0]?.at ?? 0;
-    const around = stops.map((part, index) => `${tones[index]} ${(part.at ?? 0) - from}deg`);
-    return `conic-gradient(from ${from}deg, ${around.join(", ")}, ${tones[0]} 360deg)`;
-  };
+  const ring = (theme: "--brand-dark" | "--brand-light") =>
+    ringGradient(stops.map((part) => [toneOf(part)[theme], part.at ?? 0]));
   return styleOf({ "--ring-dark": ring("--brand-dark"), "--ring-light": ring("--brand-light") });
 }

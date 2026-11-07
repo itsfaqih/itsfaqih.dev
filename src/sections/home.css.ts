@@ -18,7 +18,7 @@ export const styles = {
   overDots: style({
     backdropFilter: "blur(8px)",
   }),
-  // The custom element stands in for the block the root used to be.
+  // A custom element is inline by default.
   root: style({
     display: "block",
   }),
