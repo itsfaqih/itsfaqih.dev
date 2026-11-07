@@ -17,7 +17,7 @@ export const BEND = 20;
 /** The shortest arrow, in px, nock to tip (hints.ts HINT_SHORTEST is its curve before the head). */
 export const SHORTEST = 24;
 /** How far a head may lean off the stroke it ends. a5a5128 fixed heads up to 34° off to 2.4°. */
-export const HEAD_LEAN = 2.4;
+const HEAD_LEAN = 2.4;
 // A head's ray passes through its target's middle, a nock's back through its word's: within a
 // quarter of the box's shorter side of its centre, so it hits the item and not its edge.
 const AIM = 1 / 4;
@@ -45,7 +45,8 @@ export function head({ ink, matrix }: Drawn) {
   return { tip, r, notch, l };
 }
 
-export const spineOf = ({ spine, matrix }: Drawn) => spine.map((p) => transform(p, matrix));
+export const spineOf = ({ spine, matrix }: Omit<Drawn, "ink">) =>
+  spine.map((p) => transform(p, matrix));
 
 const sub = (a: Point, b: Point) => ({ x: a.x - b.x, y: a.y - b.y });
 const len = (v: Point) => Math.hypot(v.x, v.y);
@@ -164,7 +165,7 @@ export function tightest(points: Point[], bend: number) {
 }
 
 /** How far the line strays from the straight line between its ends. */
-export function sag(points: Point[]) {
+function sag(points: Point[]) {
   const a = points[0]!;
   const b = points.at(-1)!;
   const d = sub(b, a);
@@ -207,7 +208,7 @@ export function squareHead(drawn: Drawn) {
 }
 
 /**
- * The same rule for a head built of `grid` px cells (the pixel hints on feat/pixel-arrows): the
+ * The same rule for a head built of `grid` px cells (the pixel hints and Squint's): the
  * line's last stretch runs along one of the eight ways a pixel head can point, and the head's cells
  * mirror each other across it. `cells` are the cells' top-left corners, in the spine's units, and
  * `head` how many rows deep the head is.

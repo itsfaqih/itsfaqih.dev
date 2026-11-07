@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { appendFile, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Element, ElementContent, Root } from "hast";
@@ -188,7 +188,8 @@ function finishPages(): AstroIntegration {
         );
         await cv.module.writeCvPdfs(outDir);
         // Cloudflare Pages reads response headers from _headers. A Markdown twin names its page.
-        await writeFile(
+        // Appended, so a public/_headers keeps its own rules.
+        await appendFile(
           path.join(outDir, "_headers"),
           PUBLISHED_GUIDELINES.map(
             (rule) => `${rule.href}.md\n  Link: <${SITE_ORIGIN}${rule.href}>; rel="canonical"\n`,
@@ -212,7 +213,7 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: false,
     // The posts' fences are prerendered by rehypeHighlightCode; text stays as written, without
-    // GFM or SmartyPants, as the MDX compiler printed it before.
+    // GFM or SmartyPants.
     processor: unified({
       gfm: false,
       smartypants: false,

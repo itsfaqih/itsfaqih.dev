@@ -1,7 +1,8 @@
-import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
+import { chromium, type Browser, type BrowserContext, type Locator, type Page } from "playwright";
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from "vite-plus/test";
 import { VISIBLE_GUIDELINES } from "../../src/data/guidelines";
-import { pageReady } from "./ready";
+import { pageErrors, pathname } from "./page-setup";
+import { pageReady } from "../ready";
 
 // Drives the ⌘K palette on the built site. Every test fails on any error the page logs.
 
@@ -20,12 +21,8 @@ afterEach(async () => {
 
 async function openPalette(route = "/blog") {
   context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  errors = [];
   const page = await context.newPage();
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
+  errors = pageErrors(page);
   await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });
   await summon(page);
   return page;
@@ -42,27 +39,13 @@ const groupNames = (page: Page) =>
   page
     .getByRole("group")
     .evaluateAll((groups) => groups.map((group) => group.getAttribute("aria-label")));
+// An option shows its name on its first line, over its description.
+const names = (options: Locator) =>
+  options.allInnerTexts().then((texts) => texts.map((text) => text.split("\n")[0]));
 const optionNames = (page: Page, group: string) =>
-  page
-    .getByRole("group", { name: group, exact: true })
-    .getByRole("option")
-    .evaluateAll((options) =>
-      options.map((option) => option.querySelector(".cmdk-name")?.textContent),
-    );
-const selectedOption = (page: Page) =>
-  page
-    .getByRole("option", { selected: true })
-    .evaluateAll((options) =>
-      options.map((option) => option.querySelector(".cmdk-name")?.textContent),
-    );
-const listedOptions = (page: Page) =>
-  page
-    .getByRole("listbox")
-    .getByRole("option")
-    .evaluateAll((options) =>
-      options.map((option) => option.querySelector(".cmdk-name")?.textContent),
-    );
-const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
+  names(page.getByRole("group", { name: group, exact: true }).getByRole("option"));
+const selectedOption = (page: Page) => names(page.getByRole("option", { selected: true }));
+const listedOptions = (page: Page) => names(page.getByRole("listbox").getByRole("option"));
 
 describe("the command palette", () => {
   it("groups the root commands by category", async () => {

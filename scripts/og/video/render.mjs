@@ -106,7 +106,7 @@ if (readdirSync(frameDir).length !== frames) throw new Error("frame count mismat
 console.log(`captured ${frames} frames in ${((Date.now() - started) / 1000).toFixed(1)}s`);
 encode(frameDir, film, fps, frames, Math.round(Number(flag("--poster-at") ?? 0) * fps));
 
-export function encode(dir, name, rate, count, posterFrame = 0) {
+function encode(dir, name, rate, count, posterFrame = 0) {
   const mp4 = path.join(outDir, `${name}.mp4`);
   execFileSync("ffmpeg", [
     "-loglevel",

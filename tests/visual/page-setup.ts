@@ -4,7 +4,7 @@ import pixelmatch from "pixelmatch";
 import type { Browser, Page } from "playwright";
 import { PNG } from "pngjs";
 import { inject } from "vite-plus/test";
-import { pageReady } from "./ready";
+import { pageReady } from "../ready";
 
 declare global {
   interface Window {
@@ -23,7 +23,7 @@ export type Clip = { x: number; y: number; width: number; height: number };
 
 // Repeat captures match pixel for pixel, while a recoloured icon changes ~130 pixels and a hidden
 // one ~40. A flat budget holds a small change to the same bar on a tall page as on a short one.
-export const maxDiffPixels = 20;
+const maxDiffPixels = 20;
 
 // Blocks that fade in once scrolled into view: [data-cut] cut-ins gain .in (cut-ins.ts), and
 // [data-rev] rule sections gain data-in (rule-motion.ts). A new reveal marker belongs here.
@@ -31,9 +31,17 @@ const unrevealedSelector = "[data-cut]:not(.in), [data-rev]:not([data-in])";
 
 export const fixedTime = new Date("2026-01-15T09:30:00Z");
 
-export function routeSlug(route: string) {
-  return route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
+/** Every error the page throws or logs, gathered as it runs. */
+export function pageErrors(page: Page) {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  return errors;
 }
+
+export const pathname = (page: Page) => new URL(page.url()).pathname.replace(/\.html$/, "");
 
 /**
  * Opens a route frozen for screenshots: seeded randomness, a fixed clock, no motion, the intro
@@ -70,11 +78,7 @@ export async function openSettledPage(
     document.addEventListener("DOMContentLoaded", () => document.head.append(style));
   }, scheme);
   const page = await context.newPage();
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
+  const errors = pageErrors(page);
   await page.clock.setFixedTime(fixedTime);
   try {
     await page.goto(new URL(route, inject("baseURL")).href, { waitUntil: "networkidle" });

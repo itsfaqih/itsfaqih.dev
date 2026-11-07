@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium } from "playwright";
-import { builtRoutes, serveSite } from "../tests/visual/serve-build.ts";
+import { builtRoutes, routeSlug, serveSite } from "../tests/site.ts";
 
 const { values } = parseArgs({
   options: {
@@ -319,11 +319,10 @@ for (let run = 0; run < Number(values.runs); run++) {
         `run ${run + 1} ${key}: fcp ${result.fcp.toFixed(0)} lcp ${result.lcp.toFixed(0)} interactive ${result.interactive.toFixed(0)} load ${result.load.toFixed(0)} tbt ${result.tbt.toFixed(0)} ms, ${(result.bytes / 1024).toFixed(1)} KB (${(result.jsBytes / 1024).toFixed(1)} KB JS) ${result.requests} req${result.errors.length ? ` ERRORS: ${result.errors.join(" | ")}` : ""}`,
       );
       if (values.out) {
-        const slug = route === "/" ? "home" : route.slice(1).replaceAll("/", "__");
         writeFileSync(
           path.join(
             values.out,
-            `${values.profile}--${values.protocol}--${site.label}--${slug}--run${run + 1}.json`,
+            `${values.profile}--${values.protocol}--${site.label}--${routeSlug(route)}--run${run + 1}.json`,
           ),
           JSON.stringify({ site: site.label, route, ...result, requestLog }, null, 2),
         );

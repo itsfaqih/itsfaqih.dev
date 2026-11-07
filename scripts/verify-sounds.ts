@@ -2,8 +2,8 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { chromium, type Page } from "playwright";
-import { pageReady } from "../tests/visual/ready.ts";
-import { serveSite, SITE_ROOT } from "../tests/visual/serve-build.ts";
+import { pageReady } from "../tests/ready.ts";
+import { serveSite, SITE_ROOT } from "../tests/site.ts";
 
 const { values } = parseArgs({ options: { shots: { type: "string" } } });
 
