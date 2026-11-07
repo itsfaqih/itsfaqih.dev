@@ -92,18 +92,23 @@ describe("the built site responds to a reader", () => {
     await expect.poll(() => right.isDisabled()).toBe(true);
   });
 
-  it("closes the Dialog Design demo's dialog on Esc", async () => {
+  it("closes the Dialog Design demo's dialog on Esc and hands focus back", async () => {
     const page = await open("/rule-of-thumb/dialog-design");
     const good = page.locator("figure[data-side='good']", {
       has: page.getByRole("button", { name: "What's new", exact: true }),
     });
+    const trigger = good.getByRole("button", { name: "What's new", exact: true });
     const dialog = good.locator("[role=dialog]");
-    expect(await dialog.getAttribute("inert")).toBe("");
+    const focused = (target: Locator) =>
+      target.evaluate((node) => node.contains(document.activeElement));
+    expect(await dialog.isVisible()).toBe(false);
     await good.scrollIntoViewIfNeeded();
-    await good.getByRole("button", { name: "What's new", exact: true }).click();
-    await expect.poll(() => dialog.getAttribute("inert")).toBeNull();
+    await trigger.click();
+    await expect.poll(() => dialog.isVisible()).toBe(true);
+    await expect.poll(() => focused(dialog)).toBe(true);
     await page.keyboard.press("Escape");
-    await expect.poll(() => dialog.getAttribute("inert")).toBe("");
+    await expect.poll(() => dialog.isVisible()).toBe(false);
+    await expect.poll(() => focused(trigger)).toBe(true);
   });
 
   it("dives from a rule tile into its page and zooms back out", async () => {
