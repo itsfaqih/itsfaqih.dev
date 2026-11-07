@@ -9,7 +9,7 @@ composes it by hand from the pieces below, with proximity as the worked example.
 | Piece                                     | Where                                                                                 |
 | ----------------------------------------- | ------------------------------------------------------------------------------------- |
 | `<RuleLanding id learn tldr take>`        | `rule-landing.astro`, with slots `lead`, `intro` and the default slot for the lessons |
-| `<RuleLesson lesson rows? costsStyle?>`   | `rule-lesson.astro`, slots `body`, `extra`, `bad`, `good`                             |
+| `<RuleLesson lesson rows? costsClass?>`   | `rule-lesson.astro`, slots `body`, `extra`, `bad`, `good`                             |
 | `<RuleQuiz n level board marks?>`         | `rule-quiz.astro`, the prompt as its default slot                                     |
 | `<Code tone?>`                            | `code.astro`, tone `"chip"`, `"prompt"`, `"wrap"` or `"take"` (default `"plain"`)     |
 | `<LessonText style?>`, `<LessonText tip>` | `lesson-text.astro`                                                                   |
@@ -131,7 +131,7 @@ pass nothing and get `--rows:0`.
   hovered. Without it, a pointer resting on an edge slips off as the control moves, so the hover
   flickers or the click misses. Every `button.base` key has it already. The visual suite hovers
   and presses each moving control on home 1px inside its top and bottom edges.
-- **`costsStyle`** (handling-timestamps) is a `RuleLesson` prop, applied last to the cost row.
+- **`costsClass`** is a `RuleLesson` prop, applied last to the cost row.
 
 ## Quiz rules
 
