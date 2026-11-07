@@ -1,3 +1,4 @@
+import { PAGE_FILE_END } from "../page-path";
 import { OPENING_KEY } from "../sections/rule-open";
 
 /** How long the cut-ins wait for the page's islands before they settle without them. */
@@ -79,7 +80,7 @@ export const HEAD_SCRIPT = String.raw`(function () {
   var RULE_INDEX = /^\/rule-of-thumb$/;
   var HOME_DECK = "#rules";
   function pathOf(url) {
-    return new URL(url, location.href).pathname.replace(/(\/index)?(\.html|\/)$/, "") || "/";
+    return new URL(url, location.href).pathname.replace(${PAGE_FILE_END}, "") || "/";
   }
   function dive() {
     try {
