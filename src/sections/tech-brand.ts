@@ -213,7 +213,7 @@ export function techBrand(name: string) {
   return brand && styleOf(brand);
 }
 
-/** Serializes custom properties the way React writes a style object: `--a:1;--b:2`. */
+/** Custom properties as an inline style string: `--a:1;--b:2`. */
 export const styleOf = (properties: Record<string, string | number>) =>
   Object.entries(properties)
     .map(([key, value]) => `${key}:${value}`)

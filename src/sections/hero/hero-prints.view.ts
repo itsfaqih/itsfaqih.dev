@@ -20,12 +20,6 @@ export const SCENE_LEAD_MS = MORPH_MS - FADE_MS;
 export const REST_DEG = { x: 4, y: -6 };
 export const REST_TRANSFORM = `rotateX(${REST_DEG.x}deg) rotateY(${REST_DEG.y}deg)`;
 
-/** Custom properties as an inline style string, each name given without its leading dashes. */
-export const vars = (v: Record<string, string | number>) =>
-  Object.entries(v)
-    .map(([k, value]) => `--${k}:${value}`)
-    .join(";");
-
 // Every shape and group the prints draw: it holds still while the hero is paused or its layer is
 // on the way out, and turns about its own box. The halftone copies carry a transform attribute
 // instead, so they take the hold alone.

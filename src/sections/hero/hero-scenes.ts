@@ -1,5 +1,5 @@
 import { ARROWS, brush, fmt, type Point, unit } from "../../arrows";
-import { boxCentre, type Outline } from "./hero-morph";
+import { boxCentre } from "./hero-morph";
 import {
   ABSORBED_SCALE,
   type Piece,
@@ -11,8 +11,9 @@ import {
   WORKER_Y,
   workerOf,
 } from "./hero-pieces";
-import { easeInOut, OUT, pct, SLIDE_MS, type TopInk, vars } from "./hero-prints.view";
+import { easeInOut, OUT, pct, SLIDE_MS, type TopInk } from "./hero-prints.view";
 import { INOUT, SPRING } from "./hero-prints.css";
+import { styleOf } from "../tech-brand";
 
 export const MEANDER = [
   [40, 160],
@@ -205,7 +206,7 @@ export const JOBS: { top: TopInk; stops: JobStop[] }[] = [
 // With animation off a job stays where it opens the scene, so the queue still holds work.
 export const jobRest = ({ stops }: (typeof JOBS)[number]) => {
   const { x, opacity = 1 } = stops[0]!;
-  return vars({ "rest-x": `${x}px`, "rest-opacity": opacity });
+  return styleOf({ "--rest-x": `${x}px`, "--rest-opacity": opacity });
 };
 
 export const RETRY_WORKER = workerOf(HUE_PASSES);
@@ -277,17 +278,23 @@ export const KEYFRAMES = [meanderKeyframes(), queueKeyframes()].join("\n");
 
 // A piece turns about its outline's box centre, as moved() does for the shape the morph hands over,
 // so it doesn't shift when the scene takes over from the morph.
-const pivotOf = (outline: Outline) => {
-  const [x, y] = boxCentre(outline);
-  return `transform-origin:${x}px ${y}px`;
-};
-
 export const settleVars = (
   { outline, dx, dy, r = 0 }: Piece,
   i: number,
   span: number,
   step: number,
-) => `${vars({ i, dx: `${dx}px`, dy: `${dy}px`, r: `${r}deg`, span, step })};${pivotOf(outline)}`;
+) => {
+  const [x, y] = boxCentre(outline);
+  return styleOf({
+    "--i": i,
+    "--dx": `${dx}px`,
+    "--dy": `${dy}px`,
+    "--r": `${r}deg`,
+    "--span": span,
+    "--step": step,
+    "transform-origin": `${x}px ${y}px`,
+  });
+};
 
 export const TUMBLE_FLOAT_MS = [1500, 1800, 1600, 1700];
 export const WORKER_FLOAT_MS = [1500, 1800, 1700] as const;
