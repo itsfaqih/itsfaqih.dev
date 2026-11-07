@@ -5,6 +5,7 @@ import { row, tipped } from "./table-design.markers";
 import { style, keyframes } from "@vanilla-extract/css";
 import { when } from "../when";
 import { under1, under2 } from "../layers.css";
+import { hoverHold } from "../components/hover-hold.css";
 const PHONE = "(max-width: 640px)";
 const REDUCE = "(prefers-reduced-motion: reduce)";
 const HOVER = "(hover: hover) and (pointer: fine)";
@@ -476,46 +477,49 @@ export const styles = {
       },
     },
   }),
-  btn: style({
-    "@layer": {
-      [under1]: {
-        display: "inline-flex",
-        gap: "6px",
-        alignItems: "center",
-        height: "32px",
-        paddingBlock: 0,
-        paddingInline: "12px",
-        borderWidth: 0,
-        borderStyle: "none",
-        borderColor: "currentcolor",
-        borderRadius: "8px",
-        backgroundColor: palette["--soft-key"],
-        boxShadow: drop(3, palette["--soft-key-drop"]),
-        fontWeight: 700,
-        fontSize: "12px",
-        lineHeight: "normal",
-        fontFamily: fonts["--display"],
-        color: palette["--text"],
-        cursor: cursors["--cursor-point"],
-        transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color ${kit["--t-fb"]} ease`,
-        selectors: {
-          "&:active": {
-            boxShadow: drop(1, palette["--soft-key-drop"]),
-            transform: "translateY(2px)",
+  btn: style([
+    hoverHold.lift,
+    {
+      "@layer": {
+        [under1]: {
+          display: "inline-flex",
+          gap: "6px",
+          alignItems: "center",
+          height: "32px",
+          paddingBlock: 0,
+          paddingInline: "12px",
+          borderWidth: 0,
+          borderStyle: "none",
+          borderColor: "currentcolor",
+          borderRadius: "8px",
+          backgroundColor: palette["--soft-key"],
+          boxShadow: drop(3, palette["--soft-key-drop"]),
+          fontWeight: 700,
+          fontSize: "12px",
+          lineHeight: "normal",
+          fontFamily: fonts["--display"],
+          color: palette["--text"],
+          cursor: cursors["--cursor-point"],
+          transition: `transform 150ms ${motion["--out"]}, box-shadow 150ms ease, background-color ${kit["--t-fb"]} ease`,
+          selectors: {
+            "&:active": {
+              boxShadow: drop(1, palette["--soft-key-drop"]),
+              transform: "translateY(2px)",
+            },
           },
-        },
-        "@media": {
-          [HOVER]: {
-            selectors: {
-              "&:hover": {
-                backgroundColor: palette["--soft-key-hover"],
+          "@media": {
+            [HOVER]: {
+              selectors: {
+                "&:hover": {
+                  backgroundColor: palette["--soft-key-hover"],
+                },
               },
             },
           },
         },
       },
     },
-  }),
+  ]),
   go: style({
     backgroundColor: "var(--c)",
     boxShadow: drop(3, "var(--key-c)"),
