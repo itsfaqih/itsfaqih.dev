@@ -1,0 +1,112 @@
+---
+import { cx } from "../cx";
+import { arcade } from "../components/arcade.css";
+import { button } from "../components/button.css";
+import { buttonVariant } from "../components/button.view";
+import Icon from "../components/icon.astro";
+import { CV, CV_PDF } from "../data/cv";
+import Backdrop from "../sections/backdrop.astro";
+import { styles } from "./cv-page.css";
+
+const external = { target: "_blank", rel: "noopener noreferrer" };
+// A parser reads a link's text, not its target, so the ATS version writes the address out.
+const address = (href: string) => href.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "");
+---
+
+<cv-page class={`arc ${cx(arcade.root, arcade.scan, styles.root)}`}>
+  <Backdrop />
+  <div class:list={[arcade.wrap, styles.column]}>
+    <div class={styles.bar}>
+      <a
+        class:list={[button.base, buttonVariant["primary-brand"], button.iconStart]}
+        href={CV_PDF.design.href}
+        download={CV_PDF.design.fileName}
+        ><Icon name="DownloadSimple" size={18} weight="bold" />Download</a
+      >
+      <label class={styles.switch}>
+        <input class={styles.track} type="checkbox" role="switch" autocomplete="off" />
+        ATS friendly
+      </label>
+    </div>
+    <article class={styles.sheet}>
+      <header class={styles.head}>
+        <div>
+          <h1 class={styles.name}>{CV.name}</h1>
+          <p class={styles.role}>{CV.headline}</p>
+          <p class={styles.line}>
+            {CV.location} | <a class={styles.link} href={`mailto:${CV.email}`}>{CV.email}</a>
+          </p>
+          <p class={styles.line}>
+            {
+              CV.links.map(({ label: name, href }, index) => (
+                <>
+                  {index > 0 && " | "}
+                  <a class={styles.link} href={href} {...external}>
+                    <span class={styles.designOnly}>{name}</span>
+                    <span class={styles.atsOnly}>{address(href)}</span>
+                  </a>
+                </>
+              ))
+            }
+          </p>
+        </div>
+      </header>
+
+      <section class={styles.section}>
+        {CV.summary.map((paragraph) => <p class={styles.text}>{paragraph}</p>)}
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Professional Experience</h2>
+        {
+          CV.experience.map(({ title, points }) => (
+            <div class={styles.entry}>
+              <h3 class={styles.entryTitle}>{title}</h3>
+              <ul class={styles.list}>
+                {points.map((item) => (
+                  <li class={styles.point}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Skills &amp; Competencies</h2>
+        <p class={styles.text}>{CV.skills}</p>
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Tech Stack &amp; Tools</h2>
+        {
+          CV.stack.map((group) => (
+            <p class={styles.text}>
+              <span class={styles.label}>{group.label}:</span> {group.text}
+            </p>
+          ))
+        }
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Education</h2>
+        <h3 class={styles.entryTitle}>{CV.education.title}</h3>
+        <p class={styles.text}>{CV.education.detail}</p>
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Achievements</h2>
+        <ul class={styles.list}>{CV.achievements.map((item) => <li class={styles.point}>{item}</li>)}</ul>
+      </section>
+
+      <section class={styles.section}>
+        <h2 class={styles.heading}>Languages</h2>
+        <ul class={styles.list}>{CV.languages.map((item) => <li class={styles.point}>{item}</li>)}</ul>
+      </section>
+    </article>
+  </div>
+</cv-page>
+
+<script>
+  import "./cv-page.client";
+</script>

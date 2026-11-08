@@ -1,0 +1,64 @@
+---
+import { HINT } from "./hints";
+import NullCodeBlock from "./null-code-block.astro";
+import { DEMOS, TITLE, type Demo, type Way } from "./null-vs-undefined";
+import { flowView } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
+import { host } from "./rule-landing.css";
+
+type Props = { demo: Demo; way: Way };
+
+const { demo, way } = Astro.props;
+const { fields, before, lines } = DEMOS[demo];
+// It starts unsent, and the save runs only when the reader presses ✕ or Save (null-flow.client.ts).
+---
+
+<null-flow class={host.contents} data-demo={demo} data-way={way}>
+  <div class={styles.view}>
+    <NullCodeBlock lines={lines(way)} />
+    <div class={styles.flow} data-part="flow">
+      <div class={styles.form} data-part="form">
+        {
+          demo === "clear" ? (
+            <Fragment><span class={styles.label}>Reviewer</span><span class={styles.chip}
+              >Rina<button
+                data-hint={HINT.tap}
+                type="button"
+                aria-label="Remove reviewer Rina"
+                class={styles.remove}
+                data-part="remove">✕</button
+              ></span
+            ></Fragment>
+          ) : (
+            <Fragment><label class={styles.field}><span class={styles.label}>Title</span><input spellcheck="false" class={styles.input} value={TITLE} data-part="input" /></label><button data-hint={HINT.tap} type="button" class={flowView.save} data-part="save">Save</button></Fragment>
+          )
+        }
+      </div>
+      <div class={styles.wire} data-part="wire"
+        ><span class={styles.verb}>PATCH /tasks/12</span><span class={styles.idle}>not sent yet</span
+        ><i aria-hidden="true" class={flowView.packet(false)}></i></div
+      >
+      <dl class={styles.record} data-part="record">
+        {
+          fields.map((field, index) => (
+            <div style={`--i:${index}`} class={flowView.cell(undefined, false)}
+              ><dt class={styles.name}>{field}</dt><dd class={flowView.value(false, false)}>{before[field]}</dd></div
+            >
+          ))
+        }
+      </dl>
+      <div class={styles.ctl}
+        ><button type="button" class={flowView.button} data-part="reset" aria-disabled="true">Reset</button></div
+      >
+    </div>
+  </div>
+  {
+    demo === "clear" && (
+      <template data-part="none"><span class={styles.none}>None</span></template>
+    )
+  }
+</null-flow>
+
+<script>
+  import "./null-flow.client";
+</script>

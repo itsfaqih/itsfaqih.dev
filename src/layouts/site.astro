@@ -1,0 +1,76 @@
+---
+import { LAYER_ORDER } from "../layers";
+import "../styles.css";
+import CommandPalette from "../components/command-palette.astro";
+import Header from "../components/header.astro";
+import PageScrollbar from "../components/page-scrollbar.astro";
+import PrintCursor from "../components/print-cursor.astro";
+import { pageHead, type SharedPage } from "../seo";
+import { THEME_COLORS } from "../theme";
+import { PAGE_FILE_END } from "../page-path";
+import { HEAD_SCRIPT } from "./head-script";
+import { site } from "./site.css";
+
+type Props = {
+  /** The page's sharing metadata. Without it the page gets the site title and no sharing tags. */
+  page?: SharedPage;
+  /** The page's own colour, which the navbar's Connect and the page's hue buttons take on. */
+  hue?: `var(--${string})`;
+};
+
+const { page, hue } = Astro.props;
+const head = page ? pageHead(page) : undefined;
+const title = head?.meta.find((meta) => "title" in meta)?.title ?? "Faqih Muntashir";
+const tags = head?.meta.filter((meta) => !("title" in meta)) ?? [];
+// The build names pages index.html and blog.html; the page's own path is / and /blog.
+const path = Astro.url.pathname.replace(PAGE_FILE_END, "") || "/";
+---
+
+<!doctype html>
+<html lang="en" class={site.html}>
+  <head>
+    <meta charset="utf-8" />
+    <style is:inline set:html={`@layer ${LAYER_ORDER.join(", ")};`}></style>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <title>{title}</title>
+    {tags.map((meta) => <meta {...meta} />)}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
+    {head?.links.map((link) => <link {...link} />)}
+    <meta
+      name="theme-color"
+      content={THEME_COLORS.light}
+      media="(prefers-color-scheme: light)"
+      data-theme="light"
+    />
+    <meta
+      name="theme-color"
+      content={THEME_COLORS.dark}
+      media="(prefers-color-scheme: dark)"
+      data-theme="dark"
+    />
+    {
+      head?.scripts.map((script) => (
+        <script is:inline type={script.type} set:html={script.children} />
+      ))
+    }
+    <script is:inline set:html={HEAD_SCRIPT} />
+  </head>
+  <body class={site.body} style={hue && `--hue: ${hue}`}>
+    <Header path={path} hued={hue !== undefined} />
+    <CommandPalette />
+    <main class={site.main}><slot /></main>
+    <PrintCursor />
+    <PageScrollbar />
+    <script>
+      import "../components/favicon-cycle";
+      import "../components/smooth-scroll";
+      import { voiceControls } from "../browser/sound";
+      voiceControls();
+    </script>
+  </body>
+</html>

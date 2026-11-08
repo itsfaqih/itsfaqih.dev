@@ -1,0 +1,32 @@
+---
+import { colorOf, ruleNumber, type PublishedGuideline } from "../data/guidelines";
+import { hoverHold } from "../components/hover-hold.css";
+import { reticle } from "../sections/reticle.css";
+import RuleThumb from "../sections/rule-thumb.astro";
+import { pager } from "./rule-landing.css";
+
+type Props = { rule: PublishedGuideline; direction: "Previous" | "Next" };
+
+const { rule, direction } = Astro.props;
+// The thumb plays while the card is hovered or focused (rule-landing.client.ts).
+---
+
+<a
+  href={rule.href}
+  class:list={[reticle.card,
+    reticle.aim,
+    hoverHold.lift,
+    pager.card,
+    direction === "Next" && pager.next]}
+  style={`--c:${colorOf(rule.label)}`}
+  data-rule-open
+  data-part="pager"
+  ><RuleThumb rule={rule} class={pager.thumb} /><span class={pager.meta}
+    ><span class={pager.dir}>{direction === "Next" ? "Next rule →" : "← Previous rule"}</span
+    ><span class={pager.number}
+      >No.<!-- -->{ruleNumber(rule)}<!-- --> · <!-- -->{rule.label}</span
+    >{/* .t names the title for the rule-open view transition in arcade.css. */}<span
+      class={`t ${pager.title}`}>{rule.title}</span
+    ></span
+  ></a
+>

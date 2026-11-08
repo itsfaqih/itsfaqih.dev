@@ -1,0 +1,88 @@
+---
+import Code from "./code.astro";
+import Kbd from "./kbd.astro";
+import LessonText from "./lesson-text.astro";
+import { LESSONS, TLDR } from "./proximity-principle";
+import { styles } from "./proximity-principle.css";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import Tree from "./tree.astro";
+
+const [inline, fewer, constraint, ancestor, global] = LESSONS;
+const rows = (lesson: (typeof LESSONS)[number]) =>
+  Math.max(lesson.bad.tree.length, lesson.good.tree.length);
+---
+
+<RuleLanding
+  id="proximity-principle"
+  learn="Choose near over far"
+  tldr={TLDR}
+  take="place files the same way"
+>
+  <Fragment slot="lead">Start inline. Extract only when a second caller, or a constraint, demands it.</Fragment>
+  <Fragment slot="intro">Move code only as far as its callers need.</Fragment>
+
+  <RuleLesson lesson={inline} rows={rows(inline)}>
+    <Fragment slot="body"
+      >Keep code used once where it's used. A helper in <Code tone="chip">utils/</Code> with one caller adds a file and an import, and shares nothing.</Fragment
+    >
+    <Tree slot="bad" rows={inline.bad.tree} />
+    <Tree slot="good" rows={inline.good.tree} />
+  </RuleLesson>
+  <RuleQuiz n={1} level={inline.levels[0]} board="tree"
+    >Only <Code tone="prompt">signup.ts</Code> calls <Code tone="prompt">normalizeEmail()</Code>. Place it.</RuleQuiz
+  >
+
+  <RuleLesson lesson={fewer} rows={rows(fewer)}>
+    <Fragment slot="body"
+      >Keep one handler in one file. If you split its types, schema and helpers into a folder, reading it takes five tabs.</Fragment
+    >
+    <Tree slot="bad" rows={fewer.bad.tree} />
+    <Tree slot="good" rows={fewer.good.tree} />
+  </RuleLesson>
+  <RuleQuiz n={2} level={fewer.levels[0]} board="tree"
+    ><Code tone="prompt">sendInvite</Code> has its own types, an email template and a helper. Nothing else uses them. Place them.</RuleQuiz
+  >
+
+  <RuleLesson lesson={constraint} rows={rows(constraint)}>
+    <Fragment slot="body"
+      >Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a slow report build there and other requests stop waiting on it.</Fragment
+    >
+    <Tree slot="bad" rows={constraint.bad.tree} />
+    <Tree slot="good" rows={constraint.good.tree} />
+  </RuleLesson>
+  <RuleQuiz n={3} level={constraint.levels[0]} board="tree"
+    ><Code tone="prompt">parseCsv()</Code> takes seconds of CPU on a large upload, and only <Code tone="prompt">upload.ts</Code> calls it. Other requests must keep going. Place it.</RuleQuiz
+  >
+
+  <RuleLesson lesson={ancestor} rows={rows(ancestor)}>
+    <Fragment slot="body"
+      >When a second file needs it, move it up to the nearest folder both callers share. The path then names its owner.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >Name folders for what they hold, like <Code tone="chip">routes/</Code> or <Code tone="chip">controllers/</Code>, not<Fragment set:html="<!-- -->" /> <Code tone="chip">features/</Code>.</LessonText
+    >
+    <Tree slot="bad" rows={ancestor.bad.tree} />
+    <Tree slot="good" rows={ancestor.good.tree} />
+  </RuleLesson>
+  <RuleQuiz n={4} level={ancestor.levels[0]} board="tree"
+    ><Code tone="prompt">invoices/list.ts</Code> and <Code tone="prompt">refunds/create.ts</Code> now both call<Fragment set:html="<!-- -->" /> <Code tone="prompt">getInvoice()</Code>. Move it.</RuleQuiz
+  >
+
+  <RuleLesson lesson={global} rows={rows(global)}>
+    <Fragment slot="body"
+      >Code used almost everywhere, like auth middleware, belongs to no route. Give it a folder named for its type, and a suffix so <Kbd>⌘P</Kbd> finds it.</Fragment
+    >
+    <LessonText slot="extra" class={styles.suffixes}
+      ><Code tone="chip" class={styles.suffix}>user.schema.ts</Code><Code tone="chip" class={styles.suffix}
+        >auth.service.ts</Code
+      ><Code tone="chip" class={styles.suffix}>orders.controller.ts</Code></LessonText
+    >
+    <Tree slot="bad" rows={global.bad.tree} />
+    <Tree slot="good" rows={global.good.tree} />
+  </RuleLesson>
+  <RuleQuiz n={5} level={global.levels[0]} board="tree"
+    >Twelve routes read carts through <Code tone="prompt">cart.repository.ts</Code>. Place it.</RuleQuiz
+  >
+</RuleLanding>

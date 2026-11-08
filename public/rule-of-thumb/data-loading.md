@@ -1,145 +1,129 @@
-# Data Loading Strategies
+---
+name: data-loading
+description: Fetch early, show what you have, and never blank the screen. Use when a page or component fetches data, shows a loading state, refreshes stale data or shows a fetch error.
+---
 
-Strategies for fast, reliable data fetching. Fast first paint, smooth updates.
+# Data Loading
 
-## SSR vs SPA
+Fetch early, show what you have, and never blank the screen.
 
-Choose the right rendering strategy based on your requirements.
+People judge loading by what they see while it lasts, so design the wait.
 
-- **Server-Side Rendering (SSR)**: Use when SEO is critical, First Contentful Paint matters, or data is static.
-- **Single Page App (SPA)**: Use for apps behind authentication, highly interactive dashboards, and real-time data.
+## TL;DR
 
-**Best Practice**: Render important content on the server (SSR). Less critical data can be streamed or loaded client-side.
+| Situation                  | Do this                                                              |
+| -------------------------- | -------------------------------------------------------------------- |
+| SEO or first paint matters | Render it on the server. Behind a login, the browser is fine         |
+| Data a page needs          | Start it on navigation, batch it, stream the rest                    |
+| Refetching data you have   | Keep it on screen with a small spinner                               |
+| A reply that may be quick  | Show loading UI only after 200ms                                     |
+| Search as you type         | Send it 300ms after the last key. Cancel the old one                 |
+| A request that fails       | Show the error in place, with Retry. Log it                          |
+| Anything from an API       | Parse it where it arrives                                            |
+| Caching to disk            | Persist history with its date. Fetch balances, prices and stock live |
 
-## Trigger Fetching Early
+## Render public pages on the server
 
-Start data fetching as soon as possible — don't wait for components to render.
+Render a page that needs search traffic or a fast first paint on the server, so the first HTML response carries the content. A page rendered in the browser sends an empty shell and paints nothing until its code loads and fetches. Many crawlers and link previews read only that first response. A page behind a login never shows up in search, so the browser is fine there.
 
-- **Use Route Loaders**: Fetch data during navigation (e.g., TanStack Router loaders or React Router loaders).
-- **Don't Block Render**: Await critical data, but defer non-critical data.
-- **Batch Queries**: Group related queries to reduce round trips.
+```html
+<!-- Rendered in the browser. The first response has nothing to paint or index -->
+<div id="root"></div>
+<script src="/app.js"></script>
 
-## Stale-While-Revalidate (SWR)
+<!-- Rendered on the server. The first response carries the content -->
+<h1>Desk lamp</h1>
+<p>$48 · In stock</p>
+<script src="/app.js"></script>
+```
 
-Show cached data immediately, then fetch fresh data in the background.
+## Start fetching early
 
-1.  **Show Stale Data**: Display cached content instantly for perceived performance.
-2.  **Indicate Refetch**: Show a subtle spinner while background fetching occurs.
-3.  **Smooth Updates**: Update the UI without jarring layout shifts when fresh data arrives.
+Fetch on navigation, not on render. A fetch that starts when the page renders waits for the page's code to load and render first, so the requests form a waterfall. Start every request the page needs as the user navigates, so they run while the code loads. Wait for what the page needs and stream the rest.
 
-## Spin Delay
-
-Prevent flickering skeletons for fast responses.
-
-- **Wait before showing skeleton**: Only show loading UI if the request takes longer than ~200ms.
-- **Avoid Flicker**: A skeleton that flashes for 50ms is annoying.
-
-## Error Handling
-
-Show errors inline, not as toasts. Make them recoverable.
-
-- **Inline Errors**: Place error messages where the data would have appeared.
-- **Retry Button**: Always offer a way to retry the failed request.
-- **Observability**: Log errors to monitoring services.
-
-## Realtime Data
-
-- **WebSocket**: Use for instant (<1s), high-frequency updates (chat, stock tickers). Persistant connection.
-- **Interval Polling**: Use for updates every 30s+. Simpler infrastructure (HTTP).
-
-## Cache Persistence
-
-Not all data should be persisted to local storage.
-
-- **Don't Persist**: Bank balances, stock prices, inventory counts (stale data leads to bad decisions).
-- **OK to Persist**: Transaction history, user preferences, static content.
-- **Best Practice**: Always show a "Last updated" timestamp when displaying persisted/cached data.
-
-### Persistence Methods
-
-Choose the right storage mechanism based on your needs:
-
-#### LocalStorage (~5MB limit)
-
-Simple key-value storage. Best for small, string-based data.
-
-- Synchronous API — can block main thread
-- Only stores strings (requires JSON.stringify)
-- Good for: user preferences, tokens, small cache
-
-#### IndexedDB (No practical limit)
-
-Full database in the browser. Best for structured, large datasets.
-
-- Asynchronous API — doesn't block UI
-- Supports indexes, transactions, and cursors
-- Good for: offline-first apps, large cache, complex queries
-
-#### Embedded Database (ElectricSQL, Turso, PGlite, etc.)
-
-Full SQL database running in the browser with sync capabilities.
-
-- Real SQL queries (SQLite-based)
-- Automatic sync with remote database
-- Good for: offline-first apps, local-first architecture, complex data
-
-## Parsing Data from External Source
-
-When retrieving data from external sources (HTTP APIs, databases, third-party services), always parse and validate it to ensure correctness.
-
-### Why Parse External Data?
-
-- **Without Parsing**: Runtime crashes from `undefined` values, type mismatches (`"42"` instead of `42`), silent failures.
-- **With Parsing**: Early error detection, full TypeScript type safety after parsing, graceful error handling with fallbacks.
-
-### Best Practices
-
-- **Parse at the boundary**: Validate data immediately after `fetch()` or database query. Don't let invalid data propagate.
-- **Use fallback values**: For optional fields, provide sensible defaults (e.g., `role: 'User'`).
-- **Show meaningful errors**: Display user-friendly messages when parsing fails. Log technical details to observability tools.
-- **Keep schemas in sync**: Update validation schemas when your API changes. They serve as living documentation.
-
-### Tools
-
-Use **Zod** or similar libraries to handle missing data gracefully using `.catch()`:
-
-#### 1. The Scenario
-
-The API response is missing a required field (`city`), but we don't want to crash.
-
-```json
-// Raw API Response
-{
-  "id": 1,
-  "name": "Alice"
+```ts
+// runs when the user navigates to /invoices/:id, before the page renders
+function onNavigate(id: string) {
+  const invoice = fetchInvoice(id); // the page waits for this
+  const activity = fetchActivity(id); // streamed, so the page shows it when it lands
+  return { invoice, activity };
 }
 ```
 
-#### 2. The Solution
+## Keep stale data on screen
 
-Use `.catch()` to provide a fallback value when a field is missing or invalid.
+When you refetch data you already have, keep it on screen with a small spinner beside it, and swap the new value in place. Clearing it to a skeleton makes the page jump and hides numbers people were reading.
 
-```typescript
-import { z } from "zod";
+```ts
+async function refetch() {
+  spinner.hidden = false; // the old value stays on screen
+  total.textContent = format(await fetchRevenue(range));
+  spinner.hidden = true;
+}
+```
 
-const UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  // Fallback to "Unknown" if missing
-  city: z.string().catch("Unknown"),
+## Avoid skeleton flickers
+
+Most replies are quick. Show loading UI only after 200ms, so a fast reply appears with no skeleton flash.
+
+```ts
+const timer = setTimeout(() => (skeleton.hidden = false), 200);
+const data = await request;
+clearTimeout(timer);
+skeleton.hidden = true;
+```
+
+## Debounce search input
+
+A search box that sends a request on every keystroke floods the server, and a slow reply for an old query can land after the newest one. Wait for a pause in typing, then send one request, and cancel the one in flight when a new one starts.
+
+```ts
+let timer: ReturnType<typeof setTimeout> | undefined;
+let inFlight: AbortController | undefined;
+
+input.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    inFlight?.abort(); // an older reply can no longer land after this one
+    const current = (inFlight = new AbortController());
+    try {
+      const response = await fetch(`/search?q=${encodeURIComponent(input.value)}`, {
+        signal: current.signal,
+      });
+      showResults(await response.json());
+    } catch (error) {
+      if (!current.signal.aborted) throw error;
+    }
+  }, 300);
 });
-
-const user = UserSchema.parse(response);
 ```
 
-#### 3. The Result
+## Errors where the data was
 
-The data is now safe to use in your application.
+Show the error where the data would go, with a Retry button. It stays there until someone acts on it, and it says why the card is empty. A toast fades before anyone reads it and leaves an empty card. Log every failure so you learn about it before a user reports it.
 
-```json
-{
-  "id": 1,
-  "name": "Alice",
-  "city": "Unknown" // ✅ Safe fallback applied
+```html
+<section role="alert">Couldn't load the team. <button>Retry</button></section>
+```
+
+## Parse at the boundary
+
+Treat API data as a guess until you check it. Parse it as soon as it arrives and give optional fields a fallback. The rest of your code then gets real types, and a missing field fails where it came in. When a required field is missing, show a plain message and log the details.
+
+```ts
+function parseUser(data: unknown): User {
+  const raw = data as Record<string, unknown>;
+  if (typeof raw.id !== "number" || typeof raw.name !== "string") {
+    log("bad user payload", data);
+    throw new Error("Couldn't load this profile");
+  }
+  const city = typeof raw.city === "string" ? raw.city : "Unknown"; // a missing city becomes "Unknown"
+  return { id: raw.id, name: raw.name, city };
 }
+
+const user = parseUser(await response.json());
 ```
+
+## Persist what can't mislead
+
+A disk cache is already old when the app next opens. Persist history, settings and static content, and show when each was updated. Fetch balances, prices and stock counts live, since a stale number there leads to a wrong decision.

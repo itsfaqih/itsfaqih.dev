@@ -1,0 +1,68 @@
+---
+import { draw, REST_TRANSFORM, SCENE_MS, TOKEN_COUNT, topInk, TOPS } from "./hero-prints.view";
+import { marker } from "../../when";
+import { styles } from "./hero-prints.css";
+import { KEYFRAMES, SCENE_LABELS } from "./hero-scenes";
+import HeroScene from "./hero-scene.astro";
+
+// The bench's prints (hero-prints.client.ts). Scene 0 is drawn; every scene and the morph's tokens
+// wait in templates for the element to swap in.
+const p = "hp";
+---
+
+<hero-prints class:list={[styles.root, marker]} data-paused=""
+  ><style is:inline set:html={KEYFRAMES}></style><div class={styles.stage}
+    ><div class={styles.card} style={`transform:${REST_TRANSFORM}`}
+      ><svg
+        class={styles.svg}
+        viewBox="0 0 320 200"
+        role="img"
+        aria-label={SCENE_LABELS[0]}
+        style={`--scene-duration:${SCENE_MS}ms`}
+        ><defs class={draw()}
+          ><pattern
+            class={draw()}
+            id={`${p}ht`}
+            width="5"
+            height="5"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(18)"
+            ><circle class={draw(styles.hue)} cx="2.5" cy="2.5" r="1.75"></circle></pattern
+          ></defs
+        ><g class={draw(styles.layer, marker)}><HeroScene index={0} p={p} /></g></svg
+      ></div
+    ></div
+  >{
+    SCENE_LABELS.map((label, index) => (
+      <template data-scene={index} data-label={label}>
+        <svg>
+          <g class={draw(styles.layer, marker)}>
+            <HeroScene index={index} p={p} />
+          </g>
+        </svg>
+      </template>
+    ))
+  }<template data-morph
+    ><svg
+      ><g class={draw()}
+        >{
+          Array.from({ length: TOKEN_COUNT }, () => (
+            <g class={draw()}>
+              <path
+                fill={`url(#${p}ht)`}
+                class:list={[styles.part, styles.screen]}
+              />
+              {TOPS.map((top) => (
+                <path data-top={top} {...topInk(top)} />
+              ))}
+            </g>
+          ))
+        }</g
+      ></svg
+    ></template
+  ></hero-prints
+>
+
+<script>
+  import "./hero-prints.client";
+</script>

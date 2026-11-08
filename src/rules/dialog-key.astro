@@ -1,0 +1,10 @@
+---
+import { hoverHold } from "../components/hover-hold.css";
+import { styles } from "./dialog-design.css";
+
+type Props = { part: string };
+
+const { part } = Astro.props;
+---
+
+<button type="button" class:list={[hoverHold.lift, styles.key]} data-part={part}><slot /></button>

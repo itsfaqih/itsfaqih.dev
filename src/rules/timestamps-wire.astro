@@ -1,0 +1,35 @@
+---
+import type { WireLine } from "./handling-timestamps";
+import { styles } from "./handling-timestamps.css";
+import { tsView } from "./handling-timestamps.view";
+
+type Props = { lines: WireLine[] };
+
+const { lines } = Astro.props;
+// The empty comments keep each part its own text node, so the elements can patch each piece in
+// place (timestamps-wire.ts).
+---
+
+<div class={styles.wire}>
+  {
+    lines.map((line) => (
+      <code
+        data-note={line.note ? "true" : undefined}
+        class={tsView.line(line.note === true, line.hot === true)}
+        >{
+          line.c.map((part, index) =>
+            part.quoted ? (
+              <span class={styles.str}
+                >"<Fragment set:html="<!-- -->" />{part.text}<Fragment set:html="<!-- -->" />"</span
+              >
+            ) : (
+              <Fragment
+                >{index > 0 && !line.c[index - 1]!.quoted && <Fragment set:html="<!-- -->" />}{part.text}</Fragment
+              >
+            ),
+          )
+        }</code
+      >
+    ))
+  }
+</div>

@@ -1,154 +1,98 @@
+---
+name: button-design
+description: Make a button show what it does and what it's doing. Use when you build, style or review a button, pick its variant, or place an icon beside its label.
+---
+
 # Button Design
 
-The details that make buttons feel tangible and responsive. Don't settle for browser defaults.
+Make a button show what it does and what it's doing.
 
-## The Essential States
+## TL;DR
 
-A well-designed button handles these six states seamlessly:
+| Situation                  | Do this                                                   |
+| -------------------------- | --------------------------------------------------------- |
+| Any button                 | Give hover, press and focus a look, in 100 to 200ms       |
+| Hovering a disabled button | Lay it flat and keep it still                             |
+| Picking a variant          | Fill one per screen, tint the secondary, make Cancel text |
+| An icon beside the label   | Take 4px off the icon's side                              |
+| A button with only an icon | Pad (height - icon) / 2, not the text's 16px              |
 
-1.  **Idle State**: The default resting state. Clearly clickable with valid contrast. Use `cursor: default`.
-2.  **Hover State**: Provides feedback when cursor is over the button. Signals interactivity.
-3.  **Focus State**: Shows when the button is focused via keyboard navigation. Essential for accessibility.
-4.  **Pressing State**: Visual feedback on press. Scale-down or click effect.
-5.  **Pending State**: Shows progress while waiting. Prevents double-clicks. Use `cursor: wait`.
-6.  **Disabled State**: Indicates unavailable action. Reduced opacity and no pointer events. Use `cursor: not-allowed`.
-7.  **Cursor**: Use `cursor: default` for buttons (actions) and `cursor: pointer` for links (navigation).
+## Give every state a look
 
-## Disabled State UX
+Give hover, press and focus each a visible change, so people see a click land and a keyboard user can see where they are. Animate each change in 100 to 200ms. Draw the focus ring on `:focus-visible`, so it shows for the keyboard only.
 
-When a button is disabled, the cursor should immediately change to indicate the action is forbidden (`cursor: not-allowed`).
-Consider adding a tooltip explaining _why_ it is disabled.
+```css
+button {
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+button:hover {
+  background-color: var(--button-hover);
+}
+button:active {
+  transform: translateY(2px) scale(0.97);
+}
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
 
-## Code Implementation
-
-A robust implementation handles all states in a unified component:
-
-```tsx
-<button
-  disabled={isPending || isDisabled}
-  className={cn(
-    // Base styles
-    "px-6 py-3 rounded-xl font-medium transition-all",
-    // Hover
-    "hover:bg-zinc-500/5 hover:shadow-lg",
-    // Focus (keyboard navigation)
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-    "focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    // Active/Press
-    "active:scale-95",
-    // Pending/Disabled
-    isPending ? "cursor-wait" : isDisabled ? "cursor-not-allowed opacity-60" : "cursor-default",
-  )}
->
-  {isPending ? <Loader2 className="animate-spin" /> : "Submit"}
-</button>
+@media (prefers-reduced-motion: reduce) {
+  button:active {
+    transform: none;
+  }
+}
 ```
 
-## Button Variants
+## Keep a disabled button still on hover
 
-Different actions require different visual weights. Use the right variant to guide users through your interface.
+A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Lay it flat, then keep it still on hover and press. Scope the hover and press looks to buttons that can act.
 
-### Primary (Filled)
+```css
+button:is(:disabled, [aria-disabled="true"]) {
+  box-shadow: none;
+}
+button:hover:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--button-hover);
+}
+button:active:not(:disabled, [aria-disabled="true"]) {
+  transform: translateY(2px) scale(0.97);
+}
+```
 
-Solid, high-contrast buttons that demand immediate attention.
+## Fill one button per screen
 
-**When to use:**
-- Main call-to-action per screen/section
-- Actions that complete a workflow: "Submit", "Save", "Confirm"
-- Use **Brand** for the primary CTA
-- Use **Neutral** for important but non-primary actions like "Cancel" or "Back"
+Visual weight shows people the next step. Fill the main action in the brand colour, tint the supporting one, and leave Cancel as text. Save red for destructive actions.
 
-**Examples:** Submit form, Create account, Checkout, Confirm purchase
+A tint is the brand colour at low strength, such as `color-mix(in srgb, var(--brand) 18%, transparent)`. A text button stays transparent until hover.
 
-### Secondary (Tinted)
+```html
+<button class="text">Cancel</button>
+<button class="tinted">Save draft</button>
+<button class="filled">Publish</button>
+```
 
-Light background with subtle tint. Visible but doesn't compete with primary.
+## Optical alignment over mathematical alignment
 
-**When to use:**
-- Supporting actions that need visibility without dominance
-- Card actions and toolbar buttons
-- When multiple actions have similar importance
-- Alternative actions: "Edit", "View Details", "Share"
+Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.
 
-**Examples:** Edit profile, View report, Export data, Refresh
+```css
+.icon-start {
+  padding-inline: 12px 16px; /* + New project */
+}
+.icon-end {
+  padding-inline: 16px 12px; /* Continue → */
+}
+```
 
-### Tertiary (Minimal)
+## Give an icon button less padding than a text button
 
-Transparent background, text only. Minimal visual weight.
+Keep a button with only an icon square, and don't copy a text button's padding. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.
 
-**When to use:**
-- Low-priority actions that shouldn't distract
-- Repeated actions in lists or tables
-- Dismissive actions: "Skip", "Dismiss", "Maybe later"
-- Inline links styled as buttons
-
-**Examples:** Skip intro, Learn more, Show less, Clear filters
-
-### Quick Reference
-
-| Level | Visual Weight | Use For |
-|-------|---------------|---------|
-| Primary (Filled) | High | Main CTA, final actions |
-| Secondary (Tinted) | Medium | Supporting actions, cards |
-| Tertiary (Minimal) | Low | Skip, dismiss, inline actions |
-
-### Destructive Actions
-
-- **Destructive (Filled)**: High-impact negative actions (e.g., "Delete Project"). Use Red sparingly.
-- **Secondary Destructive**: Moderate warnings (e.g., "Remove Access").
-- **Tertiary Destructive**: Low-priority negative actions (e.g., "Unsubscribe").
-
-**⚠️ Avoid Red for Primary Actions**: Reserve red for destructive actions only. Using red for a "Confirm" button creates cognitive friction as users are trained to associate red with danger.
-
-## Icon Integration
-
-### Leading Icons
-
-Use for:
-
-- **Back/Return actions** (ArrowLeft)
-- **Confirmation actions** (Check)
-- **Add/Create actions** (Plus)
-- **Feature emphasis** (Sparkles)
-
-_Padding tip_: Apply `pl-2 pr-3` for optical balance when using a leading icon.
-
-### Trailing Icons
-
-Use for:
-
-- **Forward/Next actions** ("Continue" -> ArrowRight)
-- **External links** (ArrowUpRight)
-- **Dropdown triggers** (ChevronDown)
-- **Download actions** (Download)
-
-_Padding tip_: Apply `pl-3 pr-2` for optical balance.
-
-### Icon-Only Buttons
-
-Use for:
-
-- **Toolbars & action bars** (Settings)
-- **Repeated actions** (Delete, Edit)
-- **Mobile interfaces** (Search)
-
-**Requirements**:
-
-1.  **Tooltip** is mandatory to explain the action.
-2.  **aria-label** is required for accessibility.
-3.  **Square aspect ratio** (e.g., `size-8.5 p-0`).
-
-## Best Practices
-
-- **Keep transitions snappy**: Use 100-200ms.
-- **Prevent double-clicks**: Disable during pending.
-- **Update text**: "Submit" -> "Processing..." -> "Done!".
-- **Show success**: Briefly show a success state before resetting.
-- **Maintain contrast**: Ensure readability even when disabled.
-
-## Why It Matters
-
-- **Reduces uncertainty**: Users know their action was registered.
-- **Prevents errors**: Block double-submissions.
-- **Feels premium**: Polished interactions build trust.
-- **Improves accessibility**: Clear states help everyone.
+```css
+.icon-only {
+  padding: 11px; /* (38px height - 16px icon) / 2 */
+}
+```

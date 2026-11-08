@@ -1,0 +1,109 @@
+---
+import { row } from "./table-design.markers";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade.css";
+import { TEAM } from "./table-design";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+// The first frame is the roster's starting state, "empty". The templates hold the rest, which
+// table-design.client.ts clones as the roster changes.
+---
+
+<table-states class={styles.card} data-careful={careful ? "true" : undefined}>
+  <div class={styles.bar}>
+    <label class={styles.search}
+      ><Icon
+        name="MagnifyingGlass"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        class={styles.searchIcon}
+      /><input
+        type="search"
+        enterkeyhint="search"
+        autocapitalize="none"
+        autocorrect="off"
+        class={styles.searchInput}
+        value=""
+        placeholder="Search users"
+        aria-label="Search users"
+        data-part="search"
+      /></label
+    >
+  </div>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly}>Team members</caption>
+    <colgroup><col /><col class={styles.colRole} /></colgroup>
+    <thead>
+      <tr
+        ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
+          >Role</th
+        ></tr
+      >
+    </thead>
+    <tbody class={styles.body}
+      >{
+        careful ? (
+          <tr class={row} data-part="said"
+            ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}
+              ><div class={styles.said}
+                ><b class={view.saidTitle(false)} data-part="title">No users yet</b><span
+                  class={styles.saidHint}
+                  data-part="hint">Add your first teammate.</span
+                ><button type="button" class={view.saidButton(true)} data-part="act">Add user</button
+                ></div
+              ></td
+            ></tr
+          >
+        ) : (
+          <tr class={row} data-part="blank"
+            ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}>No data</td></tr
+          >
+        )
+      }</tbody
+    >
+  </table>
+  <template data-part="row"
+    ><tr class={row}
+      ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
+    ></template
+  >
+  {
+    careful ? (
+      <Fragment>
+        <template data-part="bones"
+          >{TEAM.map((user) => (
+            <tr class={row} aria-hidden="true"
+              ><td class:list={[styles.td, styles.still]}
+                ><span class={styles.bone} style={`--w:${user.name.length * 6}px`} /></td
+              ><td class:list={[styles.td, styles.still]}
+                ><span class={styles.bone} style="--w:44px" /></td
+              ></tr
+            >
+          ))}</template
+        >
+        <template data-part="retry"
+          ><Icon
+            name="ArrowClockwise"
+            size="1em"
+            weight="bold"
+            aria-hidden="true"
+            class={styles.btnIcon}
+          /></template
+        >
+      </Fragment>
+    ) : (
+      <template data-part="spin"
+        ><span class={styles.spin} role="img" aria-label="Loading"></span></template
+      >
+    )
+  }
+</table-states>
+
+<script>
+  import "./table-design.client";
+</script>

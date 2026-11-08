@@ -1,0 +1,104 @@
+---
+import { HINT } from "./hints";
+import { row } from "./table-design.markers";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade.css";
+import { CREW } from "./table-design";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+---
+
+<table-actions class={styles.card} data-careful={careful ? "true" : undefined}>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly}>Team members with actions</caption>
+    <colgroup
+      ><col /><col class={styles.colRole} />{careful && <col class={styles.colActs} />}</colgroup
+    >
+    <thead>
+      <tr
+        ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
+          >Role</th
+        >{
+          careful && (
+            <th scope="col" class:list={[styles.th, styles.num]}
+              ><span class={arcade.srOnly}>Actions</span></th
+            >
+          )
+        }</tr
+      >
+    </thead>
+    <tbody class={styles.body}>
+      {
+        CREW.map(({ name, role }, at) => (
+          <tr class={row} data-name={name}
+            ><td class={view.nameCell(false)}
+              ><span data-hint={at === 0 ? HINT.hover : undefined} data-part="name">{name}</span>{
+                !careful && (
+                  <span class={styles.inline}
+                    ><button
+                      type="button"
+                      aria-label={`Edit ${name}`}
+                      aria-pressed="false"
+                      class:list={[styles.inlineButton, styles.ring]}
+                      data-act="edit">Edit</button
+                    ><button
+                      type="button"
+                      aria-label={`Delete ${name}`}
+                      class:list={[styles.inlineButton, styles.inlineDelete, styles.ring]}
+                      data-act="delete">Delete</button
+                    ></span
+                  >
+                )
+              }</td
+            ><td class={view.roleCell(false)}>{role}</td>{
+              careful && (
+                <td class={view.actsCell(false)}
+                  ><span class={styles.icons}
+                    ><span class={view.tipped}
+                      ><button
+                        type="button"
+                        class={view.iconKey(false, false)}
+                        aria-label={`Edit ${name}`}
+                        aria-pressed="false"
+                        data-act="edit"
+                        ><Icon
+                          name="PencilSimple"
+                          size="1em"
+                          weight="bold"
+                          class={styles.iconGlyph}
+                        /></button
+                      ><span class={styles.tip} aria-hidden="true">Edit</span></span
+                    ><span class={view.tipped}
+                      ><button
+                        type="button"
+                        class={view.iconKey(true, false)}
+                        aria-label={`Delete ${name}`}
+                        data-act="delete"
+                        ><Icon name="Trash" size="1em" weight="bold" class={styles.iconGlyph} /></button
+                      ><span class={styles.tip} aria-hidden="true">Delete</span></span
+                    ></span
+                  ></td
+                >
+              )
+            }</tr
+          >
+        ))
+      }
+    </tbody>
+  </table>
+  <div class={styles.foot}>
+    <span data-part="count">{CREW.length}<!-- --> of <!-- -->{CREW.length}<!-- --> users</span>
+  </div>
+  <template data-part="restore"
+    ><button type="button" class:list={[styles.link, styles.ring]} data-act="restore">Restore</button
+    ></template
+  >
+</table-actions>
+
+<script>
+  import "./table-design.client";
+</script>

@@ -1,0 +1,26 @@
+---
+import { HINT } from "./hints";
+import { styles } from "./button-design.css";
+import { marker } from "../when";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+---
+
+<div class={styles.stage}>
+  <div class={styles.steps}>
+    <button
+      data-hint={HINT.hover}
+      type="button"
+      class:list={[styles.key,
+        styles.sm,
+        careful ? styles.plain : [styles.plainFace, styles.live],
+        styles.off,
+        marker]}
+      aria-disabled="true">Back</button
+    >
+    <button type="button" class:list={[styles.key, styles.sm, styles.live]}>Next</button>
+  </div>
+  <small class={styles.small}>Step 1 of 3</small>
+</div>

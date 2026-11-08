@@ -1,0 +1,12 @@
+---
+import Code from "./code.astro";
+import { codeCell } from "./handling-timestamps";
+
+type Props = { text: string; tone: "plain" | "wrap" };
+
+const { text, tone } = Astro.props;
+const code = codeCell(text);
+// A slot's label takes the wrap tone; on the board the code stays bare.
+---
+
+{code === undefined ? text : tone === "wrap" ? <Code tone="wrap">{code}</Code> : <code>{code}</code>}

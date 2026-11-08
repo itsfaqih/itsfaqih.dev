@@ -1,0 +1,26 @@
+---
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade.css";
+import { host } from "./rule-landing.css";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+---
+
+<table-live class={host.contents}>
+  <button type="button" class:list={[styles.live, styles.ring]}
+    ><span class={view.dot(true)} aria-hidden="true"></span>Live<Icon
+      name="Pause"
+      size="1em"
+      weight="bold"
+      aria-hidden="true"
+      class={styles.liveIcon}
+    /><span class={arcade.srOnly}>, pause updates</span></button
+  >
+  <template data-part="play"
+    ><Icon name="Play" size="1em" weight="bold" aria-hidden="true" class={styles.liveIcon} /></template
+  >
+</table-live>
+
+<script>
+  import "./table-design.client";
+</script>

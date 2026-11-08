@@ -1,74 +1,77 @@
-# The Proximity Principle
+---
+name: proximity-principle
+description: Keep code next to the code that uses it. Use when you decide where a new file, component, helper or test goes, or whether to split code into its own file.
+---
 
-A visual guide to structuring code and files. Less jumping, more shipping.
+# Proximity Principle
 
-## The Core Principles
+Keep code next to the code that uses it.
 
-1.  **Colocate**: Put related code as close as possible to where it's used.
-2.  **Inline First**: Don't extract until code is reused. Keep it inline by default.
-3.  **Lowest Common Ancestor**: When sharing code, place it at the nearest common parent directory.
-4.  **Prefer Fewer Files**: One file with related code beats many files requiring imports.
+## TL;DR
 
-## Don't Abstract Prematurely
+| Situation                     | Do this                               |
+| ----------------------------- | ------------------------------------- |
+| Code used once                | Keep it inline                        |
+| Code too long                 | Extract a function, same file         |
+| Reused in the same file       | Extract a function, same file         |
+| Reused across files           | Move it to the lowest common ancestor |
+| Used almost everywhere        | Use a type folder, like middleware/   |
+| Your stack demands a boundary | Comply with the constraint            |
 
-If code is only used once, keep it inline. Abstraction adds complexity.
+## Inline it first
 
-- **Bad**: Creating `utils/date.ts` for a function used once in `UserProfile.tsx`.
-- **Good**: Defining the function inside `UserProfile.tsx` or using it inline.
+Keep code used once where it's used, in its caller's file. A one-caller helper in `utils/` adds a file and an import, and shares nothing.
 
-## Exception: React State Isolation
+```ts
+// src/routes/orders/refund.ts
+function toCents(amount: number) {
+  return Math.round(amount * 100);
+}
 
-Extract a child component when it has its own state — even if only used once. This prevents the parent from re-rendering when the child's state changes.
-
-```tsx
-// Good - child state doesn't re-render parent
-function SearchInput({ onSearch }) {
-  const [query, setQuery] = useState(""); // Only SearchInput re-renders
-  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+export function refund(order: Order) {
+  return payments.refund(order.chargeId, toCents(order.total));
 }
 ```
 
-## Prefer Fewer Files
+## Prefer fewer files
 
-Splitting code across many files increases cognitive load. Keep related code together.
+Keep one handler in one file, with its types, schema and helpers, so it reads in one tab. Split into a folder and reading it takes five tabs.
 
-- **Bad**: `UserProfile/` folder with `index.tsx`, `UserProfile.tsx`, `styles.ts`, `types.ts`, `hooks.ts`. (5 files for one component).
-- **Good**: `user-profile.tsx`. One file. Everything related is together.
+```text
+routes/orders/
+  create-order.ts         type OrderInput, const schema, function priceItems(), createOrder
+```
 
-## Extract Only When Reused
+## Comply with the constraint
 
-Only move code to a separate file when it's needed in multiple files.
+Extract code used once when your stack demands a boundary. Node runs every handler on one thread, and a worker thread loads its code from its own file. Move a slow report build there and other requests stop waiting on it.
 
-1.  **Code used once**: Keep inline.
-2.  **Code reused in same file**: Extract to function in same file.
-3.  **Code reused across files**: Extract to lowest common ancestor.
+```ts
+// src/routes/reports/export.ts
+const worker = new Worker(new URL("./build-report.worker.ts", import.meta.url));
+worker.postMessage({ month }); // buildReport() runs off the main thread
+```
 
-## Lowest Common Ancestor
+## Use the lowest common ancestor
 
-When you do share code, place it at the nearest common parent. This makes it clear which scope the utility belongs to.
+When a second file needs it, move it up to the nearest folder both callers share, so the path names its owner. Name folders for what they hold, like `routes/` or `controllers/`.
 
-> **Tip**: Avoid generic directory names like `features/`. Use specific names that describe what the directory contains: `pages/`, `routes/`, `controllers/`, etc.
+```text
+src/
+  routes/shop/
+    cart.ts
+    cart/summary.ts           calls getCart()
+    checkout/charge.ts        calls getCart()
+```
 
-## Exception: Global Code
+## Give global code a type folder
 
-For something that we can expect to be used globally (e.g. a button component) or used almost everywhere, it's better to put them in a "type" directory (e.g. `components/`, `schemas/`).
+Code used almost everywhere, like auth middleware, belongs to no route. Give it a folder named for its type, and a type suffix so `⌘P` finds it: `user.schema.ts`, `auth.service.ts`, `orders.controller.ts`.
 
-- **Bad**: Placing `button.tsx` inside `pages/` at the lowest ancestor — it doesn't belong to any page.
-- **Good**: Placing `button.tsx` in `components/`. Globally used code lives in a type directory. Clear intent, easy to find.
-
-## File Suffixes
-
-When organizing by type at scale, use suffixes for discoverability (Ctrl+P).
-
-- `user.schema.ts`
-- `use-auth.hook.ts`
-- `dashboard.page.tsx`
-
-## Quick Reference
-
-- **Code used once** -> Keep it inline
-- **Code is too long** -> Extract to function, keep in file
-- **Code reused in same file** -> Extract to function, keep in file
-- **Code reused across files** -> Extract to lowest common ancestor
-- **Code used globally / almost everywhere** -> Put in a type directory (e.g. components/, schemas/)
-- **React: Child has own state** -> Extract to component
+```text
+src/
+  middleware/
+    require-auth.ts
+  routes/
+    settings/, checkout/, … 10 more routes    import middleware/require-auth
+```

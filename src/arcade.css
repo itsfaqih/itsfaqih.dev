@@ -1,0 +1,359 @@
+/* The global rules that remain, each where a class cannot reach: html and the classes scripts set
+   on it, view-transition pseudo-elements, @property registrations, and the reduced-motion blanket.
+   Each rule says why it is global. Everything else styles itself with vanilla-extract. */
+
+@layer global {
+  /* Global: color-scheme on html follows the theme class the inline script sets there. */
+  :root {
+    color-scheme: dark;
+  }
+
+  .light {
+    color-scheme: light;
+  }
+
+  /* Global: the page-wide cursor default, kept with the element defaults below that build on it. */
+  html {
+    cursor: var(--cursor);
+  }
+  /* Global: element defaults for every control on the page, below any class (zero specificity).
+     Form controls take cursor: default from the browser's stylesheet rather than inheriting, which
+     would show the system arrow under the print cursor. The rules below re-point the active ones. */
+  :where(button, input, select, textarea, label) {
+    cursor: var(--cursor);
+  }
+  /* Global: a custom property every element and pseudo-element must declare for itself.
+     Text on a hue: white once the hue under it (--c) is dark enough, near-black otherwise. Below
+     OKLCH lightness 0.65 white reads better on these saturated hues. Set on every element because a
+     custom property resolves var(--c) where it is declared, and --c changes from element to element. */
+  *,
+  ::before,
+  ::after {
+    --on-c: oklch(from var(--c, var(--go)) clamp(0.16, (0.65 - l) * 1000, 1) 0 0);
+  }
+  /* Global: zero-specificity cursor defaults for every interactive element, as above. */
+  :where(
+    a[href],
+    button:not(:disabled),
+    [role="button"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="option"],
+    summary,
+    label[for],
+    select
+  ) {
+    cursor: var(--cursor-point);
+  }
+  /* Global: zero-specificity cursor default for every disabled control, as above. */
+  :where(button:disabled, input:disabled, select:disabled, textarea:disabled) {
+    cursor: var(--cursor-forbid);
+  }
+  /* Global: zero-specificity cursor defaults for every text field, as above. */
+  :where(
+    input:not(
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="button"],
+      [type="submit"],
+      [type="color"],
+      [type="file"]
+    ),
+    textarea,
+    [contenteditable]
+  ) {
+    cursor: var(--cursor-text);
+  }
+
+  /* Global: keys on a class a script sets on html.
+     print-cursor.client.ts sets html.cur-on and draws the shape itself, so every element's cursor token
+     becomes a blank image whose fragment names that shape, for the cursor to read back. The image is
+     inline: a file would be one more round trip that holds up the load event. */
+  html.cur-on {
+    --cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#arrow")
+        0 0,
+      none;
+    --cursor-point:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#point")
+        0 0,
+      none;
+    --cursor-grab:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#grab")
+        0 0,
+      none;
+    --cursor-grabbing:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#grabbing")
+        0 0,
+      none;
+    --cursor-text:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#text")
+        0 0,
+      none;
+    --cursor-forbid:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E#forbid")
+        0 0,
+      none;
+  }
+  /* Global: keys on a class a script sets on html.
+     the head script sets html.sb-own where page-scrollbar.client.ts draws its own bar; the native one
+     belongs to <html>. */
+  html.sb-own {
+    scrollbar-width: none;
+  }
+  /* Global: the native bar is a pseudo-element of html. */
+  html.sb-own::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Global (to the end of the stack-filter block): view transitions are pseudo-elements of html,
+     keyed on its attributes and transition types, which a class cannot target.
+     Every same-site page change is a cross-document view transition; the head script
+     (src/layouts/head-script.ts) gives each one its type.
+     Theme switch: the new theme opens as a circle from the toggle over a frozen old frame. */
+
+  html[data-theme-swap]::view-transition-old(root),
+  html[data-theme-swap]::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+  html[data-theme-swap]::view-transition-new(root) {
+    animation: theme-reveal 500ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  /* Opening a rule from a card dives into it: the home deck's card, or on the index the panel the
+     tile projects onto. The page zooms toward the card (the head script sets --open-x and --open-y
+     to its centre) while the card's frame swells past the screen edges, and its thumbnail and title
+     fly on into the rule page's cover and heading. The names exist only during that transition, so
+     the theme switch still reveals the page as one picture. */
+  /* Global: the dive's one curve and length, set on html so its view-transition pseudo-elements
+     inherit them. */
+  html {
+    --dive-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --dive-time: 620ms;
+  }
+  html:active-view-transition-type(rule-open, rule-close) [data-opening] {
+    view-transition-name: rule-card;
+  }
+  html:active-view-transition-type(rule-open, rule-close) [data-opening] .thumb {
+    view-transition-name: rule-thumb;
+  }
+  html:active-view-transition-type(rule-open, rule-close) [data-opening] .t,
+  html:active-view-transition-type(rule-open, rule-close) [data-opening] > h3 {
+    view-transition-name: rule-title;
+  }
+  /* The header island stays put over the dive and the page fade, above the swelling card, instead
+     of zooming or fading away with the page. */
+  html:active-view-transition-type(rule-open, rule-close, page-fade) .island {
+    view-transition-name: site-nav;
+  }
+  ::view-transition-group(site-nav) {
+    z-index: 2;
+  }
+  /* Above the card: zooming out, the card exists only on the new page, and new-only groups
+     otherwise stack over the ones both pages share. */
+  ::view-transition-group(rule-thumb),
+  ::view-transition-group(rule-title) {
+    z-index: 1;
+    animation-duration: 520ms;
+    animation-timing-function: var(--dive-ease);
+  }
+  ::view-transition-old(rule-title),
+  ::view-transition-new(rule-title) {
+    height: 100%;
+    object-fit: contain;
+    object-position: left top;
+  }
+  ::view-transition-old(rule-title) {
+    animation: rule-title-out 160ms ease-out both;
+  }
+  ::view-transition-new(rule-title) {
+    animation: rule-title-in 280ms 140ms ease-out both;
+  }
+
+  html:active-view-transition-type(rule-open)::view-transition-old(root) {
+    transform-origin: var(--open-x, 50%) var(--open-y, 50%);
+    animation:
+      rule-dive-root var(--dive-time) var(--dive-ease) both,
+      vt-fade-out 200ms ease-out both;
+  }
+  html:active-view-transition-type(rule-open)::view-transition-new(root) {
+    animation: vt-fade-in 300ms 220ms ease-out both;
+  }
+  ::view-transition-old(rule-card) {
+    animation:
+      rule-dive-card var(--dive-time) var(--dive-ease) both,
+      vt-fade-out 180ms 80ms ease-out both;
+  }
+  /* Leaving a rule for the index runs the dive backwards: the rule page fades, the index settles
+     in from the zoom toward the rule's tile (the head script sets --open-x and --open-y to its
+     centre), and the tile's frame shrinks back from past the screen edges while the cover and heading
+     fly home into its thumbnail and title. */
+  html:active-view-transition-type(rule-close)::view-transition-old(root) {
+    animation: vt-fade-out 300ms 100ms ease-in both;
+  }
+  html:active-view-transition-type(rule-close)::view-transition-new(root) {
+    transform-origin: var(--open-x, 50%) var(--open-y, 50%);
+    animation: rule-undive-root var(--dive-time) var(--dive-ease) both;
+  }
+  ::view-transition-new(rule-card) {
+    animation:
+      rule-undive-card var(--dive-time) var(--dive-ease) both,
+      vt-fade-in 260ms 120ms ease-out both;
+  }
+
+  /* Both layers cover the screen as they grow, so a blur on either re-rasterises it every frame and
+     drops the dive to about 30fps. The upscaled card softens on its own. */
+
+  /* Every other navigation fades through: the old page fades out, then the new one fades in. The
+     head script (src/layouts/head-script.ts) types it; rule cards and the theme switch run their own. */
+  html:active-view-transition-type(page-fade)::view-transition-old(root) {
+    animation: vt-fade-out 160ms ease-out both;
+  }
+  html:active-view-transition-type(page-fade)::view-transition-new(root) {
+    animation: vt-fade-in 240ms 120ms ease-out both;
+  }
+
+  /* Filtering the stack: badges the filter keeps glide to their new places, new ones slide up and
+     dropped ones fade.
+     The root stays live, so chips and hover states keep rendering while the badges move. */
+  html:active-view-transition-type(stack-filter)::view-transition {
+    pointer-events: none;
+  }
+  html:active-view-transition-type(stack-filter)::view-transition-old(root) {
+    display: none;
+  }
+  html:active-view-transition-type(stack-filter)::view-transition-new(root) {
+    animation: none;
+  }
+  ::view-transition-group(.stack-move) {
+    animation-duration: 280ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  ::view-transition-old(.stack-out) {
+    animation: stack-out 160ms ease-out both;
+  }
+  ::view-transition-new(.stack-in) {
+    animation: stack-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(.stack-move),
+    ::view-transition-old(.stack-out),
+    ::view-transition-new(.stack-in) {
+      animation-duration: 0s;
+    }
+  }
+
+  /* Global: the site's chrome and the page's ground sit on <body> and <html>, outside the page's styles.
+     The printed CV keeps its design and colours, or is the ATS version's plain sheet on white. */
+  @media print {
+    html:has(cv-page) {
+      print-color-adjust: exact;
+    }
+    /* The fixed header's room goes with it. */
+    body:has(cv-page) {
+      padding: 0 !important;
+    }
+    body:has(cv-page) > :not(main, [data-backdrop]) {
+      display: none !important;
+    }
+    cv-page::after {
+      display: none !important;
+    }
+    html:has(cv-page[data-ats]),
+    body:has(cv-page[data-ats]) {
+      background: #fff !important;
+    }
+    body:has(cv-page[data-ats]) > [data-backdrop] {
+      display: none;
+    }
+  }
+}
+
+/* Global: at-rules that belong to no layer. */
+@view-transition {
+  navigation: auto;
+}
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-x) var(--theme-y));
+  }
+  to {
+    clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
+  }
+}
+@keyframes rule-title-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes rule-title-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes rule-undive-root {
+  from {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+@keyframes rule-undive-card {
+  from {
+    transform: scale(var(--dive-scale, 4.5));
+  }
+}
+@keyframes rule-dive-root {
+  to {
+    transform: scale(1.25);
+  }
+}
+@keyframes rule-dive-card {
+  to {
+    transform: scale(var(--dive-scale, 4.5));
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes stack-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes stack-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+/* Global: @property registers for the whole document. --hue is registered so the hero prints' ink
+   (hero-prints.astro) eases to the next slide's colour. */
+@property --hue {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+/* Global: reaches every element and pseudo-element under an .arc root, including ones that set
+   their own motion, which a class on the root alone cannot. */
+@media (prefers-reduced-motion: reduce) {
+  :where(.arc *),
+  :where(.arc *)::before,
+  :where(.arc *)::after {
+    animation: none !important;
+    transition-property: opacity, color, background-color, border-color !important;
+  }
+}

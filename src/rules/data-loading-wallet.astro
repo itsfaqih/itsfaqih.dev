@@ -1,0 +1,56 @@
+---
+import { HINT } from "./hints";
+import { CACHED, HISTORY, money } from "./data-loading";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
+
+type Props = {
+  /** Persist only the dated history; the balance waits for a connection. */
+  careful?: boolean;
+};
+
+const { careful = false } = Astro.props;
+---
+
+<data-loading-wallet class={styles.view} data-careful={careful ? "" : undefined}
+  ><div class={styles.card}
+    ><div class={styles.head}
+      ><span>Wallet</span><span class={view.signal("offline")} data-part="signal"
+        >No signal, day 3</span
+      ></div
+    ><div class={styles.balance} data-part="balance"
+      ><span class={styles.balanceLabel}>Balance</span><b
+        class={view.balance(false, careful)}>{careful ? "Needs a connection" : money(CACHED)}</b
+      ></div
+    ><div class={styles.hist}
+      ><div class={styles.histHead}
+        ><span>Recent</span>{
+          careful && (
+            <span class={styles.stamp} data-part="stamp">Updated 2 days ago</span>
+          )
+        }</div
+      ><ul class={styles.histList} data-part="history"
+        >{
+          HISTORY.map((row) => (
+            <li class={view.histRow(false)}
+              ><span>{row.label}</span><b class={styles.histAmount}
+                >{row.amount < 0 ? "−" : "+"}<!-- -->{money(Math.abs(row.amount))}</b
+              ></li
+            >
+          ))
+        }</ul
+      ></div
+    ></div
+  ><div class={styles.ctl}
+    ><span class={styles.note}>Opened from cache</span><button
+      data-hint={HINT.tap}
+      type="button"
+      class={view.ctlButton}
+      data-part="go">Get signal</button
+    ></div
+  ></data-loading-wallet
+>
+
+<script>
+  import "./data-loading-wallet.client";
+</script>

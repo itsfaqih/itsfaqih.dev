@@ -1,0 +1,24 @@
+---
+import { colorOf, ruleNumber, type PublishedGuideline } from "../data/guidelines";
+import { loadIn } from "../components/load-in.css";
+import { reticle } from "./reticle.css";
+import { styles } from "./rule-select.css";
+import RuleThumb from "./rule-thumb.astro";
+
+type Props = { rule: PublishedGuideline };
+
+const { rule } = Astro.props;
+---
+
+<a
+  href={rule.href}
+  class:list={[loadIn.piece, loadIn.deal, reticle.card, reticle.on, styles.tile]}
+  data-cut="true"
+  style={`--c:${colorOf(rule.label)}`}
+  data-rule-open
+  ><RuleThumb rule={rule} /><span class={styles.number}
+    ><span>{ruleNumber(rule)}</span><span aria-label="Has demos">▶</span></span
+  >{/* .t names the title for the rule-open view transition in arcade.css. */}<span
+    class={`t ${styles.tileTitle}`}>{rule.title}</span
+  ></a
+>

@@ -1,0 +1,10 @@
+---
+import { arcade } from "../components/arcade.css";
+import { styles } from "./typescript-code-writing.css";
+
+type Props = { text: string };
+
+const { text } = Astro.props;
+---
+
+<span class={arcade.srOnly}>{text}</span><span aria-hidden="true" class={styles.gap}></span>

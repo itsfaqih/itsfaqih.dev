@@ -1,0 +1,54 @@
+---
+import { HINT } from "./hints";
+import { LAMP, RENDERS } from "./data-loading";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
+
+type Props = {
+  /** Render /lamp on the server, so its first response carries the product. */
+  server?: boolean;
+};
+
+const { server = false } = Astro.props;
+const { html, painted, crawler } = RENDERS[server ? "server" : "browser"];
+// The first frame is the still state: blank in the browser, the product from the server.
+---
+
+<data-loading-seo class={styles.view} data-server={server ? "" : undefined}
+  ><pre class={styles.source}><span class={styles.comment}>{`// GET ${LAMP.path} → first response`}</span>{"\n"}<!-- -->{html.join("\n")}</pre
+  ><div class={styles.card}
+    ><div class={styles.head}
+      ><span>shop.test{LAMP.path}</span><span
+        class:list={[styles.status, !server && styles.offline]}
+        aria-live="polite"
+        data-part="status">{server ? painted : "Blank until app.js runs"}</span
+      ></div
+    ><div class={view.frame(!server)} data-part="frame"
+      >{
+        server && (
+          <Fragment
+            ><b class={styles.lampTitle}>{LAMP.title}</b><span class={styles.lampPrice}
+              >{LAMP.price}<!-- --> · <!-- -->{LAMP.stock}</span
+            ></Fragment
+          >
+        )
+      }</div
+    ><p class={styles.said}>{crawler}</p></div
+  ><div class={styles.ctl}
+    ><span class={styles.note}>Crawlers read the first response</span><button
+      data-hint={HINT.tap}
+      type="button"
+      class={view.ctlButton}
+      data-part="load">Load {LAMP.path}</button
+    ></div
+  ><template data-part="product"
+    ><b class:list={[styles.lampTitle, styles.lampShown]}>{LAMP.title}</b><span
+      class:list={[styles.lampPrice, styles.lampShown]}
+      >{LAMP.price}<!-- --> · <!-- -->{LAMP.stock}</span
+    ></template
+  ></data-loading-seo
+>
+
+<script>
+  import "./data-loading-seo.client";
+</script>

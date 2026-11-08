@@ -1,0 +1,23 @@
+---
+import { styles } from "./backdrop-dots.css";
+
+type Props = {
+  /** Slow waves swell the dots across the page. */
+  tide?: boolean;
+};
+
+const { tide = false } = Astro.props;
+---
+
+<site-backdrop data-tide={tide ? "" : undefined} class={styles.host}>
+  <template>
+    <div class={styles.root} data-backdrop aria-hidden="true">
+      <i class:list={[styles.layer, styles.grid]}></i><canvas class={styles.layer}
+      ></canvas>
+    </div>
+  </template>
+</site-backdrop>
+
+<script>
+  import "./backdrop.client";
+</script>

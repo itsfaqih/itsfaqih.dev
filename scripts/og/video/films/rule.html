@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rule</title>
+    <link rel="stylesheet" href="../film.css" />
+    <style>
+      .bar {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 12px;
+        background: var(--hue);
+        transform-origin: left;
+      }
+      /* A track clips its line so the words can rise into it on entry. */
+      .track {
+        position: relative;
+        overflow: hidden;
+      }
+      .track > span {
+        display: block;
+        white-space: pre;
+        will-change: transform;
+      }
+      .eyebrow,
+      .topic {
+        position: absolute;
+        top: 60px;
+        height: 34px;
+        line-height: 34px;
+      }
+      .eyebrow {
+        left: 72px;
+        color: var(--hue);
+      }
+      .topic {
+        right: 72px;
+        color: var(--dim);
+      }
+      .title {
+        position: absolute;
+        left: 72px;
+        top: 146px;
+        width: 1056px;
+        height: 1.16em;
+        font-family: var(--display);
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .shift {
+        position: absolute;
+        left: 72px;
+        top: 258px;
+        display: flex;
+        align-items: flex-end;
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 88px;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .from {
+        height: 1.16em;
+        margin-bottom: -0.08em;
+      }
+      .arrow {
+        flex: none;
+        width: 0.9em;
+        height: 0.6em;
+        margin: 0 0.32em 0.2em 0.18em;
+        color: var(--mute);
+        overflow: visible;
+      }
+      .arrow path {
+        stroke-dasharray: 1;
+      }
+      .chip {
+        position: relative;
+        height: 1.08em;
+        margin-left: -10px;
+      }
+      .hl {
+        position: absolute;
+        inset: 0;
+        clip-path: inset(0 0 -0.16em 0);
+        overflow: hidden;
+        background: var(--hue);
+        color: var(--on-accent);
+      }
+      .hl > span {
+        position: absolute;
+        left: 10px;
+        top: -0.02em;
+        white-space: pre;
+      }
+      .claim {
+        position: absolute;
+        left: 72px;
+        top: 400px;
+        width: 1000px;
+        font-size: 34px;
+        line-height: 44px;
+        color: var(--dim);
+      }
+      .foot {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mark {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .mark b {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 26px;
+        letter-spacing: -0.02em;
+      }
+      .dim {
+        color: var(--dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="bar" id="bar"></div>
+      <div class="track eyebrow mono"><span id="eyebrow"></span></div>
+      <div class="track topic mono"><span id="topic">Rule of Thumb</span></div>
+      <div class="track title" id="titleTrack"><span id="title"></span></div>
+      <div class="shift">
+        <div class="track from"><span id="from"></span></div>
+        <svg
+          class="arrow"
+          id="arrow"
+          viewBox="0 0 90 60"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="11"
+          stroke-linecap="square"
+        >
+          <path pathLength="1" d="M6 30H78" />
+          <path pathLength="1" d="M54 8l24 22-24 22" />
+        </svg>
+        <div class="chip" id="chip">
+          <div class="hl"><span id="to"></span></div>
+        </div>
+      </div>
+      <div class="claim" id="claim"></div>
+      <div class="foot mono" id="foot">
+        <div class="mark"><b>FAQIH</b><span class="dim">itsfaqih.dev</span></div>
+      </div>
+    </div>
+    <script src="rules-data.js"></script>
+    <script src="../vendor/gsap.min.js"></script>
+    <script src="../film.js"></script>
+    <script src="dots.js"></script>
+    <script>
+      // One rule from src/data/guidelines.ts (via rules-data.js), picked by ?id=.
+      const id = new URLSearchParams(location.search).get("id") ?? "button-design";
+      const rule = window.RULES.find((r) => r.id === id);
+      if (!rule) throw new Error(`no rule ${id}`);
+      // The cover tag is uppercase in the data; set it in sentence case, keeping acronyms.
+      const ACRONYMS = new Set(["UTC"]);
+      const word = (w) => (ACRONYMS.has(w) ? w : w.toLowerCase());
+      const $ = (x) => document.getElementById(x);
+      $("stage").style.setProperty("--hue", rule.hue);
+      $("eyebrow").textContent = rule.label;
+      $("title").textContent = rule.title;
+      $("claim").textContent = rule.claim;
+      $("from").textContent = word(rule.from);
+      $("to").textContent = word(rule.to);
+      const [shaft, head] = document.querySelectorAll(".arrow path");
+
+      // An entrance that builds the card once, then an idle where nothing leaves: the arrow
+      // keeps nudging the "after" chip along.
+      const IDLE = 2.4; // the first nudge
+      const BEAT = 1.6; // one nudge and ping
+      const T = IDLE + BEAT * 4;
+      const GAIN = 1.8; // the corner light, brighter than the site's
+      const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+      const TEXT = [244, 244, 248];
+      const MUTE = [135, 135, 157];
+
+      document.fonts.ready.then(() => {
+        // The title takes 88px, or less when a long one would overflow the line.
+        const title = $("title");
+        title.parentElement.style.fontSize = "88px";
+        const tw = title.scrollWidth;
+        if (tw > 1056) title.parentElement.style.fontSize = `${Math.floor((88 * 1056) / tw)}px`;
+        const W = $("to").getBoundingClientRect().width + 20;
+        const rise = (el) => el.parentElement.getBoundingClientRect().height * 1.05;
+        const H = {
+          eyebrow: rise($("eyebrow")),
+          topic: rise($("topic")),
+          title: rise($("title")),
+          from: rise($("from")),
+          to: $("chip").getBoundingClientRect().height * 1.05,
+        };
+        const expoOut = gsap.parseEase("expo.out");
+        const out3 = gsap.parseEase("power3.out");
+        const out2 = gsap.parseEase("power2.out");
+        const inOut2 = gsap.parseEase("power2.inOut");
+        // The light in the bottom-right corner comes in with the top bar, as the site's lights do.
+        const dots = createDots($("stage"));
+        const up = (el, h, a, d = 0.6) =>
+          (el.style.transform = `translateY(${h * (1 - prog(window.__t, a, d, expoOut))}px)`);
+        register({
+          duration: T,
+          frame: (t) => {
+            window.__t = t;
+            // Entrance, top to bottom, each line rising into its track.
+            $("bar").style.transform = `scaleX(${prog(t, 0, 0.6, out3)})`;
+            up($("eyebrow"), H.eyebrow, 0.08);
+            up($("topic"), H.topic, 0.12);
+            up($("title"), H.title, 0.18);
+            up($("from"), H.from, 0.34);
+            // The rule happens once: the "before" dims, the arrow draws, the "after" chip opens.
+            const dim = prog(t, 0.95, 0.4, out3);
+            $("from").style.color = `rgb(${mix(TEXT, MUTE, dim)})`;
+            const a = prog(t, 1.0, 0.36, out3);
+            shaft.style.strokeDashoffset = String(1 - clamp01(a / 0.7));
+            head.style.strokeDashoffset = String(1 - clamp01((a - 0.55) / 0.45));
+            $("chip").style.width = `${W * prog(t, 1.14, 0.5, expoOut)}px`;
+            up($("to"), H.to, 1.2, 0.5);
+            const claim = prog(t, 0.5, 0.6, out3);
+            $("claim").style.opacity = claim;
+            $("claim").style.transform = `translateY(${18 * (1 - claim)}px)`;
+            const foot = prog(t, 0.7, 0.5, out3);
+            $("foot").style.opacity = foot;
+            $("foot").style.transform = `translateY(${12 * (1 - foot)}px)`;
+            // Idle: every beat the arrow pushes 8px toward the chip, and the chip gives 5px a
+            // moment later; both ease back. Nothing leaves the frame.
+            const nudge = (u) =>
+              u < 0.22 ? out2(u / 0.22) : 1 - inOut2(clamp01((u - 0.22) / 0.6));
+            let push = 0;
+            let give = 0;
+            if (t >= IDLE) {
+              const u = (t - IDLE) % BEAT;
+              push = nudge(u);
+              give = u >= 0.12 ? nudge(u - 0.12) : 0;
+            }
+            $("arrow").style.transform = `translateX(${(8 * push).toFixed(2)}px)`;
+            $("chip").style.transform = `translateX(${(5 * give).toFixed(2)}px)`;
+            // The light comes in with the top bar, on its curve, rather than with its own blip.
+            dots(t, [
+              {
+                el: CORNER,
+                reach: 560,
+                gain: GAIN,
+                hue: rule.hue,
+                on: -Infinity,
+                weight: prog(t, 0, 0.6, out3),
+              },
+            ]);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

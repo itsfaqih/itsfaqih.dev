@@ -1,0 +1,69 @@
+---
+import { HINT } from "./hints";
+import { row } from "./table-design.markers";
+import Icon from "../components/icon.astro";
+import { arcade } from "../components/arcade.css";
+import { STAFF, URL_PAGES, URL_PER_PAGE } from "./table-design";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+import TablePageNav from "./table-page-nav.astro";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+const page = 2;
+const query = careful ? `?page=${page}` : "";
+const shown = STAFF.slice((page - 1) * URL_PER_PAGE, page * URL_PER_PAGE);
+---
+
+<table-url class={styles.card} data-careful={careful ? "true" : undefined}>
+  <div class={styles.bar}>
+    <button type="button" class:list={[styles.icon, styles.ring]} aria-label="Reload" data-hint={HINT.tap} data-part="reload"
+      ><Icon
+        name="ArrowClockwise"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        class={styles.iconGlyph}
+      /></button
+    >
+    <span class={styles.address} data-part="address"
+      ><span class={styles.host}>acme.app</span>/users{
+        query && <b class={styles.query}>{query}</b>
+      }</span
+    >
+  </div>
+  <table class={styles.table}>
+    <caption class={arcade.srOnly} data-part="caption">Users, page <!-- -->{page}</caption>
+    <colgroup><col /><col class={styles.colRole} /></colgroup>
+    <thead>
+      <tr
+        ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
+          >Role</th
+        ></tr
+      >
+    </thead>
+    <tbody class={view.body(false)} data-part="rows">
+      {
+        shown.map((person) => (
+          <tr class={row}
+            ><td class={styles.td}>{person.name}</td><td class:list={[styles.td, styles.dim]}
+              >{person.role}</td
+            ></tr
+          >
+        ))
+      }
+    </tbody>
+  </table>
+  <TablePageNav page={page} pages={URL_PAGES} />
+  <p class={styles.note} aria-live="polite" data-part="note">Pick a page, then reload.</p>
+  <template data-part="row"
+    ><tr class={row}
+      ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
+    ></template
+  >
+</table-url>
+
+<script>
+  import "./table-design.client";
+</script>

@@ -1,0 +1,18 @@
+# Git hooks, installed by `vp install` (the `prepare` script). Pre-commit runs the fast checks on
+# staged files; `vp run verify` runs the whole gate before a merge. Lefthook also runs Git LFS's
+# own hooks (post-checkout, post-commit, post-merge, pre-push), so the behavior baselines in LFS
+# keep working.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: "*.{ts,mts,tsx,js,mjs,json,jsonc,md,css,yml,yaml,html}"
+      run: vp fmt --check {staged_files}
+    - name: lint
+      glob: "*.{ts,mts,tsx,js,mjs,astro}"
+      run: vp lint {staged_files}
+    # The checker runs over the whole project in a few seconds, so it runs whenever code or a
+    # config it reads (tsconfig.json, package.json) changes.
+    - name: typecheck
+      glob: "*.{ts,mts,tsx,astro,json}"
+      run: vp run typecheck

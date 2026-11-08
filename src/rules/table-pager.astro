@@ -1,0 +1,72 @@
+---
+import { row } from "./table-design.markers";
+import { arcade } from "../components/arcade.css";
+import { FILTERED, FILTERS, PER_PAGE, START_FILTER } from "./table-design";
+import { host } from "./rule-landing.css";
+import { styles } from "./table-design.css";
+import TablePageNav from "./table-page-nav.astro";
+
+type Props = { careful: boolean };
+
+const { careful } = Astro.props;
+// Picking a filter mounts its table afresh on page 1, from that filter's template.
+---
+
+<table-pager class={host.contents} data-careful={careful ? "true" : undefined}>
+  {
+    ([START_FILTER, ...FILTERS.map(([filter]) => filter)] as const).map((filter, at) => {
+      const people = FILTERED[filter];
+      const pages = Math.ceil(people.length / PER_PAGE);
+      const shown = people.slice(0, PER_PAGE);
+      const card = (
+        <div class={styles.card} data-part="card">
+          <table class={styles.table}>
+            <caption class={arcade.srOnly} data-part="caption">Users, page <!-- -->1</caption>
+            <colgroup><col /><col class={styles.colRole} /></colgroup>
+            <thead>
+              <tr
+                ><th scope="col" class={styles.th}>Name</th><th scope="col" class={styles.th}
+                  >Role</th
+                ></tr
+              >
+            </thead>
+            <tbody class={styles.body} data-part="rows">
+              {
+                shown.length === 0 ? (
+                  <tr class={row}
+                    ><td colspan="2" class:list={[styles.td, styles.blank, styles.still]}
+                      ><div class={styles.said}
+                        ><b class={styles.saidTitle}>No owners</b><span class={styles.saidHint}
+                          >Nobody has the Owner role yet.</span
+                        ></div
+                      ></td
+                    ></tr
+                  >
+                ) : (
+                  shown.map((person) => (
+                    <tr class={row}
+                      ><td class={styles.td}>{person.name}</td><td class:list={[styles.td, styles.dim]}
+                        >{person.role}</td
+                      ></tr
+                    >
+                  ))
+                )
+              }
+            </tbody>
+          </table>
+          {(!careful || pages > 1) && <TablePageNav page={1} pages={pages} />}
+        </div>
+      );
+      return at === 0 ? card : <template data-filter={filter}>{card}</template>;
+    })
+  }
+  <template data-part="row"
+    ><tr class={row}
+      ><td class={styles.td}></td><td class:list={[styles.td, styles.dim]}></td></tr
+    ></template
+  >
+</table-pager>
+
+<script>
+  import "./table-design.client";
+</script>

@@ -1,0 +1,294 @@
+---
+import Icon from "../components/icon.astro";
+import DialogConfirmDemo from "./dialog-confirm-demo.astro";
+import { LESSONS, RENAMED, REPLY, REVIEW, SIGN_OUT, TLDR } from "./dialog-design";
+import { quiz, styles } from "./dialog-design.css";
+import { quizKit } from "./rule-landing.css";
+import DialogDraftDemo from "./dialog-draft-demo.astro";
+import DialogEscapeDemo from "./dialog-escape-demo.astro";
+import DialogFocusDemo from "./dialog-focus-demo.astro";
+import DialogNameDemo from "./dialog-name-demo.astro";
+import DialogScrollDemo from "./dialog-scroll-demo.astro";
+import Kbd from "./kbd.astro";
+import LessonText from "./lesson-text.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import QuizChoice from "./quiz-choice.astro";
+import RuleQuiz from "./rule-quiz.astro";
+
+const [focus, escape, safe, draft, scroll, name] = LESSONS;
+const btn = [styles.btn, quiz.key];
+const x = { name: "X", size: "1em", weight: "bold", "aria-hidden": "true" } as const;
+---
+
+<RuleLanding id="dialog-design" learn="Hold focus, let go cleanly" tldr={TLDR} take="build dialogs the same way">
+  <Fragment slot="lead">Trap Tab inside the dialog, lock the page behind it, and name it for screen readers.</Fragment>
+  <Fragment slot="intro">A dialog takes over the screen, so give people a way to finish it and a way to leave.</Fragment>
+
+  <RuleLesson lesson={focus}>
+    <Fragment slot="body">Move focus into the dialog when it opens. Let <Kbd>Tab</Kbd> cycle its controls and never reach the inert page behind. On close, return focus to the button that opened it. Press Tab in both.</Fragment>
+    <DialogFocusDemo slot="bad" />
+    <DialogFocusDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={1} level={focus.levels[0]}
+    >You opened <b>Add card</b> from its button halfway down a billing page, then pressed Save. Tap where focus goes.
+    <div slot="board" class={quiz.screen}>
+      <span class:list={[styles.page, quiz.page]}>
+        <QuizChoice level={focus.levels[0]} id="body" look="spot"
+          ><span class={styles.spread}
+            ><span class={styles.logo}></span><span class={quiz.nav}
+              >{Array.from({ length: 12 }, () => <span class={quiz.navLink}></span>)}</span
+            ></span
+          ></QuizChoice
+        >
+        <b class={styles.strong}>Billing</b>
+        <span style="--w:64%" class={styles.ghost}></span>
+        <span class:list={[styles.card, styles.spread, quiz.wrap]}
+          ><span class={styles.project}
+            ><b class={styles.strong}>Payment method</b><small class={styles.meta}>Visa ending 4242</small></span
+          ><QuizChoice level={focus.levels[0]} id="trigger" look="spot"
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Add card</span></QuizChoice
+          ></span
+        >
+        <span class:list={[styles.card, styles.spread, quiz.wrap]}
+          ><span class={styles.project}
+            ><b class={styles.strong}>Invoices</b><small class={styles.meta}>12 this year</small></span
+          ><QuizChoice level={focus.levels[0]} id="next" look="spot"
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Download all</span></QuizChoice
+          ></span
+        >
+        <span style="--w:52%" class={styles.ghost}></span>
+        <span style="--w:40%" class={styles.ghost}></span>
+      </span>
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={escape}>
+    <Fragment slot="body">Close every dialog on <Kbd>Esc</Kbd>, every time, since keyboard users leave that way. Let a click outside close an info dialog too, since closing it loses nothing.</Fragment>
+    <DialogEscapeDemo slot="bad" />
+    <DialogEscapeDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={2} level={escape.levels[0]}
+    >Three dialogs, and a click lands on the dim area around each. Pick the one that click should close.
+    <div slot="board" class={quizKit.trio}>
+      <QuizChoice level={escape.levels[0]} id="issue" caption="Text typed in"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Reply</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{REPLY}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Send</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+        ></QuizChoice
+      >
+      <QuizChoice level={escape.levels[0]} id="news" caption="Nothing to fill in"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Keyboard shortcuts</span><Icon {...x} class={quiz.miniX} /></span
+            ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
+              class={quiz.miniActs}><span class={quiz.miniBtn}>Done</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+        ></QuizChoice
+      >
+      <QuizChoice level={escape.levels[0]} id="rename" caption="Name edited"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Rename file</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{RENAMED}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Save</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.clickDot}></span>click</span></span
+        ></QuizChoice
+      >
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={safe}>
+    <Fragment slot="body">Focus a form's first field so people can type at once. Focus Cancel on a confirm that destroys something, so a stray <Kbd>Enter</Kbd> backs out. Open both and press Enter.</Fragment>
+    <LessonText slot="extra" tip>Focus the destructive button only where speed matters more and the action can be undone.</LessonText>
+    <DialogConfirmDemo slot="bad" />
+    <DialogConfirmDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={3} level={safe.levels[0]}
+    >You close a half-written post, and <b>Discard changes?</b> opens. Tap where focus starts.
+    <div slot="board" class:list={[quiz.screen, quiz.tall]}>
+      <span class:list={[quiz.layer, styles.page, quiz.page]}>
+        <span class={styles.spread}><span class={styles.logo}></span><span style="--w:30%" class={styles.ghost}></span></span>
+        <span class:list={[styles.card, styles.spread, quiz.wrap]}
+          ><span class={styles.project}
+            ><b class={styles.strong}>Draft post</b><small class={styles.meta}>3 paragraphs, not saved</small></span
+          ><QuizChoice level={safe.levels[0]} id="trigger" look="spot"
+            ><span class:list={[btn, styles.soft, quiz.softInCard]}>Close editor</span></QuizChoice
+          ></span
+        >
+        <span style="--w:62%" class={styles.ghost}></span>
+      </span>
+      <span aria-hidden="true" class:list={[quiz.layer, quiz.scrim]}></span>
+      <span class:list={[quiz.layer, quiz.panel, quiz.low]}>
+        <span class={styles.head}><span class={styles.title}>Discard changes?</span></span>
+        <span class={styles.body}>Your 3 unsaved paragraphs will be lost.</span>
+        <span class={styles.acts}
+          ><QuizChoice level={safe.levels[0]} id="keep" look="spot"
+            ><span class:list={[btn, styles.plain, quiz.plain]}>Keep editing</span></QuizChoice
+          ><QuizChoice level={safe.levels[0]} id="discard" look="spot"
+            ><span class:list={[btn, styles.red]}>Discard</span></QuizChoice
+          ></span
+        >
+      </span>
+    </div>
+  </RuleQuiz>
+  <RuleQuiz n={4} level={safe.levels[1]!}
+    ><b>Add contact</b> has Name and Email fields. Tap where focus starts.
+    <div slot="board" class:list={[quiz.screen, quiz.dimmed]}>
+      <span class={quiz.panel}>
+        <span class={styles.head}
+          ><span class={styles.title}>Add contact</span><QuizChoice level={safe.levels[1]!} id="close" look="spot"
+            ><span class:list={[styles.close, quiz.close]}><Icon {...x} class={styles.closeIcon} /></span></QuizChoice
+          ></span
+        >
+        <QuizChoice level={safe.levels[1]!} id="name" look="spot"
+          ><span class={styles.field}
+            ><span class={styles.label}>Name</span><span class:list={[styles.input, quiz.input, quiz.placeholder]}
+              >Ravi Shah</span
+            ></span
+          ></QuizChoice
+        >
+        <QuizChoice level={safe.levels[1]!} id="email" look="spot"
+          ><span class={styles.field}
+            ><span class={styles.label}>Email</span><span class:list={[styles.input, quiz.input, quiz.placeholder]}
+              >ravi@example.com</span
+            ></span
+          ></QuizChoice
+        >
+        <span class={styles.acts}
+          ><QuizChoice level={safe.levels[1]!} id="save" look="spot"><span class:list={[btn]}>Save</span></QuizChoice></span
+        >
+      </span>
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={draft}>
+    <Fragment slot="body">A click outside is often a slip. Once a form has input, shake the dialog on that click instead of closing it, and ask before <Kbd>Esc</Kbd> or × discards the draft. Click the dim area in both.</Fragment>
+    <DialogDraftDemo slot="bad" />
+    <DialogDraftDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={5} level={draft.levels[0]}
+    >Three dialogs, and someone presses <Kbd>Esc</Kbd> in each. Pick the one that should ask before it closes.
+    <div slot="board" class={quizKit.trio}>
+      <QuizChoice level={draft.levels[0]} id="blank" caption="Nothing typed yet"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Write a review</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class:list={[quiz.miniField, quiz.placeholder]}>What did you think?</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Post</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
+        ></QuizChoice
+      >
+      <QuizChoice level={draft.levels[0]} id="issue" caption="Text typed in"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>Write a review</span><Icon {...x} class={quiz.miniX} /></span
+            ><span class={quiz.miniField}>{REVIEW}</span><span class={quiz.miniActs}
+              ><span class={quiz.miniBtn}>Post</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
+        ></QuizChoice
+      >
+      <QuizChoice level={draft.levels[0]} id="news" caption="Nothing to fill in"
+        ><span class={quiz.mini}
+          ><span class={quiz.miniPanel}
+            ><span class={quiz.miniHead}
+              ><span class={quiz.miniTitle}>About</span><Icon {...x} class={quiz.miniX} /></span
+            ><span style="--w:92%" class={styles.ghost}></span><span style="--w:64%" class={styles.ghost}></span><span
+              class={quiz.miniActs}><span class={quiz.miniBtn}>Close</span></span
+            ></span
+          ><span class={quiz.click}><span class={quiz.escKey}>Esc</span>pressed</span></span
+        ></QuizChoice
+      >
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={scroll}>
+    <Fragment slot="body">Stop the page under the dialog from scrolling, so people keep their place. Keep the scrollbar's space so nothing shifts when the scrollbar hides. Open Share, then scroll.</Fragment>
+    <DialogScrollDemo slot="bad" />
+    <DialogScrollDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={6} level={scroll.levels[0]}
+    ><b>Sort</b> opens over a long product list. Here are its layers, pulled apart. Tap the one to lock so the list stays still.
+    <div slot="board" class={quiz.layers}>
+      <span class={quiz.layerCol}
+        ><span class={quiz.tilt}
+          ><QuizChoice level={scroll.levels[0]} id="body" look="spot"
+            ><span class={quiz.slab}
+              >{[80, 92, 70].map((width) => <span style={`--w:${width}%`} class={styles.ghost}></span>)}<span
+                class={quiz.slabFigure}></span
+              >{[88, 60, 94, 76, 84, 52].map((width) => <span style={`--w:${width}%`} class={styles.ghost}></span>)}<span
+                class={quiz.thumb}></span></span
+            ></QuizChoice
+          ></span
+        ><span class={quiz.layerName}>The page</span></span
+      >
+      <span class={quiz.layerCol}
+        ><span class={quiz.tilt}
+          ><QuizChoice level={scroll.levels[0]} id="scrim" look="spot"
+            ><span class:list={[quiz.slab, quiz.slabScrim]}></span></QuizChoice
+          ></span
+        ><span class={quiz.layerName}>The dim layer</span></span
+      >
+      <span class={quiz.layerCol}
+        ><span class={quiz.tilt}
+          ><QuizChoice level={scroll.levels[0]} id="panel" look="spot"
+            ><span class:list={[quiz.slab, quiz.slabPanel]}
+              ><span class={quiz.miniHead}
+                ><span class={quiz.miniTitle}>Sort</span><Icon {...x} class={quiz.miniX} /></span
+              ><span class={quiz.miniField}>Price, low to high</span></span
+            ></QuizChoice
+          ></span
+        ><span class={quiz.layerName}>The dialog panel</span></span
+      >
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={name}>
+    <Fragment slot="body">Tell a screen reader that a dialog opened and what it's called. Mark it as a modal dialog, name it by its title and describe it by its text.</Fragment>
+    <DialogNameDemo slot="bad" />
+    <DialogNameDemo slot="good" sealed />
+  </RuleLesson>
+  <RuleQuiz n={7} level={name.levels[0]}
+    >A screen reader user presses <b>Sign out everywhere</b>, and its dialog opens. They swipe through it. Pick what they should hear.
+    <div slot="board" class={quizKit.stack}>
+      {
+        (
+          [
+            ["loose", [SIGN_OUT.title + ", dialog", "Cancel, button", "Account settings, signed in on 3 devices"]],
+            ["role", ["dialog", SIGN_OUT.body, "Cancel, button"]],
+            ["named", [SIGN_OUT.title + ", dialog", SIGN_OUT.body, "Cancel, button"]],
+          ] as const
+        ).map(([id, lines]) => (
+          <QuizChoice level={name.levels[0]} id={id}
+            ><span class={quiz.transcript}
+              >{
+                lines.map((line) => (
+                  <span class={styles.speech}
+                    ><Icon name="SpeakerHigh" size="1em" weight="bold" aria-hidden="true" class={styles.speaker} />{line}</span
+                  >
+                ))
+              }</span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
+</RuleLanding>
+
+<script>
+  import "./dialog-design.client";
+</script>

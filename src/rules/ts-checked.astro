@@ -1,0 +1,45 @@
+---
+import { cx } from "../cx";
+import { arcade } from "../components/arcade.css";
+import { button } from "../components/button.css";
+import { buttonVariant } from "../components/button.view";
+import TsPaint from "./ts-paint.astro";
+import type { Line } from "./typescript-code-writing";
+import { styles } from "./typescript-code-writing.css";
+
+type Props = { lines: Line[] };
+
+const { lines } = Astro.props;
+const errors = lines.filter((line) => line.note?.error).length;
+// Rendered as tsc left it; ts-checked.client.ts may hide the output until tsc runs.
+---
+
+<ts-checked class={styles.view}>
+  <div class={styles.code}>
+    <i aria-hidden="true" class={`ts-cursor ${styles.cursor}`}></i>{
+      lines.map((line) => (
+        <div class={`ts-ln ${cx(styles.line, line.hot && styles.hot)}`}>
+          <code class={styles.source}>{line.c ? <TsPaint text={line.c} /> : " "}{line.note?.error && (
+              <i class={`ts-sq ${cx(styles.squiggle, line.note.tone === "yes" && styles.squiggleYes)}`}></i>
+            )}</code>{line.note && (
+            <span
+              class={`ts-out ${cx(styles.out, line.note.tone === "no" && styles.outNo, line.note.tone === "yes" && styles.outYes)}`}
+              ><span class={arcade.srOnly}>{line.note.error ? "error: " : "gives "}</span>{line.note.text}</span
+            >
+          )}
+        </div>
+      ))
+    }
+  </div>
+  <div class={styles.term}>
+    <span class={styles.command}>$ tsc</span><span aria-live="polite" class={styles.summary}
+      >{errors === 1 ? "1 error" : `${errors} errors`}</span
+    ><button type="button" class:list={[button.base, buttonVariant["primary-neutral"], button.sm, styles.run]}
+      >Run tsc</button
+    >
+  </div>
+</ts-checked>
+
+<script>
+  import "./ts-checked.client";
+</script>

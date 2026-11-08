@@ -1,0 +1,17 @@
+---
+import Site from "../../layouts/site.astro";
+import RuleIndex from "../../rules/rule-index.astro";
+
+const lede = "Rules I follow when building web apps. Many have demos you can try.";
+---
+
+<Site
+  page={{
+    path: "/rule-of-thumb",
+    title: "Rule of Thumb: Guidelines for Building Web Apps",
+    description: lede,
+    type: "website",
+  }}
+>
+  <RuleIndex lede={lede} />
+</Site>

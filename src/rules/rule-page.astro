@@ -1,0 +1,13 @@
+---
+import { colorOf } from "../data/guidelines";
+import Site from "../layouts/site.astro";
+import { publishedRule, ruleHead } from "./rule-head";
+
+type Props = { id: string };
+
+const rule = publishedRule(Astro.props.id);
+---
+
+<Site page={ruleHead(rule)} hue={colorOf(rule.label)}>
+  <slot />
+</Site>

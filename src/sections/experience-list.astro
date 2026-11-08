@@ -1,0 +1,72 @@
+---
+import type { Job } from "./home-content";
+import { arcade } from "../components/arcade.css";
+import { boxScrollbar } from "../components/box-scrollbar.css";
+import { loadIn } from "../components/load-in.css";
+import { techBrand } from "./tech-brand";
+import { marker } from "../when";
+import { moreLabel, rowView } from "./experience-list.view";
+import { styles } from "./experience-list.css";
+import CompanyLogo from "./company-logo.astro";
+import TechIcon from "./tech-icon.astro";
+
+// The work history (experience-list.client.ts): one row per job, one open at a time, with the
+// open row's achievements. Each row keeps its achievements in a template for when it opens.
+type Props = { jobs: Job[] };
+
+const { jobs } = Astro.props;
+---
+
+<experience-list class={styles.list} data-sound="none"
+  >{
+    jobs.map((job, index) => {
+      const isOpen = index === 0;
+      const view = rowView(isOpen);
+      const achievements = () => (
+        <ul class={styles.achievements}>
+          {job.achievements.map((item, at) => (
+            <li class={styles.achievement} style={`--j:${at}`}>{item}</li>
+          ))}
+        </ul>
+      );
+      return (
+        <div
+          class:list={[loadIn.piece, styles.row, marker]}
+          data-cut="true"
+          data-on={isOpen ? "" : undefined}
+        >
+          <h3 class={styles.heading}>
+            <button
+              type="button"
+              class={view.head}
+              aria-expanded={isOpen ? "true" : "false"}
+              aria-controls={`job-${index}`}
+            >
+              <span class={styles.years}>{job.years}</span>
+              <span class={view.company}><CompanyLogo name={job.company} class={styles.logo} />{job.company}<small class={styles.role}>{job.role}</small></span>
+              <span class={view.chevron} aria-hidden="true" />
+            </button>
+          </h3>
+          <div data-stack="true" class={view.frame}>
+            <ul data-own-scroll class={view.stack} aria-label={`${job.company} stack`}>
+              {job.stack.map((tool) => (
+                <li data-tool="true" class={view.pill} style={techBrand(tool)}><TechIcon name={tool} class={isOpen ? styles.markOpen : styles.markClosed} />{tool}</li>
+              ))}
+              <li data-more="true" hidden><span class={view.more}><span>{moreLabel(0)}</span><span class={arcade.srOnly}> tools</span></span></li>
+            </ul>
+            <span aria-hidden="true" class={view.hint}>Scroll down</span>
+            <div hidden aria-hidden="true" class:list={[boxScrollbar.track, styles.stackBar, marker]}>
+              <div class={boxScrollbar.thumb} />
+            </div>
+          </div>
+          <div id={`job-${index}`} data-body="true" class={styles.body}>{isOpen && achievements()}</div>
+          <template>{achievements()}</template>
+        </div>
+      );
+    })
+  }</experience-list
+>
+
+<script>
+  import "./experience-list.client";
+</script>

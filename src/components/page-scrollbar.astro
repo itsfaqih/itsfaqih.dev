@@ -1,0 +1,12 @@
+---
+import { marker } from "../when";
+import { styles } from "./page-scrollbar.css";
+---
+
+<page-scrollbar class:list={[styles.track, marker]} aria-hidden="true"
+  ><div data-part="thumb" class={styles.thumb}></div></page-scrollbar
+>
+
+<script>
+  import "./page-scrollbar.client";
+</script>

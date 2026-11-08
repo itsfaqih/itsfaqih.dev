@@ -1,0 +1,18 @@
+---
+import { arcade } from "../components/arcade.css";
+import { KINDS, paint } from "./null-vs-undefined.view";
+import { styles } from "./null-vs-undefined.css";
+
+type Props = { text: string; tone: "plain" | "wrap" };
+
+const { text, tone } = Astro.props;
+// A slot's label is a blank for screen readers to read; the rest is code.
+---
+
+{
+  tone === "wrap" ? (
+    <Fragment><span class={arcade.srOnly}>{text}</span><span aria-hidden="true" class={styles.gap} /></Fragment>
+  ) : (
+    <code class={styles.boardCode}>{paint(text, KINDS).map((p) => (p.class ? <span class={p.class}>{p.text}</span> : p.text))}</code>
+  )
+}

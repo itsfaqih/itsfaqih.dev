@@ -1,0 +1,117 @@
+---
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { Level } from "./lesson";
+import HintLayer from "./hint-layer.astro";
+import { host, lessonKit, quizKit, shell, tree } from "./rule-landing.css";
+import { quizView } from "./rule-landing.view";
+
+/**
+ * Draws a row's string as markup, from props `text` and `tone` (how code reads where it lands: "wrap"
+ * inside a slot button, "plain" elsewhere).
+ */
+type Mark = AstroComponentFactory;
+
+type Props = {
+  /** The level's number across the page, for its `lv-N` anchor. */
+  n: number;
+  level: Level;
+  board?: string;
+  /** What the quiz asks for before a first try, in place of the default for its kind. */
+  hint?: string;
+  /** For rows that carry markup, such as painted code: what draws each lead, slot label and text row. */
+  marks?: { lead?: Mark; label?: Mark; text?: Mark };
+};
+
+const { n, level, board = "board", marks = {}, hint: asked } = Astro.props;
+const { lead: Lead, label: Label, text: Text } = marks;
+const idle = { open: false, near: false, missed: false, cleared: false, seated: false };
+const place = "piece" in level ? level : null;
+const hint = asked ?? (place
+  ? `Drag the piece into the ${board}. Or tap it, then tap a spot.`
+  : "Tap the one that fits.");
+---
+
+<rule-quiz
+  class={host.contents}
+  data-answer={level.answer}
+  data-piece={place?.piece}
+  data-board={board}
+  data-ask={hint}
+  data-sound="none"
+>
+  <article id={`lv-${n}`} class:list={[lessonKit.panel, quizKit.level, shell.rev]} data-rev="true">
+    <div class={quizKit.copy}>
+      <div class={quizKit.levelHead} data-part="head">
+        <span class={quizKit.badge}>Quiz</span>
+      </div>
+      <h3 class={quizKit.title}>{level.name}</h3>
+      <p class={quizKit.prompt}><slot /></p>
+      <div aria-live="polite" class={quizView.say(false, false)} data-part="say">
+        <p class={quizView.said(false)}>{hint}</p>
+      </div>
+    </div>
+
+    <div class:list={[lessonKit.well, quizKit.board, !place && quizKit.chooseBoard]} data-hint-zone="true">
+      {
+        place ? (
+          <Fragment>
+          <ul class={tree.list}>
+            {
+              place.rows.map((row) =>
+                "slot" in row ? (
+                  <li style={`--d:${row.depth}`} class:list={[tree.row, row.lead ? quizKit.leadRow : null]}
+                    >{row.lead && <span class={quizKit.lead}>{Lead ? <Lead text={row.lead} tone="plain" /> : row.lead}</span>}<button
+                      type="button"
+                      class={quizView.slot({ ...idle, lead: row.lead !== undefined })}
+                      disabled
+                      data-slot={row.slot.id}
+                      data-note={row.slot.note}
+                      data-part="slot">{Label ? <Label text={row.slot.label} tone="wrap" /> : row.slot.label}</button
+                    ></li
+                  >
+                ) : (
+                  <li style={`--d:${row.depth}`} class:list={[tree.row, row.kind && tree[row.kind]]}
+                    >{Text ? <Text text={row.text} tone="plain" /> : row.text}{row.tag && <span class={tree.calls}>{row.tag}</span>}</li
+                  >
+                ),
+              )
+            }
+          </ul>
+          <div class={quizKit.tray}>
+            <button
+              type="button"
+              class={quizView.piece(false, false)}
+              aria-pressed="false"
+              aria-label={`${place.piece}. Pick up`}
+              data-part="piece">{place.piece}</button
+            ><span class={quizKit.trayNote} data-part="note"></span>
+          </div>
+          </Fragment>
+        ) : (
+          <slot name="board" />
+        )
+      }
+    </div>
+    <HintLayer />
+  </article>
+  <template data-part="seat"
+    ><span class:list={[place ? [quizKit.piece, quizKit.seated] : quizKit.tick]}
+      >{place ? place.piece : "✓"}<span aria-hidden="true" class={quizKit.burst}
+        >{
+          Array.from({ length: 8 }, (_, index) => (
+            <i style={`--a:${index * 45 + 22}deg`} class={quizKit.spark} />
+          ))
+        }</span
+      ></span
+    ></template
+  >
+  <template data-part="clear"
+    ><span class={quizKit.stamp}>Clear</span><span role="img" class={quizKit.stars}
+      >{[1, 2, 3].map(() => <i aria-hidden="true" class={quizView.star(false)}>★</i>)}</span
+    ></template
+  >
+</rule-quiz>
+
+<script>
+  import "./rule-quiz.client";
+</script>

@@ -1,0 +1,89 @@
+---
+import { HINT } from "./hints";
+import { marker } from "../when";
+import type { Level } from "./lesson";
+import { type Load, SKELETON, skeletonChoice, skeletonSays } from "./data-loading";
+import { quiz, styles } from "./data-loading.css";
+import { skeletonView, slideView, view } from "./data-loading.view";
+
+// Quiz 4's board (data-loading-skeleton.client.ts): drag when the skeleton shows along a track
+// with no clock on it, then watch a fast or a slow search play out. Check sends the zone the
+// marker is in to the quiz as that zone's answer.
+type Props = { level: Level };
+
+const { level } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const labels = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.label]));
+const at = SKELETON.from;
+const id = skeletonChoice(at);
+const load: Load = "fast";
+// Each reply's mark, with its label on its own row above the rail: the slow one's left of its line,
+// the fast one's right of it, so the two never meet on a narrow track.
+const MARKS = [
+  [SKELETON.lands.slow, "Slow reply lands", 0, true],
+  [SKELETON.lands.fast, "Fast reply lands", 18, false],
+] as const;
+const LOADS = [
+  ["fast", "Fast load"],
+  ["slow", "Slow load"],
+] as const;
+---
+
+<data-loading-skeleton
+  class:list={[quiz.skel, marker]}
+  data-notes={JSON.stringify(notes)}
+  data-labels={JSON.stringify(labels)}
+  ><div class:list={[quiz.skelLane, quiz.track]} data-part="track"
+    ><i class={quiz.skelRail} aria-hidden="true"></i
+    >{
+      MARKS.map(([lands, label, top, before]) => (
+        <i class={quiz.skelMark} style={`--at:${lands};--top:${top}px`} aria-hidden="true"
+          ><span class:list={[quiz.skelMarkLabel, before && quiz.skelMarkLabelBefore]}>{label}</span></i
+        >
+      ))
+    }<i class={quiz.skelHead} style="--at:0" aria-hidden="true" hidden data-part="head"></i
+    ><span
+      role="slider"
+      tabindex="0"
+      class={quiz.skelHandle}
+      style={`--at:${at}`}
+      aria-label="When the skeleton shows"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow={at * 100}
+      aria-valuetext={labels[id]}
+      data-part="handle"
+      data-hint={HINT.drag}>skeleton</span
+    ></div
+  ><div class={quiz.skelBar}
+    ><span class={quiz.seg} role="group" aria-label="How fast the search replies"
+      >{
+        LOADS.map(([key, name]) => (
+          <button type="button" class={skeletonView.key(key === load)} aria-pressed={key === load ? "true" : "false"} data-load={key}
+            >{name}</button
+          >
+        ))
+      }</span
+    ><button type="button" class={view.ctlButton} data-part="replay">Replay</button></div
+  ><div class:list={[styles.card, quiz.skelPreview]} aria-hidden="true"
+    ><div class={styles.box}
+      ><i class={styles.boxGlass}></i><span>desk lam</span><i class={styles.caret}></i></div
+    ><span class={quiz.skelFound}
+      >{["Desk lamp", "Floor lamp"].map((match) => <span class={skeletonView.match("data")} data-part="match">{match}</span>)}</span
+    ></div
+  ><div class:list={[quiz.slideFoot, quiz.skelFoot]}
+    ><p class={quiz.skelSaid} aria-live="polite" data-part="said">{skeletonSays(load, at)}</p><button
+      type="button"
+      class={slideView.check}
+      data-part="slot"
+      data-look="check"
+      data-slot={id}
+      data-note={notes[id]}>Check</button
+    ></div
+  ></data-loading-skeleton
+>
+
+<script>
+  import "./data-loading-skeleton.client";
+</script>

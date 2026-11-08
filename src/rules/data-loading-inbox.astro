@@ -1,0 +1,48 @@
+---
+import { HINT } from "./hints";
+import { INBOX, inboxRows, replyIn } from "./data-loading";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
+
+type Props = {
+  /** Hold the skeleton back until the reply has taken `SPIN_DELAY`. */
+  delay?: boolean;
+};
+
+const { delay = false } = Astro.props;
+---
+
+<data-loading-inbox class={styles.view} data-delay={delay ? "" : undefined}
+  ><div class={styles.card}
+    ><div class={styles.head}
+      ><span>Inbox</span><span class={styles.status} data-part="unread"
+        >3<!-- --> unread</span
+      ></div
+    ><ul class={styles.mail} data-part="mail"
+      >{
+        inboxRows(0).map(([from, subject]) => (
+          <li class={view.mailRow(false)}
+            ><i aria-hidden="true" class={view.avatar(false)}>{from.charAt(0)}</i><span
+              class={styles.mailText}
+              ><b class={view.mailFrom(false)}>{from}</b><em class={view.mailSubject(false)}
+                >{subject}</em
+              ></span
+            ></li
+          >
+        ))
+      }</ul
+    ><p class={styles.said} aria-live="polite" data-part="said"
+      >Pick how fast the server replies.</p
+    ></div
+  ><div class={styles.ctl}
+    ><span class={styles.note}>Server replies in</span><span
+      class={styles.pair}
+      ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="fast">{replyIn(INBOX.fast)}</button
+      ><button type="button" class={view.ctlButton} data-part="slow">{replyIn(INBOX.slow)}</button></span
+    ></div
+  ></data-loading-inbox
+>
+
+<script>
+  import "./data-loading-inbox.client";
+</script>

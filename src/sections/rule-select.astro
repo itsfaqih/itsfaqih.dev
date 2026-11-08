@@ -1,0 +1,105 @@
+---
+import { colorOf, ruleNumber, TOPICS, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
+import { arcade } from "../components/arcade.css";
+import { loadIn } from "../components/load-in.css";
+import { chips } from "./chips.css";
+import { countClass } from "./chips.view";
+import { beamClass } from "./rule-select.view";
+import { styles } from "./rule-select.css";
+import RuleThumb from "./rule-thumb.astro";
+import RuleTile from "./rule-tile.astro";
+
+// The panel's screen for a picked rule. Its title scrambles in, letter by letter, from cells the
+// client fills with stand-in glyphs (rule-select.client.ts).
+const panelThumb = [styles.thumb, styles.panelThumb];
+const topics = ["All", ...TOPICS];
+const count = (topic: string) =>
+  topic === "All" ? RULES.length : RULES.filter((rule) => rule.label === topic).length;
+---
+
+<rule-select class={styles.select}>
+  <aside
+    class:list={[loadIn.piece, styles.panel]}
+    data-cut="true"
+    data-empty=""
+    data-part="panel"
+  >
+    <div class:list={[styles.plate, styles.standby]}><span>No.—</span><span>STANDBY</span></div>
+    <RuleThumb class={panelThumb} />
+    <h3 class:list={[styles.title, styles.standby]}>Pick a rule</h3>
+    <p class={styles.blurb}>Hover or focus a rule to preview it.</p>
+    <dl class={styles.facts}>
+      <div class={styles.fact}>
+        <dt class={styles.term}>TOPIC</dt><dd
+          class={styles.value}
+          data-part="topic">All</dd
+        >
+      </div>
+    </dl>
+  </aside>
+  <div>
+    <div class={styles.tools}>
+      <label class:list={[loadIn.piece, styles.search]} data-cut="true"
+        >FIND<input
+          class={styles.input}
+          type="search"
+          enterkeyhint="search"
+          autocapitalize="none"
+          autocorrect="off"
+          placeholder="button, cache, null…"
+          aria-label="Search rules"
+          value=""
+          data-part="search"
+        /><kbd class={styles.key}>/</kbd></label
+      >
+    </div>
+    <div class={chips.group} role="group" aria-label="Filter by topic">
+      {
+        topics.map((name) => (
+          <button
+            type="button"
+            class:list={[loadIn.piece, chips.chip]}
+            data-cut="true"
+            aria-pressed={String(name === "All")}
+            style={`--c:${colorOf(name)}`}
+            data-topic={name}
+          >
+            <i class={chips.dot} />{name}<b class={countClass(name === "All")}>{count(name)}</b>
+          </button>
+        ))
+      }
+    </div>
+    <div class={styles.tiles} data-part="tiles">
+      {RULES.map((rule) => <RuleTile rule={rule} />)}
+    </div>
+  </div>
+  <div class={beamClass(false)} aria-hidden="true" data-part="beam"></div>
+  <p class={arcade.srOnly} aria-live="polite" data-part="status"></p>
+  <template data-part="deck">{RULES.map((rule) => <RuleTile rule={rule} />)}</template>
+  {
+    RULES.map((rule) => (
+      <template data-panel={rule.id}>
+        <div class={styles.plate}><span>No.{ruleNumber(rule)}</span><span>{rule.label.toUpperCase()}</span></div>
+        <RuleThumb rule={rule} play at="panel" class={panelThumb} />
+        <h3 class={styles.title}><span aria-hidden="true" data-part="scramble">{
+          rule.title.split(" ").map((word, index) => (
+            <Fragment>{index > 0 && " "}<span class={styles.word}>{
+              Array.from(word, (char) => <span class={styles.cell}>{char}</span>)
+            }</span></Fragment>
+          ))
+        }</span><span class={arcade.srOnly}>{rule.title}</span></h3>
+        <p class={styles.blurb}>{rule.description}</p>
+        <dl class={styles.facts}>
+          <div class={styles.fact}>
+            <dt class={styles.term}>TOPIC</dt><dd class={styles.value}>{rule.label}</dd>
+          </div>
+        </dl>
+      </template>
+    ))
+  }
+  <template data-part="empty"><p class={styles.empty}></p></template>
+</rule-select>
+
+<script>
+  import "./rule-select.client";
+</script>

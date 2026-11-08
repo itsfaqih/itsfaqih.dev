@@ -1,0 +1,217 @@
+---
+import Code from "./code.astro";
+import {
+  DAY,
+  digits,
+  formatLines,
+  HOUR,
+  LESSONS,
+  MOMENT,
+  NO_Z,
+  type Person,
+  responseLines,
+  RIGHT,
+  SERVER_TIME,
+  TLDR,
+  utcIso,
+  wallOf,
+} from "./handling-timestamps";
+import { quiz, styles } from "./handling-timestamps.css";
+import { quizKit } from "./rule-landing.css";
+import LessonText from "./lesson-text.astro";
+import QuizChoice from "./quiz-choice.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import TimestampsBoardCell from "./timestamps-board-cell.astro";
+import TimestampsFilter from "./timestamps-filter.astro";
+import TimestampsOrders from "./timestamps-orders.astro";
+import TimestampsReaders from "./timestamps-readers.astro";
+import TimestampsReminder from "./timestamps-reminder.astro";
+import TimestampsWire from "./timestamps-wire.astro";
+const [store, zulu, local, input, filter] = LESSONS;
+const marks = { lead: TimestampsBoardCell, label: TimestampsBoardCell, text: TimestampsBoardCell };
+
+// Quizzes use other people, zones and dates than the lessons, so they test the rule, not recall.
+const YUKI: Person = { who: "Yuki", city: "Tokyo", tz: "Asia/Tokyo" };
+const LENA: Person = { who: "Lena", city: "Berlin", tz: "Europe/Berlin" };
+const POSTED = Date.parse("2026-03-04T09:00:00.000Z");
+const PAID = Date.parse("2026-03-04T11:30:00.000Z");
+const comments = [
+  { id: 7, by: YUKI },
+  { id: 8, by: LENA },
+];
+const tables = [
+  [
+    "local",
+    "Each writer's clock",
+    comments.map((row) => ({ ...row, at: wallOf(POSTED, row.by.tz) })).sort((a, b) => a.at - b.at),
+  ],
+  ["server", "The server's clock, Singapore", comments.map((row) => ({ ...row, at: wallOf(POSTED, "Asia/Singapore") }))],
+  ["utc", "UTC", comments.map((row) => ({ ...row, at: POSTED }))],
+] as const;
+
+const responses = [
+  ["bare", "No zone", digits(PAID)],
+  ["z", "Ends in Z", utcIso(PAID).replace(".000", "")],
+  ["text", "Already formatted", "Mar 4, 11:30 AM"],
+] as const;
+
+const day = Date.parse("2026-03-04T00:00:00Z");
+const axisStart = day - 12 * HOUR;
+const axisSpan = 2 * DAY;
+const along = (instant: number) => `--at:${((instant - axisStart) / axisSpan) * 100}%`;
+const lanes = [
+  ["utc", "UTC report", "run by the server", day],
+  ["yuki", "Yuki", "Tokyo, UTC+9", day - 9 * HOUR],
+  ["lena", "Lena", "Berlin, UTC+1", day - HOUR],
+] as const;
+---
+
+<RuleLanding
+  id="handling-timestamps"
+  learn="One moment, two clocks"
+  tldr={TLDR}
+  take="store, send and show time the same way"
+>
+  <Fragment slot="lead"
+    >Convert picked times to UTC in the browser, return ISO strings ending in Z, and filter by the user's own day as a UTC range.</Fragment
+  >
+  <Fragment slot="intro"
+    >Keep one moment as one value until it reaches the screen of Rina in Jakarta (UTC+7) or Sam in New York (UTC−5).</Fragment
+  >
+
+  <RuleLesson lesson={store} costsClass={styles.costs}>
+    <Fragment slot="body"
+      >Rina in Jakarta and Sam in New York order in the same second. A column with no offset stores each writer's local time, so one moment becomes two values. Store UTC to keep it one.</Fragment
+    >
+    <LessonText slot="extra" tip
+      >UTC never shifts for daylight saving or politics. It means the same moment everywhere.</LessonText
+    >
+    <TimestampsOrders slot="bad" way="bad" />
+    <TimestampsOrders slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={1} level={store.levels[0]}
+    >Yuki in Tokyo and Lena in Berlin post a comment in the same second. Pick what<Fragment set:html="<!-- -->" /> <Code tone="prompt">posted_at</Code> stores.
+    <div slot="board" class={quizKit.stack}>
+      {
+        tables.map(([id, caption, rows]) => (
+          <QuizChoice level={store.levels[0]} id={id} caption={caption}
+            ><span class={quiz.table}
+                ><span class:list={[styles.th, quiz.head]}>id</span><span class:list={[styles.th, quiz.head]}
+                  >by</span
+                ><span class:list={[styles.th, quiz.head]}>posted_at</span>{
+                  rows.map((row) => (
+                    <Fragment
+                      ><span class:list={[styles.td, quiz.cell]}>{row.id}</span><span
+                        class:list={[styles.td, quiz.cell]}>{row.by.who}</span
+                      ><span class:list={[styles.td, quiz.cell]}>{digits(row.at).replace("T", " ")}</span></Fragment
+                    >
+                  ))
+                }</span
+              ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={zulu} costsClass={styles.costs}>
+    <Fragment slot="body"
+      >An ISO string without a <Code tone="chip">Z</Code> has no zone, so each browser reads it as local time. Rina and Sam both see 6:00 AM, and both are wrong. End it with a <Code tone="chip">Z</Code> so each browser converts it to its own zone.</Fragment
+    >
+    <div slot="bad" class={styles.view}>
+      <TimestampsWire lines={responseLines("bad")} />
+      <TimestampsReaders readings={NO_Z} utc={MOMENT} />
+    </div>
+    <div slot="good" class={styles.view}>
+      <TimestampsWire lines={responseLines("good")} />
+      <TimestampsReaders readings={RIGHT} utc={MOMENT} />
+    </div>
+  </RuleLesson>
+  <RuleQuiz n={2} level={zulu.levels[0]}
+    >The payment went through at 11:30 UTC. Yuki in Tokyo should see 8:30 PM. Pick the response that gets Yuki there.
+    <div slot="board" class={quizKit.stack}>
+      {
+        responses.map(([id, caption, value]) => (
+          <QuizChoice level={zulu.levels[0]} id={id} caption={caption}
+            ><span class={styles.wire}
+                ><span class:list={[styles.line, quiz.line]}>GET /payments/7</span><span
+                  class:list={[styles.line, quiz.line]}
+                  >{'{ "paidAt": '}<span class={quiz.str}>"{value}"</span>{" }"}</span
+                ></span
+              ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={local} costsClass={styles.costs}>
+    <Fragment slot="body"
+      >The server knows its own time zone, not the reader's, so a time it formats is right only where it runs. Send UTC and let each browser format it.</Fragment
+    >
+    <div slot="bad" class={styles.view}>
+      <TimestampsWire lines={formatLines("bad")} />
+      <TimestampsReaders readings={SERVER_TIME} utc={MOMENT} />
+    </div>
+    <div slot="good" class={styles.view}>
+      <TimestampsWire lines={formatLines("good")} />
+      <TimestampsReaders readings={RIGHT} utc={MOMENT} />
+    </div>
+  </RuleLesson>
+  <RuleQuiz n={3} level={local.levels[0]} board="flow" marks={marks}
+    >A comment is stored as <Code tone="prompt">2026-03-04 09:00:00</Code> UTC. Yuki in Tokyo should see 6:00 PM and Lena in Berlin 10:00 AM. Place the formatting.</RuleQuiz
+  >
+
+  <RuleLesson lesson={input} costsClass={styles.costs}>
+    <Fragment slot="body"
+      >Rina sets a reminder for 7:00 AM. From <Code tone="chip">2026-01-01T07:00:00</Code> the server can't tell whose 7:00 that is, so it reads it as UTC. Send UTC with a <Code tone="chip">Z</Code>, or the local time with its offset. Both name one moment.</Fragment
+    >
+    <TimestampsReminder slot="bad" way="bad" />
+    <TimestampsReminder slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={4} level={input.levels[0]} board="flow" marks={marks}
+    >Lena in Berlin books a meeting for Mar 12, 9:30 AM. Place the conversion to UTC.</RuleQuiz
+  >
+  <RuleQuiz n={5} level={input.levels[1]!} board="flow" marks={marks}
+    >Yuki books a table for 6:00 PM in Tokyo. The browser has that time and its <Code tone="prompt">+09:00</Code> offset. Place the offset.</RuleQuiz
+  >
+
+  <RuleLesson lesson={filter} costsClass={styles.costs}>
+    <Fragment slot="body"
+      >Rina asks for her orders on Jan 10. Her day starts at midnight in Jakarta, 17:00 UTC the day before, so send that moment. If you send midnight with no zone, the query runs from 07:00 to 07:00 her time. Orders before 07:00 go missing, and the next morning's show up.</Fragment
+    >
+    <TimestampsFilter slot="bad" way="bad" />
+    <TimestampsFilter slot="good" way="good" />
+  </RuleLesson>
+  <RuleQuiz n={6} level={filter.levels[0]}
+    >Three filters for Mar 4 each need a start. Tap the Mar 4 that starts at 15:00 UTC on Mar 3.
+    <div slot="board" class={quiz.screen}>
+      {
+        lanes.map(([id, who, where, start]) => (
+          <QuizChoice level={filter.levels[0]} id={id} look="spot"
+            ><span class={quiz.lane}
+              ><span class={quiz.who}
+                >{who}<span class={quiz.where}>{where}</span></span
+              ><span class={quiz.track}
+                ><span style={along(start)} class={quiz.day}>Mar 4</span><span
+                  style={along(day)}
+                  class={quiz.mark}></span
+                ></span
+              ></span
+            ></QuizChoice
+          >
+        ))
+      }
+      <span class:list={[quiz.lane, quiz.rule]}
+        ><span class={quiz.axisWho}>UTC</span><span class={quiz.ticks}
+          ><span style={along(day)} class={quiz.tick}>Mar 4, 00:00</span><span
+            style={along(day + DAY)}
+            class={quiz.tick}>Mar 5, 00:00</span
+          ></span
+        ></span
+      >
+    </div>
+  </RuleQuiz>
+</RuleLanding>

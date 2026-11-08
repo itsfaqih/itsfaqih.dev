@@ -1,0 +1,31 @@
+---
+import { HINT } from "./hints";
+import DialogBox from "./dialog-box.astro";
+import { cardView } from "./dialog-design.view";
+import { styles } from "./dialog-design.css";
+import DialogKey from "./dialog-key.astro";
+import DialogWindow from "./dialog-window.astro";
+import { host } from "./rule-landing.css";
+
+type Props = { sealed?: boolean };
+
+const { sealed = false } = Astro.props;
+// The template holds the project card's deleted state, which dialog-design.client.ts swaps in.
+---
+
+<dialog-confirm class={host.contents} data-sealed={sealed ? "" : undefined}>
+  <DialogWindow>
+    <div slot="page" class={styles.page} data-part="page">
+      <div class={styles.spread}><span class={styles.logo}></span><span style="--w:30%" class={styles.ghost}></span></div>
+      <div class={cardView(false)} data-part="card"><span class={styles.project}><b class={styles.strong}>Moonbase</b><small class={styles.meta}>214 files · edited 2h ago</small></span><button data-hint={HINT.open} type="button" data-stop="trigger" class:list={[styles.stop, styles.btn, styles.red, styles.redTint]}>Delete project</button></div>
+      <span style="--w:62%" class={styles.ghost}></span>
+      <span style="--w:48%" class={styles.ghost}></span>
+    </div>
+    <DialogBox id={`confirm-${sealed ? "good" : "bad"}-`} title="Delete Moonbase?" body="Its 214 files go too. This can't be undone." part="dialog">
+      <div class={styles.acts}><button type="button" data-stop="cancel" class:list={[styles.stop, styles.btn, styles.plain]}>Cancel</button><button type="button" data-stop="delete" class:list={[styles.stop, styles.btn, styles.red]}>Delete</button></div>
+    </DialogBox>
+    <DialogKey slot="keys" part="enter">Enter</DialogKey>
+    <Fragment slot="read">Open Delete project, then press Enter</Fragment>
+  </DialogWindow>
+  <template data-part="gone"><span class={styles.project}><b class:list={[styles.strong, styles.goneName]}>Moonbase deleted</b><small class={styles.meta}>214 files gone</small></span><button type="button" data-stop="reset" class:list={[styles.stop, styles.btn, styles.soft, styles.softInCard]}>Restore</button></template>
+</dialog-confirm>

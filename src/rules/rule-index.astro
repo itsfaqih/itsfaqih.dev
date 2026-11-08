@@ -1,0 +1,45 @@
+---
+import { cx } from "../cx";
+import { TOPICS, VISIBLE_GUIDELINES as RULES } from "../data/guidelines";
+import { arcade } from "../components/arcade.css";
+import { loadIn } from "../components/load-in.css";
+import Backdrop from "../sections/backdrop.astro";
+import { heroType } from "../sections/hero-type.css";
+import RuleSelect from "../sections/rule-select.astro";
+import { veil } from "../sections/section.css";
+import { styles } from "./rule-index.css";
+
+type Props = {
+  /** The line under the title, which is also the page's description. */
+  lede: string;
+};
+
+const { lede } = Astro.props;
+const words = cx(loadIn.piece, loadIn.words);
+---
+
+<rule-index class={`arc ${cx(arcade.root, arcade.scan, styles.root)}`}>
+  <Backdrop tide />
+  <div class={arcade.wrap}>
+    <div class={styles.head}>
+      <div class:list={[loadIn.veil, veil.dense, veil.fit, heroType.tag]} data-cut="true"
+        ><span class={words} data-cut="true">{RULES.length} rules · {TOPICS.length} topics</span></div
+      >
+      <h1
+        data-cut="true"
+        class:list={[loadIn.veil, veil.soft, veil.fit, heroType.title, styles.title]}
+        ><span class={words} data-cut="true">Rule of Thumb</span></h1
+      >
+      <p data-cut="true" class:list={[loadIn.veil, veil.soft, veil.fit, styles.lede]}
+        ><span class={words} data-cut="true">{lede}</span></p
+      >
+    </div>
+    <div class={styles.body}>
+      <RuleSelect />
+    </div>
+  </div>
+</rule-index>
+
+<script>
+  import "./rule-index.client";
+</script>

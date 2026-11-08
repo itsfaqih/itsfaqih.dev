@@ -1,0 +1,189 @@
+---
+import Icon from "../components/icon.astro";
+import { LESSONS, TLDR } from "./button-design";
+import { quiz, styles } from "./button-design.css";
+import { quizKit } from "./rule-landing.css";
+import ButtonHierarchy from "./button-hierarchy.astro";
+import ButtonIcons from "./button-icons.astro";
+import ButtonStates from "./button-states.astro";
+import ButtonCursor from "./button-cursor.astro";
+import ButtonSquare from "./button-square.astro";
+import ButtonStill from "./button-still.astro";
+import ButtonToggle from "./button-toggle.astro";
+import Kbd from "./kbd.astro";
+import RuleLanding from "./rule-landing.astro";
+import RuleLesson from "./rule-lesson.astro";
+import QuizChoice from "./quiz-choice.astro";
+import RuleQuiz from "./rule-quiz.astro";
+import Ruler from "./button-ruler.astro";
+
+const [states, still, hierarchy, icons, square] = LESSONS;
+const key = [styles.key, styles.sm, styles.flat];
+---
+
+<RuleLanding
+  id="button-design"
+  learn="Answer every press"
+  tldr={TLDR}
+  take="build buttons the same way"
+>
+  <Fragment slot="lead">Style every state, weigh each variant, and line up the icon.</Fragment>
+  <Fragment slot="intro">Give each state a visible change, so people can tell each press worked.</Fragment>
+
+  <RuleLesson lesson={states}>
+    <Fragment slot="body"
+      >Give hover, press and focus a look. If nothing changes, a click feels like it missed and a keyboard user can't see where they are. Hover both, press both, then <Kbd>Tab</Kbd> to them.</Fragment
+    >
+    <ButtonStates slot="bad" />
+    <ButtonStates slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={1} level={states.levels[0]}
+    >Mia uses only the keyboard. She presses <Kbd>Tab</Kbd> to reach <b>Send</b>. Pick the Send that shows her where she is.
+    <div slot="board" class={quizKit.trio}>
+      <QuizChoice level={states.levels[0]} id="hover" caption="Changes on hover"
+        ><span class={quiz.mock}><span class:list={[key, styles.hover]}>Send</span></span></QuizChoice
+      >
+      <QuizChoice level={states.levels[0]} id="press" caption="Changes on press"
+        ><span class={quiz.mock}><span class:list={[key, styles.press]}>Send</span></span></QuizChoice
+      >
+      <QuizChoice level={states.levels[0]} id="focus" caption="Changes on focus"
+        ><span class={quiz.mock}><span class:list={[key, styles.focus]}>Send</span></span></QuizChoice
+      >
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={still}>
+    <Fragment slot="body"
+      >A disabled button that lights up on hover looks clickable while its cursor shows it isn't, so people click and nothing happens. Lay it flat, then keep it still on hover and press. Hover Back in both.</Fragment
+    >
+    <ButtonStill slot="bad" />
+    <ButtonStill slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={2} level={still.levels[0]}
+    >Ana opens a new doc. <b>Undo edit</b> stays off until she changes something, and she hovers it. Pick what she should see.
+    <div slot="board" class={quizKit.trio}>
+      <QuizChoice level={still.levels[0]} id="hand" caption="Lights up, hand cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.plain, quiz.lit]}>Undo edit</span><ButtonCursor kind="hand" /></span
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={still.levels[0]} id="mixed" caption="Lights up, no‑entry cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.off, quiz.lit]}>Undo edit</span><ButtonCursor
+              kind="forbid"
+            /></span
+          ></span
+        ></QuizChoice
+      >
+      <QuizChoice level={still.levels[0]} id="still" caption="Stays put, no‑entry cursor"
+        ><span class={quiz.mock}
+          ><span class={quiz.hovered}
+            ><span class:list={[key, styles.off]}>Undo edit</span><ButtonCursor kind="forbid" /></span
+          ></span
+        ></QuizChoice
+      >
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={hierarchy}>
+    <Fragment slot="body"
+      >Visual weight shows people the next step. Fill the main action in the brand colour, tint the supporting one, and leave Cancel as text. Keep red for destructive actions.</Fragment
+    >
+    <ButtonToggle slot="extra" label="Squint" name="squint" />
+    <ButtonHierarchy slot="bad" />
+    <ButtonHierarchy slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={3} level={hierarchy.levels[0]}
+    >A cart has three actions. <b>Continue shopping</b> is text and <b>Edit cart</b> is tinted. Pick the footer where <b>Checkout</b> reads as the next step.
+    <div slot="board" class={quizKit.stack}>
+      {
+        (
+          [
+            ["tint", "Checkout tinted", styles.tint],
+            ["red", "Checkout filled red", styles.red],
+            ["brand", "Checkout filled, brand colour", null],
+          ] as const
+        ).map(([id, caption, look]) => (
+          <QuizChoice level={hierarchy.levels[0]} id={id} caption={caption}
+            ><span class:list={[quiz.mock, quiz.end]}
+              ><span class:list={[key, styles.text]}>Continue shopping</span><span class:list={[key, styles.tint]}
+                >Edit cart</span
+              ><span class:list={[key, look]}>Checkout</span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={icons}>
+    <Fragment slot="body"
+      >Take 4px off the icon's side. An icon has white space inside its own box, so equal padding makes that side look wider.</Fragment
+    >
+    <ButtonToggle slot="extra" label="Show padding" name="pads" />
+    <ButtonIcons slot="bad" />
+    <ButtonIcons slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={4} level={icons.levels[0]}
+    >Someone took 4px off one side of each of these buttons. Tap the one that still looks lopsided.
+    <div slot="board" class={quiz.screen}>
+      <span class={quiz.bar}>
+        <QuizChoice level={icons.levels[0]} id="download" look="spot"
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.lead]}
+              ><Icon name="DownloadSimple" size="1em" weight="bold" aria-hidden="true" class={styles.icon} />Download<Ruler pads={[12, 16]} /></span
+            ></span
+          ></QuizChoice
+        >
+        <QuizChoice level={icons.levels[0]} id="open" look="spot"
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.lead]}
+              >Open<Icon name="ArrowSquareOut" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler pads={[12, 16]} /></span
+            ></span
+          ></QuizChoice
+        >
+        <QuizChoice level={icons.levels[0]} id="next" look="spot"
+          ><span class={quiz.ruled}
+            ><span class:list={[key, styles.plain, styles.trail]}
+              >Next<Icon name="ArrowRight" size="1em" weight="bold" aria-hidden="true" class={styles.icon} /><Ruler pads={[16, 12]} /></span
+            ></span
+          ></QuizChoice
+        >
+      </span>
+    </div>
+  </RuleQuiz>
+
+  <RuleLesson lesson={square}>
+    <Fragment slot="body"
+      >Keep a button with only an icon square, and don't copy a text button's padding. A text button's 16px sides make room for its label, and an icon button that copies them comes out 48px tall beside 38px text buttons. Work the padding out from the height instead. (38px height - 16px icon) / 2 gives 11px on every side, the text button's top and bottom padding, not its sides.</Fragment
+    >
+    <ButtonToggle slot="extra" label="Show padding" name="ring" />
+    <ButtonSquare slot="bad" />
+    <ButtonSquare slot="good" careful />
+  </RuleLesson>
+  <RuleQuiz n={5} level={square.levels[0]}
+    >A video player's bar has a <b>Subtitles</b> button, 32px tall with 16px sides. <b>Play</b> sits beside it with only a 20px icon. Pick the padding for Play.
+    <div slot="board" class={quizKit.stack}>
+      {
+        (
+          [
+            ["sides", "16 every side", styles.tall],
+            ["fit", "6 every side", styles.snug],
+            ["usual", "8 every side", styles.short],
+          ] as const
+        ).map(([id, caption, look]) => (
+          <QuizChoice level={square.levels[0]} id={id} caption={caption}
+            ><span class={quiz.mock}
+              ><span class:list={[key, styles.plain, styles.iconOnly, look]}
+                ><Icon name="Play" size="1em" weight="bold" aria-hidden="true" class={styles.bigIcon} /></span
+              ><span class:list={[key, styles.plain, styles.low]}>Subtitles</span></span
+            ></QuizChoice
+          >
+        ))
+      }
+    </div>
+  </RuleQuiz>
+</RuleLanding>

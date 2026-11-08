@@ -1,0 +1,59 @@
+---
+import { HINT } from "./hints";
+import {
+  FATE,
+  FILTER_DATE,
+  filterLines,
+  filterOf,
+  hhmm,
+  shortDay,
+  timeOf,
+  type Way,
+} from "./handling-timestamps";
+import { styles } from "./handling-timestamps.css";
+import { tsView } from "./handling-timestamps.view";
+import { host } from "./rule-landing.css";
+import TimestampsWire from "./timestamps-wire.astro";
+
+type Props = { way: Way };
+
+const { way } = Astro.props;
+const { from, orders } = filterOf(way, FILTER_DATE);
+---
+
+<timestamps-filter class={host.contents} data-way={way}>
+  <div class={styles.view}>
+    <label class={styles.form}
+      ><span class={styles.formHead}>Rina's orders on</span><input
+        data-hint={HINT.edit}
+        type="date"
+        required
+        class={styles.input}
+        value={FILTER_DATE}
+      /></label
+    >
+    <TimestampsWire lines={filterLines(way, from)} />
+    <ul class={styles.orders}>
+      {
+        orders.map((order) => (
+          <li class={tsView.order(order.fate)}
+            ><span class={styles.orderId}>#<Fragment set:html="<!-- -->" />{order.id}</span><span
+              class={tsView.when(order.fate)}
+              >{shortDay(order.wall)}<Fragment set:html="<!-- -->" />, <Fragment set:html="<!-- -->" />{
+                timeOf(order.wall)
+              }<small class={styles.utc}
+                >{shortDay(order.instant)}<Fragment set:html="<!-- -->" />, <Fragment set:html="<!-- -->" />{
+                  hhmm(order.instant)
+                }<Fragment set:html="<!-- -->" /> UTC</small
+              ></span
+            >{FATE[order.fate] && <span class={tsView.fate(order.fate)}>{FATE[order.fate]}</span>}</li
+          >
+        ))
+      }
+    </ul>
+  </div>
+</timestamps-filter>
+
+<script>
+  import "./timestamps-filter.client";
+</script>

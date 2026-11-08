@@ -1,0 +1,6 @@
+---
+import Icon from "../components/icon.astro";
+import { styles } from "./dialog-design.css";
+---
+
+<button type="button" aria-label="Close" data-stop="x" class:list={[styles.stop, styles.close]}><Icon name="X" size="1em" weight="bold" aria-hidden="true" class={styles.closeIcon} /></button>

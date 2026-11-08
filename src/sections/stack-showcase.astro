@@ -1,0 +1,156 @@
+---
+import type { StackGroup, StackUse } from "./home-content";
+import { chips } from "./chips.css";
+import { ringOf } from "./company-logos";
+import { techBrand } from "./tech-brand";
+import { iconLit, techBadge } from "./tech-icon.css";
+import { section, veil } from "./section.css";
+import { loadIn } from "../components/load-in.css";
+import { countClass } from "./chips.view";
+import { groupLabelClass, groupWordsClass, toolClass } from "./stack-showcase.view";
+import { styles } from "./stack-showcase.css";
+import CompanyLogo from "./company-logo.astro";
+import TechIcon from "./tech-icon.astro";
+
+type Props = { groups: StackGroup[]; sources: { use: StackUse; stack: string[] }[] };
+
+const { groups, sources } = Astro.props;
+
+const FILTER_ROWS = [
+  { kind: "work", label: "Company", color: "var(--ts)" },
+  { kind: "project", label: "Project", color: "var(--ar)" },
+] as const;
+
+const placesOf = (kind: StackUse["kind"]) =>
+  sources.filter(({ use }) => use.kind === kind).map(({ use }) => use.name);
+const usesOf = (tool: string) =>
+  sources.filter(({ stack }) => stack.includes(tool)).map(({ use }) => use);
+const allTools = groups.flatMap((group) => group.tools);
+const usedAt = Object.fromEntries(
+  allTools.map((tool) => [tool, usesOf(tool).map((use) => use.name)]),
+);
+const lists = (tool: string) =>
+  [
+    { title: "Work", uses: usesOf(tool).filter((use) => use.kind === "work") },
+    { title: "Projects", uses: usesOf(tool).filter((use) => use.kind === "project") },
+  ].filter(({ uses }) => uses.length > 0);
+---
+
+<stack-showcase class={styles.host}
+  ><section id="stack" class:list={[section.block, styles.section]}
+    ><div class={section.head}
+      ><h2 class:list={[section.title, veil.soft]}
+        ><small
+          class:list={[loadIn.veil, section.eyebrow, veil.dense, veil.fit]}
+          data-cut="true"
+          data-eyebrow="true"
+          style="--c:var(--ar)"
+          ><span class:list={[loadIn.piece, loadIn.words]} data-cut="true">Tools I use</span
+          ></small
+        ><span class:list={[loadIn.piece, section.titleText]} data-cut="true">Stack</span></h2
+      ></div
+    ><div class={styles.filter}
+      ><div class={styles.row}
+        ><span class={styles.spacer}></span><div
+          class:list={[chips.group, styles.chips]}
+          ><button
+            type="button"
+            class:list={[loadIn.piece, chips.chip]}
+            data-cut="true"
+            aria-pressed="true"
+            style="--c:var(--go)"
+            data-chip=""
+            ><i class={chips.dot}></i>All<b class={countClass(true)}>{allTools.length}</b
+            ></button
+          ></div
+        ></div
+      >{
+        FILTER_ROWS.filter((row) => placesOf(row.kind).length > 0).map((row) => (
+          <div class={styles.row}>
+            <h3 class:list={[loadIn.veil, veil.dense, styles.rowLabel]} data-cut="true">
+              <span class:list={[loadIn.piece, loadIn.words]} data-cut="true">{row.label}</span>
+            </h3>
+            <div
+              class:list={[chips.group, styles.chips]}
+              role="group"
+              aria-label={`Filter by ${row.label.toLowerCase()}`}
+            >
+              {placesOf(row.kind).map((name) => (
+                <button
+                  type="button"
+                  class:list={[loadIn.piece, chips.chip, row.kind === "work" && styles.ringChip]}
+                  data-cut="true"
+                  aria-pressed="false"
+                  style={`--c:${row.color}${row.kind === "work" ? `;${ringOf(name)}` : ""}`}
+                  data-chip={name}
+                >{row.kind === "work" ? (
+                    <CompanyLogo name={name} class={styles.chipLogo} />
+                  ) : (
+                    <i class={chips.dot} />
+                  )}{name}<b class={countClass(false)}>{
+                    allTools.filter((tool) => usedAt[tool]!.includes(name)).length
+                  }</b></button>
+              ))}
+            </div>
+          </div>
+        ))
+      }</div
+    ><div class={styles.groups} data-part="groups"
+      >{
+        groups.map((group) => (
+          <div class={styles.group}>
+            <h3 class={groupLabelClass(false)} data-cut="true">
+              <span class={groupWordsClass(false)} data-cut="true">{group.label}</span>
+            </h3>
+            <ul class={styles.tools}>
+              {group.tools.map((tool) => (
+                <li
+                  class={toolClass(false)}
+                  data-cut="true"
+                  tabindex="0"
+                  style={techBrand(tool)}
+                  data-tool={tool}
+                  data-used-at={JSON.stringify(usedAt[tool])}
+                ><TechIcon name={tool} />{tool}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }</div
+    ><template data-part="card"
+      ><div
+        id="stack-peek"
+        role="tooltip"
+        class:list={[techBadge.brand, iconLit.on, styles.peek]}></div
+      ></template
+    >{
+      groups.flatMap((group) =>
+        group.tools.map((tool) => (
+          <template data-peek={tool} data-style={techBrand(tool)}>
+            <header class={styles.peekHead}>{tool}<small class={styles.peekGroup}>{group.label}</small></header>
+            {lists(tool).length === 0 && (
+              <p class={styles.peekNote}>Not part of a role or project listed on this site.</p>
+            )}
+            {lists(tool).map(({ title, uses }) => (
+              <Fragment>
+                <h4 class={styles.useTitle}>{title}</h4>
+                <ul class={styles.uses}>
+                  {uses.map((use) => (
+                    <li class={styles.use}>
+                      <b class={styles.useName}>{use.name}</b>
+                      <span class={styles.useDetail}>{use.detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Fragment>
+            ))}
+          </template>
+        )),
+      )
+    }</section
+  ></stack-showcase
+>
+
+<script>
+  import "./stack-showcase.client";
+</script>

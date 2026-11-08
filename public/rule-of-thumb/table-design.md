@@ -1,38 +1,97 @@
+---
+name: table-design
+description: Line up what people compare, and never leave a table blank. Use when you build or review a data table, its loading and empty states, row actions or pagination.
+---
+
 # Table Design
 
-Best practices for designing data tables. Clear, scannable, and user-friendly.
+Line up what people compare, and never leave a table blank.
 
-## Table States
+People scan a table for one value, so make each column easy to run an eye down.
 
-Handle every possible state your table can be in.
+## TL;DR
 
-1.  **Loading**: Use skeleton rows (not spinners) to maintain layout.
-2.  **Empty**: "No users yet". Provide a clear CTA to create the first item.
-3.  **Error**: "Failed to load". Offer a retry button.
-4.  **Searching**: "No results for 'xyz'". Provide a clear way to clear the search.
-5.  **Data**: The normal state.
+| Situation                 | Do this                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| A column of numbers       | Right-align it, with tabular figures and separators        |
+| Money in a finance view   | Use a monospace face                                       |
+| Rows still loading        | Draw skeleton rows at the real row height                  |
+| Empty, failed or no match | Say which and give one next step: Add, Retry, Clear search |
+| Row actions               | Put icon buttons with tooltips in a fixed last column      |
+| One page, or none         | Skip the pager                                             |
+| The current page          | Put it in the URL as ?page=2                               |
 
-## Pagination
+## Right-align numbers
 
-Smart pagination ensures easy navigation.
+People compare numbers by their last digits. Right-align every numeric column and use tabular figures, so every digit is the same width. Add thousands separators and fixed fraction digits, so `12500` reads `12,500.00`. In a finance view, set money in a monospace face.
 
-- **Hide when ≤1 page**: Reduces clutter.
-- **Hide when empty**: Unnecessary when there's no data.
-- **Use URL query params**: Store page state in the URL (`?page=2`) for shareable links and browser history support.
+Keep raw numbers in state, sort on them, and format only when you draw the cell. A number formatted in the API turns `b.revenue - a.revenue` into `NaN`, and formatted text sorts `"9,000.00"` above `"12,500.00"`.
 
-## Displaying Actions
+```css
+td.number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+```
 
-Make actions predictable and easy to hit.
+```ts
+const sorted = rows.toSorted((a, b) => b.revenue - a.revenue);
+cell.textContent = row.revenue.toLocaleString("en-US", { minimumFractionDigits: 2 });
+```
 
-- **Right-align Actions**: Place them in the last column.
-- **Fixed Width**: Give the actions column a fixed width (e.g., `w-32`) to prevent layout shifts.
-- **Icon Buttons**: Use icon-only buttons with tooltips for common actions (Edit, Delete) to save space.
+## Give every state a next step
 
-## Displaying Numbers
+A table is often loading, empty, failed or showing no matches. Draw each one, and in every blank state say why and what to do next:
 
-Numeric data should be easy to scan and compare.
+- **Loading.** Skeleton rows at the real row height keep the table's shape.
+- **Empty.** Show "No users yet" and an Add user button.
+- **Error.** Show "Couldn't load users" and only a Retry button, so the failure stays in view.
+- **No results.** Show `No results for "xyz"` and a Clear search button.
 
-- **Right-align Numbers**: Allows users to scan decimals vertically.
-- **Use Tabular Nums**: Apply `font-variant-numeric: tabular-nums` (Tailwind: `tabular-nums`) so digits have uniform width.
-- **Format with Locale**: Use `toLocaleString()` for thousand separators (e.g., `1,234.56`).
-- **Monospace Font**: Often helps with alignment in finance contexts.
+```tsx
+const blank = {
+  empty: { title: "No users yet", hint: "Add your first teammate.", action: "Add user" },
+  error: { title: "Couldn't load users", hint: "The server didn't answer.", action: "Retry" },
+  none: {
+    title: `No results for "${query}"`,
+    hint: "Check the spelling, or clear the search.",
+    action: "Clear search",
+  },
+}[state];
+```
+
+## Put actions in a fixed last column
+
+Give the column a fixed width and right-align it, so Edit sits in the same place on every row. Show the buttons on every row at all times, so people find them at a glance. Use icon buttons to save room, and give each one an accessible name and a tooltip.
+
+```html
+<td class="actions">
+  <button aria-label="Edit" title="Edit">✎</button>
+  <button aria-label="Delete" title="Delete">🗑</button>
+</td>
+```
+
+```css
+td.actions {
+  width: 76px;
+  text-align: right;
+}
+```
+
+## Skip the pager for one page
+
+Render the pager only for 2 or more pages. With one page it is a row of dead arrows, and under an empty table it reads "Page 1 of 0".
+
+## Keep the page in the URL
+
+Read the page from the URL's query, as `?page=2`, so a reload, the Back button and a shared link all land where you were.
+
+```ts
+const url = new URL(location.href);
+const page = Number(url.searchParams.get("page") ?? "1");
+
+function goTo(next: number) {
+  url.searchParams.set("page", String(next));
+  history.pushState(null, "", url);
+}
+```

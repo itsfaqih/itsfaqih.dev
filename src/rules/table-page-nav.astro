@@ -1,0 +1,50 @@
+---
+import Icon from "../components/icon.astro";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+
+type Props = { page: number; pages: number };
+
+const { page, pages } = Astro.props;
+---
+
+<nav class={styles.pager} aria-label="Pages" data-part="nav"
+  ><span>Page <!-- -->{page}<!-- --> of <!-- -->{pages}</span><span class={styles.pages}
+    ><button
+      type="button"
+      aria-label="Previous page"
+      disabled={page <= 1}
+      class:list={[styles.page, styles.ring]}
+      data-step="-1"
+      ><Icon
+        name="CaretLeft"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        class={styles.pageIcon}
+      /></button
+    >{
+      Array.from({ length: pages }, (_, at) => at + 1).map((n) => (
+        <button
+          type="button"
+          aria-current={n === page ? "page" : undefined}
+          class={view.pageKey(n === page)}
+          data-page={n}>{n}</button
+        >
+      ))
+    }<button
+      type="button"
+      aria-label="Next page"
+      disabled={page >= pages}
+      class:list={[styles.page, styles.ring]}
+      data-step="1"
+      ><Icon
+        name="CaretRight"
+        size="1em"
+        weight="bold"
+        aria-hidden="true"
+        class={styles.pageIcon}
+      /></button
+    ></span
+  ></nav
+>

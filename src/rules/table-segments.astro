@@ -1,0 +1,29 @@
+---
+import { HINT } from "./hints";
+import { styles } from "./table-design.css";
+import { view } from "./table-design.view";
+
+type Props = {
+  label: string;
+  options: readonly (readonly [string, string])[];
+  value: string;
+  /** The page store the segments pick a value of. */
+  of: "roster" | "filter";
+};
+
+const { label, options, value, of } = Astro.props;
+---
+
+<table-segments class={styles.seg} role="group" aria-label={label} data-hint={HINT.pick} data-of={of}
+  >{
+    options.map(([key, name]) => (
+      <button type="button" aria-pressed={value === key ? "true" : "false"} class={view.segKey(value === key)} data-key={key}
+        >{name}</button
+      >
+    ))
+  }</table-segments
+>
+
+<script>
+  import "./table-design.client";
+</script>

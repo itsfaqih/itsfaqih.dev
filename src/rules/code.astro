@@ -1,0 +1,14 @@
+---
+import { type ClassValue } from "../cx";
+import { codeTone, type Tone } from "./rule-landing.view";
+
+type Props = {
+  /** Where the code sits: "chip" in lesson copy, "prompt" in a quiz prompt, "wrap" elsewhere. */
+  tone?: Tone;
+  class?: ClassValue;
+};
+
+const { tone = "plain", class: className } = Astro.props;
+---
+
+<code class:list={[codeTone(tone), className]}><slot /></code>

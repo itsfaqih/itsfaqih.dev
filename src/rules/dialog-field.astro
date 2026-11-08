@@ -1,0 +1,10 @@
+---
+import { styles } from "./dialog-design.css";
+
+type Props = { name: string; label: string; value: string; placeholder?: string };
+
+const { name, label, value, placeholder } = Astro.props;
+// The focus ring goes on the wrap, as an input draws no ::after.
+---
+
+<label class={styles.field}><span class={styles.label}>{label}</span><span class={styles.inputWrap}><input value={value} placeholder={placeholder} data-stop={name} class:list={[styles.stop, styles.input]} /></span></label>

@@ -12,5 +12,19 @@ count.txt
 .vinxi
 todos.json
 
-*storybook.log
-storybook-static
+tests/visual/__diff__
+.vitest/
+
+# Agent and editor files, design prototypes, and screenshots stay local
+/.agent/
+/.audit/
+/.gemini/
+/.hermes.md
+/.vscode/
+/plans/
+/redesign/
+/scripts/og/video/out/
+/shots/
+/*.png
+.astro
+

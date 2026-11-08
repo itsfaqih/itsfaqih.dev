@@ -1,0 +1,115 @@
+---
+import { colorOf, ruleNumber, type PublishedGuideline } from "../data/guidelines";
+import { arcade } from "../components/arcade.css";
+import { hoverHold } from "../components/hover-hold.css";
+import { loadIn } from "../components/load-in.css";
+import { veil } from "./section.css";
+import { number, styles } from "./rule-spread.css";
+import { PAGE_FILE_END } from "../page-path";
+import { pad } from "./rule-spread.view";
+import RuleThumb from "./rule-thumb.astro";
+
+// The home deck of rules (rule-spread.client.ts), fanned out from the middle one.
+type Props = { rules: PublishedGuideline[] };
+
+const { rules } = Astro.props;
+const last = rules.length - 1;
+const initial = Math.floor(last / 2);
+const rule = rules[initial]!;
+---
+
+<rule-spread class={styles.spread}
+  ><div
+    class={styles.stage}
+    role="group"
+    aria-roledescription="carousel"
+    aria-label="Rules. Drag, scroll sideways, or use the left and right arrow keys."
+    data-part="stage"
+    >{
+      rules.map((item, index) => (
+        <div
+          class={styles.slot}
+          style={`--d:${index - initial};--ad:${Math.abs(index - initial)};z-index:${10 - Math.abs(index - initial)}`}
+        ><a
+            href={item.href}
+            class:list={[loadIn.piece, hoverHold.lift, styles.card]}
+            data-cut="true"
+            draggable="false"
+            aria-current={index === initial ? "true" : undefined}
+            style={`--c:${colorOf(item.label)}`}
+            data-rule-open
+          ><span class={styles.plate}><span>No.<Fragment set:html="<!-- -->" />{ruleNumber(item)}</span><span>▶ DEMO</span></span><RuleThumb
+              rule={item}
+              play={index === initial}
+              class={styles.thumb}
+            />{/* .t names the title for the rule-open view transition in arcade.css. */}<span
+              class={`t ${styles.title}`}>{item.title}</span
+            ><span class={styles.summary}>{item.description}</span><span
+              class:list={[styles.plate, styles.foot]}
+              ><span>{item.label}</span><span class={styles.arrow} aria-hidden="true"
+                >↗</span
+              ></span
+            ></a
+          ></div>
+      ))
+    }</div
+  ><div class={styles.nav}
+    ><span class={arcade.srOnly} aria-live="polite" data-part="title">{rule.title}</span
+    ><button
+      type="button"
+      class:list={[loadIn.piece, hoverHold.lift, styles.step]}
+      data-cut="true"
+      aria-label="Previous rule"
+      disabled={initial === 0}
+      data-part="previous">←</button
+    ><span class:list={[loadIn.veil, veil.dense]} data-cut="true"
+      ><span class:list={[loadIn.piece, loadIn.words]} data-cut="true"
+        ><span class={number.root} data-dir="up" data-part="number"
+          ><span class={number.digits}>{pad(initial + 1)}</span></span
+        > / <Fragment set:html="<!-- -->" />{pad(rules.length)}</span
+      ></span
+    ><button
+      type="button"
+      class:list={[loadIn.piece, hoverHold.lift, styles.step]}
+      data-cut="true"
+      aria-label="Next rule"
+      disabled={initial === last}
+      data-part="next">→</button
+    ></div
+  ></rule-spread
+><script is:inline define:vars={{ pageFileEnd: PAGE_FILE_END.source }}>
+  // Back from a rule's page (its "Back to home" link goes to /#rules), the deck opens on that
+  // rule's card before first paint, so the zoom out lands on it. rule-spread.client.ts starts from
+  // whichever card is current.
+  (function () {
+    var deck = document.currentScript.previousElementSibling;
+    if (location.hash !== "#rules" || !document.referrer) return;
+    var from = new URL(document.referrer).pathname.replace(new RegExp(pageFileEnd), "");
+    var slots = Array.from(deck.querySelector('[data-part="stage"]').children);
+    var at = slots.findIndex(function (slot) {
+      return slot.firstElementChild.getAttribute("href") === from;
+    });
+    if (at < 0) return;
+    slots.forEach(function (slot, index) {
+      var d = index - at;
+      slot.style.setProperty("--d", d);
+      slot.style.setProperty("--ad", Math.abs(d));
+      slot.style.zIndex = 10 - Math.abs(d);
+      var card = slot.firstElementChild;
+      if (d) card.removeAttribute("aria-current");
+      else card.setAttribute("aria-current", "true");
+      card.querySelector(".thumb").toggleAttribute("data-play", !d);
+    });
+    var part = function (name) {
+      return deck.querySelector('[data-part="' + name + '"]');
+    };
+    part("title").textContent = slots[at].querySelector(".t").textContent;
+    part("number").firstElementChild.textContent = String(at + 1).padStart(2, "0");
+    part("previous").disabled = at === 0;
+    part("next").disabled = at === slots.length - 1;
+  })();
+</script>
+
+<script>
+  import "./rule-spread.client";
+</script>

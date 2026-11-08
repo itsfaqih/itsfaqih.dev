@@ -1,0 +1,64 @@
+---
+import { ARROWS, cellTimes, pixels } from "../arrows";
+import { styles } from "./button-design.css";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+const { grid } = ARROWS.hint;
+// A short line straight down, four cells of shaft over the head, centred in a box five cells wide.
+const arrow = pixels(
+  [
+    { x: 2.5 * grid, y: 0 },
+    { x: 2.5 * grid, y: 6 * grid },
+  ],
+  ARROWS.hint,
+);
+const width = 5 * grid;
+const height = 7 * grid;
+const times = (i: number) => {
+  const { at, out } = cellTimes(i, arrow.cells.length);
+  return `--at: ${at}ms; --out: ${out}ms`;
+};
+const key = [styles.key, styles.sm, styles.live, styles.cardRowKey, styles.squinted];
+// Each note names what squinting leaves of its button, and shows only while Squint is on.
+const KEYS = [
+  { label: "Cancel", look: careful ? styles.text : styles.plain, note: careful ? "fades out" : "heavy" },
+  { label: "Save draft", look: careful && styles.tint, note: careful ? "lighter" : "heavy" },
+  { label: "Publish", look: !careful && styles.red, note: careful ? "seen first" : "heavy and red" },
+];
+const say = careful
+  ? "Blurred, only weight is left. Publish is the heaviest, so the eye lands there first."
+  : "Blurred, only weight is left. Three equal blobs give the eye nowhere to land, and the red one reads as danger.";
+---
+
+<div class={styles.stage}>
+  <div class={styles.card}>
+    <span class:list={[styles.cardTitle, styles.squinted]}>Spring launch notes</span>
+    <span class:list={[styles.cardSub, styles.squinted]}>Draft · 1,240 words</span>
+    <div class:list={[styles.row, styles.cardRow]}>
+      {
+        KEYS.map(({ label, look, note }) => (
+          <span class={styles.pin}
+            ><button type="button" class:list={[key, look]}>{label}</button><span class={styles.squintNote}
+              ><span class={styles.squintLabel}>{note}</span><svg
+                  viewBox={`0 0 ${width} ${height}`}
+                  width={width}
+                  height={height}
+                  aria-hidden="true"
+                  data-arrow="squint"
+                  data-spine={arrow.spine}
+                  >{
+                    arrow.cells.map(({ x, y }, c) => (
+                      <rect class={styles.squintCell} x={x} y={y} width={grid} height={grid} style={times(c)} />
+                    ))
+                  }</svg
+              ></span
+            ></span
+          >
+        ))
+      }
+    </div>
+  </div>
+  <p class={styles.squintSay}>{say}</p>
+</div>

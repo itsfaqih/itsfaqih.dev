@@ -1,0 +1,99 @@
+---
+import { HINT } from "./hints";
+import { arcade } from "../components/arcade.css";
+import { AXIS, ORDERS, screenOf, SWEEP, type Waterfall } from "./data-loading";
+import { styles } from "./data-loading.css";
+import { pct, view } from "./data-loading.view";
+
+type Props = Waterfall;
+
+const { bars, paint } = Astro.props;
+const clock = (ms: number) => `${(ms / AXIS) * SWEEP}ms`;
+const screen = screenOf(Astro.props);
+const deferred = bars.some((bar) => bar.kind === "defer");
+---
+
+<data-loading-waterfall class={styles.view}
+  ><div class={styles.wf} style={`--sweep:${SWEEP}ms`}
+    ><ul class={styles.lanes} aria-hidden="true"
+      >{bars.map((bar) => <li class={styles.label}>{bar.label}</li>)}</ul
+    ><div class={styles.plot} data-part="plot"
+      ><ul class={styles.lanes}
+        >{
+          bars.map((bar) => (
+            <li class={styles.lane}
+              ><span
+                class:list={[styles.bar, styles[bar.kind]]}
+                style={`left:${pct(bar.from)};width:${pct(bar.to - bar.from)}`}></span
+              ><span class={arcade.srOnly}
+                ><Fragment
+                  set:html={`${bar.label}<!-- -->: <!-- -->${bar.from}<!-- --> to <!-- -->${bar.to}<!-- -->ms${bar.kind === "defer" ? "<!-- -->, deferred" : ""}`}
+                /></span
+              ></li
+            >
+          ))
+        }</ul
+      ><span
+        class={view.paint("still")}
+        style={`left:${pct(paint)};--at:${(paint / AXIS) * SWEEP}ms`}
+        data-part="paint"
+        ><b class={view.paintTag(paint)}
+          ><span class={styles.long}>on screen </span>{paint}<!-- -->ms</b
+        ></span
+      ><span class={view.cover("still")} aria-hidden="true" data-part="cover"></span><span
+        class={styles.grid}
+        aria-hidden="true"></span
+      ></div
+    ><span class={styles.axis} aria-hidden="true"
+      >{
+        [0, 250, 500, 750, 1000].map((ms) => (
+          <i class={styles.tick} style={`left:${pct(ms)}`}>{ms}</i>
+        ))
+      }</span
+    ><div
+      class={view.screen("still")}
+      style={`--shell:${clock(screen.shell)};--rows:${clock(screen.rows)}${screen.reviews === undefined ? "" : `;--reviews:${clock(screen.reviews)}`}`}
+      aria-hidden="true"
+      data-part="screen"
+      data-hint-solid
+      ><span class={styles.wait}><span class={view.spin(false)}></span></span><div class={styles.page}
+        ><span class={styles.head}>Your orders</span><ul class={styles.histList}
+          >{
+            ORDERS.map(({ item, total, stars }) => (
+              <li class={styles.order}
+                ><span class={styles.orderBones}
+                  ><i class:list={[styles.bone, styles.boneItem]}></i><i
+                    class:list={[styles.bone, styles.boneTotal]}></i></span
+                ><span class={styles.orderRow}
+                  ><span class={styles.orderItem}>{item}</span>{
+                    screen.reviews !== undefined && (
+                      <span class={styles.review}
+                        ><span class={styles.reviewBone}><i class={styles.bone}></i></span><span
+                          class:list={[styles.stamp, styles.reviewStars]}>★ {stars}</span
+                        ></span
+                      >
+                    )
+                  }<b class:list={[styles.histAmount, styles.orderTotal]}>{total}</b></span
+                ></li
+              >
+            ))
+          }</ul
+        ></div
+      ></div
+    ></div
+  ><div class={styles.ctl}
+    ><span class={styles.note}
+      ><i class:list={[styles.key, styles.keyReq]}></i> request<!-- --> <i
+        class:list={[styles.key, styles.keyCode]}></i> code{
+        deferred && (
+          <Fragment><i class:list={[styles.key, styles.keyDefer]}></i> deferred</Fragment>
+        )
+      }</span
+    ><button data-hint={HINT.tap} type="button" class={view.ctlButton} data-part="play">Play</button
+    ></div
+  ></data-loading-waterfall
+>
+
+<script>
+  import "./data-loading-waterfall.client";
+</script>

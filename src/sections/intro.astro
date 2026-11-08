@@ -1,0 +1,31 @@
+---
+import { SLIDES } from "../data/home";
+import { marker } from "../when";
+import { styles } from "./intro.css";
+
+// The home intro: the name slams in, cuts flash through what I build, then the shutters split.
+// It plays once per session; the head script (src/layouts/head-script.ts) sets .no-intro whenever
+// it shouldn't.
+const words = SLIDES.slice(0, 4);
+---
+
+<home-intro class:list={[styles.root, marker]} aria-hidden="true"
+  ><div class:list={[styles.shutter, styles.top]}></div><div
+    class:list={[styles.shutter, styles.bottom]}
+  ></div><div class={styles.stage}
+    ><div class={styles.name}>FAQIH MUNTASHIR</div><div class={styles.slot}
+      >{
+        words.map(({ tab, color }, index) => (
+          <span
+            class:list={[styles.cut, index === words.length - 1 && styles.lastCut]}
+            style={`--i:${index};--c:${color}`}
+          >{tab.toUpperCase()}</span>
+        ))
+      }</div
+    ></div
+  ></home-intro
+>
+
+<script>
+  import "./intro.client";
+</script>

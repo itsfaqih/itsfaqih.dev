@@ -1,0 +1,38 @@
+---
+import { type ClassValue } from "../cx";
+import { companyLogo } from "./company-logos.css";
+import { LOGOS, toneOf } from "./company-logos";
+import { styleOf } from "./tech-brand";
+import { icon, techBadge } from "./tech-icon.css";
+
+/**
+ * An employer's mark in one colour, which `class` can tint, over the mark in its own colours as
+ * toneOf sets them for the theme. The colours show while an ancestor sets --lit to 1 (iconLit).
+ */
+type Props = { name: string; class?: ClassValue };
+
+const { name, class: className } = Astro.props;
+const logo = LOGOS.get(name);
+---
+
+{
+  logo && (
+    <span class:list={[icon.pair, className]} aria-hidden="true">
+      <svg class={icon.flat} viewBox={logo.viewBox}>
+        {logo.parts.map((part) => (
+          <path d={part.d} fill-rule={part.evenOdd ? "evenodd" : undefined} />
+        ))}
+      </svg>
+      <svg class={icon.lit} viewBox={logo.viewBox}>
+        {logo.parts.map((part) => (
+          <path
+            class:list={[techBadge.brand, companyLogo.part]}
+            style={styleOf(toneOf(part))}
+            d={part.d}
+            fill-rule={part.evenOdd ? "evenodd" : undefined}
+          />
+        ))}
+      </svg>
+    </span>
+  )
+}

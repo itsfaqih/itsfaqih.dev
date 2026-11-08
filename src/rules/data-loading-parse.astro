@@ -1,0 +1,47 @@
+---
+import { HINT } from "./hints";
+import { RESPONSE, trustJson, withCityFallback } from "./data-loading";
+import { styles } from "./data-loading.css";
+import { view } from "./data-loading.view";
+
+type Props = {
+  /** Parse the response with a schema instead of trusting it. */
+  parse?: boolean;
+};
+
+const { parse = false } = Astro.props;
+const outcome = parse ? withCityFallback(RESPONSE) : trustJson(RESPONSE);
+---
+
+<data-loading-parse class={styles.view}
+  ><pre class={styles.source}><span class={styles.comment}>{"// GET /users/1 → "}</span>{RESPONSE}<!-- -->{"\n"}<!-- -->{parse ? <Fragment>{"const user = "}<mark class={styles.mark}>User.parse</mark>{"(await res.json());\n"}<span class={styles.comment}>{'// a missing city becomes "Unknown"'}</span></Fragment> : <Fragment>{"const user = await res.json(); "}<span class={styles.comment}>{"// any"}</span></Fragment>}{"\n"}<!-- -->{"render(user.city.toUpperCase());"}</pre
+  ><div class:list={[styles.card, styles.result]} aria-live="polite" data-part="result"
+    >{
+      outcome.ok ? (
+        <div class={styles.profile}
+          ><i aria-hidden="true" class:list={[styles.avatar, styles.profileAvatar]}
+            >{outcome.user.name.charAt(0)}</i
+          ><b class={styles.profileName}>{outcome.user.name}</b><span
+            class={styles.city}>{outcome.user.city}</span
+          ></div
+        >
+      ) : (
+        <div class={styles.crash} role="alert"
+          ><b class={styles.crashTitle}>Uncaught <!-- -->{outcome.error.split(":")[0]}</b
+          ><code class={styles.crashCode}>{outcome.error}</code></div
+        >
+      )
+    }</div
+  ><div class={styles.ctl}
+    ><span class={styles.note}>The API left out city</span><button
+      data-hint={HINT.tap}
+      type="button"
+      class={view.ctlButton}
+      data-part="fetch">Fetch /users/1</button
+    ></div
+  ></data-loading-parse
+>
+
+<script>
+  import "./data-loading-parse.client";
+</script>

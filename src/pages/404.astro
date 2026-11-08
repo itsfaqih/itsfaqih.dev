@@ -1,0 +1,11 @@
+---
+import Site from "../layouts/site.astro";
+import { site } from "../layouts/site.css";
+---
+
+<Site>
+  <div class={site.notFound}>
+    <h1 class={site.notFoundTitle}>Page Not Found</h1>
+    <a href="/" class={site.homeLink}>Go back home</a>
+  </div>
+</Site>

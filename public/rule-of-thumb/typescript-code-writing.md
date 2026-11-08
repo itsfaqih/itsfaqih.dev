@@ -1,163 +1,99 @@
+---
+name: typescript-code-writing
+description: Write types precise enough that the compiler catches a mistake where you made it. Use when you write or review TypeScript types, function signatures or tsconfig flags.
+---
+
 # TypeScript Guidelines
 
-Patterns for writing clean, robust, and maintainable TypeScript.  
-**Strict defaults, explicit intent.**
+Write types precise enough that the compiler catches a mistake where you made it.
 
-## Exports & Functions
+## TL;DR
 
-Consistent module structure makes code easier to navigate and refactor.
+| Situation                  | Do this                                                               |
+| -------------------------- | --------------------------------------------------------------------- |
+| A function other files use | Use export function name()                                            |
+| A shape, a union, an alias | Use type                                                              |
+| One shape built on another | Use interface … extends                                               |
+| A fixed set of values      | Use a string union, not an enum                                       |
+| A local value              | Infer it. Annotate returns and APIs.                                  |
+| Three or more parameters   | Take one options object                                               |
+| A new tsconfig             | Enable strict, noUncheckedIndexedAccess, verbatimModuleSyntax and ESM |
 
-### Prefer Named Exports
+## Name it once
 
-Named exports ensure consistent naming across the codebase and work better with auto-imports/refactoring tools. Avoid default exports.
+Export each function by name, with the `function` keyword, so every importer uses one name, a typo fails to compile, and stack traces name the function. Keep arrow functions for callbacks.
 
-### Use "function" keyword
-
-Use the function keyword for top-level functions. It hoists, provides better stack traces, and distinguishes them from variables. Reserve arrow functions for callbacks or nested logic.
-
-#### Named Exports vs Default
-
-```tsx
-// ❌ Avoid this
-export default function(items: Item[]) { ... }
-// or
-const calculateTotal = (items: Item[]) => { ... };
-export default calculateTotal;
-
-// ✅ Do this
-export function calculateTotal(items: Item[]) {
-  return items.reduce((sum, item) => sum + item.price, 0);
-}
+```ts
+// cart.ts
+export function calculateTotal(items: Item[]) {…} // stack trace: at calculateTotal
+// receipt.ts
+import { calculateTotl } from "./cart"; // TS2724: did you mean 'calculateTotal'?
 ```
 
-Named exports prevent "magic naming" when importing and make re-exports cleaner.
+## Extend with interface
 
-## Type Definitions
+Use `type` for shapes, unions and aliases. To build one shape on another, use `interface … extends`, so a clash fails at the declaration and the error names both types. An `&` intersection compiles the clash into `never` and reports it at the first object of that type.
 
-How to define data shapes relative to flexibility and performance.
-
-### Use "type" by default
-
-Use "type" for most definitions (unions, primitives, simple objects). Use "interface" specifically when you need to **extend** other types (to avoid intersection performance issues) or for declaration merging.
-
-### Unions over Enums
-
-Avoid enums as they emit runtime code and reduce interoperability. String literal unions are simpler, purely type-level, and compatible with modern Node.js type-stripping.
-
-### Infer when possible
-
-Use inference to reduce noise. Only annotate explicitly when documenting intent or enforcing contracts.
-
-#### Type vs Interface
-
-```tsx
-// ✅ Use type for simple objects
-type User = {
-  id: string;
-  name: string;
-}
-
-// ❌ Avoid intersection for extension
-type Admin = User & {
-  permissions: string[];
-}
-
-// ✅ Use interface for extension
+```ts
+type User = { id: string; name: string };
 interface Admin extends User {
-  permissions: string[];
+  // TS2430: incorrectly extends 'User'
+  id: number;
 }
 ```
 
-#### Types vs Enums
+## Use unions, not enums
 
-```tsx
-// ❌ Avoid this
-enum UserRoleEnum {
-  Admin = "ADMIN",
-  Editor = "EDITOR",
-  Viewer = "VIEWER"
-}
+Write a string union, which exists only as a type. A string enum is a runtime object. It rejects the plain string it stands for, adds JavaScript to the bundle, and fails under Node's type stripping. For the values at runtime too, derive the type from an `as const` array.
 
-// ✅ Do this
-type UserRole = "ADMIN" | "EDITOR" | "VIEWER";
-const UserRoleEnum = {
-  Admin: "ADMIN",
-  Editor: "EDITOR",
-  Viewer: "VIEWER"
-} as const
+```ts
+type Role = "ADMIN" | "VIEWER"; // 0 lines of JS
+function setRole(role: Role) {}
+setRole("ADMIN"); // 0 errors
+setRole("ADMN"); // TS2345
+
+const ROLES = ["ADMIN", "VIEWER"] as const;
+type RoleFromList = (typeof ROLES)[number]; // "ADMIN" | "VIEWER"
 ```
 
-String literal unions are simpler and don't emit runtime code.
+## Infer inside, annotate the edges
 
-#### Type Inference
+Let TypeScript infer locals, which keeps their narrow types. Annotate where a contract starts, such as a return type or a public API. A typo then fails where you wrote it.
 
-```tsx
-// ❌ Avoid unnecessary explicit typing
-const x: number = 5; // it's a constant, it's not going to change to other types
-const items: string[] = ["a", "b", "c"];
-
-// ✅ Do this - let TypeScript infer
-const y = 5; // inferred as number
-const items = ["a", "b", "c"]; // inferred as string[]
-
-// ✅ Annotate when enforcing a contract
-function getUser(): User { // explicit return type documents intent
-  return { id: "1", name: "Alice" };
+```ts
+const role = "ADMIN"; // role: "ADMIN"
+setRole(role); // 0 errors
+function getUser(): User {
+  return { id: "1", nmae: "Ana" }; // TS2353: 'nmae' is not in 'User'
 }
 ```
 
-Only add type annotations when they add value - for function signatures, public APIs, or to catch errors.
+## Take one options object
 
-## Function Parameters
+Past two parameters, take one options object. Named keys label each value at the call, can't swap, and take a new optional field without breaking a caller.
 
-Managing arguments for readability and extensibility.
-
-### Use Option Objects
-
-When a function takes more than two parameters, combine them into a single object argument. This improves readability (named args) and makes adding new optional parameters non-breaking.
-
-#### Object Parameters
-
-```tsx
-// ❌ Avoid this
-function createUser(name: string, email: string, role: string, isActive: boolean) { ... }
-
-createUser("Alice", "alice@example.com", "admin", true); // what is "true"?
-
-// ✅ Do this
-type CreateUserOptions = {
-  name: string;
-  email: string;
-  role?: "admin" | "user";
-  isActive?: boolean;
-}
-
-function createUser(options: CreateUserOptions) { ... }
-
-createUser({
-  name: "Alice",
-  email: "alice@example.com",
-  role: "admin"
-  // arguments are clear and order-independent
-});
+```ts
+function createUser(options: { name: string; email: string; role?: "admin" | "user" }) {}
+createUser({ email: "ana@x.io", name: "Ana" }); // 0 errors, any order
+createUser({ name, email, role: "admn" }); // TS2820: did you mean '"admin"'?
 ```
 
-Positional arguments become confusing easily.
+## Turn the flags on
 
-## Strictness & Config
+Enable `strict`, `noUncheckedIndexedAccess` and `verbatimModuleSyntax`. `noUncheckedIndexedAccess` types every index read as possibly `undefined`, which catches `users[0]` on an empty list. `verbatimModuleSyntax` makes a type import say `import type`. Write ESM, with `import` and `export`.
 
-The foundation of a safe codebase.
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true
+  }
+}
+```
 
-### Must-Have Flags
-
-- **`"strict": true`**: Enables strictNullChecks, noImplicitAny, etc.
-- **`"noUncheckedIndexedAccess": true`**: Forces you to check if array access / index signature is defined.
-- **`"verbatimModuleSyntax": true`**: Enforces consistent imports/exports and ESM compatibility.
-
-### Module System
-
-Use **ESM (ECMAScript Modules)** exclusively.
-
-- ✓ import / export syntax
-- ✗ require() / module.exports
-- ✓ Top-level await support
+```ts
+const first = users[0]; // first: User | undefined
+first.name.toUpperCase(); // TS18048: 'first' is possibly 'undefined'
+first?.name ?? "No users yet"; // 0 errors
+```

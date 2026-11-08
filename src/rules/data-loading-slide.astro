@@ -1,0 +1,78 @@
+---
+import { HINT } from "./hints";
+import { arcade } from "../components/arcade.css";
+import type { Level } from "./lesson";
+import { marker } from "../when";
+import { rowsAt, SLIDE, slideChoice, slideSays } from "./data-loading";
+import { quiz, styles } from "./data-loading.css";
+import { pct, slideView } from "./data-loading.view";
+
+// Quiz 2's board (data-loading-slide.client.ts): GET /invoices slides along a track with no clock
+// on it, marked where the code loads, and the rows' paint line follows it. Check sends the zone it's
+// in to the quiz as that zone's answer.
+type Props = { level: Level };
+
+const { level } = Astro.props;
+if (!("choices" in level)) throw new Error(`${level.name} needs choices`);
+const notes = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.note]));
+const labels = Object.fromEntries(level.choices.map((choice) => [choice.id, choice.label]));
+const start = SLIDE.from;
+const shown = rowsAt(start);
+const id = slideChoice(start);
+---
+
+<data-loading-slide
+  class:list={[quiz.slide, marker]}
+  data-notes={JSON.stringify(notes)}
+  data-labels={JSON.stringify(labels)}
+  ><div class:list={[styles.wf, quiz.slideWf]}
+    ><ul class={styles.lanes} aria-hidden="true"
+      ><li class={styles.label}>app.js</li><li class={styles.label}>GET /invoices</li><li class={styles.label}>render rows</li></ul
+    ><div class:list={[styles.plot, quiz.slidePlot]}
+      ><i class={quiz.slideMark} style={`left:${pct(SLIDE.code)}`} aria-hidden="true"></i
+      ><span class={quiz.slideMarkLabel} style={`left:${pct(SLIDE.code)}`} aria-hidden="true">Code loaded</span
+      ><ul class={styles.lanes}
+        ><li class={styles.lane}
+          ><span class:list={[styles.bar, styles.code]} style={`left:0;width:${pct(SLIDE.code)}`}></span
+          ><span class={arcade.srOnly}>app.js loads first, from the navigation until the code is loaded</span></li
+        ><li class:list={[styles.lane, quiz.track]} data-part="track"
+          ><span
+            role="slider"
+            tabindex="0"
+            class:list={[styles.bar, styles.req, quiz.handle]}
+            style={`left:${pct(start)};width:${pct(SLIDE.request)}`}
+            aria-label="When GET /invoices starts"
+            aria-valuemin="0"
+            aria-valuemax={SLIDE.max}
+            aria-valuenow={start}
+            aria-valuetext={slideSays(labels[id], start)}
+            data-part="handle"
+            data-hint={HINT.drag}></span
+          ></li
+        ><li class={styles.lane}
+          ><span
+            class:list={[styles.bar, styles.render]}
+            style={`left:${pct(shown - SLIDE.render)};width:${pct(SLIDE.render)}`}
+            data-part="rows"></span
+          ></li
+        ></ul
+      ><span class={styles.paint} style={`left:${pct(shown)}`} data-part="paint"
+        ><b class={slideView.tag(shown)} data-part="tag">Rows show</b></span
+      ><span class={styles.grid} aria-hidden="true"></span></div
+    ></div
+  ><div class={quiz.slideFoot}
+    ><span class={quiz.readout} aria-hidden="true" data-part="start">{labels[id]}</span
+    ><button
+      type="button"
+      class={slideView.check}
+      data-part="slot"
+      data-look="check"
+      data-slot={id}
+      data-note={notes[id]}>Check</button
+    ></div
+  ></data-loading-slide
+>
+
+<script>
+  import "./data-loading-slide.client";
+</script>

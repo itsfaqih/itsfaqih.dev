@@ -1,0 +1,13 @@
+---
+import { type ClassValue } from "../cx";
+import { maxWidths, styles } from "./page-container.css";
+
+type Props = {
+  maxWidth?: "2xl" | "3xl" | "4xl";
+  class?: ClassValue;
+};
+
+const { maxWidth = "2xl", class: className } = Astro.props;
+---
+
+<div class:list={[styles.container, maxWidths[maxWidth], className]}><slot /></div>

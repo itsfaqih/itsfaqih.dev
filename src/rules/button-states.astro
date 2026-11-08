@@ -1,0 +1,35 @@
+---
+import { HINT } from "./hints";
+import { styles } from "./button-design.css";
+
+type Props = { careful?: boolean };
+
+const { careful = false } = Astro.props;
+const FORCED = {
+  idle: null,
+  hover: styles.hover,
+  press: styles.press,
+  focus: styles.focus,
+};
+---
+
+<div class={styles.stage}>
+  <button data-hint={HINT.press} type="button" class:list={[styles.key, careful ? styles.live : styles.flat]}
+    >Save changes</button
+  >
+  <div class={styles.specimens} aria-hidden="true">
+    {
+      (["idle", "hover", "press", "focus"] as const).map((state) => (
+        <span class={styles.specimen}
+          ><span
+            class:list={[styles.key,
+              styles.sm,
+              styles.specimenKey,
+              FORCED[state],
+              !careful && styles.flatForced]}>Save</span
+          ><small class={styles.small}>{state}</small></span
+        >
+      ))
+    }
+  </div>
+</div>

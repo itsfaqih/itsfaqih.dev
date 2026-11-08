@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rule index</title>
+    <link rel="stylesheet" href="../film.css" />
+    <style>
+      .bar {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 12px;
+        transform-origin: left;
+      }
+      /* A track clips its line so the words can rise into it on entry. */
+      .track {
+        position: relative;
+        overflow: hidden;
+      }
+      .track > span {
+        display: block;
+        white-space: pre;
+      }
+      .eyebrow {
+        position: absolute;
+        top: 60px;
+        left: 72px;
+        height: 34px;
+        line-height: 34px;
+        color: var(--go);
+      }
+      .title {
+        position: absolute;
+        left: 72px;
+        top: 176px;
+        display: flex;
+        align-items: flex-end;
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 112px;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        white-space: pre;
+      }
+      .of {
+        height: 1.16em;
+        margin-bottom: -0.08em;
+      }
+      .hl {
+        position: relative;
+        height: 1.08em;
+        margin-left: 0.24em;
+        clip-path: inset(0 0 -0.16em 0);
+        overflow: hidden;
+        color: var(--on-accent);
+      }
+      .hl > span {
+        position: absolute;
+        left: 10px;
+        top: -0.02em;
+        white-space: pre;
+      }
+      .lede {
+        position: absolute;
+        left: 72px;
+        top: 352px;
+        width: 960px;
+        font-size: 34px;
+        line-height: 44px;
+        color: var(--dim);
+      }
+      .foot {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        bottom: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mark {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .mark b {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 26px;
+        letter-spacing: -0.02em;
+      }
+      .dim {
+        color: var(--dim);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="bar" id="bar"></div>
+      <!-- Words from src/pages/rule-of-thumb/index.astro: its title and lede. No rule names or
+           counts, so the film stays true as rules are added. -->
+      <div class="track eyebrow mono">
+        <span id="eyebrow">Guidelines for building web apps</span>
+      </div>
+      <div class="title">
+        <div class="track of"><span id="of">Rule of</span></div>
+        <div class="hl" id="hl"><span id="thumb">Thumb</span></div>
+      </div>
+      <div class="lede" id="lede">
+        Rules I follow when building web apps.<br />Many have demos you can try.
+      </div>
+      <div class="foot mono" id="foot">
+        <div class="mark"><b>FAQIH</b><span class="dim">itsfaqih.dev</span></div>
+      </div>
+    </div>
+    <script src="../vendor/gsap.min.js"></script>
+    <script src="../film.js"></script>
+    <script src="dots.js"></script>
+    <script>
+      // The topic hues of src/data/guidelines.ts CATEGORY_COLOR, dark palette, in its order.
+      const HUES = ["#4dd4ff", "#ff6ad5", "#ffb02e", "#7dff6a", "#bca2ff"];
+      // An entrance that builds the card once, then an idle where nothing leaves: the chip
+      // takes each topic hue in turn, rising from its bottom edge, and the top bar follows.
+      const IDLE = 2.0; // the first hue change starts
+      const SLOT = 1.6;
+      const T = IDLE + SLOT * HUES.length;
+      const WIPE = 0.34;
+      const $ = (x) => document.getElementById(x);
+      const expoOut = gsap.parseEase("expo.out");
+      const out3 = gsap.parseEase("power3.out");
+      document.fonts.ready.then(() => {
+        const W = $("thumb").getBoundingClientRect().width + 20;
+        const rise = (el) => el.parentElement.getBoundingClientRect().height * 1.05;
+        const H = {
+          eyebrow: rise($("eyebrow")),
+          of: rise($("of")),
+          thumb: $("hl").getBoundingClientRect().height * 1.05,
+        };
+        const up = (el, h, t, a, d = 0.6) =>
+          (el.style.transform = `translateY(${h * (1 - prog(t, a, d, expoOut))}px)`);
+        // The light in the bottom-right corner comes in with the top bar, on its curve, then takes each new hue as the chip does.
+        const dots = createDots($("stage"));
+        const lights = [
+          { since: -Infinity, hue: HUES[0] },
+          ...HUES.map((_, i) => ({
+            since: IDLE + i * SLOT + SLOT - WIPE,
+            hue: HUES[(i + 1) % HUES.length],
+          })),
+        ];
+        register({
+          duration: T,
+          frame: (t) => {
+            $("bar").style.transform = `scaleX(${prog(t, 0, 0.6, out3)})`;
+            up($("eyebrow"), H.eyebrow, t, 0.08);
+            up($("of"), H.of, t, 0.18);
+            $("hl").style.width = `${W * prog(t, 0.42, 0.55, expoOut)}px`;
+            up($("thumb"), H.thumb, t, 0.5, 0.55);
+            const lede = prog(t, 0.6, 0.6, out3);
+            $("lede").style.opacity = lede;
+            $("lede").style.transform = `translateY(${18 * (1 - lede)}px)`;
+            const foot = prog(t, 0.8, 0.5, out3);
+            $("foot").style.opacity = foot;
+            $("foot").style.transform = `translateY(${12 * (1 - foot)}px)`;
+            // Idle: hue i holds, then hue i+1 rises through the chip with a hard edge.
+            let s = 0;
+            let p = 0;
+            if (t >= IDLE) {
+              const k = t - IDLE;
+              s = Math.min(Math.floor(k / SLOT), HUES.length - 1);
+              p = prog(k - s * SLOT, SLOT - WIPE, WIPE, out3);
+            }
+            const next = (s + 1) % HUES.length;
+            const pct = (p * 100).toFixed(2);
+            $("hl").style.background =
+              `linear-gradient(to top, ${HUES[next]} ${pct}%, ${HUES[s]} ${pct}%)`;
+            $("bar").style.backgroundColor = p >= 0.5 ? HUES[next] : HUES[s];
+            dots(
+              t,
+              fadeGlows(lights, t).map((g) => ({
+                el: CORNER,
+                reach: 560,
+                gain: 1.8,
+                hue: g.hue,
+                weight: g.weight * prog(t, 0, 0.6, out3),
+                on: -Infinity,
+              })),
+            );
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

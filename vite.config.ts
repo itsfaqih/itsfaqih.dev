@@ -1,65 +1,88 @@
-import { defineConfig } from "vite";
-import mdx from "@mdx-js/rollup";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkMdxFrontmatter from "remark-mdx-frontmatter";
-import rehypeSlug from "rehype-slug";
-import { devtools } from "@tanstack/devtools-vite";
-import { nitro } from "nitro/vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import babel from "@rolldown/plugin-babel";
-import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
-import stylex from "@stylexjs/unplugin";
+import { defineConfig } from "vite-plus";
 
-
-const isCloudflareBuild =
-  process.env.NITRO_PRESET?.includes("cloudflare") || process.env.CF_PAGES === "1";
-
+// Vite+ reads its lint and format settings from here. Astro builds the site from astro.config.ts,
+// and vitest.config.ts holds the test projects.
 const config = defineConfig({
-  server: {
-    port: 5173,
-    host: "127.0.0.1",
+  fmt: {
+    ignorePatterns: [
+      "tools/oxlint/anti-slop/**",
+      "src/fonts.css",
+      "scripts/og/video/vendor/**",
+      "dist/**",
+      ".astro/**",
+    ],
   },
-  resolve: {
-    tsconfigPaths: true,
-  },
-  plugins: [
-    mdx({
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-      rehypePlugins: [rehypeSlug],
-    }),
-    devtools(),
-    nitro(
-      isCloudflareBuild
-        ? { commands: { preview: "node scripts/cloudflare-pages-preview.mjs" } }
-        : undefined,
-    ),
-
-    stylex.vite({
-      devMode: "css-only",
-      cssInjectionTarget: (filepath) => /(?:^|\/)index(?:-[^/]+)?\.css$/.test(filepath),
-    }),
-    tanstackStart({
-      server: {
-        build: {
-          inlineCss: true,
+  lint: {
+    ignorePatterns: [
+      ".agent/**",
+      ".agents/**",
+      ".claude/**",
+      ".codex/**",
+      ".continue/**",
+      ".cursor/**",
+      ".gemini/**",
+      ".hermes/**",
+      ".opencode/**",
+      ".pi/**",
+      ".roo/**",
+      ".windsurf/**",
+      "tools/oxlint/anti-slop/**",
+      "scripts/og/video/vendor/**",
+      "dist/**",
+      ".astro/**",
+    ],
+    jsPlugins: [
+      {
+        name: "anti-slop",
+        specifier: "./tools/oxlint/anti-slop/index.ts",
+      },
+      {
+        name: "vite-plus",
+        specifier: "vite-plus/oxlint-plugin",
+      },
+    ],
+    rules: {
+      "anti-slop/no-chained-type-assertions": "error",
+      "anti-slop/no-conditional-empty-object-spread": "error",
+      "anti-slop/no-known-value-widening": "error",
+      "anti-slop/no-module-mocking": "error",
+      "anti-slop/no-object-parameters": "error",
+      "anti-slop/no-reflect-apply": "error",
+      "anti-slop/no-reflect-get": "error",
+      "anti-slop/no-runtime-typeof": "error",
+      "anti-slop/no-shape-in-symbol-names": "error",
+      "anti-slop/no-unknown-parameters": "error",
+      "anti-slop/no-unknown-returns": "error",
+      "anti-slop/no-unknown-type-aliases": "error",
+      "anti-slop/no-unsafe-dictionary-type": "error",
+      "anti-slop/no-widen-then-assert": "error",
+      "anti-slop/require-safety-comment-for-type-assertion": "error",
+      "vite-plus/prefer-vite-plus-imports": "error",
+      // The site is Astro markup plus custom elements; React and its UI kits left with the migration.
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "react",
+                "react/*",
+                "react-dom",
+                "react-dom/*",
+                "@astrojs/react",
+                "@base-ui/*",
+                "vaul",
+                "@phosphor-icons/react",
+                "@phosphor-icons/react/*",
+              ],
+              message:
+                "Write an .astro component with a custom element (see docs/astro-migration.md); icons go through src/components/icon.astro.",
+            },
+          ],
         },
-      },
-      // Generate complete HTML for every discoverable route at build time.
-      // The client still hydrates for fast in-app navigation, but the first
-      // response is static HTML rather than a JavaScript-only SPA shell.
-      prerender: {
-        enabled: true,
-        autoStaticPathsDiscovery: true,
-        autoSubfolderIndex: true,
-        crawlLinks: true,
-        failOnError: true,
-        retryCount: 2,
-        retryDelay: 1000,
-      },
-    }),
-    viteReact(),
-    babel({ presets: [reactCompilerPreset()] }),
-  ],
+      ],
+    },
+  },
 });
 
 export default config;
